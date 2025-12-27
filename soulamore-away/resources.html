@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Away Resources | Soulamore</title>
+    <!-- GLOBAL ASSETS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+
+    <style>
+        /* --- THEME: MIDNIGHT VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.8);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --alert-red: #ef4444;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- BACKGROUND --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* --- HERO --- */
+        .hero {
+            text-align: center;
+            padding: 120px 0 80px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* --- RESOURCE CARDS (The Core) --- */
+        .resource-section {
+            margin-bottom: 80px;
+        }
+
+        .glass-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 50px;
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 40px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .glass-card:hover {
+            border-color: var(--teal-glow);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .content-side h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .feel-list {
+            margin: 20px 0;
+            border-left: 2px solid var(--peach-glow);
+            padding-left: 20px;
+        }
+
+        .feel-list li {
+            list-style: none;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+
+        .help-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        /* --- INTERACTION SIDES --- */
+        .interaction-side {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            height: 100%;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            border: 1px dashed var(--border-glass);
+            position: relative;
+        }
+
+        /* 1. HOMESICKNESS: CANDLE */
+        .candle {
+            width: 40px;
+            height: 100px;
+            background: #ddd;
+            border-radius: 4px;
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .flame {
+            width: 20px;
+            height: 30px;
+            background: orange;
+            border-radius: 50% 50% 20% 20%;
+            position: absolute;
+            top: -35px;
+            left: 10px;
+            opacity: 0.5;
+            transition: 1s;
+            box-shadow: 0 0 20px orange;
+            animation: flicker 0.1s infinite;
+        }
+
+        .candle:hover .flame {
+            opacity: 1;
+            transform: scale(1.2);
+            box-shadow: 0 0 50px orange;
+        }
+
+        @keyframes flicker {
+            0% {
+                transform: rotate(-2deg);
+            }
+
+            100% {
+                transform: rotate(2deg);
+            }
+        }
+
+        /* 2. BURNOUT: BATTERY */
+        .battery-box {
+            width: 150px;
+            height: 60px;
+            border: 3px solid white;
+            border-radius: 10px;
+            padding: 5px;
+            position: relative;
+        }
+
+        .battery-level {
+            height: 100%;
+            width: 10%;
+            background: var(--alert-red);
+            transition: 1s;
+            border-radius: 5px;
+        }
+
+        /* 3. UNCERTAINTY: FOG */
+        .fog-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backdrop-filter: blur(10px);
+            transition: 2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .fog-text {
+            z-index: 1;
+            font-weight: 700;
+            color: var(--teal-glow);
+            font-size: 1.5rem;
+            opacity: 0;
+            transition: 1s;
+        }
+
+        .interaction-side:hover .fog-container {
+            backdrop-filter: blur(0px);
+            opacity: 0;
+        }
+
+        .interaction-side:hover .fog-text {
+            opacity: 1;
+        }
+
+        /* 4. LANGUAGE: FLIP CARD */
+        .flip-card {
+            perspective: 1000px;
+            width: 250px;
+            height: 150px;
+            cursor: pointer;
+        }
+
+        .flip-inner {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .flip-card:hover .flip-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-front,
+        .flip-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            padding: 20px;
+            font-weight: 700;
+        }
+
+        .flip-front {
+            background: var(--peach-glow);
+            color: #0f172a;
+        }
+
+        .flip-back {
+            background: var(--teal-glow);
+            color: #0f172a;
+            transform: rotateY(180deg);
+        }
+
+        /* --- PEER PROFILES --- */
+        .peer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .peer-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .peer-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--teal-glow);
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--teal-glow);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .connect-btn {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .connect-btn:hover {
+            background: white;
+            color: #0f172a;
+        }
+
+        /* --- FOOTER --- */
+        .disclaimer {
+            text-align: center;
+            border-top: 1px solid var(--border-glass);
+            padding: 40px;
+            margin-top: 80px;
+            opacity: 0.6;
+            font-size: 0.85rem;
+        }
+
+        @media(max-width: 800px) {
+            .glass-card {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- GLOBAL HEADER -->
+    <header>
+        <div class="main-nav">
+            <a href="../../index.html" class="nav-logo">
+                <i class="fas fa-heart"></i> Soulamore
+            </a>
+            <button class="mobile-toggle" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-group">
+                <nav class="nav-links">
+                    <a href="../../index.html">Home</a>
+                    <a href="../../soulamore-campus.html">Campus</a>
+                    <a href="../../soulamore-away.html" class="active">Away</a>
+                    <a href="../../confession-box.html">Confession Box</a>
+                    <a href="../../blogs.html">Blogs</a>
+                    <a href="../../forum.html">Forum</a>
+                    <a href="../../about.html">About</a>
+                    <a href="../../contact.html">Contact</a>
+                    <a href="../join-us/index.html">Join Us</a>
+                </nav>
+                <a href="../../login.html" class="nav-btn">Log In</a>
+            </div>
+        </div>
+    </header>
+
+    <div id="particles"></div>
+
+    <main class="page-wrapper">
+        <div class="container">
+
+            <!-- Breadcrumb -->
+            <div style="font-size:0.9rem; margin-top: 30px; opacity:0.7; text-align:left;">
+                <a href="../../soulamore-away.html"><i class="fas fa-arrow-left"></i> Back to Away</a>
+            </div>
+
+            <!-- HERO -->
+            <section class="hero fade-in">
+                <h1>Resources for the Journey.</h1>
+                <p>Living abroad changes you. You don’t have to navigate that change alone. <br>Explore tools and
+                    perspectives for the moments when things feel heavy.</p>
+            </section>
+
+            <!-- 1. HOMESICKNESS -->
+            <div class="glass-card fade-in">
+                <div class="content-side">
+                    <h2><i class="fas fa-home" style="color:var(--peach-glow);"></i> Homesickness</h2>
+                    <div class="feel-list">
+                        <li>Missing familiar routines & food</li>
+                        <li>Missing a version of yourself that felt "anchored"</li>
+                    </div>
+                    <div class="help-box">
+                        <strong>The Shift:</strong> Missing home doesn’t mean you made the wrong choice. It means you
+                        have deep roots.
+                    </div>
+                </div>
+                <div class="interaction-side">
+                    <p style="font-size:0.9rem; opacity:0.8;">The Light of Home</p>
+                    <div class="candle">
+                        <div class="flame"></div>
+                    </div>
+                    <p style="font-size:0.8rem; opacity:0.6; margin-top:20px;">Hover to keep the light burning.</p>
+                </div>
+            </div>
+
+            <!-- 2. EXPAT BURNOUT -->
+            <div class="glass-card fade-in">
+                <div class="content-side">
+                    <h2><i class="fas fa-battery-quarter" style="color:var(--alert-red);"></i> Expat Burnout</h2>
+                    <div class="feel-list">
+                        <li>Feeling constantly "on"</li>
+                        <li>Pressured to prove the move was worth it</li>
+                    </div>
+                    <div class="help-box">
+                        <strong>The Shift:</strong> You don’t have to earn your right to be tired. Rest is part of the
+                        work.
+                    </div>
+                </div>
+                <div class="interaction-side" id="burnoutZone">
+                    <p style="font-size:0.9rem; opacity:0.8;">Stop Moving to Recharge</p>
+                    <div class="battery-box">
+                        <div class="battery-level" id="batteryLevel"></div>
+                    </div>
+                    <p id="rechargeText" style="font-size:0.8rem; opacity:0.6; margin-top:20px;">Pause your cursor
+                        here...</p>
+                </div>
+            </div>
+
+            <!-- 3. UNCERTAINTY -->
+            <div class="glass-card fade-in">
+                <div class="content-side">
+                    <h2><i class="fas fa-compass" style="color:var(--teal-glow);"></i> Uncertainty</h2>
+                    <div class="feel-list">
+                        <li>Visa stress & long-term planning anxiety</li>
+                        <li>Feeling suspended between "here" and "there"</li>
+                    </div>
+                    <div class="help-box">
+                        <strong>The Shift:</strong> Not everything has to be figured out right now. Find stability in
+                        today.
+                    </div>
+                </div>
+                <div class="interaction-side">
+                    <span class="fog-text">Clarity comes in steps.</span>
+                    <div class="fog-container" style="color:white; font-size:2rem;"><i class="fas fa-smog"></i></div>
+                    <p style="position:absolute; bottom:20px; font-size:0.8rem; opacity:0.6;">Hover to clear the fog.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 4. LANGUAGE BARRIERS -->
+            <div class="glass-card fade-in">
+                <div class="content-side">
+                    <h2><i class="fas fa-language" style="color:var(--gold-glow);"></i> Language Barriers</h2>
+                    <div class="feel-list">
+                        <li>Feeling reduced or misunderstood</li>
+                        <li>Loss of confidence and self-expression</li>
+                    </div>
+                    <div class="help-box">
+                        <strong>The Shift:</strong> Your intelligence didn’t disappear — the language is still catching
+                        up.
+                    </div>
+                </div>
+                <div class="interaction-side">
+                    <div class="flip-card">
+                        <div class="flip-inner">
+                            <div class="flip-front">"I sound stupid."</div>
+                            <div class="flip-back">"I am brave for trying."</div>
+                        </div>
+                    </div>
+                    <p style="font-size:0.8rem; opacity:0.6; margin-top:20px;">Hover to reframe.</p>
+                </div>
+            </div>
+
+            <!-- 5. FINANCIAL STRESS -->
+            <div class="glass-card fade-in">
+                <div class="content-side">
+                    <h2><i class="fas fa-coins" style="color:var(--peach-glow);"></i> Financial Stress</h2>
+                    <div class="feel-list">
+                        <li>Guilt about spending in new currency</li>
+                        <li>Fear of instability</li>
+                    </div>
+                    <div class="help-box">
+                        <strong>The Shift:</strong> This isn't just about math. It's about emotional steadiness.
+                    </div>
+                </div>
+                <div class="interaction-side">
+                    <i class="fas fa-balance-scale" style="font-size:3rem; color:var(--peach-glow);"></i>
+                    <p style="margin-top:15px; font-size:0.9rem;">Balance perspective, not just budgets.</p>
+                </div>
+            </div>
+
+            <!-- PEER CONNECTION -->
+            <div class="fade-in" style="margin-top:80px;">
+                <h2 style="text-align:center;">Connect with Experienced Peers</h2>
+                <p style="text-align:center; opacity:0.8;">People who have stood where you are standing now.</p>
+
+                <div class="peer-grid">
+                    <div class="peer-card">
+                        <div class="avatar">L</div>
+                        <h3>Lakshit</h3>
+                        <p style="font-size:0.9rem; opacity:0.7;">"I know the silence of a new city."</p>
+                        <button class="connect-btn">Connect</button>
+                    </div>
+                    <div class="peer-card">
+                        <div class="avatar" style="background:var(--peach-glow);">A</div>
+                        <h3>Aditya</h3>
+                        <p style="font-size:0.9rem; opacity:0.7;">"Navigating visas and hope."</p>
+                        <button class="connect-btn">Connect</button>
+                    </div>
+                    <div class="peer-card">
+                        <div class="avatar" style="background:var(--gold-glow);">Aa</div>
+                        <h3>Aarti</h3>
+                        <p style="font-size:0.9rem; opacity:0.7;">"Healing through migration."</p>
+                        <button class="connect-btn">Connect</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="disclaimer fade-in">
+                <h3>Soulamore Away</h3>
+                Soulamore Away is not a crisis service. If you are feeling unsafe, please contact your nearest hospital
+                or local emergency helpline.<br>
+                Seeking professional help is an act of care.
+            </div>
+
+        </div>
+    </main>
+
+    <script src="../../assets/js/main.js"></script>
+    <script>
+        // --- PARTICLES ---
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 4 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            particleContainer.appendChild(p);
+        }
+
+        // --- BATTERY RECHARGE LOGIC ---
+        const burnoutZone = document.getElementById('burnoutZone');
+        const batteryLevel = document.getElementById('batteryLevel');
+        const rechargeText = document.getElementById('rechargeText');
+        let moveTimer;
+
+        burnoutZone.addEventListener('mousemove', () => {
+            clearTimeout(moveTimer);
+            batteryLevel.style.width = '10%';
+            batteryLevel.style.backgroundColor = '#ef4444';
+            rechargeText.innerText = "Stop moving to recharge...";
+
+            moveTimer = setTimeout(() => {
+                batteryLevel.style.width = '100%';
+                batteryLevel.style.backgroundColor = '#4ade80';
+                rechargeText.innerText = "Rest restores power.";
+            }, 1000);
+        });
+
+        // --- FADE IN ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = "translateY(0)";
+                }
+            });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>

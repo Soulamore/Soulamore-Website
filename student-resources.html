@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Resources | Soulamore Campus</title>
+    <!-- GLOBAL ASSETS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/global.css">
+
+    <style>
+        /* --- PAGE THEME: STUDENT RES (Light/Approachable) --- */
+        :root {
+            --primary-peach: #F49F75;
+            --primary-dark: #D67D55;
+            --text-navy: #1A2B45;
+            --accent-teal: #4ECDC4;
+            --accent-yellow: #FFE66D;
+            --white: #ffffff;
+            --light-bg: #fdfbf7;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-navy);
+            background-color: var(--white);
+        }
+
+        /* HEADER OVERRIDE FOR LIGHT THEME IF NEEDED (Global is dark, but we can stick to global for consistency) */
+        /* For now keeping global dark header as requested "identical header". */
+
+        /* --- HERO --- */
+        .resource-hero {
+            background: linear-gradient(135deg, #e3f2fd 0%, #fff 100%);
+            padding: 100px 0 60px;
+            /* Top padding for fixed header */
+            text-align: center;
+            border-bottom: 5px solid var(--accent-teal);
+        }
+
+        .resource-hero h1 {
+            font-size: 3rem;
+            color: var(--text-navy);
+            margin-bottom: 10px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        /* --- BREADCRUMB --- */
+        .breadcrumb {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        /* --- SECTIONS --- */
+        .why-section {
+            padding: 60px 0;
+            background-color: var(--white);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: var(--light-bg);
+            padding: 25px;
+            border-left: 4px solid var(--primary-peach);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .topics-section {
+            padding: 60px 0;
+            background-color: #f4fbfb;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .topic-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 1px solid #eee;
+            display: block;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.2);
+            border-color: var(--accent-teal);
+        }
+
+        .topic-icon {
+            font-size: 2rem;
+            color: var(--accent-teal);
+            margin-bottom: 15px;
+        }
+
+        .topic-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-navy);
+        }
+
+        .tools-section {
+            padding: 80px 0;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .tool-card {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+            background: white;
+            transition: transform 0.3s;
+            border-top: 5px solid var(--text-navy);
+        }
+
+        .tool-header {
+            background: var(--light-bg);
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tool-header i {
+            font-size: 1.5rem;
+            color: var(--primary-peach);
+        }
+
+        .step-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .step-list li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .step-list li::before {
+            content: '•';
+            color: var(--accent-teal);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .journal-section {
+            background-color: #fff5f0;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .prompt-box {
+            background: white;
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px dashed var(--primary-peach);
+        }
+
+        .peer-section {
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .crisis-banner {
+            background-color: var(--text-navy);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            border-radius: 20px 20px 0 0;
+            margin-top: 40px;
+        }
+
+        .helpline-box {
+            background: rgba(255, 255, 255, 0.1);
+            display: inline-block;
+            padding: 20px 40px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid var(--accent-teal);
+        }
+
+        .helpline-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+            display: block;
+            margin: 10px 0;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="main-nav">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-heart"></i> Soulamore Campus
+            </a>
+            <button class="mobile-toggle" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-group">
+                <nav class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="soulamore-campus.html" class="active">Campus</a>
+                    <a href="soulamore-away.html">Away</a>
+                    <a href="confession-box.html">Confession Box</a>
+                    <a href="blogs.html">Blogs</a>
+                    <a href="forum.html">Forum</a>
+                    <a href="about.html">About</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="join-us/index.html">Join Us</a>
+                </nav>
+                <a href="login.html" class="nav-btn">Log In</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <section class="resource-hero">
+            <div class="container fade-in">
+                <!-- BREADCRUMB -->
+                <div class="breadcrumb">
+                    <a href="index.html">Home</a> &gt; <a href="soulamore-campus.html">Campus</a> &gt; Resources
+                </div>
+
+                <div class="tagline">🌱 Soulamore Student Resources</div>
+                <h1>For real days. Real stress. Real students.</h1>
+                <p>School life can be overwhelming. These resources are based on real student experiences, mental health
+                    research, and what actually works.</p>
+            </div>
+        </section>
+
+        <!-- STATS -->
+        <section class="why-section">
+            <div class="container fade-in">
+                <div class="section-header">
+                    <h2>Why This Page Exists</h2>
+                    <p>What Students in India Are Actually Facing</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <strong>1 in 4</strong>
+                        Indian students show signs of anxiety or emotional distress.
+                    </div>
+                    <div class="stat-box">
+                        <strong>48%</strong>
+                        Of adolescent girls report frequent stress, worry, or sadness.
+                    </div>
+                    <div class="stat-box">
+                        <strong>140% Increase</strong>
+                        In student suicides between 2001 and 2022.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOPICS NAVIGATION -->
+        <section class="topics-section">
+            <div class="container fade-in">
+                <div class="section-header">
+                    <h2>🧭 Start Here</h2>
+                    <p>Choose what feels closest. You don’t need to label yourself perfectly.</p>
+                </div>
+                <div class="topics-grid">
+                    <a href="campus/exam-pressure.html" class="topic-card">
+                        <i class="fas fa-file-alt topic-icon"></i>
+                        <div class="topic-title">Exam Stress & Pressure</div>
+                    </a>
+                    <a href="campus/anxiety-and-overthinking.html" class="topic-card">
+                        <i class="fas fa-brain topic-icon"></i>
+                        <div class="topic-title">Overthinking & Anxiety</div>
+                    </a>
+                    <a href="campus/feeling-low.html" class="topic-card">
+                        <i class="fas fa-battery-quarter topic-icon"></i>
+                        <div class="topic-title">Feeling Low or Burnt Out</div>
+                    </a>
+                    <a href="campus/loneliness.html" class="topic-card">
+                        <i class="fas fa-user-invisible topic-icon"></i>
+                        <div class="topic-title">Loneliness & Invisible</div>
+                    </a>
+                    <!-- Additional placeholder topics linked to same logic or 404/coming soon -->
+                    <div class="topic-card" style="opacity:0.6; cursor:default;">
+                        <i class="fas fa-mobile-alt topic-icon"></i>
+                        <div class="topic-title">Phone Addiction (Coming Soon)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="tools-section">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2>🧠 Real Tools That Actually Help</h2>
+                </div>
+                <!-- ... (Tools content same as source) ... -->
+                <div class="tools-grid">
+                    <div class="tool-card fade-in">
+                        <div class="tool-header"><i class="fas fa-stopwatch"></i>
+                            <h3>The 90-Second Rule</h3>
+                        </div>
+                        <div class="tool-body">
+                            <p>Emotional surges peak for about 60–90 seconds if you don’t fight them.</p>
+                        </div>
+                    </div>
+                    <div class="tool-card fade-in">
+                        <div class="tool-header"><i class="fas fa-hand-holding-water"></i>
+                            <h3>5-4-3-2-1 Grounding</h3>
+                        </div>
+                        <div class="tool-body">
+                            <p>Pulls your brain out of panic mode by focusing on senses.</p>
+                        </div>
+                    </div>
+                    <div class="tool-card fade-in">
+                        <div class="tool-header"><i class="fas fa-moon"></i>
+                            <h3>Sleep Reset</h3>
+                        </div>
+                        <div class="tool-body">
+                            <p>If your mind won’t shut up at night, write worries down.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CRISIS BANNER -->
+        <section class="peer-section">
+            <div class="container fade-in">
+                <div class="crisis-banner">
+                    <div class="container">
+                        <h2>🆘 When You Should Ask for Extra Help</h2>
+                        <div class="helpline-box">
+                            <span>Immediate Support (India) • Tele-MANAS Helpline</span>
+                            <span class="helpline-number">14416 / 1800-891-4416</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <h3>Soulamore</h3>
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="support.html">Help & Support</a>
+                <a href="contact.html">Contact</a>
+                <a href="legal.html">Legal</a>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.5; margin-top:20px;">©2025 Soulamore</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+
+</html>

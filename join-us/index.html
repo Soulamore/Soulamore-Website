@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Our Cause | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+
+    <style>
+        /* --- GLOBAL THEME: MIDNIGHT VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.8);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* --- PARTICLES --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* --- AUDIO --- */
+        .audio-control {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 99;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* --- CONTAINER --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- NAV OVERRIDE --- */
+        nav {
+            padding: 30px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-link {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: var(--peach-glow);
+            opacity: 1;
+        }
+
+        /* --- HERO --- */
+        .hero {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .hero-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            color: var(--teal-glow);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* --- SPLIT SECTION (THE CHOICE) --- */
+        .split-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .path-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .path-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .path-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.6;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .path-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .path-desc {
+            opacity: 0.8;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        /* Peer Card Styling */
+        .path-peer:hover {
+            border-color: var(--gold-glow);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(251, 191, 36, 0.1);
+        }
+
+        .path-peer .path-icon {
+            color: var(--gold-glow);
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .path-peer .path-btn {
+            background: linear-gradient(135deg, var(--gold-glow) 0%, #d97706 100%);
+            color: #0f172a;
+        }
+
+        /* Psych Card Styling */
+        .path-psych:hover {
+            border-color: var(--teal-glow);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(78, 205, 196, 0.1);
+        }
+
+        .path-psych .path-icon {
+            color: var(--teal-glow);
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .path-psych .path-btn {
+            background: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+            color: #0f172a;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .feature-list li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .feature-list i {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .path-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        /* Hover Reveal Effect */
+        .path-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+            opacity: 0;
+            transition: 0.5s;
+        }
+
+        .path-card:hover::before {
+            opacity: 1;
+        }
+
+        /* --- FOOTER --- */
+        .closing-line {
+            text-align: center;
+            margin: 80px 0 40px;
+            font-size: 1.5rem;
+            opacity: 0.8;
+            font-family: 'Outfit';
+        }
+
+        @media(max-width: 800px) {
+            .split-section {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- AUDIO -->
+    <audio id="ambientAudio" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+    </audio>
+    <div class="audio-control" onclick="toggleAudio()"><i class="fas fa-music"></i> <span id="audioText">Ambience</span>
+    </div>
+
+    <!-- PARTICLES -->
+    <div id="particles"></div>
+
+    <!-- GLOBAL HEADER -->
+    <header>
+        <div class="main-nav">
+            <a href="../../index.html" class="nav-logo">
+                <i class="fas fa-heart"></i> Soulamore
+            </a>
+            <button class="mobile-toggle" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-group">
+                <nav class="nav-links">
+                    <a href="../../index.html">Home</a>
+                    <a href="../soulamore-campus.html">Campus</a>
+                    <a href="../soulamore-away.html">Away</a>
+                    <a href="../confession-box.html">Confession Box</a>
+                    <a href="../blogs.html">Blogs</a>
+                    <a href="../forum.html">Forum</a>
+                    <a href="../about.html">About</a>
+                    <a href="../contact.html">Contact</a>
+                </nav>
+                <a href="../login.html" class="nav-btn">Log In</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container" style="margin-top: 50px;">
+
+        <!-- HERO -->
+        <section class="hero fade-in">
+            <div class="hero-badge">THE ECOSYSTEM</div>
+            <h1>Two Ways to Give Back</h1>
+            <p>Mental health doesn’t change because of campaigns alone. It changes when people feel seen, heard, and
+                less alone. Soulamore exists to make those conversations possible.</p>
+        </section>
+
+        <!-- THE CHOICE (SPLIT SECTION) -->
+        <div class="split-section fade-in">
+
+            <!-- 1. JOIN AS PEER -->
+            <div class="path-card path-peer">
+                <div class="path-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                <span class="path-label">Lived Experience</span>
+                <div class="path-title">Join as a Peer</div>
+                <p class="path-desc">You don’t need a degree to care. If you’ve been through it — anxiety, exam
+                    pressure, loneliness — your story can be someone else’s survival guide.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-circle"></i> Listen to anonymous confessions.</li>
+                    <li><i class="fas fa-circle"></i> Offer empathy, not medical advice.</li>
+                    <li><i class="fas fa-circle"></i> Flexible hours (Volunteer).</li>
+                </ul>
+                <!-- LINK TO PEER PAGE -->
+                <a href="peer.html" class="path-btn">Apply as a Peer <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- 2. JOIN AS PSYCHOLOGIST -->
+            <div class="path-card path-psych">
+                <div class="path-icon"><i class="fas fa-user-md"></i></div>
+                <span class="path-label">Clinical Expertise</span>
+                <div class="path-title">Join as a Psychologist</div>
+                <p class="path-desc">For licensed professionals who want to move beyond the clinic. Help us build
+                    structured, scalable mental health interventions for campuses.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-circle"></i> Paid consultations via the platform.</li>
+                    <li><i class="fas fa-circle"></i> Lead campus workshops.</li>
+                    <li><i class="fas fa-circle"></i> Crisis intervention support.</li>
+                </ul>
+                <a href="psychologist.html" class="path-btn">Apply as Pro <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+        </div>
+
+        <div class="closing-line fade-in">
+            "Both paths lead to the same place: <br>A kinder world."
+        </div>
+
+    </div>
+
+    <!-- GLOBAL FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <h3>Soulamore</h3>
+            <p style="font-size:0.9rem; opacity:0.7; margin-top:10px;">Your Partner in Mental Wellness.</p>
+            <div class="footer-links">
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../legal.html">Legal</a>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.5; margin-top:20px;">©2025 Soulamore</p>
+        </div>
+    </footer>
+
+    <script src="../../assets/js/main.js"></script>
+    <script>
+        // --- AUDIO ---
+        const audio = document.getElementById('ambientAudio');
+        let playing = false;
+        function toggleAudio() {
+            if (playing) {
+                audio.pause();
+                document.getElementById('audioText').innerText = "Ambience";
+            } else {
+                audio.volume = 0.2;
+                audio.play();
+                document.getElementById('audioText').innerText = "Pause";
+            }
+            playing = !playing;
+        }
+
+        // --- PARTICLES ---
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 40; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 3 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            particleContainer.appendChild(p);
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = "translateY(0)";
+                }
+            });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>

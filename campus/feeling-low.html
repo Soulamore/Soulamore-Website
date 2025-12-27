@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feeling Low | Soulamore Campus</title>
+    <!-- GLOBAL ASSETS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Plus+Jakarta+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <style>
+        /* --- PAGE THEME: LOW (Grey/Peach) --- */
+        :root {
+            --bg-base: #f4f6f8;
+            --text-main: #4a5568;
+            --text-light: #718096;
+            --glass: rgba(255, 255, 255, 0.7);
+            --peach: #F49F75;
+            --teal: #4ECDC4;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            transition: background 2s ease;
+        }
+
+        /* --- HERO --- */
+        .hero {
+            padding: 120px 0 60px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* --- CONTENT CARDS --- */
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        /* --- INTERACTIVE CIRCLE --- */
+        .interactive-zone {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .color-circle {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: #dcdcdc;
+            transition: transform 0.1s ease-out, box-shadow 0.5s ease;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .glow-layer {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--peach) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 2s ease;
+            z-index: 1;
+            animation: pulse 4s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* --- 1% RULE --- */
+        .habit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .habit-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 0.9rem;
+            border: 1px solid #eee;
+            transition: transform 0.2s;
+        }
+
+        .habit-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--teal);
+        }
+
+        /* --- JOURNAL PROMPTS --- */
+        .prompt-input {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid #e2e8f0;
+            background: transparent;
+            padding: 10px 0;
+            font-family: inherit;
+            font-size: 1rem;
+            color: #2d3748;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        .prompt-input:focus {
+            outline: none;
+            border-color: var(--peach);
+        }
+
+        /* --- THERAPIST CTA --- */
+        .cta-wrapper {
+            text-align: center;
+            padding: 50px 0;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 50px;
+        }
+
+        .therapist-btn {
+            background: #2d3748;
+            color: white;
+            padding: 14px 30px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .therapist-btn:hover {
+            background: var(--peach);
+        }
+
+        /* --- SOUND TOGGLE --- */
+        .sound-toggle {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            z-index: 90;
+            background: rgba(255, 255, 255, 0.5);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(45, 55, 72, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 12px;
+            background: #2d3748;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            background: #edf2f7;
+            color: #4a5568;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .fade-in {
+            animation: fadeIn 1.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .color-circle {
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- GLOBAL HEADER -->
+    <header>
+        <div class="main-nav">
+            <a href="../index.html" class="nav-logo">
+                <i class="fas fa-heart"></i> Soulamore
+            </a>
+            <button class="mobile-toggle" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-group">
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../soulamore-campus.html" class="active">Campus</a>
+                    <a href="../soulamore-away.html">Away</a>
+                    <a href="../confession-box.html">Confession Box</a>
+                    <a href="../blogs.html">Blogs</a>
+                    <a href="../forum.html">Forum</a>
+                    <a href="../about.html">About</a>
+                    <a href="../contact.html">Contact</a>
+                    <a href="../join-us/index.html">Join Us</a>
+                </nav>
+                <a href="../login.html" class="nav-btn">Log In</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <!-- SOUND TOGGLE -->
+        <button class="sound-toggle" onclick="toggleRain()">
+            <i class="fas fa-cloud-rain" id="soundIcon"></i> <span id="soundText">Play Rain</span>
+        </button>
+        <audio id="rainAudio" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_03d6f7344e.mp3" type="audio/mp3">
+        </audio>
+
+        <!-- HERO -->
+        <section class="hero fade-in">
+            <div class="container">
+                <!-- Breadcrumb -->
+                <div style="font-size:0.9rem; margin-bottom:20px; opacity:0.7;">
+                    <a href="../soulamore-campus.html">Campus</a> &gt; <a href="../student-resources.html">Resources</a>
+                    &gt; Feeling Low
+                </div>
+
+                <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.8;">🌧️</div>
+                <h1>Feeling Low</h1>
+                <p>When everything feels heavy, quiet, or empty.</p>
+            </div>
+        </section>
+
+        <div class="container">
+
+            <!-- VALIDATION -->
+            <div class="card fade-in">
+                <h3>It’s not just sadness.</h3>
+                <p style="margin-top: 15px;">
+                    Feeling low often means you’ve been carrying too much for too long.
+                    It’s your nervous system saying: <em>"I’m tired of being strong."</em>
+                </p>
+            </div>
+
+            <!-- INTERACTIVE CORE: RETURN TO COLOR -->
+            <div class="card fade-in" style="text-align: center;">
+                <h2 style="margin-bottom: 10px;">🌀 The Return to Color</h2>
+                <p style="font-size: 0.9rem; margin-bottom: 30px;">Move your cursor (or finger) slowly over the circle.
+                </p>
+
+                <div class="interactive-zone" id="zone">
+                    <div class="glow-layer" id="glow"></div>
+                    <div class="color-circle" id="circle">
+                        <span id="circleText">You don’t have to feel better.<br>Just stay here for a moment.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ONE PERCENT RULE -->
+            <div class="card fade-in">
+                <h2>The "One Percent Rule"</h2>
+                <p style="margin-bottom: 20px;">What is one tiny thing you can do—not to feel happy, but to feel a
+                    little less numb?</p>
+
+                <div class="habit-grid">
+                    <div class="habit-card"><i class="fas fa-glass-water" style="color:var(--teal);"></i><br>Drink Water
+                    </div>
+                    <div class="habit-card"><i class="fas fa-wind" style="color:var(--peach);"></i><br>Open Window</div>
+                    <div class="habit-card"><i class="fas fa-child-reaching" style="color:#a0aec0;"></i><br>Stretch Arms
+                    </div>
+                    <div class="habit-card"><i class="fas fa-sun" style="color:#ecc94b;"></i><br>2 Mins Sun</div>
+                </div>
+            </div>
+
+            <!-- JOURNALING (Gentle) -->
+            <div class="card fade-in">
+                <h2>Writing When Words Are Hard</h2>
+                <p style="margin-bottom: 20px; font-size: 0.9rem;">Finish these sentences. Stop whenever you want.</p>
+
+                <label style="display:block; font-size: 0.9rem; font-weight: 600;">Today feels heavy because...</label>
+                <input type="text" class="prompt-input" placeholder="...">
+
+                <label style="display:block; font-size: 0.9rem; font-weight: 600; margin-top: 20px;">What I miss without
+                    knowing why is...</label>
+                <input type="text" class="prompt-input" placeholder="...">
+
+                <label style="display:block; font-size: 0.9rem; font-weight: 600; margin-top: 20px;">If my low mood
+                    could speak, it would ask for...</label>
+                <input type="text" class="prompt-input" placeholder="...">
+            </div>
+
+            <!-- REMINDER -->
+            <div style="text-align: center; margin: 40px 0; color: var(--text-main);">
+                <p style="font-size: 1.1rem; font-style: italic;">
+                    "You don’t have to climb out of this feeling today.<br>You only have to stay connected to yourself."
+                </p>
+            </div>
+
+            <!-- CTA SECTION -->
+            <div class="cta-wrapper fade-in">
+                <h3 style="margin-bottom: 10px;">Support is here.</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 30px;">Help isn't just for crises. It's for restoring life.
+                </p>
+
+                <button class="therapist-btn" onclick="openModal()">
+                    <i class="fas fa-user-md"></i> Talk to a School Therapist
+                </button>
+
+                <div style="margin-top: 30px; font-size: 0.9rem;">
+                    Or call Tele-MANAS (24/7): <strong style="color: var(--teal);">14416</strong>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <h3>Soulamore</h3>
+            <div class="footer-links">
+                <a href="../about.html">About</a>
+                <a href="../support.html">Help & Support</a>
+                <a href="../contact.html">Contact</a>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.5; margin-top:20px;">©2025 Soulamore</p>
+        </div>
+    </footer>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="therapistModal">
+        <div class="modal-card">
+            <button
+                style="position:absolute; top:20px; right:20px; border:none; background:none; font-size:1.5rem; cursor:pointer;"
+                onclick="closeModal()">&times;</button>
+
+            <div class="step-content active" id="step1">
+                <h3>Connect with support</h3>
+                <p style="color: #666; margin: 15px 0;">This request goes confidentially to your school counselor.</p>
+                <div class="btn-group">
+                    <button class="btn-secondary" onclick="closeModal()">Not right now</button>
+                    <button class="btn-primary" onclick="goToStep2()">Yes, I'd like to talk</button>
+                </div>
+            </div>
+
+            <div class="step-content" id="step2">
+                <h3>Request a Chat</h3>
+                <input type="text" placeholder="Name (Optional)"
+                    style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px;">
+                <select style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px;">
+                    <option>Select Class</option>
+                    <option>Class 9-12</option>
+                </select>
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="submitForm()">Send
+                    Request</button>
+            </div>
+
+            <div class="step-content" id="step3" style="text-align: center;">
+                <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--teal); margin-bottom: 20px;"></i>
+                <h3>Request Sent</h3>
+                <p>Your counselor has been notified.</p>
+                <button class="btn-secondary" style="margin-top: 20px;" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/main.js"></script>
+    <script>
+        // --- INTERACTIVE CIRCLE LOGIC ---
+        const zone = document.getElementById('zone');
+        const circle = document.getElementById('circle');
+        const glow = document.getElementById('glow');
+        const text = document.getElementById('circleText');
+
+        let progress = 0;
+        let completed = false;
+
+        zone.addEventListener('mousemove', (e) => {
+            if (completed) return;
+            progress += 0.5;
+            if (progress <= 100) {
+                let saturation = progress;
+                circle.style.background = `linear-gradient(135deg, hsl(20, ${saturation}%, 70%) 0%, hsl(176, ${saturation}%, 55%) 100%)`;
+                glow.style.opacity = progress / 100;
+                let rot = (e.clientX / window.innerWidth) * 20 - 10;
+                circle.style.transform = `rotate(${rot}deg) scale(${1 + (progress / 500)})`;
+            }
+            if (progress > 100 && !completed) {
+                completed = true;
+                text.innerHTML = "Low energy<br>still counts as energy.";
+                text.style.fontSize = "1.1rem";
+                circle.style.boxShadow = "0 0 50px rgba(244, 159, 117, 0.4)";
+            }
+        });
+
+        zone.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            zone.dispatchEvent(new Event('mousemove'));
+        });
+
+        // --- SOUND TOGGLE ---
+        const audio = document.getElementById('rainAudio');
+        const soundBtn = document.querySelector('.sound-toggle');
+        const soundText = document.getElementById('soundText');
+        const soundIcon = document.getElementById('soundIcon');
+        let isPlaying = false;
+
+        function toggleRain() {
+            if (isPlaying) {
+                audio.pause();
+                soundText.innerText = "Play Rain";
+                soundIcon.className = "fas fa-cloud-rain";
+                soundBtn.style.background = "rgba(255,255,255,0.5)";
+            } else {
+                audio.volume = 0.5;
+                audio.play();
+                soundText.innerText = "Pause Rain";
+                soundIcon.className = "fas fa-pause";
+                soundBtn.style.background = "#fff";
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // --- MODAL ---
+        const modal = document.getElementById('therapistModal');
+        const s1 = document.getElementById('step1');
+        const s2 = document.getElementById('step2');
+        const s3 = document.getElementById('step3');
+
+        function openModal() { modal.style.display = 'flex'; resetModal(); }
+        function closeModal() { modal.style.display = 'none'; }
+        function goToStep2() { s1.classList.remove('active'); s2.classList.add('active'); }
+        function submitForm() { s2.classList.remove('active'); s3.classList.add('active'); }
+        function resetModal() { s1.classList.add('active'); s2.classList.remove('active'); s3.classList.remove('active'); }
+        window.onclick = function (e) { if (e.target == modal) closeModal(); }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Ensure animations run
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                    }
+                });
+            });
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+
+</html>

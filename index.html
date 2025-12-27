@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soulamore | Navigate Life Together</title>
+
+    <!-- FONTS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- ICONS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- GLOBAL CSS -->
+    <link rel="stylesheet" href="assets/css/global.css">
+
+    <style>
+        /* --- PAGE SPECIFIC THEME: VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.7);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+            --chat-user: #2a9d8f;
+            --chat-bot: #334155;
+        }
+
+        body {
+            /* Background matches global but explicit here for safety */
+            background-color: var(--deep-space);
+            color: var(--starlight);
+        }
+
+        /* --- ANIMATION LAYERS --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        .thought-bubble {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.05);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            user-select: none;
+            animation: floatUp linear infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(110vh) scale(0.8);
+            }
+
+            to {
+                transform: translateY(-10vh) scale(1);
+            }
+        }
+
+        /* --- AUDIO UI --- */
+        .audio-control {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 99;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+
+        .audio-bars .bar {
+            width: 3px;
+            background: var(--teal-glow);
+            height: 5px;
+            margin-right: 2px;
+            display: inline-block;
+        }
+
+        .playing .bar {
+            animation: soundWave 0.5s infinite;
+        }
+
+        @keyframes soundWave {
+
+            0%,
+            100% {
+                height: 5px;
+            }
+
+            50% {
+                height: 15px;
+            }
+        }
+
+        /* --- SECTIONS --- */
+        .hero {
+            padding: 60px 0 80px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.8;
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+
+        /* Shredder */
+        .shredder-box {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            padding: 30px;
+            border-radius: 24px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .paper-input {
+            width: 100%;
+            height: 120px;
+            background: #fff;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            padding: 20px;
+            border-radius: 8px;
+            border: none;
+            resize: none;
+            outline: none;
+            transform-origin: bottom center;
+        }
+
+        .shred-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 5px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .shred-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .shredding {
+            animation: shredPaper 1.5s forwards ease-in;
+        }
+
+        @keyframes shredPaper {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(100px) scaleY(0.5);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(200px) scaleY(0);
+                opacity: 0;
+            }
+        }
+
+        /* Pillars */
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+            margin-top: 100px;
+        }
+
+        .compass-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .pillar-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 30px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.4s;
+            text-align: center;
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--peach-glow);
+        }
+
+        .pillar-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--teal-glow);
+        }
+
+        .pillar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .pillar-desc {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* AI Section */
+        .ai-section {
+            margin: 100px 0;
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 30px;
+            padding: 60px 40px;
+            border: 1px solid var(--border-glass);
+        }
+
+        .chat-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .chat-interface {
+            background: var(--deep-space);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .chat-header {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .chat-window {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .bot {
+            background: var(--chat-bot);
+            align-self: flex-start;
+        }
+
+        .user {
+            background: var(--chat-user);
+            color: #0f172a;
+            font-weight: 600;
+            align-self: flex-end;
+        }
+
+        .chat-input-area {
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 10px;
+            border-radius: 50px;
+            color: white;
+        }
+
+        .send-btn {
+            background: var(--teal-glow);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: black;
+        }
+
+        /* Mission */
+        .mission-box {
+            text-align: center;
+            max-width: 800px;
+            margin: 80px auto;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+            border-radius: 30px;
+            border: 1px solid var(--border-glass);
+        }
+
+        /* Breath Game */
+        .game-section {
+            text-align: center;
+            margin: 100px 0;
+        }
+
+        .game-circle {
+            width: 150px;
+            height: 150px;
+            border: 4px solid var(--teal-glow);
+            border-radius: 50%;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.1s;
+            position: relative;
+        }
+
+        .game-circle:active {
+            background: rgba(78, 205, 196, 0.2);
+            transform: scale(0.95);
+            border-color: var(--peach-glow);
+        }
+
+        .expanding {
+            animation: growCircle 4s infinite alternate ease-in-out;
+        }
+
+        @keyframes growCircle {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.4);
+            }
+        }
+
+        /* Steps & Features */
+        .steps-wrapper {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .step-item {
+            position: relative;
+            padding: 20px;
+            border-left: 2px solid var(--teal-glow);
+        }
+
+        .step-num {
+            font-size: 3rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.1);
+            line-height: 1;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 80px 0;
+        }
+
+        .feature-box {
+            text-align: center;
+            padding: 20px;
+            background: var(--navy-glass);
+            border-radius: 15px;
+            border: 1px solid var(--border-glass);
+        }
+
+        /* Oracle */
+        .oracle-section {
+            text-align: center;
+            margin: 100px 0;
+        }
+
+        .oracle-card {
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            margin: 0 auto;
+            background: var(--gradient-primary);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 20px 50px rgba(78, 205, 196, 0.2);
+        }
+
+        .oracle-content {
+            color: var(--deep-space);
+            font-size: 1.4rem;
+            font-weight: 700;
+            padding: 20px;
+        }
+
+        /* Lifeline */
+        .lifeline-section {
+            margin: 100px 0;
+        }
+
+        .lifeline-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--peach-glow);
+            padding: 50px;
+            border-radius: 24px;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .lifeline-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .lifeline-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            width: 100%;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .lifeline-btn {
+            background: var(--peach-glow);
+            color: var(--deep-space);
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            grid-column: span 2;
+            width: 100%;
+        }
+
+        /* Utilities */
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media(max-width: 768px) {
+
+            .compass-grid,
+            .chat-layout,
+            .steps-wrapper,
+            .lifeline-form {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- GLOBAL HEADER -->
+    <header>
+        <div class="main-nav">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-heart"></i> Soulamore
+            </a>
+            <button class="mobile-toggle" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-group">
+                <nav class="nav-links">
+                    <a href="index.html" class="active">Home</a>
+                    <a href="soulamore-campus.html">Campus</a>
+                    <a href="soulamore-away.html">Away</a>
+                    <a href="confession-box.html">Confession Box</a>
+                    <a href="blogs.html">Blogs</a>
+                    <a href="forum.html">Forum</a>
+                    <a href="about.html">About</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="join-us/index.html">Join Us</a>
+                </nav>
+                <a href="login.html" class="nav-btn">Log In</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- PAGE WRAPPER -->
+    <main class="page-wrapper">
+        <!-- GLOBAL AUDIO -->
+        <audio id="ambientAudio" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+        </audio>
+        <div class="audio-control" onclick="toggleAudio()">
+            <div class="audio-bars" id="audioVisualizer">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <span id="audioText">Play Audio</span>
+        </div>
+
+        <!-- BACKGROUNDS -->
+        <div id="particles"></div>
+        <div id="atmosphere"></div>
+
+        <div class="container">
+
+            <!-- HERO & SHREDDER -->
+            <section class="hero fade-in">
+                <p style="color:var(--peach-glow); font-weight:600; letter-spacing:1px; text-transform:uppercase;">You
+                    deserve to be happy</p>
+                <h1>Navigate Life Together</h1>
+                <p>One conversation at a time. Start by letting go of one heavy thought right now.</p>
+
+                <div class="shredder-box">
+                    <textarea class="paper-input" id="worryText"
+                        placeholder="Type a worry here... (e.g., 'I feel like I'm failing')"></textarea>
+                    <button class="shred-btn" onclick="shredWorry()">SHRED IT <i class="fas fa-trash-alt"></i></button>
+                    <div id="shredSuccess" style="display:none; margin-top:20px; color:var(--teal-glow);">Gone. You are
+                        lighter now.</div>
+                </div>
+            </section>
+
+            <!-- 1. WELLNESS COMPASS -->
+            <div class="section-header fade-in">
+                <h2>The 4 Pillars of You</h2>
+                <p style="opacity:0.6;">We support your whole self.</p>
+            </div>
+            <div class="compass-grid fade-in">
+                <div class="pillar-card" onclick="location.href='soulamore-campus.html'">
+                    <div class="pillar-icon"><i class="fas fa-brain"></i></div>
+                    <div class="pillar-title">Mental Wellness</div>
+                    <div class="pillar-desc">Safe spaces to discuss anxiety, stress, and emotional resilience.</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon"><i class="fas fa-running"></i></div>
+                    <div class="pillar-title">Physical Wellness</div>
+                    <div class="pillar-desc">Body positivity, health habits, and vitality discussions.</div>
+                </div>
+                <!-- Add links if they exist, otherwise placeholder logic -->
+                <div class="pillar-card">
+                    <div class="pillar-icon"><i class="fas fa-wallet"></i></div>
+                    <div class="pillar-title">Financial Wellness</div>
+                    <div class="pillar-desc">Navigating money stress, budgeting, and financial freedom.</div>
+                </div>
+                <div class="pillar-card" onclick="location.href='student-resources.html'">
+                    <div class="pillar-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="pillar-title">Academic Wellness</div>
+                    <div class="pillar-desc">Study pressure, career guidance, and learning support.</div>
+                </div>
+            </div>
+
+            <!-- 2. SOULBOT AI -->
+            <div class="ai-section fade-in">
+                <div class="chat-layout">
+                    <div>
+                        <h2 style="font-size: 2.5rem; margin-bottom: 15px;">Meet SoulBot <span
+                                style="font-size:1rem; background:var(--teal-glow); color:black; padding:2px 8px; border-radius:4px; vertical-align:middle;">BETA</span>
+                        </h2>
+                        <p style="opacity: 0.8; margin-bottom: 20px;">
+                            An always-available AI companion to help you organize your thoughts.
+                            <strong>Chats are saved privately on your device.</strong>
+                        </p>
+                        <ul style="list-style:none; opacity:0.7; font-size:0.9rem;">
+                            <li style="margin-bottom:10px;"><i class="fas fa-check" style="color:var(--teal-glow);"></i>
+                                Non-judgmental listening</li>
+                            <li style="margin-bottom:10px;"><i class="fas fa-check" style="color:var(--teal-glow);"></i>
+                                Helps identify emotions</li>
+                            <li style="margin-bottom:10px;"><i class="fas fa-check" style="color:var(--teal-glow);"></i>
+                                Available 24/7</li>
+                        </ul>
+                    </div>
+                    <div class="chat-interface">
+                        <div class="chat-header">
+                            <span><i class="fas fa-robot"></i> Soulamore Assistant</span>
+                            <button onclick="clearChat()"
+                                style="background:none; border:none; color:#aaa; cursor:pointer;">Clear History</button>
+                        </div>
+                        <div class="chat-window" id="chatWindow"></div>
+                        <div class="chat-input-area">
+                            <input type="text" class="chat-input" id="userMsg" placeholder="How are you feeling?"
+                                onkeypress="handleEnter(event)">
+                            <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. MISSION -->
+            <div class="mission-box fade-in">
+                <h2 style="margin-bottom:20px;">Our Mission</h2>
+                <p class="mission-text">
+                    "In our hearts, we believe healing should be accessible to all. Life's journey brings a variety of
+                    experiences. At our core, we're here to offer support. Our community serves as your sanctuary,
+                    ensuring you're
+                    nurtured in every aspect of your journey."
+                </p>
+            </div>
+
+            <!-- 4. BREATH GAME -->
+            <div class="game-section fade-in">
+                <h2>The 4-Second Hold</h2>
+                <p style="opacity:0.7;">Click and hold the circle to match your breath.</p>
+                <div class="game-circle expanding" onmousedown="holdBreath()" onmouseup="releaseBreath()"
+                    ontouchstart="holdBreath()" ontouchend="releaseBreath()">
+                    <span id="breathLabel" style="font-weight:700; color:var(--teal-glow);">Hold</span>
+                </div>
+                <p id="breathStatus">Inhale... Exhale...</p>
+            </div>
+
+            <!-- 5. HOW IT WORKS -->
+            <div class="section-header fade-in">
+                <h2>How it Works</h2>
+            </div>
+            <div class="steps-wrapper fade-in">
+                <div class="step-item">
+                    <div class="step-num">01</div>
+                    <div class="step-content">
+                        <h3>Decide to Discuss</h3>
+                        <p style="opacity:0.7;">Take the first step. Acknowledge the need for support.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">02</div>
+                    <div class="step-content">
+                        <h3>Connect with a Peer</h3>
+                        <p style="opacity:0.7;">Find someone who resonates with your story.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">03</div>
+                    <div class="step-content">
+                        <h3>Engage & Heal</h3>
+                        <p style="opacity:0.7;">Share your thoughts. Embark on a journey of healing.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. ORACLE -->
+            <div class="oracle-section fade-in">
+                <h2>Need a Sign?</h2>
+                <p style="opacity:0.6; margin-bottom:20px;">Tap the card for your message today.</p>
+                <div class="oracle-card" onclick="flipOracle(this)">
+                    <div class="oracle-content" id="oracleText"><i class="fas fa-hand-sparkles"
+                            style="font-size:3rem; margin-bottom:20px;"></i><br>Click to Reveal</div>
+                </div>
+            </div>
+
+            <!-- 7. WHY SOULAMORE -->
+            <div class="section-header fade-in">
+                <h2>Why Soulamore?</h2>
+            </div>
+            <div class="features-grid fade-in">
+                <div class="feature-box">
+                    <div class="f-icon">💙</div>
+                    <h3>Heartfelt Connections</h3>
+                    <p style="font-size:0.9rem; opacity:0.7;">Genuine empathy and emotional support.</p>
+                </div>
+                <div class="feature-box">
+                    <div class="f-icon">🛡️</div>
+                    <h3>Sanctuary of Trust</h3>
+                    <p style="font-size:0.9rem; opacity:0.7;">Confidentiality and safety first.</p>
+                </div>
+                <div class="feature-box">
+                    <div class="f-icon">🕯️</div>
+                    <h3>Guiding Light</h3>
+                    <p style="font-size:0.9rem; opacity:0.7;">Peers who have triumphed over adversity.</p>
+                </div>
+            </div>
+
+            <!-- 8. LIFELINE -->
+            <div class="lifeline-section fade-in">
+                <div class="lifeline-card">
+                    <i class="fas fa-phone-volume"
+                        style="font-size: 3rem; color: var(--peach-glow); margin-bottom: 20px;"></i>
+                    <h2>Need Human Connection?</h2>
+                    <p style="opacity:0.8;">Technology is great, but sometimes you just need a person. Fill this out,
+                        and our care team will reach out.</p>
+                    <form class="lifeline-form" onsubmit="submitLead(event)">
+                        <input type="text" class="lifeline-input" placeholder="Your Name" required>
+                        <input type="email" class="lifeline-input" placeholder="Your Email" required>
+                        <select class="lifeline-input full-width" style="color:#aaa;">
+                            <option>I want to talk to a...</option>
+                            <option>Student Peer (Casual)</option>
+                            <option>Therapist (Professional)</option>
+                            <option>Just need resources</option>
+                        </select>
+                        <button type="submit" class="lifeline-btn">Request Support</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- GLOBAL FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <h3>Soulamore</h3>
+            <p style="font-size:0.9rem; opacity:0.7; margin-top:10px;">Your Partner in Mental Wellness.</p>
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="support.html">Help & Support</a>
+                <a href="contact.html">Contact</a>
+                <a href="legal.html">Legal</a>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.5; margin-top:20px;">
+                Disclaimer: Online therapy is not advisable if you are in acute distress.<br>
+                Please contact your nearest hospital if you are feeling suicidal or at risk of self-harm.
+            </p>
+            <p style="font-size:0.8rem; opacity:0.5; margin-top:10px;">©2025 Soulamore</p>
+        </div>
+    </footer>
+
+    <!-- SHARED JS -->
+    <script src="assets/js/main.js"></script>
+
+    <!-- PAGE SPECIFIC JS -->
+    <script>
+        // 1. PARTICLES & THOUGHTS
+        const particleContainer = document.getElementById('particles');
+        const atmosphere = document.getElementById('atmosphere');
+        const thoughts = ["Hope", "Stress", "Dreams", "Future", "Love", "Anxiety", "Peace", "Growth"];
+
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 5 + 'px'; p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            particleContainer.appendChild(p);
+        }
+
+        setInterval(() => {
+            let t = document.createElement('div');
+            t.classList.add('thought-bubble');
+            t.innerText = thoughts[Math.floor(Math.random() * thoughts.length)];
+            t.style.left = Math.random() * 90 + 'vw';
+            t.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            atmosphere.appendChild(t);
+            setTimeout(() => t.remove(), 25000);
+        }, 2000);
+
+        // 2. AUDIO
+        const audio = document.getElementById('ambientAudio');
+        const vis = document.getElementById('audioVisualizer');
+        const aText = document.getElementById('audioText');
+        let isPlaying = false;
+        function toggleAudio() {
+            if (isPlaying) { audio.pause(); vis.classList.remove('playing'); aText.innerText = "Play Audio"; }
+            else { audio.volume = 0.3; audio.play(); vis.classList.add('playing'); aText.innerText = "Pause"; }
+            isPlaying = !isPlaying;
+        }
+
+        // 3. SHREDDER
+        function shredWorry() {
+            const inp = document.getElementById('worryText');
+            if (inp.value.trim() === "") return;
+            inp.classList.add('shredding');
+            setTimeout(() => {
+                document.querySelector('.shredder-box').innerHTML = "<h3 style='color:var(--teal-glow)'>Gone.</h3><p>You are lighter now.</p>";
+            }, 1500);
+        }
+
+        // 4. SOULBOT AI
+        const chatWindow = document.getElementById('chatWindow');
+        const msgInput = document.getElementById('userMsg');
+        let chatHistory = JSON.parse(localStorage.getItem('soulBotHistory')) || [{ sender: 'bot', text: "Hi, I'm SoulBot. How are you feeling today?" }];
+
+        function renderChat() {
+            chatWindow.innerHTML = '';
+            chatHistory.forEach(msg => {
+                let d = document.createElement('div');
+                d.className = 'message ' + msg.sender;
+                d.innerText = msg.text;
+                chatWindow.appendChild(d);
+            });
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+        renderChat();
+
+        function sendMessage() {
+            const txt = msgInput.value.trim();
+            if (!txt) return;
+            chatHistory.push({ sender: 'user', text: txt });
+            msgInput.value = '';
+            renderChat();
+            localStorage.setItem('soulBotHistory', JSON.stringify(chatHistory));
+
+            setTimeout(() => {
+                let reply = "I hear you. Tell me more about that.";
+                if (txt.toLowerCase().includes("sad")) reply = "I'm sorry you're feeling down. It's okay to feel this way.";
+                if (txt.toLowerCase().includes("anxious")) reply = "That sounds heavy. Try the breathing exercise below. I'm here.";
+                chatHistory.push({ sender: 'bot', text: reply });
+                renderChat();
+                localStorage.setItem('soulBotHistory', JSON.stringify(chatHistory));
+            }, 1000);
+        }
+        function clearChat() { chatHistory = []; renderChat(); localStorage.removeItem('soulBotHistory'); }
+        function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+
+        // 5. BREATH GAME
+        function holdBreath() {
+            document.getElementById('breathStatus').innerText = "Hold... Stay with it...";
+            document.querySelector('.game-circle').style.borderColor = "#F49F75";
+            document.getElementById('breathLabel').innerText = "Holding";
+        }
+        function releaseBreath() {
+            document.getElementById('breathStatus').innerText = "Release... Let it go.";
+            document.querySelector('.game-circle').style.borderColor = "#4ECDC4";
+            document.getElementById('breathLabel').innerText = "Exhale";
+        }
+
+        // 6. ORACLE
+        const quotes = ["You are enough.", "Healing is not linear.", "One step at a time.", "Rest is productive."];
+        function flipOracle(card) {
+            const c = document.getElementById('oracleText');
+            card.style.transform = "rotateY(180deg)";
+            setTimeout(() => {
+                c.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+                c.style.transform = "rotateY(180deg)";
+                card.style.background = "white"; card.style.color = "#0f172a";
+            }, 200);
+        }
+
+        // 7. LIFELINE
+        function submitLead(e) {
+            e.preventDefault();
+            document.querySelector('.lifeline-btn').innerText = "Request Sent ✓";
+            document.querySelector('.lifeline-btn').style.background = "#48bb78";
+        }
+
+        // 8. FADE IN
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = 1; entry.target.style.transform = "translateY(0)"; } });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,213 @@
+/* --- GLOBAL RESET & TYPOGRAPHY --- */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+    /* Global Variables */
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+
+    /* Global Colors (Used in Header/Footer) */
+    --deep-space: #0f172a;
+    --navy-glass: rgba(30, 41, 59, 0.7);
+    --border-glass: rgba(255, 255, 255, 0.1);
+    --starlight: #f1f5f9;
+    --teaser-blue: #4ECDC4;
+    --peach-glow: #F49F75;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: 0.3s;
+}
+
+ul {
+    list-style: none;
+}
+
+/* --- GLOBAL HEADER --- */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 15px 0;
+    transition: 0.3s;
+    backdrop-filter: blur(12px);
+    background: rgba(15, 23, 42, 0.85);
+    /* Default Dark */
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.main-nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+}
+
+.nav-logo {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--starlight);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--starlight);
+    opacity: 0.8;
+    position: relative;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    opacity: 1;
+    color: var(--teaser-blue);
+}
+
+.nav-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--teaser-blue);
+}
+
+.nav-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    /* Space between links and login btn */
+}
+
+.nav-btn {
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: linear-gradient(135deg, var(--teaser-blue), #2a9d8f);
+    color: var(--deep-space);
+    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2);
+}
+
+.nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(78, 205, 196, 0.3);
+}
+
+.mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--starlight);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* --- GLOBAL FOOTER --- */
+footer {
+    background-color: var(--deep-space);
+    color: var(--starlight);
+    padding: 60px 20px;
+    border-top: 1px solid var(--border-glass);
+    position: relative;
+    z-index: 10;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    opacity: 0.7;
+    font-size: 0.95rem;
+}
+
+.footer-links a:hover {
+    opacity: 1;
+    color: var(--peach-glow);
+}
+
+/* --- UTILITIES --- */
+.page-wrapper {
+    position: relative;
+    min-height: 100vh;
+    padding-top: 80px;
+    /* Offset fixed header */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+    .mobile-toggle {
+        display: block;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(15px);
+        flex-direction: column;
+        padding: 40px;
+        align-items: center;
+        gap: 25px;
+        transform: translateY(-150%);
+        transition: 0.4s ease-in-out;
+        border-bottom: 1px solid var(--border-glass);
+    }
+
+    .nav-links.open {
+        transform: translateY(0);
+    }
+
+    .nav-group {
+        /* On mobile, we might want Login inside the menu or separate. 
+           For now, keeping Login visible next to hamburger is good UX, 
+           but if space is tight, we can move it. */
+    }
+}

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soulamore Blog | The Library</title>
+    <!-- Fonts: Outfit for UI, Lora for Reading -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/global.css">
+
+    <style>
+        /* --- THEME: MIDNIGHT VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.7);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --paper-white: #ffffff;
+            --text-ink: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow: hidden;
+            /* Scroll handled internally */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* --- CONSTELLATION CANVAS --- */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        /* --- NAV (Custom for Blog Overlay) --- */
+        /* Overriding global Main Nav slightly or keeping it sticky at top */
+        .main-nav {
+            position: relative;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        /* --- SCROLL CONTAINER --- */
+        .blog-container {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            position: relative;
+            z-index: 10;
+            padding: 40px 20px;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- HEADER & FILTERS --- */
+        .blog-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .blog-header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #fbbf24);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .filter-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--border-glass);
+            background: rgba(255, 255, 255, 0.03);
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            border-color: var(--teal-glow);
+            font-weight: 700;
+        }
+
+        /* --- BLOG GRID --- */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .blog-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: 0.4s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--peach-glow);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-img {
+            height: 200px;
+            background: #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+
+        .blog-card:hover .card-img img {
+            transform: scale(1.05);
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .badge-psych {
+            color: var(--teal-glow);
+            border: 1px solid var(--teal-glow);
+        }
+
+        .badge-peer {
+            color: var(--gold-glow);
+            border: 1px solid var(--gold-glow);
+        }
+
+        .card-content {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-meta {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .card-excerpt {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+            flex: 1;
+        }
+
+        .read-more {
+            color: var(--peach-glow);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- READING OVERLAY (The White Room) --- */
+        .reader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            overflow-y: auto;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .reader-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .white-paper {
+            background: var(--paper-white);
+            color: var(--text-ink);
+            width: 100%;
+            max-width: 800px;
+            min-height: 100vh;
+            padding: 80px 60px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            margin-top: 0;
+            animation: slideUpPaper 0.5s ease-out;
+        }
+
+        @keyframes slideUpPaper {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .reader-close {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            z-index: 2001;
+        }
+
+        .reader-close:hover {
+            background: white;
+            color: black;
+        }
+
+        /* Typography for Reader */
+        .paper-meta {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .paper-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            line-height: 1.1;
+            margin-bottom: 40px;
+            color: #0f172a;
+        }
+
+        .paper-body {
+            font-family: 'Lora', serif;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .paper-body p {
+            margin-bottom: 25px;
+        }
+
+        .paper-body h3 {
+            font-family: 'Outfit', sans-serif;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        /* --- LOGIN MODAL --- */
+        .login-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 20px;
+            z-index: 3000;
+            display: none;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            width: 350px;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-glass);
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--teal-glow);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        @media(max-width: 800px) {
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .white-paper {
+                padding: 40px 24px;
+            }
+
+            .paper-title {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- CONSTELLATION BACKGROUND -->
+    <canvas id="starCanvas"></canvas>
+
+    <!-- GLOBAL HEADER -->
+    <header>
+        <div class="main-nav">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-heart"></i> Soulamore
+            </a>
+            <button class="mobile-toggle" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-group">
+                <nav class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="soulamore-campus.html">Campus</a>
+                    <a href="soulamore-away.html">Away</a>
+                    <a href="confession-box.html">Confession Box</a>
+                    <a href="blogs.html" class="active">Blogs</a>
+                    <a href="forum.html">Forum</a>
+                    <a href="about.html">About</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="join-us/index.html">Join Us</a>
+                </nav>
+                <a href="login.html" class="nav-btn">Log In</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- LOGIN MODAL -->
+    <div class="login-modal" id="loginModal">
+        <h3 style="margin-bottom:20px;">Welcome Back</h3>
+        <input type="email" class="input-box" placeholder="Email">
+        <input type="password" class="input-box" placeholder="Password">
+        <button class="auth-btn" onclick="performLogin()">Log In</button>
+        <p style="font-size:0.8rem; margin-top:15px; opacity:0.6; cursor:pointer;" onclick="toggleLogin()">Close</p>
+    </div>
+
+    <!-- MAIN SCROLL AREA -->
+    <div class="blog-container">
+        <div class="content-wrapper">
+
+            <header class="blog-header fade-in">
+                <h1>Stories & Insights</h1>
+                <p style="font-size:1.2rem; opacity:0.8;">Expert guidance and lived experiences, curated for you.</p>
+            </header>
+
+            <!-- FILTER BAR -->
+            <div class="filter-bar fade-in">
+                <button class="filter-btn active" onclick="filterPosts('all', this)">All Stories</button>
+                <button class="filter-btn" onclick="filterPosts('Psychologist', this)">Expert Insights</button>
+                <button class="filter-btn" onclick="filterPosts('Peer', this)">Peer Stories</button>
+                <button class="filter-btn" onclick="filterPosts('Anxiety', this)">Anxiety</button>
+                <button class="filter-btn" onclick="filterPosts('Student Life', this)">Student Life</button>
+            </div>
+
+            <!-- BLOG GRID (Dynamic Content) -->
+            <div class="blog-grid" id="blogGrid">
+                <!-- Posts will be injected here by JS -->
+            </div>
+
+        </div>
+    </div>
+
+    <!-- READER OVERLAY (The White Room) -->
+    <div class="reader-overlay" id="readerOverlay">
+        <div class="reader-close" onclick="closeArticle()"><i class="fas fa-times"></i></div>
+        <div class="white-paper">
+            <div class="paper-meta" id="readMeta">Psychologist • 5 Min Read</div>
+            <h1 class="paper-title" id="readTitle">Article Title</h1>
+            <div class="paper-body" id="readBody">
+                <!-- Article Content Goes Here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        // --- 1. MOCK DATABASE (Simulating API) ---
+        const posts = [
+            {
+                id: 1,
+                title: "Why 'Just Relax' Doesn't Work for Anxiety",
+                author: "Dr. Aditi (Psychologist)",
+                type: "Psychologist",
+                topic: "Anxiety",
+                date: "Oct 24, 2025",
+                readTime: "5 min",
+                image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=600&q=80",
+                excerpt: "Anxiety is a physiological state, not a choice. Here is the neuroscience behind why your brain ignores logic during panic.",
+                body: `
+                    <p>Anxiety is often misunderstood as simply "worrying too much." But for those who experience it, it's a physiological storm. When someone says "just relax," they are appealing to your prefrontal cortex (logic), but your amygdala (fear center) has already hijacked the controls.</p>
+                    <h3>The Science of Safety</h3>
+                    <p>Your nervous system scans for safety 4 times every second. When it detects a threat—even a psychological one like an exam or a social interaction—it shifts into fight or flight.</p>
+                    <p>To truly calm down, you don't need logic. You need biology. Techniques like the physiological sigh (two inhales, one long exhale) work because they mechanically offload carbon dioxide and slow your heart rate.</p>
+                    <h3>3 Steps to Ground Yourself</h3>
+                    <p>1. <strong>Physical Contact:</strong> Feel your feet on the floor.<br>2. <strong>Visual Orientation:</strong> Look around and name 3 blue objects.<br>3. <strong>Exhale:</strong> Make your exhale longer than your inhale.</p>
+                `
+            },
+            {
+                id: 2,
+                title: "Surviving Your First Month Abroad",
+                author: "Lakshit (Peer)",
+                type: "Peer",
+                topic: "Student Life",
+                date: "Oct 20, 2025",
+                readTime: "4 min",
+                image: "https://images.unsplash.com/photo-1526772662000-3f88f107f5d8?auto=format&fit=crop&w=600&q=80",
+                excerpt: "I thought I was ready. Then I landed in Berlin and the silence hit me. Here is how I navigated the loneliness of a new city.",
+                body: `
+                    <p>The photos on Instagram showed coffee shops and landmarks. They didn't show the silence of my dorm room at 10 PM. Moving abroad is romanticized, but the reality is often a mix of adrenaline and deep isolation.</p>
+                    <h3>The Grocery Store Meltdown</h3>
+                    <p>I cried in a supermarket aisle because I couldn't find the right milk. It sounds funny now, but back then, it felt like proof that I wasn't cut out for this. If you are feeling this way: you are not weak. You are adjusting.</p>
+                    <h3>Finding Your Anchors</h3>
+                    <p>What saved me wasn't trying to fit in immediately. It was finding small anchors. A weekly call home. A favorite park bench. A specific song playlist. These small familiarities act as a bridge while you build your new life.</p>
+                `
+            },
+            {
+                id: 3,
+                title: "The Invisible Weight of Academic Validation",
+                author: "Aarti (Peer)",
+                type: "Peer",
+                topic: "Student Life",
+                date: "Oct 15, 2025",
+                readTime: "6 min",
+                image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80",
+                excerpt: "When your self-worth is tied to a grade sheet, every exam feels like a trial of your existence. Let's decouple worth from work.",
+                body: "<p>Content regarding academic pressure...</p>"
+            },
+            {
+                id: 4,
+                title: "Signs of Burnout You Might Be Ignoring",
+                author: "Dr. S. Mehta (Psychologist)",
+                type: "Psychologist",
+                topic: "Anxiety",
+                date: "Oct 10, 2025",
+                readTime: "3 min",
+                image: "https://images.unsplash.com/photo-1502472584811-0a2f2ca8eb0e?auto=format&fit=crop&w=600&q=80",
+                excerpt: "Burnout isn't just being tired. It's a state of emotional detachment. Learn the subtle signs before you hit the wall.",
+                body: "<p>Content regarding burnout...</p>"
+            }
+        ];
+
+        // --- 2. RENDER LOGIC ---
+        const grid = document.getElementById('blogGrid');
+
+        function renderPosts(filter = 'all') {
+            grid.innerHTML = '';
+            posts.forEach(post => {
+                if (filter === 'all' || post.type === filter || post.topic === filter) {
+                    const badgeClass = post.type === 'Psychologist' ? 'badge-psych' : 'badge-peer';
+                    const icon = post.type === 'Psychologist' ? '<i class="fas fa-user-md"></i>' : '<i class="fas fa-user"></i>';
+
+                    const card = document.createElement('div');
+                    card.className = 'blog-card fade-in';
+                    card.onclick = () => openArticle(post);
+                    card.innerHTML = `
+                        <div class="card-img"><img src="${post.image}" alt="${post.title}"></div>
+                        <div class="card-badge ${badgeClass}">${icon} ${post.type}</div>
+                        <div class="card-content">
+                            <div class="card-meta"><span>${post.topic}</span><span>${post.date}</span></div>
+                            <h3 class="card-title">${post.title}</h3>
+                            <p class="card-excerpt">${post.excerpt}</p>
+                            <div class="read-more">Read Article <i class="fas fa-arrow-right"></i></div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                }
+            });
+        }
+
+        function filterPosts(category, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderPosts(category);
+        }
+
+        // --- 3. READING MODE ---
+        function openArticle(post) {
+            document.getElementById('readMeta').innerText = `${post.author} • ${post.readTime} • ${post.date}`;
+            document.getElementById('readTitle').innerText = post.title;
+            document.getElementById('readBody').innerHTML = post.body;
+
+            const overlay = document.getElementById('readerOverlay');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Stop background scroll
+        }
+
+        function closeArticle() {
+            document.getElementById('readerOverlay').classList.remove('active');
+            document.body.style.overflow = 'hidden'; // Keep main app overflow style
+        }
+
+        // --- 4. CONSTELLATION ANIMATION (Background) ---
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, stars = [];
+        let mouse = { x: null, y: null };
+
+        window.addEventListener('mousemove', e => { mouse.x = e.x; mouse.y = e.y; });
+        window.addEventListener('resize', init);
+
+        function init() {
+            width = window.innerWidth; height = window.innerHeight;
+            canvas.width = width; canvas.height = height;
+            stars = [];
+            for (let i = 0; i < 60; i++) stars.push({
+                x: Math.random() * width, y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5, size: Math.random() * 2
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            stars.forEach(star => {
+                star.x += star.vx; star.y += star.vy;
+                if (star.x < 0 || star.x > width) star.vx *= -1;
+                if (star.y < 0 || star.y > height) star.vy *= -1;
+
+                ctx.beginPath(); ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.fill();
+
+                // Connect to mouse
+                if (mouse.x) {
+                    const dx = mouse.x - star.x; const dy = mouse.y - star.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        ctx.beginPath(); ctx.strokeStyle = `rgba(78, 205, 196, ${1 - dist / 150})`;
+                        ctx.moveTo(star.x, star.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+        init(); animate();
+
+        // --- 5. LOGIN MOCKUP ---
+        function toggleLogin() {
+            const modal = document.getElementById('loginModal');
+            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+        }
+        function performLogin() {
+            toggleLogin();
+        }
+
+        // Initialize
+        renderPosts();
+
+        // Fade in animation trigger
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = 1; entry.target.style.transform = "translateY(0)"; } });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Soulamore | The Blueprint</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Space+Mono&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/global.css">
+
+    <style>
+        /* --- DESIGN SYSTEM: MIDNIGHT ARCHITECT --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.7);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --tech-font: 'Space Mono', monospace;
+            /* For architectural details */
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- BACKGROUND: BLUEPRINT GRID --- */
+        #blueprint {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(78, 205, 196, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(78, 205, 196, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+        }
+
+        /* --- PARTICLES --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* --- HERO --- */
+        .hero {
+            padding: 120px 0 80px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-marker {
+            font-family: var(--tech-font);
+            font-size: 0.8rem;
+            color: var(--teal-glow);
+            border: 1px solid var(--teal-glow);
+            padding: 5px 15px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            color: white;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.8;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* --- GLASS CARDS --- */
+        .glass-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 50px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        /* Architectural "Corner Markers" */
+        .glass-card::before {
+            content: '+';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: var(--border-glass);
+            font-family: var(--tech-font);
+        }
+
+        .glass-card::after {
+            content: '+';
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: var(--border-glass);
+            font-family: var(--tech-font);
+        }
+
+        /* --- FOUNDER SECTION (The Architect) --- */
+        .founder-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 50px;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid var(--teal-glow);
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .founder-photo-zone {
+            height: 100%;
+            min-height: 500px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-right: 1px solid var(--border-glass);
+        }
+
+        /* The Arch Shape for the Photo */
+        .arch-frame {
+            width: 80%;
+            height: 70%;
+            background: #1e293b;
+            border-top-left-radius: 500px;
+            border-top-right-radius: 500px;
+            border: 2px dashed var(--peach-glow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .arch-frame i {
+            font-size: 4rem;
+            color: var(--peach-glow);
+            opacity: 0.5;
+            margin-bottom: 10px;
+        }
+
+        .arch-label {
+            font-family: var(--tech-font);
+            font-size: 0.8rem;
+            color: var(--peach-glow);
+            text-transform: uppercase;
+        }
+
+        /* Real Photo Replacement Instructions: 
+           To add your photo, remove the <i> and <span> inside .arch-frame 
+           and add: <img src="YOUR_URL" style="width:100%; height:100%; object-fit:cover;"> 
+        */
+
+        .founder-content {
+            padding: 50px;
+        }
+
+        .tech-label {
+            font-family: var(--tech-font);
+            font-size: 0.8rem;
+            color: var(--teal-glow);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .founder-quote {
+            font-size: 1.1rem;
+            font-style: italic;
+            opacity: 0.8;
+            margin-top: 20px;
+            border-left: 3px solid var(--peach-glow);
+            padding-left: 20px;
+        }
+
+        /* --- COMPARISON GRID (The "Structure") --- */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .comp-col h3 {
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .comp-list {
+            list-style: none;
+        }
+
+        .comp-list li {
+            margin-bottom: 15px;
+            padding-left: 20px;
+            position: relative;
+            opacity: 0.8;
+        }
+
+        .comp-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--teal-glow);
+        }
+
+        /* --- AUDIENCE FLOOR PLAN --- */
+        .audience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .room-card {
+            border: 1px solid var(--border-glass);
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            transition: 0.3s;
+        }
+
+        .room-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--peach-glow);
+        }
+
+        .room-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--starlight);
+        }
+
+        /* --- DISCLAIMER --- */
+        .disclaimer-box {
+            border: 1px solid #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        /* --- FOOTER --- */
+        .closing-line {
+            text-align: center;
+            margin: 80px 0;
+            font-size: 1.5rem;
+            opacity: 0.8;
+        }
+
+        @media(max-width: 800px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .founder-layout,
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .founder-photo-zone {
+                min-height: 300px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-glass);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- GLOBAL HEADER -->
+    <header>
+        <div class="main-nav">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-heart"></i> Soulamore
+            </a>
+            <button class="mobile-toggle" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-group">
+                <nav class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="soulamore-campus.html">Campus</a>
+                    <a href="soulamore-away.html">Away</a>
+                    <a href="confession-box.html">Confession Box</a>
+                    <a href="blogs.html">Blogs</a>
+                    <a href="forum.html">Forum</a>
+                    <a href="about.html" class="active">About</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="join-us/index.html">Join Us</a>
+                </nav>
+                <a href="login.html" class="nav-btn">Log In</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- BACKGROUND LAYERS -->
+    <div id="blueprint"></div>
+    <div id="particles"></div>
+
+    <main class="page-wrapper">
+        <div class="container">
+
+            <!-- HERO -->
+            <section class="hero fade-in">
+                <div class="hero-marker">PROJECT: SOULAMORE</div>
+                <h1>Why We Exist</h1>
+                <p>Not a business plan. A response to quiet moments.</p>
+            </section>
+
+            <!-- INTRO (The Concept) -->
+            <div class="glass-card fade-in">
+                <span class="tech-label">01 // THE ORIGIN</span>
+                <h2 style="margin-bottom: 20px;">We make space for the messy stuff.</h2>
+                <p style="font-size: 1.1rem; opacity: 0.9;">
+                    Soulamore came from the realization that everything looks fine from the outside, but something often
+                    feels heavy inside. <br><br>
+                    We live in a world where conversations are fast, curated, and filtered. Yet, the emotions we
+                    struggle with — loneliness, self-doubt, pressure — are slow and messy. Soulamore exists to make
+                    space for those conversations again.
+                </p>
+            </div>
+
+            <!-- FOUNDER STORY (The Architect) -->
+            <div class="glass-card founder-layout fade-in">
+                <!-- Photo Zone -->
+                <div class="founder-photo-zone">
+                    <div class="arch-frame">
+                        <!-- Replace this Icon/Text with your <img> tag -->
+                        <i class="fas fa-user-astronaut"></i>
+                        <span class="arch-label">Aditya Harsh</span>
+                        <span style="font-size:0.7rem; opacity:0.5; margin-top:5px;">Architect & Founder</span>
+                    </div>
+                    <!-- Decor lines -->
+                    <div
+                        style="position:absolute; bottom:20px; left:20px; font-family:var(--tech-font); font-size:0.6rem; opacity:0.5;">
+                        EST. 2023</div>
+                    <div
+                        style="position:absolute; top:20px; right:20px; font-family:var(--tech-font); font-size:0.6rem; opacity:0.5;">
+                        FIG. 1.0</div>
+                </div>
+
+                <!-- Content Zone -->
+                <div class="founder-content">
+                    <span class="tech-label">02 // THE ARCHITECT'S PERSPECTIVE</span>
+                    <h2 style="margin-bottom: 20px;">Designing Emotional Spaces</h2>
+
+                    <p>Soulamore is founded by <strong>Aditya Harsh</strong>, an architect by training.</p>
+                    <br>
+                    <p>"Architecture taught me how to design spaces that people move through every day — offices,
+                        campuses, public places. But somewhere along that journey, I realized something uncomfortable:
+                        <strong>we design buildings carefully, but often ignore the emotional load people carry inside
+                            them.</strong>"
+                    </p>
+
+                    <div class="founder-quote">
+                        "Soulamore is my attempt to design a different kind of space. Not built with concrete or glass,
+                        but with empathy, honesty, and shared experiences."
+                    </div>
+                </div>
+            </div>
+
+            <!-- WHAT WE ARE vs ARE NOT -->
+            <div class="glass-card fade-in">
+                <span class="tech-label">03 // STRUCTURAL INTEGRITY</span>
+                <div class="comparison-grid">
+                    <div class="comp-col">
+                        <h3><i class="fas fa-times" style="color:#ef4444; margin-right:10px;"></i> What We Are Not</h3>
+                        <ul class="comp-list">
+                            <li>A mental health clinic.</li>
+                            <li>A replacement for therapy.</li>
+                            <li>A place for quick fixes.</li>
+                            <li>Just "motivational quotes."</li>
+                        </ul>
+                    </div>
+                    <div class="comp-col">
+                        <h3 style="border-color:var(--teal-glow);"><i class="fas fa-check"
+                                style="color:var(--teal-glow); margin-right:10px;"></i> What We Are</h3>
+                        <ul class="comp-list">
+                            <li>A safe space to share what you carry.</li>
+                            <li>Peer conversations, not performances.</li>
+                            <li>Emotional honesty, not perfection.</li>
+                            <li>Community before content.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WHO IS THIS FOR (The Occupants) -->
+            <div class="glass-card fade-in" style="text-align:center;">
+                <span class="tech-label">04 // OCCUPANTS</span>
+                <h2 style="margin-bottom:30px;">Who belongs here?</h2>
+
+                <div class="audience-grid">
+                    <div class="room-card">
+                        <div class="room-icon"><i class="fas fa-user-graduate"></i></div>
+                        <strong>Students</strong>
+                        <p style="font-size:0.8rem; opacity:0.7;">Navigating pressure</p>
+                    </div>
+                    <div class="room-card">
+                        <div class="room-icon"><i class="fas fa-briefcase"></i></div>
+                        <strong>Professionals</strong>
+                        <p style="font-size:0.8rem; opacity:0.7;">Carrying quiet burnout</p>
+                    </div>
+                    <div class="room-card">
+                        <div class="room-icon"><i class="fas fa-plane"></i></div>
+                        <strong>Expats</strong>
+                        <p style="font-size:0.8rem; opacity:0.7;">Living away from home</p>
+                    </div>
+                    <div class="room-card">
+                        <div class="room-icon"><i class="fas fa-heart"></i></div>
+                        <strong>You</strong>
+                        <p style="font-size:0.8rem; opacity:0.7;">Functioning, but not "okay"</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:30px; font-style:italic; opacity:0.7;">You don’t need a label to belong here. You
+                    just need the courage to be honest.</p>
+            </div>
+
+            <!-- DISCLAIMER -->
+            <div class="disclaimer-box fade-in">
+                <h4 style="color:#ef4444; margin-bottom:10px;">Important Note</h4>
+                <p style="font-size:0.9rem; opacity:0.9;">Soulamore is a peer-support platform. It is
+                    <strong>not</strong> a substitute for professional medical care. If you are experiencing severe
+                    distress, please reach out to a qualified professional.
+                </p>
+            </div>
+
+            <!-- CLOSING -->
+            <div class="closing-line fade-in">
+                "Soulamore is still growing.<br>
+                <span style="font-size:1rem; opacity:0.6;">So are the people who find their way here.</span>"
+            </div>
+
+        </div>
+    </main>
+
+    <!-- GLOBAL FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <h3>Soulamore</h3>
+            <p style="font-size:0.9rem; opacity:0.7; margin-top:10px;">Your Partner in Mental Wellness.</p>
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a> <!-- Changed to Contact based on new layout -->
+                <a href="contact.html#support">Help & Support</a>
+                <a href="legal.html">Legal</a>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.5; margin-top:20px;">©2025 Soulamore</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        // --- PARTICLES ---
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 4 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            particleContainer.appendChild(p);
+        }
+
+        // --- FADE IN ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = "translateY(0)";
+                }
+            });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>

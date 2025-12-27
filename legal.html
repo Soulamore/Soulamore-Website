@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal & Compliance | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/global.css">
+
+    <style>
+        /* --- THEME: MIDNIGHT VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --alert-red: #ef4444;
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- BACKGROUND --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* --- LAYOUT: SIDEBAR & CONTENT --- */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-top: 40px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            opacity: 0.7;
+        }
+
+        .legal-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 40px;
+            margin-bottom: 100px;
+            align-items: start;
+        }
+
+        /* TABS (Sidebar) */
+        .legal-tabs {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 20px;
+            position: sticky;
+            top: 100px;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px 15px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .tab-btn.active {
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            font-weight: 700;
+        }
+
+        .tab-btn.active i {
+            color: var(--deep-space);
+        }
+
+        /* CONTENT CARDS */
+        .content-area {
+            min-height: 500px;
+        }
+
+        .legal-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 20px;
+            display: none;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .legal-card.active {
+            display: block;
+            animation: slideUp 0.4s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .legal-card h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .legal-card h3 {
+            font-size: 1.2rem;
+            color: white;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
+        .legal-card p {
+            margin-bottom: 15px;
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        .legal-card ul {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .legal-card li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        .legal-card li::before {
+            content: '•';
+            color: var(--teal-glow);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* Disclaimer Specifics */
+        .disclaimer-card h2 {
+            color: var(--alert-red);
+            border-color: var(--alert-red);
+        }
+
+        .disclaimer-card li::before {
+            color: var(--alert-red);
+        }
+
+        /* Refund Specifics */
+        .refund-card h2 {
+            color: var(--gold-glow);
+            border-color: var(--gold-glow);
+        }
+
+        .refund-card li::before {
+            color: var(--gold-glow);
+        }
+
+        /* Audio Button */
+        .audio-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        @media(max-width: 800px) {
+            .legal-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .legal-tabs {
+                position: relative;
+                top: 0;
+                margin-bottom: 30px;
+                display: flex;
+                overflow-x: auto;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .tab-btn {
+                white-space: nowrap;
+                width: auto;
+                flex: 0 0 auto;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- GLOBAL HEADER -->
+    <header>
+        <div class="main-nav">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-heart"></i> Soulamore
+            </a>
+            <button class="mobile-toggle" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-group">
+                <nav class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="soulamore-campus.html">Campus</a>
+                    <a href="soulamore-away.html">Away</a>
+                    <a href="confession-box.html">Confession Box</a>
+                    <a href="blogs.html">Blogs</a>
+                    <a href="forum.html">Forum</a>
+                    <a href="about.html">About</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="join-us/index.html">Join Us</a>
+                </nav>
+                <a href="login.html" class="nav-btn">Log In</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- AUDIO & PARTICLES -->
+    <audio id="bgAudio" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+    </audio>
+    <div class="audio-control" onclick="toggleAudio()"><i class="fas fa-music"></i> <span id="audioText">Ambience</span>
+    </div>
+    <div id="particles"></div>
+
+    <main class="page-wrapper">
+        <div class="container">
+
+            <!-- HERO -->
+            <section class="hero fade-in">
+                <h1>Transparency & Trust</h1>
+                <p>These terms exist to protect you, other users, and the integrity of the Soulamore community.</p>
+            </section>
+
+            <!-- LAYOUT -->
+            <div class="legal-layout fade-in">
+
+                <!-- TABS -->
+                <div class="legal-tabs">
+                    <button class="tab-btn active" onclick="openTab('terms', this)"><i class="fas fa-file-contract"></i>
+                        Terms of Use</button>
+                    <!-- Redirects to dedicated privacy policy page if clicked, or opens inline if we merge content. Since prompt implied separate Privacy, we will link it or keep it simple. Let's keep it self contained here for general terms but create a specific privacy policy page too. -->
+                    <button class="tab-btn" onclick="location.href='privacy-policy.html'"><i class="fas fa-lock"></i>
+                        Privacy Policy (Full)</button>
+                    <button class="tab-btn" onclick="openTab('disclaimer', this)"><i
+                            class="fas fa-exclamation-triangle"></i> Disclaimer</button>
+                    <button class="tab-btn" onclick="openTab('refund', this)"><i class="fas fa-credit-card"></i>
+                        Cancellation</button>
+                </div>
+
+                <!-- CONTENT AREA -->
+                <div class="content-area">
+
+                    <!-- 1. TERMS OF USE -->
+                    <div id="terms" class="legal-card active">
+                        <h2><i class="fas fa-file-contract"></i> Terms of Use</h2>
+                        <p>Welcome to Soulamore. By accessing or using this website, you agree to the terms outlined
+                            below.</p>
+
+                        <h3>What Soulamore is</h3>
+                        <p>Soulamore is a mental wellness and peer-support platform built around conversation,
+                            reflection, and shared human experiences.</p>
+                        <p><strong>Soulamore is NOT:</strong></p>
+                        <ul>
+                            <li>A medical service</li>
+                            <li>A therapy clinic</li>
+                            <li>A crisis or emergency response platform</li>
+                        </ul>
+
+                        <h3>Using the platform responsibly</h3>
+                        <p>By using Soulamore, you agree to:</p>
+                        <ul>
+                            <li>Engage respectfully with others</li>
+                            <li>Share content responsibly and honestly</li>
+                            <li>Avoid abusive, harmful, misleading, or threatening content</li>
+                            <li>Respect boundaries set for Peers and Psychologists</li>
+                        </ul>
+
+                        <h3>Moderation & Access</h3>
+                        <p>Soulamore reserves the right to review, edit, or remove content that violates guidelines and
+                            restrict access in cases of misuse.</p>
+
+                        <p style="margin-top:30px; border-top:1px solid var(--border-glass); padding-top:20px;">
+                            For questions regarding these terms: <strong
+                                style="color:var(--teal-glow);">contact.soulamore@gmail.com</strong>
+                        </p>
+                    </div>
+
+                    <!-- 3. DISCLAIMER -->
+                    <div id="disclaimer" class="legal-card disclaimer-card">
+                        <h2><i class="fas fa-exclamation-triangle"></i> Disclaimer</h2>
+                        <p>Soulamore is a peer-support and conversation platform. <strong>It is not a substitute for
+                                professional mental health care, medical advice, or emergency services.</strong></p>
+
+                        <h3>Important Clarification</h3>
+                        <ul>
+                            <li>Peers are not therapists</li>
+                            <li>Psychologists on the platform do not provide emergency care</li>
+                            <li>Content is shared for reflection and support only</li>
+                        </ul>
+
+                        <div
+                            style="background:rgba(239, 68, 68, 0.1); border:1px solid var(--alert-red); padding:20px; border-radius:10px; margin-top:20px;">
+                            <h4 style="color:var(--alert-red); margin-bottom:10px;">Emergency Situations</h4>
+                            <p style="font-size:0.9rem;">If you are experiencing suicidal thoughts, risk of self-harm,
+                                or immediate danger, please contact:</p>
+                            <ul style="margin-bottom:0;">
+                                <li>Your nearest hospital</li>
+                                <li>A licensed mental health professional</li>
+                                <li>A local emergency helpline</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 4. CANCELLATION & REFUNDS -->
+                    <div id="refund" class="legal-card refund-card">
+                        <h2><i class="fas fa-credit-card"></i> Cancellation & Refunds</h2>
+                        <p>Soulamore offers digital services focused on mental wellness.</p>
+
+                        <h3>Digital Services</h3>
+                        <p>For paid digital offerings:</p>
+                        <ul>
+                            <li>Once access to a service is provided, refunds are generally not applicable.</li>
+                            <li>Exceptions may be considered for technical issues or duplicate payments.</li>
+                        </ul>
+
+                        <h3>Sessions & Appointments</h3>
+                        <ul>
+                            <li>Cancellations made <strong>24 hours or more</strong> in advance may be eligible for
+                                rescheduling.</li>
+                            <li>Cancellations within 24 hours may not be refundable.</li>
+                        </ul>
+
+                        <h3>Support</h3>
+                        <p>If you believe there has been an error, contact us at <strong
+                                style="color:var(--gold-glow);">contact.soulamore@gmail.com</strong>.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div style="text-align:center; opacity:0.6; margin-bottom:60px;">
+                "These policies exist to ensure clarity, trust, and mutual respect — not rigidity."
+            </div>
+
+        </div>
+    </main>
+
+    <!-- GLOBAL FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <h3>Soulamore</h3>
+            <p style="font-size:0.9rem; opacity:0.7; margin-top:10px;">Your Partner in Mental Wellness.</p>
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="contact.html">Help & Support</a>
+                <a href="legal.html">Legal</a>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.5; margin-top:20px;">©2025 Soulamore</p>
+        </div>
+    </footer>
+
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        // --- TAB SWITCHING ---
+        function openTab(tabId, btn) {
+            // Hide all content
+            document.querySelectorAll('.legal-card').forEach(card => card.classList.remove('active'));
+            // Remove active class from buttons
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            // Show content
+            document.getElementById(tabId).classList.add('active');
+            // Activate button
+            btn.classList.add('active');
+        }
+
+        // --- PARTICLES ---
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 4 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            particleContainer.appendChild(p);
+        }
+
+        // --- AUDIO ---
+        const audio = document.getElementById('bgAudio');
+        let playing = false;
+        function toggleAudio() {
+            if (playing) {
+                audio.pause();
+                document.getElementById('audioText').innerText = "Ambience";
+            } else {
+                audio.volume = 0.3;
+                audio.play();
+                document.getElementById('audioText').innerText = "Pause";
+            }
+            playing = !playing;
+        }
+
+        // --- FADE IN ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = "translateY(0)";
+                }
+            });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>

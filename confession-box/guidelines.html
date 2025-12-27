@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confession Guidelines | Soulamore</title>
+    <!-- GLOBAL ASSETS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+
+    <style>
+        /* --- GLOBAL THEME: MIDNIGHT VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --alert-red: #ef4444;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- BACKGROUND --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* --- HERO --- */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-top: 120px;
+        }
+
+        .hero-icon {
+            font-size: 3rem;
+            color: var(--peach-glow);
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: floatIcon 3s infinite ease-in-out;
+        }
+
+        @keyframes floatIcon {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* --- GLASS CARDS --- */
+        .glass-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            transition: 0.3s;
+        }
+
+        .glass-card:hover {
+            border-color: var(--teal-glow);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- GRID SYSTEMS --- */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* --- LIST STYLES --- */
+        .check-list,
+        .cross-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .check-list li,
+        .cross-list li {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .check-list li::before {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--teal-glow);
+            position: absolute;
+            left: 0;
+        }
+
+        .cross-list li::before {
+            content: '\f00d';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--alert-red);
+            position: absolute;
+            left: 0;
+        }
+
+        /* --- SPECIAL BOXES --- */
+        .crisis-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--alert-red);
+            padding: 30px;
+            border-radius: 16px;
+            margin: 40px 0;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .contact-pill {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-glass);
+            padding: 10px 20px;
+            border-radius: 50px;
+            color: var(--teal-glow);
+            font-weight: 700;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        /* --- AUDIO BUTTON --- */
+        .audio-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        @media(max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- GLOBAL HEADER -->
+    <header>
+        <div class="main-nav">
+            <a href="../../index.html" class="nav-logo">
+                <i class="fas fa-heart"></i> Soulamore
+            </a>
+            <button class="mobile-toggle" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-group">
+                <nav class="nav-links">
+                    <a href="../../index.html">Home</a>
+                    <a href="../../soulamore-campus.html">Campus</a>
+                    <a href="../../soulamore-away.html">Away</a>
+                    <a href="../../confession-box.html" class="active">Confession Box</a>
+                    <a href="../../blogs.html">Blogs</a>
+                    <a href="../../forum.html">Forum</a>
+                    <a href="../../about.html">About</a>
+                    <a href="../../contact.html">Contact</a>
+                </nav>
+                <a href="../../login.html" class="nav-btn">Log In</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- AUDIO & PARTICLES -->
+    <audio id="bgAudio" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+    </audio>
+    <div class="audio-control" onclick="toggleAudio()"><i class="fas fa-music"></i> <span id="audioText">Ambience</span>
+    </div>
+    <div id="particles"></div>
+
+    <main class="page-wrapper">
+        <div class="container">
+
+            <!-- Breadcrumb -->
+            <div style="font-size:0.9rem; margin-top: 30px; opacity:0.7; text-align:left;">
+                <a href="../../confession-box.html"><i class="fas fa-arrow-left"></i> Back to Confessions</a>
+            </div>
+
+            <!-- HERO -->
+            <section class="hero fade-in">
+                <i class="fas fa-dove hero-icon"></i>
+                <h1>Guidelines, Safety & Moderation</h1>
+                <p>The Confession Box is built on trust. These guidelines exist to protect everyone involved: the person
+                    sharing, the people reading, and the community as a whole.</p>
+            </section>
+
+            <!-- PURPOSE CARD -->
+            <div class="glass-card fade-in">
+                <h3 style="color:var(--teal-glow); margin-bottom:15px;">Why this page exists</h3>
+                <p style="opacity:0.9;">People share thoughts here that they may not say out loud anywhere else. That
+                    makes this space meaningful — and also sensitive.<br><br>We want you to feel safe enough to share,
+                    while keeping the platform responsible and grounded.</p>
+            </div>
+
+            <!-- WHAT IT IS VS IS NOT -->
+            <div class="grid-2 fade-in">
+                <div class="glass-card" style="border-top: 4px solid var(--teal-glow);">
+                    <h3><i class="fas fa-check-circle" style="color:var(--teal-glow);"></i> What it IS</h3>
+                    <ul class="check-list">
+                        <li>A space to share thoughts you carry quietly</li>
+                        <li>Expression without fear of judgement</li>
+                        <li>Feeling less alone in isolation</li>
+                        <li>Conversations rooted in empathy</li>
+                    </ul>
+                    <p style="font-size:0.9rem; opacity:0.7; margin-top:20px;">You don’t need perfect words. Just
+                        honesty.</p>
+                </div>
+
+                <div class="glass-card" style="border-top: 4px solid var(--alert-red);">
+                    <h3><i class="fas fa-times-circle" style="color:var(--alert-red);"></i> What it is NOT</h3>
+                    <ul class="cross-list">
+                        <li>A substitute for professional therapy</li>
+                        <li>A crisis intervention service</li>
+                        <li>A place for diagnosis or medical advice</li>
+                        <li>A platform for harassment or hate</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- GUIDELINES -->
+            <div class="glass-card fade-in">
+                <h2 style="text-align:center; margin-bottom:30px;">Guidelines for Sharing</h2>
+
+                <div class="grid-2">
+                    <div>
+                        <h4 style="color:var(--gold-glow); margin-bottom:10px;">✔ Do This</h4>
+                        <p style="font-size:0.9rem; opacity:0.8;"><strong>Share from experience:</strong> Speak in your
+                            own voice about what you feel or struggle with.</p>
+                        <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;"><strong>Be Respectful:</strong>
+                            Toward yourself, others reading, and people mentioned indirectly.</p>
+                    </div>
+                    <div>
+                        <h4 style="color:var(--alert-red); margin-bottom:10px;">❌ Do Not Include</h4>
+                        <ul class="cross-list">
+                            <li>Names, phone numbers, addresses</li>
+                            <li>Hate speech or abusive language</li>
+                            <li>Graphic or explicit sexual content</li>
+                            <li>Promotion of self-harm or violence</li>
+                            <li>Medical claims or instructions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANONYMITY & MODERATION -->
+            <div class="glass-card fade-in">
+                <h3 style="margin-bottom:20px;"><i class="fas fa-user-shield"></i> Anonymity & Moderation</h3>
+
+                <div style="margin-bottom:30px;">
+                    <strong><i class="fas fa-mask" style="color:var(--peach-glow);"></i> Privacy:</strong>
+                    <p style="opacity:0.8; font-size:0.95rem;">Confessions can be submitted anonymously. We do not
+                        require real names. Personal identifiers are removed if detected.</p>
+                </div>
+
+                <div>
+                    <strong><i class="fas fa-gavel" style="color:var(--teal-glow);"></i> How we Moderate:</strong>
+                    <p style="opacity:0.8; font-size:0.95rem;">Every confession goes through <strong>human
+                            moderation</strong> before being shared. We check for emotional safety and community
+                        wellbeing.</p>
+
+                    <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-top:15px;">
+                        <p style="font-size:0.9rem;"><strong>Moderation is NOT:</strong> Judgement or censorship of
+                            "bad" feelings.<br>
+                            <strong>Moderation IS:</strong> A safety check to protect vulnerable readers.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMMUNITY & COMMENTS -->
+            <div class="glass-card fade-in">
+                <h3>Community Responses</h3>
+                <p style="opacity:0.8; margin-bottom:15px;">If you are commenting on a confession:</p>
+                <ul class="check-list">
+                    <li>Lead with empathy, not advice</li>
+                    <li>Avoid minimising someone’s experience</li>
+                    <li>Do not diagnose or label</li>
+                    <li>Respect boundaries</li>
+                </ul>
+            </div>
+
+            <!-- CRISIS WARNING -->
+            <div class="crisis-box fade-in">
+                <i class="fas fa-exclamation-triangle"
+                    style="font-size:2rem; color:var(--alert-red); margin-top:5px;"></i>
+                <div>
+                    <h3 style="color:var(--alert-red); margin-bottom:10px;">Sensitive & High-Risk Content</h3>
+                    <p style="opacity:0.9;">If a confession indicates active suicidal intent, immediate danger, or
+                        severe distress, <strong>we may choose not to publish it publicly.</strong></p>
+                    <p style="opacity:0.9; margin-top:10px;">Soulamore is not equipped to handle emergencies — and being
+                        honest about that is part of keeping people safe. If you are in danger, please contact local
+                        emergency services.</p>
+                </div>
+            </div>
+
+            <!-- REPORTING -->
+            <div class="glass-card fade-in" style="text-align:center;">
+                <h3>Reporting Concerns</h3>
+                <p style="opacity:0.8; margin-bottom:20px;">If you see content that feels harmful, abusive, or unsafe,
+                    please report it immediately.</p>
+                <a href="mailto:contact.soulamore@gmail.com" class="contact-pill"><i class="fas fa-envelope"></i>
+                    contact.soulamore@gmail.com</a>
+            </div>
+
+            <!-- CLOSING -->
+            <div style="text-align:center; margin: 60px 0; opacity:0.8;" class="fade-in">
+                <p style="font-size:1.2rem; margin-bottom:20px;">
+                    "Not every feeling needs to be fixed.<br>Some just need to be acknowledged."
+                </p>
+                <p style="font-size:0.9rem;">That’s what the Confession Box exists for.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="../../assets/js/main.js"></script>
+    <script>
+        // --- AUDIO ---
+        const audio = document.getElementById('bgAudio');
+        let playing = false;
+        function toggleAudio() {
+            if (playing) {
+                audio.pause();
+                document.getElementById('audioText').innerText = "Ambience";
+            } else {
+                audio.volume = 0.3;
+                audio.play();
+                document.getElementById('audioText').innerText = "Pause";
+            }
+            playing = !playing;
+        }
+
+        // --- PARTICLES ---
+        const pContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 4 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            pContainer.appendChild(p);
+        }
+
+        // --- FADE IN ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = "translateY(0)";
+                }
+            });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>
