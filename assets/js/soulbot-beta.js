@@ -2,11 +2,15 @@
 // Injects the Soulbot AI popup into any page (Index, etc.)
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 0. CHECK FOR DUPLICATES
+    if (document.getElementById('soulbot-trigger-btn')) {
+        console.log("SoulBot already injected.");
+        return;
+    }
+
     // 0. Determine Path to Soulbot.html based on current location
     // Heuristic: If we are in a subfolder (campus, join-us, etc), go up one level.
     const pathDepth = window.location.pathname.split('/').length - 1;
-    // This is tricky on local files. Better heuristic: check if 'assets' is a sibling or child.
-    // Simpler: Just check known subdirectories.
     const isSubPage = window.location.pathname.includes('/campus/') ||
         window.location.pathname.includes('/join-us/') ||
         window.location.pathname.includes('/soulamore-away/') ||
@@ -19,10 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Create the floating trigger button
     const triggerBtn = document.createElement('div');
+    triggerBtn.id = 'soulbot-trigger-btn'; // ID for duplicate check
     triggerBtn.className = 'soulbot-beta-trigger';
     triggerBtn.innerHTML = '<i class="fas fa-robot"></i>';
     triggerBtn.title = "Chat with SoulBot (Beta)";
-    // CHANGED: Moved 'bottom' to 110px to avoid Audio Player overlap
     triggerBtn.style.cssText = `
         position: fixed;
         bottom: 110px; 
@@ -49,10 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Create the Iframe Container (Hidden by default)
     const chatFrame = document.createElement('iframe');
+    chatFrame.id = 'soulbot-chat-frame';
     chatFrame.src = soulbotUrl;
     chatFrame.style.cssText = `
         position: fixed;
-        bottom: 180px; /* Moved up to match button */
+        bottom: 180px;
         right: 30px;
         width: 380px;
         height: 600px;
@@ -97,12 +102,26 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(triggerBtn);
     document.body.appendChild(chatFrame);
 
-    // 5. Mobile Adjustments
-    if (window.innerWidth < 500) {
-        chatFrame.style.width = '100%';
-        chatFrame.style.height = '100%';
-        chatFrame.style.bottom = '0';
-        chatFrame.style.right = '0';
-        chatFrame.style.borderRadius = '0';
+    // 5. Responsive Logic (Handle Resize)
+    function handleResize() {
+        if (window.innerWidth < 500) {
+            chatFrame.style.width = '100%';
+            chatFrame.style.height = '100%';
+            chatFrame.style.bottom = '0';
+            chatFrame.style.right = '0';
+            chatFrame.style.borderRadius = '0';
+            chatFrame.style.maxHeight = '100vh';
+        } else {
+            chatFrame.style.width = '380px';
+            chatFrame.style.height = '600px';
+            chatFrame.style.bottom = '180px';
+            chatFrame.style.right = '30px';
+            chatFrame.style.borderRadius = '24px';
+            chatFrame.style.maxHeight = '70vh';
+        }
     }
+
+    // Run on load and resize
+    handleResize();
+    window.addEventListener('resize', handleResize);
 });
