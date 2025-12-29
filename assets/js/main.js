@@ -54,6 +54,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Close Menu When Link Clicked ---
+    if (navLinks) {
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('open');
+                document.body.classList.remove('no-scroll');
+                const icon = toggleBtn.querySelector('i');
+                if (icon) {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+        });
+    }
+
     // --- Header Scroll Effect (Optional: Glass morph gets stronger on scroll) ---
     const header = document.querySelector('header');
     if (header) {
