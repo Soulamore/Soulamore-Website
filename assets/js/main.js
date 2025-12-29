@@ -71,8 +71,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Header Scroll Effect (Optional: Glass morph gets stronger on scroll) ---
     const header = document.querySelector('header');
-    if (header) {
-        window.addEventListener('scroll', () => {
+
+    // --- Reading Progress Bar Injection ---
+    if (!document.getElementById('scroll-progress-container')) {
+        const pCont = document.createElement('div');
+        pCont.id = 'scroll-progress-container';
+        const pBar = document.createElement('div');
+        pBar.id = 'scroll-progress-bar';
+        pCont.appendChild(pBar);
+        document.body.prepend(pCont);
+    }
+    const progressBar = document.getElementById('scroll-progress-bar');
+
+    window.addEventListener('scroll', () => {
+        // Header Effect
+        if (header) {
             if (window.scrollY > 50) {
                 header.style.background = 'rgba(15, 23, 42, 0.95)';
                 header.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
@@ -80,6 +93,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 header.style.background = 'rgba(15, 23, 42, 0.85)';
                 header.style.boxShadow = 'none';
             }
-        });
-    }
+        }
+
+        // Progress Bar Update
+        if (progressBar) {
+            const scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollCurrent = document.documentElement.scrollTop || document.body.scrollTop;
+            if (scrollTotal > 0) {
+                const scrollPercent = (scrollCurrent / scrollTotal) * 100;
+                progressBar.style.width = scrollPercent + '%';
+            }
+        }
+    });
 });
