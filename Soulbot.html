@@ -418,202 +418,145 @@
         </div>
     </div>
 
-    <script type="module">
-        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+    1. **Listen & Validate**: Make the user feel heard.
+    2. **Viral Push (Confession Box)**: If the user has a secret, guilt, or heavy thought, STRONGLY recommend the
+    **Confession Box** as a safe, anonymous place to "let it out".
+    3. **Data Collection**: If the user seems engaged or asks for long-term help, ask: "Would you like me to send you a
+    curated list of resources?" If yes, output \`[[CAPTURE_LEAD]]\`.
+    4. **Deep Linking**: Guide users to resources using \`[[RECOMMEND: KEY]]\` (KEY:
+    ${Object.keys(SITE_KNOWLEDGE).join(', ')}).
 
-        // --- CONFIGURATION ---
-        // TODO: REPLACE WITH VALID KEY FROM https://aistudio.google.com/
-        const API_KEY = "YOUR_API_KEY_HERE";
-        const genAI = new GoogleGenerativeAI(API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    TONE: Warm, professional but friendly. No emojis unless necessary.
+    SAFETY: If suicide/harm mentioned, output \`[[CRISIS]]\`.
+    `;
 
-        // --- SITE KNOWLEDGE BASE (Context Injection) ---
-        const SITE_KNOWLEDGE = {
-            "confession": { url: "confession-box.html", title: "Confession Box", desc: "Share your secret anonymously (Popular)." },
-            "peers": { url: "our-peers/index.html", title: "Our Peers", desc: "Talk to students who listen." },
-            "anxiety": { url: "campus/anxiety-and-overthinking.html", title: "Anxiety Toolkit", desc: "Calm your racing mind." },
-            "loneliness": { url: "campus/loneliness.html", title: "Loneliness Guide", desc: "You are not alone." },
-            "forum": { url: "forum.html", title: "Community Forum", desc: "Join the discussion." },
-            "blogs": { url: "blogs.html", title: "Stories & Insights", desc: "Read experiences." }
-        };
+    // --- STATE MANAGEMENT ---
+    let chatHistory = JSON.parse(localStorage.getItem('soulbot_history')) || [];
+    const isReturning = localStorage.getItem('soulbot_returning') === 'true';
 
-        // --- SYSTEM PROMPT (Psychologist + Viral Strategy) ---
-        const SYSTEM_INSTRUCTION = `
-            You are SoulBot, a smart, empathetic companion on the Soulamore website.
-            
-            YOUR GOALS:
-            1. **Listen & Validate**: Make the user feel heard.
-            2. **Viral Push (Confession Box)**: If the user has a secret, guilt, or heavy thought, STRONGLY recommend the **Confession Box** as a safe, anonymous place to "let it out".
-            3. **Data Collection**: If the user seems engaged or asks for long-term help, ask: "Would you like me to send you a curated list of resources?" If yes, output \`[[CAPTURE_LEAD]]\`.
-            4. **Deep Linking**: Guide users to resources using \`[[RECOMMEND: KEY]]\` (KEY: ${Object.keys(SITE_KNOWLEDGE).join(', ')}).
+    // --- DOM ---
+    const chatBody = document.getElementById('chatBody');
+    const userInput = document.getElementById('userInput');
+    const container = document.getElementById('chatContainer');
+    let hint = document.getElementById('botHint'); // Changed to 'let' as it might be reassigned
+    const thinking = document.getElementById('thinkingIndicator');
 
-            TONE: Warm, professional but friendly. No emojis unless necessary.
-            SAFETY: If suicide/harm mentioned, output \`[[CRISIS]]\`.
-        `;
+    // --- INIT ---
+    function init() {
+    // RELIABLE EMBED CHECK: Are we in an iframe?
+    const isEmbedURL = new URLSearchParams(window.location.search).has('embed');
+    const isIframe = (window.self !== window.top);
+    // Layout Fingerprint: soulbot-beta.js forces width to 380px (desktop) or 100% (mobile)
+    // But checking clientWidth < 600 is a safer indicator of being in the chat bubble vs full screen. const
+        isChatBubbleSize=(document.documentElement.clientWidth < 600); const isEmbedded=isIframe || isEmbedURL ||
+        isChatBubbleSize; if (isEmbedded) { document.body.classList.add('embedded'); container.classList.add('active');
+        // Always open in embed mode // SAFETY CLEANUP: Remove any existing triggers (zombies from cache or static HTML)
+        const zombieBtn=document.getElementById('triggerBtn'); if (zombieBtn) zombieBtn.remove(); const
+        zombieHint=document.getElementById('botHint'); if (zombieHint) zombieHint.remove(); } else { // STANDALONE MODE:
+        Inject Trigger & Hint document.body.classList.add('standalone'); injectTriggerAndHint();
+        hint=document.getElementById('botHint'); // Reassign hint after injection } if (chatHistory.length> 0) {
+        chatHistory.forEach(msg => {
+        if (msg.role !== 'system') appendMessage(msg.role, msg.text, false);
+        });
+        } else {
+        const introText = isReturning
+        ? "Welcome back. I'm here if you need to vent."
+        : "Hi. I'm SoulBot. You can tell me anything—no judgment, just listening.";
+        setTimeout(() => addBotMessage(introText), 600);
+        }
 
-        // --- STATE MANAGEMENT ---
-        let chatHistory = JSON.parse(localStorage.getItem('soulbot_history')) || [];
-        const isReturning = localStorage.getItem('soulbot_returning') === 'true';
-
-        // --- DOM ---
-        const chatBody = document.getElementById('chatBody');
-        const userInput = document.getElementById('userInput');
-        const container = document.getElementById('chatContainer');
-        let hint = document.getElementById('botHint'); // Changed to 'let' as it might be reassigned
-        const thinking = document.getElementById('thinkingIndicator');
-
-        // --- INIT ---
-        function init() {
-            // RELIABLE EMBED CHECK: Are we in an iframe?
-            const isEmbedURL = new URLSearchParams(window.location.search).has('embed');
-            const isIframe = (window.self !== window.top);
-            // Layout Fingerprint: soulbot-beta.js forces width to 380px (desktop) or 100% (mobile)
-            // But checking clientWidth < 600 is a safer indicator of being in the chat bubble vs full screen.
-            const isChatBubbleSize = (document.documentElement.clientWidth < 600);
-
-            const isEmbedded = isIframe || isEmbedURL || isChatBubbleSize;
-
-            if (isEmbedded) {
-                document.body.classList.add('embedded');
-                container.classList.add('active'); // Always open in embed mode
-
-                // SAFETY CLEANUP: Remove any existing triggers (zombies from cache or static HTML)
-                const zombieBtn = document.getElementById('triggerBtn');
-                if (zombieBtn) zombieBtn.remove();
-                const zombieHint = document.getElementById('botHint');
-                if (zombieHint) zombieHint.remove();
-
-            } else {
-                // STANDALONE MODE: Inject Trigger & Hint
-                document.body.classList.add('standalone');
-                injectTriggerAndHint();
-                hint = document.getElementById('botHint'); // Reassign hint after injection
-            }
-
-            if (chatHistory.length > 0) {
-                chatHistory.forEach(msg => {
-                    if (msg.role !== 'system') appendMessage(msg.role, msg.text, false);
-                });
-            } else {
-                const introText = isReturning
-                    ? "Welcome back. I'm here if you need to vent."
-                    : "Hi. I'm SoulBot. You can tell me anything—no judgment, just listening.";
-                setTimeout(() => addBotMessage(introText), 600);
-            }
-
-            // Auto Popup (Only valid if we just injected the hint)
-            if (!isEmbedded && !sessionStorage.getItem('soulbot_seen')) {
-                setTimeout(() => {
-                    const hintEl = document.getElementById('botHint');
-                    if (hintEl && !container.classList.contains('active')) hintEl.classList.add('visible');
-                }, 5000);
-                sessionStorage.setItem('soulbot_seen', 'true');
-            }
-            localStorage.setItem('soulbot_returning', 'true');
+        // Auto Popup (Only valid if we just injected the hint)
+        if (!isEmbedded && !sessionStorage.getItem('soulbot_seen')) {
+        setTimeout(() => {
+        const hintEl = document.getElementById('botHint');
+        if (hintEl && !container.classList.contains('active')) hintEl.classList.add('visible');
+        }, 5000);
+        sessionStorage.setItem('soulbot_seen', 'true');
+        }
+        localStorage.setItem('soulbot_returning', 'true');
         }
 
         function injectTriggerAndHint() {
-            // 1. Create Trigger
-            const btn = document.createElement('div');
-            btn.className = 'soulbot-trigger';
-            btn.id = 'triggerBtn';
-            btn.onclick = toggleChat;
-            btn.innerHTML = '<i class="fas fa-robot trigger-icon"></i>';
-            document.body.appendChild(btn);
+        // 1. Create Trigger
+        const btn = document.createElement('div');
+        btn.className = 'soulbot-trigger';
+        btn.id = 'triggerBtn';
+        btn.onclick = toggleChat;
+        btn.innerHTML = '<i class="fas fa-robot trigger-icon"></i>';
+        document.body.appendChild(btn);
 
-            // 2. Create Hint
-            const h = document.createElement('div');
-            h.className = 'bot-hint';
-            h.id = 'botHint';
-            h.innerText = "Want to vent anonymously? I'm listening.";
-            document.body.appendChild(h);
+        // 2. Create Hint
+        const h = document.createElement('div');
+        h.className = 'bot-hint';
+        h.id = 'botHint';
+        h.innerText = "Want to vent anonymously? I'm listening.";
+        document.body.appendChild(h);
         }
 
         // --- UI UTILS ---
         window.toggleChat = function () {
-            container.classList.toggle('active');
-            if (hint) { // Check if hint element exists before trying to remove class
-                hint.classList.remove('visible');
-            }
+        container.classList.toggle('active');
+        if (hint) { // Check if hint element exists before trying to remove class
+        hint.classList.remove('visible');
+        }
         };
 
         window.autoResize = function (el) {
-            el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px';
+        el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px';
         };
 
         window.handleEnter = function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
         };
 
         function scrollToBottom() { chatBody.scrollTop = chatBody.scrollHeight; }
 
         function appendMessage(role, text, save = true) {
-            // Filter tags
-            const displayText = text.replace(/\[\[.*?\]\]/g, '').trim();
-            if (!displayText && role === 'bot') return;
+        // Filter tags
+        const displayText = text.replace(/\[\[.*?\]\]/g, '').trim();
+        if (!displayText && role === 'bot') return;
 
-            const div = document.createElement('div');
-            div.className = `message ${role === 'user' ? 'user-msg' : 'bot-msg'}`;
+        const div = document.createElement('div');
+        div.className = `message ${role === 'user' ? 'user-msg' : 'bot-msg'}`;
 
-            // Sanitize HTML to prevent XSS (CodeQL Fix)
-            const escapeHTML = (str) => str.replace(/[&<>'"]/g,
-                tag => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    "'": '&#39;',
-                    '"': '&quot;'
-                }[tag]));
-
-            // Bold formatting on sanitized text
-            div.innerHTML = escapeHTML(displayText).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-            chatBody.insertBefore(div, thinking);
-            scrollToBottom();
-
-            if (save) {
-                chatHistory.push({ role, text });
-                localStorage.setItem('soulbot_history', JSON.stringify(chatHistory));
-            }
-        }
-
-        // --- MAIN LOGIC ---
-        window.sendMessage = async function () {
-            const text = userInput.value.trim();
-            if (!text) return;
-
-            userInput.value = ''; userInput.style.height = '44px';
-            appendMessage('user', text);
-
-            // Local Crisis Check
-            if (['suicide', 'kill myself', 'die', 'hurt myself'].some(w => text.toLowerCase().includes(w))) {
+        // Sanitize HTML to prevent XSS (CodeQL Fix)
+        const escapeHTML = (str) => str.replace(/[&<>'"]/g,
+            tag => ({
+            '&': '&amp;',
+            '<': '&lt;' , '>' : '&gt;' , "'" : '&#39;' , '"' : '&quot;' }[tag])); // Bold formatting on sanitized text
+                div.innerHTML=escapeHTML(displayText).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>' );
+                chatBody.insertBefore(div, thinking); scrollToBottom(); if (save) { chatHistory.push({ role, text });
+                localStorage.setItem('soulbot_history', JSON.stringify(chatHistory)); } } // --- MAIN LOGIC ---
+                window.sendMessage=async function () { const text=userInput.value.trim(); if (!text) return;
+                userInput.value='' ; userInput.style.height='44px' ; appendMessage('user', text); // Local Crisis Check
+                if (['suicide', 'kill myself' , 'die' , 'hurt myself' ].some(w=> text.toLowerCase().includes(w))) {
                 showCrisisCard(); return;
-            }
+                }
 
-            // Check for Placeholder Key (Simulate Offline Mode)
-            const isOffline = API_KEY.includes("YOUR KEY");
-            if (isOffline) {
+                // Check for Placeholder Key (Simulate Offline Mode)
+                const isOffline = API_KEY.includes("YOUR KEY");
+                if (isOffline) {
                 setTimeout(() => {
-                    handleOffline();
+                handleOffline();
                 }, 600);
                 return;
-            }
+                }
 
-            thinking.style.display = 'flex';
-            scrollToBottom();
+                thinking.style.display = 'flex';
+                scrollToBottom();
 
-            try {
+                try {
                 const historyForAI = chatHistory.map(h => ({
-                    role: h.role === 'user' ? 'user' : 'model',
-                    parts: [{ text: h.text }]
+                role: h.role === 'user' ? 'user' : 'model',
+                parts: [{ text: h.text }]
                 }));
 
                 const chat = model.startChat({
-                    history: [
-                        { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
-                        { role: "model", parts: [{ text: "Understood. I'm ready." }] },
-                        ...historyForAI
-                    ],
+                history: [
+                { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
+                { role: "model", parts: [{ text: "Understood. I'm ready." }] },
+                ...historyForAI
+                ],
                 });
 
                 const result = await chat.sendMessage(text);
@@ -623,7 +566,8 @@
 
                 // --- PARSING TAGS ---
                 if (response.includes('[[CRISIS]]')) showCrisisCard();
-                if (response.includes('[[CAPTURE_LEAD]]')) showLeadForm("Would you like us to send you some resources?");
+                if (response.includes('[[CAPTURE_LEAD]]')) showLeadForm("Would you like us to send you some
+                resources?");
 
                 const recRegex = /\[\[RECOMMEND:\s*(\w+)\]\]/g;
                 let match;
@@ -634,100 +578,103 @@
 
                 if (recs.length > 0) showSuggestionChips(recs);
 
-            } catch (error) {
+                } catch (error) {
                 console.error(error);
                 thinking.style.display = 'none';
                 handleOffline();
-            }
-        };
+                }
+                };
 
-        function handleOffline() {
-            addBotMessage("I'm currently offline to process some updates.");
-            setTimeout(() => {
-                addBotMessage("But our team is here. Leave a message or your email, and we'll reach out to you personally.");
+                function handleOffline() {
+                addBotMessage("I'm currently offline to process some updates.");
+                setTimeout(() => {
+                addBotMessage("But our team is here. Leave a message or your email, and we'll reach out to you
+                personally.");
                 showLeadForm("Leave your message/details:");
-            }, 800);
-        }
+                }, 800);
+                }
 
-        function addBotMessage(text) { appendMessage('bot', text); }
+                function addBotMessage(text) { appendMessage('bot', text); }
 
-        function showCrisisCard() {
-            const div = document.createElement('div');
-            div.className = 'crisis-card';
-            div.innerHTML = `I hear your pain. Please stay safe.<br><br><span class="crisis-link" onclick="window.open('tel:14416')">📞 Call Tele-MANAS (14416)</span>`;
-            chatBody.insertBefore(div, thinking);
-            scrollToBottom();
-        }
+                function showCrisisCard() {
+                const div = document.createElement('div');
+                div.className = 'crisis-card';
+                div.innerHTML = `I hear your pain. Please stay safe.<br><br><span class="crisis-link"
+                    onclick="window.open('tel:14416')">📞 Call Tele-MANAS (14416)</span>`;
+                chatBody.insertBefore(div, thinking);
+                scrollToBottom();
+                }
 
-        function showSuggestionChips(keys) {
-            const div = document.createElement('div');
-            div.className = 'chips-container';
-            div.style.padding = '0 15px 15px';
-            let html = '';
-            keys.forEach(key => {
+                function showSuggestionChips(keys) {
+                const div = document.createElement('div');
+                div.className = 'chips-container';
+                div.style.padding = '0 15px 15px';
+                let html = '';
+                keys.forEach(key => {
                 const data = SITE_KNOWLEDGE[key.toLowerCase()];
                 if (data) {
-                    html += `<div class="chip" onclick="window.top.location.href='${data.url}'">
-                        <i class="fas fa-arrow-right"></i> ${data.desc}
-                    </div>`;
+                html += `<div class="chip" onclick="window.top.location.href='${data.url}'">
+                    <i class="fas fa-arrow-right"></i> ${data.desc}
+                </div>`;
                 }
-            });
-            if (html) { div.innerHTML = html; chatBody.insertBefore(div, thinking); scrollToBottom(); }
-        }
+                });
+                if (html) { div.innerHTML = html; chatBody.insertBefore(div, thinking); scrollToBottom(); }
+                }
 
-        // --- LEAD GEN ---
-        function showLeadForm(title = "Let us send you personalized resources.") {
-            const div = document.createElement('div');
-            div.className = 'lead-form';
-            div.innerHTML = `
+                // --- LEAD GEN ---
+                function showLeadForm(title = "Let us send you personalized resources.") {
+                const div = document.createElement('div');
+                div.className = 'lead-form';
+                div.innerHTML = `
                 <div style="color:#aaa; font-size:0.85rem;">${title}</div>
                 <input type="text" id="leadName" class="lead-input" placeholder="Name">
                 <input type="email" id="leadEmail" class="lead-input" placeholder="Contact (Email/Phone)">
                 <button class="lead-submit" onclick="saveLead(this)">Keep Me Updated</button>
-            `;
-            chatBody.insertBefore(div, thinking);
-            scrollToBottom();
-        }
+                `;
+                chatBody.insertBefore(div, thinking);
+                scrollToBottom();
+                }
 
-        window.saveLead = function (btn) {
-            const parent = btn.parentElement;
-            const name = parent.querySelector('#leadName').value;
-            const email = parent.querySelector('#leadEmail').value;
-            if (!email) return;
+                window.saveLead = function (btn) {
+                const parent = btn.parentElement;
+                const name = parent.querySelector('#leadName').value;
+                const email = parent.querySelector('#leadEmail').value;
+                if (!email) return;
 
-            const leads = JSON.parse(localStorage.getItem('soulbot_leads')) || [];
-            leads.push({ name, email, date: new Date().toLocaleString() });
-            localStorage.setItem('soulbot_leads', JSON.stringify(leads));
+                const leads = JSON.parse(localStorage.getItem('soulbot_leads')) || [];
+                leads.push({ name, email, date: new Date().toLocaleString() });
+                localStorage.setItem('soulbot_leads', JSON.stringify(leads));
 
-            parent.innerHTML = "<div style='color:#4ECDC4; text-align:center;'>Thanks! We've saved your info.</div>";
-            addBotMessage("Got it. I'll make sure the team knows.");
-        }
+                parent.innerHTML = "<div style='color:#4ECDC4; text-align:center;'>Thanks! We've saved your info.</div>
+                ";
+                addBotMessage("Got it. I'll make sure the team knows.");
+                }
 
-        // --- ADMIN ONLY (Hidden) ---
-        window.exportLeads = function () {
-            if (!confirm("Admin: Download captured leads?")) return;
-            const leads = localStorage.getItem('soulbot_leads');
-            if (!leads) { alert("No leads captured yet."); return; }
+                // --- ADMIN ONLY (Hidden) ---
+                window.exportLeads = function () {
+                if (!confirm("Admin: Download captured leads?")) return;
+                const leads = localStorage.getItem('soulbot_leads');
+                if (!leads) { alert("No leads captured yet."); return; }
 
-            const blob = new Blob([leads], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = 'soulbot_leads.json';
-            a.click();
-        }
+                const blob = new Blob([leads], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'soulbot_leads.json';
+                a.click();
+                }
 
-        window.clearMemory = function () {
-            if (confirm("Clear history?")) {
+                window.clearMemory = function () {
+                if (confirm("Clear history?")) {
                 localStorage.removeItem('soulbot_history');
                 chatHistory = []; chatBody.innerHTML = '';
                 chatBody.appendChild(thinking);
                 addBotMessage("Memory cleared.");
-            }
-        };
+                }
+                };
 
-        init();
-    </script>
-    <!-- Sciprt removed to prevent recursion: <script src="assets/js/soulbot-beta.js"></script> -->
+                init();
+                </script>
+                <!-- Sciprt removed to prevent recursion: <script src="assets/js/soulbot-beta.js"></script> -->
 </body>
 
 </html>
