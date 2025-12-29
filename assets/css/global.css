@@ -53,27 +53,37 @@ header {
 }
 
 .main-nav {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 0 24px;
+    padding: 0 40px;
 }
 
 .nav-logo {
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 1.5rem;
-    color: var(--starlight);
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-self: start;
+    padding: 5px 0;
+}
+
+.nav-logo img {
+    height: 45px;
+    /* Adjust based on logo aspect ratio */
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s;
+}
+
+.nav-logo:hover img {
+    transform: scale(1.05);
 }
 
 .nav-links {
     display: flex;
     gap: 30px;
+    justify-self: center;
 }
 
 .nav-links a {
@@ -91,20 +101,12 @@ header {
 }
 
 .nav-links a.active::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: var(--teaser-blue);
+    display: none;
 }
 
 .nav-group {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    /* Space between links and login btn */
+    display: contents;
+    /* Allows children (links and btn) to participate in the grid */
 }
 
 .nav-btn {
@@ -115,6 +117,7 @@ header {
     background: linear-gradient(135deg, var(--teaser-blue), #2a9d8f);
     color: var(--deep-space);
     box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2);
+    justify-self: end;
 }
 
 .nav-btn:hover {
@@ -165,11 +168,89 @@ footer {
     color: var(--peach-glow);
 }
 
+.footer-socials {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.footer-socials a {
+    color: var(--starlight);
+    font-size: 1.5rem;
+    opacity: 0.7;
+    transition: 0.3s;
+}
+
+.footer-socials a:hover {
+    color: var(--peach-glow);
+    transform: translateY(-2px);
+    opacity: 1;
+}
+
+/* --- DROPDOWN MENU --- */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    padding: 10px 0;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+    animation: fadeInDropdown 0.3s ease;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    color: var(--starlight);
+    opacity: 0.8;
+    white-space: nowrap;
+}
+
+.dropdown-content a:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--teaser-blue);
+    opacity: 1;
+}
+
+.dropdown-content a::after {
+    display: none !important;
+    /* Remove underline effect for dropdown items */
+}
+
+@keyframes fadeInDropdown {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* --- UTILITIES --- */
 .page-wrapper {
     position: relative;
     min-height: 100vh;
-    padding-top: 80px;
+    padding-top: 140px;
+    /* Increased from 80px to fix overlap */
     /* Offset fixed header */
 }
 
@@ -180,9 +261,31 @@ footer {
 }
 
 /* --- RESPONSIVE --- */
+/* Default Styles for Injected Elements */
+.mobile-login-btn {
+    display: none;
+    /* Hidden by default on desktop */
+}
+
 @media (max-width: 900px) {
     .mobile-toggle {
         display: block;
+    }
+
+    /* Hide external Login button on mobile */
+    .nav-btn {
+        display: none;
+    }
+
+    /* Style for the Javascript-injected mobile login button */
+    .mobile-login-btn {
+        display: block;
+        /* Show on mobile (hidden on desktop) */
+        width: 100%;
+        text-align: center;
+        margin-top: 10px;
+        order: -1;
+        /* Try to push to top if flex container allows */
     }
 
     .nav-links {
@@ -205,9 +308,5 @@ footer {
         transform: translateY(0);
     }
 
-    .nav-group {
-        /* On mobile, we might want Login inside the menu or separate. 
-           For now, keeping Login visible next to hamburger is good UX, 
-           but if space is tight, we can move it. */
-    }
+
 }

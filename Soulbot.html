@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoulBot | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Plus+Jakarta+Sans:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- THEME: MIDNIGHT VEGITO (Chat Edition) --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(15, 23, 42, 0.95);
+            --starlight: #f1f5f9;
+            --teal-glow: #4ECDC4;
+            --peach-glow: #F49F75;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --bot-msg-bg: #1e293b;
+            --user-msg-bg: #2a9d8f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        /* --- FLOATING TRIGGER --- */
+        .soulbot-trigger {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--deep-space), #1e293b);
+            border: 1px solid var(--teal-glow);
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 9999;
+            transition: transform 0.3s;
+        }
+
+        .soulbot-trigger:hover {
+            transform: scale(1.1);
+        }
+
+        .trigger-icon {
+            font-size: 1.5rem;
+            color: var(--teal-glow);
+        }
+
+        /* Notification Bubble */
+        .bot-hint {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: var(--navy-glass);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px 20px 0 20px;
+            border: 1px solid var(--border-glass);
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            transition: 0.5s;
+            z-index: 9998;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .bot-hint.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- CHAT WINDOW --- */
+        .chat-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 380px;
+            height: 600px;
+            max-height: 80vh;
+            background: var(--navy-glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            pointer-events: none;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 9999;
+        }
+
+        .chat-container.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        /* Header */
+        .chat-header {
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-family: 'Outfit';
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: help;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--teal-glow);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--teal-glow);
+        }
+
+        .header-actions i {
+            color: #aaa;
+            cursor: pointer;
+            margin-left: 15px;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .header-actions i:hover {
+            color: white;
+        }
+
+        /* Messages Area */
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease-out;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bot-msg {
+            background: var(--bot-msg-bg);
+            color: var(--starlight);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .user-msg {
+            background: var(--user-msg-bg);
+            color: #0f172a;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* Thinking Indicator */
+        .thinking {
+            align-self: flex-start;
+            display: flex;
+            gap: 4px;
+            padding: 10px;
+            display: none;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #64748b;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* Input Area */
+        .chat-footer {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid var(--border-glass);
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            padding: 12px;
+            border-radius: 20px;
+            color: white;
+            outline: none;
+            font-family: inherit;
+            resize: none;
+            max-height: 100px;
+            min-height: 44px;
+        }
+
+        .chat-input:focus {
+            border-color: var(--teal-glow);
+        }
+
+        .send-btn {
+            background: var(--teal-glow);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f172a;
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Crisis Card */
+        .crisis-card {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .crisis-link {
+            color: white;
+            text-decoration: underline;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Suggestion Chips */
+        .chips-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+
+        .chip {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border: 1px solid var(--border-glass);
+            border-radius: 50px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            transition: 0.2s;
+        }
+
+        .chip:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--teal-glow);
+            border-color: var(--teal-glow);
+        }
+
+        /* Lead Form */
+        .lead-form {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .lead-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-glass);
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .lead-submit {
+            background: var(--peach-glow);
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        /* --- EMBED MODE (When inside iframe) --- */
+        body.embedded .soulbot-trigger {
+            display: none !important;
+        }
+
+        body.embedded .bot-hint {
+            display: none !important;
+        }
+
+        body.embedded .chat-container {
+            /* Fill the iframe completely */
+            width: 100% !important;
+            height: 100% !important;
+            bottom: 0 !important;
+            right: 0 !important;
+            max-height: none !important;
+            border-radius: 0 !important;
+            transform: none !important;
+            opacity: 1 !important;
+            pointer-events: all !important;
+            box-shadow: none !important;
+            border: none !important;
+            background: transparent !important;
+        }
+
+        /* Hide minimize button in embed mode */
+        body.embedded .header-actions .fa-chevron-down {
+            display: none !important;
+        }
+
+        /* Mobile Responsive */
+        @media(max-width: 500px) {
+            .chat-container {
+                width: 100%;
+                height: 100%;
+                bottom: 0;
+                right: 0;
+                border-radius: 0;
+                max-height: 100vh;
+            }
+
+            .soulbot-trigger {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Trigger Button -->
+    <div class="soulbot-trigger" id="triggerBtn" onclick="toggleChat()">
+        <i class="fas fa-robot trigger-icon"></i>
+    </div>
+
+    <!-- Auto Popup Hint -->
+    <div class="bot-hint" id="botHint">
+        Want to vent anonymously? I'm listening.
+    </div>
+
+    <!-- Chat Interface -->
+    <div class="chat-container" id="chatContainer">
+
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="header-title" ondblclick="exportLeads()" title="Double click for Admin">
+                <div class="status-dot"></div> SoulBot
+            </div>
+            <div class="header-actions">
+                <i class="fas fa-trash-alt" title="Clear Memory" onclick="clearMemory()"></i>
+                <i class="fas fa-chevron-down" onclick="toggleChat()"></i>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="chat-body" id="chatBody">
+            <div class="thinking" id="thinkingIndicator">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-footer">
+            <textarea id="userInput" class="chat-input" rows="1" placeholder="Type here..." oninput="autoResize(this)"
+                onkeydown="handleEnter(event)"></textarea>
+            <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+        // --- CONFIGURATION ---
+        // TODO: REPLACE WITH VALID KEY FROM https://aistudio.google.com/
+        const API_KEY = "AIzaSyB0c4gekhIe-l3zlZb87JXYBj2rITqao1k";
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        // --- SITE KNOWLEDGE BASE (Context Injection) ---
+        const SITE_KNOWLEDGE = {
+            "confession": { url: "confession-box.html", title: "Confession Box", desc: "Share your secret anonymously (Popular)." },
+            "peers": { url: "our-peers/index.html", title: "Our Peers", desc: "Talk to students who listen." },
+            "anxiety": { url: "campus/anxiety-and-overthinking.html", title: "Anxiety Toolkit", desc: "Calm your racing mind." },
+            "loneliness": { url: "campus/loneliness.html", title: "Loneliness Guide", desc: "You are not alone." },
+            "forum": { url: "forum.html", title: "Community Forum", desc: "Join the discussion." },
+            "blogs": { url: "blogs.html", title: "Stories & Insights", desc: "Read experiences." }
+        };
+
+        // --- SYSTEM PROMPT (Psychologist + Viral Strategy) ---
+        const SYSTEM_INSTRUCTION = `
+            You are SoulBot, a smart, empathetic companion on the Soulamore website.
+            
+            YOUR GOALS:
+            1. **Listen & Validate**: Make the user feel heard.
+            2. **Viral Push (Confession Box)**: If the user has a secret, guilt, or heavy thought, STRONGLY recommend the **Confession Box** as a safe, anonymous place to "let it out".
+            3. **Data Collection**: If the user seems engaged or asks for long-term help, ask: "Would you like me to send you a curated list of resources?" If yes, output \`[[CAPTURE_LEAD]]\`.
+            4. **Deep Linking**: Guide users to resources using \`[[RECOMMEND: KEY]]\` (KEY: ${Object.keys(SITE_KNOWLEDGE).join(', ')}).
+
+            TONE: Warm, professional but friendly. No emojis unless necessary.
+            SAFETY: If suicide/harm mentioned, output \`[[CRISIS]]\`.
+        `;
+
+        // --- STATE MANAGEMENT ---
+        let chatHistory = JSON.parse(localStorage.getItem('soulbot_history')) || [];
+        const isReturning = localStorage.getItem('soulbot_returning') === 'true';
+
+        // --- DOM ---
+        const chatBody = document.getElementById('chatBody');
+        const userInput = document.getElementById('userInput');
+        const container = document.getElementById('chatContainer');
+        const hint = document.getElementById('botHint');
+        const thinking = document.getElementById('thinkingIndicator');
+
+        // --- INIT ---
+        function init() {
+            // Check for Embed Mode
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('embed')) {
+                document.body.classList.add('embedded');
+                // Ensure chat container is visible via CSS, but we can also force it here if needed
+                container.classList.add('active');
+            }
+
+            if (chatHistory.length > 0) {
+                chatHistory.forEach(msg => {
+                    if (msg.role !== 'system') appendMessage(msg.role, msg.text, false);
+                });
+            } else {
+                const introText = isReturning
+                    ? "Welcome back. I'm here if you need to vent."
+                    : "Hi. I'm SoulBot. You can tell me anything—no judgment, just listening.";
+                setTimeout(() => addBotMessage(introText), 600);
+            }
+
+            // Auto Popup (Only if NOT embedded, as parent handles logic)
+            if (!document.body.classList.contains('embedded') && !sessionStorage.getItem('soulbot_seen')) {
+                setTimeout(() => {
+                    if (!container.classList.contains('active')) hint.classList.add('visible');
+                }, 5000);
+                sessionStorage.setItem('soulbot_seen', 'true');
+            }
+            localStorage.setItem('soulbot_returning', 'true');
+        }
+
+        // --- UI UTILS ---
+        window.toggleChat = function () {
+            container.classList.toggle('active');
+            hint.classList.remove('visible');
+        };
+
+        window.autoResize = function (el) {
+            el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px';
+        };
+
+        window.handleEnter = function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        };
+
+        function scrollToBottom() { chatBody.scrollTop = chatBody.scrollHeight; }
+
+        function appendMessage(role, text, save = true) {
+            // Filter tags
+            const displayText = text.replace(/\[\[.*?\]\]/g, '').trim();
+            if (!displayText && role === 'bot') return;
+
+            const div = document.createElement('div');
+            div.className = `message ${role === 'user' ? 'user-msg' : 'bot-msg'}`;
+            // Bold formatting
+            div.innerHTML = displayText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            chatBody.insertBefore(div, thinking);
+            scrollToBottom();
+
+            if (save) {
+                chatHistory.push({ role, text });
+                localStorage.setItem('soulbot_history', JSON.stringify(chatHistory));
+            }
+        }
+
+        // --- MAIN LOGIC ---
+        window.sendMessage = async function () {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            userInput.value = ''; userInput.style.height = '44px';
+            appendMessage('user', text);
+
+            // Local Crisis Check
+            if (['suicide', 'kill myself', 'die', 'hurt myself'].some(w => text.toLowerCase().includes(w))) {
+                showCrisisCard(); return;
+            }
+
+            // Check for Placeholder Key (Simulate Offline Mode)
+            const isOffline = API_KEY.includes("YOUR KEY") || API_KEY.startsWith("AIzaSyB0c4gekhIe-l3zlZb87JXYBj2rITqao1k");
+            if (isOffline) {
+                setTimeout(() => {
+                    handleOffline();
+                }, 600);
+                return;
+            }
+
+            thinking.style.display = 'flex';
+            scrollToBottom();
+
+            try {
+                const historyForAI = chatHistory.map(h => ({
+                    role: h.role === 'user' ? 'user' : 'model',
+                    parts: [{ text: h.text }]
+                }));
+
+                const chat = model.startChat({
+                    history: [
+                        { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
+                        { role: "model", parts: [{ text: "Understood. I'm ready." }] },
+                        ...historyForAI
+                    ],
+                });
+
+                const result = await chat.sendMessage(text);
+                const response = result.response.text();
+
+                thinking.style.display = 'none';
+
+                // --- PARSING TAGS ---
+                if (response.includes('[[CRISIS]]')) showCrisisCard();
+                if (response.includes('[[CAPTURE_LEAD]]')) showLeadForm("Would you like us to send you some resources?");
+
+                const recRegex = /\[\[RECOMMEND:\s*(\w+)\]\]/g;
+                let match;
+                const recs = [];
+                while ((match = recRegex.exec(response)) !== null) recs.push(match[1]);
+
+                appendMessage('bot', response);
+
+                if (recs.length > 0) showSuggestionChips(recs);
+
+            } catch (error) {
+                console.error(error);
+                thinking.style.display = 'none';
+                handleOffline();
+            }
+        };
+
+        function handleOffline() {
+            addBotMessage("I'm currently offline to process some updates.");
+            setTimeout(() => {
+                addBotMessage("But our team is here. Leave a message or your email, and we'll reach out to you personally.");
+                showLeadForm("Leave your message/details:");
+            }, 800);
+        }
+
+        function addBotMessage(text) { appendMessage('bot', text); }
+
+        function showCrisisCard() {
+            const div = document.createElement('div');
+            div.className = 'crisis-card';
+            div.innerHTML = `I hear your pain. Please stay safe.<br><br><span class="crisis-link" onclick="window.open('tel:14416')">📞 Call Tele-MANAS (14416)</span>`;
+            chatBody.insertBefore(div, thinking);
+            scrollToBottom();
+        }
+
+        function showSuggestionChips(keys) {
+            const div = document.createElement('div');
+            div.className = 'chips-container';
+            div.style.padding = '0 15px 15px';
+            let html = '';
+            keys.forEach(key => {
+                const data = SITE_KNOWLEDGE[key.toLowerCase()];
+                if (data) {
+                    html += `<div class="chip" onclick="window.top.location.href='${data.url}'">
+                        <i class="fas fa-arrow-right"></i> ${data.desc}
+                    </div>`;
+                }
+            });
+            if (html) { div.innerHTML = html; chatBody.insertBefore(div, thinking); scrollToBottom(); }
+        }
+
+        // --- LEAD GEN ---
+        function showLeadForm(title = "Let us send you personalized resources.") {
+            const div = document.createElement('div');
+            div.className = 'lead-form';
+            div.innerHTML = `
+                <div style="color:#aaa; font-size:0.85rem;">${title}</div>
+                <input type="text" id="leadName" class="lead-input" placeholder="Name">
+                <input type="email" id="leadEmail" class="lead-input" placeholder="Contact (Email/Phone)">
+                <button class="lead-submit" onclick="saveLead(this)">Keep Me Updated</button>
+            `;
+            chatBody.insertBefore(div, thinking);
+            scrollToBottom();
+        }
+
+        window.saveLead = function (btn) {
+            const parent = btn.parentElement;
+            const name = parent.querySelector('#leadName').value;
+            const email = parent.querySelector('#leadEmail').value;
+            if (!email) return;
+
+            const leads = JSON.parse(localStorage.getItem('soulbot_leads')) || [];
+            leads.push({ name, email, date: new Date().toLocaleString() });
+            localStorage.setItem('soulbot_leads', JSON.stringify(leads));
+
+            parent.innerHTML = "<div style='color:#4ECDC4; text-align:center;'>Thanks! We've saved your info.</div>";
+            addBotMessage("Got it. I'll make sure the team knows.");
+        }
+
+        // --- ADMIN ONLY (Hidden) ---
+        window.exportLeads = function () {
+            if (!confirm("Admin: Download captured leads?")) return;
+            const leads = localStorage.getItem('soulbot_leads');
+            if (!leads) { alert("No leads captured yet."); return; }
+
+            const blob = new Blob([leads], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'soulbot_leads.json';
+            a.click();
+        }
+
+        window.clearMemory = function () {
+            if (confirm("Clear history?")) {
+                localStorage.removeItem('soulbot_history');
+                chatHistory = []; chatBody.innerHTML = '';
+                chatBody.appendChild(thinking);
+                addBotMessage("Memory cleared.");
+            }
+        };
+
+        init();
+    </script>
+    <script src="assets/js/soulbot-beta.js"></script>
+</body>
+
+</html>
