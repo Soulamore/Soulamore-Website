@@ -658,7 +658,8 @@
 <body>
 
     <!-- GLOBAL HEADER -->
-    <header style="background: #0f172a !important; border-bottom: none !important; backdrop-filter: none !important; box-shadow: none !important;">
+    <header
+        style="background: #0f172a !important; border-bottom: none !important; backdrop-filter: none !important; box-shadow: none !important;">
         <div class="main-nav">
             <a href="./index.html" class="nav-logo"><img src="./assets/images/logo.png" alt="Soulamore Logo"></a>
             <div class="nav-group">
@@ -1086,7 +1087,11 @@
                 let count = Math.floor(Math.random() * 30) + 5;
                 if (city.toLowerCase() === "berlin") count = 42;
                 result.style.display = "block";
-                result.innerHTML = `<i class="fas fa-users"></i> We found <span style="color:white; font-size:1.5rem;">${count}</span> peers near ${city} ready to help!`;
+                // Sanitize input
+                const escapeHTML = (str) => str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
+                const safeCity = escapeHTML(city);
+
+                result.innerHTML = `<i class="fas fa-users"></i> We found <span style="color:white; font-size:1.5rem;">${count}</span> peers near ${safeCity} ready to help!`;
                 btn.innerText = "Scan Area";
             }, 1500);
         }

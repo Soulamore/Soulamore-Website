@@ -355,7 +355,7 @@
             pointer-events: all !important;
             box-shadow: none !important;
             border: none !important;
-            background: transparent !important;
+            /* background: transparent !important; REMOVED to show navy glass */
         }
 
         /* Hide minimize button in embed mode */
@@ -527,8 +527,19 @@
 
             const div = document.createElement('div');
             div.className = `message ${role === 'user' ? 'user-msg' : 'bot-msg'}`;
-            // Bold formatting
-            div.innerHTML = displayText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            // Sanitize HTML to prevent XSS (CodeQL Fix)
+            const escapeHTML = (str) => str.replace(/[&<>'"]/g,
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag]));
+
+            // Bold formatting on sanitized text
+            div.innerHTML = escapeHTML(displayText).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
             chatBody.insertBefore(div, thinking);
             scrollToBottom();
