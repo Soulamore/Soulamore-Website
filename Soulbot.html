@@ -35,57 +35,28 @@
             overflow: hidden;
         }
 
-        /* --- FLOATING TRIGGER --- */
-        .soulbot-trigger {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--deep-space), #1e293b);
-            border: 1px solid var(--teal-glow);
-            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 9999;
-            transition: transform 0.3s;
-        }
-
-        .soulbot-trigger:hover {
-            transform: scale(1.1);
-        }
-
-        .trigger-icon {
-            font-size: 1.5rem;
-            color: var(--teal-glow);
-        }
-
-        /* Notification Bubble */
+        /* START HIDDEN (Fix for Double Bot Issue) */
+        .soulbot-trigger,
         .bot-hint {
-            position: fixed;
-            bottom: 100px;
-            right: 30px;
-            background: var(--navy-glass);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 20px 20px 0 20px;
-            border: 1px solid var(--border-glass);
-            font-size: 0.9rem;
-            opacity: 0;
-            transform: translateY(10px);
-            pointer-events: none;
-            transition: 0.5s;
-            z-index: 9998;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            display: none !important;
         }
 
-        .bot-hint.visible {
-            opacity: 1;
-            transform: translateY(0);
+        /* Only show if explicitly enabled via 'standalone' class */
+        body.standalone .soulbot-trigger {
+            display: flex !important;
         }
+
+        body.standalone .bot-hint {
+            display: block !important;
+            opacity: 0;
+            /* Still needs fade-in logic */
+        }
+
+        body.standalone .bot-hint.visible {
+            opacity: 1;
+        }
+
+        /* --- CHAT WINDOW --- */
 
         /* --- CHAT WINDOW --- */
         .chat-container {
@@ -360,14 +331,8 @@
             color: #0f172a;
         }
 
-        /* --- EMBED MODE (When inside iframe) --- */
-        body.embedded .soulbot-trigger {
-            display: none !important;
-        }
-
-        body.embedded .bot-hint {
-            display: none !important;
-        }
+        /* --- EMBED MODE (Default now, so we just remove overrides or keep for safety) --- */
+        /* Note: Trigger is now hidden by default, so we don't need to force hide it here. */
 
         body.embedded .chat-container {
             /* Fill the iframe completely */
@@ -500,10 +465,14 @@
         function init() {
             // Check for Embed Mode
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('embed')) {
+            const isEmbedded = urlParams.has('embed');
+
+            if (isEmbedded) {
                 document.body.classList.add('embedded');
-                // Ensure chat container is visible via CSS, but we can also force it here if needed
-                container.classList.add('active');
+                container.classList.add('active'); // Always open in embed mode
+            } else {
+                // If NOT embedded (standalone), add class to Show Trigger
+                document.body.classList.add('standalone');
             }
 
             if (chatHistory.length > 0) {
