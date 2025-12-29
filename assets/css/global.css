@@ -271,6 +271,72 @@ footer {
     }
 }
 
+/* --- UX ENHANCEMENT: BUTTON SHIMMER (#2) --- */
+.nav-btn,
+.lifeline-btn,
+.shred-btn,
+.send-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-btn::after,
+.lifeline-btn::after,
+.shred-btn::after,
+.send-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: skewX(-20deg);
+    animation: shimmer 6s infinite;
+    /* Gentle, periodic shimmer */
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+
+    10% {
+        left: 200%;
+    }
+
+    /* Fast sweep */
+    100% {
+        left: 200%;
+    }
+
+    /* Wait for next cycle */
+}
+
+/* --- UX ENHANCEMENT: SOULBOT PULSE (#3) --- */
+/* Targeting the floating trigger button usually found in Soulbot.html or injected */
+#triggerBtn,
+.trigger-btn {
+    animation: heartbeat 3s infinite ease-in-out;
+}
+
+@keyframes heartbeat {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(78, 205, 196, 0.6);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+    }
+}
+
 /* --- UTILITIES --- */
 .page-wrapper {
     position: relative;
@@ -303,6 +369,51 @@ footer {
 
     .mobile-toggle {
         display: block;
+    }
+
+    /* --- UX ENHANCEMENT: MOBILE BOTTOM NAV (#1) --- */
+    .mobile-bottom-nav {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 400px;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--border-glass);
+        border-radius: 50px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 12px 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        z-index: 1001;
+        /* Above page, below modal */
+        transition: transform 0.3s ease;
+    }
+
+    .mb-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: var(--starlight);
+        font-size: 0.75rem;
+        gap: 4px;
+        opacity: 0.7;
+        cursor: pointer;
+    }
+
+    .mb-item i {
+        font-size: 1.2rem;
+        margin-bottom: 2px;
+    }
+
+    .mb-item:hover,
+    .mb-item.active {
+        opacity: 1;
+        color: var(--teaser-blue);
     }
 
     /* Hide external Login button on mobile */

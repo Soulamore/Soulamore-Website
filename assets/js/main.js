@@ -105,4 +105,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // --- UX ENHANCEMENT: MOBILE BOTTOM NAV (#1) ---
+    // Injecting here to avoid editing 44 files
+    if (window.innerWidth <= 900 && !document.querySelector('.mobile-bottom-nav')) {
+        const bottomNav = document.createElement('div');
+        bottomNav.className = 'mobile-bottom-nav';
+        bottomNav.innerHTML = `
+            <a href="./index.html" class="mb-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <div class="mb-item" onclick="if(window.openSoulbot) window.openSoulbot(); else alert('Soulbot loading...');">
+                <i class="fas fa-robot" style="color:var(--teaser-blue);"></i>
+                <span>Chat</span>
+            </div>
+            <a href="./get-help-now.html" class="mb-item">
+                <i class="fas fa-heart-pulse" style="color:var(--peach-glow);"></i>
+                <span>Crisis</span>
+            </a>
+            <div class="mb-item" onclick="document.querySelector('.mobile-toggle').click()">
+                <i class="fas fa-bars"></i>
+                <span>Menu</span>
+            </div>
+        `;
+        document.body.appendChild(bottomNav);
+    }
 });
