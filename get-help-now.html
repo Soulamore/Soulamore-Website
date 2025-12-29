@@ -161,67 +161,127 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
         }
 
-        /* BREATHING TOOL (4-4-8 Timing) */
-        /* Total cycle: 16 seconds */
+        /* BREATHING TOOL (Visual First) */
         .breath-container {
-            margin: 40px 0;
-            cursor: pointer;
+            margin: 40px auto;
+            width: 250px;
+            height: 250px;
+            position: relative;
             display: flex;
+            align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
 
         .breath-circle {
-            width: 200px;
-            height: 200px;
-            background: white;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ffffff, #e0f2fe);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 30px rgba(78, 205, 196, 0.3);
+            box-shadow: 0 0 40px rgba(78, 205, 196, 0.4);
             position: relative;
-            transition: transform 0.3s;
+            z-index: 2;
+            transition: all 0.5s ease;
+        }
+
+        .breath-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border: 2px solid rgba(78, 205, 196, 0.3);
+            border-radius: 50%;
+            z-index: 1;
         }
 
         .breath-label {
             font-weight: 700;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--accent-teal);
-            transition: 0.5s;
+            text-align: center;
+            user-select: none;
         }
 
-        /* Animation Keyframes: 16s Total */
-        /* 0-4s: Inhale (25%) */
-        /* 4-8s: Hold (25%) */
-        /* 8-16s: Exhale (50%) */
-        @keyframes breatheSize {
+        .instruction-sub {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 20px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* ANIMATIONS (4s In, 4s Hold, 8s Out = 16s Total) */
+        @keyframes inhaleExpand {
             0% {
                 transform: scale(1);
-                background: white;
+                background: #ffffff;
             }
 
-            25% {
-                transform: scale(1.4);
-                background: #e0f2fe;
-            }
-
-            /* End Inhale */
-            50% {
-                transform: scale(1.4);
-                background: #e0f2fe;
-            }
-
-            /* End Hold */
             100% {
-                transform: scale(1);
-                background: white;
+                transform: scale(2.2);
+                background: #effcfb;
             }
-
-            /* End Exhale */
         }
 
-        .breathing .breath-circle {
-            animation: breatheSize 16s infinite ease-in-out;
+        @keyframes holdPulse {
+            0% {
+                transform: scale(2.2);
+            }
+
+            50% {
+                transform: scale(2.15);
+            }
+
+            100% {
+                transform: scale(2.2);
+            }
+        }
+
+        @keyframes exhaleContract {
+            0% {
+                transform: scale(2.2);
+                background: #effcfb;
+            }
+
+            100% {
+                transform: scale(1);
+                background: #ffffff;
+            }
+        }
+
+        @keyframes ringExpand {
+            0% {
+                width: 100px;
+                height: 100px;
+                opacity: 1;
+            }
+
+            100% {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
+            }
+        }
+
+        /* Classes controlled by JS for precise timing */
+        .inhaling .breath-circle {
+            animation: inhaleExpand 4s forwards cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .holding .breath-circle {
+            animation: holdPulse 4s infinite ease-in-out;
+        }
+
+        .exhaling .breath-circle {
+            animation: exhaleContract 8s forwards ease-out;
+        }
+
+        .inhaling .breath-ring {
+            animation: ringExpand 4s infinite linear;
         }
 
         /* GROUNDING TOOL */
@@ -334,7 +394,8 @@
     <!-- INTERACTIVE BACKGROUND -->
     <canvas id="calmCanvas"></canvas>
 
-    <header style="background: #0f172a !important; border-bottom: none !important; backdrop-filter: none !important; box-shadow: none !important;">
+    <header
+        style="background: #0f172a !important; border-bottom: none !important; backdrop-filter: none !important; box-shadow: none !important;">
         <div class="main-nav">
             <a href="index.html" class="nav-logo"><img src="assets/images/logo.png" alt="Soulamore Logo"></a>
             <div class="nav-group">
@@ -448,13 +509,16 @@
             <h2 style="font-size:1.8rem; margin-bottom:10px;">Till help arrives, let's stay.</h2>
             <p>Everything below is optional. You’re not weak for being here. Let’s slow this moment down.</p>
 
-            <!-- 1. BREATHING (Fixed 4-4-8 Timing) -->
-            <div class="breath-container" id="breathTool" onclick="toggleBreath()">
+            <!-- 1. BREATHING (Visual Focus) -->
+            <div class="breath-container" id="breathWidget" onclick="toggleBreath()">
+                <div class="breath-ring"></div>
+                <!-- Circle itself -->
                 <div class="breath-circle">
-                    <span id="breathText" class="breath-label">Tap to Breathe</span>
+                    <span id="breathText" class="breath-label"><i class="fas fa-play"
+                            style="margin-left:5px;"></i></span>
                 </div>
             </div>
-            <p style="font-size:0.9rem; opacity:0.7;">Technique: 4s In, 4s Hold, 8s Out. (Repeats)</p>
+            <p class="instruction-sub" id="breathInstruction">Tap the circle to follow the rhythm.</p>
 
             <!-- 2. GROUNDING (5-4-3-2-1) -->
             <div style="margin-top:60px; text-align:left;">
@@ -601,48 +665,65 @@
         resize(); animate();
 
 
-        // --- BREATHING LOGIC (4-4-8) ---
+        // --- VISUAL BREATHING LOGIC (4-4-8) ---
         let breathing = false;
-        let breathInterval;
+        let breathTimeouts = [];
 
         function toggleBreath() {
-            const container = document.getElementById('breathTool');
+            const container = document.getElementById('breathWidget');
             const text = document.getElementById('breathText');
+            const instr = document.getElementById('breathInstruction');
 
             if (!breathing) {
-                container.classList.add('breathing');
                 breathing = true;
-
-                // Start Cycle immediately
-                runBreathCycle(text);
-
-                // Loop every 16 seconds
-                breathInterval = setInterval(() => {
-                    runBreathCycle(text);
-                }, 16000);
-
+                instr.innerText = "Follow the circle...";
+                text.innerText = "";
+                runMethod(container, text); // Start immediate cycle
             } else {
-                container.classList.remove('breathing');
-                clearInterval(breathInterval);
-                text.innerText = "Tap to Breathe";
-                breathing = false;
+                stopBreath(container, text, instr);
             }
         }
 
-        function runBreathCycle(textElement) {
-            // 0s - Start Inhale
-            textElement.innerText = "Inhale (4s)";
+        function runMethod(container, text) {
+            if (!breathing) return;
 
-            // 4s - Hold
-            setTimeout(() => {
-                if (breathing) textElement.innerText = "Hold (4s)";
-            }, 4000);
+            // INHALE (4s)
+            container.className = 'breath-container inhaling';
+            text.innerText = "Inhale";
 
-            // 8s - Exhale
-            setTimeout(() => {
-                if (breathing) textElement.innerText = "Exhale (8s)";
-            }, 8000);
+            breathTimeouts.push(setTimeout(() => {
+                if (!breathing) return;
+                // HOLD (4s)
+                container.className = 'breath-container holding';
+                text.innerText = "Hold";
+
+                breathTimeouts.push(setTimeout(() => {
+                    if (!breathing) return;
+                    // EXHALE (8s)
+                    container.className = 'breath-container exhaling';
+                    text.innerText = "Exhale";
+
+                    breathTimeouts.push(setTimeout(() => {
+                        if (!breathing) return;
+                        // LOOP
+                        runMethod(container, text);
+                    }, 8000));
+
+                }, 4000));
+
+            }, 4000));
         }
+
+        function stopBreath(container, text, instr) {
+            breathing = false;
+            breathTimeouts.forEach(t => clearTimeout(t));
+            breathTimeouts = [];
+
+            container.className = 'breath-container'; // Remove all anim classes
+            text.innerHTML = '<i class="fas fa-play" style="margin-left:5px;"></i>';
+            instr.innerText = "Tap to breathe again.";
+        }
+
 
         // --- GROUNDING DOTS ---
         function popDot(el) { el.classList.toggle('active'); }
