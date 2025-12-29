@@ -26,6 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
             navLinks.classList.toggle('open');
             document.body.classList.toggle('no-scroll'); // Prevent background scroll
 
+            // UX: Hide Bottom Nav when Menu is Open
+            const bottomNav = document.querySelector('.mobile-bottom-nav');
+            if (bottomNav) {
+                bottomNav.classList.toggle('hidden');
+            }
+
             const icon = toggleBtn.querySelector('i');
             if (navLinks.classList.contains('open')) {
                 icon.classList.remove('fa-bars');
@@ -60,6 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
             link.addEventListener('click', () => {
                 navLinks.classList.remove('open');
                 document.body.classList.remove('no-scroll');
+
+                // UX: Show Bottom Nav again
+                const bottomNav = document.querySelector('.mobile-bottom-nav');
+                if (bottomNav) bottomNav.classList.remove('hidden');
+
                 const icon = toggleBtn.querySelector('i');
                 if (icon) {
                     icon.classList.remove('fa-times');
