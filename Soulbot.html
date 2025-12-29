@@ -482,25 +482,26 @@
                 injectTriggerAndHint();
                 hint = document.getElementById('botHint');
             }
-            chatHistory.forEach(msg => {
-                if (msg.role !== 'system') appendMessage(msg.role, msg.text, false);
-            });
-        } else {
-            const introText = isReturning
-                ? "Welcome back. I'm here if you need to vent."
-                : "Hi. I'm SoulBot. You can tell me anything—no judgment, just listening.";
-            setTimeout(() => addBotMessage(introText), 600);
-        }
+            if (chatHistory.length > 0) {
+                chatHistory.forEach(msg => {
+                    if (msg.role !== 'system') appendMessage(msg.role, msg.text, false);
+                });
+            } else {
+                const introText = isReturning
+                    ? "Welcome back. I'm here if you need to vent."
+                    : "Hi. I'm SoulBot. You can tell me anything—no judgment, just listening.";
+                setTimeout(() => addBotMessage(introText), 600);
+            }
 
-        // Auto Popup (Only valid if we just injected the hint)
-        if (!isEmbedded && !sessionStorage.getItem('soulbot_seen')) {
-            setTimeout(() => {
-                const hintEl = document.getElementById('botHint');
-                if (hintEl && !container.classList.contains('active')) hintEl.classList.add('visible');
-            }, 5000);
-            sessionStorage.setItem('soulbot_seen', 'true');
-        }
-        localStorage.setItem('soulbot_returning', 'true');
+            // Auto Popup (Only valid if we just injected the hint)
+            if (!isEmbedded && !sessionStorage.getItem('soulbot_seen')) {
+                setTimeout(() => {
+                    const hintEl = document.getElementById('botHint');
+                    if (hintEl && !container.classList.contains('active')) hintEl.classList.add('visible');
+                }, 5000);
+                sessionStorage.setItem('soulbot_seen', 'true');
+            }
+            localStorage.setItem('soulbot_returning', 'true');
         }
 
         function injectTriggerAndHint() {
