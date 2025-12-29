@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.pathname.includes('/Login Pages/');
 
     const basePath = isSubPage ? '../' : '';
-    const soulbotUrl = basePath + 'Soulbot.html?embed=true&v=2.1';
+    const soulbotUrl = basePath + 'Soulbot.html?embed=true&v=2.5';
 
     // 1. Create the floating trigger button
     const triggerBtn = document.createElement('div');
