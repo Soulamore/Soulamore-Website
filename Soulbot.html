@@ -465,7 +465,13 @@
         // --- INIT ---
         function init() {
             // RELIABLE EMBED CHECK: Are we in an iframe?
-            const isEmbedded = (window.self !== window.top) || new URLSearchParams(window.location.search).has('embed');
+            const isEmbedURL = new URLSearchParams(window.location.search).has('embed');
+            const isIframe = (window.self !== window.top);
+            // Layout Fingerprint: soulbot-beta.js forces width to 380px (desktop) or 100% (mobile)
+            // But checking clientWidth ~ 380 is a strong indicator of being in the desktop chat bubble.
+            const isChatBubbleSize = (document.documentElement.clientWidth === 380);
+
+            const isEmbedded = isIframe || isEmbedURL || isChatBubbleSize;
 
             if (isEmbedded) {
                 document.body.classList.add('embedded');
