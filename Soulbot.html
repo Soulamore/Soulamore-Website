@@ -384,15 +384,8 @@
 
 <body>
 
-    <!-- Trigger Button -->
-    <div class="soulbot-trigger" id="triggerBtn" onclick="toggleChat()">
-        <i class="fas fa-robot trigger-icon"></i>
-    </div>
-
-    <!-- Auto Popup Hint -->
-    <div class="bot-hint" id="botHint">
-        Want to vent anonymously? I'm listening.
-    </div>
+    <!-- Trigger Button & Hint are now injected via JS to prevent Double Bot in iframe -->
+    <!-- Chat Interface -->
 
     <!-- Chat Interface -->
     <div class="chat-container" id="chatContainer">
@@ -466,29 +459,22 @@
         const chatBody = document.getElementById('chatBody');
         const userInput = document.getElementById('userInput');
         const container = document.getElementById('chatContainer');
-        const hint = document.getElementById('botHint');
+        let hint = document.getElementById('botHint'); // Changed to 'let' as it might be reassigned
         const thinking = document.getElementById('thinkingIndicator');
 
         // --- INIT ---
         function init() {
-            // Check for Embed Mode
             // RELIABLE EMBED CHECK: Are we in an iframe?
             const isEmbedded = (window.self !== window.top) || new URLSearchParams(window.location.search).has('embed');
 
             if (isEmbedded) {
                 document.body.classList.add('embedded');
                 container.classList.add('active'); // Always open in embed mode
-
-                // NUCLEAR OPTION: Force hide the internal trigger to prevent "Double Bot"
-                const internalTrigger = document.getElementById('triggerBtn');
-                if (internalTrigger) internalTrigger.style.setProperty('display', 'none', 'important');
-
-                const internalHint = document.getElementById('botHint');
-                if (internalHint) internalHint.style.setProperty('display', 'none', 'important');
-
             } else {
-                // If NOT embedded (standalone), add class to Show Trigger
+                // STANDALONE MODE: Inject Trigger & Hint
                 document.body.classList.add('standalone');
+                injectTriggerAndHint();
+                hint = document.getElementById('botHint'); // Reassign hint after injection
             }
 
             if (chatHistory.length > 0) {
@@ -502,20 +488,40 @@
                 setTimeout(() => addBotMessage(introText), 600);
             }
 
-            // Auto Popup (Only if NOT embedded, as parent handles logic)
-            if (!document.body.classList.contains('embedded') && !sessionStorage.getItem('soulbot_seen')) {
+            // Auto Popup (Only valid if we just injected the hint)
+            if (!isEmbedded && !sessionStorage.getItem('soulbot_seen')) {
                 setTimeout(() => {
-                    if (!container.classList.contains('active')) hint.classList.add('visible');
+                    const hintEl = document.getElementById('botHint');
+                    if (hintEl && !container.classList.contains('active')) hintEl.classList.add('visible');
                 }, 5000);
                 sessionStorage.setItem('soulbot_seen', 'true');
             }
             localStorage.setItem('soulbot_returning', 'true');
         }
 
+        function injectTriggerAndHint() {
+            // 1. Create Trigger
+            const btn = document.createElement('div');
+            btn.className = 'soulbot-trigger';
+            btn.id = 'triggerBtn';
+            btn.onclick = toggleChat;
+            btn.innerHTML = '<i class="fas fa-robot trigger-icon"></i>';
+            document.body.appendChild(btn);
+
+            // 2. Create Hint
+            const h = document.createElement('div');
+            h.className = 'bot-hint';
+            h.id = 'botHint';
+            h.innerText = "Want to vent anonymously? I'm listening.";
+            document.body.appendChild(h);
+        }
+
         // --- UI UTILS ---
         window.toggleChat = function () {
             container.classList.toggle('active');
-            hint.classList.remove('visible');
+            if (hint) { // Check if hint element exists before trying to remove class
+                hint.classList.remove('visible');
+            }
         };
 
         window.autoResize = function (el) {
