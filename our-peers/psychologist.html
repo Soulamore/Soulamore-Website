@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Soulamore is a student wellness platform offering anonymous support, peer connection, and mental health resources.">
     <title>Psychologist Profile | Soulamore</title>
     <!-- Fonts: Outfit (UI), Lora (Storytelling) -->
     <link
@@ -13,21 +15,39 @@
     <link rel="stylesheet" href="../assets/css/global.css">
 
     <style>
-        /* --- DYNAMIC THEME SYSTEM (Clinical Neutral) --- */
+        /* --- DYNAMIC THEME SYSTEM --- */
         :root {
-            --bg-color: #F8FAFC;
-            /* Slate-50 */
+            /* Default: Anxiety (Sage) */
+            --bg-color: #E6EFE8;
             --card-bg: #ffffff;
-            --text-main: #334155;
-            /* Slate-700 */
-            --text-muted: #64748b;
-            /* Slate-500 */
-            --accent-color: #475569;
-            /* Slate-600 */
-            --accent-soft: #e2e8f0;
+            --text-main: #2c3e50;
+            --text-muted: #5f6c7b;
+            --accent-color: #7A9E7E;
+            --accent-soft: #dbece0;
             --btn-text: #ffffff;
-            --clinical-teal: #0d9488;
-            /* Teal-600 */
+        }
+
+        /* Loneliness Theme (Dusty Peach) */
+        body.theme-lonely {
+            --bg-color: #F4E6DF;
+            --accent-color: #C08B7A;
+            --accent-soft: #ebdcd5;
+        }
+
+        /* Low Mood Theme (Warm Amber) */
+        body.theme-low {
+            --bg-color: #FFF8E1;
+            --accent-color: #D4A373;
+            --accent-soft: #faebd7;
+        }
+        
+        /* Clinical (Professional) */
+        body.theme-clinical {
+            --bg-color: #F8FAFC; /* Slate 50 */
+            --accent-color: #0d9488; /* Teal 600 */
+            --accent-soft: #ccfbf1; /* Teal 100 */
+            --text-main: #334155; /* Slate 700 */
+            --text-muted: #64748b; /* Slate 500 */
         }
 
         * {
@@ -41,11 +61,10 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             line-height: 1.7;
+            transition: background-color 0.8s ease;
         }
 
-        h1,
-        h2,
-        h3 {
+        h1, h2, h3, .section-title {
             font-family: 'Outfit', sans-serif;
             color: var(--text-main);
         }
@@ -76,6 +95,29 @@
             }
         }
 
+        /* --- NAV (Light Version) --- */
+        nav {
+            padding: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            color: var(--accent-color);
+        }
+
         /* --- HERO SECTION --- */
         .profile-hero {
             text-align: center;
@@ -97,24 +139,37 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: #eee;
+            background: #e2e8f0;
             object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #94a3b8;
         }
 
         .hero-name {
             font-size: 2.5rem;
             margin-bottom: 5px;
-            font-weight: 700;
+            font-weight: 600;
         }
-
+        
         .hero-title {
             font-family: 'Outfit', sans-serif;
             font-size: 1.1rem;
-            color: var(--clinical-teal);
+            color: var(--accent-color);
             font-weight: 500;
             margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+
+        .hero-quote {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
         }
 
         .badge-row {
@@ -126,16 +181,16 @@
         }
 
         .soft-badge {
-            background: white;
+            background: rgba(255, 255, 255, 0.6);
             padding: 6px 16px;
             border-radius: 50px;
             font-size: 0.85rem;
             color: var(--text-muted);
-            border: 1px solid rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .soft-badge i {
-            color: var(--clinical-teal);
+            color: var(--accent-color);
             margin-right: 5px;
         }
 
@@ -143,19 +198,20 @@
         .soft-card {
             background: var(--card-bg);
             padding: 50px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
             margin-bottom: 30px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            border: 1px solid rgba(0, 0, 0, 0.02);
         }
 
         .section-title {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             margin-bottom: 20px;
-            color: var(--text-main);
-            border-bottom: 2px solid var(--accent-soft);
-            padding-bottom: 10px;
-            display: inline-block;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         /* List Styles */
@@ -170,11 +226,13 @@
         }
 
         .check-list li::before {
-            content: '✓';
+            content: '•';
             position: absolute;
-            left: 5px;
-            color: var(--clinical-teal);
-            font-weight: bold;
+            left: 10px;
+            color: var(--accent-color);
+            font-size: 1.5rem;
+            line-height: 1rem;
+            top: 5px;
         }
 
         /* --- STYLE CHIPS --- */
@@ -186,21 +244,19 @@
 
         .style-chip {
             padding: 8px 16px;
-            background: #f0fdfa;
-            /* Teal-50 */
-            color: var(--clinical-teal);
-            border: 1px solid #ccfbf1;
-            border-radius: 6px;
+            background: var(--accent-soft);
+            color: var(--text-main);
+            border-radius: 12px;
             font-size: 0.9rem;
             font-weight: 500;
         }
-
-        /* --- CREDENTIALS BOX --- */
+        
+        /* --- CREDENTIALS BOX (Specific to Psychologist) --- */
         .credentials-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.05);
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 16px;
             font-size: 0.9rem;
             color: var(--text-muted);
             display: grid;
@@ -213,224 +269,249 @@
             color: var(--text-main);
             margin-bottom: 2px;
         }
-
+        
         /* --- CTA --- */
         .cta-section {
             text-align: center;
             margin-bottom: 80px;
             padding-top: 40px;
-            border-top: 1px solid var(--accent-soft);
+            border-top: 1px solid rgba(0,0,0,0.05);
         }
 
         .primary-btn {
-            background: var(--clinical-teal);
+            background: var(--accent-color);
             color: white;
             padding: 18px 40px;
-            border-radius: 8px;
+            border-radius: 50px; /* Matching Soft Theme */
             font-size: 1.1rem;
             font-weight: 600;
             text-decoration: none;
             display: inline-block;
             transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(13, 148, 136, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             border: none;
             cursor: pointer;
         }
 
         .primary-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(13, 148, 136, 0.3);
-            background: #0f766e;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            opacity: 0.9;
         }
 
-        /* --- DISCLAIMER --- */
-        .disclaimer-box {
-            font-size: 0.8rem;
-            color: var(--text-muted);
+        /* --- FOOTER --- */
+        /* Dynamic Footer Themes */
+        .theme-clinical {
+            --footer-bg: #1e293b; /* Slate 800 */
+        }
+        
+        footer {
+            background-color: var(--footer-bg) !important;
+            transition: background-color 0.5s ease;
+            position: relative;
+            font-family: 'Inter', sans-serif;
             text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            background: #fff1f2;
-            border: 1px solid #ffe4e6;
-            border-radius: 8px;
+        }
+
+        footer h3 {
+            font-family: 'Outfit', sans-serif !important;
+            color: #dbece0 !important;
+        }
+
+        footer p {
+            font-family: 'Inter', sans-serif !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-size: 0.9rem !important;
+        }
+
+        footer a {
+            font-family: 'Inter', sans-serif !important;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
+            pointer-events: none;
+        }
+        
+        @media(max-width: 600px) {
+            .hero-name { font-size: 2rem; }
+            .soft-card { padding: 30px 20px; }
+            .credentials-box { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 
-<body>
+<body class="theme-clinical"> <!-- DEFAULT THEME: Clinical -->
 
-    <!-- GLOBAL HEADER -->
-    <header>
-        <div class="main-nav">
-            <a href="../index.html" class="nav-logo">
-                <i class="fas fa-heart"></i> Soulamore
+    <div class="container">
+
+        <!-- NAV -->
+        <div class="profile-nav" style="padding: 20px 0; display:flex; justify-content:space-between; align-items:center;">
+            <a href="index.html" class="back-btn"
+                style="font-size:1rem; font-weight:600; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-arrow-left"></i> Back to Peers
             </a>
-            <div class="nav-group">
-                <nav class="nav-links">
-                    <a href="../index.html">Home</a>
 
-                    <div class="dropdown">
-                        <a href="../soulamore-campus.html">Campus <i class="fas fa-chevron-down"
-                                style="font-size:0.7rem; margin-left:5px;"></i></a>
-                        <div class="dropdown-content">
-                            <a href="../campus/what-is-campus.html">What is Campus?</a>
-                            <a href="../campus/institutions.html">Institutions</a>
-                            <a href="../student-resources.html">Student Resources</a>
-                        </div>
-                    </div>
-
-                    <div class="dropdown">
-                        <a href="../soulamore-away.html">Away <i class="fas fa-chevron-down"
-                                style="font-size:0.7rem; margin-left:5px;"></i></a>
-                        <div class="dropdown-content">
-                            <a href="../soulamore-away/who-its-for.html">Who It's For</a>
-                            <a href="../soulamore-away/resources.html">Resources</a>
-                        </div>
-                    </div>
-
-                    <div class="dropdown">
-                        <a href="../confession-box.html">Confession Box <i class="fas fa-chevron-down"
-                                style="font-size:0.7rem; margin-left:5px;"></i></a>
-                        <div class="dropdown-content">
-                            <a href="../confession-box/guidelines.html">Guidelines</a>
-                        </div>
-                    </div>
-
-                    <a href="index.html">Peers</a>
-
-                    <a href="../blogs.html">Blogs</a>
-                    <a href="../forum.html">Forum</a>
-
-                    <div class="dropdown">
-                        <a href="../join-us/index.html">Join Us <i class="fas fa-chevron-down"
-                                style="font-size:0.7rem; margin-left:5px;"></i></a>
-                        <div class="dropdown-content">
-                            <a href="../join-us/peer.html">Join as Peer</a>
-                            <a href="../join-us/psychologist.html">Join as Psychologist</a>
-                        </div>
-                    </div>
-
-                    <a href="../about.html">About</a>
-                    <a href="../contact.html">Contact</a>
-                </nav>
-                <a href="../login.html" class="nav-btn">Log In</a>
+            <!-- Optional Audio for Psychologist? Maybe "Focus Mode" or standard Ambience. Keeping standard to match Profile.html logic -->
+            <div class="audio-control-pill" onclick="toggleProfileAudio()"
+                style="cursor:pointer; background:rgba(255,255,255,0.5); padding:8px 16px; border-radius:50px; font-size:0.9rem; display:flex; align-items:center; gap:8px; border:1px solid rgba(0,0,0,0.05);">
+                <i class="fas fa-music"></i> <span id="audioLabel">Play Serenity</span>
             </div>
-            <button class="mobile-toggle" aria-label="Toggle Navigation">
-                <i class="fas fa-bars"></i>
-            </button>
         </div>
-    </header>
 
-    <div class="page-wrapper"> <!-- Added for padding -->
-        <div class="container">
+        <!-- HIDDEN AUDIO -->
+        <audio id="profileAudio" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/02/07/audio_180e30c45d.mp3" type="audio/mp3">
+        </audio>
 
-            <!-- HERO -->
-            <section class="profile-hero fade-in">
-                <div class="avatar-container">
-                    <!-- Placeholder Avatar -->
-                    <div
-                        style="width:100%; height:100%; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-size:2rem; color:#64748b;">
-                        <i class="fas fa-user-md"></i>
-                    </div>
-                </div>
-                <h1 class="hero-name">Dr. Sarah Jenkins</h1>
-                <div class="hero-title">Clinical Psychologist (PhD)</div>
-
-                <p>"Therapy is a collaborative process. My goal is to help you build the tools you need to navigate life
-                    with resilience."</p>
-
-                <div class="badge-row">
-                    <span class="soft-badge"><i class="fas fa-id-card"></i> License #PSY-13490</span>
-                    <span class="soft-badge"><i class="fas fa-video"></i> Video Sessions</span>
-                    <span class="soft-badge"><i class="fas fa-clock"></i> 50 Min</span>
-                    <span class="soft-badge">English</span>
-                </div>
-            </section>
-
-            <!-- 1. APPROACH -->
-            <div class="soft-card fade-in">
-                <div class="section-title">Clinical Approach</div>
-                <p>
-                    I specialize in <strong>Cognitive Behavioral Therapy (CBT)</strong> and <strong>Mindfulness-Based
-                        Stress Reduction</strong>.
-                    My practice focuses on helping young adults manage anxiety, academic pressure, and life transitions.
-                    <br><br>
-                    I believe in evidence-based practices tailored to your unique context. We will work together to
-                    identify patterns of thinking that may be holding you back.
-                </p>
-            </div>
-
-            <!-- 2. SPECIALIZATIONS -->
-            <div class="soft-card fade-in">
-                <div class="section-title">Specializations</div>
-                <div class="style-grid">
-                    <span class="style-chip">Anxiety Disorders</span>
-                    <span class="style-chip">Academic Stress</span>
-                    <span class="style-chip">Burnout</span>
-                    <span class="style-chip">Identity & Self-Esteem</span>
-                    <span class="style-chip">Trauma-Informed Care</span>
+        <!-- HERO -->
+        <section class="profile-hero fade-in">
+            <div class="avatar-container">
+                <div class="avatar-img">
+                    <i class="fas fa-user-md"></i>
                 </div>
             </div>
+            <h1 class="hero-name">Dr. Sarah Jenkins</h1>
+            <div class="hero-title">Clinical Psychologist (PhD)</div>
+            
+            <p class="hero-quote">"Therapy is a collaborative process. My goal is to help you build the tools you need to navigate life with resilience."</p>
 
-            <!-- 3. CREDENTIALS -->
-            <div class="soft-card fade-in">
-                <div class="section-title">Education & Credentials</div>
-                <div class="credentials-box">
-                    <div class="cred-item">
-                        <strong>PhD in Clinical Psychology</strong>
-                        University of Melbourne, 2018
-                    </div>
-                    <div class="cred-item">
-                        <strong>Registered Psychologist</strong>
-                        Psychology Board of Australia
-                    </div>
-                    <div class="cred-item">
-                        <strong>Membership</strong>
-                        Australian Psychological Society (MAPS)
-                    </div>
-                    <div class="cred-item">
-                        <strong>Experience</strong>
-                        7+ Years in Clinical Practice
-                    </div>
-                </div>
+            <div class="badge-row">
+                <span class="soft-badge"><i class="fas fa-id-card"></i> License #PSY-13490</span>
+                <span class="soft-badge"><i class="fas fa-video"></i> Video Sessions</span>
+                <span class="soft-badge"><i class="fas fa-clock"></i> 50 Min</span>
+                <span class="soft-badge">English</span>
             </div>
+        </section>
 
-            <!-- 4. SESSION STRUCTURE -->
-            <div class="soft-card fade-in">
-                <div class="section-title">Session Information</div>
-                <ul class="check-list">
-                    <li><strong>First Session:</strong> Assessment and goal setting.</li>
-                    <li><strong>Confidentiality:</strong> Strictly maintained according to legal & ethical guidelines.
-                    </li>
-                    <li><strong>Fees:</strong> $180 / session (Medicare rebates available).</li>
-                    <li><strong>Cancellation:</strong> 24-hour notice required.</li>
-                </ul>
-            </div>
-
-            <!-- 5. CTA -->
-            <div class="cta-section fade-in">
-                <button class="primary-btn" onclick="bookSession()">Book a Consultation</button>
-                <br>
-                <p style="font-size:0.9rem; margin-top:15px; opacity:0.7;">
-                    Next available appointment: Tomorrow at 2:00 PM
-                </p>
-            </div>
-
-            <!-- DISCLAIMER -->
-            <div class="disclaimer-box fade-in">
-                <strong>Emergency Policy:</strong> <br>
-                I am not available for 24/7 crisis support. If you are in immediate danger, please contact local
-                emergency services or a crisis lifeline immediately.
-            </div>
-
+        <!-- 1. APPROACH -->
+        <div class="soft-card fade-in">
+            <div class="section-title"><i class="fas fa-brain"></i> Clinical Approach</div>
+            <p>
+                I specialize in <strong>Cognitive Behavioral Therapy (CBT)</strong> and <strong>Mindfulness-Based
+                    Stress Reduction</strong>.
+                My practice focuses on helping young adults manage anxiety, academic pressure, and life transitions.
+                <br><br>
+                I believe in evidence-based practices tailored to your unique context. We will work together to
+                identify patterns of thinking that may be holding you back.
+            </p>
         </div>
-    </div> <!-- End Page Wrapper -->
 
-    <script src="../assets/js/main.js"></script> <!-- Link to Main JS for Mobile Menu -->
+        <!-- 2. SPECIALIZATIONS -->
+        <div class="soft-card fade-in">
+            <div class="section-title"><i class="fas fa-star"></i> Specializations</div>
+            <div class="style-grid">
+                <span class="style-chip">Anxiety Disorders</span>
+                <span class="style-chip">Academic Stress</span>
+                <span class="style-chip">Burnout</span>
+                <span class="style-chip">Identity & Self-Esteem</span>
+                <span class="style-chip">Trauma-Informed Care</span>
+            </div>
+        </div>
+
+        <!-- 3. CREDENTIALS -->
+        <div class="soft-card fade-in">
+            <div class="section-title"><i class="fas fa-graduation-cap"></i> Education & Credentials</div>
+            <div class="credentials-box">
+                <div class="cred-item">
+                    <strong>PhD in Clinical Psychology</strong>
+                    University of Melbourne, 2018
+                </div>
+                <div class="cred-item">
+                    <strong>Registered Psychologist</strong>
+                    Psychology Board of Australia
+                </div>
+                <div class="cred-item">
+                    <strong>Membership</strong>
+                    Australian Psychological Society (MAPS)
+                </div>
+                <div class="cred-item">
+                    <strong>Experience</strong>
+                    7+ Years in Clinical Practice
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. SESSION STRUCTURE -->
+        <div class="soft-card fade-in">
+            <div class="section-title"><i class="fas fa-clipboard-list"></i> Session Information</div>
+            <ul class="check-list">
+                <li><strong>First Session:</strong> Assessment and goal setting.</li>
+                <li><strong>Confidentiality:</strong> Strictly maintained according to legal & ethical guidelines.</li>
+                <li><strong>Fees:</strong> $180 / session (Medicare rebates available).</li>
+                <li><strong>Cancellation:</strong> 24-hour notice required.</li>
+            </ul>
+        </div>
+
+        <!-- 5. CTA -->
+        <div class="cta-section fade-in">
+            <button class="primary-btn" onclick="bookSession()">Book a Consultation</button>
+            <br>
+            <p style="font-size:0.9rem; margin-top:15px; opacity:0.7;">
+                Next available appointment: Tomorrow at 2:00 PM
+            </p>
+            
+             <!-- DISCLAIMER MOVED HERE -->
+             <div style="background:rgba(239, 68, 68, 0.1); color:#991b1b; padding:15px; border-radius:12px; margin-top:30px; font-size:0.85rem; border:1px solid rgba(239, 68, 68, 0.2);">
+                 <strong>Emergency Policy:</strong> I am not available for 24/7 crisis support. If you are in immediate danger, please contact local emergency services.
+             </div>
+        </div>
+
+    </div>
+
+    <!-- STANDARDIZED FOOTER (Matched to profile.html logic) -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="../assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; margin-bottom: 15px;">
+            </div>
+            <p style="font-size:0.9rem; opacity:0.7; margin-top:10px;">Your Partner in Mental Wellness.</p>
+            
+            <p style="font-size:0.85rem; opacity:0.6; margin-top:20px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                Disclaimer: Online therapy is not advisable if you are in acute distress.
+                Please contact your nearest hospital if you are feeling suicidal or at risk of self-harm.
+            </p>
+
+            <div class="footer-links">
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../legal.html">Legal</a>
+            </div>
+            
+            <div class="footer-socials">
+                <a href="https://www.instagram.com/soulamore_/" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/soulamore/" target="_blank"><i class="fab fa-linkedin"></i></a>
+                <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank"><i class="fab fa-facebook"></i></a>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.5; margin-top:20px;">© 2025 by Hashlilly! All rights reserved.</p>
+        </div>
+    </footer>
+
     <script>
+        // --- AUDIO LOGIC ---
+        const pAudio = document.getElementById('profileAudio');
+        let pPlaying = false;
+        function toggleProfileAudio() {
+            const label = document.getElementById('audioLabel');
+            if (pPlaying) {
+                pAudio.pause();
+                label.innerText = "Play Serenity";
+            } else {
+                pAudio.volume = 0.2;
+                pAudio.play();
+                label.innerText = "Pause Music";
+            }
+            pPlaying = !pPlaying;
+        }
+
         // --- BOOKING LOGIC ---
         function bookSession() {
-            // Integration with Calendly or Booking System
             alert("Redirecting to secure booking portal...");
         }
 
@@ -445,6 +526,6 @@
         });
         document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     </script>
+    <script src="../assets/js/soulbot-beta.js"></script>
 </body>
-
 </html>

@@ -4,11 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Soulamore: A safe, anonymous student wellness ecosystem. Connect with peers, vent in the confession box, and find mental health resources.">
     <title>Our Peers | Soulamore</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
 
     <style>
         /* --- THEME: MIDNIGHT VEGITO --- */
@@ -95,55 +98,12 @@
             }
         }
 
-        /* --- NAV --- */
-        nav {
-            padding: 20px 0;
-            border-bottom: 1px solid var(--border-glass);
-            margin-bottom: 60px;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-
-        .back-btn {
-            color: var(--starlight);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-
-        .back-btn:hover {
-            color: var(--peach-glow);
-        }
+        /* --- NAV STYLES REMOVED FOR GLOBAL HEADER CONSISTENCY --- */
 
         /* --- HERO --- */
         .hero {
             text-align: center;
-            padding: 80px 0 40px;
+            padding: 180px 0 60px;
         }
 
         .hero h1 {
@@ -196,27 +156,82 @@
             gap: 10px;
         }
 
-        .filter-chip {
-            padding: 8px 18px;
+        /* --- HORIZONTAL RAIL --- */
+        .category-rail-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .category-rail {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 20px;
+            /* Increased to prevents glow clipping */
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE */
+            mask-image: linear-gradient(to right, black 95%, transparent 100%);
+        }
+
+        .category-rail::-webkit-scrollbar {
+            display: none;
+            /* Chrome/Safari */
+        }
+
+        .category-pill {
+            padding: 10px 24px;
             border: 1px solid var(--border-glass);
             border-radius: 50px;
             cursor: pointer;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 0.95rem;
             transition: 0.3s;
-            font-size: 0.9rem;
-            background: rgba(255, 255, 255, 0.03);
-            user-select: none;
+            color: var(--starlight);
+            flex-shrink: 0;
+            backdrop-filter: blur(5px);
         }
 
-        .filter-chip:hover {
+        .category-pill:hover {
+            border-color: var(--teal-glow);
             background: rgba(255, 255, 255, 0.1);
-            border-color: var(--teal-glow);
         }
 
-        .filter-chip.active {
-            background: var(--teal-glow);
+        .category-pill.active {
+            background: var(--gradient-primary);
             color: var(--deep-space);
-            border-color: var(--teal-glow);
+            border-color: transparent;
             font-weight: 700;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        /* --- SECONDARY FILTER BAR --- */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 50px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-glass);
+        }
+
+        .filter-select {
+            background: var(--navy-glass);
+            color: var(--starlight);
+            border: 1px solid var(--border-glass);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .filter-select:hover {
+            border-color: var(--teal-glow);
         }
 
         /* --- PEER GRID --- */
@@ -406,60 +421,65 @@
 
     <!-- NAV -->
     <!-- GLOBAL HEADER -->
-    <header>
+    <header style="background: #0f172a !important; border-bottom: none !important; backdrop-filter: none !important; box-shadow: none !important;">
         <div class="main-nav">
-            <a href="../index.html" class="nav-logo">
-                <i class="fas fa-heart"></i> Soulamore
-            </a>
+            <a href="../index.html" class="nav-logo"><img src="../assets/images/logo.png" alt="Soulamore Logo"></a>
 
             <div class="nav-group">
                 <nav class="nav-links">
-                    <a href="../index.html">Home</a>
-
-                    <div class="dropdown">
-                        <a href="../soulamore-campus.html">Campus <i class="fas fa-chevron-down"
-                                style="font-size:0.7rem; margin-left:5px;"></i></a>
-                        <div class="dropdown-content">
-                            <a href="../campus/what-is-campus.html">What is Campus?</a>
-                            <a href="../campus/institutions.html">Institutions</a>
-                            <a href="../student-resources.html">Student Resources</a>
+                        <div class="dropdown">
+                            <a href="../index.html" class="active">Home <i class="fas fa-chevron-down" style="font-size:0.7rem; margin-left:5px;"></i></a>
+                            <div class="dropdown-content">
+                                <a href="../get-help-now.html">Get Help Now</a>
+                                <a href="../vent-box.html">The Vent Box</a>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="dropdown">
-                        <a href="../soulamore-away.html">Away <i class="fas fa-chevron-down"
-                                style="font-size:0.7rem; margin-left:5px;"></i></a>
-                        <div class="dropdown-content">
-                            <a href="../soulamore-away/who-its-for.html">Who It's For</a>
-                            <a href="../soulamore-away/resources.html">Resources</a>
+                        <div class="dropdown">
+                            <a href="../soulamore-campus.html">Campus <i class="fas fa-chevron-down" style="font-size:0.7rem; margin-left:5px;"></i></a>
+                            <div class="dropdown-content">
+                                <a href="../campus/what-is-campus.html">What is Campus?</a>
+                                <a href="../campus/institutions.html">Institutions</a>
+                                <a href="../student-resources.html">Student Resources</a>
+                                <a href="../campus/campus-ambassadors.html">Campus Ambassadors</a>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="dropdown">
-                        <a href="../confession-box.html">Confession Box <i class="fas fa-chevron-down"
-                                style="font-size:0.7rem; margin-left:5px;"></i></a>
-                        <div class="dropdown-content">
-                            <a href="../confession-box/guidelines.html">Guidelines</a>
+                        <div class="dropdown">
+                            <a href="../soulamore-away.html">Away <i class="fas fa-chevron-down" style="font-size:0.7rem; margin-left:5px;"></i></a>
+                            <div class="dropdown-content">
+                                <a href="../soulamore-away/who-its-for.html">Who It's For</a>
+                                <a href="../soulamore-away/resources.html">Resources</a>
+                            </div>
                         </div>
-                    </div>
-
-                    <a href="index.html" class="active">Peers</a>
-
-                    <a href="../blogs.html">Blogs</a>
-                    <a href="../forum.html">Forum</a>
-
-                    <div class="dropdown">
-                        <a href="../join-us/index.html">Join Us <i class="fas fa-chevron-down"
-                                style="font-size:0.7rem; margin-left:5px;"></i></a>
-                        <div class="dropdown-content">
-                            <a href="../join-us/peer.html">Join as Peer</a>
-                            <a href="../join-us/psychologist.html">Join as Psychologist</a>
+                        <div class="dropdown">
+                            <a href="../confession-box.html">Confession Box <i class="fas fa-chevron-down" style="font-size:0.7rem; margin-left:5px;"></i></a>
+                            <div class="dropdown-content">
+                                <a href="../confession-box/guidelines.html">Guidelines</a>
+                            </div>
                         </div>
-                    </div>
-
-                    <a href="../about.html">About</a>
-                    <a href="../contact.html">Contact</a>
-                </nav>
+                        <div class="dropdown">
+                            <a href="../support-groups.html">Support Groups <i class="fas fa-chevron-down" style="font-size:0.7rem; margin-left:5px;"></i></a>
+                            <div class="dropdown-content">
+                                <a href="../community-calendar.html">Community Calendar</a>
+                            </div>
+                        </div>
+                        <a href="index.html" class="active">Peers</a>
+                        <div class="dropdown">
+                            <a href="../join-us/index.html" class="active">Join Us <i class="fas fa-chevron-down" style="font-size:0.7rem; margin-left:5px;"></i></a>
+                            <div class="dropdown-content">
+                                <a href="../join-us/peer.html">Join as Peer</a>
+                                <a href="../join-us/psychologist.html">Join as Psychologist</a>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <a href="#">Community <i class="fas fa-chevron-down" style="font-size:0.7rem; margin-left:5px;"></i></a>
+                            <div class="dropdown-content">
+                                <a href="../blogs.html">Blogs</a>
+                                <a href="../forum.html">Forum</a>
+                            </div>
+                        </div>
+                        <a href="../about.html">About</a>
+                        <a href="../contact.html">Contact</a>
+                    </nav>
                 <a href="../login.html" class="nav-btn">Log In</a>
             </div>
 
@@ -475,6 +495,14 @@
         <section class="hero fade-in">
             <span class="subtitle">Real people. Trained listeners. Shared ground.</span>
             <h1>Our Peers</h1>
+
+            <div class="footer-socials">
+                <a href="https://www.instagram.com/soulamore_/" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/soulamore/" target="_blank"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank"><i
+                        class="fab fa-facebook"></i></a>
+            </div>
             <p>At Soulamore, peers are not here to fix you. They are here to sit with you, listen without judgement, and
                 help you untangle what feels heavy.</p>
         </section>
@@ -487,34 +515,63 @@
         </div>
 
         <!-- FILTERS -->
+        <!-- FILTERS -->
         <div class="filter-section fade-in">
-            <div class="filter-group">
-                <span class="filter-label">What you're going through</span>
-                <div class="chip-wrapper">
-                    <div class="filter-chip" onclick="filterPeers('Anxiety')">Anxiety & Overthinking</div>
-                    <div class="filter-chip" onclick="filterPeers('Low Mood')">Feeling Low</div>
-                    <div class="filter-chip" onclick="filterPeers('Loneliness')">Loneliness</div>
-                    <div class="filter-chip" onclick="filterPeers('Academic')">Academic Pressure</div>
-                    <div class="filter-chip" onclick="filterPeers('Burnout')">Burnout</div>
-                    <div class="filter-chip" onclick="filterPeers('Relationships')">Relationships</div>
+            <!-- 1. Horizontal Rail -->
+            <div class="category-rail-container">
+                <div class="category-rail">
+                    <div class="category-pill active" onclick="setCategory('all')">All Topics</div>
+                    <div class="category-pill" onclick="setCategory('Anxiety')">Anxiety & Overthinking</div>
+                    <div class="category-pill" onclick="setCategory('Low Mood')">Feeling Low</div>
+                    <div class="category-pill" onclick="setCategory('Loneliness')">Loneliness</div>
+                    <div class="category-pill" onclick="setCategory('Academic')">Academic Pressure</div>
+                    <div class="category-pill" onclick="setCategory('Relationships')">Relationships</div>
+                    <div class="category-pill" onclick="setCategory('Body Image')">Body Image</div>
+                    <div class="category-pill" onclick="setCategory('Self-Esteem')">Self-Esteem</div>
+                    <div class="category-pill" onclick="setCategory('ADHD')">ADHD Support</div>
+                    <div class="category-pill" onclick="setCategory('Grief')">Grief & Loss</div>
+                    <div class="category-pill" onclick="setCategory('LGBTQ')">LGBTQ+ Identity</div>
                 </div>
             </div>
 
-            <div class="filter-group">
-                <span class="filter-label">Conversation Style & Identity</span>
-                <div class="chip-wrapper">
-                    <div class="filter-chip" onclick="filterPeers('Gentle Listener')">Gentle Listener</div>
-                    <div class="filter-chip" onclick="filterPeers('Structured')">Structured</div>
-                    <div class="filter-chip" onclick="filterPeers('Expat')">Expat / Away</div>
-                    <div class="filter-chip" onclick="filterPeers('Student')">Student</div>
-                    <div class="filter-chip" onclick="filterPeers('Hindi')">Hindi</div>
-                </div>
-            </div>
+            <!-- 2. Secondary Filter Bar (Markers) -->
+            <div class="filter-bar">
+                <select class="filter-select" id="priceFilter" onchange="applyFilters()">
+                    <option value="all">Price: Any</option>
+                    <option value="Free">Free (Volunteer)</option>
+                    <option value="Paid">Paid Session</option>
+                </select>
 
-            <div style="text-align:center;">
-                <button onclick="resetFilters()"
-                    style="background:none; border:none; color:var(--peach-glow); text-decoration:underline; cursor:pointer;">Reset
-                    Filters</button>
+                <select class="filter-select" id="langFilter" onchange="applyFilters()">
+                    <option value="all">Language: Any</option>
+                    <option value="English">English</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="Spanish">Spanish</option>
+                </select>
+
+                <select class="filter-select" id="ageFilter" onchange="applyFilters()">
+                    <option value="all">Peer Age: Any</option>
+                    <option value="18-24">18 - 24</option>
+                    <option value="25-34">25 - 34</option>
+                    <option value="35+">35+</option>
+                </select>
+
+                <select class="filter-select" id="genderFilter" onchange="applyFilters()">
+                    <option value="all">Gender: Any</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Non-binary">Non-binary</option>
+                </select>
+
+                <select class="filter-select" id="availFilter" onchange="applyFilters()">
+                    <option value="all">Availability: Any</option>
+                    <option value="Online">Online Now</option>
+                    <option value="Offline">Schedule Later</option>
+                </select>
+
+                <button onclick="resetAll()"
+                    style="font-size:0.8rem; background:none; border:none; color:var(--peach-glow); text-decoration:underline; cursor:pointer;">Reset
+                    All</button>
             </div>
         </div>
 
@@ -547,98 +604,155 @@
     </div>
 
     <script>
-        // --- PEER DATA ---
+        // --- PEER DATA (Updated with Markers) ---
         const peers = [
             {
                 id: 1,
                 name: "Aditya",
                 quote: "I’m here to listen without rushing your story.",
-                tags: ["Anxiety", "Student", "Structured", "Hindi"],
-                avatarColor: "#4ECDC4",
-                online: true
+                tags: ["Anxiety", "Student", "Structured", "Hindi", "ADHD"],
+                markers: { price: "Free", lang: "Hindi", age: "18-24", gender: "Male", avail: "Online" },
+                avatarColor: "#4ECDC4"
             },
             {
                 id: 2,
                 name: "Aarti",
                 quote: "Healing touches the soul when shared.",
-                tags: ["Low Mood", "Relationships", "Gentle Listener"],
-                avatarColor: "#F49F75",
-                online: false
+                tags: ["Low Mood", "Relationships", "Gentle Listener", "Self-Esteem"],
+                markers: { price: "Free", lang: "Hindi", age: "25-34", gender: "Female", avail: "Offline" },
+                avatarColor: "#F49F75"
             },
             {
                 id: 3,
                 name: "Lakshit",
                 quote: "I know the silence of a new city.",
-                tags: ["Expat", "Loneliness", "Burnout", "Hindi"],
-                avatarColor: "#fbbf24",
-                online: true
+                tags: ["Expat", "Loneliness", "Burnout", "Hindi", "Grief"],
+                markers: { price: "Paid", lang: "Hindi", age: "25-34", gender: "Male", avail: "Online" },
+                avatarColor: "#fbbf24"
             },
             {
                 id: 4,
                 name: "Riya",
                 quote: "Academic pressure is real. Let's untangle it.",
-                tags: ["Academic", "Student", "Structured"],
-                avatarColor: "#a78bfa",
-                online: true
+                tags: ["Academic", "Student", "Structured", "Body Image"],
+                markers: { price: "Free", lang: "English", age: "18-24", gender: "Female", avail: "Online" },
+                avatarColor: "#a78bfa"
             },
             {
                 id: 5,
                 name: "Sam",
                 quote: "Sometimes you just need to vent.",
-                tags: ["Burnout", "Gentle Listener", "Loneliness"],
-                avatarColor: "#94a3b8",
-                online: false
+                tags: ["Burnout", "Gentle Listener", "Loneliness", "LGBTQ"],
+                markers: { price: "Free", lang: "English", age: "18-24", gender: "Non-binary", avail: "Offline" },
+                avatarColor: "#94a3b8"
             },
             {
                 id: 6,
                 name: "Meera",
                 quote: "Your feelings are valid, always.",
-                tags: ["Relationships", "Anxiety", "Gentle Listener"],
-                avatarColor: "#2a9d8f",
-                online: true
+                tags: ["Relationships", "Anxiety", "Gentle Listener", "Body Image"],
+                markers: { price: "Paid", lang: "Spanish", age: "35+", gender: "Female", avail: "Online" },
+                avatarColor: "#2a9d8f"
             }
         ];
+
+        // --- FILTER STATE ---
+        let currentCategory = 'all';
 
         // --- RENDER PEERS ---
         const grid = document.getElementById('peerGrid');
 
-        function renderPeers(filter = 'all') {
+        function renderPeers() {
             grid.innerHTML = '';
-            peers.forEach(peer => {
-                if (filter === 'all' || peer.tags.some(tag => tag.includes(filter))) {
-                    const statusClass = peer.online ? 'status-online' : 'status-offline';
-                    const tagHTML = peer.tags.map(t => `<span class="mini-tag">${t}</span>`).join('');
 
-                    const card = document.createElement('div');
-                    card.className = 'peer-card fade-in';
-                    card.innerHTML = `
-                        <div class="status-dot ${statusClass}"></div>
-                        <div class="peer-avatar" style="background:${peer.avatarColor}">${peer.name.charAt(0)}</div>
-                        <div class="peer-name">${peer.name}</div>
-                        <div class="grounding-line">"${peer.quote}"</div>
-                        <div class="tags-row">${tagHTML}</div>
-                        <a href="profile.html" class="connect-btn">View Profile</a>
-                    `;
-                    grid.appendChild(card);
-                }
+            // Get dropdown values
+            const pVal = document.getElementById('priceFilter').value;
+            const lVal = document.getElementById('langFilter').value;
+            const aVal = document.getElementById('ageFilter').value;
+            const gVal = document.getElementById('genderFilter').value;
+            const avVal = document.getElementById('availFilter').value;
+
+            // Filter Logic
+            const filtered = peers.filter(peer => {
+                // 1. Check Category
+                const catMatch = (currentCategory === 'all') || peer.tags.some(t => t.includes(currentCategory));
+
+                // 2. Check Markers
+                const priceMatch = (pVal === 'all') || peer.markers.price === pVal;
+                const langMatch = (lVal === 'all') || peer.markers.lang === lVal || (lVal === 'English' && true); // Assume all speak English default? Simplified.
+                const ageMatch = (aVal === 'all') || peer.markers.age === aVal;
+                const genderMatch = (gVal === 'all') || peer.markers.gender === gVal;
+                const availMatch = (avVal === 'all') || peer.markers.avail === avVal;
+
+                return catMatch && priceMatch && langMatch && ageMatch && genderMatch && availMatch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; opacity:0.5; margin-top:30px;">No peers found matching these filters. Try adjusting your preferences.</p>';
+                return;
+            }
+
+            filtered.forEach(peer => {
+                const statusClass = (peer.markers.avail === 'Online') ? 'status-online' : 'status-offline';
+                // Show first 3 tags
+                const tagHTML = peer.tags.slice(0, 3).map(t => `<span class="mini-tag">${t}</span>`).join('');
+                const priceBadge = (peer.markers.price === "Paid") ? '<span style="font-size:0.7rem; background:var(--gold-glow); color:black; padding:2px 8px; border-radius:10px; margin-left:5px;">Paid</span>' : '';
+
+                const card = document.createElement('div');
+                card.className = 'peer-card fade-in';
+                card.innerHTML = `
+                    <div class="status-dot ${statusClass}"></div>
+                    <div class="peer-avatar" style="background:${peer.avatarColor}">${peer.name.charAt(0)}</div>
+                    <div class="peer-name">${peer.name} ${priceBadge}</div>
+                    <div class="grounding-line">"${peer.quote}"</div>
+                    <div class="tags-row">${tagHTML}</div>
+                    <a href="profile.html" class="connect-btn">View Profile</a>
+                `;
+                grid.appendChild(card);
             });
         }
 
-        // --- FILTER LOGIC ---
-        function filterPeers(tag) {
-            // Update active state of chips
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            renderPeers(tag);
+        // --- INTERACTION ---
+        function setCategory(cat) {
+            currentCategory = cat;
+            // Update UI pills
+            document.querySelectorAll('.category-pill').forEach(p => {
+                p.classList.remove('active');
+                if ((cat === 'all' && p.innerText === 'All Topics') || p.getAttribute('onclick').includes(cat)) {
+                    p.classList.add('active');
+                }
+            });
+            renderPeers();
         }
 
-        function resetFilters() {
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            renderPeers('all');
+        function applyFilters() {
+            renderPeers();
+        }
+
+        function resetAll() {
+            currentCategory = 'all';
+            document.getElementById('priceFilter').value = 'all';
+            document.getElementById('langFilter').value = 'all';
+            document.getElementById('ageFilter').value = 'all';
+            document.getElementById('genderFilter').value = 'all';
+            document.getElementById('availFilter').value = 'all';
+
+            // Reset Active Pill UI
+            document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+            document.querySelector('.category-pill').classList.add('active'); // First one
+
+            renderPeers();
         }
 
         // --- INIT ---
-        renderPeers();
+        // Check for URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const catParam = urlParams.get('category');
+        if (catParam) {
+            setCategory(catParam);
+        } else {
+            renderPeers();
+        }
 
         // --- PARTICLES ---
         const pContainer = document.getElementById('particles');
@@ -680,6 +794,42 @@
         // We observe cards after rendering? No, static elements only for now
         document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     </script>
+    <!-- GLOBAL FOOTER (HASHLILLY STANDARD) -->
+    <!-- GLOBAL FOOTER -->
+
+
+    <!-- STANDARDIZED FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="../assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; margin-bottom: 15px;">
+            </div>
+            <p style="font-size:0.9rem; opacity:0.7; margin-top:10px;">Your Partner in Mental Wellness.</p>
+
+            <p
+                style="font-size:0.85rem; opacity:0.6; margin-top:20px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                Disclaimer: Online therapy is not advisable if you are in acute distress.
+                Please contact your nearest hospital if you are feeling suicidal or at risk of self-harm.
+            </p>
+
+            <div class="footer-links">
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../legal.html">Legal</a>
+            </div>
+
+            <div class="footer-socials">
+                <a href="https://www.instagram.com/soulamore_/" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/soulamore/" target="_blank"><i
+                        class="fab fa-linkedin"></i></a>
+                <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank"><i
+                        class="fab fa-facebook"></i></a>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.5; margin-top:20px;">© 2025 by Hashlilly! All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/soulbot-beta.js"></script>
 </body>
 
 </html>

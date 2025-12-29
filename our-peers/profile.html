@@ -4,12 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Soulamore is a student wellness platform offering anonymous support, peer connection, and mental health resources.">
     <title>Peer Profile | Soulamore</title>
     <!-- Fonts: Outfit (UI), Lora (Storytelling) -->
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Lora:ital,wght@0,400;0,500;1,400&family=Plus+Jakarta+Sans:wght@400;500&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
 
     <style>
         /* --- DYNAMIC THEME SYSTEM --- */
@@ -345,6 +348,68 @@
                 padding: 30px 20px;
             }
         }
+
+        /* --- DYNAMIC FOOTER THEMES --- */
+        /* Default fallback */
+        :root {
+            --footer-bg: #0f172a;
+        }
+
+        /* Theme overrides for footer */
+        .theme-anxiety {
+            --footer-bg: #182e2b;
+        }
+
+        /* Deep Sage */
+        .theme-low {
+            --footer-bg: #2e241b;
+        }
+
+        /* Deep Amber */
+        .theme-lonely {
+            --footer-bg: #2e201e;
+        }
+
+        /* Deep Peach */
+
+        footer {
+            background-color: var(--footer-bg) !important;
+            transition: background-color 0.5s ease;
+            position: relative;
+            /* Reset Fonts for Footer to match Global Site */
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+        }
+
+        footer h3 {
+            font-family: 'Outfit', sans-serif !important;
+            color: #dbece0 !important;
+            /* Use a light color compatible with dark themes */
+        }
+
+        footer p {
+            font-family: 'Inter', sans-serif !important;
+            /* Override Lora */
+            color: rgba(255, 255, 255, 0.7) !important;
+            /* Override text-muted */
+            font-size: 0.9rem !important;
+        }
+
+        footer a {
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        /* Overlay effect: Add a gradient for depth */
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -363,69 +428,24 @@
     <div class="container">
 
         <!-- NAV -->
-        <!-- GLOBAL HEADER -->
-        <header>
-            <div class="main-nav">
-                <a href="../index.html" class="nav-logo">
-                    <i class="fas fa-heart"></i> Soulamore
-                </a>
+        <!-- CUSTOM PROFILE NAV -->
+        <div class="profile-nav"
+            style="padding: 20px 0; display:flex; justify-content:space-between; align-items:center;">
+            <a href="index.html" class="back-btn"
+                style="font-size:1rem; font-weight:600; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-arrow-left"></i> Back to Peers
+            </a>
 
-                <div class="nav-group">
-                    <nav class="nav-links">
-                        <a href="../index.html">Home</a>
-
-                        <div class="dropdown">
-                            <a href="../soulamore-campus.html">Campus <i class="fas fa-chevron-down"
-                                    style="font-size:0.7rem; margin-left:5px;"></i></a>
-                            <div class="dropdown-content">
-                                <a href="../campus/what-is-campus.html">What is Campus?</a>
-                                <a href="../campus/institutions.html">Institutions</a>
-                                <a href="../student-resources.html">Student Resources</a>
-                            </div>
-                        </div>
-
-                        <div class="dropdown">
-                            <a href="../soulamore-away.html">Away <i class="fas fa-chevron-down"
-                                    style="font-size:0.7rem; margin-left:5px;"></i></a>
-                            <div class="dropdown-content">
-                                <a href="../soulamore-away/who-its-for.html">Who It's For</a>
-                                <a href="../soulamore-away/resources.html">Resources</a>
-                            </div>
-                        </div>
-
-                        <div class="dropdown">
-                            <a href="../confession-box.html">Confession Box <i class="fas fa-chevron-down"
-                                    style="font-size:0.7rem; margin-left:5px;"></i></a>
-                            <div class="dropdown-content">
-                                <a href="../confession-box/guidelines.html">Guidelines</a>
-                            </div>
-                        </div>
-
-                        <a href="index.html" class="active">Peers</a>
-
-                        <a href="../blogs.html">Blogs</a>
-                        <a href="../forum.html">Forum</a>
-
-                        <div class="dropdown">
-                            <a href="../join-us/index.html">Join Us <i class="fas fa-chevron-down"
-                                    style="font-size:0.7rem; margin-left:5px;"></i></a>
-                            <div class="dropdown-content">
-                                <a href="../join-us/peer.html">Join as Peer</a>
-                                <a href="../join-us/psychologist.html">Join as Psychologist</a>
-                            </div>
-                        </div>
-
-                        <a href="../about.html">About</a>
-                        <a href="../contact.html">Contact</a>
-                    </nav>
-                    <a href="../login.html" class="nav-btn">Log In</a>
-                </div>
-
-                <button class="mobile-toggle" aria-label="Toggle Navigation">
-                    <i class="fas fa-bars"></i>
-                </button>
+            <div class="audio-control-pill" onclick="toggleProfileAudio()"
+                style="cursor:pointer; background:rgba(255,255,255,0.5); padding:8px 16px; border-radius:50px; font-size:0.9rem; display:flex; align-items:center; gap:8px; border:1px solid rgba(0,0,0,0.05);">
+                <i class="fas fa-music"></i> <span id="audioLabel">Play Ambience</span>
             </div>
-        </header>
+        </div>
+
+        <!-- HIDDEN AUDIO -->
+        <audio id="profileAudio" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+        </audio>
 
         <!-- HERO -->
         <section class="profile-hero fade-in">
@@ -517,13 +537,60 @@
         </div>
 
         <!-- FOOTER COPY -->
-        <div class="footer-micro fade-in">
-            "You’re allowed to take support at your own pace."
-        </div>
+
 
     </div>
 
+
+    
+
+    
+    <!-- STANDARDIZED FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="../assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; margin-bottom: 15px;">
+            </div>
+            <p style="font-size:0.9rem; opacity:0.7; margin-top:10px;">Your Partner in Mental Wellness.</p>
+            
+            <p style="font-size:0.85rem; opacity:0.6; margin-top:20px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                Disclaimer: Online therapy is not advisable if you are in acute distress.
+                Please contact your nearest hospital if you are feeling suicidal or at risk of self-harm.
+            </p>
+
+            <div class="footer-links">
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../legal.html">Legal</a>
+            </div>
+            
+            <div class="footer-socials">
+                <a href="https://www.instagram.com/soulamore_/" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/soulamore/" target="_blank"><i class="fab fa-linkedin"></i></a>
+                <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank"><i class="fab fa-facebook"></i></a>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.5; margin-top:20px;">© 2025 by Hashlilly! All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
     <script>
+        // --- AUDIO LOGIC ---
+        const pAudio = document.getElementById('profileAudio');
+        let pPlaying = false;
+        function toggleProfileAudio() {
+            const label = document.getElementById('audioLabel');
+            if (pPlaying) {
+                pAudio.pause();
+                label.innerText = "Play Ambience";
+            } else {
+                pAudio.volume = 0.2;
+                pAudio.play();
+                label.innerText = "Pause Music";
+            }
+            pPlaying = !pPlaying;
+        }
+
         // --- THEME SWITCHER LOGIC ---
         function setTheme(themeName) {
             document.body.className = themeName;
@@ -564,6 +631,7 @@
         });
         document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     </script>
+    <script src="../assets/js/soulbot-beta.js"></script>
 </body>
 
 </html>
