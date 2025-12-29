@@ -296,33 +296,42 @@ footer {
         /* Try to push to top if flex container allows */
     }
 
+    /* Mobile Menu Style (Side Drawer) */
     .nav-links {
         position: fixed;
-        top: 70px;
-        left: 0;
+        top: 0;
+        right: 0;
+        /* Align to right */
+        left: auto;
+        /* Unset left */
         width: 100%;
-        min-height: 50vh;
-        /* Ensure enough height for items */
+        /* Full width or adjusting to say 80% if desired, sticking to 100% for now matching prev logic */
+        height: 100vh;
         background: rgba(15, 23, 42, 0.98);
-        /* Slightly darker for legibility */
-        backdrop-filter: blur(15px);
+        backdrop-filter: blur(20px);
         display: flex !important;
-        /* OVERRIDE embedded display:none */
         flex-direction: column;
+        justify-content: center;
+        /* Center items vertically */
         padding: 40px;
         align-items: center;
         gap: 25px;
-        transform: translateY(-150%);
-        transition: 0.4s ease-in-out;
-
-        border-bottom: 1px solid var(--border-glass);
-        padding-top: 100px;
-        /* Ensure clearance for logo/header */
+        transform: translateX(100%);
+        /* Start off-screen right */
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border-left: 1px solid var(--border-glass);
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        /* Below toggle button which is in header z-1000 */
     }
 
     .nav-links.open {
-        transform: translateY(0);
+        transform: translateX(0);
+        /* Slide in */
     }
+}
 
-
+/* Scroll Lock Class (Toggled by JS) */
+body.no-scroll {
+    overflow: hidden;
 }

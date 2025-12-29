@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         toggleBtn.addEventListener('click', () => {
             navLinks.classList.toggle('open');
+            document.body.classList.toggle('no-scroll'); // Prevent background scroll
+
             const icon = toggleBtn.querySelector('i');
             if (navLinks.classList.contains('open')) {
                 icon.classList.remove('fa-bars');
