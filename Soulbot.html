@@ -476,6 +476,13 @@
             if (isEmbedded) {
                 document.body.classList.add('embedded');
                 container.classList.add('active'); // Always open in embed mode
+
+                // SAFETY CLEANUP: Remove any existing triggers (zombies from cache or static HTML)
+                const zombieBtn = document.getElementById('triggerBtn');
+                if (zombieBtn) zombieBtn.remove();
+                const zombieHint = document.getElementById('botHint');
+                if (zombieHint) zombieHint.remove();
+
             } else {
                 // STANDALONE MODE: Inject Trigger & Hint
                 document.body.classList.add('standalone');
