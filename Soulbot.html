@@ -461,35 +461,46 @@
             const isEmbedURL = new URLSearchParams(window.location.search).has('embed');
             const isIframe = (window.self !== window.top);
             // Layout Fingerprint: soulbot-beta.js forces width to 380px (desktop) or 100% (mobile)
-            // But checking clientWidth < 600 is a safer indicator of being in the chat bubble vs full screen. const
-            isChatBubbleSize = (document.documentElement.clientWidth < 600); const isEmbedded = isIframe || isEmbedURL ||
-                isChatBubbleSize; if (isEmbedded) {
-                    document.body.classList.add('embedded'); container.classList.add('active');
-                    // Always open in embed mode // SAFETY CLEANUP: Remove any existing triggers (zombies from cache or static HTML)
-                    const zombieBtn = document.getElementById('triggerBtn'); if (zombieBtn) zombieBtn.remove(); const
-                        zombieHint = document.getElementById('botHint'); if (zombieHint) zombieHint.remove();
-                } else { // STANDALONE MODE:
-        Inject Trigger & Hint document.body.classList.add('standalone'); injectTriggerAndHint();
-                hint = document.getElementById('botHint'); // Reassign hint after injection } if (chatHistory.length> 0) {
-                chatHistory.forEach(msg => {
-                    if (msg.role !== 'system') appendMessage(msg.role, msg.text, false);
-                });
-            } else {
-                const introText = isReturning
-                    ? "Welcome back. I'm here if you need to vent."
-                    : "Hi. I'm SoulBot. You can tell me anything—no judgment, just listening.";
-                setTimeout(() => addBotMessage(introText), 600);
-            }
+            // But checking clientWidth < 600 is a safer indicator of being in the chat bubble vs full screen.
+            const isChatBubbleSize = (document.documentElement.clientWidth < 600);
 
-            // Auto Popup (Only valid if we just injected the hint)
-            if (!isEmbedded && !sessionStorage.getItem('soulbot_seen')) {
-                setTimeout(() => {
-                    const hintEl = document.getElementById('botHint');
-                    if (hintEl && !container.classList.contains('active')) hintEl.classList.add('visible');
-                }, 5000);
-                sessionStorage.setItem('soulbot_seen', 'true');
+            const isEmbedded = isIframe || isEmbedURL || isChatBubbleSize;
+
+            if (isEmbedded) {
+                document.body.classList.add('embedded');
+                container.classList.add('active'); // Always open in embed mode
+
+                // SAFETY CLEANUP: Remove any existing triggers (zombies from cache or static HTML)
+                const zombieBtn = document.getElementById('triggerBtn');
+                if (zombieBtn) zombieBtn.remove();
+                const zombieHint = document.getElementById('botHint');
+                if (zombieHint) zombieHint.remove();
+
+            } else {
+                // STANDALONE MODE: Inject Trigger & Hint
+                document.body.classList.add('standalone');
+                injectTriggerAndHint();
+                hint = document.getElementById('botHint');
             }
-            localStorage.setItem('soulbot_returning', 'true');
+            chatHistory.forEach(msg => {
+                if (msg.role !== 'system') appendMessage(msg.role, msg.text, false);
+            });
+        } else {
+            const introText = isReturning
+                ? "Welcome back. I'm here if you need to vent."
+                : "Hi. I'm SoulBot. You can tell me anything—no judgment, just listening.";
+            setTimeout(() => addBotMessage(introText), 600);
+        }
+
+        // Auto Popup (Only valid if we just injected the hint)
+        if (!isEmbedded && !sessionStorage.getItem('soulbot_seen')) {
+            setTimeout(() => {
+                const hintEl = document.getElementById('botHint');
+                if (hintEl && !container.classList.contains('active')) hintEl.classList.add('visible');
+            }, 5000);
+            sessionStorage.setItem('soulbot_seen', 'true');
+        }
+        localStorage.setItem('soulbot_returning', 'true');
         }
 
         function injectTriggerAndHint() {
@@ -587,8 +598,7 @@
 
                 // --- PARSING TAGS ---
                 if (response.includes('[[CRISIS]]')) showCrisisCard();
-                if (response.includes('[[CAPTURE_LEAD]]')) showLeadForm("Would you like us to send you some
-                resources ? ");
+                if (response.includes('[[CAPTURE_LEAD]]')) showLeadForm("Would you like us to send you some resources?");
 
                 const recRegex = /\[\[RECOMMEND:\s*(\w+)\]\]/g;
                 let match;
@@ -609,8 +619,7 @@
         function handleOffline() {
             addBotMessage("I'm currently offline to process some updates.");
             setTimeout(() => {
-                addBotMessage("But our team is here. Leave a message or your email, and we'll reach out to you
-                personally.");
+                addBotMessage("But our team is here. Leave a message or your email, and we'll reach out to you personally.");
                 showLeadForm("Leave your message/details:");
             }, 800);
         }
@@ -666,8 +675,7 @@
             leads.push({ name, email, date: new Date().toLocaleString() });
             localStorage.setItem('soulbot_leads', JSON.stringify(leads));
 
-            parent.innerHTML = "<div style='color:#4ECDC4; text-align:center;'>Thanks! We've saved your info.</div>
-            ";
+            parent.innerHTML = "<div style='color:#4ECDC4; text-align:center;'>Thanks! We've saved your info.</div>";
             addBotMessage("Got it. I'll make sure the team knows.");
         }
 
