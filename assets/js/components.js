@@ -47,11 +47,11 @@ const getHeaderHTML = (rootPath) => `
             </div>
 
             <!-- 1. HOME -->
-            <a href="${rootPath}index.html" id="nav-home"><i class="fas fa-home"></i> Home</a>
+            <a href="${rootPath}index.html" id="nav-home"><i class="fas fa-home"></i>Home</a>
 
             <!-- 2. SPACES -->
             <div class="dropdown">
-                <a href="#" id="nav-spaces"><i class="fas fa-rocket"></i> Spaces <i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
+                <a href="#" id="nav-spaces"><i class="fas fa-rocket"></i>Spaces<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
                     <a href="${rootPath}soulamore-campus.html" id="nav-campus">Campus</a>
                     <a href="${rootPath}soulamore-away.html" id="nav-away">Away</a>
@@ -61,7 +61,7 @@ const getHeaderHTML = (rootPath) => `
 
             <!-- 3. WELLNESS -->
             <div class="dropdown">
-                <a href="#" id="nav-wellness"><i class="fas fa-heart-pulse"></i> Wellness <i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
+                <a href="#" id="nav-wellness"><i class="fas fa-heart-pulse"></i>Wellness<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
                     <a href="${rootPath}confession-box.html" id="nav-confession">Confession Box</a>
                     <a href="${rootPath}support-groups.html" id="nav-support">Support Groups</a>
@@ -72,7 +72,7 @@ const getHeaderHTML = (rootPath) => `
 
             <!-- 4. COMMUNITY -->
             <div class="dropdown">
-                <a href="#" id="nav-community"><i class="fas fa-users"></i> Community <i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
+                <a href="#" id="nav-community"><i class="fas fa-users"></i>Community<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
                     <a href="${rootPath}join-us/index.html" id="nav-join">Join Us</a>
                     <a href="${rootPath}blogs.html" id="nav-blogs">Blogs</a>
@@ -83,7 +83,7 @@ const getHeaderHTML = (rootPath) => `
 
             <!-- 5. COMPANY -->
             <div class="dropdown">
-                <a href="#" id="nav-company"><i class="fas fa-building"></i> Company <i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
+                <a href="#" id="nav-company"><i class="fas fa-building"></i>Company<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
                     <a href="${rootPath}about.html" id="nav-about">About</a>
                     <a href="${rootPath}contact.html" id="nav-contact">Contact</a>
