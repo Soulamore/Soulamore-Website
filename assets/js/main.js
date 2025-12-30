@@ -70,16 +70,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const toggleBtn = document.createElement('button');
             toggleBtn.className = 'dropdown-toggle-btn';
             toggleBtn.style.cssText = `
-                background: none; 
+                background: rgba(255, 255, 255, 0.05); /* Subtle Button BG */
                 border: none; 
+                border-left: 1px solid rgba(255, 255, 255, 0.1); /* Separator Line */
                 color: var(--teal-glow); 
-                padding: 15px; 
+                padding: 0;
+                width: 50px; /* Fixed Button Width */
+                height: 50px; /* Fixed Height */
                 cursor: pointer;
                 font-size: 1rem;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin-left: auto; /* Push to right */
+                margin-left: 15px; /* Push away from text */
+                border-radius: 8px; /* Rounded Button */
             `;
 
             // 2. Move icon to button
