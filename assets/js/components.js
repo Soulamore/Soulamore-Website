@@ -91,7 +91,7 @@ const getHeaderHTML = (rootPath) => `
             </div>
 
         </nav>
-        <a href="${rootPath}login.html" class="nav-btn">Log In</a>
+        <a href="${rootPath}login.html" class="nav-btn">Log In <i class="fas fa-user-circle"></i></a>
     </div>
     <button class="mobile-toggle" aria-label="Toggle Navigation">
         <i class="fas fa-bars"></i>
