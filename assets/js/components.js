@@ -149,6 +149,12 @@ function getRootPath() {
 function injectHeader() {
     const headerElement = document.querySelector('header');
     if (headerElement) {
+        // Z-INDEX FIX: Move header to body root to escape .container's z-index trap (5)
+        // This ensures header (20000) can beat Soulbot (9999) and Audio (99)
+        if (headerElement.parentElement !== document.body) {
+            document.body.prepend(headerElement);
+        }
+
         headerElement.classList.add('island-nav');
 
         // --- THEMING LOGIC ---
