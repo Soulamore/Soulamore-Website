@@ -267,8 +267,16 @@ function initializeHeaderLogic() {
             // Only hijacking if in mobile view (or if valid link is #)
             if (window.innerWidth <= 1150 || toggle.getAttribute('href') === '#') {
                 e.preventDefault();
+                e.stopPropagation(); // Stop bubbling
                 const parent = toggle.parentElement;
-                parent.classList.toggle('active');
+
+                // Toggle Logic
+                if (parent.classList.contains('active')) {
+                    parent.classList.remove('active');
+                } else {
+                    // Close others if needed (optional)
+                    parent.classList.add('active');
+                }
 
                 // Icon rotation
                 const icon = toggle.querySelector('.fa-chevron-down');
