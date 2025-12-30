@@ -60,23 +60,65 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Dynamic Dropdown Arrow Detachment (Fix for Mobile Navigation) ---
+    // Instead of fighting event bubbling, we separate the arrow from the link entirely.
+    const dropdowns = document.querySelectorAll('.dropdown > a');
+    dropdowns.forEach(link => {
+        const icon = link.querySelector('i');
+        if (icon && (icon.classList.contains('fa-chevron-down') || icon.classList.contains('fa-chevron-right'))) {
+            // 1. Create a separate button
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'dropdown-toggle-btn';
+            toggleBtn.style.cssText = `
+                background: none; 
+                border: none; 
+                color: var(--teal-glow); 
+                padding: 15px; 
+                cursor: pointer;
+                font-size: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: auto; /* Push to right */
+            `;
+
+            // 2. Move icon to button
+            toggleBtn.appendChild(icon);
+
+            // 3. Insert button after link
+            link.parentNode.insertBefore(toggleBtn, link.nextSibling);
+
+            // 4. Style the parent to align them
+            link.parentNode.style.display = 'flex';
+            link.parentNode.style.alignItems = 'center';
+            link.parentNode.style.justifyContent = 'space-between'; // Ensure text left, arrow right
+            link.style.flex = '1'; // Link takes available space
+
+            // 5. Add Toggle Logic to Button ONLY
+            toggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const dropdown = toggleBtn.closest('.dropdown');
+                dropdown.classList.toggle('active');
+
+                // Rotate icon
+                if (dropdown.classList.contains('active')) {
+                    icon.style.transform = 'rotate(180deg)';
+                } else {
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+    });
+
     // --- Close Menu When Link Clicked ---
     if (navLinks) {
         // 1. Handle Link Clicks (Close Menu)
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', (e) => {
                 // CHECK IF CLICKED ELEMENT IS THE ARROW (ICON)
-                if (e.target.tagName === 'I' || e.target.classList.contains('fa-chevron-down')) {
-                    e.preventDefault();
-                    e.stopPropagation(); // Stop bubbling
-
-                    // Toggle Dropdown
-                    const dropdown = link.closest('.dropdown');
-                    if (dropdown) {
-                        dropdown.classList.toggle('active');
-                    }
-                    return; // EXIT FUNCTION: Do not close menu
-                }
+                // This logic is now handled by the separate dropdown-toggle-btn
+                // So, if it's a normal link click, close the menu.
 
                 // OTHERWISE: It's a normal link click -> Navigate & Close Menu
                 navLinks.classList.remove('open');
