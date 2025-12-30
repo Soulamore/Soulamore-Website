@@ -17,14 +17,12 @@ const style = document.createElement('style');
 style.innerHTML = `
     @media (min-width: 1151px) {
         .mobile-profile-card, 
-        .mobile-toggle, 
-        .mobile-bottom-nav,
+        .mobile-toggle,
+        .mobile-bottom-nav, 
         .dropdown-toggle-btn { 
             display: none !important; 
         }
-        .nav-links i { 
-            display: none !important; 
-        }
+        /* Icons are now ALLOWED on desktop per user request */
     }
 `;
 document.head.appendChild(style);
