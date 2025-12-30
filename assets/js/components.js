@@ -91,7 +91,12 @@ const getHeaderHTML = (rootPath) => `
             </div>
 
         </nav>
-        <a href="${rootPath}login.html" class="nav-btn">Log In <i class="fas fa-user-circle"></i></a>
+
+        <!-- Auth Group (Icon + Button) -->
+        <div class="auth-box">
+             <a href="#" class="user-icon-btn"><i class="fas fa-user-circle"></i></a>
+             <a href="${rootPath}login.html" class="nav-btn">Log In</a>
+        </div>
     </div>
     <button class="mobile-toggle" aria-label="Toggle Navigation">
         <i class="fas fa-bars"></i>
