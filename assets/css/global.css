@@ -145,6 +145,19 @@ header.island-nav {
     display: none;
 }
 
+/* --- DESKTOP CLEANUP (Hide Mobile Elements) --- */
+.mobile-profile-card {
+    display: none;
+    /* Hidden on Desktop */
+}
+
+.nav-links i {
+    display: none;
+    /* Hide Icons on Desktop for clean look */
+}
+
+/* Mobile Toggle is already hidden below */
+
 .nav-group {
     display: contents;
     /* Allows children (links and btn) to participate in the grid */
@@ -181,6 +194,7 @@ header.island-nav {
 
 /* --- GLOBAL FOOTER --- */
 footer {
+    width: 100%;
     background-color: var(--deep-space);
     color: var(--starlight);
     padding: 60px 20px !important;
@@ -275,28 +289,32 @@ footer a {
 /* MOBILE FIXES */
 @media (max-width: 900px) {
 
-    /* Hide the embedded icon in the link (replaced by button) */
+    /* Show the embedded icon in the link */
     .dropdown>a>i {
-        display: none !important;
+        display: inline-block !important;
+        margin-left: auto;
+        /* Push to right */
     }
 
-    /* Show the separate toggle button */
+    /* Hide the separate toggle button (unused) */
     .dropdown-toggle-btn {
-        display: flex !important;
+        display: none !important;
     }
 
     /* Ensure parent aligns them correctly */
     .nav-links li.dropdown {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        /* allow dropdown content to break to new line */
+        flex-direction: column;
+        /* Stack link and content */
+        align-items: stretch;
     }
 
     /* Ensure link takes separate space */
     .nav-links li.dropdown>a {
-        flex: 1;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 }
 
@@ -457,9 +475,10 @@ footer a {
     /* Hidden by default on desktop */
 }
 
-@media (max-width: 900px) {
+/* --- MOBILE / TABLET OPTIMIZATION (Up to 1150px) --- */
+@media (max-width: 1150px) {
 
-    /* Mobile Reset for Island Nav */
+    /* 1. Header Changes */
     header.island-nav {
         top: 0;
         width: 100%;
@@ -467,88 +486,60 @@ footer a {
         border-radius: 0;
         transform: none;
         left: 0;
-        padding: 15px 20px;
-        background: var(--deep-space);
-        /* Solid background for legibility */
+        padding: 15px 25px;
+        background: var(--navy-glass);
+        /* Fallback */
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border: none;
         border-bottom: 1px solid var(--border-glass);
+        justify-content: space-between;
     }
 
     .main-nav {
+        width: 100%;
         display: flex;
         justify-content: space-between;
-        padding: 0;
-    }
-
-    .mobile-toggle {
-        display: block;
-    }
-
-    /* --- UX ENHANCEMENT: MOBILE BOTTOM NAV (#1) --- */
-    .mobile-bottom-nav {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 400px;
-        background: rgba(15, 23, 42, 0.95);
-        backdrop-filter: blur(16px);
-        border: 1px solid var(--border-glass);
-        border-radius: 50px;
-        display: flex;
-        justify-content: space-around;
         align-items: center;
-        padding: 12px 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        z-index: 1001;
-        /* Above page, below modal */
-        transition: transform 0.3s ease;
     }
 
-    .mobile-bottom-nav.hidden {
-        transform: translate(-50%, 200%);
-        /* Slide down off-screen */
-        pointer-events: none;
-    }
-
-    .mb-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-decoration: none;
-        color: var(--starlight);
-        font-size: 0.75rem;
-        gap: 4px;
-        opacity: 0.7;
-        cursor: pointer;
-    }
-
-    .mb-item i {
-        font-size: 1.2rem;
-        margin-bottom: 2px;
-    }
-
-    .mb-item:hover,
-    .mb-item.active {
-        opacity: 1;
-        color: var(--teaser-blue);
-    }
-
-    /* Hide external Login button on mobile */
+    /* Hide Desktop Elements */
+    .nav-group>.nav-links,
     .nav-btn {
         display: none;
     }
 
-    /* Style for the Javascript-injected mobile login button */
-    .mobile-login-btn {
+    .mobile-toggle {
         display: block;
-        /* Show on mobile (hidden on desktop) */
+        font-size: 1.5rem;
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        /* order: -1; REMOVED to keep it on the right */
+    }
+
+    /* 4. DASHBOARD LIST ITEMS */
+    .nav-links>a,
+    .dropdown>a {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 15px;
+        color: rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.2s;
         width: 100%;
+        margin-bottom: 5px;
+    }
+
+    /* Re-enable icons for Mobile Sidebar */
+    .nav-links i {
+        display: inline-block;
+        width: 25px;
+        /* Fixed width for alignment */
         text-align: center;
-        margin-top: 10px;
-        order: -1;
-        /* Try to push to top if flex container allows */
     }
 
     /* Mobile Menu Style (Side Drawer) */
@@ -597,4 +588,58 @@ body.no-scroll {
 .mobile-toggle {
     z-index: 1011 !important;
     /* Highest priority */
+}
+
+/* --- MOBILE BOTTOM NAV (From main.js) --- */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    border-radius: 50px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 20px;
+    z-index: 1001;
+    /* Below Sidebar (1010) */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.mobile-bottom-nav.hidden {
+    transform: translate(-50%, 150%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mb-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--starlight);
+    font-size: 0.75rem;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.mb-item i {
+    font-size: 1.2rem;
+    margin-bottom: 2px;
+}
+
+.mb-item:hover,
+.mb-item.active {
+    opacity: 1;
+    color: var(--teaser-blue);
+    transform: translateY(-2px);
 }

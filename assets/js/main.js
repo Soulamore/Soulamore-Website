@@ -1,146 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Mobile Menu Toggle ---
-    const toggleBtn = document.querySelector('.mobile-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    const desktopLoginBtn = document.querySelector('.nav-btn');
 
-    if (toggleBtn && navLinks) {
-        // --- Dynamic Mobile Login Button ---
-        // Clone the desktop button and put it inside the mobile menu (at the top)
-        if (desktopLoginBtn) {
-            // Check if already exists to avoid duplicates if script runs twice
-            if (!navLinks.querySelector('.mobile-login-btn')) {
-                const mobileBtn = desktopLoginBtn.cloneNode(true);
-                mobileBtn.classList.add('mobile-login-btn');
-                mobileBtn.classList.remove('nav-btn'); // Remove desktop class to avoid conflicts if needed, but keeping styles might be good.
-                // Re-add nav-btn styles but override display:none via the new class in CSS if needed, 
-                // OR just copy styles. Ideally, keep nav-btn class but make sure CSS allows it inside menu.
-                // Let's rely on .mobile-login-btn specific CSS we just added.
-                // mobileBtn.style.display = 'block';  <-- REMOVED: Let CSS control this (hidden on desktop, block on mobile)
-                // Prepend to top
-                navLinks.prepend(mobileBtn);
-            }
-        }
+    // --- PART 1: BODY ELEMENTS (Safe to keep) ---
 
-        toggleBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('open');
-            document.body.classList.toggle('no-scroll'); // Prevent background scroll
-
-            // UX: Hide Bottom Nav when Menu is Open
-            const bottomNav = document.querySelector('.mobile-bottom-nav');
-            if (bottomNav) {
-                bottomNav.classList.toggle('hidden');
-            }
-
-            const icon = toggleBtn.querySelector('i');
-            if (navLinks.classList.contains('open')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
-            } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
-        });
-    }
-
-    // --- Active Link Highlighting ---
+    // --- Active Link Highlighting (FALLBACK) ---
+    // Kept as a fallback for any links OUTSIDE the header (e.g., Footer links)
     const currentPath = window.location.pathname;
-    const links = document.querySelectorAll('.nav-links a');
+    const links = document.querySelectorAll('a'); // Target ALL links, not just .nav-links
 
     links.forEach(link => {
         const href = link.getAttribute('href');
         if (!href) return;
-
         // Clean paths for comparison
         const cleanHref = href.replace('./', '').split(/[?#]/)[0];
         const cleanPath = currentPath.split('/').pop().split(/[?#]/)[0];
 
-        if (cleanPath === cleanHref || (cleanPath === '' && cleanHref === 'index.html')) {
-            link.classList.add('active');
+        if (cleanPath === cleanHref && cleanHref !== '#' && cleanHref !== '') {
+            // Optional: Add active class to footer links if desired, 
+            // but usually we strictly wanted Header active states which components.js handles.
+            // Leaving this empty strictly for safety to not interfere.
         }
     });
-
-    // --- Dynamic Dropdown Arrow Detachment (Fix for Mobile Navigation) ---
-    // Instead of fighting event bubbling, we separate the arrow from the link entirely.
-    const dropdowns = document.querySelectorAll('.dropdown > a');
-    dropdowns.forEach(link => {
-        const icon = link.querySelector('i');
-        if (icon && (icon.classList.contains('fa-chevron-down') || icon.classList.contains('fa-chevron-right'))) {
-            // 1. Create a separate button
-            const toggleBtn = document.createElement('button');
-            toggleBtn.className = 'dropdown-toggle-btn';
-            toggleBtn.style.cssText = `
-                background: rgba(255, 255, 255, 0.05); /* Subtle Button BG */
-                border: none; 
-                border-left: 1px solid rgba(255, 255, 255, 0.1); /* Separator Line */
-                color: var(--teal-glow); 
-                padding: 0;
-                width: 50px; /* Fixed Button Width */
-                height: 50px; /* Fixed Height */
-                cursor: pointer;
-                font-size: 1rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-left: 15px; /* Push away from text */
-                border-radius: 8px; /* Rounded Button */
-            `;
-
-            // 2. Clone icon to button (Leaving original for Desktop)
-            const iconClone = icon.cloneNode(true);
-            toggleBtn.appendChild(iconClone);
-
-            // 3. Insert button after link
-            link.parentNode.insertBefore(toggleBtn, link.nextSibling);
-
-            // 4. Style the parent to align them (Handled by CSS Media Queries now)
-
-            // 5. Add Toggle Logic to Button ONLY
-            toggleBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const dropdown = toggleBtn.closest('.dropdown');
-                dropdown.classList.toggle('active');
-
-                // Rotate icon inside button
-                const btnIcon = toggleBtn.querySelector('i');
-                if (dropdown.classList.contains('active')) {
-                    if (btnIcon) btnIcon.style.transform = 'rotate(180deg)';
-                } else {
-                    if (btnIcon) btnIcon.style.transform = 'rotate(0deg)';
-                }
-            });
-        }
-    });
-
-    // --- Close Menu When Link Clicked ---
-    if (navLinks) {
-        // 1. Handle Link Clicks (Close Menu)
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', (e) => {
-                // CHECK IF CLICKED ELEMENT IS THE ARROW (ICON)
-                // This logic is now handled by the separate dropdown-toggle-btn
-                // So, if it's a normal link click, close the menu.
-
-                // OTHERWISE: It's a normal link click -> Navigate & Close Menu
-                navLinks.classList.remove('open');
-                document.body.classList.remove('no-scroll');
-
-                // UX: Show Bottom Nav again
-                const bottomNav = document.querySelector('.mobile-bottom-nav');
-                if (bottomNav) bottomNav.classList.remove('hidden');
-
-                const icon = toggleBtn.querySelector('i');
-                if (icon) {
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
-                }
-            });
-        });
-    }
-
-    // --- Header Scroll Effect (Optional: Glass morph gets stronger on scroll) ---
-    const header = document.querySelector('header');
 
     // --- Reading Progress Bar Injection ---
     if (!document.getElementById('scroll-progress-container')) {
@@ -154,17 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('scroll-progress-bar');
 
     window.addEventListener('scroll', () => {
-        // Header Effect
-        if (header) {
-            if (window.scrollY > 50) {
-                header.style.background = 'rgba(15, 23, 42, 0.95)';
-                header.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
-            } else {
-                header.style.background = 'rgba(15, 23, 42, 0.85)';
-                header.style.boxShadow = 'none';
-            }
-        }
-
         // Progress Bar Update
         if (progressBar) {
             const scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight;
