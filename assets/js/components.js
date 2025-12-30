@@ -38,7 +38,8 @@ const getHeaderHTML = (rootPath) => `
             
             <!-- MOBILE PROFILE CARD (Visible < 1150px) -->
             <!-- This appears at top of drawer -->
-            <div class="mobile-profile-card">
+            <!-- INLINE STYLE: Default to hidden to prevent desktop flash/cache issues -->
+            <div class="mobile-profile-card" style="display: none;">
                 <div class="mp-avatar"><i class="fas fa-ghost"></i></div>
                 <div class="mp-info">
                     <span class="mp-name">Welcome, Friend</span>
