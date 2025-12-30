@@ -86,17 +86,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 border-radius: 8px; /* Rounded Button */
             `;
 
-            // 2. Move icon to button
-            toggleBtn.appendChild(icon);
+            // 2. Clone icon to button (Leaving original for Desktop)
+            const iconClone = icon.cloneNode(true);
+            toggleBtn.appendChild(iconClone);
 
             // 3. Insert button after link
             link.parentNode.insertBefore(toggleBtn, link.nextSibling);
 
-            // 4. Style the parent to align them
-            link.parentNode.style.display = 'flex';
-            link.parentNode.style.alignItems = 'center';
-            link.parentNode.style.justifyContent = 'space-between'; // Ensure text left, arrow right
-            link.style.flex = '1'; // Link takes available space
+            // 4. Style the parent to align them (Handled by CSS Media Queries now)
 
             // 5. Add Toggle Logic to Button ONLY
             toggleBtn.addEventListener('click', (e) => {
@@ -105,11 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dropdown = toggleBtn.closest('.dropdown');
                 dropdown.classList.toggle('active');
 
-                // Rotate icon
+                // Rotate icon inside button
+                const btnIcon = toggleBtn.querySelector('i');
                 if (dropdown.classList.contains('active')) {
-                    icon.style.transform = 'rotate(180deg)';
+                    if (btnIcon) btnIcon.style.transform = 'rotate(180deg)';
                 } else {
-                    icon.style.transform = 'rotate(0deg)';
+                    if (btnIcon) btnIcon.style.transform = 'rotate(0deg)';
                 }
             });
         }
