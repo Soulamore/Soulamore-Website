@@ -12,6 +12,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // --- 1. DEFINE COMPONENTS ---
 
+// CRITICAL CSS: Force-hide mobile elements on desktop to bypass cache issues
+const style = document.createElement('style');
+style.innerHTML = `
+    @media (min-width: 1151px) {
+        .mobile-profile-card, 
+        .mobile-toggle, 
+        .mobile-bottom-nav,
+        .dropdown-toggle-btn { 
+            display: none !important; 
+        }
+        .nav-links i { 
+            display: none !important; 
+        }
+    }
+`;
+document.head.appendChild(style);
+
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo"><img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo"></a>
