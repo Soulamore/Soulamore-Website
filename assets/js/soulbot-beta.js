@@ -98,11 +98,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     triggerBtn.onclick = toggleState;
 
-    // 4. Inject into Body
+    // 4. Message Listener for Close Event from Iframe
+    window.addEventListener('message', (event) => {
+        if (event.data === 'close-soulbot') {
+            if (isOpen) toggleState(); // Close if open
+        }
+    });
+
+    // 5. Inject into Body
     document.body.appendChild(triggerBtn);
     document.body.appendChild(chatFrame);
 
-    // 5. Responsive Logic (Handle Resize)
+    // 6. Responsive Logic (Handle Resize)
     function handleResize() {
         if (window.innerWidth < 500) {
             chatFrame.style.width = '100%';

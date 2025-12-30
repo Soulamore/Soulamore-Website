@@ -528,8 +528,12 @@
 
         // --- UI UTILS ---
         window.toggleChat = function () {
+            // Send close signal to parent iframe controller (soulbot-beta.js)
+            window.parent.postMessage('close-soulbot', '*');
+
+            // Fallback for standalone mode
             container.classList.toggle('active');
-            if (hint) { // Check if hint element exists before trying to remove class
+            if (hint) {
                 hint.classList.remove('visible');
             }
         };
