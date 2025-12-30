@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Handle Link Clicks (Close Menu)
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', (e) => {
-                // If the click target was the ICON (Arrow), prevent navigation
+                // CHECK IF CLICKED ELEMENT IS THE ARROW (ICON)
                 if (e.target.tagName === 'I' || e.target.classList.contains('fa-chevron-down')) {
                     e.preventDefault();
                     e.stopPropagation(); // Stop bubbling
@@ -75,10 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (dropdown) {
                         dropdown.classList.toggle('active');
                     }
-                    return; // Don't close menu
+                    return; // EXIT FUNCTION: Do not close menu
                 }
 
-                // Normal Link Click -> Close Menu
+                // OTHERWISE: It's a normal link click -> Navigate & Close Menu
                 navLinks.classList.remove('open');
                 document.body.classList.remove('no-scroll');
 
