@@ -137,6 +137,8 @@ function injectHeader() {
             if (customColor) {
                 headerElement.style.setProperty('background', customColor, 'important');
                 headerElement.style.setProperty('backdrop-filter', 'none', 'important');
+                headerElement.style.setProperty('box-shadow', 'none', 'important');
+                headerElement.style.setProperty('border', 'none', 'important');
             }
         }
         headerElement.innerHTML = getHeaderHTML(getRootPath());
