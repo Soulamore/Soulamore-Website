@@ -106,6 +106,7 @@ const getHeaderHTML = (rootPath) => `
                 </div>
             </div>
 
+
             <!-- 4. COMMUNITY (Social & Join) -->
             <div class="dropdown">
                 <a href="#" id="nav-community"><i class="fas fa-users"></i>Community<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
@@ -114,7 +115,7 @@ const getHeaderHTML = (rootPath) => `
                     <div class="dropdown-submenu">
                          <a href="${rootPath}join-us/index.html" id="nav-join">Join Us</a>
                          <div class="dropdown-content">
-                            <a href="${rootPath}join-us/index.html">Overview</a>
+                            <!-- Parent is the Overview, only sub-pages here -->
                             <a href="${rootPath}join-us/peer.html">Apply as Peer</a>
                             <a href="${rootPath}join-us/psychologist.html">Apply as Psychologist</a>
                          </div>
@@ -124,6 +125,7 @@ const getHeaderHTML = (rootPath) => `
                     <a href="${rootPath}community-calendar.html" id="nav-calendar">Calendar</a>
                 </div>
             </div>
+
 
             <!-- 5. COMPANY (Legal & Info) -->
             <div class="dropdown">
@@ -135,6 +137,9 @@ const getHeaderHTML = (rootPath) => `
                     <a href="${rootPath}legal.html" id="nav-legal">Legal</a>
                 </div>
             </div>
+
+            <!-- CRISIS CTA (Visible Always) -->
+            <a href="${rootPath}get-help-now.html" id="nav-crisis" style="color: #ff6b6b; font-weight: 700; background: rgba(255,107,107,0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255,107,107,0.3);"><i class="fas fa-life-ring"></i> Get Help</a>
 
         </nav>
 
