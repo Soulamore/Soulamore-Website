@@ -47,47 +47,85 @@ const getHeaderHTML = (rootPath) => `
             </div>
 
             <!-- 1. HOME -->
-            <a href="${rootPath}index.html" id="nav-home"><i class="fas fa-home"></i>Home</a>
 
+            <a href="${rootPath}index.html" id="nav-home"><i class="fas fa-home"></i>Home</a>
 
             <!-- 2. SPACES (Activity Centers) -->
             <div class="dropdown">
                 <a href="#" id="nav-spaces"><i class="fas fa-rocket"></i>Spaces<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
-                    <a href="${rootPath}soulamore-campus.html" id="nav-campus">Campus (Overview)</a>
                     
-                    <!-- NESTED CAMPUS RESOURCES -->
+                    <!-- NESTED: CAMPUS -->
                     <div class="dropdown-submenu">
-                        <a href="#" id="nav-campus-res">Student Toolkit</a>
-                        <div class="dropdown-content">
-                             <a href="${rootPath}student-resources.html" id="nav-hub"><strong>Full Library</strong></a>
-                             <a href="${rootPath}campus/anxiety-and-overthinking.html" id="nav-anxiety">Anxiety</a>
-                             <a href="${rootPath}campus/exam-pressure.html" id="nav-exams">Exams</a>
-                             <a href="${rootPath}campus/loneliness.html" id="nav-lonely">Loneliness</a>
-                             <a href="${rootPath}campus/feeling-low.html" id="nav-low">Feeling Low</a>
-                             <a href="${rootPath}campus/safety-boundaries.html" id="nav-safety">Boundaries</a>
-                        </div>
+                         <a href="${rootPath}soulamore-campus.html" id="nav-campus">Soulamore Campus</a>
+                         <div class="dropdown-content">
+                            <a href="${rootPath}soulamore-campus.html">Overview</a>
+                            <a href="${rootPath}campus/what-is-campus.html">What is Campus?</a>
+                            <a href="${rootPath}campus/campus-ambassadors.html">Ambassadors</a>
+                            <a href="${rootPath}campus/institutions.html">For Institutions</a>
+                            <a href="${rootPath}campus/student-faqs.html">Student FAQs</a>
+                            <!-- Toolkit Nested inside Campus -->
+                             <div class="dropdown-submenu">
+                                <a href="#" style="color:var(--teal-glow);">Student Toolkit</a>
+                                <div class="dropdown-content">
+                                    <a href="${rootPath}student-resources.html"><strong>Full Library</strong></a>
+                                    <a href="${rootPath}campus/anxiety-and-overthinking.html">Anxiety</a>
+                                    <a href="${rootPath}campus/exam-pressure.html">Exams</a>
+                                    <a href="${rootPath}campus/loneliness.html">Loneliness</a>
+                                    <a href="${rootPath}campus/feeling-low.html">Feeling Low</a>
+                                    <a href="${rootPath}campus/safety-boundaries.html">Boundaries</a>
+                                </div>
+                            </div>
+                         </div>
                     </div>
 
-                    <a href="${rootPath}soulamore-away.html" id="nav-away">Soulamore Away</a>
+                     <!-- NESTED: AWAY -->
+                    <div class="dropdown-submenu">
+                         <a href="${rootPath}soulamore-away.html" id="nav-away">Soulamore Away</a>
+                         <div class="dropdown-content">
+                            <a href="${rootPath}soulamore-away.html">Overview</a>
+                            <a href="${rootPath}soulamore-away/who-its-for.html">Who It's For</a>
+                            <a href="${rootPath}soulamore-away/resources.html">Away Resources</a>
+                         </div>
+                    </div>
+
                     <a href="${rootPath}our-peers/index.html" id="nav-peers">Meet Our Peers</a>
-                    <a href="${rootPath}join-us/index.html" id="nav-join-spaces">Join the Team</a>
                 </div>
             </div>
 
-            <!-- 3. WELLNESS (Tools & Vents) -->
+             <!-- 3. WELLNESS (Tools & Vents) -->
+            <div class="dropdown">
+                <a href="#" id="nav-wellness"><i class="fas fa-heart-pulse"></i>Wellness<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
+                <div class="dropdown-content">
+                    <!-- Tools -->
+                    <a href="${rootPath}confession-box.html" id="nav-confession">Confession Box</a>
+                     <a href="${rootPath}confession-box/guidelines.html" id="nav-confession-guide" style="font-size:0.85rem; opacity:0.8; padding-left:30px;">— Guidelines</a>
+                    <a href="${rootPath}vent-box.html" id="nav-vent">The Vent Box</a>
+                    <a href="${rootPath}support-groups.html" id="nav-support">Support Groups</a>
+                    <a href="${rootPath}get-help-now.html" id="nav-help" style="color:var(--teal-glow); font-weight:700;">Get Help Now</a>
+                </div>
+            </div>
 
-            <!-- 5. COMMUNITY (Social) -->
+            <!-- 4. COMMUNITY (Social & Join) -->
             <div class="dropdown">
                 <a href="#" id="nav-community"><i class="fas fa-users"></i>Community<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
+                     <!-- NESTED: JOIN US -->
+                    <div class="dropdown-submenu">
+                         <a href="${rootPath}join-us/index.html" id="nav-join">Join Us</a>
+                         <div class="dropdown-content">
+                            <a href="${rootPath}join-us/index.html">Overview</a>
+                            <a href="${rootPath}join-us/peer.html">Apply as Peer</a>
+                            <a href="${rootPath}join-us/psychologist.html">Apply as Psychologist</a>
+                         </div>
+                    </div>
                     <a href="${rootPath}blogs.html" id="nav-blogs">Blogs & Stories</a>
                     <a href="${rootPath}forum.html" id="nav-forum">Discussion Forum</a>
                     <a href="${rootPath}community-calendar.html" id="nav-calendar">Calendar</a>
                 </div>
             </div>
 
-            <!-- 6. COMPANY (Legal & Info) -->
+            <!-- 5. COMPANY (Legal & Info) -->
             <div class="dropdown">
                 <a href="#" id="nav-company"><i class="fas fa-building"></i>About<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
