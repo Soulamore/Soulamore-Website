@@ -145,7 +145,7 @@ const getHeaderHTML = (rootPath) => `
         <!-- Auth Group (Crisis + Icon + Button) -->
         <div class="auth-box">
              <!-- CRISIS CTA -->
-             <a href="${rootPath}get-help-now.html" id="nav-crisis" style="color: #ff6b6b; font-weight: 700; background: rgba(255,107,107,0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255,107,107,0.3); display: flex; align-items: center; gap: 8px;"><i class="fas fa-life-ring"></i> Get Help</a>
+             <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
              
              <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
              <a href="${rootPath}login.html" class="nav-btn">Log In / Sign Up</a>
