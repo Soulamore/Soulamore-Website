@@ -59,23 +59,23 @@ const getHeaderHTML = (rootPath) => `
                     <div class="dropdown-submenu">
                          <a href="${rootPath}soulamore-campus.html" id="nav-campus">Soulamore Campus</a>
                          <div class="dropdown-content">
-                            <a href="${rootPath}soulamore-campus.html">Overview</a>
                             <a href="${rootPath}campus/what-is-campus.html">What is Campus?</a>
                             <a href="${rootPath}campus/campus-ambassadors.html">Ambassadors</a>
                             <a href="${rootPath}campus/institutions.html">For Institutions</a>
                             <a href="${rootPath}campus/student-faqs.html">Student FAQs</a>
-                            <!-- Toolkit Nested inside Campus -->
-                             <div class="dropdown-submenu">
-                                <a href="#" style="color:var(--teal-glow);">Student Toolkit</a>
+                            
+                            <!-- Student Resources Group -->
+                            <div class="dropdown-submenu">
+                                <a href="#" style="color:var(--teal-glow);">Student Resources</a>
                                 <div class="dropdown-content">
-                                    <a href="${rootPath}student-resources.html"><strong>Full Library</strong></a>
                                     <a href="${rootPath}campus/anxiety-and-overthinking.html">Anxiety</a>
                                     <a href="${rootPath}campus/exam-pressure.html">Exams</a>
                                     <a href="${rootPath}campus/loneliness.html">Loneliness</a>
                                     <a href="${rootPath}campus/feeling-low.html">Feeling Low</a>
-                                    <a href="${rootPath}campus/safety-boundaries.html">Boundaries</a>
                                 </div>
                             </div>
+                            
+                            <a href="${rootPath}campus/safety-boundaries.html">Boundaries</a>
                          </div>
                     </div>
 
@@ -97,15 +97,20 @@ const getHeaderHTML = (rootPath) => `
             <div class="dropdown">
                 <a href="#" id="nav-wellness"><i class="fas fa-heart-pulse"></i>Wellness<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
-                    <!-- Tools -->
-                    <a href="${rootPath}confession-box.html" id="nav-confession">Confession Box</a>
-                     <a href="${rootPath}confession-box/guidelines.html" id="nav-confession-guide" style="font-size:0.85rem; opacity:0.8; padding-left:30px;">— Guidelines</a>
+                    <!-- Confession Box Flyout -->
+                    <div class="dropdown-submenu">
+                        <a href="${rootPath}confession-box.html" id="nav-confession">Confession Box</a>
+                        <div class="dropdown-content">
+                            <a href="${rootPath}confession-box.html">Go to Box</a>
+                            <a href="${rootPath}confession-box/guidelines.html">Guidelines</a>
+                        </div>
+                    </div>
+
                     <a href="${rootPath}vent-box.html" id="nav-vent">The Vent Box</a>
                     <a href="${rootPath}support-groups.html" id="nav-support">Support Groups</a>
-                    <a href="${rootPath}get-help-now.html" id="nav-help" style="color:var(--teal-glow); font-weight:700;">Get Help Now</a>
+                    <a href="${rootPath}community-calendar.html" id="nav-calendar">Community Calendar</a>
                 </div>
             </div>
-
 
             <!-- 4. COMMUNITY (Social & Join) -->
             <div class="dropdown">
@@ -115,17 +120,14 @@ const getHeaderHTML = (rootPath) => `
                     <div class="dropdown-submenu">
                          <a href="${rootPath}join-us/index.html" id="nav-join">Join Us</a>
                          <div class="dropdown-content">
-                            <!-- Parent is the Overview, only sub-pages here -->
                             <a href="${rootPath}join-us/peer.html">Apply as Peer</a>
                             <a href="${rootPath}join-us/psychologist.html">Apply as Psychologist</a>
                          </div>
                     </div>
                     <a href="${rootPath}blogs.html" id="nav-blogs">Blogs & Stories</a>
                     <a href="${rootPath}forum.html" id="nav-forum">Discussion Forum</a>
-                    <a href="${rootPath}community-calendar.html" id="nav-calendar">Calendar</a>
                 </div>
             </div>
-
 
             <!-- 5. COMPANY (Legal & Info) -->
             <div class="dropdown">
