@@ -49,44 +49,62 @@ const getHeaderHTML = (rootPath) => `
             <!-- 1. HOME -->
             <a href="${rootPath}index.html" id="nav-home"><i class="fas fa-home"></i>Home</a>
 
-            <!-- 2. SPACES -->
+
+            <!-- 2. SPACES (Activity Centers) -->
             <div class="dropdown">
                 <a href="#" id="nav-spaces"><i class="fas fa-rocket"></i>Spaces<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
-                    <a href="${rootPath}soulamore-campus.html" id="nav-campus">Campus</a>
-                    <a href="${rootPath}soulamore-away.html" id="nav-away">Away</a>
-                    <a href="${rootPath}our-peers/index.html" id="nav-peers">Peers</a>
+                    <a href="${rootPath}soulamore-campus.html" id="nav-campus">Campus (For Schools)</a>
+                    <a href="${rootPath}soulamore-away.html" id="nav-away">Soulamore Away</a>
+                    <a href="${rootPath}our-peers/index.html" id="nav-peers">Meet Our Peers</a>
+                    <a href="${rootPath}join-us/index.html" id="nav-join-spaces">Join the Team</a>
                 </div>
             </div>
 
-            <!-- 3. WELLNESS -->
+            <!-- 3. WELLNESS (Tools & Vents) -->
             <div class="dropdown">
                 <a href="#" id="nav-wellness"><i class="fas fa-heart-pulse"></i>Wellness<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
+                    <!-- Tools -->
                     <a href="${rootPath}confession-box.html" id="nav-confession">Confession Box</a>
-                    <a href="${rootPath}support-groups.html" id="nav-support">Support Groups</a>
+                     <a href="${rootPath}confession-box/guidelines.html" id="nav-confession-guide" style="font-size:0.85rem; opacity:0.8; padding-left:30px;">— Guidelines</a>
                     <a href="${rootPath}vent-box.html" id="nav-vent">The Vent Box</a>
-                    <a href="${rootPath}get-help-now.html" id="nav-help">Get Help Now</a>
+                    <a href="${rootPath}support-groups.html" id="nav-support">Support Groups</a>
+                    <a href="${rootPath}get-help-now.html" id="nav-help" style="color:var(--teal-glow); font-weight:700;">Get Help Now</a>
                 </div>
             </div>
 
-            <!-- 4. COMMUNITY -->
+            <!-- 4. RESOURCES (Library) - NEW -->
+            <div class="dropdown">
+                <a href="#" id="nav-resources"><i class="fas fa-book-open"></i>Resources<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
+                <div class="dropdown-content">
+                    <a href="${rootPath}student-resources.html" id="nav-hub"><strong>Student Hub</strong></a>
+                    <a href="${rootPath}campus/anxiety-and-overthinking.html" id="nav-anxiety">Anxiety & Overthinking</a>
+                    <a href="${rootPath}campus/exam-pressure.html" id="nav-exams">Exam Pressure</a>
+                    <a href="${rootPath}campus/loneliness.html" id="nav-lonely">Loneliness</a>
+                    <a href="${rootPath}campus/feeling-low.html" id="nav-low">Feeling Low</a>
+                    <a href="${rootPath}campus/safety-boundaries.html" id="nav-safety">Safety & Boundaries</a>
+                </div>
+            </div>
+
+            <!-- 5. COMMUNITY (Social) -->
             <div class="dropdown">
                 <a href="#" id="nav-community"><i class="fas fa-users"></i>Community<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
-                    <a href="${rootPath}join-us/index.html" id="nav-join">Join Us</a>
-                    <a href="${rootPath}blogs.html" id="nav-blogs">Blogs</a>
-                    <a href="${rootPath}forum.html" id="nav-forum">Forum</a>
+                    <a href="${rootPath}blogs.html" id="nav-blogs">Blogs & Stories</a>
+                    <a href="${rootPath}forum.html" id="nav-forum">Discussion Forum</a>
                     <a href="${rootPath}community-calendar.html" id="nav-calendar">Calendar</a>
                 </div>
             </div>
 
-            <!-- 5. COMPANY -->
+            <!-- 6. COMPANY (Legal & Info) -->
             <div class="dropdown">
-                <a href="#" id="nav-company"><i class="fas fa-building"></i>Company<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
+                <a href="#" id="nav-company"><i class="fas fa-building"></i>About<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
-                    <a href="${rootPath}about.html" id="nav-about">About</a>
-                    <a href="${rootPath}contact.html" id="nav-contact">Contact</a>
+                    <a href="${rootPath}about.html" id="nav-about">Our Story</a>
+                    <a href="${rootPath}contact.html" id="nav-contact">Contact Us</a>
+                    <a href="${rootPath}privacy-policy.html" id="nav-privacy">Privacy Policy</a>
+                    <a href="${rootPath}legal.html" id="nav-legal">Legal</a>
                 </div>
             </div>
 
