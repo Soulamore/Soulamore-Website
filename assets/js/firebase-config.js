@@ -1,16 +1,30 @@
-// Soulamore Firebase Configuration
-// Replace with your actual project keys from Firebase Console -> Project Settings -> General
+/**
+ * Firebase Configuration & Initialization
+ * Central hub for all backend connections.
+ */
 
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// TODO: User to provide these keys from Firebase Console > Project Settings
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "YOUR_API_KEY_HERE",
+    authDomain: "soulamore-f0a64.firebaseapp.com",
+    projectId: "soulamore-f0a64",
+    storageBucket: "soulamore-f0a64.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID",
+    measurementId: "G-MEASUREMENT_ID"
 };
 
-// Initialize Firebase (when SDK is loaded)
-// firebase.initializeApp(firebaseConfig);
-// const db = firebase.firestore();
-// const auth = firebase.auth();
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
+// Export for use in data-handler.js
+export { db, collection, addDoc, serverTimestamp };
+
+console.log("Firebase initialized.");

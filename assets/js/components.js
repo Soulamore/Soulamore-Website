@@ -54,7 +54,21 @@ const getHeaderHTML = (rootPath) => `
             <div class="dropdown">
                 <a href="#" id="nav-spaces"><i class="fas fa-rocket"></i>Spaces<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
                 <div class="dropdown-content">
-                    <a href="${rootPath}soulamore-campus.html" id="nav-campus">Campus (For Schools)</a>
+                    <a href="${rootPath}soulamore-campus.html" id="nav-campus">Campus (Overview)</a>
+                    
+                    <!-- NESTED CAMPUS RESOURCES -->
+                    <div class="dropdown-submenu">
+                        <a href="#" id="nav-campus-res">Student Toolkit</a>
+                        <div class="dropdown-content">
+                             <a href="${rootPath}student-resources.html" id="nav-hub"><strong>Full Library</strong></a>
+                             <a href="${rootPath}campus/anxiety-and-overthinking.html" id="nav-anxiety">Anxiety</a>
+                             <a href="${rootPath}campus/exam-pressure.html" id="nav-exams">Exams</a>
+                             <a href="${rootPath}campus/loneliness.html" id="nav-lonely">Loneliness</a>
+                             <a href="${rootPath}campus/feeling-low.html" id="nav-low">Feeling Low</a>
+                             <a href="${rootPath}campus/safety-boundaries.html" id="nav-safety">Boundaries</a>
+                        </div>
+                    </div>
+
                     <a href="${rootPath}soulamore-away.html" id="nav-away">Soulamore Away</a>
                     <a href="${rootPath}our-peers/index.html" id="nav-peers">Meet Our Peers</a>
                     <a href="${rootPath}join-us/index.html" id="nav-join-spaces">Join the Team</a>
@@ -62,30 +76,6 @@ const getHeaderHTML = (rootPath) => `
             </div>
 
             <!-- 3. WELLNESS (Tools & Vents) -->
-            <div class="dropdown">
-                <a href="#" id="nav-wellness"><i class="fas fa-heart-pulse"></i>Wellness<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
-                <div class="dropdown-content">
-                    <!-- Tools -->
-                    <a href="${rootPath}confession-box.html" id="nav-confession">Confession Box</a>
-                     <a href="${rootPath}confession-box/guidelines.html" id="nav-confession-guide" style="font-size:0.85rem; opacity:0.8; padding-left:30px;">— Guidelines</a>
-                    <a href="${rootPath}vent-box.html" id="nav-vent">The Vent Box</a>
-                    <a href="${rootPath}support-groups.html" id="nav-support">Support Groups</a>
-                    <a href="${rootPath}get-help-now.html" id="nav-help" style="color:var(--teal-glow); font-weight:700;">Get Help Now</a>
-                </div>
-            </div>
-
-            <!-- 4. RESOURCES (Library) - NEW -->
-            <div class="dropdown">
-                <a href="#" id="nav-resources"><i class="fas fa-book-open"></i>Resources<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
-                <div class="dropdown-content">
-                    <a href="${rootPath}student-resources.html" id="nav-hub"><strong>Student Hub</strong></a>
-                    <a href="${rootPath}campus/anxiety-and-overthinking.html" id="nav-anxiety">Anxiety & Overthinking</a>
-                    <a href="${rootPath}campus/exam-pressure.html" id="nav-exams">Exam Pressure</a>
-                    <a href="${rootPath}campus/loneliness.html" id="nav-lonely">Loneliness</a>
-                    <a href="${rootPath}campus/feeling-low.html" id="nav-low">Feeling Low</a>
-                    <a href="${rootPath}campus/safety-boundaries.html" id="nav-safety">Safety & Boundaries</a>
-                </div>
-            </div>
 
             <!-- 5. COMMUNITY (Social) -->
             <div class="dropdown">
@@ -311,7 +301,19 @@ function initializeHeaderLogic() {
         });
     });
 
-    // C. Scroll Glass Effect
+    // C. Sub-Dropdown Logic (Mobile Nesting)
+    const subToggles = document.querySelectorAll('.dropdown-submenu > a');
+    subToggles.forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+            if (window.innerWidth <= 1150) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggle.parentElement.classList.toggle('active');
+            }
+        });
+    });
+
+    // D. Scroll Glass Effect
     if (header) {
         window.addEventListener('scroll', () => {
             const scriptTag = document.querySelector('script[src*="components.js"]');

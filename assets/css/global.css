@@ -422,16 +422,33 @@ footer a {
 }
 
 .nav-links.open .dropdown-content {
-    position: relative;
+    position: static;
     box-shadow: none;
     background: rgba(255, 255, 255, 0.03);
-    width: 100%;
+    border: none;
+    padding: 0;
+    margin-top: 10px;
+    display: none;
+    /* Controlled by JS now */
+    animation: none !important;
+}
+
+.dropdown.active .dropdown-content {
+    display: block;
+}
+
+/* Nesting for Mobile */
+.dropdown-submenu .dropdown-content {
+    position: static;
+    margin-left: 20px;
+    /* Indent */
+    border-left: 2px solid var(--teal-glow);
+    left: 0;
     top: 0;
 }
 
-.nav-links.open .dropdown.active .dropdown-content {
+.dropdown-submenu.active>.dropdown-content {
     display: block;
-    animation: fadeInDropdown 0.3s ease;
 }
 
 @media (min-width: 1151px) {
@@ -745,6 +762,59 @@ footer a {
     }
 
     /* SHOW DROPDOWN ON MOBILE TOGGLE */
+    /* Dropdown Content (Hidden by Default) */
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: var(--navy);
+        min-width: 220px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 12px;
+        top: 100%;
+        left: 0;
+        padding: 10px 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* --- NESTED DROPDOWN SUPPORT --- */
+    .dropdown-submenu {
+        position: relative;
+    }
+
+    .dropdown-submenu .dropdown-content {
+        top: 0;
+        left: 100%;
+        /* Desktop: Fly out to right */
+        margin-top: -10px;
+        display: none;
+    }
+
+    .dropdown-submenu:hover>.dropdown-content {
+        display: block;
+    }
+
+    .dropdown-submenu>a::after {
+        content: "\f054";
+        /* FontAwesome Right Arrow */
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        float: right;
+        font-size: 0.8em;
+        opacity: 0.7;
+        margin-top: 4px;
+    }
+
+    /* ------------------------------- */
+
+    /* Show Dropdown on Hover */
+    @media(hover: hover) and (min-width: 1150px) {
+        .dropdown:hover .dropdown-content {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+    }
+
     .dropdown.active .dropdown-content {
         display: block !important;
         position: static;
