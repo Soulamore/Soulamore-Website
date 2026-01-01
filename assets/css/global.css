@@ -99,8 +99,9 @@ header.island-nav {
 .main-nav {
     max-width: 100%;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
+    /* Flexbox is safer than Grid here */
+    justify-content: space-between;
     align-items: center;
     padding: 0 40px;
 }
@@ -108,25 +109,19 @@ header.island-nav {
 .nav-group {
     display: flex;
     align-items: center;
-    width: 100%;
-    justify-content: flex-end;
-    /* Push content to right */
     gap: 40px;
-    /* Space between Nav Links and Auth Box */
 }
 
 .nav-logo {
     display: flex;
     align-items: center;
-    justify-self: start;
     padding: 5px 0;
-    margin-right: 20px;
-    /* Increased separation from Home link */
+    margin-right: auto;
+    /* Pushes everything else to the right if needed, but space-between handles it */
 }
 
 .nav-logo img {
     height: 45px;
-    /* Adjust based on logo aspect ratio */
     width: auto;
     object-fit: contain;
     transition: transform 0.3s;
@@ -138,10 +133,9 @@ header.island-nav {
 
 .nav-links {
     display: flex;
+    /* Desktop Default */
     gap: 25px;
-    justify-self: center;
     align-items: center;
-    /* Ensure vertical centering */
 }
 
 .nav-links a {
@@ -151,13 +145,9 @@ header.island-nav {
     opacity: 0.8;
     position: relative;
     display: flex;
-    /* Enforce row layout */
     align-items: center;
-    /* Center icon vertically */
     gap: 5px;
-    /* Reduced Gap (Requested "Too Much") */
     white-space: nowrap;
-    /* Prevent wrapping */
 }
 
 .nav-links a:hover,
@@ -170,32 +160,24 @@ header.island-nav {
     display: none;
 }
 
-/* --- DESKTOP CLEANUP (Hide Mobile Elements) --- */
+/* --- DESKTOP CLEANUP --- */
 .mobile-profile-card {
     display: none !important;
-    /* Hidden on Desktop */
 }
 
-/* Nav Link Icons on Desktop - VISIBLE NOW (Per User Request) */
+/* Icons */
 .nav-links i {
     color: var(--peach-glow);
-    /* Match Mobile & Logo (Requested) */
     margin-right: 8px;
     font-size: 0.9em;
     display: inline-block;
-    /* Allow visibility */
 }
 
 .nav-links a:hover i {
     color: var(--peach-glow);
 }
 
-/* Mobile Toggle is already hidden below */
-
-.nav-group {
-    display: contents;
-    /* Allows children (links and btn) to participate in the grid */
-}
+/* REMOVE CONFLICTING DEFINITIONS */
 
 /* DESKTOP DROPDOWN ARROWS */
 .dropdown>a>.fa-chevron-down {
@@ -996,6 +978,22 @@ header.island-nav .nav-logo img {
 
     .nav-links.open {
         transform: translateX(0);
+    }
+
+    /* Mobile Only Help Button */
+    .mobile-only-help {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 107, 107, 0.15);
+        color: #ff6b6b !important;
+        border: 1px solid rgba(255, 107, 107, 0.4);
+        padding: 12px;
+        border-radius: 12px;
+        font-weight: 700;
+        margin-top: 20px;
+        width: 100%;
+        text-align: center;
     }
 }
 }

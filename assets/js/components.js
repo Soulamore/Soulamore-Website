@@ -139,6 +139,9 @@ const getHeaderHTML = (rootPath) => `
                 </div>
             </div>
 
+            <!-- MOBILE: Add pure "Get Help" link for mobile view only -->
+            <!-- (Inserted dynamically between Company and Auth) --> 
+             <a href="${rootPath}get-help-now.html" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Get Help Now</a>
 
         </nav>
 
