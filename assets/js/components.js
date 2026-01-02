@@ -5,8 +5,8 @@ try {
     const style = document.createElement('style');
     style.id = 'header-critical-style';
     style.innerHTML = `
-        /* DESKTOP (Width > 1024px) */
-        @media (min-width: 1025px) {
+        /* DESKTOP (Width > 1150px) */
+        @media (min-width: 1151px) {
             .mobile-profile-card, 
             .mobile-toggle,
             .mobile-only-help { 
@@ -21,15 +21,54 @@ try {
                 height: auto !important;
                 padding: 0 !important;
                 box-shadow: none !important;
+                gap: 30px !important;
+                align-items: center !important;
             }
             .auth-box {
                 display: flex !important; /* Force Auth Box Visible */
+                align-items: center !important;
+                gap: 15px !important;
+            }
+            .main-nav {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 15px 40px !important;
+                max-width: 1400px !important;
+                margin: 0 auto !important;
+            }
+            .nav-logo img {
+                height: 40px !important;
+                width: auto !important;
+            }
+            /* Button Consistency */
+            .nav-btn {
+                background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)) !important;
+                border: 1px solid rgba(255,255,255,0.2) !important;
+                padding: 10px 24px !important;
+                border-radius: 50px !important;
+                color: white !important;
+                font-weight: 500 !important;
+                transition: all 0.3s ease !important;
+                text-decoration: none !important;
+            }
+            .nav-btn:hover {
+                background: white !important;
+                color: #0f172a !important;
+                transform: translateY(-2px);
             }
         }
-        /* MOBILE (Width <= 1024px) */
-        @media (max-width: 1024px) {
+        /* MOBILE (Width <= 1150px) */
+        @media (max-width: 1150px) {
             .auth-box { display: none !important; }
             .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
+            .main-nav {
+                 display: flex !important;
+                 justify-content: space-between !important;
+                 align-items: center !important;
+                 padding: 15px 20px !important;
+            }
+            .nav-logo img { height: 35px !important; }
         }
     `;
     document.head.appendChild(style);
@@ -627,58 +666,4 @@ function injectSoulBotWidget() {
     }
 }
 
-// --- 5. FOOTER INJECTION ---
-function injectFooter() {
-    const footer = document.querySelector('footer');
-    if (!footer) return;
 
-    footer.innerHTML = `
-        <div style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px; color: var(--starlight); border-top: 1px solid var(--border-glass); margin-top: 60px;">
-            
-            <!-- Brand -->
-            <div style="flex: 1; min-width: 250px;">
-                <h3 style="font-family:'Outfit'; font-size:1.5rem; color:white; margin-bottom:15px; display:flex; align-items:center; gap:10px;">
-                    <i class="fas fa-moon" style="color:var(--teal-glow)"></i> Soulamore
-                </h3>
-                <p style="opacity:0.7; line-height:1.6;">A safe space to pause, reflect, and reconnect with yourself. Built with care for every soul.</p>
-                <div style="margin-top:20px; display:flex; gap:15px;">
-                    <a href="#" style="color:white; opacity:0.7; transition:0.3s; font-size:1.2rem;"><i class="fab fa-instagram"></i></a>
-                    <a href="#" style="color:white; opacity:0.7; transition:0.3s; font-size:1.2rem;"><i class="fab fa-twitter"></i></a>
-                    <a href="#" style="color:white; opacity:0.7; transition:0.3s; font-size:1.2rem;"><i class="fab fa-linkedin"></i></a>
-                </div>
-            </div>
-
-            <!-- Links -->
-            <div style="display:flex; gap:40px; flex-wrap:wrap;">
-                <div>
-                    <h4 style="color:white; margin-bottom:15px;">Explore</h4>
-                    <ul style="list-style:none; opacity:0.8; line-height:2;">
-                        <li><a href="index.html" style="color:inherit; text-decoration:none;">Home</a></li>
-                        <li><a href="about.html" style="color:inherit; text-decoration:none;">About Us</a></li>
-                        <li><a href="soulamore-spaces.html" style="color:inherit; text-decoration:none;">Spaces</a></li>
-                        <li><a href="soulbot.html" style="color:inherit; text-decoration:none;">SoulBot</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 style="color:white; margin-bottom:15px;">Support</h4>
-                    <ul style="list-style:none; opacity:0.8; line-height:2;">
-                        <li><a href="faq.html" style="color:inherit; text-decoration:none;">FAQ</a></li>
-                        <li><a href="contact.html" style="color:inherit; text-decoration:none;">Contact</a></li>
-                        <li><a href="privacy.html" style="color:inherit; text-decoration:none;">Privacy Policy</a></li>
-                        <li><a href="terms.html" style="color:inherit; text-decoration:none;">Terms of Service</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div style="text-align:center; padding:20px; border-top:1px solid rgba(255,255,255,0.05); color:rgba(255,255,255,0.4); font-size:0.9rem;">
-            &copy; 2026 Soulamore. All rights reserved.
-        </div>
-    `;
-}
-
-// --- INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', () => {
-    injectHeader();
-    injectFooter();
-    injectSoulBotWidget();
-});
