@@ -95,10 +95,13 @@ class GravityField {
             p.y += p.vy;
 
             // Draw Point
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${0.1 * p.mass})`;
+            this.ctx.fillStyle = `rgba(255, 255, 255, ${0.3 * p.mass})`; // Increased base opacity slightly
+            this.ctx.shadowBlur = 4; // GLOW EFFECT
+            this.ctx.shadowColor = 'rgba(78, 205, 196, 0.5)'; // Teal Glow
             this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, 1, 0, Math.PI * 2);
+            this.ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2); // Slightly larger dots
             this.ctx.fill();
+            this.ctx.shadowBlur = 0; // Reset
         }
 
         requestAnimationFrame(() => this.animate());
