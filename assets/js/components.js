@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Soulamore: DOM Content Loaded, initializing...");
         injectHeader();
         injectFooter();
+        injectSoulBotWidget(); // New Widget
         setActiveState();
         initializeHeaderLogic();
         console.log("Soulamore: Initialization complete.");
@@ -489,5 +490,136 @@ function initializeHeaderLogic() {
                 }
             }
         });
+    }
+}
+
+// --- 4. SOULBOT WIDGET ---
+function injectSoulBotWidget() {
+    // Check if we are ALREADY on soulbot.html to avoid double chat
+    if (window.location.pathname.includes('soulbot.html')) return;
+
+    const widget = document.createElement('div');
+    widget.id = 'soulbot-widget';
+    widget.innerHTML = `
+        <style>
+            #soulbot-widget-container {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                z-index: 9999;
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+            }
+            #sb-bubble {
+                width: 60px;
+                height: 60px;
+                background: linear-gradient(135deg, #4ECDC4, #2dd4bf);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4);
+                transition: transform 0.3s;
+                color: #0f172a;
+                font-size: 1.5rem;
+            }
+            #sb-bubble:hover { transform: scale(1.1); }
+            #sb-window {
+                width: 350px;
+                height: 500px;
+                background: #0f172a;
+                border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 20px;
+                margin-bottom: 20px;
+                display: none; /* Hidden by default */
+                flex-direction: column;
+                overflow: hidden;
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+                animation: slideUp 0.3s ease-out;
+            }
+            @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+            
+            .sb-header { background: rgba(30, 41, 59, 0.9); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+            .sb-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(15, 23, 42, 0.95); }
+            .sb-footer { padding: 15px; background: rgba(30, 41, 59, 0.9); display: flex; gap: 10px; }
+            .sb-input { flex: 1; background: rgba(255,255,255,0.05); border: none; padding: 10px 15px; border-radius: 20px; color: white; outline: none; }
+            .sb-send { background: #4ECDC4; color: #0f172a; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+            
+            .sb-msg { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; }
+            .sb-msg-bot { background: rgba(255,255,255,0.05); align-self: flex-start; color: #e2e8f0; }
+            .sb-msg-user { background: #2dd4bf; align-self: flex-end; color: #0f172a; }
+        </style>
+        
+        <div id="soulbot-widget-container">
+            <div id="sb-window">
+                <div class="sb-header">
+                    <span style="font-weight:700; color:white;"><i class="fas fa-robot" style="color:#4ECDC4;"></i> SoulBot</span>
+                    <i class="fas fa-expand-alt" style="cursor:pointer; color: #94a3b8;" title="Full Screen" onclick="window.location.href='soulbot.html'"></i>
+                </div>
+                <div class="sb-body" id="sb-chat-body">
+                    <div class="sb-msg sb-msg-bot">Hi there. I'm here if you need to untangle a thought.</div>
+                </div>
+                <div class="sb-footer">
+                    <input type="text" class="sb-input" id="sb-input" placeholder="Type here..." onkeypress="handleWidgetEnter(event)">
+                    <button class="sb-send" onclick="sendWidgetMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+            <div id="sb-bubble" onclick="toggleWidget()">
+                <i class="fas fa-comment-dots"></i>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(widget);
+
+    // Widget Logic using window scope to avoid redeclaration issues if re-run
+    window.toggleWidget = function () {
+        const win = document.getElementById('sb-window');
+        const bubble = document.getElementById('sb-bubble');
+        if (win.style.display === 'flex') {
+            win.style.display = 'none';
+            bubble.innerHTML = '<i class="fas fa-comment-dots"></i>';
+        } else {
+            win.style.display = 'flex';
+            bubble.innerHTML = '<i class="fas fa-times"></i>';
+            document.getElementById('sb-input').focus();
+        }
+    };
+
+    window.handleWidgetEnter = function (e) {
+        if (e.key === 'Enter') sendWidgetMessage();
+    };
+
+    window.sendWidgetMessage = function () {
+        const input = document.getElementById('sb-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        // Add User Msg
+        appendWidgetMsg(text, 'user');
+        input.value = '';
+
+        // Simulate Bot Response (Simple Echo for now, full logic is on main page)
+        // In a real app, we would hit the API here too. 
+        // For now, redirect users to full experience for deep chat.
+        setTimeout(() => {
+            appendWidgetMsg("I'm listening. For a deeper conversation, let's go to my full quiet space.", 'bot');
+            setTimeout(() => {
+                if (confirm("Would you like to move to the full SoulBot experience?")) {
+                    window.location.href = 'soulbot.html';
+                }
+            }, 1000);
+        }, 800);
+    };
+
+    function appendWidgetMsg(text, sender) {
+        const body = document.getElementById('sb-chat-body');
+        const div = document.createElement('div');
+        div.className = `sb-msg sb-msg-${sender}`;
+        div.innerText = text;
+        body.appendChild(div);
+        body.scrollTop = body.scrollHeight;
     }
 }
