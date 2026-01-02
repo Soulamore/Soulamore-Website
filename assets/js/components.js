@@ -495,7 +495,10 @@ function initializeHeaderLogic() {
 
 // --- 4. SOULBOT WIDGET ---
 function injectSoulBotWidget() {
-    // Check if we are ALREADY on soulbot.html to avoid double chat
+    // 1. Avoid Double Injection
+    if (document.getElementById('soulbot-widget')) return;
+
+    // 2. Hide on SoulBot Page (it has its own full UI)
     if (window.location.pathname.includes('soulbot.html')) return;
 
     const widget = document.createElement('div');
@@ -504,7 +507,7 @@ function injectSoulBotWidget() {
         <style>
             #soulbot-widget-container {
                 position: fixed;
-                bottom: 30px;
+                bottom: 100px; /* Moved up to avoid Audio Control overlap */
                 right: 30px;
                 z-index: 9999;
                 font-family: 'Plus Jakarta Sans', sans-serif;
