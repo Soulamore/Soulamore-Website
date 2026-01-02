@@ -294,12 +294,21 @@ function getRootPath() {
 // --- 4. INJECTION LOGIC ---
 
 function injectHeader() {
-    const headerElement = document.querySelector('header');
-    if (headerElement) {
+    let headerElement = document.querySelector('header');
+
+    // 1. Auto-Create Header if Missing (Robustness)
+    if (!headerElement) {
+        console.log("Soulamore: No <header> found, creating one...");
+        headerElement = document.createElement('header');
+        document.body.prepend(headerElement);
+    } else {
+        // Ensure it's the first element if it exists but is misplaced
         if (headerElement.parentElement !== document.body) {
             document.body.prepend(headerElement);
         }
+    }
 
+    if (headerElement) {
         headerElement.classList.add('island-nav');
 
         // THEMING
