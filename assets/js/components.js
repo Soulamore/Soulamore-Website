@@ -799,3 +799,21 @@ function injectSoulBotWidget() {
     }
 }
 
+// --- 7. INITIALIZATION (CRITICAL: MUST RUN) ---
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Soulamore: Initializing...");
+
+    // 1. Inject Components
+    try { injectHeader(); } catch (e) { console.error("Header Injection Failed:", e); }
+    try { injectFooter(); } catch (e) { console.error("Footer Injection Failed:", e); }
+    try { injectSoulBotWidget(); } catch (e) { console.error("SoulBot Widget Failed:", e); }
+
+    // 2. Set Active State
+    try { setActiveState(); } catch (e) { console.warn("Active State Error:", e); }
+
+    // 3. Initialize Interactions
+    try { initializeHeaderLogic(); } catch (e) { console.warn("Header Logic Error:", e); }
+
+    console.log("Soulamore: Initialization Complete.");
+});
+
