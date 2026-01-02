@@ -144,9 +144,10 @@ try {
             .main-nav, .auth-box {
                 flex-wrap: nowrap !important;
             }
-             /* Allow wrapping for links if space is tight */
+             /* FORCE SINGLE LINE HEADER - Revert wrapping to fix 'exploded' look */
             .nav-links {
-               flex-wrap: wrap !important; 
+               flex-wrap: nowrap !important; 
+               white-space: nowrap !important;
                justify-content: center !important;
             }
         }
