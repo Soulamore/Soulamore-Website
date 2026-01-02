@@ -442,14 +442,15 @@
     <canvas id="particles"></canvas>
 
     <style>
-        /* --- RAZZLE DAZZLE UPGRADE --- */
+        /* --- RAZZLE DAZZLE FIXED --- */
 
-        /* 1. Ambient Orbs */
+        /* 1. Ambient Orbs (Moved to Background) */
         .ambient-orb {
             position: fixed;
             border-radius: 50%;
             filter: blur(100px);
-            z-index: 0;
+            z-index: -1;
+            /* Critical Fix */
             opacity: 0.4;
             pointer-events: none;
             animation: floatOrb 15s ease-in-out infinite alternate;
@@ -482,6 +483,15 @@
             animation-duration: 25s;
         }
 
+        #particles {
+            z-index: -1;
+            /* Critical Fix */
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
         @keyframes floatOrb {
             0% {
                 transform: translate(0, 0) scale(1);
@@ -492,33 +502,41 @@
             }
         }
 
-        /* 2. Text Pop (Neon Glow - High Visibility) */
+        /* 2. Text Pop (Sharpened Glow) */
         .header h1 {
             font-size: 3.5rem;
             margin-bottom: 20px;
             color: #ffffff;
+            /* Tighter shadows for sharper look */
             text-shadow:
-                0 0 10px rgba(78, 205, 196, 0.5),
-                0 0 20px rgba(78, 205, 196, 0.3),
-                0 0 40px rgba(78, 205, 196, 0.2);
+                0 0 2px rgba(78, 205, 196, 0.8),
+                0 0 10px rgba(78, 205, 196, 0.4),
+                0 0 20px rgba(78, 205, 196, 0.2);
             animation: neonPulse 3s ease-in-out infinite alternate;
+            position: relative;
+            z-index: 2;
         }
 
         @keyframes neonPulse {
             0% {
                 text-shadow:
-                    0 0 10px rgba(78, 205, 196, 0.5),
-                    0 0 20px rgba(78, 205, 196, 0.3),
-                    0 0 40px rgba(78, 205, 196, 0.2);
+                    0 0 5px rgba(78, 205, 196, 0.8),
+                    0 0 15px rgba(78, 205, 196, 0.4),
+                    0 0 30px rgba(78, 205, 196, 0.2);
             }
 
             100% {
                 text-shadow:
-                    0 0 15px rgba(244, 159, 117, 0.6),
-                    0 0 30px rgba(244, 159, 117, 0.4),
-                    0 0 60px rgba(244, 159, 117, 0.2);
+                    0 0 5px rgba(244, 159, 117, 0.8),
+                    0 0 15px rgba(244, 159, 117, 0.4),
+                    0 0 30px rgba(244, 159, 117, 0.2);
             }
         }
+
+        .playground-menu {
+            position: relative;
+            z-index: 1;
+            /* Ensure content is above bg */
         }
 
         /* 3. Card Glow Upgrade */
