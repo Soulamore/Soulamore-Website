@@ -31,61 +31,24 @@
             box-sizing: border-box;
         }
 
+
+        /* --- LAYOUT FIX FOR HEADER --- */
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--deep-space);
-            color: var(--starlight);
-            line-height: 1.6;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+            /* Remove fixed/hidden overflow to allow normal scrolling with header */
+            overflow: auto !important;
+            height: auto !important;
+            display: block !important;
         }
 
-        h1,
-        h2,
-        h3 {
-            font-family: 'Outfit', sans-serif;
-        }
-
-        /* --- BACKGROUND --- */
-        #particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .particle {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.2;
-            animation: float linear infinite;
-        }
-
-        @keyframes float {
-            from {
-                transform: translateY(100vh);
-            }
-
-            to {
-                transform: translateY(-10vh);
-            }
-        }
-
-        /* --- VIEW MANAGER --- */
+        /* Adjust View Manager to be part of normal flow */
         .view-section {
             display: none;
-            height: 100%;
             width: 100%;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-            position: relative;
-            z-index: 10;
+            /* Remove fixed height/scroll so body handles scrolling */
+            height: auto;
+            overflow: visible;
+            padding-top: 100px;
+            /* Space for fixed header */
         }
 
         .view-section.active {
@@ -93,133 +56,28 @@
             animation: fadeIn 0.5s ease-out;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* --- NAV --- */
-        nav {
-            padding: 20px 30px;
-            border-bottom: 1px solid var(--border-glass);
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-
-        .back-btn {
-            color: rgba(255, 255, 255, 0.6);
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .back-btn:hover {
-            color: var(--teal-glow);
-        }
-
-        /* ================= PAGE 1: EXPLANATION ================= */
-        .container {
-            max-width: 900px;
+        /* --- NEW NEURAL ORB ANIMATION (Canvas-based) --- */
+        #neural-canvas {
+            width: 300px;
+            height: 300px;
             margin: 0 auto;
-            padding: 60px 24px;
-            text-align: center;
+            position: relative;
+            z-index: 5;
+            /* Filter to create the glow effect */
+            filter: drop-shadow(0 0 15px var(--teal-glow));
         }
 
-        /* NEURAL ORB ANIMATION */
+        /* Remove old CSS animation styles */
         .neural-orb-container {
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 40px;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 20px;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .neural-orb {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #4ECDC4, #0f172a);
-            box-shadow: 0 0 60px rgba(78, 205, 196, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.5);
-            position: relative;
-            z-index: 2;
-            animation: breathe 4s ease-in-out infinite;
-        }
-
-        .neural-wave {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 2px solid rgba(78, 205, 196, 0.3);
-            animation: ripple 3s linear infinite;
-            z-index: 1;
-        }
-
-        .neural-wave:nth-child(2) {
-            animation-delay: 1s;
-        }
-
-        .neural-wave:nth-child(3) {
-            animation-delay: 2s;
-        }
-
-        @keyframes breathe {
-
-            0%,
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 60px rgba(78, 205, 196, 0.6);
-            }
-
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 80px rgba(78, 205, 196, 0.8);
-            }
-        }
-
-        @keyframes ripple {
-            0% {
-                width: 140px;
-                height: 140px;
-                opacity: 1;
-                border-width: 3px;
-            }
-
-            100% {
-                width: 280px;
-                height: 280px;
-                opacity: 0;
-                border-width: 0px;
-            }
-        }
 
         .hero h1 {
             font-size: 3.5rem;
@@ -503,9 +361,7 @@
             <!-- HERO SECTION -->
             <section class="hero" style="text-align: center; margin-bottom: 80px;">
                 <div class="neural-orb-container">
-                    <div class="neural-wave"></div>
-                    <div class="neural-wave"></div>
-                    <div class="neural-orb"></div>
+                    <canvas id="neural-canvas" width="300" height="300"></canvas>
                 </div>
 
                 <h1>SoulBot</h1>
