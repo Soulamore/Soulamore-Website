@@ -140,20 +140,28 @@ try {
                 display: block !important;
             }
             
-            /* Level 2: Nested Submenu (Medium Border) */
+            /* Level 2: Nested Submenu (Straight Line / Stacked) */
             .dropdown-content .dropdown-content {
-                border-left-color: rgba(78, 205, 196, 0.6) !important; /* Level 2: Medium */
-                top: 0 !important;
-                left: 100% !important;
+                position: relative !important;
+                top: auto !important;
+                left: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                border-left: 2px solid rgba(78, 205, 196, 0.3) !important;
+                background: transparent !important;
+                padding-left: 20px !important;
+                min-width: 100% !important;
             }
 
-            /* Level 3: Deep Nested (Solid Border) */
+            /* Level 3: Deep Nested */
             .dropdown-content .dropdown-content .dropdown-content {
-                border-left-color: #4ECDC4 !important; /* Level 3: Solid */
+                border-left-color: #4ECDC4 !important;
+                padding-left: 15px !important;
             }
 
             .dropdown-content a, .dropdown-submenu a {
                 color: #e2e8f0 !important;
+                display: block !important; /* Ensure block for vertical stacking */
             }
             .dropdown-content a:hover, .dropdown-submenu a:hover {
                 background: rgba(255,255,255,0.05) !important;
@@ -164,12 +172,18 @@ try {
             .main-nav, .auth-box {
                 flex-wrap: nowrap !important;
             }
-             /* FORCE SINGLE LINE HEADER - Revert wrapping to fix 'exploded' look */
+             /* FORCE SINGLE LINE HEADER */
             .nav-links {
                flex-wrap: nowrap !important; 
                white-space: nowrap !important;
                justify-content: center !important;
             }
+        }
+        
+        /* MOBILE GLOBAL FIXES */
+        @media (max-width: 768px) {
+            body { padding-bottom: 80px !important; } /* Space for FAB/Nav */
+            .container { padding-left: 20px !important; padding-right: 20px !important; }
         }
     `;
     document.head.appendChild(style);
@@ -646,59 +660,10 @@ function injectSoulBotWidget() {
 
     const widget = document.createElement('div');
     widget.id = 'soulbot-widget';
-    widget.innerHTML = `
-        <style>
-            #soulbot-widget-container {
-                position: fixed;
-                bottom: 100px; /* Moved up to avoid Audio Control overlap */
-                right: 30px;
-                z-index: 9999;
-                font-family: 'Plus Jakarta Sans', sans-serif;
-                display: flex;
-                flex-direction: column;
-                align-items: flex-end;
-            }
-            #sb-bubble {
-                width: 60px;
-                height: 60px;
-                background: linear-gradient(135deg, #4ECDC4, #2dd4bf);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4);
-                transition: transform 0.3s;
-                color: #0f172a;
-                font-size: 1.5rem;
-            }
-            #sb-bubble:hover { transform: scale(1.1); }
-            #sb-window {
-                width: 350px;
-                height: 500px;
-                background: #0f172a;
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 20px;
-                margin-bottom: 20px;
-                display: none; /* Hidden by default */
-                flex-direction: column;
-                overflow: hidden;
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: slideUp 0.3s ease-out;
-            }
-            @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-            
-            .sb-header { background: rgba(30, 41, 59, 0.9); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-            .sb-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(15, 23, 42, 0.95); }
-            .sb-footer { padding: 15px; background: rgba(30, 41, 59, 0.9); display: flex; gap: 10px; }
-            .sb-input { flex: 1; background: rgba(255,255,255,0.05); border: none; padding: 10px 15px; border-radius: 20px; color: white; outline: none; }
-            .sb-send { background: #4ECDC4; color: #0f172a; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-            
-            .sb-msg { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; }
-            .sb-msg-bot { background: rgba(255,255,255,0.05); align-self: flex-start; color: #e2e8f0; }
-            .sb-msg-user { background: #2dd4bf; align-self: flex-end; color: #0f172a; }
-        </style>
-        
+            .sb - msg - bot { background: rgba(255, 255, 255, 0.05); align - self: flex - start; color: #e2e8f0; }
+            .sb - msg - user { background: #2dd4bf; align - self: flex - end; color: #0f172a; }
+        </style >
+
         <div id="soulbot-widget-container">
             <div id="sb-window">
                 <div class="sb-header">
@@ -710,7 +675,7 @@ function injectSoulBotWidget() {
                 </div>
                 <div class="sb-footer">
                     <input type="text" class="sb-input" id="sb-input" placeholder="Type here..." onkeypress="handleWidgetEnter(event)">
-                    <button class="sb-send" onclick="sendWidgetMessage()"><i class="fas fa-paper-plane"></i></button>
+                        <button class="sb-send" onclick="sendWidgetMessage()"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
             <div id="sb-bubble" onclick="toggleWidget()">
@@ -763,7 +728,7 @@ function injectSoulBotWidget() {
     function appendWidgetMsg(text, sender) {
         const body = document.getElementById('sb-chat-body');
         const div = document.createElement('div');
-        div.className = `sb-msg sb-msg-${sender}`;
+        div.className = `sb - msg sb - msg - ${ sender } `;
         div.innerText = text;
         body.appendChild(div);
         body.scrollTop = body.scrollHeight;
