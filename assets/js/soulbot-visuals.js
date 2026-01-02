@@ -287,8 +287,18 @@ class NeuralSphere {
 }
 
 // Initialize
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    new ConstellationField('particles');
+    // Only init ConstellationField if the canvas exists on the page (e.g., index.html)
+    // and explicitly NOT on soulbot.html to allow full performance for the Avatar
+    const particleCanvas = document.getElementById('particles');
+    if (particleCanvas) {
+        // Double check we are not on soulbot page if we want to be strict, 
+        // but removing the ID from soulbot.html is cleaner.
+        new ConstellationField('particles');
+    }
+
+    // Only init NeuralSphere if the container exists (soulbot.html)
     if (document.getElementById('neural-canvas')) {
         new NeuralSphere('neural-canvas');
     }
