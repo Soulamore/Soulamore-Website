@@ -86,6 +86,7 @@ try {
             z-index: 100;
             background: rgba(15, 23, 42, 0.95); /* Ensure visibility */
             color: #e2e8f0;
+            border-top: 1px solid rgba(255,255,255,0.1); /* Full Width Separator */
         }
         
         /* AGGRESSIVE LINK COLOR OVERRIDES */
@@ -379,7 +380,7 @@ const getHeaderHTML = (rootPath) => `
 `;
 
 const getFooterHTML = (rootPath) => `
-<div class="footer-content" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
+<div class="footer-content" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
     
     <div class="footer-logo" style="margin-bottom: 20px;">
         <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 60px;">
