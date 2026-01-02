@@ -220,31 +220,30 @@ const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo"><img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo"></a>
 
-    <div class="nav-group">
-        <nav class="nav-links">
-            
-            <!-- MOBILE PROFILE CARD (Visible < 1150px) -->
-            <div class="mobile-profile-card" style="display: none;">
-                <div class="mp-avatar"><i class="fas fa-ghost"></i></div>
-                <div class="mp-info">
-                    <span class="mp-name">Welcome, Friend</span>
-                    <span class="mp-status">Guest</span>
-                    <a href="${rootPath}login.html" class="mp-btn">Log In</a>
-                </div>
+    <nav class="nav-links">
+        
+        <!-- MOBILE PROFILE CARD (Visible < 1150px) -->
+        <div class="mobile-profile-card" style="display: none;">
+            <div class="mp-avatar"><i class="fas fa-ghost"></i></div>
+            <div class="mp-info">
+                <span class="mp-name">Welcome, Friend</span>
+                <span class="mp-status">Guest</span>
+                <a href="${rootPath}login.html" class="mp-btn">Log In</a>
             </div>
-
-            <!-- GENERATED NAVIGATION ITEMS -->
-            ${generateNavHTML(rootPath)}
-
-        </nav>
-
-        <!-- Auth Group -->
-        <div class="auth-box">
-             <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
-             <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
-             <a href="${rootPath}login.html" class="nav-btn">Log In / Sign Up</a>
         </div>
+
+        <!-- GENERATED NAVIGATION ITEMS -->
+        ${generateNavHTML(rootPath)}
+
+    </nav>
+
+    <!-- Auth Group -->
+    <div class="auth-box">
+            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
+            <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
+            <a href="${rootPath}login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
+    
     <button class="mobile-toggle" aria-label="Toggle Navigation">
         <i class="fas fa-bars"></i>
     </button>
