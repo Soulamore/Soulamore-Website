@@ -59,7 +59,13 @@ const NAV_DATA = [
         label: 'Home',
         icon: 'fas fa-home',
         href: 'index.html',
-        type: 'link'
+        type: 'dropdown',
+        children: [
+            { id: 'nav-homepage', label: 'Home', href: 'index.html' },
+            { id: 'nav-reset', label: '5-Step Reset', href: '5-step-reset.html' },
+            { id: 'nav-play', label: 'Mental Playground', href: 'playground.html' },
+            { id: 'nav-soulbot', label: 'SoulBot AI', href: 'soulbot.html' }
+        ]
     },
     {
         id: 'nav-spaces',
