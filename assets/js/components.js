@@ -102,26 +102,35 @@ try {
             color: #4ECDC4 !important;
         }
         
-        /* SPECIAL EXCEPTION: Mobile Menu & Dropdowns (Dark Text) */
+        /* SPECIAL EXCEPTION: Mobile Menu & Dropdowns (Dark Theme Restoration) */
         @media (max-width: 1150px) {
             .nav-links.open {
-                background: white !important; /* Ensure background is white */
+                background: rgba(15, 23, 42, 0.98) !important; /* Dark Mobile Menu */
             }
             .nav-links.open a {
-                color: #0f172a !important; 
+                color: #e2e8f0 !important; /* Light Text */
             }
         }
         /* Dropdowns on Desktop */
         @media (min-width: 1151px) {
             .dropdown-content, .dropdown-submenu {
-                background: white !important; /* Ensure background is white */
+                background: rgba(15, 23, 42, 0.95) !important; /* Dark Glass Dropdown */
+                border: 1px solid rgba(255,255,255,0.1) !important;
+                backdrop-filter: blur(10px) !important;
             }
             .dropdown-content a, .dropdown-submenu a {
-                color: #0f172a !important;
+                color: #e2e8f0 !important; /* Light Text */
             }
             .dropdown-content a:hover, .dropdown-submenu a:hover {
-                background: #f1f5f9 !important;
+                background: rgba(255,255,255,0.05) !important;
                 color: #4ECDC4 !important;
+            }
+            /* Prevent Header Scattering */
+            .nav-links, .main-nav, .auth-box {
+                flex-wrap: nowrap !important;
+            }
+            .nav-links a {
+                white-space: nowrap !important;
             }
         }
     `;
