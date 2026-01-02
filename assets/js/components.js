@@ -7,6 +7,12 @@ try {
     style.innerHTML = `
         /* DESKTOP (Width > 1150px) */
         @media (min-width: 1151px) {
+            header {
+                z-index: 9999 !important; /* Force Header on Top */
+                position: fixed !important;
+                width: 100% !important;
+                top: 0 !important;
+            }
             .mobile-profile-card, 
             .mobile-toggle,
             .mobile-only-help { 
@@ -69,6 +75,13 @@ try {
                  padding: 15px 20px !important;
             }
             .nav-logo img { height: 35px !important; }
+            header { z-index: 9999 !important; position: fixed !important; width: 100% !important; top: 0 !important; }
+        }
+        /* GLOBAL FOOTER FIX */
+        footer {
+            position: relative;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.95); /* Ensure visibility */
         }
     `;
     document.head.appendChild(style);
