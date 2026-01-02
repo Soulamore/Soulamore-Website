@@ -356,34 +356,49 @@ const getHeaderHTML = (rootPath) => `
 `;
 
 const getFooterHTML = (rootPath) => `
-<div class="footer-content" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
-    
-    <div class="footer-logo" style="margin-bottom: 20px;">
-        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px;">
-    </div>
-    
-    <h3 style="color:white; font-family:'Outfit', sans-serif; font-size: 1.5rem; margin-bottom: 10px;">Soulamore</h3>
-    <p style="font-size:1rem; opacity:0.8; margin-bottom: 30px; max-width: 600px;">Your Partner in Mental Wellness.</p>
-    
-    <div class="footer-links" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;">
-        <a href="${rootPath}about.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">About</a>
-        <a href="${rootPath}contact.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Contact</a>
-        <a href="${rootPath}legal.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Legal</a>
-        <a href="${rootPath}privacy-policy.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Privacy</a>
+<div class="footer-content" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px;">
+        
+        <!-- Brand Column -->
+        <div style="flex: 1; min-width: 250px;">
+             <div class="footer-logo" style="margin-bottom: 20px;">
+                <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px;">
+            </div>
+            <p style="font-size:1rem; opacity:0.8; line-height: 1.6; margin-bottom: 20px;">Your Partner in Mental Wellness.</p>
+            <div class="footer-socials" style="display: flex; gap: 15px;">
+                <a href="https://www.instagram.com/soulamore_/" target="_blank" style="font-size: 1.2rem; color: #e2e8f0 !important;"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/soulamore/" target="_blank" style="font-size: 1.2rem; color: #e2e8f0 !important;"><i class="fab fa-linkedin"></i></a>
+                <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank" style="font-size: 1.2rem; color: #e2e8f0 !important;"><i class="fab fa-facebook"></i></a>
+            </div>
+        </div>
+
+        <!-- Links Column 1 -->
+        <div style="min-width: 150px;">
+            <h4 style="color:white; margin-bottom: 20px; font-family:'Outfit', sans-serif;">Explore</h4>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <a href="${rootPath}index.html" style="color: #e2e8f0 !important; text-decoration: none;">Home</a>
+                <a href="${rootPath}about.html" style="color: #e2e8f0 !important; text-decoration: none;">About Us</a>
+                <a href="${rootPath}soulbot.html" style="color: #e2e8f0 !important; text-decoration: none;">SoulBot AI</a>
+                <a href="${rootPath}playground.html" style="color: #e2e8f0 !important; text-decoration: none;">Mental Playground</a>
+            </div>
+        </div>
+
+        <!-- Links Column 2 -->
+        <div style="min-width: 150px;">
+             <h4 style="color:white; margin-bottom: 20px; font-family:'Outfit', sans-serif;">Support</h4>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <a href="${rootPath}contact.html" style="color: #e2e8f0 !important; text-decoration: none;">Contact</a>
+                <a href="${rootPath}privacy.html" style="color: #e2e8f0 !important; text-decoration: none;">Privacy Policy</a>
+                <a href="${rootPath}terms.html" style="color: #e2e8f0 !important; text-decoration: none;">Terms of Service</a>
+                <a href="${rootPath}get-help-now.html" style="color: #e2e8f0 !important; text-decoration: none;">Get Help</a>
+            </div>
+        </div>
     </div>
 
-    <div class="footer-socials" style="display: flex; gap: 20px; margin-bottom: 30px;">
-        <a href="https://www.instagram.com/soulamore_/" target="_blank" style="font-size: 1.5rem; color: white;"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.linkedin.com/company/soulamore/" target="_blank" style="font-size: 1.5rem; color: white;"><i class="fab fa-linkedin"></i></a>
-        <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank" style="font-size: 1.5rem; color: white;"><i class="fab fa-facebook"></i></a>
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px; padding-top: 20px; text-align: center; font-size: 0.85rem; opacity: 0.6;">
+        <p style="margin-bottom: 10px;">Disclaimer: Online therapy is not advisable if you are in acute distress. Please contact your nearest hospital if you are feeling suicidal or at risk of self-harm.</p>
+        <p>&copy; 2026 by Hashlilly! All rights reserved.</p>
     </div>
-
-    <p style="font-size:0.8rem; opacity:0.5; max-width: 800px; line-height: 1.6; margin-bottom: 20px;">
-        Disclaimer: Online therapy is not advisable if you are in acute distress.
-        Please contact your nearest hospital if you are feeling suicidal or at risk of self-harm.
-    </p>
-
-    <p style="font-size:0.8rem; opacity:0.4;">© 2026 by Hashlilly! All rights reserved.</p>
 </div>
 `;
 
