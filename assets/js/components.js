@@ -571,7 +571,7 @@ function injectSoulBotWidget() {
                 </div>
             </div>
             <div id="sb-bubble" onclick="toggleWidget()">
-                <i class="fas fa-comment-dots"></i>
+                <i class="fas fa-robot"></i>
             </div>
         </div>
     `;
@@ -583,7 +583,7 @@ function injectSoulBotWidget() {
         const bubble = document.getElementById('sb-bubble');
         if (win.style.display === 'flex') {
             win.style.display = 'none';
-            bubble.innerHTML = '<i class="fas fa-comment-dots"></i>';
+            bubble.innerHTML = '<i class="fas fa-robot"></i>';
         } else {
             win.style.display = 'flex';
             bubble.innerHTML = '<i class="fas fa-times"></i>';
