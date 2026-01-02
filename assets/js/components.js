@@ -113,7 +113,7 @@ try {
         }
         /* Dropdowns on Desktop */
         @media (min-width: 1151px) {
-            .dropdown-content, .dropdown-submenu {
+            .dropdown-content {
                 background: rgba(15, 23, 42, 0.95) !important; /* Dark Glass Dropdown */
                 border: 1px solid rgba(255,255,255,0.1) !important;
                 border-left: 4px solid #4ECDC4 !important; /* Restore Teal Edge Highlight Prominently */
@@ -378,7 +378,6 @@ const getFooterHTML = (rootPath) => `
         <a href="${rootPath}about.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">About</a>
         <a href="${rootPath}contact.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Contact</a>
         <a href="${rootPath}legal.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Legal</a>
-        <a href="${rootPath}privacy-policy.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Privacy</a>
     </div>
 
     <div class="footer-socials" style="display: flex; gap: 20px; margin-bottom: 30px;">
