@@ -23,8 +23,13 @@ class ConstellationField {
         if (!this.canvas) return;
         this.ctx = this.canvas.getContext('2d');
         this.particles = [];
+        this.resizeTimeout = null;
+
         this.resize();
-        window.addEventListener('resize', () => this.resize());
+        window.addEventListener('resize', () => {
+            clearTimeout(this.resizeTimeout);
+            this.resizeTimeout = setTimeout(() => this.resize(), 200);
+        });
         this.animate();
     }
 
@@ -38,14 +43,15 @@ class ConstellationField {
 
     initParticles() {
         this.particles = [];
-        // Less density for better readability
-        const count = Math.floor((this.w * this.h) / 10000);
+        // Optimized density: Less particles, smoother performance
+        // increased divisor from 10000 to 18000
+        const count = Math.floor((this.w * this.h) / 18000);
         for (let i = 0; i < count; i++) {
             this.particles.push({
                 x: Math.random() * this.w,
                 y: Math.random() * this.h,
-                vx: (Math.random() - 0.5) * 0.5,
-                vy: (Math.random() - 0.5) * 0.5,
+                vx: (Math.random() - 0.5) * 0.3, // Slower, calmer movement
+                vy: (Math.random() - 0.5) * 0.3,
                 size: Math.random() * 2,
                 alpha: Math.random() * 0.5 + 0.1
             });
@@ -55,7 +61,10 @@ class ConstellationField {
     animate() {
         this.ctx.clearRect(0, 0, this.w, this.h);
 
-        // Update & Draw Particles
+        // BATCH DRAWING: Draw all dots first
+        this.ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+        this.ctx.beginPath();
+
         for (let i = 0; i < this.particles.length; i++) {
             let p = this.particles[i];
 
@@ -63,49 +72,73 @@ class ConstellationField {
             p.x += p.vx;
             p.y += p.vy;
 
-            // Bounce
+            // Soft Bounce
             if (p.x < 0 || p.x > this.w) p.vx *= -1;
             if (p.y < 0 || p.y > this.h) p.vy *= -1;
 
-            // Draw Point (Very Faint)
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${0.05})`; // Ultra subtle dots
-            this.ctx.beginPath();
+            this.ctx.moveTo(p.x, p.y);
             this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            this.ctx.fill();
+        }
+        this.ctx.fill();
 
-            // Connect if close to mouse
+        // BATCH DRAWING: Draw connections
+        // We use a fixed color for efficiency: faint white
+        this.ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+        this.ctx.lineWidth = 0.5;
+        this.ctx.beginPath();
+
+        // N^2 Loop Optimization: 
+        // 1. Reduced particle count in init
+        // 2. Strict distance cap (80px)
+        for (let i = 0; i < this.particles.length; i++) {
+            let p = this.particles[i];
+
+            // Mouse Interaction (Aggressive but batched per particle logic if needed, 
+            // but for LINES it's faster to batch here)
             const dx = mouse.x - p.x;
             const dy = mouse.y - p.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            // Interaction Zone
             if (dist < 150) {
-                this.ctx.strokeStyle = `rgba(78, 205, 196, ${1 - dist / 150})`; // Teal Fade
-                this.ctx.lineWidth = 1;
-                this.ctx.beginPath();
-                this.ctx.moveTo(p.x, p.y);
-                this.ctx.lineTo(mouse.x, mouse.y); // Connect to mouse
-                this.ctx.stroke();
-
-                // Parallax push
-                p.x -= dx * 0.03;
-                p.y -= dy * 0.03;
+                // Push particles away slightly (Parallax)
+                p.x -= dx * 0.02;
+                p.y -= dy * 0.02;
             }
 
-            // Connect to neighbors (Constellations) if close
-            for (let j = i; j < this.particles.length; j++) {
+            // Connect Neighbors
+            // Optimization: Only check next 15 particles to avoid full N^2 scan while keeping randomness
+            const checkLimit = Math.min(this.particles.length, i + 15);
+            for (let j = i + 1; j < checkLimit; j++) {
                 const p2 = this.particles[j];
-                const d2 = Math.hypot(p.x - p2.x, p.y - p2.y);
-                if (d2 < 80) {
-                    this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.03})`; // Barely visible connections
-                    this.ctx.lineWidth = 0.5;
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(p.x, p.y);
-                    this.ctx.lineTo(p2.x, p2.y);
-                    this.ctx.stroke();
+                const d2 = Math.abs(p.x - p2.x) + Math.abs(p.y - p2.y); // Manhattan approx for speed first
+                if (d2 < 100) { // Broad check
+                    if (Math.hypot(p.x - p2.x, p.y - p2.y) < 80) { // Precise check
+                        this.ctx.moveTo(p.x, p.y);
+                        this.ctx.lineTo(p2.x, p2.y);
+                    }
                 }
             }
         }
+        this.ctx.stroke();
+
+        // MOUSE CONNECTIONS (Separate Batch for different color)
+        this.ctx.strokeStyle = "rgba(78, 205, 196, 0.4)";
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        for (let i = 0; i < this.particles.length; i++) {
+            let p = this.particles[i];
+            const dx = mouse.x - p.x;
+            const dy = mouse.y - p.y;
+            if (Math.abs(dx) < 150 && Math.abs(dy) < 150) { // Fast box check
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 150) {
+                    this.ctx.moveTo(p.x, p.y);
+                    this.ctx.lineTo(mouse.x, mouse.y);
+                }
+            }
+        }
+        this.ctx.stroke();
+
         requestAnimationFrame(() => this.animate());
     }
 }
