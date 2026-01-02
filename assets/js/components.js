@@ -42,8 +42,8 @@ try {
                 display: flex !important;
                 justify-content: space-between !important;
                 align-items: center !important;
-                padding: 15px 40px !important;
-                max-width: 1400px !important;
+                padding: 15px 20px !important; /* Reduced padding */
+                max-width: 1200px !important; /* Revert to tighter width */
                 margin: 0 auto !important;
             }
             .nav-logo img {
