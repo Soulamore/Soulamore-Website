@@ -115,6 +115,10 @@ try {
         /* Dropdowns on Desktop */
         @media (min-width: 1151px) {
             /* Level 1: Outer Dropdown (Lightest Border) */
+            .dropdown {
+                position: relative !important; /* CRITICAL: Fix absolute positioning context */
+            }
+
             .dropdown-content {
                 display: none !important; /* HIDE BY DEFAULT */
                 position: absolute !important; /* FIXED LAYOUT EXPLOSION */
@@ -127,6 +131,8 @@ try {
                 backdrop-filter: blur(10px) !important;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
                 min-width: 200px !important; /* Ensure minimum width */
+                border-radius: 12px !important;
+                padding: 10px 0 !important;
             }
 
             /* SHOW ON HOVER */
