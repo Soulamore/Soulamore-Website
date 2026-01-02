@@ -223,33 +223,95 @@
         }
 
         /* --- 2. MANDALA STYLES --- */
+        .square-container {
+            width: 80vh;
+            height: 80vh;
+            max-width: 90vw;
+            max-height: 90vw;
+            background: #0f172a;
+            /* Default bg */
+            border: 1px solid var(--border-glass);
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
         #mandala-canvas {
             cursor: crosshair;
+            width: 100%;
+            height: 100%;
+            display: block;
         }
 
         .mandala-controls {
             position: absolute;
-            bottom: 30px;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            gap: 10px;
-            background: var(--navy-glass);
-            padding: 10px;
+            gap: 15px;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 15px 25px;
             border-radius: 50px;
             border: 1px solid var(--border-glass);
+            align-items: center;
+            z-index: 10;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding-right: 15px;
+        }
+
+        .control-group:last-child {
+            border: none;
+            padding: 0;
+        }
+
+        .control-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-right: 5px;
+            font-weight: 600;
         }
 
         .color-dot {
-            width: 30px;
-            height: 30px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: 0.2s;
         }
 
+        .color-dot:hover,
         .color-dot.active {
             border-color: white;
             transform: scale(1.2);
         }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .action-btn:hover {
+            background: var(--teal-glow);
+            color: #0f172a;
+        }
+
 
         /* --- 3. BODY SCAN STYLES --- */
         .body-svg {
@@ -654,13 +716,34 @@
             <h2>Mandala Weaver</h2> <button class="close-btn" onclick="closeApp()">Exit</button>
         </div>
         <div class="canvas-area">
-            <canvas id="mandala-canvas"></canvas>
-            <div class="mandala-controls">
-                <div class="color-dot active" style="background:#4ECDC4" onclick="setPenColor('#4ECDC4')"></div>
-                <div class="color-dot" style="background:#F49F75" onclick="setPenColor('#F49F75')"></div>
-                <div class="color-dot" style="background:#fbbf24" onclick="setPenColor('#fbbf24')"></div>
-                <div class="color-dot" style="background:#ffffff" onclick="setPenColor('#ffffff')"></div>
+
+            <div class="square-container" id="mandala-container">
+                <canvas id="mandala-canvas"></canvas>
+
+                <div class="mandala-controls">
+                    <!-- Pen Colors -->
+                    <div class="control-group">
+                        <span class="control-label">Pen</span>
+                        <div class="color-dot active" style="background:#4ECDC4" onclick="setPenColor('#4ECDC4', this)">
+                        </div>
+                        <div class="color-dot" style="background:#F49F75" onclick="setPenColor('#F49F75', this)"></div>
+                        <div class="color-dot" style="background:#ffffff" onclick="setPenColor('#ffffff', this)"></div>
+                    </div>
+
+                    <!-- BG Colors -->
+                    <div class="control-group">
+                        <span class="control-label">Bg</span>
+                        <div class="color-dot" style="background:#0f172a" onclick="setBgColor('#0f172a')"></div>
+                        <div class="color-dot" style="background:#000000" onclick="setBgColor('#000000')"></div>
+                        <div class="color-dot" style="background:#1e293b" onclick="setBgColor('#1e293b')"></div>
+                    </div>
+
+                    <!-- Actions -->
+                    <button class="action-btn" onclick="downloadMandala()"><i class="fas fa-download"></i> Save</button>
+                    <button class="action-btn" onclick="clearMandala()"><i class="fas fa-trash"></i></button>
+                </div>
             </div>
+
         </div>
     </div>
 
@@ -817,58 +900,147 @@
 
         // --- 2. MANDALA LOGIC ---
         const mCanvas = document.getElementById('mandala-canvas');
+        const mContainer = document.getElementById('mandala-container');
         const mCtx = mCanvas.getContext('2d');
         let painting = false;
         let penColor = '#4ECDC4';
+        let bgColor = '#0f172a';
 
         function initMandala() {
-            mCanvas.width = window.innerWidth;
-            mCanvas.height = window.innerHeight;
+            // Match internal resolution to display size for sharpness
+            const size = mContainer.clientWidth;
+            mCanvas.width = size;
+            mCanvas.height = size; // Square
+
             mCtx.lineWidth = 2;
             mCtx.lineCap = 'round';
+            // Scale context if high DPI needed, but for now 1:1 pixel mapping
         }
 
-        function setPenColor(c) { penColor = c; }
+        // Handle window resize dynamically
+        window.addEventListener('resize', () => {
+            if (document.getElementById('mandala').classList.contains('active')) {
+                // Note: Resizing canvas clears it. We might want to save/restore, 
+                // but for MVP reset is acceptable or we just don't resize if drawing exists.
+                // Ideally we backup image data.
+                const oldData = mCtx.getImageData(0, 0, mCanvas.width, mCanvas.height);
+                initMandala();
+                // Create temp canvas to scale old data? slightly complex for now.
+                // Let's just re-init which clears.
+            }
+        });
+
+        function setPenColor(c, el) {
+            penColor = c;
+            // Update active state
+            document.querySelectorAll('.control-group .color-dot').forEach(d => d.classList.remove('active'));
+            if (el) el.classList.add('active');
+        }
+
+        function setBgColor(c) {
+            bgColor = c;
+            mContainer.style.background = c;
+        }
+
+        function clearMandala() {
+            mCtx.clearRect(0, 0, mCanvas.width, mCanvas.height);
+        }
+
+        function downloadMandala() {
+            // 1. Create a temp canvas to composite
+            const temp = document.createElement('canvas');
+            temp.width = mCanvas.width;
+            temp.height = mCanvas.height;
+            const tCtx = temp.getContext('2d');
+
+            // 2. Fill Background
+            tCtx.fillStyle = bgColor;
+            tCtx.fillRect(0, 0, temp.width, temp.height);
+
+            // 3. Draw Mandala
+            tCtx.drawImage(mCanvas, 0, 0);
+
+            // 4. Download
+            const link = document.createElement('a');
+            link.download = 'my-mandala-' + Date.now() + '.png';
+            link.href = temp.toDataURL();
+            link.click();
+        }
 
         function draw(e) {
             if (!painting) return;
             const rect = mCanvas.getBoundingClientRect();
-            const x = e.clientX - rect.left - mCanvas.width / 2;
-            const y = e.clientY - rect.top - mCanvas.height / 2;
+            // Need to account for scale if CSS width != internal width, but here we sync them.
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Center coords
+            const cx = mCanvas.width / 2;
+            const cy = mCanvas.height / 2;
+            const dx = x - cx;
+            const dy = y - cy;
 
             mCtx.save();
-            mCtx.translate(mCanvas.width / 2, mCanvas.height / 2);
+            mCtx.translate(cx, cy);
             mCtx.strokeStyle = penColor;
 
             const slices = 12;
+            const angle = Math.PI * 2 / slices;
+
             for (let i = 0; i < slices; i++) {
-                mCtx.rotate(Math.PI * 2 / slices);
+                mCtx.rotate(angle);
                 mCtx.beginPath();
-                mCtx.moveTo(lastX, lastY);
-                mCtx.lineTo(x, y);
+                mCtx.moveTo(lastdx, lastdy);
+                mCtx.lineTo(dx, dy);
                 mCtx.stroke();
+
                 // Mirror
                 mCtx.save();
                 mCtx.scale(1, -1);
                 mCtx.beginPath();
-                mCtx.moveTo(lastX, lastY);
-                mCtx.lineTo(x, y);
+                mCtx.moveTo(lastdx, lastdy);
+                mCtx.lineTo(dx, dy);
                 mCtx.stroke();
                 mCtx.restore();
             }
             mCtx.restore();
-            lastX = x; lastY = y;
+
+            lastdx = dx; lastdy = dy;
         }
 
-        let lastX, lastY;
+        let lastdx, lastdy;
         mCanvas.addEventListener('mousedown', (e) => {
             painting = true;
             const rect = mCanvas.getBoundingClientRect();
-            lastX = e.clientX - rect.left - mCanvas.width / 2;
-            lastY = e.clientY - rect.top - mCanvas.height / 2;
+            const cx = mCanvas.width / 2;
+            const cy = mCanvas.height / 2;
+            lastdx = (e.clientX - rect.left) - cx;
+            lastdy = (e.clientY - rect.top) - cy;
         });
-        mCanvas.addEventListener('mouseup', () => painting = false);
+        mCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            painting = true;
+            const rect = mCanvas.getBoundingClientRect();
+            const cx = mCanvas.width / 2;
+            const cy = mCanvas.height / 2;
+            const touch = e.touches[0];
+            lastdx = (touch.clientX - rect.left) - cx;
+            lastdy = (touch.clientY - rect.top) - cy;
+        }, { passive: false });
+
+        window.addEventListener('mouseup', () => painting = false);
+        window.addEventListener('touchend', () => painting = false);
+
         mCanvas.addEventListener('mousemove', draw);
+        mCanvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            // Mock mouse event structure for draw function
+            draw({
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+        }, { passive: false });
 
         // --- 3. BODY SCAN LOGIC ---
         function showInstruction(text) {
