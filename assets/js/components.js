@@ -1,9 +1,10 @@
 console.log("Soulamore: Components.js loading...");
 
 // CRITICAL: Inject Styles Immediately
+// CRITICAL: Inject Styles Immediately
 try {
     const style = document.createElement('style');
-    style.id = 'header-critical-style';
+    style.id = 'header-styles-v2'; // Changed ID to force refresh/avoid conflicts
     style.innerHTML = `
         /* DESKTOP (Width > 1150px) */
         @media (min-width: 1151px) {
@@ -29,6 +30,8 @@ try {
                 box-shadow: none !important;
                 gap: 30px !important;
                 align-items: center !important;
+                visibility: visible !important; /* Ensure visibility */
+                opacity: 1 !important;
             }
             .auth-box {
                 display: flex !important; /* Force Auth Box Visible */
@@ -84,28 +87,51 @@ try {
             background: rgba(15, 23, 42, 0.95); /* Ensure visibility */
             color: #e2e8f0;
         }
-        /* Override default link colors */
-        .nav-links a, .footer-links a, .footer-socials a {
+        
+        /* AGGRESSIVE LINK COLOR OVERRIDES */
+        /* Targets all header links and footer links */
+        header a, footer a {
             color: #e2e8f0 !important;
             text-decoration: none !important;
             transition: color 0.3s ease;
         }
-        .nav-links a:hover, .footer-links a:hover, .footer-socials a:hover {
+        header a:visited, footer a:visited {
+            color: #e2e8f0 !important;
+        }
+        header a:hover, footer a:hover {
             color: #4ECDC4 !important;
         }
-        /* Fix Mobile Menu Link Colors */
-        .nav-links.open a {
-            color: #0f172a !important; /* Dark text on white mobile menu */
+        
+        /* SPECIAL EXCEPTION: Mobile Menu & Dropdowns (Dark Text) */
+        @media (max-width: 1150px) {
+            .nav-links.open {
+                background: white !important; /* Ensure background is white */
+            }
+            .nav-links.open a {
+                color: #0f172a !important; 
+            }
         }
-        .dropdown-content a, .dropdown-submenu a {
-            color: #0f172a !important; /* Dark text in dropdowns */
-        }
-        .dropdown-content a:hover, .dropdown-submenu a:hover {
-            color: #4ECDC4 !important;
+        /* Dropdowns on Desktop */
+        @media (min-width: 1151px) {
+            .dropdown-content, .dropdown-submenu {
+                background: white !important; /* Ensure background is white */
+            }
+            .dropdown-content a, .dropdown-submenu a {
+                color: #0f172a !important;
+            }
+            .dropdown-content a:hover, .dropdown-submenu a:hover {
+                background: #f1f5f9 !important;
+                color: #4ECDC4 !important;
+            }
         }
     `;
     document.head.appendChild(style);
-    console.log("Soulamore: Critical styles injected (Breakpoint: 1024px).");
+    console.log("Soulamore: Critical styles v2 injected.");
+} catch (e) {
+    console.error("Soulamore: Style injection failed", e);
+}
+document.head.appendChild(style);
+console.log("Soulamore: Critical styles injected (Breakpoint: 1024px).");
 } catch (e) {
     console.error("Soulamore: Style injection failed", e);
 }
