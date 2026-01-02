@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-Step Reset | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/global.css">
+
+    <style>
+        /* --- 5-STEP RESET SPECIFIC STYLES --- */
+        body {
+            /* Variables inherited from global.css */
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* --- BACKGROUND --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* --- CONTAINER --- */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            position: relative;
+            z-index: 5;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-top: 60px;
+            /* Offset for Header */
+        }
+
+        /* --- PROGRESS BAR --- */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 20%;
+            background: var(--gradient-primary);
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* --- STEP CARD --- */
+        .step-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.5s;
+            position: absolute;
+            width: 100%;
+            left: 0;
+            right: 0;
+            pointer-events: none;
+        }
+
+        .step-card.active {
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+            pointer-events: all;
+        }
+
+        .step-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--teal-glow);
+            filter: drop-shadow(0 0 20px rgba(78, 205, 196, 0.3));
+        }
+
+        .step-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .step-desc {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        /* --- INTERACTIVE WIDGETS --- */
+        .widget-area {
+            width: 100%;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 1. Box Breathing */
+        .box-breath {
+            width: 150px;
+            height: 150px;
+            border: 4px solid var(--teal-glow);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: 0.5s;
+        }
+
+        .box-breath.anim {
+            animation: boxCycle 16s infinite;
+        }
+
+        @keyframes boxCycle {
+            0% {
+                border-color: var(--teal-glow);
+                transform: scale(1);
+            }
+
+            /* Inhale */
+            25% {
+                border-color: var(--peach-glow);
+                transform: scale(1.1);
+            }
+
+            /* Hold */
+            50% {
+                border-color: var(--gold-glow);
+                transform: scale(1);
+            }
+
+            /* Exhale */
+            75% {
+                border-color: var(--starlight);
+                transform: scale(1);
+            }
+
+            /* Hold */
+            100% {
+                border-color: var(--teal-glow);
+                transform: scale(1);
+            }
+        }
+
+        .breath-label {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* 2. Thought Pop (OCD/Anxiety) */
+        .bubble-container {
+            height: 200px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thought-bubble {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            position: absolute;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid var(--border-glass);
+            animation: floatUp 8s linear infinite;
+        }
+
+        .thought-bubble:hover {
+            background: var(--alert-red);
+            border-color: var(--alert-red);
+        }
+
+        /* 3. Focus Timer (ADHD) */
+        .timer-circle {
+            width: 140px;
+            height: 140px;
+            border: 3px solid var(--gold-glow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        /* 4. Gratitude List */
+        .gratitude-input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        /* 5. Visualization */
+        .visual-img {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--peach-glow);
+            cursor: pointer;
+            transition: 1s;
+        }
+
+        .visual-img.calm {
+            background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80');
+            background-size: cover;
+        }
+
+        /* --- BUTTONS --- */
+        .nav-btn {
+            background: transparent;
+            border: 1px solid var(--starlight);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: white;
+            color: var(--deep-space);
+        }
+
+        .nav-btn.primary {
+            background: var(--gradient-primary);
+            border: none;
+            color: var(--deep-space);
+        }
+
+        .nav-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="particles"></div>
+
+    <div class="container">
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- STEP 1: REGULATE (Breathing) -->
+        <div class="step-card active" id="step1">
+            <i class="fas fa-lungs step-icon"></i>
+            <h2 class="step-title">1. Regulate Your Nervous System</h2>
+            <p class="step-desc">Anxiety lives in the body. Before we fix the mind, we must calm the biology. Follow the
+                square.</p>
+
+            <div class="widget-area">
+                <div class="box-breath" id="boxBreath" onclick="toggleBreath()">
+                    <span class="breath-label" id="breathText">Tap to Start</span>
+                </div>
+            </div>
+
+            <div class="nav-row">
+                <button class="nav-btn" style="visibility:hidden">Back</button>
+                <button class="nav-btn primary" onclick="nextStep(2)">Next Step <i
+                        class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- STEP 2: RELEASE (OCD/Anxiety) -->
+        <div class="step-card" id="step2">
+            <i class="fas fa-soap step-icon" style="color:var(--peach-glow);"></i>
+            <h2 class="step-title">2. Pop the Intrusive Thoughts</h2>
+            <p class="step-desc">Thoughts are just bubbles. They float up, but you don't have to hold them. Click to pop
+                them.</p>
+
+            <div class="widget-area">
+                <div class="bubble-container" id="bubbleZone"></div>
+            </div>
+
+            <div class="nav-row">
+                <button class="nav-btn" onclick="nextStep(1)">Back</button>
+                <button class="nav-btn primary" onclick="nextStep(3)">Next Step <i
+                        class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- STEP 3: FOCUS (ADHD) -->
+        <div class="step-card" id="step3">
+            <i class="fas fa-stopwatch step-icon" style="color:var(--gold-glow);"></i>
+            <h2 class="step-title">3. The 2-Minute Rule</h2>
+            <p class="step-desc">Overwhelmed? Commit to just 2 minutes of a task. Often, starting is the hardest part.
+            </p>
+
+            <div class="widget-area">
+                <div class="timer-circle" id="timerDisplay">02:00</div>
+            </div>
+            <button class="nav-btn" style="margin-bottom:20px;" onclick="startTimer()">Start Timer</button>
+
+            <div class="nav-row">
+                <button class="nav-btn" onclick="nextStep(2)">Back</button>
+                <button class="nav-btn primary" onclick="nextStep(4)">Next Step <i
+                        class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- STEP 4: REFRAME (Gratitude) -->
+        <div class="step-card" id="step4">
+            <i class="fas fa-pen-nib step-icon" style="color:#a78bfa;"></i>
+            <h2 class="step-title">4. Shift Your Focus</h2>
+            <p class="step-desc">Brain fog often comes from focusing on what's lacking. Name 3 simple things that are
+                okay right now.</p>
+
+            <div class="widget-area" style="flex-direction:column; max-width:400px;">
+                <input type="text" class="gratitude-input" placeholder="1. I am safe...">
+                <input type="text" class="gratitude-input" placeholder="2. I have...">
+                <input type="text" class="gratitude-input" placeholder="3. I can...">
+            </div>
+
+            <div class="nav-row">
+                <button class="nav-btn" onclick="nextStep(3)">Back</button>
+                <button class="nav-btn primary" onclick="nextStep(5)">Next Step <i
+                        class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- STEP 5: VISUALIZE (Peace) -->
+        <div class="step-card" id="step5">
+            <i class="fas fa-eye step-icon" style="color:var(--teal-glow);"></i>
+            <h2 class="step-title">5. Visualize Calm</h2>
+            <p class="step-desc">Tap the dark void below to reveal a peaceful place. Anchor yourself there for a moment.
+            </p>
+
+            <div class="widget-area">
+                <div class="visual-img" onclick="this.classList.add('calm'); this.innerHTML='';">
+                    <i class="fas fa-mountain"></i>
+                </div>
+            </div>
+
+            <div class="nav-row">
+                <button class="nav-btn" onclick="nextStep(4)">Back</button>
+                <button class="nav-btn primary" onclick="window.location.reload()">Restart Cycle</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="assets/js/components.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script>
+        // --- NAVIGATION LOGIC ---
+        function nextStep(step) {
+            document.querySelectorAll('.step-card').forEach(el => el.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+
+            // Update Progress Bar
+            const percent = step * 20;
+            document.getElementById('progressBar').style.width = percent + '%';
+
+            // Trigger Logic based on Step
+            if (step === 2) startBubbles();
+        }
+
+        // --- STEP 1: BREATHING ---
+        let breathing = false;
+        function toggleBreath() {
+            const box = document.getElementById('boxBreath');
+            const txt = document.getElementById('breathText');
+            if (!breathing) {
+                box.classList.add('anim');
+                breathing = true;
+                runBreathCycle(txt);
+                setInterval(() => runBreathCycle(txt), 16000);
+            } else {
+                box.classList.remove('anim');
+                breathing = false;
+                txt.innerText = "Tap to Start";
+            }
+        }
+        function runBreathCycle(el) {
+            el.innerText = "Inhale (4s)";
+            setTimeout(() => el.innerText = "Hold (4s)", 4000);
+            setTimeout(() => el.innerText = "Exhale (4s)", 8000);
+            setTimeout(() => el.innerText = "Hold (4s)", 12000);
+        }
+
+        // --- STEP 2: BUBBLES ---
+        const thoughts = ["What if?", "Not enough", "Mistake", "Panic", "Judgement", "Fail"];
+        function startBubbles() {
+            const zone = document.getElementById('bubbleZone');
+            zone.innerHTML = '';
+            setInterval(() => {
+                const b = document.createElement('div');
+                b.className = 'thought-bubble';
+                b.innerText = thoughts[Math.floor(Math.random() * thoughts.length)];
+                b.style.left = Math.random() * 80 + '%';
+                b.style.bottom = '-50px';
+                b.onclick = function () { this.style.transform = "scale(1.5)"; this.style.opacity = "0"; setTimeout(() => this.remove(), 200); };
+                zone.appendChild(b);
+                setTimeout(() => b.remove(), 8000);
+            }, 1500);
+        }
+
+        // --- STEP 3: TIMER ---
+        function startTimer() {
+            let time = 120;
+            const display = document.getElementById('timerDisplay');
+            const interval = setInterval(() => {
+                const m = Math.floor(time / 60).toString().padStart(2, '0');
+                const s = (time % 60).toString().padStart(2, '0');
+                display.innerText = `${m}:${s}`;
+                time--;
+                if (time < 0) {
+                    clearInterval(interval);
+                    display.innerText = "Done!";
+                    display.style.color = "#4ECDC4";
+                }
+            }, 1000);
+        }
+
+        // --- PARTICLES ---
+        const pContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) { let p = document.createElement('div'); p.classList.add('particle'); p.style.left = Math.random() * 100 + 'vw'; p.style.width = Math.random() * 4 + 'px'; p.style.height = p.style.width; p.style.animationDuration = Math.random() * 20 + 10 + 's'; p.style.opacity = Math.random() * 0.3; pContainer.appendChild(p); }
+    </script>
+</body>
+
+</html>

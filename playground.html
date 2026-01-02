@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soulamore | Mental Health Playground</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/global.css">
+
+    <style>
+        /* --- PLAYGROUND SPECIFIC STYLES --- */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Revert overflow-x: hidden from global for canvas apps */
+        body {
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* --- BACKGROUND --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        /* --- MAIN MENU --- */
+        .playground-menu {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 100px 20px 60px 20px;
+            /* Top padding for header */
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, var(--teal-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            opacity: 0.7;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 50px;
+        }
+
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .activity-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 30px;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--teal-glow);
+            box-shadow: 0 10px 40px rgba(78, 205, 196, 0.2);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            color: var(--peach-glow);
+            transition: 0.3s;
+        }
+
+        .activity-card:hover .card-icon {
+            background: var(--peach-glow);
+            color: var(--deep-space);
+        }
+
+        /* --- FULLSCREEN OVERLAYS --- */
+        .activity-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--deep-space);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .activity-overlay.active {
+            display: flex;
+            opacity: 1;
+            z-index: 20000;
+            /* Above header */
+        }
+
+        .overlay-nav {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-glass);
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 101;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: 1px solid var(--border-glass);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .close-btn:hover {
+            border-color: var(--alert-red);
+            color: var(--alert-red);
+        }
+
+        .canvas-area {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- 1. SHREDDER STYLES --- */
+        .shredder-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--border-glass);
+            color: var(--peach-glow);
+            font-size: 2rem;
+            width: 80%;
+            text-align: center;
+            outline: none;
+            font-family: 'Outfit';
+            padding-bottom: 10px;
+        }
+
+        .shred-btn {
+            margin-top: 40px;
+            padding: 15px 40px;
+            background: var(--alert-red);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+            transition: 0.2s;
+        }
+
+        .shred-btn:hover {
+            transform: scale(1.1);
+        }
+
+        #shredder-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        /* --- 2. MANDALA STYLES --- */
+        #mandala-canvas {
+            cursor: crosshair;
+        }
+
+        .mandala-controls {
+            position: absolute;
+            bottom: 30px;
+            display: flex;
+            gap: 10px;
+            background: var(--navy-glass);
+            padding: 10px;
+            border-radius: 50px;
+            border: 1px solid var(--border-glass);
+        }
+
+        .color-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .color-dot.active {
+            border-color: white;
+            transform: scale(1.2);
+        }
+
+        /* --- 3. BODY SCAN STYLES --- */
+        .body-svg {
+            height: 80vh;
+            stroke: var(--teal-glow);
+            stroke-width: 2;
+            fill: none;
+            filter: drop-shadow(0 0 10px var(--teal-glow));
+        }
+
+        .body-point {
+            fill: var(--peach-glow);
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.3s;
+            animation: pulse 2s infinite;
+        }
+
+        .body-point:hover {
+            opacity: 1;
+            r: 15;
+        }
+
+        .instruction-toast {
+            position: absolute;
+            bottom: 10%;
+            background: var(--navy-glass);
+            padding: 20px 40px;
+            border-radius: 20px;
+            border: 1px solid var(--gold-glow);
+            color: var(--gold-glow);
+            font-size: 1.2rem;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: 0.4s;
+        }
+
+        .instruction-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* --- 4. SOUND BATH STYLES --- */
+        .mixer-board {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .fader-group {
+            text-align: center;
+        }
+
+        .fader {
+            -webkit-appearance: none;
+            height: 200px;
+            width: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            writing-mode: bt-lr;
+            /* IE/Edge */
+            -webkit-appearance: slider-vertical;
+            accent-color: var(--teal-glow);
+        }
+
+        .fader-icon {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--starlight);
+            transition: 0.3s;
+        }
+
+        .fader:hover+.fader-icon,
+        .fader:active+.fader-icon {
+            color: var(--teal-glow);
+            text-shadow: 0 0 15px var(--teal-glow);
+        }
+
+        /* --- 5. BUBBLE POPPER STYLES --- */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(20, 20, 40, 0.9);
+            border: 1px solid var(--border-glass);
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.1s;
+            font-size: 0.8rem;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .bubble:hover {
+            border-color: var(--alert-red);
+            color: white;
+        }
+
+        /* --- 6. BALLOON STYLES --- */
+        .balloon {
+            width: 100px;
+            height: 120px;
+            background: radial-gradient(circle at 30% 30%, var(--peach-glow), #c2410c);
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            position: relative;
+            transition: transform 0.1s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset -10px -10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #c2410c;
+        }
+
+        .string {
+            width: 2px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.5);
+            position: absolute;
+            bottom: -110px;
+            left: 50%;
+        }
+
+        .balloon-text {
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.2);
+            font-family: 'Outfit';
+        }
+
+        .inflate-btn {
+            position: absolute;
+            bottom: 50px;
+            padding: 20px 50px;
+            background: var(--navy-glass);
+            border: 1px solid var(--peach-glow);
+            color: var(--peach-glow);
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.1s;
+        }
+
+        .inflate-btn:active {
+            transform: scale(0.95);
+            background: var(--peach-glow);
+            color: black;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(244, 159, 117, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(244, 159, 117, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(244, 159, 117, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- BACKGROUND PARTICLES -->
+    <canvas id="particles"></canvas>
+
+    <!-- MAIN MENU -->
+    <div class="playground-menu">
+        <div class="header">
+            <h1>Mental Health Playground</h1>
+            <p>Interactive tools to reset, release, and regulate. Pick an activity to begin.</p>
+        </div>
+
+        <div class="activity-grid">
+            <div class="activity-card" onclick="openApp('shredder')">
+                <div class="card-icon"><i class="fas fa-fire"></i></div>
+                <h3>Worry Shredder</h3>
+                <p>Type it out. Burn it down. Let it go.</p>
+            </div>
+            <div class="activity-card" onclick="openApp('mandala')">
+                <div class="card-icon"><i class="fas fa-spinner"></i></div>
+                <h3>Mandala Weaver</h3>
+                <p>Draw symmetry to find focus and flow.</p>
+            </div>
+            <div class="activity-card" onclick="openApp('body')">
+                <div class="card-icon"><i class="fas fa-child-reaching"></i></div>
+                <h3>Body Scan</h3>
+                <p>Locate tension and release it physically.</p>
+            </div>
+            <div class="activity-card" onclick="openApp('sound')">
+                <div class="card-icon"><i class="fas fa-sliders"></i></div>
+                <h3>Sound Bath</h3>
+                <p>Mix your own calming frequency.</p>
+            </div>
+            <div class="activity-card" onclick="openApp('bubbles')">
+                <div class="card-icon"><i class="fas fa-soap"></i></div>
+                <h3>Thought Popper</h3>
+                <p>Burst negative thoughts into light.</p>
+            </div>
+            <div class="activity-card" onclick="openApp('balloon')">
+                <div class="card-icon"><i class="fas fa-wind"></i></div>
+                <h3>Balloon Release</h3>
+                <p>Build tension, then watch it drift away.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP 1: SHREDDER -->
+    <div id="shredder" class="activity-overlay">
+        <div class="overlay-nav">
+            <h2>The Worry Shredder</h2> <button class="close-btn" onclick="closeApp()">Exit</button>
+        </div>
+        <div class="canvas-area" style="flex-direction: column;">
+            <canvas id="shredder-canvas"></canvas>
+            <input type="text" class="shredder-input" id="worryInput" placeholder="I am worried about..."
+                autocomplete="off">
+            <button class="shred-btn" onclick="shredIt()">LET GO</button>
+        </div>
+    </div>
+
+    <!-- APP 2: MANDALA -->
+    <div id="mandala" class="activity-overlay">
+        <div class="overlay-nav">
+            <h2>Mandala Weaver</h2> <button class="close-btn" onclick="closeApp()">Exit</button>
+        </div>
+        <div class="canvas-area">
+            <canvas id="mandala-canvas"></canvas>
+            <div class="mandala-controls">
+                <div class="color-dot active" style="background:#4ECDC4" onclick="setPenColor('#4ECDC4')"></div>
+                <div class="color-dot" style="background:#F49F75" onclick="setPenColor('#F49F75')"></div>
+                <div class="color-dot" style="background:#fbbf24" onclick="setPenColor('#fbbf24')"></div>
+                <div class="color-dot" style="background:#ffffff" onclick="setPenColor('#ffffff')"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP 3: BODY SCAN -->
+    <div id="body" class="activity-overlay">
+        <div class="overlay-nav">
+            <h2>Somatic Release</h2> <button class="close-btn" onclick="closeApp()">Exit</button>
+        </div>
+        <div class="canvas-area">
+            <svg class="body-svg" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Abstract Body Outline -->
+                <path
+                    d="M50 10 C 60 10 65 20 65 30 Q 80 35 90 60 L 95 100 L 85 105 L 80 65 Q 65 70 65 90 L 65 130 L 75 190 L 55 190 L 50 140 L 45 190 L 25 190 L 35 130 L 35 90 Q 35 70 20 65 L 15 105 L 5 100 L 10 60 Q 20 35 35 30 C 35 20 40 10 50 10" />
+
+                <!-- Interactive Points -->
+                <circle cx="50" cy="20" r="5" class="body-point"
+                    onclick="showInstruction('Unclench your jaw. Let your tongue drop.')" />
+                <circle cx="35" cy="40" r="5" class="body-point"
+                    onclick="showInstruction('Drop your shoulders down. Exhale deeply.')" />
+                <circle cx="65" cy="40" r="5" class="body-point"
+                    onclick="showInstruction('Drop your shoulders down. Exhale deeply.')" />
+                <circle cx="50" cy="80" r="5" class="body-point"
+                    onclick="showInstruction('Soften your belly. Let it expand.')" />
+                <circle cx="15" cy="100" r="5" class="body-point"
+                    onclick="showInstruction('Shake out your hands. Release the grip.')" />
+                <circle cx="85" cy="100" r="5" class="body-point"
+                    onclick="showInstruction('Shake out your hands. Release the grip.')" />
+            </svg>
+            <div id="bodyToast" class="instruction-toast">Instruction</div>
+        </div>
+    </div>
+
+    <!-- APP 4: SOUND BATH -->
+    <div id="sound" class="activity-overlay">
+        <div class="overlay-nav">
+            <h2>Sonic Mixer</h2> <button class="close-btn" onclick="closeApp()">Exit</button>
+        </div>
+        <div class="canvas-area">
+            <div class="mixer-board">
+                <div class="fader-group">
+                    <input type="range" min="0" max="1" step="0.01" value="0" class="fader"
+                        oninput="updateVol('rain', this.value)">
+                    <div class="fader-icon"><i class="fas fa-cloud-rain"></i><br><span
+                            style="font-size:0.8rem">Rain</span></div>
+                </div>
+                <div class="fader-group">
+                    <input type="range" min="0" max="1" step="0.01" value="0" class="fader"
+                        oninput="updateVol('om', this.value)">
+                    <div class="fader-icon"><i class="fas fa-om"></i><br><span style="font-size:0.8rem">Om</span></div>
+                </div>
+                <div class="fader-group">
+                    <input type="range" min="0" max="1" step="0.01" value="0" class="fader"
+                        oninput="updateVol('bowl', this.value)">
+                    <div class="fader-icon"><i class="fas fa-bell"></i><br><span style="font-size:0.8rem">Bowl</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP 5: BUBBLES -->
+    <div id="bubbles" class="activity-overlay">
+        <div class="overlay-nav">
+            <h2>Pop the Negativity</h2> <button class="close-btn" onclick="closeApp()">Exit</button>
+        </div>
+        <div class="canvas-area" id="bubble-canvas">
+            <!-- Bubbles injected here -->
+        </div>
+    </div>
+
+    <!-- APP 6: BALLOON -->
+    <div id="balloon" class="activity-overlay">
+        <div class="overlay-nav">
+            <h2>Tension Release</h2> <button class="close-btn" onclick="closeApp()">Exit</button>
+        </div>
+        <div class="canvas-area" style="flex-direction:column">
+            <div class="balloon" id="theBalloon">
+                <div class="string"></div>
+            </div>
+            <div style="height:150px"></div>
+            <button class="inflate-btn" onmousedown="startInflate()" onmouseup="releaseBalloon()"
+                ontouchstart="startInflate()" ontouchend="releaseBalloon()">
+                HOLD to Inflate
+            </button>
+        </div>
+    </div>
+
+    <script src="assets/js/components.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script>
+        // --- PARTICLE BACKGROUND ---
+        const pCanvas = document.getElementById('particles');
+        const pCtx = pCanvas.getContext('2d');
+        let pWidth, pHeight, particles = [];
+
+        function resizeParticles() {
+            pWidth = window.innerWidth; pHeight = window.innerHeight;
+            pCanvas.width = pWidth; pCanvas.height = pHeight;
+        }
+        window.addEventListener('resize', resizeParticles);
+        resizeParticles();
+
+        for (let i = 0; i < 50; i++) particles.push({ x: Math.random() * pWidth, y: Math.random() * pHeight, r: Math.random() * 2, s: Math.random() * 0.5 + 0.1 });
+
+        function animateParticles() {
+            pCtx.clearRect(0, 0, pWidth, pHeight);
+            pCtx.fillStyle = "rgba(255,255,255,0.2)";
+            particles.forEach(p => {
+                p.y -= p.s; if (p.y < 0) p.y = pHeight;
+                pCtx.beginPath(); pCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2); pCtx.fill();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // --- APP NAVIGATION ---
+        function openApp(id) {
+            document.getElementById(id).classList.add('active');
+            if (id === 'mandala') initMandala();
+            if (id === 'bubbles') startBubbles();
+            if (id === 'sound') initAudio();
+        }
+
+        function closeApp() {
+            document.querySelectorAll('.activity-overlay').forEach(el => el.classList.remove('active'));
+            if (audioCtx) audioCtx.suspend(); // Stop sound
+            stopBubbles();
+        }
+
+        // --- 1. SHREDDER LOGIC ---
+        function shredIt() {
+            const inp = document.getElementById('worryInput');
+            if (!inp.value) return;
+
+            // Visual fake shred
+            inp.style.transition = "1s ease-in";
+            inp.style.transform = "translateY(50px) scale(0.8) skew(20deg)";
+            inp.style.opacity = "0";
+
+            // Particle Explosion (CSS)
+            // Simple reset for demo
+            setTimeout(() => {
+                inp.value = "";
+                inp.style.transform = "none";
+                inp.style.opacity = "1";
+                inp.placeholder = "It is gone. You are safe.";
+            }, 1500);
+        }
+
+        // --- 2. MANDALA LOGIC ---
+        const mCanvas = document.getElementById('mandala-canvas');
+        const mCtx = mCanvas.getContext('2d');
+        let painting = false;
+        let penColor = '#4ECDC4';
+
+        function initMandala() {
+            mCanvas.width = window.innerWidth;
+            mCanvas.height = window.innerHeight;
+            mCtx.lineWidth = 2;
+            mCtx.lineCap = 'round';
+        }
+
+        function setPenColor(c) { penColor = c; }
+
+        function draw(e) {
+            if (!painting) return;
+            const rect = mCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left - mCanvas.width / 2;
+            const y = e.clientY - rect.top - mCanvas.height / 2;
+
+            mCtx.save();
+            mCtx.translate(mCanvas.width / 2, mCanvas.height / 2);
+            mCtx.strokeStyle = penColor;
+
+            const slices = 12;
+            for (let i = 0; i < slices; i++) {
+                mCtx.rotate(Math.PI * 2 / slices);
+                mCtx.beginPath();
+                mCtx.moveTo(lastX, lastY);
+                mCtx.lineTo(x, y);
+                mCtx.stroke();
+                // Mirror
+                mCtx.save();
+                mCtx.scale(1, -1);
+                mCtx.beginPath();
+                mCtx.moveTo(lastX, lastY);
+                mCtx.lineTo(x, y);
+                mCtx.stroke();
+                mCtx.restore();
+            }
+            mCtx.restore();
+            lastX = x; lastY = y;
+        }
+
+        let lastX, lastY;
+        mCanvas.addEventListener('mousedown', (e) => {
+            painting = true;
+            const rect = mCanvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left - mCanvas.width / 2;
+            lastY = e.clientY - rect.top - mCanvas.height / 2;
+        });
+        mCanvas.addEventListener('mouseup', () => painting = false);
+        mCanvas.addEventListener('mousemove', draw);
+
+        // --- 3. BODY SCAN LOGIC ---
+        function showInstruction(text) {
+            const toast = document.getElementById('bodyToast');
+            toast.innerText = text;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // --- 4. SOUND BATH (WEB AUDIO API) ---
+        let audioCtx, rainNode, omNode, bowlNode;
+        let rainGain, omGain, bowlGain;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+                // Rain (Brown Noise)
+                const bufferSize = audioCtx.sampleRate * 2;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
+
+                rainNode = audioCtx.createBufferSource();
+                rainNode.buffer = buffer;
+                rainNode.loop = true;
+                rainGain = audioCtx.createGain();
+                rainGain.gain.value = 0;
+                rainNode.connect(rainGain).connect(audioCtx.destination);
+                rainNode.start();
+
+                // Om (Sine Oscillators)
+                omNode = audioCtx.createOscillator();
+                omNode.type = 'sine';
+                omNode.frequency.value = 136.1; // Om Frequency
+                omGain = audioCtx.createGain();
+                omGain.gain.value = 0;
+                omNode.connect(omGain).connect(audioCtx.destination);
+                omNode.start();
+
+                // Bowl (Triangle)
+                bowlNode = audioCtx.createOscillator();
+                bowlNode.type = 'triangle';
+                bowlNode.frequency.value = 432;
+                bowlGain = audioCtx.createGain();
+                bowlGain.gain.value = 0;
+                bowlNode.connect(bowlGain).connect(audioCtx.destination);
+                bowlNode.start();
+            }
+            audioCtx.resume();
+        }
+
+        function updateVol(type, val) {
+            if (!audioCtx) return;
+            if (type === 'rain') rainGain.gain.value = val * 0.5;
+            if (type === 'om') omGain.gain.value = val * 0.3;
+            if (type === 'bowl') bowlGain.gain.value = val * 0.2;
+        }
+
+        // --- 5. BUBBLE POPPER ---
+        const thoughts = ["Not enough", "Failure", "Anxious", "Too much", "Lonely", "What if?"];
+        let bubbleInt;
+
+        function startBubbles() {
+            const canvas = document.getElementById('bubble-canvas');
+            canvas.innerHTML = '';
+            bubbleInt = setInterval(() => {
+                const b = document.createElement('div');
+                b.className = 'bubble';
+                b.innerText = thoughts[Math.floor(Math.random() * thoughts.length)];
+                b.style.left = Math.random() * 90 + '%';
+                b.style.bottom = '-50px';
+                b.style.width = (Math.random() * 40 + 60) + 'px';
+                b.style.height = b.style.width;
+
+                // Animation
+                let pos = -50;
+                const speed = Math.random() * 1 + 0.5;
+                const anim = setInterval(() => {
+                    pos += speed;
+                    b.style.bottom = pos + 'px';
+                    if (pos > window.innerHeight) { b.remove(); clearInterval(anim); }
+                }, 16);
+
+                b.onclick = (e) => {
+                    e.target.style.transform = "scale(1.5)";
+                    e.target.style.opacity = "0";
+                    // Burst effect could go here
+                    setTimeout(() => e.target.remove(), 200);
+                };
+
+                canvas.appendChild(b);
+            }, 1000);
+        }
+
+        function stopBubbles() { clearInterval(bubbleInt); }
+
+        // --- 6. BALLOON RELEASE ---
+        let scale = 1;
+        let inflateInt;
+        const balloon = document.getElementById('theBalloon');
+
+        function startInflate() {
+            inflateInt = setInterval(() => {
+                if (scale < 3) {
+                    scale += 0.05;
+                    balloon.style.transform = `scale(${scale})`;
+                }
+            }, 100);
+        }
+
+        function releaseBalloon() {
+            clearInterval(inflateInt);
+            balloon.style.transition = "all 3s ease-in";
+            balloon.style.transform = `translateY(-120vh) scale(${scale})`;
+            balloon.style.opacity = 0;
+
+            setTimeout(() => {
+                scale = 1;
+                balloon.style.transition = "none";
+                balloon.style.transform = "translateY(0) scale(1)";
+                balloon.style.opacity = 1;
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
