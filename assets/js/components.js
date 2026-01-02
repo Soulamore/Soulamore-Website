@@ -5,23 +5,35 @@ try {
     const style = document.createElement('style');
     style.id = 'header-critical-style';
     style.innerHTML = `
-        @media (min-width: 1151px) {
+        /* DESKTOP (Width > 1024px) */
+        @media (min-width: 1025px) {
             .mobile-profile-card, 
             .mobile-toggle,
             .mobile-only-help { 
                 display: none !important; 
             }
             .nav-links {
-                display: flex !important; /* Force Desktop Visibility */
+                display: flex !important; /* Force Desktop Flex Row */
+                flex-direction: row !important;
+                position: static !important;
+                transform: none !important;
+                background: transparent !important;
+                height: auto !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+            }
+            .auth-box {
+                display: flex !important; /* Force Auth Box Visible */
             }
         }
-        @media (max-width: 1150px) {
+        /* MOBILE (Width <= 1024px) */
+        @media (max-width: 1024px) {
             .auth-box { display: none !important; }
             .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
         }
     `;
     document.head.appendChild(style);
-    console.log("Soulamore: Critical styles injected.");
+    console.log("Soulamore: Critical styles injected (Breakpoint: 1024px).");
 } catch (e) {
     console.error("Soulamore: Style injection failed", e);
 }
