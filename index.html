@@ -280,6 +280,35 @@
             }
         }
 
+        /* --- VISUAL ANCHOR (BREATHING GLOW) --- */
+        .breathing-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: breathe 8s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
         .dust-particle {
             position: absolute;
             width: 4px;
@@ -287,6 +316,11 @@
             background: white;
             border-radius: 50%;
             pointer-events: none;
+        }
+
+        .next-steps-guide a:hover {
+            background: var(--teal-glow) !important;
+            color: #0f172a !important;
         }
 
         .section-header {
@@ -669,16 +703,34 @@
         <header></header>
 
         <!-- HERO & SHREDDER -->
+        <!-- HERO & SHREDDER -->
         <section class="hero fade-in">
-            <p style="color:var(--peach-glow); font-weight:600; letter-spacing:1px; text-transform:uppercase;">You
-                deserve to be happy</p>
-            <h1>Navigate Life Together</h1>
-            <p>One conversation at a time. Start by letting go of one heavy thought right now.</p>
+            <div class="breathing-glow"></div> <!-- Visual Anchor -->
+
+            <p
+                style="color:var(--peach-glow); font-weight:600; letter-spacing:1px; text-transform:uppercase; font-size: 0.9rem; opacity: 0.9; margin-bottom: 10px;">
+                Step 1 of 3: Release</p>
+            <h1>You Don't Have To <br>Hold Everything Alone.</h1>
+            <p style="max-width: 600px; margin: 0 auto 10px;">One conversation at a time.</p>
+            <p style="font-size: 1rem; opacity: 0.7; font-style: italic; margin-bottom: 40px;">Putting a thought into
+                words helps your body release it.</p>
 
             <div class="shredder-box">
                 <textarea class="paper-input" id="worryText"
                     placeholder="Type a worry here... (e.g., 'I feel like I'm failing')"></textarea>
-                <button class="shred-btn" onclick="shredWorry()">SHRED IT <i class="fas fa-trash-alt"></i></button>
+
+                <div style="text-align: right; margin-top: 5px;">
+                    <a href="#" onclick="autofillWorry(event)"
+                        style="font-size: 0.8rem; opacity: 0.6; text-decoration: underline;">Not sure what to write?</a>
+                </div>
+
+                <div style="position: relative; display: inline-block;">
+                    <button class="shred-btn" onclick="shredWorry()" title="Release it when you're ready">SHRED IT <i
+                            class="fas fa-trash-alt"></i></button>
+                    <div style="font-size: 0.75rem; opacity: 0.5; margin-top: 10px;">This is private. Nothing is saved.
+                    </div>
+                </div>
+
                 <div id="shredSuccess" style="display:none; margin-top:20px; color:var(--teal-glow);">Gone. You are
                     lighter now.</div>
             </div>
@@ -961,9 +1013,51 @@
             const inp = document.getElementById('worryText');
             if (inp.value.trim() === "") return;
             inp.classList.add('shredding');
+
+            // Soften the experience with immediate feedback
             setTimeout(() => {
-                document.querySelector('.shredder-box').innerHTML = "<h3 style='color:var(--teal-glow)'>Gone.</h3><p>You are lighter now.</p>";
+                const nextSteps = `
+                    <div class="fade-in">
+                        <h3 style='color:var(--teal-glow); margin-bottom: 5px;'>Gone.</h3>
+                        <p style="margin-bottom: 20px;">You are lighter now.</p>
+                        
+                        <div class="next-steps-guide" style="text-align:left; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+                            <p style="font-size:0.9rem; opacity:0.8; margin-bottom:15px;">If you’re still feeling heavy, you don’t have to stop here.</p>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content: center;">
+                                <a href="5-step-reset.html" style="background:rgba(255,255,255,0.1); padding:10px 20px; border-radius:30px; font-size:0.85rem; text-decoration:none; transition:0.3s;">Try a quick reset</a>
+                                <a href="soulbot.html" style="background:rgba(255,255,255,0.1); padding:10px 20px; border-radius:30px; font-size:0.85rem; text-decoration:none; transition:0.3s;">Sit with SoulBot</a>
+                                <a href="playground.html" style="background:rgba(255,255,255,0.1); padding:10px 20px; border-radius:30px; font-size:0.85rem; text-decoration:none; transition:0.3s;">Explore quiet tools</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.querySelector('.shredder-box').innerHTML = nextSteps;
             }, 1500);
+        }
+
+        // Placeholder Rotation & Autofill
+        const placeholders = [
+            "I feel like I'm failing...",
+            "I can't shut my mind off...",
+            "I'm tired of pretending I'm okay...",
+            "Everything feels too much today...",
+            "I don't know what I'm feeling..."
+        ];
+
+        let phIndex = 0;
+        setInterval(() => {
+            const el = document.getElementById('worryText');
+            if (el && document.activeElement !== el && el.value === "") {
+                el.placeholder = placeholders[phIndex];
+                phIndex = (phIndex + 1) % placeholders.length;
+            }
+        }, 4000);
+
+        function autofillWorry(e) {
+            e.preventDefault();
+            const el = document.getElementById('worryText');
+            el.value = "I just need a moment to breathe and reset.";
+            el.focus();
         }
 
         // 4. SOULBOT AI (LINKED TO BETA)
