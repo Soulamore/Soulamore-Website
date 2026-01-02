@@ -1,13 +1,42 @@
-/**
- * Soulamore Component Loader (Data-Driven Version)
- * Dynamically injects Header/Footer with a premium Mobile Sidebar (Glassmorphism).
- */
+console.log("Soulamore: Components.js loading...");
+
+// CRITICAL: Inject Styles Immediately
+try {
+    const style = document.createElement('style');
+    style.id = 'header-critical-style';
+    style.innerHTML = `
+        @media (min-width: 1151px) {
+            .mobile-profile-card, 
+            .mobile-toggle,
+            .mobile-only-help { 
+                display: none !important; 
+            }
+            .nav-links {
+                display: flex !important; /* Force Desktop Visibility */
+            }
+        }
+        @media (max-width: 1150px) {
+            .auth-box { display: none !important; }
+            .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
+        }
+    `;
+    document.head.appendChild(style);
+    console.log("Soulamore: Critical styles injected.");
+} catch (e) {
+    console.error("Soulamore: Style injection failed", e);
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-    injectHeader();
-    injectFooter();
-    setActiveState();
-    initializeHeaderLogic();
+    try {
+        console.log("Soulamore: DOM Content Loaded, initializing...");
+        injectHeader();
+        injectFooter();
+        setActiveState();
+        initializeHeaderLogic();
+        console.log("Soulamore: Initialization complete.");
+    } catch (error) {
+        console.error("Soulamore: Critical Error during initialization:", error);
+    }
 });
 
 // --- 1. DATA CONFIGURATION ---
