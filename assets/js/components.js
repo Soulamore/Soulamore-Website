@@ -82,6 +82,26 @@ try {
             position: relative;
             z-index: 100;
             background: rgba(15, 23, 42, 0.95); /* Ensure visibility */
+            color: #e2e8f0;
+        }
+        /* Override default link colors */
+        .nav-links a, .footer-links a, .footer-socials a {
+            color: #e2e8f0 !important;
+            text-decoration: none !important;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover, .footer-links a:hover, .footer-socials a:hover {
+            color: #4ECDC4 !important;
+        }
+        /* Fix Mobile Menu Link Colors */
+        .nav-links.open a {
+            color: #0f172a !important; /* Dark text on white mobile menu */
+        }
+        .dropdown-content a, .dropdown-submenu a {
+            color: #0f172a !important; /* Dark text in dropdowns */
+        }
+        .dropdown-content a:hover, .dropdown-submenu a:hover {
+            color: #4ECDC4 !important;
         }
     `;
     document.head.appendChild(style);
@@ -310,29 +330,34 @@ const getHeaderHTML = (rootPath) => `
 `;
 
 const getFooterHTML = (rootPath) => `
-<div class="footer-content">
-    <div class="footer-logo">
-        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; margin-bottom: 15px;">
-    </div>
-    <p style="font-size:0.9rem; opacity:0.7; margin-top:10px;">Your Partner in Mental Wellness.</p>
+<div class="footer-content" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
     
-    <p style="font-size:0.85rem; opacity:0.6; margin-top:20px; max-width: 800px; margin-left: auto; margin-right: auto;">
+    <div class="footer-logo" style="margin-bottom: 20px;">
+        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px;">
+    </div>
+    
+    <h3 style="color:white; font-family:'Outfit', sans-serif; font-size: 1.5rem; margin-bottom: 10px;">Soulamore</h3>
+    <p style="font-size:1rem; opacity:0.8; margin-bottom: 30px; max-width: 600px;">Your Partner in Mental Wellness.</p>
+    
+    <div class="footer-links" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;">
+        <a href="${rootPath}about.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">About</a>
+        <a href="${rootPath}contact.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Contact</a>
+        <a href="${rootPath}legal.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Legal</a>
+        <a href="${rootPath}privacy-policy.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Privacy</a>
+    </div>
+
+    <div class="footer-socials" style="display: flex; gap: 20px; margin-bottom: 30px;">
+        <a href="https://www.instagram.com/soulamore_/" target="_blank" style="font-size: 1.5rem; color: white;"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.linkedin.com/company/soulamore/" target="_blank" style="font-size: 1.5rem; color: white;"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank" style="font-size: 1.5rem; color: white;"><i class="fab fa-facebook"></i></a>
+    </div>
+
+    <p style="font-size:0.8rem; opacity:0.5; max-width: 800px; line-height: 1.6; margin-bottom: 20px;">
         Disclaimer: Online therapy is not advisable if you are in acute distress.
         Please contact your nearest hospital if you are feeling suicidal or at risk of self-harm.
     </p>
 
-    <div class="footer-links">
-        <a href="${rootPath}about.html">About</a>
-        <a href="${rootPath}contact.html">Contact</a>
-        <a href="${rootPath}legal.html">Legal</a>
-    </div>
-    
-    <div class="footer-socials">
-        <a href="https://www.instagram.com/soulamore_/" target="_blank"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.linkedin.com/company/soulamore/" target="_blank"><i class="fab fa-linkedin"></i></a>
-        <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank"><i class="fab fa-facebook"></i></a>
-    </div>
-    <p style="font-size:0.8rem; opacity:0.5; margin-top:20px;">© 2025 by Hashlilly! All rights reserved.</p>
+    <p style="font-size:0.8rem; opacity:0.4;">© 2026 by Hashlilly! All rights reserved.</p>
 </div>
 `;
 
