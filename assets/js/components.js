@@ -368,30 +368,28 @@ const getFooterHTML = (rootPath) => `
 <div class="footer-content" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
     
     <div class="footer-logo" style="margin-bottom: 20px;">
-        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px;">
+        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 60px;">
     </div>
     
-    <h3 style="color:white; font-family:'Outfit', sans-serif; font-size: 1.5rem; margin-bottom: 10px;">Soulamore</h3>
-    <p style="font-size:1rem; opacity:0.8; margin-bottom: 30px; max-width: 600px;">Your Partner in Mental Wellness.</p>
+    <p style="font-size:1.1rem; opacity:0.8; margin-bottom: 20px; color: #e2e8f0;">Your Partner in Mental Wellness.</p>
+
+    <p style="font-size:0.85rem; opacity:0.6; max-width: 800px; line-height: 1.6; margin-bottom: 30px; color: #94a3b8;">
+        Disclaimer: Online therapy is not advisable if you are in acute distress. Please contact your nearest hospital if you are feeling suicidal or at risk of self-harm.
+    </p>
     
-    <div class="footer-links" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;">
-        <a href="${rootPath}about.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">About</a>
-        <a href="${rootPath}contact.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Contact</a>
-        <a href="${rootPath}legal.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Legal</a>
+    <div class="footer-links" style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;">
+        <a href="${rootPath}about.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500; font-size: 1.1rem;">About</a>
+        <a href="${rootPath}contact.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500; font-size: 1.1rem;">Contact</a>
+        <a href="${rootPath}legal.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500; font-size: 1.1rem;">Legal</a>
     </div>
 
     <div class="footer-socials" style="display: flex; gap: 20px; margin-bottom: 30px;">
-        <a href="https://www.instagram.com/soulamore_/" target="_blank" style="font-size: 1.5rem; color: white;"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.linkedin.com/company/soulamore/" target="_blank" style="font-size: 1.5rem; color: white;"><i class="fab fa-linkedin"></i></a>
-        <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank" style="font-size: 1.5rem; color: white;"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.instagram.com/soulamore_/" target="_blank" style="font-size: 1.5rem; color: #e2e8f0;"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.linkedin.com/company/soulamore/" target="_blank" style="font-size: 1.5rem; color: #e2e8f0;"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank" style="font-size: 1.5rem; color: #e2e8f0;"><i class="fab fa-facebook"></i></a>
     </div>
 
-    <p style="font-size:0.8rem; opacity:0.5; max-width: 800px; line-height: 1.6; margin-bottom: 20px;">
-        Disclaimer: Online therapy is not advisable if you are in acute distress.
-        Please contact your nearest hospital if you are feeling suicidal or at risk of self-harm.
-    </p>
-
-    <p style="font-size:0.8rem; opacity:0.4;">© 2026 by Hashlilly! All rights reserved.</p>
+    <p style="font-size:0.8rem; opacity:0.4;">© 2025 by Hashlilly! All rights reserved.</p>
 </div>
 `;
 
