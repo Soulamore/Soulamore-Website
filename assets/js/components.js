@@ -116,11 +116,16 @@ try {
         @media (min-width: 1151px) {
             /* Level 1: Outer Dropdown (Lightest Border) */
             .dropdown-content {
+                position: absolute !important; /* FIXED LAYOUT EXPLOSION */
+                top: 100% !important;
+                left: 0 !important;
+                z-index: 1000 !important;
                 background: rgba(15, 23, 42, 0.95) !important;
                 border: 1px solid rgba(255,255,255,0.1) !important;
                 border-left: 4px solid rgba(78, 205, 196, 0.3) !important; /* Level 1: Lightest */
                 backdrop-filter: blur(10px) !important;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+                min-width: 200px !important; /* Ensure minimum width */
             }
             
             /* Level 2: Nested Submenu (Medium Border) */
