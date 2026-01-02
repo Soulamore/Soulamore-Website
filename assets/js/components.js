@@ -113,25 +113,38 @@ try {
         }
         /* Dropdowns on Desktop */
         @media (min-width: 1151px) {
+            /* Level 1: Outer Dropdown (Lightest Border) */
             .dropdown-content {
-                background: rgba(15, 23, 42, 0.95) !important; /* Dark Glass Dropdown */
+                background: rgba(15, 23, 42, 0.95) !important;
                 border: 1px solid rgba(255,255,255,0.1) !important;
-                border-left: 4px solid #4ECDC4 !important; /* Restore Teal Edge Highlight Prominently */
+                border-left: 4px solid rgba(78, 205, 196, 0.3) !important; /* Level 1: Lightest */
                 backdrop-filter: blur(10px) !important;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
             }
+            
+            /* Level 2: Nested Submenu (Medium Border) */
+            .dropdown-content .dropdown-content {
+                border-left-color: rgba(78, 205, 196, 0.6) !important; /* Level 2: Medium */
+            }
+
+            /* Level 3: Deep Nested (Solid Border) */
+            .dropdown-content .dropdown-content .dropdown-content {
+                border-left-color: #4ECDC4 !important; /* Level 3: Solid */
+            }
+
             .dropdown-content a, .dropdown-submenu a {
-                color: #e2e8f0 !important; /* Light Text */
+                color: #e2e8f0 !important;
             }
             .dropdown-content a:hover, .dropdown-submenu a:hover {
                 background: rgba(255,255,255,0.05) !important;
                 color: #4ECDC4 !important;
             }
-            /* Prevent Header Scattering - Only for Auth Box & Main Nav Container, NOT links themselves to allow wrap if needed */
+            
+            /* Prevent Header Scattering - Only for Auth Box & Main Nav Container */
             .main-nav, .auth-box {
                 flex-wrap: nowrap !important;
             }
-             /* Allow wrapping for links if space is tight, but keep dropdowns safe */
+             /* Allow wrapping for links if space is tight */
             .nav-links {
                flex-wrap: wrap !important; 
                justify-content: center !important;
