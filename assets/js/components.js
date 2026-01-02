@@ -130,11 +130,7 @@ try {
 } catch (e) {
     console.error("Soulamore: Style injection failed", e);
 }
-document.head.appendChild(style);
-console.log("Soulamore: Critical styles injected (Breakpoint: 1024px).");
-} catch (e) {
-    console.error("Soulamore: Style injection failed", e);
-}
+
 
 document.addEventListener("DOMContentLoaded", () => {
     try {
