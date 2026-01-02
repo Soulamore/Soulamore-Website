@@ -116,7 +116,9 @@ try {
             .dropdown-content, .dropdown-submenu {
                 background: rgba(15, 23, 42, 0.95) !important; /* Dark Glass Dropdown */
                 border: 1px solid rgba(255,255,255,0.1) !important;
+                border-left: 3px solid #4ECDC4 !important; /* Restore Teal Edge Highlight */
                 backdrop-filter: blur(10px) !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
             }
             .dropdown-content a, .dropdown-submenu a {
                 color: #e2e8f0 !important; /* Light Text */
