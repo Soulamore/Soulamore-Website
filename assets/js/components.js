@@ -1,5 +1,5 @@
 /**
- * Soulamore Component Loader (Dashboard Sidebar Version)
+ * Soulamore Component Loader (Data-Driven Version)
  * Dynamically injects Header/Footer with a premium Mobile Sidebar (Glassmorphism).
  */
 
@@ -10,22 +10,170 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeHeaderLogic();
 });
 
-// --- 1. DEFINE COMPONENTS ---
+// --- 1. DATA CONFIGURATION ---
 
-// CRITICAL CSS: Force-hide mobile elements on desktop to bypass cache issues
-const style = document.createElement('style');
-style.innerHTML = `
-    @media (min-width: 1151px) {
-        .mobile-profile-card, 
-        .mobile-toggle,
-        .mobile-bottom-nav, 
-        .dropdown-toggle-btn { 
-            display: none !important; 
-        }
-        /* Icons are now ALLOWED on desktop per user request */
+const NAV_DATA = [
+    {
+        id: 'nav-home',
+        label: 'Home',
+        icon: 'fas fa-home',
+        href: 'index.html',
+        type: 'link'
+    },
+    {
+        id: 'nav-spaces',
+        label: 'Spaces',
+        icon: 'fas fa-rocket',
+        href: '#',
+        type: 'dropdown',
+        children: [
+            {
+                id: 'nav-campus',
+                label: 'Soulamore Campus',
+                href: 'soulamore-campus.html',
+                type: 'submenu',
+                children: [
+                    { label: 'What is Campus?', href: 'campus/what-is-campus.html' },
+                    { label: 'Ambassadors', href: 'campus/campus-ambassadors.html' },
+                    { label: 'For Institutions', href: 'campus/institutions.html' },
+                    { label: 'Student FAQs', href: 'campus/student-faqs.html' },
+                    {
+                        label: 'Student Resources',
+                        href: '#',
+                        style: 'color:var(--teal-glow);',
+                        type: 'submenu',
+                        children: [
+                            { label: 'Anxiety', href: 'campus/anxiety-and-overthinking.html' },
+                            { label: 'Exams', href: 'campus/exam-pressure.html' },
+                            { label: 'Loneliness', href: 'campus/loneliness.html' },
+                            { label: 'Feeling Low', href: 'campus/feeling-low.html' }
+                        ]
+                    },
+                    { label: 'Boundaries', href: 'campus/safety-boundaries.html' }
+                ]
+            },
+            {
+                id: 'nav-away',
+                label: 'Soulamore Away',
+                href: 'soulamore-away.html',
+                type: 'submenu',
+                children: [
+                    { label: 'Overview', href: 'soulamore-away.html' },
+                    { label: "Who It's For", href: 'soulamore-away/who-its-for.html' },
+                    { label: 'Away Resources', href: 'soulamore-away/resources.html' }
+                ]
+            },
+            { id: 'nav-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' }
+        ]
+    },
+    {
+        id: 'nav-wellness',
+        label: 'Wellness',
+        icon: 'fas fa-heart-pulse',
+        href: '#',
+        type: 'dropdown',
+        children: [
+            {
+                id: 'nav-confession',
+                label: 'Confession Box',
+                href: 'confession-box.html',
+                type: 'submenu',
+                children: [
+                    { label: 'Guidelines', href: 'confession-box/guidelines.html' }
+                ]
+            },
+            { id: 'nav-vent', label: 'The Vent Box', href: 'vent-box.html' },
+            { id: 'nav-support', label: 'Support Groups', href: 'support-groups.html' },
+            { id: 'nav-calendar', label: 'Community Calendar', href: 'community-calendar.html' }
+        ]
+    },
+    {
+        id: 'nav-community',
+        label: 'Community',
+        icon: 'fas fa-users',
+        href: '#',
+        type: 'dropdown',
+        children: [
+            {
+                id: 'nav-join',
+                label: 'Join Us',
+                href: 'join-us/index.html',
+                type: 'submenu',
+                children: [
+                    { label: 'Apply as Peer', href: 'join-us/peer.html' },
+                    { label: 'Apply as Psychologist', href: 'join-us/psychologist.html' }
+                ]
+            },
+            { id: 'nav-blogs', label: 'Blogs & Stories', href: 'blogs.html' },
+            { id: 'nav-forum', label: 'Discussion Forum', href: 'forum.html' }
+        ]
+    },
+    {
+        id: 'nav-company',
+        label: 'About',
+        icon: 'fas fa-building',
+        href: '#',
+        type: 'dropdown',
+        children: [
+            { id: 'nav-about', label: 'Our Story', href: 'about.html' },
+            { id: 'nav-contact', label: 'Contact Us', href: 'contact.html' },
+            { id: 'nav-privacy', label: 'Privacy Policy', href: 'privacy-policy.html' },
+            { id: 'nav-legal', label: 'Legal', href: 'legal.html' }
+        ]
     }
-`;
-document.head.appendChild(style);
+];
+
+// --- 2. HTML GENERATOR ---
+
+function generateNavHTML(rootPath) {
+    let html = '';
+
+    NAV_DATA.forEach(item => {
+        if (item.type === 'link') {
+            // Standard Link
+            html += `<a href="${rootPath}${item.href}" id="${item.id || ''}"><i class="${item.icon}"></i>${item.label}</a>`;
+        } else if (item.type === 'dropdown') {
+            // First-level Dropdown
+            html += `
+            <div class="dropdown">
+                <a href="${item.href === '#' ? '#' : rootPath + item.href}" id="${item.id || ''}">
+                    <i class="${item.icon}"></i>${item.label}
+                    <i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i>
+                </a>
+                <div class="dropdown-content">
+                    ${generateSubmenuHTML(item.children, rootPath)}
+                </div>
+            </div>`;
+        }
+    });
+
+    // Mobile-Only Help Link (Appended at the end of nav-links)
+    html += `<a href="${rootPath}get-help-now.html" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Get Help Now</a>`;
+
+    return html;
+}
+
+function generateSubmenuHTML(children, rootPath) {
+    let html = '';
+    children.forEach(child => {
+        if (child.type === 'submenu') {
+            // Nested Dropdown (Submenu)
+            const style = child.style ? `style="${child.style}"` : '';
+            html += `
+            <div class="dropdown-submenu">
+                <a href="${child.href === '#' ? '#' : rootPath + child.href}" id="${child.id || ''}" ${style}>${child.label}</a>
+                <div class="dropdown-content">
+                    ${generateSubmenuHTML(child.children, rootPath)}
+                </div>
+            </div>`;
+        } else {
+            // Standard Sub-Link
+            const style = child.style ? `style="${child.style}"` : '';
+            html += `<a href="${rootPath}${child.href}" id="${child.id || ''}" ${style}>${child.label}</a>`;
+        }
+    });
+    return html;
+}
 
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
@@ -35,8 +183,6 @@ const getHeaderHTML = (rootPath) => `
         <nav class="nav-links">
             
             <!-- MOBILE PROFILE CARD (Visible < 1150px) -->
-            <!-- This appears at top of drawer -->
-            <!-- INLINE STYLE: Default to hidden to prevent desktop flash/cache issues -->
             <div class="mobile-profile-card" style="display: none;">
                 <div class="mp-avatar"><i class="fas fa-ghost"></i></div>
                 <div class="mp-info">
@@ -46,110 +192,14 @@ const getHeaderHTML = (rootPath) => `
                 </div>
             </div>
 
-            <!-- 1. HOME -->
-
-            <a href="${rootPath}index.html" id="nav-home"><i class="fas fa-home"></i>Home</a>
-
-            <!-- 2. SPACES (Activity Centers) -->
-            <div class="dropdown">
-                <a href="#" id="nav-spaces"><i class="fas fa-rocket"></i>Spaces<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
-                <div class="dropdown-content">
-                    
-                    <!-- NESTED: CAMPUS -->
-                    <div class="dropdown-submenu">
-                         <a href="${rootPath}soulamore-campus.html" id="nav-campus">Soulamore Campus</a>
-                         <div class="dropdown-content">
-                            <a href="${rootPath}campus/what-is-campus.html">What is Campus?</a>
-                            <a href="${rootPath}campus/campus-ambassadors.html">Ambassadors</a>
-                            <a href="${rootPath}campus/institutions.html">For Institutions</a>
-                            <a href="${rootPath}campus/student-faqs.html">Student FAQs</a>
-                            
-                            <!-- Student Resources Group -->
-                            <div class="dropdown-submenu">
-                                <a href="#" style="color:var(--teal-glow);">Student Resources</a>
-                                <div class="dropdown-content">
-                                    <a href="${rootPath}campus/anxiety-and-overthinking.html">Anxiety</a>
-                                    <a href="${rootPath}campus/exam-pressure.html">Exams</a>
-                                    <a href="${rootPath}campus/loneliness.html">Loneliness</a>
-                                    <a href="${rootPath}campus/feeling-low.html">Feeling Low</a>
-                                </div>
-                            </div>
-                            
-                            <a href="${rootPath}campus/safety-boundaries.html">Boundaries</a>
-                         </div>
-                    </div>
-
-                     <!-- NESTED: AWAY -->
-                    <div class="dropdown-submenu">
-                         <a href="${rootPath}soulamore-away.html" id="nav-away">Soulamore Away</a>
-                         <div class="dropdown-content">
-                            <a href="${rootPath}soulamore-away.html">Overview</a>
-                            <a href="${rootPath}soulamore-away/who-its-for.html">Who It's For</a>
-                            <a href="${rootPath}soulamore-away/resources.html">Away Resources</a>
-                         </div>
-                    </div>
-
-                    <a href="${rootPath}our-peers/index.html" id="nav-peers">Meet Our Peers</a>
-                </div>
-            </div>
-
-             <!-- 3. WELLNESS (Tools & Vents) -->
-            <div class="dropdown">
-                <a href="#" id="nav-wellness"><i class="fas fa-heart-pulse"></i>Wellness<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
-                <div class="dropdown-content">
-                    <!-- Confession Box Flyout -->
-                    <div class="dropdown-submenu">
-                        <a href="${rootPath}confession-box.html" id="nav-confession">Confession Box</a>
-                        <div class="dropdown-content">
-                            <a href="${rootPath}confession-box/guidelines.html">Guidelines</a>
-                        </div>
-                    </div>
-
-                    <a href="${rootPath}vent-box.html" id="nav-vent">The Vent Box</a>
-                    <a href="${rootPath}support-groups.html" id="nav-support">Support Groups</a>
-                    <a href="${rootPath}community-calendar.html" id="nav-calendar">Community Calendar</a>
-                </div>
-            </div>
-
-            <!-- 4. COMMUNITY (Social & Join) -->
-            <div class="dropdown">
-                <a href="#" id="nav-community"><i class="fas fa-users"></i>Community<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
-                <div class="dropdown-content">
-                     <!-- NESTED: JOIN US -->
-                    <div class="dropdown-submenu">
-                         <a href="${rootPath}join-us/index.html" id="nav-join">Join Us</a>
-                         <div class="dropdown-content">
-                            <a href="${rootPath}join-us/peer.html">Apply as Peer</a>
-                            <a href="${rootPath}join-us/psychologist.html">Apply as Psychologist</a>
-                         </div>
-                    </div>
-                    <a href="${rootPath}blogs.html" id="nav-blogs">Blogs & Stories</a>
-                    <a href="${rootPath}forum.html" id="nav-forum">Discussion Forum</a>
-                </div>
-            </div>
-
-            <!-- 5. COMPANY (Legal & Info) -->
-            <div class="dropdown">
-                <a href="#" id="nav-company"><i class="fas fa-building"></i>About<i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i></a>
-                <div class="dropdown-content">
-                    <a href="${rootPath}about.html" id="nav-about">Our Story</a>
-                    <a href="${rootPath}contact.html" id="nav-contact">Contact Us</a>
-                    <a href="${rootPath}privacy-policy.html" id="nav-privacy">Privacy Policy</a>
-                    <a href="${rootPath}legal.html" id="nav-legal">Legal</a>
-                </div>
-            </div>
-
-            <!-- MOBILE: Add pure "Get Help" link for mobile view only -->
-            <!-- (Inserted dynamically between Company and Auth) --> 
-             <a href="${rootPath}get-help-now.html" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Get Help Now</a>
+            <!-- GENERATED NAVIGATION ITEMS -->
+            ${generateNavHTML(rootPath)}
 
         </nav>
 
-        <!-- Auth Group (Crisis + Icon + Button) -->
+        <!-- Auth Group -->
         <div class="auth-box">
-             <!-- CRISIS CTA -->
              <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
-             
              <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
              <a href="${rootPath}login.html" class="nav-btn">Log In / Sign Up</a>
         </div>
@@ -187,7 +237,7 @@ const getFooterHTML = (rootPath) => `
 </div>
 `;
 
-// --- 2. HELPERS ---
+// --- 3. HELPERS ---
 
 function getRootPath() {
     if (location.pathname.includes('/campus/') ||
@@ -200,20 +250,18 @@ function getRootPath() {
     return "";
 }
 
-// --- 3. INJECTION LOGIC ---
+// --- 4. INJECTION LOGIC ---
 
 function injectHeader() {
     const headerElement = document.querySelector('header');
     if (headerElement) {
-        // Z-INDEX FIX: Move header to body root to escape .container's z-index trap (5)
-        // This ensures header (20000) can beat Soulbot (9999) and Audio (99)
         if (headerElement.parentElement !== document.body) {
             document.body.prepend(headerElement);
         }
 
         headerElement.classList.add('island-nav');
 
-        // --- THEMING LOGIC ---
+        // THEMING
         const scriptTag = document.querySelector('script[src*="components.js"]');
         if (scriptTag) {
             const customColor = scriptTag.getAttribute('data-header-color');
@@ -225,6 +273,27 @@ function injectHeader() {
             }
         }
         headerElement.innerHTML = getHeaderHTML(getRootPath());
+
+        // --- CRITICAL CSS INJECTION ---
+        // We inject this style to ensure consistency without relying on complex external CSS media queries alone
+        if (!document.getElementById('header-responsive-style')) {
+            const style = document.createElement('style');
+            style.id = 'header-responsive-style';
+            style.innerHTML = `
+                @media (min-width: 1151px) {
+                    .mobile-profile-card, 
+                    .mobile-toggle,
+                    .mobile-only-help { 
+                        display: none !important; 
+                    }
+                }
+                @media (max-width: 1150px) {
+                    .auth-box { display: none !important; }
+                    .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
     }
 }
 
@@ -235,39 +304,39 @@ function injectFooter() {
     }
 }
 
-// --- 4. ACTIVE STATE LOGIC ---
+// --- 5. ACTIVE STATE LOGIC ---
 
 function setActiveState() {
     const path = window.location.pathname;
-    const stateMap = {
-        'index.html': ['nav-home', null],
-        'soulamore-campus.html': ['nav-spaces', 'nav-campus'],
-        'campus': ['nav-spaces', 'nav-campus'],
-        'soulamore-away.html': ['nav-spaces', 'nav-away'],
-        'away': ['nav-spaces', 'nav-away'],
-        'our-peers': ['nav-spaces', 'nav-peers'],
-        'confession-box': ['nav-wellness', 'nav-confession'],
-        'support-groups': ['nav-wellness', 'nav-support'],
-        'vent-box': ['nav-wellness', 'nav-vent'],
-        'get-help-now': ['nav-wellness', 'nav-help'],
-        'join-us': ['nav-community', 'nav-join'],
-        'blogs': ['nav-community', 'nav-blogs'],
-        'forum': ['nav-community', 'nav-forum'],
-        'calendar': ['nav-community', 'nav-calendar'],
-        'about': ['nav-company', 'nav-about'],
-        'contact': ['nav-company', 'nav-contact']
+
+    // Auto-detect active state from NAV_DATA
+    // This is a simple check. For improved accuracy, we can map IDs manually if needed, 
+    // but checking href includes path is usually robust enough for static sites.
+
+    // Helper to find match
+    const findMatch = (items) => {
+        for (const item of items) {
+            // Check direct link
+            if (item.href && item.href !== '#' && path.includes(item.href)) {
+                document.getElementById(item.id)?.classList.add('active');
+                return true;
+            }
+            // Check children
+            if (item.children) {
+                if (findMatch(item.children)) {
+                    // If child active, activate parent too
+                    document.getElementById(item.id)?.classList.add('active');
+                    return true;
+                }
+            }
+        }
+        return false;
     };
 
-    for (const [key, ids] of Object.entries(stateMap)) {
-        if (path.includes(key)) {
-            if (ids[0]) document.getElementById(ids[0])?.classList.add('active');
-            if (ids[1]) document.getElementById(ids[1])?.classList.add('active');
-            break;
-        }
-    }
+    findMatch(NAV_DATA);
 }
 
-// --- 5. INITIALIZE HEADER LOGIC ---
+// --- 6. INTERACTION LOGIC ---
 
 function initializeHeaderLogic() {
     const toggleBtn = document.querySelector('.mobile-toggle');
@@ -276,13 +345,16 @@ function initializeHeaderLogic() {
 
     // A. Mobile Sidebar Toggle
     if (toggleBtn && navLinks) {
-        toggleBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('open');
-            document.body.classList.toggle('no-scroll'); // Lock scroll
-            toggleBtn.classList.toggle('active'); // Rotate icon
+        // Remove old listeners to prevent duplicates if re-initialized
+        const newBtn = toggleBtn.cloneNode(true);
+        toggleBtn.parentNode.replaceChild(newBtn, toggleBtn);
 
-            // Icon Swap (Bars <-> Times)
-            const icon = toggleBtn.querySelector('i');
+        newBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('open');
+            document.body.classList.toggle('no-scroll');
+            newBtn.classList.toggle('active');
+
+            const icon = newBtn.querySelector('i');
             if (navLinks.classList.contains('open')) {
                 icon.classList.remove('fa-bars');
                 icon.classList.add('fa-times');
@@ -290,57 +362,47 @@ function initializeHeaderLogic() {
                 icon.classList.remove('fa-times');
                 icon.classList.add('fa-bars');
             }
-
-            // Hide/Show Bottom Nav (optional, if overlapping)
-            const bottomNav = document.querySelector('.mobile-bottom-nav');
-            if (bottomNav) bottomNav.classList.toggle('hidden');
         });
 
-        // Close on Link Click
+        // Close on Link Click (except dropdowns)
         navLinks.querySelectorAll('a').forEach(link => {
-            // Don't close if they clicked a dropdown toggle
+            // If it has a next sibling that is a dropdown-content, it's a toggle, not a direct link
             if (link.nextElementSibling && link.nextElementSibling.classList.contains('dropdown-content')) return;
 
             link.addEventListener('click', () => {
                 navLinks.classList.remove('open');
                 document.body.classList.remove('no-scroll');
-                const icon = toggleBtn.querySelector('i');
-                if (icon) {
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
-                    toggleBtn.classList.remove('active');
-                }
-                const bottomNav = document.querySelector('.mobile-bottom-nav');
-                if (bottomNav) bottomNav.classList.remove('hidden');
+                // Reset Icon
+                const icon = newBtn.querySelector('i');
+                if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+                newBtn.classList.remove('active');
             });
         });
     }
 
-    // B. Dropdown Toggle (Sidebar Logic)
-    // In sidebar mode, clicking the link or arrow should toggle the list.
-    // We already have <a>Wrapper</a><div content> ...
-    // With global.css changes, .dropdown > a handles the click if we want entire row to toggle?
-    // Let's attach listener to the whole row link for Mobile.
-
-    // Logic: If screen < 1150px, clicking 'Spaces' toggles sub-menu instead of going to #
-    const dropdownToggles = document.querySelectorAll('.dropdown > a');
+    // B. Mobile Accordion Logic (Dropdowns)
+    const dropdownToggles = document.querySelectorAll('.dropdown > a, .dropdown-submenu > a');
     dropdownToggles.forEach(toggle => {
         toggle.addEventListener('click', (e) => {
-            // Only hijacking if in mobile view (or if valid link is #)
-            if (window.innerWidth <= 1150 || toggle.getAttribute('href') === '#') {
-                e.preventDefault();
-                e.stopPropagation(); // Stop bubbling
+            // Only hijacking if in mobile view OR if it's a null link (#)
+            if (window.innerWidth <= 1150 || toggle.getAttribute('href') === '#' || toggle.getAttribute('href').endsWith('#')) {
+                // Prevent default navigation
+                if (toggle.getAttribute('href') === '#' || window.innerWidth <= 1150) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
                 const parent = toggle.parentElement;
 
-                // Toggle Logic
+                // Toggle expansion
                 if (parent.classList.contains('active')) {
                     parent.classList.remove('active');
                 } else {
-                    // Close others if needed (optional)
+                    // Optional: Close siblings? No, let them stack.
                     parent.classList.add('active');
                 }
 
-                // Icon rotation
+                // Icon rotation (if exists)
                 const icon = toggle.querySelector('.fa-chevron-down');
                 if (icon) {
                     icon.style.transform = parent.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
@@ -349,21 +411,10 @@ function initializeHeaderLogic() {
         });
     });
 
-    // C. Sub-Dropdown Logic (Mobile Nesting)
-    const subToggles = document.querySelectorAll('.dropdown-submenu > a');
-    subToggles.forEach(toggle => {
-        toggle.addEventListener('click', (e) => {
-            if (window.innerWidth <= 1150) {
-                e.preventDefault();
-                e.stopPropagation();
-                toggle.parentElement.classList.toggle('active');
-            }
-        });
-    });
-
-    // D. Scroll Glass Effect
+    // C. Scroll Glass Effect
     if (header) {
         window.addEventListener('scroll', () => {
+            // Check if custom color override exists
             const scriptTag = document.querySelector('script[src*="components.js"]');
             const customColor = scriptTag ? scriptTag.getAttribute('data-header-color') : null;
 
