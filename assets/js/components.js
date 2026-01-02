@@ -116,6 +116,7 @@ try {
         @media (min-width: 1151px) {
             /* Level 1: Outer Dropdown (Lightest Border) */
             .dropdown-content {
+                display: none !important; /* HIDE BY DEFAULT */
                 position: absolute !important; /* FIXED LAYOUT EXPLOSION */
                 top: 100% !important;
                 left: 0 !important;
@@ -127,10 +128,17 @@ try {
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
                 min-width: 200px !important; /* Ensure minimum width */
             }
+
+            /* SHOW ON HOVER */
+            .dropdown:hover .dropdown-content {
+                display: block !important;
+            }
             
             /* Level 2: Nested Submenu (Medium Border) */
             .dropdown-content .dropdown-content {
                 border-left-color: rgba(78, 205, 196, 0.6) !important; /* Level 2: Medium */
+                top: 0 !important;
+                left: 100% !important;
             }
 
             /* Level 3: Deep Nested (Solid Border) */
