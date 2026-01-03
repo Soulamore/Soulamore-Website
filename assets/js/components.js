@@ -643,7 +643,6 @@ function initializeHeaderLogic() {
         handleScroll();
     }
 }
-}
 
 // --- 4. SOULBOT WIDGET ---
 function injectSoulBotWidget() {
