@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workplace Plans | Soulamore</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="../../assets/css/global.css">
+
+    <style>
+        /* --- GLOBAL THEME: MIDNIGHT VEGITO (Workplace Edition) --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --finance-green: #10b981;
+            --alert-red: #ef4444;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- BACKGROUND PARTICLES --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* --- HEADER & NAV --- */
+        .sub-nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 30px 20px 20px;
+            margin-top: 90px;
+            /* Offset for fixed header */
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            transition: 0.3s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        /* --- HERO --- */
+        .hero {
+            text-align: center;
+            padding: 60px 0 60px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            opacity: 0.8;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* --- PRICING CARDS --- */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .plan-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .plan-card.featured {
+            border-color: var(--teal-glow);
+            background: rgba(30, 41, 59, 0.95);
+            box-shadow: 0 20px 50px rgba(78, 205, 196, 0.15);
+        }
+
+        .plan-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: 20px;
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .plan-tagline {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 20px 0;
+            color: var(--teal-glow);
+        }
+
+        .plan-sub {
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+
+        .plan-btn {
+            margin-top: auto;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 700;
+            border: 1px solid var(--border-glass);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .plan-card.featured .plan-btn {
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            border: none;
+        }
+
+        .plan-btn:hover {
+            transform: scale(1.02);
+        }
+
+        /* --- COMPARISON TABLE --- */
+        .table-container {
+            margin-top: 80px;
+            overflow-x: auto;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 20px;
+            border: 1px solid var(--border-glass);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th,
+        td {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.03);
+            font-weight: 600;
+            color: var(--teal-glow);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        td {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .feature-col {
+            width: 40%;
+            border-right: 1px solid var(--border-glass);
+        }
+
+        .lite-col {
+            width: 30%;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .pro-col {
+            width: 30%;
+            background: rgba(78, 205, 196, 0.05);
+            border-left: 1px solid rgba(78, 205, 196, 0.2);
+        }
+
+        .check {
+            color: var(--teal-glow);
+        }
+
+        .cross {
+            color: var(--alert-red);
+            opacity: 0.5;
+        }
+
+        .partial {
+            color: var(--gold-glow);
+        }
+
+        /* --- FOOTER --- */
+        #main-footer {
+            margin-top: 100px;
+            border-top: 1px solid var(--border-glass);
+        }
+
+        @media(max-width: 800px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .plan-price {
+                font-size: 2rem;
+            }
+
+            .sub-nav-container {
+                margin-top: 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER INJECTION -->
+    <header id="main-header"></header>
+
+    <!-- PARTICLES -->
+    <div id="particles"></div>
+
+    <!-- SUB-NAV -->
+    <div class="sub-nav-container">
+        <a href="index.html" class="nav-btn"><i class="fas fa-home"></i> <span>Overview</span></a>
+        <!-- Active indicator for Plans -->
+        <div class="nav-btn active"><i class="fas fa-tags"></i> <span>Plans & Pricing</span></div>
+        <a href="guidelines.html" class="nav-btn"><i class="fas fa-book-reader"></i> <span>Guidelines</span></a>
+        <a href="index.html#programs" class="nav-btn"><i class="fas fa-layer-group"></i> <span>Programs</span></a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="container fade-in">
+
+        <!-- HERO -->
+        <section class="hero">
+            <h1>Scalable Wellness for Modern Teams</h1>
+            <p>From startups to enterprises, give your team the emotional support they deserve. No fluff, just impact.
+            </p>
+        </section>
+
+        <!-- CARDS -->
+        <div class="pricing-grid">
+            <!-- LITE PLAN -->
+            <div class="plan-card">
+                <div class="plan-header">
+                    <div class="plan-name">Soulamore Lite</div>
+                    <div class="plan-tagline">Essential support for growing teams (Up to 50 employees)</div>
+                    <div class="plan-price">₹12,500<span class="plan-sub">/month</span></div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <ul style="list-style:none; line-height: 2;">
+                        <li><i class="fas fa-check check"></i> <strong>Wellness Peers</strong> (Chats)</li>
+                        <li><i class="fas fa-check check"></i> <strong>Webinars</strong> (2x Month)</li>
+                        <li><i class="fas fa-check check"></i> <strong>Newsletter & Articles</strong></li>
+                        <li><i class="fas fa-check check"></i> <strong>Digital Reset Tools</strong></li>
+                    </ul>
+                </div>
+                <button class="plan-btn">Choose Lite</button>
+            </div>
+
+            <!-- PREMIUM PLAN -->
+            <div class="plan-card featured">
+                <div class="plan-header">
+                    <span
+                        style="background:var(--teal-glow); color:black; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700; text-transform:uppercase; margin-bottom:10px; display:inline-block;">Recommended</span>
+                    <div class="plan-name">Soulamore Premium</div>
+                    <div class="plan-tagline">Comprehensive care for maximum impact</div>
+                    <div class="plan-price">₹25,000<span class="plan-sub">/month</span></div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <ul style="list-style:none; line-height: 2;">
+                        <li><i class="fas fa-check check"></i> <strong>All Lite Features</strong></li>
+                        <li><i class="fas fa-check check"></i> <strong>100 Free Consultations</strong> (Psych/Finance)
+                        </li>
+                        <li><i class="fas fa-check check"></i> <strong>Monthly Fitness & Art Classes</strong></li>
+                        <li><i class="fas fa-check check"></i> <strong>Company Branded Portal</strong></li>
+                    </ul>
+                </div>
+                <button class="plan-btn">Choose Premium</button>
+            </div>
+        </div>
+
+        <!-- DETAILED TABLE -->
+        <div class="table-container fade-in">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="feature-col">Feature / Service</th>
+                        <th class="lite-col">Soulamore Lite</th>
+                        <th class="pro-col">Soulamore Premium</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="feature-col"><strong>Success Manager</strong><br><span
+                                style="font-size:0.8rem; opacity:0.6;">Dedicated point of contact</span></td>
+                        <td class="lite-col"><i class="fas fa-check check"></i> Included</td>
+                        <td class="pro-col"><i class="fas fa-check check"></i> Included</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-col"><strong>Company Branding</strong><br><span
+                                style="font-size:0.8rem; opacity:0.6;">Logo on top right</span></td>
+                        <td class="lite-col"><i class="fas fa-times cross"></i> Not Included</td>
+                        <td class="pro-col"><i class="fas fa-check check"></i> Included</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-col"><strong>Wellness Peers (Listeners)</strong><br><span
+                                style="font-size:0.8rem; opacity:0.6;">Anonymous chat support</span></td>
+                        <td class="lite-col"><i class="fas fa-check check"></i> Unlimited</td>
+                        <td class="pro-col"><i class="fas fa-check check"></i> Unlimited</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-col"><strong>Expert Consultations</strong><br><span
+                                style="font-size:0.8rem; opacity:0.6;">Psychologists, Finance Experts, Dietitians</span>
+                        </td>
+                        <td class="lite-col"><span class="partial">Discounted Rates</span></td>
+                        <td class="pro-col"><strong style="color:var(--teal-glow);">100 Free Calls/Year</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="feature-col"><strong>Webinars</strong><br><span
+                                style="font-size:0.8rem; opacity:0.6;">Mental health topics with Q&A</span></td>
+                        <td class="lite-col">2 per month</td>
+                        <td class="pro-col">2 per month</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-col"><strong>Manager Training</strong><br><span
+                                style="font-size:0.8rem; opacity:0.6;">Sensitization sessions</span></td>
+                        <td class="lite-col">1 per quarter</td>
+                        <td class="pro-col">1 per quarter</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-col"><strong>Group Activities</strong><br><span
+                                style="font-size:0.8rem; opacity:0.6;">Yoga, Meditation, Art Therapy</span></td>
+                        <td class="lite-col">16+ sessions/month</td>
+                        <td class="pro-col">16+ sessions/month</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-col"><strong>Digital Resources</strong><br><span
+                                style="font-size:0.8rem; opacity:0.6;">Articles, Videos, Newsletters</span></td>
+                        <td class="lite-col"><i class="fas fa-check check"></i> Included</td>
+                        <td class="pro-col"><i class="fas fa-check check"></i> Included</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-col"><strong>Wellness Games</strong><br><span
+                                style="font-size:0.8rem; opacity:0.6;">Quizzes, Puzzles, Neon Pong</span></td>
+                        <td class="lite-col">1 per month</td>
+                        <td class="pro-col">1 per month</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-col"><strong>Self Assessments</strong><br><span
+                                style="font-size:0.8rem; opacity:0.6;">Stress, Anxiety, Burnout checks</span></td>
+                        <td class="lite-col"><i class="fas fa-check check"></i> Included</td>
+                        <td class="pro-col"><i class="fas fa-check check"></i> Included</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-col"><strong>Launch Kit</strong><br><span
+                                style="font-size:0.8rem; opacity:0.6;">Mailers & Posters</span></td>
+                        <td class="lite-col">1 per quarter (Standard)</td>
+                        <td class="pro-col">1 per quarter (Branded)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align:center; margin-top: 60px;">
+            <p style="margin-bottom:20px; opacity:0.7;">Need a custom enterprise plan?</p>
+            <a href="for-hr.html" class="nav-btn"
+                style="display:inline-block; background:transparent; border-color:var(--teal-glow); color:var(--teal-glow);">Contact
+                Sales</a>
+        </div>
+
+    </div>
+
+    <!-- FOOTER INJECTION -->
+    <footer id="main-footer"></footer>
+
+    <!-- SCRIPTS -->
+    <script src="../../assets/js/components.js" data-header-color="rgba(15, 23, 42, 0.95)"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof injectHeader === 'function') injectHeader();
+            if (typeof injectFooter === 'function') injectFooter();
+        });
+
+        // Particles
+        const pContainer = document.getElementById('particles');
+        if (pContainer) {
+            for (let i = 0; i < 40; i++) {
+                let p = document.createElement('div');
+                p.classList.add('particle');
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.width = Math.random() * 4 + 'px';
+                p.style.height = p.style.width;
+                p.style.animationDuration = Math.random() * 20 + 10 + 's';
+                p.style.opacity = Math.random() * 0.3;
+                pContainer.appendChild(p);
+            }
+        }
+    </script>
+</body>
+
+</html>
