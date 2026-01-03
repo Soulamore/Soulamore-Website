@@ -781,8 +781,19 @@
         // --- UI FUNCTIONS ---
 
         window.toggleSidebar = function () {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.querySelector('.sidebar-overlay').classList.toggle('active');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            const headerBrand = document.querySelector('.model-selector');
+
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+
+            // Prevent "Double Vision" ghosting behind glass sidebar
+            if (sidebar.classList.contains('open') && window.innerWidth <= 768) {
+                if (headerBrand) headerBrand.style.opacity = '0';
+            } else {
+                if (headerBrand) headerBrand.style.opacity = '1';
+            }
         }
 
         window.autoExpand = function (field) {
