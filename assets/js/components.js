@@ -613,13 +613,20 @@ function initializeHeaderLogic() {
 
     // C. Scroll Glass Effect
     // C. Scroll Glass Effect
+    // C. Scroll Glass Effect
     if (header) {
         const handleScroll = () => {
             // Check if custom color override exists
             const scriptTag = document.querySelector('script[src*="components.js"]');
             const customColor = scriptTag ? scriptTag.getAttribute('data-header-color') : null;
 
-            if (!customColor) {
+            if (customColor) {
+                // FORCE Custom Color (Fixes Vent Box "Theme" issue)
+                header.style.setProperty('background', customColor, 'important');
+                header.style.setProperty('box-shadow', 'none', 'important');
+                header.style.setProperty('backdrop-filter', 'none', 'important');
+            } else {
+                // Standard Behavior
                 if (window.scrollY > 50) {
                     header.style.background = 'rgba(15, 23, 42, 0.95)';
                     header.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
@@ -635,6 +642,7 @@ function initializeHeaderLogic() {
         // Trigger immediately to fix initial load state "losing color"
         handleScroll();
     }
+}
 }
 
 // --- 4. SOULBOT WIDGET ---
