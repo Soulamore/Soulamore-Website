@@ -161,10 +161,13 @@ try {
 
             .dropdown-content a, .dropdown-submenu a {
                 color: #e2e8f0 !important;
-                display: block !important; /* Ensure block for vertical stacking */
+                display: block !important;
+                margin: 4px 8px !important; /* Spacing from edges */
+                border-radius: 8px !important; /* Rounded corners for hover state */
+                padding: 8px 12px !important; /* Comfortable tap target */
             }
             .dropdown-content a:hover, .dropdown-submenu a:hover {
-                background: rgba(255,255,255,0.05) !important;
+                background: rgba(255,255,255,0.1) !important;
                 color: #4ECDC4 !important;
             }
             
@@ -277,6 +280,17 @@ const NAV_DATA = [
         ]
     },
     {
+        id: 'nav-join',
+        label: 'Join Us',
+        icon: 'fas fa-hand-holding-heart', /* New Icon */
+        href: '#',
+        type: 'dropdown',
+        children: [
+            { id: 'nav-join-peer', label: 'Apply as Peer', href: 'join-us/peer.html' },
+            { id: 'nav-join-psych', label: 'Apply as Psychologist', href: 'join-us/psychologist.html' }
+        ]
+    },
+    {
         id: 'nav-company',
         label: 'About',
         icon: 'fas fa-building',
@@ -285,16 +299,6 @@ const NAV_DATA = [
         children: [
             { id: 'nav-about', label: 'Our Story', href: 'about.html' },
             { id: 'nav-contact', label: 'Contact Us', href: 'contact.html' },
-            {
-                id: 'nav-join',
-                label: 'Join Us',
-                href: 'join-us/index.html',
-                type: 'submenu',
-                children: [
-                    { label: 'Apply as Peer', href: 'join-us/peer.html' },
-                    { label: 'Apply as Psychologist', href: 'join-us/psychologist.html' }
-                ]
-            },
             { id: 'nav-legal', label: 'Legal & Privacy', href: 'legal.html' }
         ]
     }
