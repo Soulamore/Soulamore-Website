@@ -240,18 +240,7 @@ const NAV_DATA = [
                     { label: 'Ambassadors', href: 'campus/campus-ambassadors.html' },
                     { label: 'For Institutions', href: 'campus/institutions.html' },
                     { label: 'Student FAQs', href: 'campus/student-faqs.html' },
-                    {
-                        label: 'Student Resources',
-                        href: '#',
-                        style: 'color:var(--teal-glow);',
-                        type: 'submenu',
-                        children: [
-                            { label: 'Anxiety', href: 'campus/anxiety-and-overthinking.html' },
-                            { label: 'Exams', href: 'campus/exam-pressure.html' },
-                            { label: 'Loneliness', href: 'campus/loneliness.html' },
-                            { label: 'Feeling Low', href: 'campus/feeling-low.html' }
-                        ]
-                    },
+                    { label: 'Student Resources', href: 'student-resources.html', style: 'color:var(--teal-glow);' },
                     { label: 'Boundaries', href: 'campus/safety-boundaries.html' }
                 ]
             },
@@ -276,15 +265,7 @@ const NAV_DATA = [
         href: '#',
         type: 'dropdown',
         children: [
-            {
-                id: 'nav-confession',
-                label: 'Confession Box',
-                href: 'confession-box.html',
-                type: 'submenu',
-                children: [
-                    { label: 'Guidelines', href: 'confession-box/guidelines.html' }
-                ]
-            },
+            { id: 'nav-confession', label: 'Confession Box', href: 'confession-box.html' },
             { id: 'nav-vent', label: 'The Vent Box', href: 'vent-box.html' },
             { id: 'nav-support', label: 'Support Groups', href: 'support-groups.html' },
             { id: 'nav-calendar', label: 'Community Calendar', href: 'community-calendar.html' }

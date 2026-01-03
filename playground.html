@@ -1051,46 +1051,67 @@
             link.href = temp.toDataURL();
             link.click();
         }
+        // Initialize
+        function initMandala() {
+            // Resize Canvas correctly for HIDPI
+            const rect = mContainer.getBoundingClientRect();
+            mCanvas.width = rect.width;
+            mCanvas.height = rect.height;
 
+            // Clear on init
+            mCtx.clearRect(0, 0, mCanvas.width, mCanvas.height);
+            mCtx.lineWidth = 2;
+            mCtx.lineCap = 'round';
+            mCtx.strokeStyle = '#4ECDC4';
+        }
+
+        // Call init on load and resize
+        window.addEventListener('load', initMandala);
+        window.addEventListener('resize', initMandala);
+
+        // Drawing Logic
         function draw(e) {
             if (!painting) return;
-            const rect = mCanvas.getBoundingClientRect();
-            // Need to account for scale if CSS width != internal width, but here we sync them.
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
 
-            // Center coords
+            const rect = mCanvas.getBoundingClientRect();
             const cx = mCanvas.width / 2;
             const cy = mCanvas.height / 2;
-            const dx = x - cx;
-            const dy = y - cy;
 
-            mCtx.save();
-            mCtx.translate(cx, cy);
-            mCtx.strokeStyle = penColor;
+            // Handle both mouse and touch events
+            let clientX = e.clientX;
+            let clientY = e.clientY;
+
+            // If touch event, use the first touch point
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            }
+
+            const dx = (clientX - rect.left) - cx;
+            const dy = (clientY - rect.top) - cy;
 
             const slices = 12;
-            const angle = Math.PI * 2 / slices;
+            const angleStep = (Math.PI * 2) / slices;
 
+            mCtx.beginPath();
             for (let i = 0; i < slices; i++) {
-                mCtx.rotate(angle);
-                mCtx.beginPath();
-                mCtx.moveTo(lastdx, lastdy);
-                mCtx.lineTo(dx, dy);
-                mCtx.stroke();
+                const theta = i * angleStep;
 
-                // Mirror
-                mCtx.save();
-                mCtx.scale(1, -1);
-                mCtx.beginPath();
-                mCtx.moveTo(lastdx, lastdy);
-                mCtx.lineTo(dx, dy);
-                mCtx.stroke();
-                mCtx.restore();
+                // Rotate start point
+                const x1 = lastdx * Math.cos(theta) - lastdy * Math.sin(theta);
+                const y1 = lastdx * Math.sin(theta) + lastdy * Math.cos(theta);
+
+                // Rotate end point
+                const x2 = dx * Math.cos(theta) - dy * Math.sin(theta);
+                const y2 = dx * Math.sin(theta) + dy * Math.cos(theta);
+
+                mCtx.moveTo(cx + x1, cy + y1);
+                mCtx.lineTo(cx + x2, cy + y2);
             }
-            mCtx.restore();
+            mCtx.stroke();
 
-            lastdx = dx; lastdy = dy;
+            lastdx = dx;
+            lastdy = dy;
         }
 
         let lastdx, lastdy;
@@ -1102,6 +1123,8 @@
             lastdx = (e.clientX - rect.left) - cx;
             lastdy = (e.clientY - rect.top) - cy;
         });
+
+        // Touch Start
         mCanvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             painting = true;
@@ -1119,12 +1142,7 @@
         mCanvas.addEventListener('mousemove', draw);
         mCanvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            const touch = e.touches[0];
-            // Mock mouse event structure for draw function
-            draw({
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
+            draw(e); // Pass the raw event
         }, { passive: false });
 
         // --- 3. BODY SCAN LOGIC ---
@@ -1213,8 +1231,13 @@
                 b.onclick = (e) => {
                     e.target.style.transform = "scale(1.5)";
                     e.target.style.opacity = "0";
-                    // Burst effect could go here
                     setTimeout(() => e.target.remove(), 200);
+                };
+
+                // Touch support for bubbles
+                b.ontouchstart = (e) => {
+                    e.preventDefault();
+                    e.target.click();
                 };
 
                 canvas.appendChild(b);
@@ -1227,14 +1250,20 @@
         let scale = 1;
         let inflateInt;
         const balloon = document.getElementById('theBalloon');
+        const inflateBtn = document.querySelector('#balloon .action-btn'); // Select the Hold Button
 
         function startInflate() {
+            if (inflateInt) clearInterval(inflateInt);
             inflateInt = setInterval(() => {
                 if (scale < 3) {
                     scale += 0.05;
                     balloon.style.transform = `scale(${scale})`;
                 }
             }, 100);
+        }
+
+        function stopInflate() {
+            clearInterval(inflateInt);
         }
 
         function releaseBalloon() {
@@ -1249,6 +1278,19 @@
                 balloon.style.transform = "translateY(0) scale(1)";
                 balloon.style.opacity = 1;
             }, 3000);
+        }
+
+        // Add explicit touch listeners for the Inflate Button if it exists
+        if (inflateBtn) {
+            inflateBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                startInflate();
+            }, { passive: false });
+
+            inflateBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                stopInflate();
+            }, { passive: false });
         }
     </script>
 </body>
