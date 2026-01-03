@@ -444,6 +444,35 @@
             font-size: 1.2rem;
             cursor: pointer;
         }
+
+        /* --- THEME PICKER --- */
+        .theme-picker {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 8px 12px;
+            border-radius: 50px;
+            border: 1px solid var(--border-glass);
+            z-index: 200;
+        }
+
+        .theme-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+
+        .theme-dot:hover,
+        .theme-dot.active {
+            transform: scale(1.2);
+            border-color: white;
+        }
     </style>
 </head>
 
@@ -456,6 +485,7 @@
 
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
+            <div style="height: 20px;"></div>
             <div class="new-chat-btn" onclick="location.reload()">
                 <i class="fas fa-plus"></i> New Chat
             </div>
@@ -480,6 +510,29 @@
 
         <!-- MAIN CHAT -->
         <main class="main-chat">
+
+            <!-- THEME TOGGLE -->
+            <div class="theme-picker">
+                <div class="theme-dot active" style="background:#4ECDC4;" onclick="setTheme('#4ECDC4')"></div>
+                <div class="theme-dot" style="background:#a78bfa;" onclick="setTheme('#a78bfa')"></div>
+                <div class="theme-dot" style="background:#f472b6;" onclick="setTheme('#f472b6')"></div>
+                <div class="theme-dot" style="background:#fbbf24;" onclick="setTheme('#fbbf24')"></div>
+                <div class="theme-dot" style="background:#38bdf8;" onclick="setTheme('#38bdf8')"></div>
+            </div>
+
+            <script>
+                function setTheme(color) {
+                    document.documentElement.style.setProperty('--teal-glow', color);
+                    document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+                    event.target.classList.add('active');
+                    localStorage.setItem('soulbotTheme', color);
+                    document.documentElement.style.setProperty('--user-bubble', `linear-gradient(135deg, ${color}, #2a9d8f)`);
+                }
+                const savedTheme = localStorage.getItem('soulbotTheme');
+                if (savedTheme) {
+                    document.documentElement.style.setProperty('--teal-glow', savedTheme);
+                }
+            </script>
 
             <!-- HEADER -->
             <header class="chat-header">
