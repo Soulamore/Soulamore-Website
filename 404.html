@@ -208,6 +208,17 @@
     <canvas id="starCanvas"></canvas>
 
     <div class="error-container">
+        <!-- INTERACTIVE TOY -->
+        <div class="dino-toy" onclick="jumpSoul()" style="cursor: pointer; margin-bottom: 10px;">
+            <i class="fas fa-ghost" id="soulIcon"
+                style="font-size: 3rem; color: var(--teal-glow); transition: 0.2s;"></i>
+            <p id="jump-instruction" style="font-size: 0.8rem; opacity: 0.5; margin-top: 10px;">(Press Space to Jump)
+            </p>
+            <p id="jump-score"
+                style="font-size: 0.9rem; font-weight:700; color:var(--peach-glow); display:none; margin-top:5px;">
+                Score: 0</p>
+        </div>
+
         <div class="error-code">404</div>
         <h1 class="error-title">You haven't lost your way.</h1>
         <p class="error-desc">
@@ -317,6 +328,38 @@
             else { audio.volume = 0.3; audio.play(); document.getElementById('audioText').innerText = "Pause"; }
             playing = !playing;
         }
+        // --- JUMP TOY LOGIC ---
+        let score = 0;
+        const soulIcon = document.getElementById('soulIcon');
+        const scoreText = document.getElementById('jump-score');
+        const instrText = document.getElementById('jump-instruction');
+
+        function jumpSoul() {
+            if (soulIcon.classList.contains('fa-bounce')) return;
+
+            // Animation
+            soulIcon.classList.add('fa-bounce');
+            setTimeout(() => soulIcon.classList.remove('fa-bounce'), 800); // FontAwesome bounce is ~1s
+
+            // Score logic
+            score++;
+            scoreText.style.display = 'block';
+            scoreText.innerText = "Jumps: " + score;
+            instrText.style.opacity = '0';
+
+            // Message for high score
+            if (score === 10) scoreText.innerText = "Wow! 10 Jumps! 👻";
+            if (score === 20) scoreText.innerText = "You are bored, huh? 😂";
+            if (score === 50) scoreText.innerText = "Okay, go to the playground! 🎮";
+        }
+
+        // Spacebar support
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault(); // Prevent scrolling
+                jumpSoul();
+            }
+        });
     </script>
 
 
