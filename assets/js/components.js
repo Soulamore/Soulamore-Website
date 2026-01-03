@@ -162,9 +162,11 @@ try {
             .dropdown-content a, .dropdown-submenu a {
                 color: #e2e8f0 !important;
                 display: block !important;
-                margin: 4px 8px !important; /* Spacing from edges */
-                border-radius: 8px !important; /* Rounded corners for hover state */
-                padding: 8px 12px !important; /* Comfortable tap target */
+                margin: 4px 6px !important; /* Tighter margins */
+                border-radius: 8px !important;
+                padding: 8px 12px !important;
+                width: auto !important; /* Let it shrink fitting text or container */
+                box-sizing: border-box !important; /* vital */
             }
             .dropdown-content a:hover, .dropdown-submenu a:hover {
                 background: rgba(255,255,255,0.1) !important;
