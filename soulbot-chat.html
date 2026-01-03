@@ -25,7 +25,78 @@
             /* Prevent body scroll, handle inside containers */
             display: flex;
             flex-direction: column;
-            background: radial-gradient(circle at 50% 10%, #1e293b 0%, #0f172a 80%);
+            background: var(--body-bg, radial-gradient(circle at 50% 10%, #1e293b 0%, #0f172a 80%));
+            transition: background 0.5s ease;
+        }
+
+        /* LIGHT MODE OVERRIDES */
+        body.light-mode {
+            background: radial-gradient(circle at 50% 10%, #f1f5f9 0%, #e2e8f0 80%) !important;
+            color: #1e293b !important;
+        }
+
+        body.light-mode .chat-header {
+            background: rgba(255, 255, 255, 0.8) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+        }
+
+        body.light-mode .model-selector {
+            color: #1e293b !important;
+        }
+
+        body.light-mode .sidebar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.1) !important;
+        }
+
+        body.light-mode .new-chat-btn {
+            background: rgba(0, 0, 0, 0.05) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            color: #334155 !important;
+        }
+
+        body.light-mode .history-item {
+            color: #64748b !important;
+        }
+
+        body.light-mode .history-item:hover {
+            background: rgba(0, 0, 0, 0.05) !important;
+            color: #1e293b !important;
+        }
+
+        body.light-mode .chat-input-box {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        body.light-mode #userInput {
+            color: #1e293b !important;
+        }
+
+        body.light-mode .prompt-card {
+            background: rgba(255, 255, 255, 0.6) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            color: #475569 !important;
+        }
+
+        body.light-mode .prompt-card:hover {
+            background: white !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        body.light-mode .sidebar-footer {
+            border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+        }
+
+        body.light-mode .msg-content {
+            color: #334155 !important;
+        }
+
+        body.light-mode .user-avatar {
+            background: #e2e8f0 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #64748b !important;
         }
 
         /* --- LAYOUT GRID --- */
@@ -140,7 +211,10 @@
             display: flex;
             flex-direction: column;
             gap: 25px;
+            gap: 25px;
             scroll-behavior: smooth;
+            padding-bottom: 40px;
+            /* More bottom spacing */
         }
 
         /* EMPTY STATE (Soul Orb) */
@@ -513,25 +587,70 @@
 
             <!-- THEME TOGGLE -->
             <div class="theme-picker">
-                <div class="theme-dot active" style="background:#4ECDC4;" onclick="setTheme('#4ECDC4')"></div>
-                <div class="theme-dot" style="background:#a78bfa;" onclick="setTheme('#a78bfa')"></div>
-                <div class="theme-dot" style="background:#f472b6;" onclick="setTheme('#f472b6')"></div>
-                <div class="theme-dot" style="background:#fbbf24;" onclick="setTheme('#fbbf24')"></div>
-                <div class="theme-dot" style="background:#38bdf8;" onclick="setTheme('#38bdf8')"></div>
+                <div class="theme-dot active" style="background:#4ECDC4;"
+                    onclick="setTheme('#4ECDC4', 'dark', 'radial-gradient(circle at 50% 10%, #1e293b 0%, #0f172a 80%)')"
+                    title="Deep Teal (Default)"></div>
+
+                <!-- PASTELS (Lighter Tone Backgrounds) -->
+                <div class="theme-dot" style="background:#a78bfa;"
+                    onclick="setTheme('#a78bfa', 'dark', 'radial-gradient(circle at 50% 10%, #2e1065 0%, #0f172a 80%)')"
+                    title="Lavender Dream"></div>
+                <div class="theme-dot" style="background:#f472b6;"
+                    onclick="setTheme('#f472b6', 'dark', 'radial-gradient(circle at 50% 10%, #500724 0%, #0f172a 80%)')"
+                    title="Rose Petal"></div>
+                <div class="theme-dot" style="background:#fbbf24;"
+                    onclick="setTheme('#fbbf24', 'dark', 'radial-gradient(circle at 50% 10%, #451a03 0%, #0f172a 80%)')"
+                    title="Warm Amber"></div>
+                <div class="theme-dot" style="background:#38bdf8;"
+                    onclick="setTheme('#38bdf8', 'dark', 'radial-gradient(circle at 50% 10%, #0c4a6e 0%, #0f172a 80%)')"
+                    title="Sky Serenity"></div>
+
+                <!-- SPECIAL THEMES -->
+                <div class="theme-dot" style="background:#ef4444;"
+                    onclick="setTheme('#ef4444', 'dark', 'radial-gradient(circle at 50% 10%, #450a0a 0%, #000000 80%)')"
+                    title="Midnight Inferno"></div>
+                <div class="theme-dot" style="background:#ffffff; border:1px solid #ccc;"
+                    onclick="setTheme('#0f766a', 'light', 'none')" title="Zen White"></div>
             </div>
 
             <script>
-                function setTheme(color) {
-                    document.documentElement.style.setProperty('--teal-glow', color);
+                function setTheme(accent, mode, bgGradient) {
+                    // 1. Set Accent
+                    document.documentElement.style.setProperty('--teal-glow', accent);
+
+                    // 2. Set Background
+                    if (mode === 'light') {
+                        document.body.classList.add('light-mode');
+                        document.body.style.background = ''; // Use CSS default for light mode
+                    } else {
+                        document.body.classList.remove('light-mode');
+                        document.body.style.background = bgGradient;
+                        // document.documentElement.style.setProperty('--body-bg', bgGradient);
+                    }
+
+                    // 3. Update Active Dot
                     document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
                     event.target.classList.add('active');
-                    localStorage.setItem('soulbotTheme', color);
-                    document.documentElement.style.setProperty('--user-bubble', `linear-gradient(135deg, ${color}, #2a9d8f)`);
+
+                    // 4. Persist
+                    const config = { accent, mode, bgGradient };
+                    localStorage.setItem('soulbotThemeConfig', JSON.stringify(config));
                 }
-                const savedTheme = localStorage.getItem('soulbotTheme');
-                if (savedTheme) {
-                    document.documentElement.style.setProperty('--teal-glow', savedTheme);
-                }
+
+                // INIT
+                try {
+                    const saved = JSON.parse(localStorage.getItem('soulbotThemeConfig'));
+                    if (saved) {
+                        // We can't pass event.target here, so we manually find the dot or just apply styles
+                        document.documentElement.style.setProperty('--teal-glow', saved.accent);
+                        if (saved.mode === 'light') {
+                            document.body.classList.add('light-mode');
+                        } else {
+                            document.body.classList.remove('light-mode');
+                            document.body.style.background = saved.bgGradient;
+                        }
+                    }
+                } catch (e) { console.log('Theme Init Error', e); }
             </script>
 
             <!-- HEADER -->
