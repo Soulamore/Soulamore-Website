@@ -1,4 +1,4 @@
-console.log("Soulamore: Components.js loading...");
+// console.log("Soulamore: Components.js loading...");
 
 // CRITICAL: Inject Styles Immediately
 // CRITICAL: Inject Styles Immediately
@@ -187,7 +187,7 @@ try {
         }
     `;
     document.head.appendChild(style);
-    console.log("Soulamore: Critical styles v2 injected.");
+    // console.log("Soulamore: Critical styles v2 injected.");
 } catch (e) {
     console.error("Soulamore: Style injection failed", e);
 }
@@ -195,13 +195,13 @@ try {
 
 document.addEventListener("DOMContentLoaded", () => {
     try {
-        console.log("Soulamore: DOM Content Loaded, initializing...");
+        // console.log("Soulamore: DOM Content Loaded, initializing...");
         injectHeader();
         injectFooter();
         injectSoulBotWidget(); // New Widget
         setActiveState();
         initializeHeaderLogic();
-        console.log("Soulamore: Initialization complete.");
+        // console.log("Soulamore: Initialization complete.");
     } catch (error) {
         console.error("Soulamore: Critical Error during initialization:", error);
     }
@@ -791,7 +791,7 @@ function injectSoulBotWidget() {
 
 // --- 7. INITIALIZATION (CRITICAL: MUST RUN) ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Soulamore: Initializing...");
+    // console.log("Soulamore: Initializing...");
 
     // 1. Inject Components
     try { injectHeader(); } catch (e) { console.error("Header Injection Failed:", e); }
