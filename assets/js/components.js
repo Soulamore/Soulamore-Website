@@ -612,8 +612,6 @@ function initializeHeaderLogic() {
     });
 
     // C. Scroll Glass Effect
-    // C. Scroll Glass Effect
-    // C. Scroll Glass Effect
     if (header) {
         const handleScroll = () => {
             // Check if custom color override exists
@@ -621,7 +619,7 @@ function initializeHeaderLogic() {
             const customColor = scriptTag ? scriptTag.getAttribute('data-header-color') : null;
 
             if (customColor) {
-                // FORCE Custom Color (Fixes Vent Box "Theme" issue)
+                // FORCE Custom Color
                 header.style.setProperty('background', customColor, 'important');
                 header.style.setProperty('box-shadow', 'none', 'important');
                 header.style.setProperty('backdrop-filter', 'none', 'important');
@@ -631,7 +629,6 @@ function initializeHeaderLogic() {
                     header.style.background = 'rgba(15, 23, 42, 0.95)';
                     header.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
                 } else {
-                    // Default state (Top of page) - Ensure valid background, not transparent
                     header.style.background = 'rgba(15, 23, 42, 0.85)';
                     header.style.boxShadow = 'none';
                 }
@@ -639,7 +636,6 @@ function initializeHeaderLogic() {
         };
 
         window.addEventListener('scroll', handleScroll);
-        // Trigger immediately to fix initial load state "losing color"
         handleScroll();
     }
 }
