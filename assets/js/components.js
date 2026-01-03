@@ -240,7 +240,7 @@ const NAV_DATA = [
                     { label: 'Ambassadors', href: 'campus/campus-ambassadors.html' },
                     { label: 'For Institutions', href: 'campus/institutions.html' },
                     { label: 'Student FAQs', href: 'campus/student-faqs.html' },
-                    { label: 'Student Resources', href: 'student-resources.html', style: 'color:var(--teal-glow);' },
+                    { label: 'Student Resources', href: 'campus/student-resources.html', style: 'color:var(--teal-glow);' },
                     { label: 'Boundaries', href: 'campus/safety-boundaries.html' }
                 ]
             },
