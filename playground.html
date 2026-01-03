@@ -14,6 +14,22 @@
 
     <style>
         /* --- PLAYGROUND SPECIFIC STYLES --- */
+        :root {
+            /* --- GOLDEN RATIO HARMONY --- */
+            --phi: 1.618;
+            --base-unit: 20px;
+            --phi-space-xs: calc(var(--base-unit) / var(--phi));
+            /* ~12px */
+            --phi-space-sm: var(--base-unit);
+            /* 20px */
+            --phi-space-md: calc(var(--base-unit) * var(--phi));
+            /* ~32.3px */
+            --phi-space-lg: calc(var(--base-unit) * var(--phi) * var(--phi));
+            /* ~52.4px */
+            --phi-space-xl: calc(var(--base-unit) * var(--phi) * var(--phi) * var(--phi));
+            /* ~84.8px */
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--deep-space);
@@ -32,6 +48,7 @@
         h2,
         h3 {
             font-family: 'Outfit', sans-serif;
+            line-height: 1.2;
         }
 
         /* --- BACKGROUND --- */
@@ -53,14 +70,15 @@
             height: auto;
             /* Allow auto height */
             min-height: 100vh;
-            padding: 200px 20px 100px 20px;
-            /* Increased Top/Bottom Padding & Reveal Title */
+            /* Use Golden Ratio Spacing for header clearance */
+            padding: 180px var(--phi-space-sm) var(--phi-space-xl);
             text-align: center;
         }
 
         .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
+            font-size: 3.236rem;
+            /* 2 * 1.618 */
+            margin-bottom: var(--phi-space-sm);
             background: linear-gradient(to right, #fff, var(--teal-glow));
             -webkit-background-clip: text;
             background-clip: text;
@@ -68,16 +86,20 @@
         }
 
         .header p {
-            opacity: 0.7;
+            opacity: 0.8;
             font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto 50px;
+            max-width: 618px;
+            /* Golden Width */
+            margin: 0 auto var(--phi-space-xl);
+            line-height: 1.618;
+            color: #94a3b8;
         }
 
         .activity-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 32px;
+            gap: var(--phi-space-md);
+            /* ~32px */
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 24px;
@@ -94,13 +116,16 @@
         .activity-card {
             background: var(--navy-glass);
             border: 1px solid var(--border-glass);
-            padding: 50px 30px;
-            /* Breathable Padding */
+            padding: var(--phi-space-lg) var(--phi-space-md);
+            /* 52px Vertical, 32px Horizontal */
             border-radius: 24px;
             cursor: pointer;
             transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .activity-card:hover {
@@ -111,7 +136,7 @@
 
         .card-icon {
             font-size: 3rem;
-            margin-bottom: 20px;
+            margin-bottom: var(--phi-space-sm);
             background: rgba(255, 255, 255, 0.05);
             width: 80px;
             height: 80px;
@@ -119,7 +144,6 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            margin: 0 auto 20px;
             color: var(--peach-glow);
             transition: 0.3s;
         }
@@ -727,58 +751,50 @@
 
     <!-- MAIN MENU -->
     <div class="playground-menu">
-        <div class="header">
-            <h1>Gentle Tools for Moments<br>That Need a <span
-                    style="font-family:'Playfair Display', serif; font-style:italic; color:var(--peach-glow); -webkit-text-fill-color:var(--peach-glow);">Reset</span>
-            </h1>
-            <p style="margin-bottom: 30px;">
-                Not every moment needs a conversation.<br>
-                Some moments just need space.
-            </p>
-            <p style="margin-bottom: 30px;">
-                These interactive tools help you release tension, slow racing thoughts,<br>
-                and reconnect with your body — quietly, at your own pace.
-            </p>
-            <p style="font-weight: 600; color: var(--teal-glow); margin-bottom: 20px;">
-                Choose one. Stay as long as you need.
-            </p>
-            <p style="font-size: 0.85rem; opacity: 0.5; font-style: italic; margin-bottom: 50px;">
-                No tracking. No judgment. Nothing to get right.
-            </p>
-        </div>
+        <p style="margin-bottom: 30px;">
+            These interactive tools help you release tension, slow racing thoughts,<br>
+            and reconnect with your body — quietly, at your own pace.
+        </p>
+        <p style="font-weight: 600; color: var(--teal-glow); margin-bottom: 20px;">
+            Choose one. Stay as long as you need.
+        </p>
+        <p style="font-size: 0.85rem; opacity: 0.5; font-style: italic; margin-bottom: 50px;">
+            No tracking. No judgment. Nothing to get right.
+        </p>
+    </div>
 
-        <div class="activity-grid">
-            <div class="activity-card" onclick="openApp('shredder')">
-                <div class="card-icon"><i class="fas fa-fire"></i></div>
-                <h3>Worry Shredder</h3>
-                <p>Type it out. Burn it down. Let it go.</p>
-            </div>
-            <div class="activity-card" onclick="openApp('mandala')">
-                <div class="card-icon"><i class="fas fa-spinner"></i></div>
-                <h3>Mandala Weaver</h3>
-                <p>Draw symmetry to find focus and flow.</p>
-            </div>
-            <div class="activity-card" onclick="openApp('body')">
-                <div class="card-icon"><i class="fas fa-child-reaching"></i></div>
-                <h3>Body Scan</h3>
-                <p>Locate tension and release it physically.</p>
-            </div>
-            <div class="activity-card" onclick="openApp('sound')">
-                <div class="card-icon"><i class="fas fa-sliders"></i></div>
-                <h3>Sound Bath</h3>
-                <p>Mix your own calming frequency.</p>
-            </div>
-            <div class="activity-card" onclick="openApp('bubbles')">
-                <div class="card-icon"><i class="fas fa-soap"></i></div>
-                <h3>Thought Popper</h3>
-                <p>Burst negative thoughts into light.</p>
-            </div>
-            <div class="activity-card" onclick="openApp('balloon')">
-                <div class="card-icon"><i class="fas fa-wind"></i></div>
-                <h3>Balloon Release</h3>
-                <p>Build tension, then watch it drift away.</p>
-            </div>
+    <div class="activity-grid">
+        <div class="activity-card" onclick="openApp('shredder')">
+            <div class="card-icon"><i class="fas fa-fire"></i></div>
+            <h3>Worry Shredder</h3>
+            <p>Type it out. Burn it down. Let it go.</p>
         </div>
+        <div class="activity-card" onclick="openApp('mandala')">
+            <div class="card-icon"><i class="fas fa-spinner"></i></div>
+            <h3>Mandala Weaver</h3>
+            <p>Draw symmetry to find focus and flow.</p>
+        </div>
+        <div class="activity-card" onclick="openApp('body')">
+            <div class="card-icon"><i class="fas fa-child-reaching"></i></div>
+            <h3>Body Scan</h3>
+            <p>Locate tension and release it physically.</p>
+        </div>
+        <div class="activity-card" onclick="openApp('sound')">
+            <div class="card-icon"><i class="fas fa-sliders"></i></div>
+            <h3>Sound Bath</h3>
+            <p>Mix your own calming frequency.</p>
+        </div>
+        <div class="activity-card" onclick="openApp('bubbles')">
+            <div class="card-icon"><i class="fas fa-soap"></i></div>
+            <h3>Thought Popper</h3>
+            <p>Burst negative thoughts into light.</p>
+        </div>
+        <div class="activity-card" onclick="openApp('balloon')">
+            <div class="card-icon"><i class="fas fa-wind"></i></div>
+            <h3>Balloon Release</h3>
+            <p>Build tension, then watch it drift away.</p>
+        </div>
+    </div>
 
     </div>
 
