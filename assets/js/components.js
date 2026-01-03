@@ -263,10 +263,10 @@ const NAV_DATA = [
             {
                 id: 'nav-workplace',
                 label: 'Soulamore Workplace',
-                href: '#', // Placeholder for now as folder is empty
+                href: 'spaces/soulamore-workplace/index.html',
                 type: 'submenu',
                 children: [
-                    { label: 'Overview', href: '#' }
+                    { label: 'Overview', href: 'spaces/soulamore-workplace/index.html' }
                 ]
             },
             {

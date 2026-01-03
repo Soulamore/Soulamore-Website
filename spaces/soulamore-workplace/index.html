@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soulamore Workplace | Emotionally Safe Teams</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- GLOBAL THEME: MIDNIGHT VEGITO (Workplace Edition) --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --finance-green: #10b981;
+            --alert-red: #ef4444;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- PARTICLES --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* --- NAV --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-glass);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            flex-shrink: 0;
+            overflow-x: auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-btn.active {
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            font-weight: 700;
+        }
+
+        .back-home {
+            margin-left: auto;
+            border: 1px solid var(--border-glass);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+        }
+
+        /* --- SCROLL AREA --- */
+        #main-content {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            position: relative;
+        }
+
+        /* --- PAGE SECTIONS --- */
+        .page-view {
+            display: none;
+            padding: 60px 0 100px;
+        }
+
+        .page-view.active {
+            display: block;
+            animation: pageFade 0.5s ease-out;
+        }
+
+        @keyframes pageFade {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- UI COMPONENTS --- */
+        .glass-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            margin-bottom: 30px;
+        }
+
+        .glass-card:hover {
+            border-color: var(--teal-glow);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            opacity: 0.8;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-btn {
+            background: var(--gradient-primary);
+            color: var(--deep-space);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: inline-block;
+            font-size: 1.1rem;
+            text-decoration: none;
+        }
+
+        .cta-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* TRUST STRIP */
+        .trust-strip {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trust-item i {
+            color: var(--teal-glow);
+        }
+
+        /* GRIDS */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* LISTS */
+        .feature-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .feature-list li {
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            opacity: 0.9;
+        }
+
+        .feature-list i {
+            color: var(--gold-glow);
+            margin-top: 4px;
+        }
+
+        /* FINANCIAL SPECIFIC */
+        .finance-card {
+            border-color: var(--gold-glow);
+        }
+
+        .finance-card h3 {
+            color: var(--gold-glow);
+        }
+
+        /* BOUNDARY BOX */
+        .boundary-box {
+            border: 1px solid var(--alert-red);
+            background: rgba(239, 68, 68, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .boundary-title {
+            color: var(--alert-red);
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* FORM STYLES */
+        .input-box {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            padding: 12px;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .input-box:focus {
+            border-color: var(--teal-glow);
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 60px 0;
+            border-top: 1px solid var(--border-glass);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        @media(max-width: 800px) {
+            nav {
+                padding: 15px;
+            }
+
+            .nav-links span {
+                display: none;
+            }
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PARTICLES -->
+    <div id="particles"></div>
+
+    <!-- NAVIGATION -->
+    <nav>
+        <div class="logo" onclick="navTo('main')"><i class="fas fa-briefcase"></i> Soulamore Workplace</div>
+        <div class="nav-links">
+            <div class="nav-btn active" onclick="navTo('main')"><i class="fas fa-home"></i> <span>Overview</span></div>
+            <div class="nav-btn" onclick="navTo('programs')"><i class="fas fa-layer-group"></i> <span>Programs</span>
+            </div>
+            <div class="nav-btn" onclick="navTo('employees')"><i class="fas fa-user-shield"></i> <span>Employees</span>
+            </div>
+            <div class="nav-btn" onclick="navTo('financial')"><i class="fas fa-coins"></i> <span>Financial Peer</span>
+            </div>
+            <div class="nav-btn" onclick="navTo('hr')"><i class="fas fa-building"></i> <span>For HR</span></div>
+            <div class="nav-btn" onclick="navTo('policy')"><i class="fas fa-file-contract"></i> <span>Policy</span>
+            </div>
+        </div>
+        <a href="../../index.html" class="back-home">Exit</a>
+    </nav>
+
+    <!-- CONTENT CONTAINER -->
+    <div id="main-content">
+
+        <!-- 1. MAIN WORKPLACE PAGE -->
+        <div id="main" class="page-view active">
+            <div class="container">
+                <section class="hero fade-in">
+                    <div
+                        style="color:var(--teal-glow); border:1px solid var(--teal-glow); padding:5px 15px; border-radius:50px; display:inline-block; margin-bottom:20px; font-size:0.8rem; letter-spacing:1px;">
+                        WORKPLACE WELLNESS REIMAGINED</div>
+                    <h1>Build Emotionally Safer Workplaces.<br>Without Surveillance.</h1>
+                    <p>Soulamore Workplace supports employee mental wellbeing through guided programs, private self-use
+                        tools, and optional financial wellness peer support — designed for Gen Z, hybrid teams, and
+                        modern work stress.</p>
+                    <div style="margin-top:40px;">
+                        <button class="cta-btn" onclick="navTo('hr')">Bring Soulamore to Your Team</button>
+                    </div>
+                    <div class="trust-strip">
+                        <div class="trust-item"><i class="fas fa-check-circle"></i> Designed for Gen Z</div>
+                        <div class="trust-item"><i class="fas fa-check-circle"></i> Confidential & Privacy-First</div>
+                        <div class="trust-item"><i class="fas fa-check-circle"></i> Complements EAPs</div>
+                    </div>
+                </section>
+
+                <!-- THE PROBLEM -->
+                <div class="glass-card fade-in">
+                    <div class="grid-2">
+                        <div>
+                            <h3 style="margin-bottom:15px; color:var(--peach-glow);">The Silent Problem</h3>
+                            <h2>Work Stress Isn’t Just About Work Anymore.</h2>
+                            <p style="opacity:0.8; margin-top:15px;">Burnout today isn’t only caused by deadlines. It’s
+                                shaped by money anxiety, job insecurity, rising costs, and the pressure to “keep it
+                                together.” Most programs ignore this.</p>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:center;">
+                            <div style="width:100%; text-align:center;">
+                                <div
+                                    style="display:flex; height:20px; border-radius:10px; overflow:hidden; margin-bottom:10px;">
+                                    <div style="width:40%; background:var(--teal-glow);"></div>
+                                    <div style="width:35%; background:var(--gold-glow);"></div>
+                                    <div style="width:25%; background:var(--peach-glow);"></div>
+                                </div>
+                                <div
+                                    style="display:flex; justify-content:space-between; font-size:0.8rem; opacity:0.7;">
+                                    <span>Work Load</span>
+                                    <span>Financial Stress</span>
+                                    <span>Life Pressure</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HOW WE HELP -->
+                <div class="fade-in" style="margin: 80px 0;">
+                    <h2 style="text-align:center; margin-bottom:40px;">How Soulamore Helps</h2>
+                    <div class="grid-3">
+                        <div class="glass-card">
+                            <i class="fas fa-chalkboard-teacher"
+                                style="font-size:2rem; color:var(--teal-glow); margin-bottom:15px;"></i>
+                            <h4>Guided Programs</h4>
+                            <p style="font-size:0.9rem; opacity:0.7; margin-top:10px;">Modular sessions on burnout,
+                                boundaries, and stress regulation that fit real schedules.</p>
+                        </div>
+                        <div class="glass-card">
+                            <i class="fas fa-mobile-alt"
+                                style="font-size:2rem; color:var(--peach-glow); margin-bottom:15px;"></i>
+                            <h4>Quiet Self-Use Tools</h4>
+                            <p style="font-size:0.9rem; opacity:0.7; margin-top:10px;">Venting spaces, reset exercises,
+                                and reflection tools. No tracking. No visibility.</p>
+                        </div>
+                        <div class="glass-card finance-card">
+                            <i class="fas fa-coins"
+                                style="font-size:2rem; color:var(--gold-glow); margin-bottom:15px;"></i>
+                            <h4>Financial Peer Support</h4>
+                            <p style="font-size:0.9rem; opacity:0.7; margin-top:10px;">Optional, human conversations
+                                about money stress. Not advisors, just support.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DIFFERENTIATOR -->
+                <div class="glass-card fade-in" style="text-align:center;">
+                    <h2>Support Without Optics. Care Without Control.</h2>
+                    <div class="grid-2" style="margin-top:30px; text-align:left;">
+                        <ul class="feature-list">
+                            <li><i class="fas fa-times" style="color:var(--alert-red);"></i> No internal peer policing
+                            </li>
+                            <li><i class="fas fa-times" style="color:var(--alert-red);"></i> No forced participation
+                            </li>
+                        </ul>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check" style="color:var(--teal-glow);"></i> Privacy-First Insights</li>
+                            <li><i class="fas fa-check" style="color:var(--teal-glow);"></i> Supports people as they are
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. PROGRAMS & SERVICES -->
+        <div id="programs" class="page-view">
+            <div class="container">
+                <section class="hero fade-in">
+                    <h1>Workplace Wellbeing Programs</h1>
+                    <p>For Real Life Pressures.</p>
+                </section>
+
+                <div class="grid-2 fade-in">
+                    <div class="glass-card">
+                        <h3><i class="fas fa-brain" style="color:var(--teal-glow);"></i> Emotional Wellbeing</h3>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-angle-right" style="color:var(--starlight);"></i> Burnout prevention
+                            </li>
+                            <li><i class="fas fa-angle-right" style="color:var(--starlight);"></i> Stress regulation
+                            </li>
+                            <li><i class="fas fa-angle-right" style="color:var(--starlight);"></i> Workload & boundaries
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="glass-card finance-card">
+                        <h3><i class="fas fa-wallet" style="color:var(--gold-glow);"></i> Financial Wellness</h3>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-angle-right" style="color:var(--starlight);"></i> Money stress
+                                conversations</li>
+                            <li><i class="fas fa-angle-right" style="color:var(--starlight);"></i> Budgeting basics</li>
+                            <li><i class="fas fa-angle-right" style="color:var(--starlight);"></i> Debt & salary anxiety
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="glass-card fade-in">
+                    <h3><i class="fas fa-tools"></i> Self-Use Tools</h3>
+                    <p style="opacity:0.8;">Vent Box, Reset Exercises, Mental Playground. Always available.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. EMPLOYEE RESOURCES -->
+        <div id="employees" class="page-view">
+            <div class="container">
+                <section class="hero fade-in">
+                    <h1>Support for Workdays</h1>
+                    <p>And paydays that feel heavy. Mental health at work isn't separate from financial stress.</p>
+                </section>
+                <div class="grid-3 fade-in">
+                    <div class="glass-card" style="text-align:center;">
+                        <h3>Emotional Guides</h3>
+                        <p style="font-size:0.9rem; opacity:0.7;">Managing burnout & focus.</p>
+                        <button class="cta-btn" style="margin-top:15px; font-size:0.9rem; padding:10px 20px;">Read
+                            Guides</button>
+                    </div>
+                    <div class="glass-card" style="text-align:center; border-color:var(--gold-glow);">
+                        <h3 style="color:var(--gold-glow);">Financial Guides</h3>
+                        <p style="font-size:0.9rem; opacity:0.7;">Money anxiety explained simply.</p>
+                        <button class="cta-btn"
+                            style="margin-top:15px; font-size:0.9rem; padding:10px 20px; background:var(--gold-glow); color:var(--deep-space);">Read
+                            Guides</button>
+                    </div>
+                    <div class="glass-card" style="text-align:center;">
+                        <h3>Private Tools</h3>
+                        <p style="font-size:0.9rem; opacity:0.7;">Use anytime. No tracking.</p>
+                        <button class="cta-btn" style="margin-top:15px; font-size:0.9rem; padding:10px 20px;">Open
+                            Tools</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. BECOME A FINANCIAL PEER -->
+        <div id="financial" class="page-view">
+            <div class="container">
+                <section class="hero fade-in">
+                    <p style="color:var(--gold-glow); font-weight:700;">VOLUNTEER PATHWAY</p>
+                    <h1>Become a Financial Wellness Peer</h1>
+                    <p>Help others navigate money stress. This is not financial advising. It's human support.</p>
+                </section>
+
+                <div class="glass-card fade-in">
+                    <div class="grid-2">
+                        <div>
+                            <h3>Who This Is For</h3>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-check"></i> Comfortable talking about money stress</li>
+                                <li><i class="fas fa-check"></i> Lived experience with budgeting/debt</li>
+                                <li><i class="fas fa-check"></i> Want to support without selling</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3>What Peers Do</h3>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-check"></i> Listen to financial concerns</li>
+                                <li><i class="fas fa-check"></i> Share practical habits</li>
+                                <li><i class="fas fa-check"></i> Reduce shame around money</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="boundary-box fade-in">
+                    <div class="boundary-title"><i class="fas fa-exclamation-triangle"></i> WHAT THIS IS NOT</div>
+                    <div class="grid-3">
+                        <div>❌ Not financial advice</div>
+                        <div>❌ Not product selling</div>
+                        <div>❌ Not investment guidance</div>
+                    </div>
+                </div>
+
+                <div style="text-align:center; margin-top:40px;">
+                    <button class="cta-btn" onclick="alert('Application form opens...')">Apply to become a Financial
+                        Peer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. FOR HR & EMPLOYERS -->
+        <div id="hr" class="page-view">
+            <div class="container">
+                <section class="hero fade-in">
+                    <h1>Wellbeing That Acknowledges Financial Stress</h1>
+                    <p>Money anxiety is a top silent stressor. Ignoring it doesn't make it disappear.</p>
+                </section>
+
+                <div class="glass-card fade-in">
+                    <h3 style="margin-bottom:20px;">What HR Gets</h3>
+                    <div class="grid-2">
+                        <ul class="feature-list">
+                            <li><i class="fas fa-chart-line"></i> Higher engagement than generic programs</li>
+                            <li><i class="fas fa-shield-alt"></i> Safer conversations around money</li>
+                        </ul>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-user-slash"></i> No internal peer management burden</li>
+                            <li><i class="fas fa-lock"></i> Privacy-aligned aggregate insights</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Privacy Dashboard Visualization -->
+                <div class="glass-card fade-in" style="text-align:center;">
+                    <h3>Privacy-First Reporting</h3>
+                    <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">We report trends, never individuals.
+                    </p>
+                    <div
+                        style="background:rgba(0,0,0,0.3); padding:20px; border-radius:10px; display:inline-block; text-align:left;">
+                        <div style="margin-bottom:10px;"><strong>Top Stressor:</strong> Financial Anxiety (42%)</div>
+                        <div style="margin-bottom:10px;"><strong>Engagement:</strong> 78% Active</div>
+                        <div style="color:var(--teal-glow); font-size:0.8rem;"><em>*Data aggregated from 150+ users. No
+                                PII.</em></div>
+                    </div>
+                </div>
+
+                <div style="text-align:center; margin-top:40px;">
+                    <a href="mailto:contact.soulamore@gmail.com" class="cta-btn">Schedule a Consultation</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. POLICY UPDATE -->
+        <div id="policy" class="page-view">
+            <div class="container">
+                <section class="hero fade-in">
+                    <h1>Workplace Policy Updates</h1>
+                </section>
+                <div class="glass-card fade-in" style="border-color:var(--gold-glow);">
+                    <h3 style="color:var(--gold-glow);">Financial Wellness Disclaimer</h3>
+                    <p style="opacity:0.9; margin-top:10px;">
+                        Financial Wellness Peers provide emotional support and lived-experience guidance only.
+                        They <strong>do not</strong> offer financial, legal, or investment advice.
+                        Clear boundaries are maintained at all times.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- LOGIC -->
+    <script>
+        function navTo(pageId) {
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            // Highlight nav button logic
+            const map = { 'main': 0, 'programs': 1, 'employees': 2, 'financial': 3, 'hr': 4, 'policy': 5 };
+            if (map[pageId] !== undefined) document.querySelectorAll('.nav-btn')[map[pageId]].classList.add('active');
+
+            document.getElementById('main-content').scrollTop = 0;
+        }
+
+        // Particles
+        const pContainer = document.getElementById('particles');
+        for (let i = 0; i < 40; i++) { let p = document.createElement('div'); p.classList.add('particle'); p.style.left = Math.random() * 100 + 'vw'; p.style.width = Math.random() * 4 + 'px'; p.style.height = p.style.width; p.style.animationDuration = Math.random() * 20 + 10 + 's'; p.style.opacity = Math.random() * 0.3; pContainer.appendChild(p); }
+
+        // Fade In
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = 1; entry.target.style.transform = "translateY(0)"; } });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>
