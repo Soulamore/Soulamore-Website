@@ -1,3 +1,19 @@
+/**
+ * SOULAMORE CORE COMPONENTS - v2.1
+ * Last Updated: Jan 2026
+ * --------------------------------
+ * This file handles the global injection of the website's core UI shell.
+ * It ensures visual consistency across all static HTML pages without duplication.
+ * 
+ * CORE RESPONSIBILITIES:
+ * 1. Style Injection: Injects critical CSS for fixed headers and mobile menus to prevent FOUC.
+ * 2. Header Injection: Generates the desktop/mobile navigation bar dynamically.
+ * 3. Footer Injection: Generates the global footer with standard links.
+ * 4. Active State: Highlights current page in navigation.
+ * 5. Mobile Logic: Handles hamburger menu toggling and accordion dropdowns.
+ * 
+ * NOTE: Backup for this file exists as `components.backup.js`.
+ */
 // console.log("Soulamore: Components.js loading...");
 
 // CRITICAL: Inject Styles Immediately

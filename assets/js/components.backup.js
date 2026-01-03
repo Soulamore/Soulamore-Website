@@ -161,10 +161,15 @@ try {
 
             .dropdown-content a, .dropdown-submenu a {
                 color: #e2e8f0 !important;
-                display: block !important; /* Ensure block for vertical stacking */
+                display: block !important;
+                margin: 4px 6px !important; /* Tighter margins */
+                border-radius: 8px !important;
+                padding: 8px 12px !important;
+                width: auto !important; /* Let it shrink fitting text or container */
+                box-sizing: border-box !important; /* vital */
             }
             .dropdown-content a:hover, .dropdown-submenu a:hover {
-                background: rgba(255,255,255,0.05) !important;
+                background: rgba(255,255,255,0.1) !important;
                 color: #4ECDC4 !important;
             }
             
@@ -215,12 +220,20 @@ const NAV_DATA = [
         label: 'Home',
         icon: 'fas fa-home',
         href: 'index.html',
+        type: 'link', // CHANGED: Direct Link
+    },
+    {
+        id: 'nav-tools',
+        label: 'Tools', // NEW: Grouping Interactive Features
+        icon: 'fas fa-toolbox',
+        href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-homepage', label: 'Home', href: 'index.html' },
+            { id: 'nav-vent', label: 'The Vent Box', href: 'vent-box.html', style: 'color:var(--ember-orange);' }, // Elevated
             { id: 'nav-reset', label: '5-Step Reset', href: '5-step-reset.html' },
             { id: 'nav-play', label: 'Mental Playground', href: 'playground.html' },
-            { id: 'nav-soulbot', label: 'SoulBot AI', href: 'soulbot.html' }
+            { id: 'nav-soulbot', label: 'SoulBot AI', href: 'soulbot.html' },
+            { id: 'nav-confession', label: 'Confession Box', href: 'confession-box.html' }
         ]
     },
     {
@@ -239,9 +252,7 @@ const NAV_DATA = [
                     { label: 'What is Campus?', href: 'campus/what-is-campus.html' },
                     { label: 'Ambassadors', href: 'campus/campus-ambassadors.html' },
                     { label: 'For Institutions', href: 'campus/institutions.html' },
-                    { label: 'Student FAQs', href: 'campus/student-faqs.html' },
-                    { label: 'Student Resources', href: 'campus/student-resources.html', style: 'color:var(--teal-glow);' },
-                    { label: 'Boundaries', href: 'campus/safety-boundaries.html' }
+                    { label: 'Student Resources', href: 'campus/student-resources.html' }
                 ]
             },
             {
@@ -251,24 +262,9 @@ const NAV_DATA = [
                 type: 'submenu',
                 children: [
                     { label: 'Overview', href: 'soulamore-away.html' },
-                    { label: "Who It's For", href: 'soulamore-away/who-its-for.html' },
                     { label: 'Away Resources', href: 'soulamore-away/resources.html' }
                 ]
-            },
-            { id: 'nav-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' }
-        ]
-    },
-    {
-        id: 'nav-wellness',
-        label: 'Wellness',
-        icon: 'fas fa-heart-pulse',
-        href: '#',
-        type: 'dropdown',
-        children: [
-            { id: 'nav-confession', label: 'Confession Box', href: 'confession-box.html' },
-            { id: 'nav-vent', label: 'The Vent Box', href: 'vent-box.html' },
-            { id: 'nav-support', label: 'Support Groups', href: 'support-groups.html' },
-            { id: 'nav-calendar', label: 'Community Calendar', href: 'community-calendar.html' }
+            }
         ]
     },
     {
@@ -278,18 +274,22 @@ const NAV_DATA = [
         href: '#',
         type: 'dropdown',
         children: [
-            {
-                id: 'nav-join',
-                label: 'Join Us',
-                href: 'join-us/index.html',
-                type: 'submenu',
-                children: [
-                    { label: 'Apply as Peer', href: 'join-us/peer.html' },
-                    { label: 'Apply as Psychologist', href: 'join-us/psychologist.html' }
-                ]
-            },
+            { id: 'nav-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
+            { id: 'nav-support', label: 'Support Groups', href: 'support-groups.html' },
+            { id: 'nav-forum', label: 'Discussion Forum', href: 'forum.html' },
             { id: 'nav-blogs', label: 'Blogs & Stories', href: 'blogs.html' },
-            { id: 'nav-forum', label: 'Discussion Forum', href: 'forum.html' }
+            { id: 'nav-calendar', label: 'Community Calendar', href: 'community-calendar.html' }
+        ]
+    },
+    {
+        id: 'nav-join',
+        label: 'Join Us',
+        icon: 'fas fa-hand-holding-heart', /* New Icon */
+        href: '#',
+        type: 'dropdown',
+        children: [
+            { id: 'nav-join-peer', label: 'Apply as Peer', href: 'join-us/peer.html' },
+            { id: 'nav-join-psych', label: 'Apply as Psychologist', href: 'join-us/psychologist.html' }
         ]
     },
     {
@@ -301,8 +301,7 @@ const NAV_DATA = [
         children: [
             { id: 'nav-about', label: 'Our Story', href: 'about.html' },
             { id: 'nav-contact', label: 'Contact Us', href: 'contact.html' },
-            { id: 'nav-privacy', label: 'Privacy Policy', href: 'privacy-policy.html' },
-            { id: 'nav-legal', label: 'Legal', href: 'legal.html' }
+            { id: 'nav-legal', label: 'Legal & Privacy', href: 'legal.html' }
         ]
     }
 ];
@@ -394,31 +393,64 @@ const getHeaderHTML = (rootPath) => `
 `;
 
 const getFooterHTML = (rootPath) => `
-<div class="footer-content" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
+<div class="footer-content" style="max-width: 1200px; margin: 0 auto; padding: 60px 20px; font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0;">
     
-    <div class="footer-logo" style="margin-bottom: 20px;">
-        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 60px;">
-    </div>
-    
-    <p style="font-size:1.1rem; opacity:0.8; margin-bottom: 20px; color: #e2e8f0;">Your Partner in Mental Wellness.</p>
+    <div class="footer-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:40px; text-align:left;">
+        
+        <!-- BRAND COLUMN -->
+        <div class="footer-brand">
+            <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; margin-bottom: 20px;">
+            <p style="font-size:0.9rem; opacity:0.6; line-height:1.6;">
+                Your sanctuary for mental wellness. <br>
+                Tech meets empathy.
+            </p>
+            <div class="footer-socials" style="display: flex; gap: 15px; margin-top: 20px;">
+                <a href="https://www.instagram.com/soulamore_/" target="_blank" style="font-size: 1.2rem; opacity:0.8;"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/soulamore/" target="_blank" style="font-size: 1.2rem; opacity:0.8;"><i class="fab fa-linkedin"></i></a>
+                <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank" style="font-size: 1.2rem; opacity:0.8;"><i class="fab fa-facebook"></i></a>
+            </div>
+        </div>
 
-    <p style="font-size:0.85rem; opacity:0.6; max-width: 800px; line-height: 1.6; margin-bottom: 30px; color: #94a3b8;">
-        Disclaimer: Online therapy is not advisable if you are in acute distress. Please contact your nearest hospital if you are feeling suicidal or at risk of self-harm.
-    </p>
-    
-    <div class="footer-links" style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;">
-        <a href="${rootPath}about.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500; font-size: 1.1rem;">About</a>
-        <a href="${rootPath}contact.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500; font-size: 1.1rem;">Contact</a>
-        <a href="${rootPath}legal.html" style="color: #e2e8f0; text-decoration: none; font-weight: 500; font-size: 1.1rem;">Legal</a>
+        <!-- TOOLS COLUMN -->
+        <div class="footer-col">
+            <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Relief Tools</h4>
+            <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}vent-box.html">The Vent Box</a></li>
+                <li><a href="${rootPath}5-step-reset.html">5-Step Reset</a></li>
+                <li><a href="${rootPath}playground.html">Mental Playground</a></li>
+                <li><a href="${rootPath}soulbot.html">SoulBot AI</a></li>
+                <li><a href="${rootPath}confession-box.html">Confession Box</a></li>
+            </ul>
+        </div>
+
+        <!-- SPACES COLUMN -->
+        <div class="footer-col">
+            <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Community</h4>
+            <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}soulamore-campus.html">Campus Ambassadors</a></li>
+                <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
+                <li><a href="${rootPath}forum.html">Discussion Forum</a></li>
+                <li><a href="${rootPath}join-us/index.html">Join the Team</a></li>
+            </ul>
+        </div>
+
+        <!-- COMPANY COLUMN -->
+        <div class="footer-col">
+            <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Company</h4>
+            <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}about.html">Our Story</a></li>
+                <li><a href="${rootPath}contact.html">Contact Us</a></li>
+                <li><a href="${rootPath}legal.html">Privacy & Legal</a></li>
+                <li><a href="${rootPath}get-help-now.html" style="color:var(--ember-red); font-weight:600;">Crisis Resources</a></li>
+            </ul>
+        </div>
+
     </div>
 
-    <div class="footer-socials" style="display: flex; gap: 20px; margin-bottom: 30px;">
-        <a href="https://www.instagram.com/soulamore_/" target="_blank" style="font-size: 1.5rem; color: #e2e8f0;"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.linkedin.com/company/soulamore/" target="_blank" style="font-size: 1.5rem; color: #e2e8f0;"><i class="fab fa-linkedin"></i></a>
-        <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank" style="font-size: 1.5rem; color: #e2e8f0;"><i class="fab fa-facebook"></i></a>
+    <div class="footer-bottom" style="margin-top:50px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); text-align:center; font-size:0.8rem; opacity:0.4;">
+        © 2025 by Hashlilly! All rights reserved. <br>
+        <span style="font-size:0.7rem;">Disclaimer: We are not a replacement for professional medical help.</span>
     </div>
-
-    <p style="font-size:0.8rem; opacity:0.4;">© 2025 by Hashlilly! All rights reserved.</p>
 </div>
 `;
 
