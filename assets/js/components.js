@@ -215,19 +215,7 @@ try {
 }
 
 
-document.addEventListener("DOMContentLoaded", () => {
-    try {
-        // console.log("Soulamore: DOM Content Loaded, initializing...");
-        injectHeader();
-        injectFooter();
-        injectSoulBotWidget(); // New Widget
-        setActiveState();
-        initializeHeaderLogic();
-        // console.log("Soulamore: Initialization complete.");
-    } catch (error) {
-        console.error("Soulamore: Critical Error during initialization:", error);
-    }
-});
+// Duplicate listener removed. Please refer to footer execution.
 
 // --- 1. DATA CONFIGURATION ---
 
@@ -334,7 +322,152 @@ const NAV_DATA = [
 ];
 
 // --- 2. HTML GENERATOR ---
-// ... (omitted standard generator which uses NAV_DATA) ...
+
+function generateNavHTML(rootPath) {
+    let html = '';
+
+    NAV_DATA.forEach(item => {
+        if (item.type === 'link') {
+            // Standard Link
+            html += `<a href="${rootPath}${item.href}" id="${item.id || ''}"><i class="${item.icon}"></i>${item.label}</a>`;
+        } else if (item.type === 'dropdown') {
+            // First-level Dropdown
+            html += `
+            <div class="dropdown">
+                <a href="${item.href === '#' ? '#' : rootPath + item.href}" id="${item.id || ''}">
+                    <i class="${item.icon}"></i>${item.label}
+                    <i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i>
+                </a>
+                <div class="dropdown-content">
+                    ${generateSubmenuHTML(item.children, rootPath)}
+                </div>
+            </div>`;
+        }
+    });
+
+    // Mobile-Only Help Link (Appended at the end of nav-links)
+    html += `<a href="${rootPath}get-help-now.html" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Get Help Now</a>`;
+
+    return html;
+}
+
+function generateSubmenuHTML(children, rootPath) {
+    let html = '';
+    children.forEach(child => {
+        if (child.type === 'submenu') {
+            // Nested Dropdown (Submenu)
+            const style = child.style ? `style="${child.style}"` : '';
+            html += `
+            <div class="dropdown-submenu">
+                <a href="${child.href === '#' ? '#' : rootPath + child.href}" id="${child.id || ''}" ${style}>${child.label}</a>
+                <div class="dropdown-content">
+                    ${generateSubmenuHTML(child.children, rootPath)}
+                </div>
+            </div>`;
+        } else {
+            // Standard Sub-Link
+            const style = child.style ? `style="${child.style}"` : '';
+            html += `<a href="${rootPath}${child.href}" id="${child.id || ''}" ${style}>${child.label}</a>`;
+        }
+    });
+    return html;
+}
+
+const getHeaderHTML = (rootPath) => `
+<div class="main-nav">
+    <a href="${rootPath}index.html" class="nav-logo"><img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo"></a>
+
+    <nav class="nav-links">
+        
+        <!-- MOBILE PROFILE CARD (Visible < 1150px) -->
+        <div class="mobile-profile-card" style="display: none;">
+            <div class="mp-avatar"><i class="fas fa-ghost"></i></div>
+            <div class="mp-info">
+                <span class="mp-name">Welcome, Friend</span>
+                <span class="mp-status">Guest</span>
+                <a href="${rootPath}login.html" class="mp-btn">Log In</a>
+            </div>
+        </div>
+
+        <!-- GENERATED NAVIGATION ITEMS -->
+        ${generateNavHTML(rootPath)}
+
+    </nav>
+
+    <!-- Auth Group -->
+    <div class="auth-box">
+            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
+            <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
+            <a href="${rootPath}login.html" class="nav-btn">Log In / Sign Up</a>
+    </div>
+    
+    <button class="mobile-toggle" aria-label="Toggle Navigation">
+        <i class="fas fa-bars"></i>
+    </button>
+</div>
+`;
+
+const getFooterHTML = (rootPath) => `
+<div class="footer-content" style="max-width: 1200px; margin: 0 auto; padding: 60px 20px; font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0;">
+    
+    <div class="footer-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:40px; text-align:left;">
+        
+        <!-- BRAND COLUMN -->
+        <div class="footer-brand">
+            <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; margin-bottom: 20px;">
+            <p style="font-size:0.9rem; opacity:0.6; line-height:1.6;">
+                Your sanctuary for mental wellness. <br>
+                Tech meets empathy.
+            </p>
+            <div class="footer-socials" style="display: flex; gap: 15px; margin-top: 20px;">
+                <a href="https://www.instagram.com/soulamore_/" target="_blank" style="font-size: 1.2rem; opacity:0.8;"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/soulamore/" target="_blank" style="font-size: 1.2rem; opacity:0.8;"><i class="fab fa-linkedin"></i></a>
+                <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank" style="font-size: 1.2rem; opacity:0.8;"><i class="fab fa-facebook"></i></a>
+            </div>
+        </div>
+
+        <!-- TOOLS COLUMN -->
+        <div class="footer-col">
+            <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Relief Tools</h4>
+            <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}tools/vent-box.html">The Vent Box</a></li>
+                <li><a href="${rootPath}tools/5-step-reset.html">5-Step Reset</a></li>
+                <li><a href="${rootPath}tools/playground.html">Mental Playground</a></li>
+                <li><a href="${rootPath}tools/soulbot.html">SoulBot AI</a></li>
+                <li><a href="${rootPath}tools/confession-box/index.html">Confession Box</a></li>
+            </ul>
+        </div>
+
+        <!-- SPACES COLUMN -->
+        <div class="footer-col">
+            <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Community</h4>
+            <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}spaces/soulamore-campus.html">Campus Ambassadors</a></li>
+                <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
+                <li><a href="${rootPath}community/forum.html">Discussion Forum</a></li>
+                <li><a href="${rootPath}join-us/index.html">Join the Team</a></li>
+            </ul>
+        </div>
+
+        <!-- COMPANY COLUMN -->
+        <div class="footer-col">
+            <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Company</h4>
+            <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}company/about.html">Our Story</a></li>
+                <li><a href="${rootPath}company/contact.html">Contact Us</a></li>
+                <li><a href="${rootPath}company/legal.html">Privacy & Legal</a></li>
+                <li><a href="${rootPath}get-help-now.html" style="color:var(--ember-red); font-weight:600;">Crisis Resources</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom" style="margin-top:50px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); text-align:center; font-size:0.8rem; opacity:0.4;">
+        © 2025 by Hashlilly! All rights reserved. <br>
+        <span style="font-size:0.7rem;">Disclaimer: We are not a replacement for professional medical help.</span>
+    </div>
+</div>
+`;
 
 
 // --- 3. HELPERS ---
@@ -577,6 +710,10 @@ function injectSoulBotWidget() {
 
     // 2. Hide on SoulBot Page (it has its own full UI)
     if (window.location.pathname.includes('soulbot.html')) return;
+
+    // Fix: Create the widget element
+    const widget = document.createElement('div');
+    widget.id = 'soulbot-widget';
 
     widget.innerHTML = `
         <style>
