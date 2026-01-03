@@ -1,6 +1,6 @@
 /**
- * SOULAMORE CORE COMPONENTS - v2.1
- * Last Updated: Jan 2026
+ * SOULAMORE CORE COMPONENTS - v2.2
+ * Last Updated: Jan 2026 (Psychologist Update)
  * --------------------------------
  * This file handles the global injection of the website's core UI shell.
  * It ensures visual consistency across all static HTML pages without duplication.
@@ -146,9 +146,10 @@ try {
                 border-left: 4px solid rgba(78, 205, 196, 0.3) !important; /* Level 1: Lightest */
                 backdrop-filter: blur(10px) !important;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
-                min-width: 200px !important; /* Ensure minimum width */
+                min-width: 240px !important; /* Increased width */
+                width: max-content !important; /* Allow expansion */
                 border-radius: 12px !important;
-                padding: 10px 0 !important;
+                padding: 12px 0 !important;
             }
 
             /* SHOW ON HOVER */
@@ -291,6 +292,7 @@ const NAV_DATA = [
         type: 'dropdown',
         children: [
             { id: 'nav-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
+            { id: 'nav-psych', label: 'Our Psychologists', href: 'our-peers/psychologists.html' },
             { id: 'nav-support', label: 'Support Groups', href: 'support-groups.html' },
             { id: 'nav-forum', label: 'Discussion Forum', href: 'forum.html' },
             { id: 'nav-blogs', label: 'Blogs & Stories', href: 'blogs.html' },
