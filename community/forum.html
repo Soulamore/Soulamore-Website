@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Join the Soulamore Community Forum. Discuss anxiety, relationships, and student life in a supportive environment.">
+    <title>Forum | Soulamore</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <style>
+        /* --- THEME: MIDNIGHT VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.7);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --purple-glow: #a78bfa;
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* --- LAYOUT --- */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr 300px;
+            flex: 1;
+            padding-top: 140px;
+            /* Clear fixed header */
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* --- LEFT SIDEBAR (Nav) --- */
+        .sidebar-left {
+            border-right: 1px solid var(--border-glass);
+            background: rgba(15, 23, 42, 0.5);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 140px;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #94a3b8;
+            border-radius: 12px;
+            transition: 0.3s;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-icon-active {
+            color: var(--teal-glow);
+        }
+
+        .category-header {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin: 25px 0 10px 10px;
+            font-weight: 700;
+        }
+
+        /* --- MIDDLE (Feed) --- */
+        .feed-container {
+            padding: 0;
+            position: relative;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .feed-header {
+            position: relative;
+            /* Removed sticky to scroll with page */
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 50px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #94a3b8;
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 100%;
+            outline: none;
+        }
+
+        .create-post-trigger {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid var(--border-glass);
+            margin-bottom: 20px;
+        }
+
+        .create-post-trigger:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .user-avatar-sm {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--teal-glow);
+            display: grid;
+            place-items: center;
+            color: var(--deep-space);
+            font-weight: 700;
+        }
+
+        .mock-input {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+
+        .filter-pill {
+            padding: 6px 16px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .filter-pill:hover,
+        .filter-pill.active {
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            border-color: var(--teal-glow);
+            font-weight: 700;
+        }
+
+        /* POST CARD */
+        .post-card {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-glass);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .post-card:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .tag-pill {
+            background: rgba(78, 205, 196, 0.15);
+            color: var(--teal-glow);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .post-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--starlight);
+        }
+
+        .post-preview {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            color: var(--teal-glow);
+        }
+
+        .action-btn.liked {
+            color: var(--peach-glow);
+        }
+
+        /* --- RIGHT SIDEBAR (Stats/Rules) --- */
+        .sidebar-right {
+            border-left: 1px solid var(--border-glass);
+            background: rgba(15, 23, 42, 0.5);
+            padding: 20px;
+            position: sticky;
+            top: 140px;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .panel-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--peach-glow);
+        }
+
+        .rule-item {
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+            opacity: 0.8;
+        }
+
+        .rule-item::before {
+            content: '•';
+            position: absolute;
+            left: 5px;
+            color: var(--teal-glow);
+        }
+
+        /* --- MODAL (Create Post) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-box {
+            background: #1e293b;
+            width: 600px;
+            max-width: 90%;
+            border-radius: 20px;
+            border: 1px solid var(--border-glass);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .modal-content {
+            padding: 20px;
+        }
+
+        .input-title {
+            width: 100%;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 20px;
+            outline: none;
+            font-family: 'Outfit';
+        }
+
+        .input-body {
+            width: 100%;
+            height: 200px;
+            background: transparent;
+            border: none;
+            color: #cbd5e1;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #94a3b8;
+        }
+
+        .btn-primary {
+            background: var(--teal-glow);
+            color: var(--deep-space);
+        }
+
+        /* --- POST VIEW OVERLAY --- */
+        .post-viewer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 600px;
+            height: 100%;
+            background: #1e293b;
+            border-left: 1px solid var(--border-glass);
+            z-index: 1500;
+            transition: 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -20px 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .post-viewer.active {
+            right: 0;
+        }
+
+        .viewer-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .viewer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .comment-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+        }
+
+        @media(max-width: 1000px) {
+            .app-layout {
+                grid-template-columns: 80px 1fr;
+            }
+
+            .sidebar-right {
+                display: none;
+            }
+
+            .category-header,
+            .menu-text {
+                display: none;
+            }
+
+            .menu-item {
+                justify-content: center;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .app-layout {
+                grid-template-columns: 1fr;
+                padding-top: 100px;
+                /* Reduced from 140px for mobile header */
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .sidebar-left,
+            .sidebar-right {
+                display: none;
+            }
+
+            .feed-container {
+                border-radius: 20px;
+                overflow: hidden;
+            }
+
+            .post-viewer {
+                width: 100%;
+                z-index: 2000;
+                /* Ensure it covers everything */
+            }
+
+            .modal-box {
+                width: 95%;
+                /* More width on mobile */
+                max-height: 90vh;
+                /* Prevent overflow */
+            }
+
+            .search-bar {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <link rel="icon" href="./assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <!-- GLOBAL HEADER (ISLAND STYLE) -->
+    <header></header>
+
+    <div class="app-layout">
+
+        <!-- SIDEBAR LEFT -->
+        <nav class="sidebar-left">
+            <div class="category-header">Main Menu</div>
+            <div class="menu-item active"><i class="fas fa-home menu-icon-active"></i> <span class="menu-text">Home
+                    Feed</span></div>
+            <div class="menu-item"><i class="fas fa-fire"></i> <span class="menu-text">Trending</span></div>
+            <div class="menu-item"><i class="fas fa-bookmark"></i> <span class="menu-text">Saved</span></div>
+
+            <div class="category-header">Communities</div>
+            <div class="menu-item"><i class="fas fa-graduation-cap"></i> <span class="menu-text">Academic Stress</span>
+            </div>
+            <div class="menu-item"><i class="fas fa-plane"></i> <span class="menu-text">International</span></div>
+            <div class="menu-item"><i class="fas fa-heart-broken"></i> <span class="menu-text">Relationships</span>
+            </div>
+            <div class="menu-item"><i class="fas fa-user-friends"></i> <span class="menu-text">Social Anxiety</span>
+            </div>
+        </nav>
+
+        <!-- CENTER FEED -->
+        <main class="feed-container">
+            <div class="feed-header">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search topics...">
+                </div>
+
+                <div class="filters">
+                    <div class="filter-pill active" onclick="filterFeed('All', this)">All</div>
+                    <div class="filter-pill" onclick="filterFeed('Support Needed', this)">Support Needed</div>
+                    <div class="filter-pill" onclick="filterFeed('Venting', this)">Venting</div>
+                    <div class="filter-pill" onclick="filterFeed('Success Stories', this)">Success Stories</div>
+                    <div class="filter-pill" onclick="filterFeed('Advice', this)">Advice</div>
+                    <div class="filter-pill" style="border-color: #C13584; color: #C13584;"
+                        onclick="filterFeed('Instagram', this)"><i class="fab fa-instagram"></i> Instagram</div>
+                    <div class="filter-pill" style="border-color: var(--teal-glow); color: var(--teal-glow);"
+                        onclick="filterFeed('Confessions', this)"><i class="fas fa-mask"></i> Confessions</div>
+                </div>
+            </div>
+
+            <div style="padding: 20px;">
+                <!-- MOCK INPUT -->
+                <div class="create-post-trigger" onclick="openModal()">
+                    <div class="user-avatar-sm">Me</div>
+                    <div class="mock-input">What's on your mind today?</div>
+                </div>
+
+                <!-- POSTS -->
+                <div id="postsFeed">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </main>
+
+        <!-- SIDEBAR RIGHT -->
+        <aside class="sidebar-right">
+            <div class="panel-box">
+                <div class="panel-title">Forum Rules</div>
+                <div class="rule-item">Be respectful and kind.</div>
+                <div class="rule-item">No hate speech or bullying.</div>
+                <div class="rule-item">Respect anonymity.</div>
+                <div class="rule-item">Trigger warnings for sensitive topics.</div>
+            </div>
+
+            <div class="panel-box">
+                <div class="panel-title">Online Peers</div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <div class="user-avatar-sm" style="background:#fbbf24; color:black;">A</div>
+                    <div class="user-avatar-sm" style="background:#e879f9;">S</div>
+                    <div class="user-avatar-sm" style="background:#38bdf8;">J</div>
+                    <div style="font-size:0.8rem; color:#94a3b8; display:flex; align-items:center;">+ 124 others</div>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- CREATE POST MODAL -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span>Create Post</span>
+                <i class="fas fa-times" style="cursor:pointer;" onclick="closeModal()"></i>
+            </div>
+            <div class="modal-content">
+                <input type="text" class="input-title" placeholder="Title">
+                <textarea class="input-body" placeholder="Share your experience..."></textarea>
+                <div style="margin-top:15px; display:flex; gap:10px;">
+                    <span class="filter-pill">Vent</span>
+                    <span class="filter-pill">Question</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary">Post</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POST VIEWER OVERLAY -->
+    <div class="post-viewer" id="postViewer">
+        <div class="viewer-header">
+            <div onclick="closeViewer()" style="cursor:pointer;"><i class="fas fa-arrow-left"></i> Back</div>
+            <div>Post Details</div>
+        </div>
+        <div class="viewer-content" id="viewerBody">
+            <!-- Content -->
+        </div>
+        <div class="comment-section">
+            <input type="text" placeholder="Write a supportive comment..."
+                style="width:100%; padding:10px; border-radius:8px; border:none; background:rgba(255,255,255,0.1); color:white;">
+        </div>
+    </div>
+
+
+    <!-- STANDARDIZED FOOTER -->
+    <footer></footer>
+
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script>
+
+        // --- 1. STATE & API ---
+        let feedData = [];
+
+        async function initFeed() {
+            const feedContainer = document.getElementById('postsFeed');
+            feedContainer.innerHTML = '<div style="padding:20px; text-align:center; color:#94a3b8;">Loading community posts...</div>';
+
+            try {
+                // Fetch from Service Layer
+                feedData = await window.soulamoreApi.getFeed();
+                renderFeed();
+            } catch (err) {
+                console.error("Error loading feed:", err);
+                feedContainer.innerHTML = '<div style="color:red; text-align:center;">Failed to load posts. Please try again.</div>';
+            }
+        }
+
+        // --- 2. RENDER FEED ---
+        const feedContainer = document.getElementById('postsFeed');
+        let currentFilter = 'All';
+
+        function filterFeed(category, el) {
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            currentFilter = category;
+            renderFeed();
+        }
+
+        function renderFeed() {
+            const filteredData = feedData.filter(post => {
+                if (currentFilter === 'All') return true;
+                if (currentFilter === 'Instagram') return post.source === 'instagram';
+                if (currentFilter === 'Confessions') return post.source === 'confession';
+                return post.tag === currentFilter;
+            });
+
+            if (filteredData.length === 0) {
+                feedContainer.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.6;">No posts found in this category yet.</div>';
+                return;
+            }
+
+            feedContainer.innerHTML = filteredData.map(post => {
+                let badge = '';
+                let actionButton = '';
+
+                if (post.source === 'instagram') {
+                    badge = `<span class="tag-pill" style="background:rgba(193, 53, 132, 0.2); color:#C13584; margin-left:10px;"><i class="fab fa-instagram"></i> From Instagram</span>`;
+                    actionButton = `<div class="action-btn" onclick="event.stopPropagation(); window.open('${post.instagram_post_url}')" style="color:#C13584;"><i class="fas fa-external-link-alt"></i> View on Insta</div>`;
+                } else if (post.source === 'confession') {
+                    badge = `<span class="tag-pill" style="background:rgba(78, 205, 196, 0.2); color:white; margin-left:10px;"><i class="fas fa-mask"></i> Curated Confession</span>`;
+                    actionButton = `<div class="action-btn" onclick="event.stopPropagation(); window.open('${post.instagram_reel_url}')" style="color:var(--teal-glow);"><i class="fas fa-play-circle"></i> View Reel</div>`;
+                }
+
+                return `
+                <div class="post-card fade-in" onclick="openPost(${post.id})">
+                    <div class="post-meta">
+                        <span style="font-weight:700; color:var(--starlight);">${post.author}</span>
+                        <span>• ${post.time}</span>
+                        <span class="tag-pill">${post.tag}</span>
+                        ${badge}
+                    </div>
+                    <div class="post-title">${post.title}</div>
+                    <div class="post-preview">${post.content}</div>
+                    <div class="post-actions">
+                        <div class="action-btn"><i class="fas fa-heart"></i> ${post.upvotes} Support</div>
+                        <div class="action-btn"><i class="fas fa-comment"></i> ${post.source === 'confession' ? 'View Comments' : post.comments + ' Comments'}</div>
+                        <div class="action-btn"><i class="fas fa-share"></i> Share</div>
+                        ${actionButton}
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // Initialize API
+        initFeed();
+
+        // --- 3. MODAL LOGIC ---
+        function openModal() { document.getElementById('createModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('createModal').style.display = 'none'; }
+
+        // --- 4. VIEWER LOGIC ---
+        function openPost(id) {
+            const post = feedData.find(p => p.id === id);
+            if (!post) return;
+
+            const viewer = document.getElementById('postViewer');
+            const body = document.getElementById('viewerBody');
+
+            body.innerHTML = `
+                <div class="tag-pill" style="display:inline-block; margin-bottom:10px;">${post.tag}</div>
+                <h1 style="font-size:1.8rem; margin-bottom:15px; line-height:1.2;">${post.title}</h1>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; color:#94a3b8; font-size:0.9rem;">
+                    <div class="user-avatar-sm" style="width:25px; height:25px; font-size:0.7rem;">AB</div>
+                    ${post.author} • ${post.time}
+                </div>
+                <p style="font-size:1.1rem; line-height:1.6; color:#cbd5e1;">${post.content}</p>
+                <hr style="border:0; border-top:1px solid var(--border-glass); margin:30px 0;">
+                <h3 style="margin-bottom:20px;">Comments</h3>
+                ${post.source === 'confession' ?
+                    `<div style="padding:20px; background:rgba(255,255,255,0.05); border-radius:10px; text-align:center;">
+                        <p style="margin-bottom:15px; opacity:0.8;">This confession is discussed anonymously here, but public comments are on Instagram (non-anonymous).</p>
+                        <button class="btn btn-primary" onclick="window.open('${post.instagram_reel_url}')">Read Instagram Comments</button>
+                    </div>`
+                    :
+                    `<div style="opacity:0.6; font-style:italic;">Loading comments...</div>`
+                }
+            `;
+
+            viewer.classList.add('active');
+        }
+
+        function closeViewer() {
+            document.getElementById('postViewer').classList.remove('active');
+        }
+
+        // --- 5. ANIMATION ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = 1; entry.target.style.transform = "translateY(0)"; } });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    </script>
+    <!-- GLOBAL FOOTER (HASHLILLY STANDARD) -->
+
+    <script src="../assets/js/soulbot-beta.js"></script>
+    <script src="../assets/js/launch-popup.js"></script>
+</body>
+
+</html>

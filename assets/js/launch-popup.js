@@ -2,6 +2,23 @@
     // 0. Prevent Recursion (Do not show popup inside the phone mockup iframe)
     if (window.self !== window.top) return;
 
+    // 0.1 Session Check: Show only once per session
+    // Remove this line during testing if you want to see it every time
+    if (sessionStorage.getItem('soulamore_preview_seen')) {
+        console.log('Launch preview already seen this session.');
+        return;
+    }
+
+    // Mark as seen immediately
+    sessionStorage.setItem('soulamore_preview_seen', 'true');
+
+    // 0.2 Performance: Only load iframe on Desktop
+    // Mobile users hide it via CSS anyway, so let's save their data
+    const isDesktop = window.innerWidth > 900;
+    const iframeHTML = isDesktop
+        ? `<iframe src="/index.html" class="site-iframe" scrolling="no" onload="this.style.opacity='1'"></iframe>`
+        : `<!-- Phone View Hidden on Mobile -->`;
+
     // 1. Create the Popup HTML Structure
     const popupHTML = `
     <div class="popup-overlay" id="launchPopup" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 9999; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);">
@@ -20,6 +37,13 @@
             .close-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
             .close-btn:hover { background: #4ECDC4; color: #000; }
             
+            /* Phone Mockup Adjustments */
+            .notch { position: absolute; top:0; left:50%; transform:translateX(-50%); width:100px; height:20px; background:#1e293b; border-bottom-left-radius:12px; border-bottom-right-radius:12px; z-index:10; }
+            .screen-content { width: 100%; height: 100%; overflow: hidden; background: #0f172a; /* Dark BG preventing white flash */ }
+            .site-iframe { width: 100%; height: 200%; border: none; animation: scrollApp 15s infinite ease-in-out; opacity: 0; transition: opacity 0.5s ease; }
+
+            @keyframes scrollApp { 0% { transform: translateY(0); } 20% { transform: translateY(-20%); } 50% { transform: translateY(-20%); } 70% { transform: translateY(-5%); } 100% { transform: translateY(0); } }
+
             /* Responsive */
             @media(max-width: 900px) {
                 .popup-card { grid-template-columns: 1fr; height: 95vh; overflow-y: auto; }
@@ -32,7 +56,7 @@
                 .pop-h1 { font-size: 1.8rem; margin-bottom: 15px; }
                 .pop-desc { font-size: 0.95rem; }
                 .tool-links { gap: 8px; }
-                .tool-btn { width: 100%; justify-content: center; padding: 10px; } /* Full width buttons for touch */
+                .tool-btn { width: 100%; justify-content: center; padding: 10px; } 
                 .count-box { min-width: 60px; padding: 8px 10px; }
             }
         </style>
@@ -72,8 +96,8 @@
             <div class="popup-visual" style="background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(0,0,0,0) 50%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
                 <div class="phone-frame" style="width: 280px; height: 580px; border: 10px solid #1e293b; border-radius: 35px; background: #000; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.6); overflow: hidden; transform: translateY(20px);">
                     <div class="notch" style="position: absolute; top:0; left:50%; transform:translateX(-50%); width:100px; height:20px; background:#1e293b; border-bottom-left-radius:12px; border-bottom-right-radius:12px; z-index:10;"></div>
-                    <div class="screen-content" style="width: 100%; height: 100%; overflow: hidden; background: #fff;">
-                       <iframe src="/index.html" style="width: 100%; height: 200%; border: none; animation: scrollApp 15s infinite ease-in-out;" scrolling="no"></iframe>
+                    <div class="screen-content" style="width: 100%; height: 100%; overflow: hidden; background: #0f172a;">
+                       ${iframeHTML}
                     </div>
                 </div>
             </div>

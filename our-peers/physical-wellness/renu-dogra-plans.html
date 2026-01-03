@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoga Plans | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Zen+Antique+Soft&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- THEME: MIDNIGHT YOGI --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Zen Antique Soft', serif;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* --- BACKGROUND --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- HERO --- */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            opacity: 0.8;
+            font-size: 1.2rem;
+        }
+
+        /* --- PRICING GRID --- */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            align-items: center;
+            /* Centers cards vertically if heights differ */
+        }
+
+        .plan-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-10px);
+        }
+
+        /* Highlight Card */
+        .plan-card.featured {
+            border: 2px solid var(--teal-glow);
+            background: rgba(78, 205, 196, 0.1);
+            transform: scale(1.05);
+            z-index: 2;
+            box-shadow: 0 0 50px rgba(78, 205, 196, 0.2);
+        }
+
+        .plan-card.featured:hover {
+            transform: scale(1.08);
+        }
+
+        .badge {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            padding: 5px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-family: 'Outfit';
+        }
+
+        .plan-period {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-bottom: 40px;
+            flex-grow: 1;
+        }
+
+        .feature-list li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .feature-list i {
+            color: var(--teal-glow);
+        }
+
+        .feature-list .disabled {
+            opacity: 0.4;
+            text-decoration: line-through;
+        }
+
+        .feature-list .disabled i {
+            color: #555;
+        }
+
+        .plan-btn {
+            background: transparent;
+            border: 1px solid var(--starlight);
+            color: white;
+            padding: 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .plan-btn:hover {
+            background: white;
+            color: var(--deep-space);
+        }
+
+        .plan-card.featured .plan-btn {
+            background: var(--teal-glow);
+            border-color: var(--teal-glow);
+            color: var(--deep-space);
+        }
+
+        .plan-card.featured .plan-btn:hover {
+            background: #3abeb5;
+        }
+
+        /* --- TRUST SIGNALS --- */
+        .trust-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 80px;
+            flex-wrap: wrap;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .trust-item i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--gold-glow);
+        }
+
+        @media(max-width: 800px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .plan-card.featured {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+
+        <div style="text-align:left; margin-bottom:20px;">
+            <a href="renu-dogra.html" style="color:var(--starlight); text-decoration:none; opacity:0.7;"><i
+                    class="fas fa-arrow-left"></i> Back to Renu's Profile</a>
+        </div>
+
+        <div class="hero">
+            <h1>Choose Your Path</h1>
+            <p>Commit to your wellness journey with a plan that suits your life.</p>
+        </div>
+
+        <div class="pricing-grid">
+
+            <!-- PLAN 1: DROP-IN -->
+            <div class="plan-card">
+                <h3 class="plan-name">Drop-In</h3>
+                <div class="plan-price">₹400</div>
+                <span class="plan-period">Per Session</span>
+
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Access to any 1 live class</li>
+                    <li><i class="fas fa-check"></i> Real-time feedback</li>
+                    <li class="disabled"><i class="fas fa-times"></i> Class Recordings</li>
+                    <li class="disabled"><i class="fas fa-times"></i> 1:1 Consultation</li>
+                </ul>
+
+                <button class="plan-btn">Book Class</button>
+            </div>
+
+            <!-- PLAN 2: MONTHLY (FEATURED) -->
+            <div class="plan-card featured">
+                <div class="badge">Most Popular</div>
+                <h3 class="plan-name" style="color:var(--teal-glow);">The Practitioner</h3>
+                <div class="plan-price" style="color:var(--teal-glow);">₹2,500</div>
+                <span class="plan-period">Per Month</span>
+
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> <strong>Unlimited</strong> Live Classes</li>
+                    <li><i class="fas fa-check"></i> Access to <strong>Recording Library</strong> (Practice anytime)
+                    </li>
+                    <li><i class="fas fa-check"></i> Weekly Q&A Session</li>
+                    <li><i class="fas fa-check"></i> Priority Community Support</li>
+                </ul>
+
+                <button class="plan-btn">Join Membership</button>
+            </div>
+
+            <!-- PLAN 3: PRIVATE -->
+            <div class="plan-card">
+                <h3 class="plan-name">1:1 Guidance</h3>
+                <div class="plan-price">₹1,200</div>
+                <span class="plan-period">Per Session</span>
+
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Private Video Session</li>
+                    <li><i class="fas fa-check"></i> Personalized Routine</li>
+                    <li><i class="fas fa-check"></i> Posture Correction</li>
+                    <li><i class="fas fa-check"></i> Health Goal Tracking</li>
+                </ul>
+
+                <button class="plan-btn">Request Slot</button>
+            </div>
+
+        </div>
+
+        <div class="trust-row">
+            <div class="trust-item"><i class="fas fa-lock"></i><br>Secure Payment</div>
+            <div class="trust-item"><i class="fas fa-undo"></i><br>Cancel Anytime</div>
+            <div class="trust-item"><i class="fas fa-user-check"></i><br>Verified Instructor</div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- VEDIC MANDALA BACKGROUND (Reactive) ---
+        const canvas = document.getElementById('bg-canvas');
+        const mCtx = canvas.getContext('2d');
+        let width, height;
+        let mAngle = 0;
+        let speed = 0.0005;
+
+        function resize() {
+            width = window.innerWidth; height = window.innerHeight;
+            canvas.width = width; canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        window.addEventListener('mousemove', (e) => {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const dist = Math.sqrt(Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2));
+            speed = dist < 300 ? 0.002 : 0.0005;
+        });
+
+        function drawMandala() {
+            mCtx.clearRect(0, 0, width, height);
+
+            mCtx.save();
+            mCtx.translate(width / 2, height / 2);
+            mCtx.rotate(mAngle);
+            mCtx.strokeStyle = "rgba(245, 158, 11, 0.2)"; /* Dimmed Saffron for Readability */
+            mCtx.lineWidth = 1.5;
+
+            for (let i = 0; i < 12; i++) {
+                mCtx.rotate(Math.PI / 6);
+                mCtx.beginPath(); mCtx.moveTo(0, 0);
+                mCtx.bezierCurveTo(100, 200, 300, 200, 400, 0);
+                mCtx.bezierCurveTo(300, -200, 100, -200, 0, 0);
+                mCtx.stroke();
+                mCtx.beginPath(); mCtx.arc(250, 0, 10, 0, Math.PI * 2); mCtx.stroke();
+            }
+            mCtx.restore();
+            mAngle += speed;
+            requestAnimationFrame(drawMandala);
+        }
+        drawMandala();
+    </script>
+</body>
+
+</html>
