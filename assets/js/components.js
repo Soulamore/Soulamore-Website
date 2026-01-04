@@ -77,7 +77,7 @@ try {
                 object-fit: contain;
             }
             /* Button Consistency */
-            .nav-btn {
+            .nav-btn, .lifeline-btn {
                 background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)) !important;
                 border: 1px solid rgba(255,255,255,0.2) !important;
                 padding: 10px 24px !important;
@@ -87,11 +87,27 @@ try {
                 transition: all 0.3s ease !important;
                 text-decoration: none !important;
                 white-space: nowrap !important; /* Prevent text wrapping */
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                height: 42px !important; /* Enforce explicit height */
+                box-sizing: border-box !important;
+                font-size: 0.95rem !important;
             }
-            .nav-btn:hover {
+            .nav-btn:hover, .lifeline-btn:hover {
                 background: white !important;
                 color: #0f172a !important;
                 transform: translateY(-2px);
+            }
+            /* Specific override for Get Help to distinguish slightly if needed, or keep uniform */
+            .lifeline-btn {
+                border-color: rgba(239, 68, 68, 0.5) !important; /* Red tint border */
+                background: rgba(239, 68, 68, 0.1) !important;
+            }
+            .lifeline-btn:hover {
+                background: #ef4444 !important;
+                color: white !important;
+                border-color: #ef4444 !important;
             }
         }
         /* MOBILE (Width <= 1150px) */
