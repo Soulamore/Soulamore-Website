@@ -898,22 +898,43 @@
             const div = document.createElement('div');
             div.className = 'message-row';
 
-            const avatar = role === 'user'
-                ? `<div class="msg-avatar user-avatar"><i class="fas fa-user"></i></div>`
-                : `<div class="msg-avatar bot-avatar"><i class="fas fa-ghost"></i></div>`;
+            // 1. Create Avatar
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = role === 'user' ? 'msg-avatar user-avatar' : 'msg-avatar bot-avatar';
+            const icon = document.createElement('i');
+            icon.className = role === 'user' ? 'fas fa-user' : 'fas fa-ghost';
+            avatarDiv.appendChild(icon);
 
-            // XSS Prevention: Escape user input, but allow bot HTML (formatted)
-            const safeContent = role === 'user'
-                ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;")
-                : formatText(text);
+            // 2. Create Content Wrapper
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'msg-content';
 
-            div.innerHTML = `
-                ${avatar}
-                <div class="msg-content">
-                    <div style="font-weight:700; font-size:0.9rem; margin-bottom:5px; color:${role === 'user' ? '#94a3b8' : 'var(--teal-glow)'}">${role === 'user' ? 'You' : 'SoulBot'}</div>
-                    ${safeContent}
-                </div>
-            `;
+            // 3. Create Name Label
+            const nameLabel = document.createElement('div');
+            nameLabel.style.fontWeight = '700';
+            nameLabel.style.fontSize = '0.9rem';
+            nameLabel.style.marginBottom = '5px';
+            nameLabel.style.color = role === 'user' ? '#94a3b8' : 'var(--teal-glow)';
+            nameLabel.textContent = role === 'user' ? 'You' : 'SoulBot';
+            contentDiv.appendChild(nameLabel);
+
+            // 4. Create Message Text (Safely)
+            const messageText = document.createElement('div');
+
+            if (role === 'user') {
+                // USER: Absolute Safety - Pure Text Node
+                messageText.textContent = text;
+            } else {
+                // BOT: Trusted Content - Allow Formatting
+                // We trust formatText() to return safe HTML/formatting for the bot
+                messageText.innerHTML = formatText(text);
+            }
+            contentDiv.appendChild(messageText);
+
+            // Assemble
+            div.appendChild(avatarDiv);
+            div.appendChild(contentDiv);
+
             messagesContainer.appendChild(div);
             scrollToBottom();
         }
