@@ -63,8 +63,9 @@ try {
                 margin: 0 auto !important;
             }
             .nav-logo img {
-                height: 75px !important; /* Increased to 1.5x original 50px */
+                height: 90px !important; /* Increased to 90px */
                 width: auto !important;
+                flex-shrink: 0 !important; /* Prevent shrinking */
             }
             /* Button Consistency */
             .nav-btn {
@@ -76,6 +77,7 @@ try {
                 font-weight: 500 !important;
                 transition: all 0.3s ease !important;
                 text-decoration: none !important;
+                white-space: nowrap !important; /* Prevent text wrapping */
             }
             .nav-btn:hover {
                 background: white !important;
