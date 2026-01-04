@@ -42,17 +42,25 @@ export async function handleConfession(text, email = null, phone = null) {
 }
 
 // --- 3. APPLICATIONS (Join Us) ---
+// --- 3. APPLICATIONS (Join Us) ---
 export async function handleApplication(type, data) {
     try {
+        console.log("Attempting to save application...", type);
         await addDoc(collection(db, "applications"), {
             type: type, // 'peer' or 'psychologist'
             ...data,
             status: "new",
             timestamp: serverTimestamp()
         });
+        console.log("Application saved successfully!");
         return true;
     } catch (e) {
         console.error("Error saving application: ", e);
+        // CRITICAL: If permission denied (Rules) or Network Fail, 
+        // return false so UI knows.
+        if (e.code === 'permission-denied') {
+            alert("Database Permission Denied. Please check Firestore Rules in Console.");
+        }
         return false;
     }
 }
