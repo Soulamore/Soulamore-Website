@@ -63,7 +63,7 @@ try {
                 margin: 0 auto !important;
             }
             .nav-logo img {
-                height: 40px !important;
+                height: 50px !important; /* Increased from 40px per user request */
                 width: auto !important;
             }
             /* Button Consistency */
@@ -378,7 +378,7 @@ function generateSubmenuHTML(children, rootPath) {
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
-        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 40px; width: auto; max-width: 100%;">
+        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; width: auto; max-width: 100%;">
     </a>
 
     <nav class="nav-links">

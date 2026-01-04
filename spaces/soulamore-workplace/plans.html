@@ -107,13 +107,14 @@
         }
 
         /* --- HEADER & NAV --- */
+        /* --- NAV CONTAINER (Standardized matches index.html) --- */
         .sub-nav-container {
             display: flex;
             justify-content: center;
             gap: 15px;
             padding: 30px 20px 20px;
-            margin-top: 90px;
-            /* Offset for fixed header */
+            margin-top: 110px;
+            /* Increased margin to ensure no overlap */
             flex-wrap: wrap;
             position: relative;
             z-index: 10;
@@ -132,6 +133,8 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
+            /* Ensure links don't have underline */
         }
 
         .nav-btn:hover {
@@ -145,6 +148,12 @@
             color: var(--deep-space);
             font-weight: 700;
             box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        /* Specific Active Colors */
+        .nav-btn.btn-financial.active {
+            background: var(--gold-glow);
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
         }
 
         /* --- HERO --- */
@@ -515,6 +524,15 @@
         document.addEventListener("DOMContentLoaded", () => {
             if (typeof injectHeader === 'function') injectHeader();
             if (typeof injectFooter === 'function') injectFooter();
+
+            // Enforce Header Consistency (Copied from index.html)
+            const header = document.querySelector('header');
+            if (header) {
+                header.style.setProperty('background', 'rgba(15, 23, 42, 0.95)', 'important');
+                header.style.setProperty('backdrop-filter', 'none', 'important');
+                header.style.setProperty('box-shadow', 'none', 'important');
+                header.style.setProperty('border', 'none', 'important');
+            }
         });
 
         // Particles
