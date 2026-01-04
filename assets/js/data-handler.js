@@ -6,21 +6,36 @@
 import { db, collection, addDoc, serverTimestamp } from "./firebase-config.js";
 
 // --- 1. VENT BOX (Anonymous) ---
+// --- 1. VENT BOX (Anonymous) ---
 export async function handleVentSubmission(text, type = "burn") {
-    // 1. Scrub PII
-    const cleanText = window.PIIScrubber ? window.PIIScrubber.scrubStrict(text) : text;
-
     try {
         await addDoc(collection(db, "vents"), {
-            content: cleanText,
+            content: text, // Storing raw text as requested, anonymity is policy-based
             action: type, // 'burn', 'shred', 'void'
             timestamp: serverTimestamp(),
             device: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
         });
         console.log(`Vent (${type}) saved anonymously.`);
+        return true;
     } catch (e) {
         console.error("Error saving vent: ", e);
-        // Fail silently to user (don't break their immersion)
+        return false;
+    }
+}
+
+// --- 1.5 ECHO SPACE (Loneliness) ---
+export async function handleEcho(text) {
+    try {
+        await addDoc(collection(db, "echoes"), {
+            content: text,
+            timestamp: serverTimestamp(),
+            public: true // Flag for potential future display
+        });
+        console.log("Echo sent to the void.");
+        return true;
+    } catch (e) {
+        console.error("Error sending echo: ", e);
+        return false;
     }
 }
 
@@ -114,6 +129,7 @@ export async function handlePostcard(message, city = "Unknown") {
 // Make globally available for inline HTML onclicks (via a bridge helper if needed)
 window.SoulBackend = {
     submitVent: handleVentSubmission,
+    submitEcho: handleEcho,
     submitConfession: handleConfession,
     submitApp: handleApplication,
     submitContact: handleContact,

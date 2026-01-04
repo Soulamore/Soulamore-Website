@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/global.css">
 
+    <!-- FIREBASE INTEGRATION -->
+    <script type="module" src="../assets/js/firebase-config.js"></script>
+    <script type="module" src="../assets/js/data-handler.js"></script>
+
     <style>
         :root {
             --deep-space: #0b0d12;
@@ -467,6 +471,11 @@
         function burnIt() {
             const inputVal = input.value;
             if (!inputVal.trim()) return;
+
+            // 0. Save to Backend (Fire & Forget)
+            if (window.SoulBackend && window.SoulBackend.submitVent) {
+                window.SoulBackend.submitVent(inputVal, 'burn');
+            }
 
             // 1. Lock UI
             input.setAttribute('readonly', true);

@@ -1,46 +1,91 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Applications collection - allow anyone to write (for form submissions)
-    match /applications/{document=**} {
-      allow read: if request.auth != null; // Only authenticated users can read
-      allow create: if true; // Anyone can create (submit forms)
-      allow update, delete: if request.auth != null; // Only authenticated users can update/delete
-    }
     
-    // Contacts collection - allow anyone to write (for contact forms)
+    // --- ACTIVE FEATURES (Backend Connected) ---
+
+    // Peer Application Forms
+    match /peers/{document=**} {
+      allow read: if request.auth != null;
+      allow create: if true; // Public submission
+      allow update, delete: if request.auth != null;
+    }
+
+    // Psychologist Application Forms
+    match /psychologists/{document=**} {
+      allow read: if request.auth != null;
+      allow create: if true; // Public submission
+      allow update, delete: if request.auth != null;
+    }
+
+    // Contact Forms (Company Page)
     match /contacts/{document=**} {
       allow read: if request.auth != null;
-      allow create: if true; // Anyone can create (submit contact forms)
+      allow create: if true; // Public submission
       allow update, delete: if request.auth != null;
     }
-    
-    // Confessions collection - allow writes (anonymous)
+
+    // Confession Box (Tools & Topics)
     match /confessions/{document=**} {
       allow read: if request.auth != null;
-      allow create: if true;
+      allow create: if true; // Anonymous submission
       allow update, delete: if request.auth != null;
     }
-    
-    // Vents collection - allow writes (anonymous)
+
+    // Soulamore Away (Postcards)
+    match /postcards/{document=**} {
+      allow read: if true; // Public read (Gallery)
+      allow create: if true; // Public send
+      allow update, delete: if request.auth != null;
+    }
+
+    // --- NEWLY REQUESTED FEATURES (Connecting Now) ---
+
+    // Vent Box
     match /vents/{document=**} {
       allow read: if request.auth != null;
       allow create: if true;
       allow update, delete: if request.auth != null;
     }
-    
-    // Postcards collection - allow writes (public)
-    match /postcards/{document=**} {
-      allow read: if true; // Public read
-      allow create: if true; // Public write
-      allow update: if request.auth != null;
-      allow delete: if request.auth != null;
+
+    // Echo Space (Loneliness Page)
+    match /echoes/{document=**} {
+      allow read: if true; // Public read allowed for potential "Wall of Echoes"
+      allow create: if true;
+      allow update, delete: if request.auth != null;
     }
+
+    // --- FUTURE / PLACEHOLDER FEATURES ---
     
-    // Default: deny all other access
+    // Worry Shredder & Later Box
+    match /shreds/{document=**} {
+      allow read: if request.auth != null;
+      allow create: if true;
+      allow update, delete: if request.auth != null;
+    }
+    match /worries/{document=**} {
+      allow read: if request.auth != null;
+      allow create: if true;
+      allow update, delete: if request.auth != null;
+    }
+
+    // 5-Step Reset (Gratitude/Inputs)
+    match /resets/{document=**} {
+      allow read: if request.auth != null;
+      allow create: if true;
+      allow update, delete: if request.auth != null;
+    }
+
+    // Legacy/Fallback Collection
+    match /applications/{document=**} {
+      allow read: if request.auth != null;
+      allow create: if true;
+      allow update, delete: if request.auth != null;
+    }
+
+    // Default: Deny all other access
     match /{document=**} {
       allow read, write: if false;
     }
   }
 }
-
