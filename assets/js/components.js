@@ -179,28 +179,37 @@ try {
                 padding: 8px 0 !important;
             }
 
-            /* SHOW ON HOVER */
-            .dropdown:hover .dropdown-content {
+            /* SHOW ON HOVER (Direct Child Only) */
+            .dropdown:hover > .dropdown-content {
                 display: block !important;
             }
+            .dropdown-submenu:hover > .dropdown-content {
+                 display: block !important;
+            }
             
-            /* Level 2: Nested Submenu (Straight Line / Stacked) */
+            /* Level 2: Nested Submenu (Flyout) */
+            .dropdown-submenu {
+                position: relative !important; /* Anchor for flyout */
+            }
+
             .dropdown-content .dropdown-content {
-                position: relative !important;
-                top: auto !important;
-                left: 0 !important;
-                box-shadow: none !important;
-                border: none !important;
-                border-left: 2px solid rgba(78, 205, 196, 0.3) !important;
-                background: transparent !important;
-                padding-left: 20px !important;
-                min-width: 100% !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 100% !important;
+                margin-top: -10px !important; /* Align with top */
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+                border: 1px solid rgba(255,255,255,0.1) !important;
+                border-left: 1px solid rgba(255,255,255,0.1) !important; /* Reset border */
+                background: rgba(15, 23, 42, 0.98) !important; /* Solid bg */
+                padding-left: 0 !important; /* Reset padding */
+                min-width: 200px !important;
             }
 
             /* Level 3: Deep Nested */
             .dropdown-content .dropdown-content .dropdown-content {
-                border-left-color: #4ECDC4 !important;
-                padding-left: 15px !important;
+                left: 100% !important;
+                top: 0 !important;
+                margin-top: -5px !important;
             }
 
             .dropdown-content a, .dropdown-submenu a {
