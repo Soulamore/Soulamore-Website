@@ -273,7 +273,8 @@
         }
 
         .reader-overlay.active {
-            display: flex;
+            display: block;
+            /* Switched from flex to block to ensure scrolling works reliably */
             opacity: 1;
         }
 
@@ -286,8 +287,11 @@
             padding: 80px 60px;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
             position: relative;
-            margin-top: 0;
+            margin: 0 auto;
+            /* Center horizontally */
             animation: slideUpPaper 0.5s ease-out;
+            overflow-wrap: break-word;
+            /* Prevent text overflow */
         }
 
         @keyframes slideUpPaper {
@@ -590,7 +594,7 @@
 
         function closeArticle() {
             document.getElementById('readerOverlay').classList.remove('active');
-            document.body.style.overflow = 'hidden'; // Keep main app overflow style
+            document.body.style.overflow = ''; // Restore main app scroll
         }
 
         // --- 4. CONSTELLATION ANIMATION (Background) ---
