@@ -89,7 +89,7 @@
                 </div>
 
                 <div style="margin-top:auto; font-size:0.85rem; opacity:0.7; color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif;">
-                    If you’re a peer or psychologist aligned with our mission, reach out. We’d love to hear from you.
+                    If you’re a peer or psychologist aligned with our mission, reach out at <a href="mailto:contact.soulamore@gmail.com" style="color:#4ECDC4; text-decoration:underline;">contact.soulamore@gmail.com</a>. We’d love to hear from you.
                 </div>
             </div>
 
