@@ -418,6 +418,8 @@
             outline: none;
             transition: 0.3s;
             box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            /* Enable vertical scroll */
         }
 
         .typing-area:focus {
@@ -876,17 +878,25 @@
         }
 
         function showSuccessState() {
-            const formPanel = document.getElementById('formContent');
+            const formContent = document.getElementById('formContent'); // Using formContent wrapper
             const successOverlay = document.getElementById('successState');
 
-            formPanel.style.opacity = '0';
-            successOverlay.style.display = 'flex';
+            // Add flying animation
+            formContent.classList.add('flying-away');
+
+            // Wait for animation to finish then show success
             setTimeout(() => {
-                successOverlay.style.opacity = '1';
-                successOverlay.style.transform = 'scale(1)';
-                // Confetti
-                createStars();
-            }, 100);
+                formContent.style.display = 'none';
+                formContent.classList.remove('flying-away');
+                successOverlay.style.display = 'flex';
+
+                // Fade in success overlay
+                setTimeout(() => {
+                    successOverlay.style.opacity = '1';
+                    successOverlay.style.transform = 'scale(1)';
+                    createStars();
+                }, 50);
+            }, 1000);
         }
 
         // --- BACKGROUND THOUGHTS ---
@@ -921,21 +931,7 @@
         const stats = document.querySelector('.stats-bar');
         if (stats) observer.observe(stats);
 
-        const formContent = document.getElementById('formContent');
 
-        // 1. Change button state
-        btn.innerHTML = '<i class="fas fa-star fa-spin"></i> Sending...';
-
-        // 2. Add flying animation to table container
-        formContent.classList.add('flying-away');
-
-        // 3. Wait for animation to finish then show success
-        setTimeout(() => {
-            formContent.style.display = 'none';
-            formContent.classList.remove('flying-away'); // Reset for next time if needed
-            document.getElementById('successState').style.display = 'flex';
-        }, 1500);
-        }
 
         // --- FADE IN ---
         const fadeObserver = new IntersectionObserver((entries) => {
