@@ -128,6 +128,20 @@ export async function handlePostcard(message, city = "Unknown") {
     }
 }
 
+// --- 6. 5-STEP RESET (Gratitude) ---
+export async function handleResetSubmission(items) {
+    try {
+        await addDoc(collection(db, "resets"), {
+            items: items,
+            timestamp: serverTimestamp()
+        });
+        return true;
+    } catch (e) {
+        console.error("Error saving reset items: ", e);
+        return false;
+    }
+}
+
 // Make globally available for inline HTML onclicks (via a bridge helper if needed)
 window.SoulBackend = {
     submitVent: handleVentSubmission,
@@ -135,5 +149,6 @@ window.SoulBackend = {
     submitConfession: handleConfession,
     submitApp: handleApplication,
     submitContact: handleContact,
-    submitPostcard: handlePostcard
+    submitPostcard: handlePostcard,
+    submitReset: handleResetSubmission
 };

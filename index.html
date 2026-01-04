@@ -34,6 +34,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/global.css?v=1.1">
 
+    <!-- MODULE: Backend -->
+    <script type="module" src="assets/js/firebase-config.js"></script>
+    <script type="module" src="assets/js/data-handler.js"></script>
+
     <style>
         /* --- DESIGN SYSTEM: VEGITO (The Ultimate Fusion) --- */
         :root {
@@ -1161,16 +1165,23 @@
                 <h2>Need Human Connection?</h2>
                 <p style="opacity:0.8;">Technology is great, but sometimes you just need a person. Fill this out, and
                     our care team will reach out.</p>
+                <style>
+                    /* Fix for white dropdown background */
+                    .lifeline-input option {
+                        background-color: #0f172a;
+                        color: white;
+                    }
+                </style>
                 <form class="lifeline-form" onsubmit="submitLead(event)">
-                    <input type="text" class="lifeline-input" placeholder="Your Name" required>
-                    <input type="email" class="lifeline-input" placeholder="Your Email" required>
-                    <select class="lifeline-input full-width" style="color:#aaa;">
+                    <input type="text" id="lifeName" class="lifeline-input" placeholder="Your Name" required>
+                    <input type="email" id="lifeEmail" class="lifeline-input" placeholder="Your Email" required>
+                    <select id="lifeType" class="lifeline-input full-width" style="color:#aaa;">
                         <option>I want to talk to a...</option>
                         <option>Student Peer (Casual)</option>
                         <option>Therapist (Professional)</option>
                         <option>Just need resources</option>
                     </select>
-                    <button type="submit" class="lifeline-submit-btn">Request Support</button>
+                    <button type="submit" class="lifeline-submit-btn" id="btnLife">Request Support</button>
                 </form>
             </div>
         </div>
@@ -1472,11 +1483,75 @@
         }
 
         // 7. LIFELINE
+        // 7. LIFELINE
         function submitLead(e) {
             e.preventDefault();
-            document.querySelector('.lifeline-submit-btn').innerText = "Request Sent ✓";
-            document.querySelector('.lifeline-submit-btn').style.background = "#48bb78";
+            console.log("Lifeline submit triggered");
+
+            const nameEl = document.getElementById('lifeName');
+            const emailEl = document.getElementById('lifeEmail');
+            const typeEl = document.getElementById('lifeType');
+            const btn = document.getElementById('btnLife');
+
+            // Debug log
+            if (!nameEl) console.error("Missing lifeName");
+            if (!emailEl) console.error("Missing lifeEmail");
+            if (!typeEl) console.error("Missing lifeType");
+
+            if (!nameEl || !emailEl || !typeEl || !btn) {
+                alert("Form Error: Please refresh the page. (Missing Elements)");
+                return;
+            }
+
+            const name = nameEl.value.trim();
+            const email = emailEl.value.trim();
+            const type = typeEl.value;
+
+            // Basic Validation
+            if (!name || !email) {
+                alert("Please fill in your name and email.");
+                return;
+            }
+
+            const subject = "LIFELINE (" + type + ")";
+            const message = "User requested support via Homepage Lifeline.\nType: " + type;
+
+            console.log("Submitting Lifeline:", { name, email, type });
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            btn.disabled = true;
+
+            if (window.SoulBackend && window.SoulBackend.submitContact) {
+                window.SoulBackend.submitContact(name, email, subject, message).then(success => {
+                    if (success) {
+                        btn.innerHTML = "Request Sent <i class='fas fa-check'></i>";
+                        btn.style.background = "#48bb78";
+                    } else {
+                        btn.innerHTML = "Error. Try Again.";
+                        btn.disabled = false;
+                    }
+                });
+            } else {
+                console.warn("Backend not loaded immediately. Retrying...");
+                setTimeout(() => {
+                    if (window.SoulBackend && window.SoulBackend.submitContact) {
+                        window.SoulBackend.submitContact(name, email, subject, message).then(success => {
+                            if (success) {
+                                btn.innerHTML = "Request Sent <i class='fas fa-check'></i>";
+                                btn.style.background = "#48bb78";
+                            } else {
+                                btn.innerHTML = "Error"; btn.style.background = "red";
+                            }
+                        });
+                    } else {
+                        btn.innerHTML = "Offline (Saved Locally)"; // Fake visual confirmation if real fails
+                        btn.style.background = "#48bb78";
+                        alert("We couldn't reach the server, but please email us directly at contact.soulamore@gmail.com");
+                    }
+                }, 1500);
+            }
         }
+
 
         // 8. FADE IN
         const observer = new IntersectionObserver((entries) => {

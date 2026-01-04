@@ -11,6 +11,9 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/global.css">
+    <!-- MODULE: Backend -->
+    <script type="module" src="../assets/js/firebase-config.js"></script>
+    <script type="module" src="../assets/js/data-handler.js"></script>
 
     <style>
         /* --- 5-STEP RESET SPECIFIC STYLES --- */
@@ -533,14 +536,14 @@
                     okay right now.</p>
 
                 <div class="widget-area" style="flex-direction:column; max-width:400px;">
-                    <input type="text" class="gratitude-input" placeholder="1. I am safe...">
-                    <input type="text" class="gratitude-input" placeholder="2. I have...">
-                    <input type="text" class="gratitude-input" placeholder="3. I can...">
+                    <input type="text" id="g1" class="gratitude-input" placeholder="1. I am safe...">
+                    <input type="text" id="g2" class="gratitude-input" placeholder="2. I have...">
+                    <input type="text" id="g3" class="gratitude-input" placeholder="3. I can...">
                 </div>
 
                 <div class="nav-row">
                     <button class="nav-btn" onclick="nextStep(3)">Back</button>
-                    <button class="nav-btn primary" onclick="nextStep(5)">Next Step <i
+                    <button class="nav-btn primary" id="btnStep4" onclick="submitGratitude()">Next Step <i
                             class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
@@ -642,6 +645,44 @@
                     display.style.color = "#4ECDC4";
                 }
             }, 1000);
+        }, 1000);
+        }
+
+        // --- STEP 4: GRATITUDE SUBMISSION ---
+        function submitGratitude() {
+            const g1 = document.getElementById('g1').value.trim();
+            const g2 = document.getElementById('g2').value.trim();
+            const g3 = document.getElementById('g3').value.trim();
+
+            // Optional: Require at least one? Or just send what they have.
+            // Let's send whatever they wrote.
+            const items = [g1, g2, g3].filter(i => i.length > 0);
+
+            if (items.length === 0) {
+                // If empty, just proceed without saving (or alert user?)
+                // User instruction says "Name 3 simple things", implies required. 
+                // But for a calming app, maybe don't block? 
+                // Let's just proceed.
+                nextStep(5);
+                return;
+            }
+
+            const btn = document.getElementById('btnStep4');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            if (window.SoulBackend && window.SoulBackend.submitReset) {
+                window.SoulBackend.submitReset(items).then(success => {
+                    if (success) console.log("Gratitude saved!");
+                    else console.error("Failed to save gratitude.");
+
+                    // Always move to next step regardless of backend success to not block user
+                    nextStep(5);
+                });
+            } else {
+                console.warn("Backend not loaded, proceeding anyway.");
+                nextStep(5);
+            }
         }
 
         // --- INTERACTIVE NEBULA ART ---
