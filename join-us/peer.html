@@ -425,12 +425,15 @@
                             console.log('Application submitted successfully to Firebase!');
                             window.location.href = 'peer-thank-you.html';
                         } else {
-                            console.warn("Backend submission failed, but redirecting anyway for UX.");
-                            window.location.href = 'peer-thank-you.html';
+                            console.error("Backend submission returned false. Check console for error details.");
+                            alert('Failed to save application to database. Please check the browser console for details. You may need to update Firestore security rules.');
+                            btn.disabled = false;
+                            btn.innerHTML = originalBtnText;
                         }
                     }).catch(err => {
                         console.error("Critical submission error", err);
-                        alert('There was an error submitting your application. Please check the console and try again.');
+                        console.error("Error details:", err.code, err.message);
+                        alert('There was an error submitting your application: ' + (err.message || 'Unknown error') + '. Please check the console and try again.');
                         btn.disabled = false;
                         btn.innerHTML = originalBtnText;
                     });
