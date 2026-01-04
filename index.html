@@ -1203,7 +1203,9 @@
         const msgInput = document.getElementById('userMsg');
 
         // Initial Message
-        chatWindow.innerHTML = `<div class="message bot">Hi! I've been upgraded. Click below or start typing to talk to the real me.</div>`;
+        if (chatWindow) {
+            chatWindow.innerHTML = `<div class="message bot">Hi! I've been upgraded. Click below or start typing to talk to the real me.</div>`;
+        }
 
         function sendMessage() {
             // Trigger the global Soulbot (injected by soulbot-beta.js)
@@ -1211,7 +1213,7 @@
                 window.openSoulbot();
                 // Optional: We could try to pass the message, but for now just opening is safer.
                 // Reset input
-                msgInput.value = '';
+                if (msgInput) msgInput.value = '';
             } else {
                 alert("Soulbot is initializing...");
             }
