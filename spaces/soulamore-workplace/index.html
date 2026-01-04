@@ -745,14 +745,13 @@
                     }
                 });
 
-                // --- SUB-NAV LOGIC ---
-                function navTo(pageId) {
+                // --- SUB-NAV LOGIC (Global Scope) ---
+                window.navTo = function (pageId) {
                     // 1. Fade Out Current Active
                     const currentActive = document.querySelector('.page-view.active');
 
                     // Helper to activate new page
                     const activateNewPage = () => {
-
                         // Hide all
                         document.querySelectorAll('.page-view').forEach(p => {
                             p.classList.remove('active');
@@ -764,41 +763,31 @@
 
                         if (targetPage) {
                             targetPage.classList.add('active');
-
                             // Small delay to allow display:block to render before opacity change
                             setTimeout(() => {
                                 targetPage.classList.add('fade-in-active');
-                            }
-
-                                , 50);
+                            }, 50);
 
                             window.scrollTo({
-                                top: 0, behavior: 'smooth'
+                                top: 0,
+                                behavior: 'smooth'
                             });
                         }
-                    }
-
-                        ;
+                    };
 
                     if (currentActive) {
                         currentActive.classList.remove('fade-in-active');
                         // Wait for transition before switching (200ms for quick feel)
                         setTimeout(activateNewPage, 300);
-                    }
-
-                    else {
+                    } else {
                         activateNewPage();
                     }
 
                     // 2. Button State
                     document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
-                    // Map IDs to Button Index (Strict Order: Main, Plans, Guidelines, Programs, Employees, Financial, HR, Policy)
-                    // Plans(1) & Guidelines(2) are links, so we skip them in index mapping if using div only logic, 
-                    // BUT here we have mixed types. Let's use more robust selector logic.
 
                     const buttons = document.querySelectorAll('.sub-nav-container .workplace-btn');
                     // Reset all
-                    buttons.forEach(btn => btn.classList.remove('active'));
 
                     const mapping = {
                         'main': 0,
@@ -809,13 +798,12 @@
                         'financial': 5,
                         'hr': 6,
                         'policy': 7
-                    }
-
-                        ;
+                    };
 
                     if (mapping[pageId] !== undefined && buttons[mapping[pageId]]) {
                         buttons[mapping[pageId]].classList.add('active');
                     }
+                };
 
                     // 3. Enforce Header Consistency (Removed Aggressive Override to match Global Style)
                     // The global components.js handles the island-nav look. We shouldn't force flat background here unless necessary.
