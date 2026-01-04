@@ -592,19 +592,21 @@
             border-color: var(--peach-glow);
         }
 
-        .expanding {
-            animation: growCircle 4s infinite alternate ease-in-out;
+        /* States */
+        .circle-inhale {
+            transform: scale(1.5);
         }
 
-        @keyframes growCircle {
-            from {
-                transform: scale(1);
-            }
-
-            to {
-                transform: scale(1.4);
-            }
+        .circle-exhale {
+            transform: scale(1);
         }
+
+        .circle-hold {
+            transform: scale(1.5);
+            transition: transform 0.1s;
+            /* Instant/Stick */
+        }
+
 
         /* --- 5. HOW IT WORKS (Steps) --- */
         .steps-wrapper {
@@ -1023,7 +1025,32 @@
             </div>
         </section>
 
-        <!-- 4. LIFELINE (Lead Capture) -->
+        <!-- 4. INTERACTIVE BREAK: BREATH & ORACLE -->
+        <div class="grid-2 fade-in" style="margin: 50px 0 80px 0; gap:50px; align-items:center;">
+            <!-- Breath Game -->
+            <div class="game-section" style="margin:0; text-align:center;">
+                <h2>Need a moment?</h2>
+                <div class="game-circle" id="gameCircle" onmousedown="startHold()" onmouseup="stopHold()"
+                    ontouchstart="startHold()" ontouchend="stopHold()">
+                    <span id="breathLabel" style="pointer-events:none; font-weight:700;">Inhale</span>
+                </div>
+                <p id="breathStatus" style="font-size:0.9rem; opacity:0.7; height:20px;">Watch the circle...</p>
+            </div>
+
+            <!-- Oracle Card -->
+            <div class="oracle-section" style="margin:0; text-align:center;">
+                <h2>Need a Sign?</h2>
+                <p style="opacity:0.6; margin-bottom:20px;">Tap for a message.</p>
+                <div class="oracle-card" onclick="flipOracle(this)" style="margin:0 auto;">
+                    <div class="oracle-content" id="oracleText">
+                        <i class="fas fa-hand-sparkles" style="font-size:3rem; margin-bottom:20px;"></i><br>Click to
+                        Reveal
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. LIFELINE (Lead Capture) -->
         <div class="lifeline-section fade-in">
             <div class="lifeline-card">
                 <i class="fas fa-phone-volume"
@@ -1043,33 +1070,6 @@
                     <button type="submit" class="lifeline-submit-btn">Request Support</button>
                 </form>
             </div>
-        </div>
-
-        <!-- 5. INTERACTIVE BREAK: BREATH & ORACLE -->
-        <div class="grid-2 fade-in" style="margin: 80px 0; gap:50px; align-items:center;">
-
-            <!-- Breath Game -->
-            <div class="glass-card" style="text-align:center; padding:40px;">
-                <h3 style="color:var(--teal-glow); margin-bottom:20px;">Need a moment?</h3>
-                <div class="game-circle expanding" onmousedown="holdBreath()" onmouseup="releaseBreath()"
-                    onmouseleave="releaseBreath()" ontouchstart="holdBreath()" ontouchend="releaseBreath()"
-                    ontouchcancel="releaseBreath()" oncontextmenu="return false;">
-                    <span id="breathLabel" style="pointer-events:none; font-weight:700;">Breathe</span>
-                </div>
-                <p id="breathStatus" style="font-size:0.9rem; opacity:0.7; height:20px;">Watch the circle...</p>
-            </div>
-
-            <!-- Daily Oracle (Restored Text) -->
-            <div class="oracle-section" style="margin:0;">
-                <div class="oracle-card" onclick="flipOracle(this)">
-                    <div class="oracle-content" id="oracleText">
-                        <i class="fas fa-hand-sparkles" style="font-size:3rem; margin-bottom:20px;"></i>
-                        <br>Click to Reveal
-                    </div>
-                </div>
-                <p style="margin-top:20px; font-size:0.9rem; opacity:0.7;">Tap the card for your message today.</p>
-            </div>
-
         </div>
 
         <!-- 6. HUMAN CONNECTION (Restored & Expanded) -->
@@ -1284,100 +1284,100 @@
         function clearChat() { /* No op */ }
         function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
 
-        // 5. BREATH GAME (4-4-4 Cycle Logic)
-        let breathTimer;
-        let breathInterval;
-        let breathState = "idle"; // idle, holding, exhaling
+        // 5. BREATH GAME (Inhale -> Hold -> Release -> Exhale Cycle)
+        let breathState = "inhaling"; // inhaling, ready_to_hold, holding, exhaling
+        let holdTimer = null;
+        let cycleTimer = null;
 
-        function holdBreath() {
-            // Prevent restarting if already exhaling or unexpected state
-            if (breathState === "exhaling") return;
-            breathState = "holding";
-
-            const status = document.getElementById('breathStatus');
-            const label = document.getElementById('breathLabel');
-            const circle = document.querySelector('.game-circle');
-
-            // Initial State
-            circle.style.borderColor = "#F49F75";
-            let count = 4;
-            label.innerText = count;
-            status.innerText = "Hold... Stay with it...";
-            status.style.color = "rgba(255,255,255,0.9)";
-
-            // Clear previous timers
-            clearInterval(breathInterval);
-            clearTimeout(breathTimer);
-
-            // Start Countdown Interval
-            breathInterval = setInterval(() => {
-                count--;
-                if (count > 0) {
-                    label.innerText = count;
-                } else {
-                    // Time's up -> Release Prompt
-                    clearInterval(breathInterval);
-                    label.innerText = "Release";
-                    status.innerText = "You can release now.";
-                    status.style.color = "#4ECDC4";
-                    status.style.fontWeight = "bold";
-
-                    // Haptic feedback
-                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-
-                    // Set visual cue
-                    circle.style.borderColor = "#4ECDC4";
-                    circle.style.boxShadow = "0 0 30px #4ECDC4";
-                }
-            }, 1000); // Update every second
+        // Start the cycle automatically on load
+        function initBreathCycle() {
+            runInhale();
         }
 
-        function releaseBreath() {
-            // Only trigger exhale cycle if we were holding
-            if (breathState !== "holding") return;
-            breathState = "exhaling";
+        function runInhale() {
+            breathState = "inhaling";
+            updateBreathUI("Inhale", "Breathe in deeply...", "#4ECDC4", "circle-inhale");
 
-            const status = document.getElementById('breathStatus');
-            const label = document.getElementById('breathLabel');
-            const circle = document.querySelector('.game-circle');
+            // After 4s inhale -> Prompt Hold
+            setTimeout(() => {
+                breathState = "ready_to_hold";
+                updateBreathUI("Hold", "Click & Hold now...", "#F49F75", "circle-hold");
+                // Waiting for user to click...
+            }, 4000);
+        }
 
-            clearInterval(breathInterval); // Stop holding counter if partial
-            clearTimeout(breathTimer);
+        function startHold() {
+            if (breathState !== "ready_to_hold") return;
+            breathState = "holding";
 
-            // Reset visual cues
-            circle.style.borderColor = "#4ECDC4";
-            circle.style.boxShadow = "";
-
-            // Start Exhale Countdown
             let count = 4;
-            label.innerText = count;
-            status.innerText = "Exhale slowly...";
-            status.style.color = "rgba(255,255,255,0.7)";
-            status.style.fontWeight = "normal";
+            updateBreathUI(count, "Hold... Stay with it...", "#F49F75", "circle-hold");
 
-            breathInterval = setInterval(() => {
+            // 4 Second Countdown
+            if (holdTimer) clearInterval(holdTimer);
+            holdTimer = setInterval(() => {
                 count--;
                 if (count > 0) {
-                    label.innerText = count;
-                    status.innerText = `Exhale slowly... ${count}`;
+                    document.getElementById('breathLabel').innerText = count;
                 } else {
-                    // Cycle Complete
-                    clearInterval(breathInterval);
-                    resetBreathGame();
+                    // Success!
+                    clearInterval(holdTimer);
+                    breathState = "ready_to_release";
+                    updateBreathUI("Release", "You can release now.", "#4ECDC4", "circle-hold");
                 }
             }, 1000);
         }
 
-        function resetBreathGame() {
-            breathState = "idle";
-            const status = document.getElementById('breathStatus');
-            const label = document.getElementById('breathLabel');
-            const circle = document.querySelector('.game-circle');
+        function stopHold() {
+            if (breathState === "holding") {
+                // Released too early! Reset.
+                clearInterval(holdTimer);
+                updateBreathUI("Oops", "Try to hold fully.", "white", "circle-exhale");
+                setTimeout(runInhale, 1500);
+                return;
+            }
 
-            label.innerText = "Inhale";
-            status.innerText = "Ready? Click & Hold to breathe.";
-            circle.style.borderColor = "#4ECDC4";
+            if (breathState === "ready_to_release") {
+                // Correct release -> Exhale
+                runExhale();
+            }
         }
+
+        function runExhale() {
+            breathState = "exhaling";
+            let count = 4;
+            updateBreathUI("Exhale", `Exhale slowly... ${count}`, "#4ECDC4", "circle-exhale");
+
+            let exhaleInt = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    document.getElementById('breathStatus').innerText = `Exhale slowly... ${count}`;
+                } else {
+                    clearInterval(exhaleInt);
+                    // Cycle Complete -> Loop
+                    runInhale();
+                }
+            }, 1000);
+        }
+
+        function updateBreathUI(labelText, statusText, color, circleClass) {
+            const label = document.getElementById('breathLabel');
+            const status = document.getElementById('breathStatus');
+            const circle = document.getElementById('gameCircle');
+
+            label.innerText = labelText;
+            status.innerText = statusText;
+            circle.style.borderColor = color;
+
+            // Remove old classes
+            circle.classList.remove('circle-inhale', 'circle-hold', 'circle-exhale');
+            if (circleClass) circle.classList.add(circleClass);
+        }
+
+        // Start it!
+        // Timeout to let page load first
+        setTimeout(initBreathCycle, 1000);
+
 
         // 6. ORACLE
         // Uses globalQuotes from assets/js/quotes_data.js
