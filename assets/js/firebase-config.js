@@ -23,7 +23,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const db = getFirestore(app);
+// Use the "soulamore" database instead of default
+const db = getFirestore(app, "soulamore");
 
 // Export for use in data-handler.js
 export { db, collection, addDoc, serverTimestamp };

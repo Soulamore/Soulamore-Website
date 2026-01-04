@@ -420,19 +420,29 @@
             function trySubmit() {
                 if (window.SoulBackend && window.SoulBackend.submitApp) {
                     console.log('Submitting peer application:', data);
-                    window.SoulBackend.submitApp('peer', data).then(success => {
+                    
+                    // Add timeout to prevent hanging
+                    const timeoutPromise = new Promise((_, reject) => {
+                        setTimeout(() => reject(new Error('Submission timeout after 30 seconds')), 30000);
+                    });
+                    
+                    Promise.race([
+                        window.SoulBackend.submitApp('peer', data),
+                        timeoutPromise
+                    ]).then(success => {
+                        console.log('Promise resolved with:', success);
                         if (success) {
                             console.log('Application submitted successfully to Firebase!');
                             window.location.href = 'peer-thank-you.html';
                         } else {
                             console.error("Backend submission returned false. Check console for error details.");
-                            alert('Failed to save application to database. Please check the browser console for details. You may need to update Firestore security rules.');
+                            alert('Failed to save application to database. Please check the browser console for details.');
                             btn.disabled = false;
                             btn.innerHTML = originalBtnText;
                         }
                     }).catch(err => {
                         console.error("Critical submission error", err);
-                        console.error("Error details:", err.code, err.message);
+                        console.error("Error details:", err.code, err.message, err.stack);
                         alert('There was an error submitting your application: ' + (err.message || 'Unknown error') + '. Please check the console and try again.');
                         btn.disabled = false;
                         btn.innerHTML = originalBtnText;
