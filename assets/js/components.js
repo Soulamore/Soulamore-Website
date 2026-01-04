@@ -65,6 +65,7 @@ try {
             .nav-logo img {
                 height: 40px !important;
                 width: auto !important;
+                flex-shrink: 0 !important; /* Critical: Prevent logo loss */
             }
             /* Button Consistency */
             .nav-btn {
