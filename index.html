@@ -593,18 +593,28 @@
         }
 
         /* States */
-        .circle-inhale {
-            transform: scale(1.5);
+        .circle-idle {
+            transform: scale(1);
+            transition: transform 0.5s ease-out;
+            border-color: var(--teal-glow);
         }
 
-        .circle-exhale {
-            transform: scale(1);
+        .circle-inhale {
+            transform: scale(1.5);
+            transition: transform 4s ease-in-out;
+            border-color: var(--teal-glow);
         }
 
         .circle-hold {
             transform: scale(1.5);
             transition: transform 0.1s;
-            /* Instant/Stick */
+            border-color: var(--peach-glow);
+        }
+
+        .circle-exhale {
+            transform: scale(1);
+            transition: transform 4s ease-in-out;
+            border-color: var(--teal-glow);
         }
 
 
@@ -1221,81 +1231,83 @@
         function clearChat() { /* No op */ }
         function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
 
-        // 5. BREATH GAME (Inhale -> Hold -> Release -> Exhale Cycle)
-        let breathState = "inhaling"; // inhaling, ready_to_hold, holding, exhaling
-        let holdTimer = null;
+        // 5. BREATH GAME (Continuous Press & Hold Cycle)
+        let breathState = "idle";
         let cycleTimer = null;
+        let countdownInterval = null;
 
-        // Start the cycle automatically on load
-        function initBreathCycle() {
+        // Reset on load
+        function resetBreathGame() {
+            clearTimeout(cycleTimer);
+            clearInterval(countdownInterval);
+            breathState = "idle";
+            updateBreathUI("Breathe", "Press & Hold to Start", "#4ECDC4", "circle-idle");
+        }
+
+        function startHold() {
+            if (breathState !== "idle") return;
+
+            // Step 1: Inhale (4s)
             runInhale();
+        }
+
+        function stopHold() {
+            // If user releases at any point, reset
+            resetBreathGame();
+            document.getElementById('breathStatus').innerText = "Released too soon. Press to try again.";
         }
 
         function runInhale() {
             breathState = "inhaling";
-            updateBreathUI("Inhale", "Breathe in deeply...", "#4ECDC4", "circle-inhale");
+            updateBreathUI("Inhale", "Keep holding...", "#4ECDC4", "circle-inhale");
 
-            // After 4s inhale -> Prompt Hold
-            setTimeout(() => {
-                breathState = "ready_to_hold";
-                updateBreathUI("Hold", "Click & Hold now...", "#F49F75", "circle-hold");
-                // Waiting for user to click...
+            cycleTimer = setTimeout(() => {
+                runHold();
             }, 4000);
         }
 
-        function startHold() {
-            if (breathState !== "ready_to_hold") return;
+        function runHold() {
             breathState = "holding";
-
             let count = 4;
-            updateBreathUI(count, "Hold... Stay with it...", "#F49F75", "circle-hold");
+            updateBreathUI(count, "Hold... Keep holding...", "#F49F75", "circle-hold");
 
-            // 4 Second Countdown
-            if (holdTimer) clearInterval(holdTimer);
-            holdTimer = setInterval(() => {
+            countdownInterval = setInterval(() => {
                 count--;
                 if (count > 0) {
                     document.getElementById('breathLabel').innerText = count;
                 } else {
-                    // Success!
-                    clearInterval(holdTimer);
-                    breathState = "ready_to_release";
-                    updateBreathUI("Release", "You can release now.", "#4ECDC4", "circle-hold");
+                    clearInterval(countdownInterval);
                 }
             }, 1000);
-        }
 
-        function stopHold() {
-            if (breathState === "holding") {
-                // Released too early! Reset.
-                clearInterval(holdTimer);
-                updateBreathUI("Oops", "Try to hold fully.", "white", "circle-exhale");
-                setTimeout(runInhale, 1500);
-                return;
-            }
-
-            if (breathState === "ready_to_release") {
-                // Correct release -> Exhale
+            cycleTimer = setTimeout(() => {
                 runExhale();
-            }
+            }, 4000);
         }
 
         function runExhale() {
+            clearInterval(countdownInterval); // Ensure hold timer stops
             breathState = "exhaling";
             let count = 4;
-            updateBreathUI("Exhale", `Exhale slowly... ${count}`, "#4ECDC4", "circle-exhale");
+            updateBreathUI("Exhale", "Exhale slowly... Keep holding...", "#4ECDC4", "circle-exhale");
 
-            let exhaleInt = setInterval(() => {
+            countdownInterval = setInterval(() => {
                 count--;
                 if (count > 0) {
                     document.getElementById('breathStatus').innerText = `Exhale slowly... ${count}`;
                 } else {
-                    clearInterval(exhaleInt);
-                    // Cycle Complete -> Loop
-                    runInhale();
+                    clearInterval(countdownInterval);
                 }
             }, 1000);
+
+            cycleTimer = setTimeout(() => {
+                // Success!
+                breathState = "idle"; // Reset state so stopHold doesn't show error
+                updateBreathUI("Done", "Great job.", "#4ECDC4", "circle-idle");
+                // Stop the 'stopHold' from triggering an error by unbinding or ignoring
+            }, 4000);
         }
+
 
         function updateBreathUI(labelText, statusText, color, circleClass) {
             const label = document.getElementById('breathLabel');
@@ -1303,17 +1315,16 @@
             const circle = document.getElementById('gameCircle');
 
             label.innerText = labelText;
-            status.innerText = statusText;
+            if (statusText) status.innerText = statusText;
             circle.style.borderColor = color;
 
             // Remove old classes
-            circle.classList.remove('circle-inhale', 'circle-hold', 'circle-exhale');
+            circle.className = "game-circle"; // Reset base class
             if (circleClass) circle.classList.add(circleClass);
         }
 
-        // Start it!
-        // Timeout to let page load first
-        setTimeout(initBreathCycle, 1000);
+        // Initialize
+        setTimeout(resetBreathGame, 500);
 
 
         // 6. ORACLE
