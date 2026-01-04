@@ -42,7 +42,7 @@ try {
                 height: auto !important;
                 padding: 0 !important;
                 box-shadow: none !important;
-                gap: 25px !important; /* Slightly reduced gap */
+                gap: 15px !important; /* Tightened from 25px for fit */
                 align-items: center !important;
                 visibility: visible !important; /* Ensure visibility */
                 opacity: 1 !important;
@@ -50,7 +50,7 @@ try {
             .auth-box {
                 display: flex !important; /* Force Auth Box Visible */
                 align-items: center !important;
-                gap: 15px !important;
+                gap: 12px !important; /* Slightly reduced gap */
             }
             .main-nav {
                 display: flex !important;
@@ -68,6 +68,7 @@ try {
                 flex-shrink: 0 !important; /* Critical: Prevent logo container shrinking */
                 display: flex;
                 align-items: center;
+                margin-right: 10px !important; /* Add small breathing room */
             }
             .nav-logo img {
                 height: 40px !important;
