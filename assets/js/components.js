@@ -63,9 +63,8 @@ try {
                 margin: 0 auto !important;
             }
             .nav-logo img {
-                height: 90px !important; /* Increased to 90px */
+                height: 40px !important;
                 width: auto !important;
-                flex-shrink: 0 !important; /* Prevent shrinking */
             }
             /* Button Consistency */
             .nav-btn {
