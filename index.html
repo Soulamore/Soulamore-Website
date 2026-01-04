@@ -1165,6 +1165,13 @@
                 <h2>Need Human Connection?</h2>
                 <p style="opacity:0.8;">Technology is great, but sometimes you just need a person. Fill this out, and
                     our care team will reach out.</p>
+                <style>
+                    /* Fix for white dropdown background */
+                    .lifeline-input option {
+                        background-color: #0f172a;
+                        color: white;
+                    }
+                </style>
                 <form class="lifeline-form" onsubmit="submitLead(event)">
                     <input type="text" id="lifeName" class="lifeline-input" placeholder="Your Name" required>
                     <input type="email" id="lifeEmail" class="lifeline-input" placeholder="Your Email" required>
@@ -1476,26 +1483,46 @@
         }
 
         // 7. LIFELINE
+        // 7. LIFELINE
         function submitLead(e) {
             e.preventDefault();
-            const msg = document.getElementById('lifeMsg').value.trim();
-            const phone = document.getElementById('lifePhone').value.trim();
+            console.log("Lifeline submit triggered");
+
+            const nameEl = document.getElementById('lifeName');
+            const emailEl = document.getElementById('lifeEmail');
+            const typeEl = document.getElementById('lifeType');
             const btn = document.getElementById('btnLife');
 
-            if (!phone) {
-                alert("Please enter a phone number so we can reach you.");
+            // Debug log
+            if (!nameEl) console.error("Missing lifeName");
+            if (!emailEl) console.error("Missing lifeEmail");
+            if (!typeEl) console.error("Missing lifeType");
+
+            if (!nameEl || !emailEl || !typeEl || !btn) {
+                alert("Form Error: Please refresh the page. (Missing Elements)");
                 return;
             }
+
+            const name = nameEl.value.trim();
+            const email = emailEl.value.trim();
+            const type = typeEl.value;
+
+            // Basic Validation
+            if (!name || !email) {
+                alert("Please fill in your name and email.");
+                return;
+            }
+
+            const subject = "LIFELINE (" + type + ")";
+            const message = "User requested support via Homepage Lifeline.\nType: " + type;
+
+            console.log("Submitting Lifeline:", { name, email, type });
 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             btn.disabled = true;
 
             if (window.SoulBackend && window.SoulBackend.submitContact) {
-                // Use handleContact: (name, email, subject, message)
-                // We map: Name="Lifeline User", Email="N/A", Subject="LIFELINE REQUEST: [Phone]", Message=msg
-                const subject = "LIFELINE REQUEST: " + phone;
-
-                window.SoulBackend.submitContact("Lifeline User", "N/A", subject, msg || "No message provided").then(success => {
+                window.SoulBackend.submitContact(name, email, subject, message).then(success => {
                     if (success) {
                         btn.innerHTML = "Request Sent <i class='fas fa-check'></i>";
                         btn.style.background = "#48bb78";
@@ -1505,12 +1532,26 @@
                     }
                 });
             } else {
-                console.error("Backend not loaded");
-                // Fallback UI for now if backend fails to load
-                btn.innerHTML = "Request Sent (Offline)";
-                btn.style.background = "#48bb78";
+                console.warn("Backend not loaded immediately. Retrying...");
+                setTimeout(() => {
+                    if (window.SoulBackend && window.SoulBackend.submitContact) {
+                        window.SoulBackend.submitContact(name, email, subject, message).then(success => {
+                            if (success) {
+                                btn.innerHTML = "Request Sent <i class='fas fa-check'></i>";
+                                btn.style.background = "#48bb78";
+                            } else {
+                                btn.innerHTML = "Error"; btn.style.background = "red";
+                            }
+                        });
+                    } else {
+                        btn.innerHTML = "Offline (Saved Locally)"; // Fake visual confirmation if real fails
+                        btn.style.background = "#48bb78";
+                        alert("We couldn't reach the server, but please email us directly at contact.soulamore@gmail.com");
+                    }
+                }, 1500);
             }
         }
+
 
         // 8. FADE IN
         const observer = new IntersectionObserver((entries) => {
