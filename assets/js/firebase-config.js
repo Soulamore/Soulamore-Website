@@ -23,6 +23,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+// Use default Firestore database (native Firestore, not MongoDB-compatible)
 const db = getFirestore(app);
 
 // Export for use in data-handler.js

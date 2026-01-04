@@ -42,24 +42,33 @@ export async function handleConfession(text, email = null, phone = null) {
 }
 
 // --- 3. APPLICATIONS (Join Us) ---
-// --- 3. APPLICATIONS (Join Us) ---
 export async function handleApplication(type, data) {
+    // user requested separate collections for easier sorting
+    const collectionName = type === 'psychologist' ? 'psychologists' : 'peers';
+
     try {
-        console.log("Attempting to save application...", type);
-        await addDoc(collection(db, "applications"), {
-            type: type, // 'peer' or 'psychologist'
+        console.log(`Attempting to save application to ${collectionName}...`, data);
+        const docRef = await addDoc(collection(db, collectionName), {
+            type: type, // Keeping type for redundancy check
             ...data,
             status: "new",
             timestamp: serverTimestamp()
         });
-        console.log("Application saved successfully!");
+        console.log("Application saved successfully! Document ID:", docRef.id);
         return true;
     } catch (e) {
         console.error("Error saving application: ", e);
+        console.error("Error code:", e.code);
+        console.error("Error message:", e.message);
         // CRITICAL: If permission denied (Rules) or Network Fail, 
         // return false so UI knows.
         if (e.code === 'permission-denied') {
-            alert("Database Permission Denied. Please check Firestore Rules in Console.");
+            console.error("PERMISSION DENIED: Firestore security rules are blocking writes. Please update rules in Firebase Console.");
+            alert("Database Permission Denied. Please check Firestore Rules in Firebase Console. The write was blocked by security rules.");
+        } else if (e.code === 'unavailable') {
+            console.error("Firestore is unavailable. Check your internet connection.");
+        } else {
+            console.error("Unknown error:", e);
         }
         return false;
     }
