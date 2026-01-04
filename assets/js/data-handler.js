@@ -60,8 +60,7 @@ export async function handleConfession(text, email = null, phone = null) {
 export async function handleApplication(type, data) {
     // user requested separate collections for easier sorting
     // user requested separate collections for easier sorting
-    // Reverting 'peers' to 'applications' temporarily to fix permission/live issues
-    const collectionName = type === 'psychologist' ? 'psychologists' : 'applications';
+    const collectionName = type === 'psychologist' ? 'psychologists' : 'peers';
 
     try {
         console.log(`Attempting to save application to ${collectionName}...`, data);
