@@ -173,10 +173,10 @@ try {
                 border-left: 4px solid rgba(78, 205, 196, 0.3) !important; /* Level 1: Lightest */
                 backdrop-filter: blur(10px) !important;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
-                min-width: 240px !important; /* Increased width */
+                min-width: 200px !important; /* Reduced width */
                 width: max-content !important; /* Allow expansion */
                 border-radius: 12px !important;
-                padding: 12px 0 !important;
+                padding: 8px 0 !important;
             }
 
             /* SHOW ON HOVER */
@@ -206,11 +206,12 @@ try {
             .dropdown-content a, .dropdown-submenu a {
                 color: #e2e8f0 !important;
                 display: block !important;
-                margin: 4px 6px !important; /* Tighter margins */
-                border-radius: 8px !important;
-                padding: 8px 12px !important;
-                width: auto !important; /* Let it shrink fitting text or container */
-                box-sizing: border-box !important; /* vital */
+                margin: 2px 4px !important; /* Reduced margins */
+                border-radius: 6px !important;
+                padding: 6px 10px !important; /* Reduced padding */
+                width: auto !important; 
+                box-sizing: border-box !important;
+                font-size: 0.9rem !important; /* Smaller text */
             }
             .dropdown-content a:hover, .dropdown-submenu a:hover {
                 background: rgba(255,255,255,0.1) !important;
