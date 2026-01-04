@@ -25,10 +25,8 @@ try {
         /* DESKTOP (Width > 1150px) */
         @media (min-width: 1151px) {
             header {
-                z-index: 9999 !important; /* Force Header on Top */
-                position: fixed !important;
-                width: 100% !important;
-                top: 0 !important;
+                /* Let global.css island-nav handle positioning if present */
+                z-index: 9999 !important;
             }
             .mobile-profile-card, 
             .mobile-toggle,
@@ -44,7 +42,7 @@ try {
                 height: auto !important;
                 padding: 0 !important;
                 box-shadow: none !important;
-                gap: 30px !important;
+                gap: 25px !important; /* Slightly reduced gap */
                 align-items: center !important;
                 visibility: visible !important; /* Ensure visibility */
                 opacity: 1 !important;
@@ -58,14 +56,24 @@ try {
                 display: flex !important;
                 justify-content: space-between !important;
                 align-items: center !important;
-                padding: 15px 20px !important; /* Reduced padding */
-                max-width: 1200px !important; /* Revert to tighter width */
-                margin: 0 auto !important;
+                padding: 0 !important; /* Let header handle padding */
+                width: 100% !important;
+                max-width: none !important; /* Remove inner max-width constraint */
+                margin: 0 !important;
+            }
+            .nav-links i {
+                color: #F49F75 !important; /* Force Peach Glow for Icons */
+            }
+            .nav-logo {
+                flex-shrink: 0 !important; /* Critical: Prevent logo container shrinking */
+                display: flex;
+                align-items: center;
             }
             .nav-logo img {
                 height: 40px !important;
                 width: auto !important;
-                flex-shrink: 0 !important; /* Critical: Prevent logo loss */
+                flex-shrink: 0 !important; /* Critical: Prevent logo img shrinking */
+                object-fit: contain;
             }
             /* Button Consistency */
             .nav-btn {
