@@ -391,15 +391,15 @@
 
             <!-- FOUNDER STORY (The Architect & The Engineer) -->
             <div class="glass-card founder-layout fade-in"
-                style="flex-direction:column; align-items:stretch; padding:0; gap:0;">
+                style="flex-direction:column; align-items:stretch; padding:0; gap:0; overflow:visible;">
 
-                <!-- TABS -->
+                <!-- TABS (PILL STYLE) -->
                 <div
-                    style="border-bottom:1px solid var(--border-glass); background:rgba(255,255,255,0.02); display:flex;">
-                    <button onclick="switchProfile('aditya')" id="tab-aditya" class="profile-tab active">
+                    style="display:flex; justify-content:center; gap:15px; margin-top:-25px; margin-bottom:20px; position:relative; z-index:10;">
+                    <button onclick="switchProfile('aditya')" id="tab-aditya" class="workplace-btn active">
                         <i class="fas fa-pencil-ruler"></i> ADITYA HARSH
                     </button>
-                    <button onclick="switchProfile('abhishek')" id="tab-abhishek" class="profile-tab">
+                    <button onclick="switchProfile('abhishek')" id="tab-abhishek" class="workplace-btn">
                         <i class="fas fa-code"></i> ABHISHEK SINGLA
                     </button>
                 </div>
@@ -486,40 +486,41 @@
             </div>
 
             <style>
-                /* TAB STYLES */
-                .profile-tab {
-                    flex: 1;
-                    padding: 20px;
-                    background: transparent;
-                    border: none;
-                    border-bottom: 2px solid transparent;
-                    color: rgba(255, 255, 255, 0.5);
-                    font-family: var(--tech-font);
-                    cursor: pointer;
-                    transition: 0.3s;
+                /* PILL TAB STYLES (Workplace Style) */
+                .workplace-btn {
+                    padding: 10px 25px;
+                    border-radius: 50px;
                     font-size: 0.9rem;
+                    cursor: pointer;
+                    color: rgba(255, 255, 255, 0.7);
+                    background: var(--deep-space);
+                    /* Solid background to float over border */
+                    border: 1px solid var(--border-glass);
+                    transition: 0.3s;
+                    white-space: nowrap;
                     display: flex;
                     align-items: center;
-                    justify-content: center;
-                    gap: 10px;
+                    gap: 8px;
+                    font-family: var(--tech-font);
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
                 }
 
-                .profile-tab:hover {
+                .workplace-btn:hover {
                     color: white;
-                    background: rgba(255, 255, 255, 0.02);
+                    border-color: var(--teal-glow);
+                    transform: translateY(-2px);
                 }
 
-                .profile-tab.active {
-                    color: var(--teal-glow);
-                    border-bottom-color: var(--teal-glow);
-                    background: rgba(78, 205, 196, 0.05);
+                .workplace-btn.active {
+                    background: var(--teal-glow);
+                    color: var(--deep-space);
+                    font-weight: 700;
+                    border-color: var(--teal-glow);
+                    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
                 }
 
                 #tab-abhishek.active {
-                    color: var(--peach-glow);
-                    /* Differentiate colors if desired, or keep consistent */
-                    border-bottom-color: var(--peach-glow);
-                    background: rgba(244, 159, 117, 0.05);
+                    /* Optional: Different color for Abhi? Or keep uniform Teal? Keeping Teal for consistency with Workplace theme unless requested. */
                 }
 
                 /* Layout Classes for Inner Split */
@@ -532,6 +533,11 @@
 
                 .founder-text-zone {
                     padding: 50px;
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(15, 23, 42, 0.8) 100%);
+                }
+
+                .founder-photo-zone {
+                    background: rgba(0, 0, 0, 0.3);
                 }
 
                 .arch-marker-bl {
@@ -591,13 +597,18 @@
                     .founder-text-zone {
                         padding: 30px;
                     }
+
+                    .workplace-btn {
+                        padding: 8px 15px;
+                        font-size: 0.8rem;
+                    }
                 }
             </style>
 
             <script>
                 function switchProfile(name) {
                     // Update Tabs
-                    document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.workplace-btn').forEach(t => t.classList.remove('active'));
                     document.getElementById('tab-' + name).classList.add('active');
 
                     // Update Content
