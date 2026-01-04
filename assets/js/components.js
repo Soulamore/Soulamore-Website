@@ -266,7 +266,9 @@ const NAV_DATA = [
                 href: 'spaces/soulamore-workplace/index.html',
                 type: 'submenu',
                 children: [
-                    { label: 'Overview', href: 'spaces/soulamore-workplace/index.html' }
+                    { label: 'Overview', href: 'spaces/soulamore-workplace/index.html' },
+                    { label: 'Plans & Pricing', href: 'spaces/soulamore-workplace/plans.html' },
+                    { label: 'Guidelines', href: 'spaces/soulamore-workplace/guidelines.html' }
                 ]
             },
             {
