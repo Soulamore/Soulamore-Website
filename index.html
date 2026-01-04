@@ -882,7 +882,8 @@
             <div class="glass-card" style="text-align:center; padding:40px;">
                 <h3 style="color:var(--teal-glow); margin-bottom:20px;">Need a moment?</h3>
                 <div class="game-circle expanding" onmousedown="holdBreath()" onmouseup="releaseBreath()"
-                    ontouchstart="holdBreath()" ontouchend="releaseBreath()">
+                    onmouseleave="releaseBreath()" ontouchstart="holdBreath()" ontouchend="releaseBreath()"
+                    ontouchcancel="releaseBreath()" oncontextmenu="return false;">
                     <span id="breathLabel" style="pointer-events:none; font-weight:700;">Breathe</span>
                 </div>
                 <p id="breathStatus" style="font-size:0.9rem; opacity:0.7; height:20px;">Watch the circle...</p>
@@ -1152,14 +1153,19 @@
             clearTimeout(breathTimer);
 
             const status = document.getElementById('breathStatus');
+            const label = document.getElementById('breathLabel');
+            const circle = document.querySelector('.game-circle');
+
+            // Override everything to ensure "Exhale" state
             status.innerText = "Release... Let it go.";
             status.style.fontSize = "0.9rem"; // Reset size
             status.style.color = "rgba(255,255,255,0.7)";
             status.style.fontWeight = "normal";
 
-            document.querySelector('.game-circle').style.borderColor = "#4ECDC4";
-            document.querySelector('.game-circle').style.boxShadow = ""; // Remove glow
-            document.getElementById('breathLabel').innerText = "Exhale";
+            label.innerText = "Exhale"; // Force Label
+
+            circle.style.borderColor = "#4ECDC4";
+            circle.style.boxShadow = ""; // Remove glow logic if stuck
         }
 
         // 6. ORACLE
