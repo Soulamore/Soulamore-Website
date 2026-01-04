@@ -63,7 +63,7 @@ try {
                 margin: 0 auto !important;
             }
             .nav-logo img {
-                height: 50px !important; /* Increased from 40px per user request */
+                height: 75px !important; /* Increased to 1.5x original 50px */
                 width: auto !important;
             }
             /* Button Consistency */
