@@ -14,6 +14,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/global.css">
 
+    <!-- FIREBASE INTEGRATION -->
+    <script type="module" src="../../assets/js/firebase-config.js"></script>
+    <script type="module" src="../../assets/js/data-handler.js"></script>
+
     <style>
         /* --- PAGE SPECIFIC THEME: ANXIETY (Soft Lavender & Teal) --- */
         :root {
@@ -630,6 +634,11 @@
             const feedback = document.getElementById('worryFeedback');
 
             if (input.value.trim() !== "") {
+                // Save to Backend (Worry)
+                if (window.SoulBackend && window.SoulBackend.submitVent) {
+                    window.SoulBackend.submitVent(input.value, 'worry_later_box');
+                }
+
                 input.classList.add('disappear-anim');
                 setTimeout(() => {
                     input.style.display = 'none';
