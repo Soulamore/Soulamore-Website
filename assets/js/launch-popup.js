@@ -21,7 +21,7 @@
 
     // 1. Create the Popup HTML Structure
     const popupHTML = `
-    <div class="popup-overlay" id="launchPopup" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 9999; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);">
+    <div class="popup-overlay" id="launchPopup" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 999999; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);">
         <style>
             .popup-card { background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; width: 90%; max-width: 1000px; height: 85vh; max-height: 800px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); display: grid; grid-template-columns: 1.2fr 1fr; overflow: hidden; position: relative; color: white; }
             .badge { background: rgba(78, 205, 196, 0.1); color: #4ECDC4; border: 1px solid #4ECDC4; padding: 6px 16px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; letter-spacing: 1px; width: fit-content; margin-bottom: 20px; font-family: 'Plus Jakarta Sans', sans-serif; }

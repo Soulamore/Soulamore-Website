@@ -727,75 +727,87 @@
             <footer id="main-footer"></footer>
             <!-- COMPONENTS SCIPT -->
             <script src="../../assets/js/components.js"></script>
-            <script>document.addEventListener("DOMContentLoaded", () => {
-                    if (typeof injectHeader === 'function') injectHeader();
-                    if (typeof injectFooter === 'function') injectFooter();
+            <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                    // 0. Safety Check for Global Injections
+                    try {
+                        if (typeof injectHeader === 'function') injectHeader();
+                        if (typeof injectFooter === 'function') injectFooter();
+                    } catch (e) {
+                        console.error("Soulamore: Injection error", e);
+                    }
 
-                    // Handle URL Hash for Deep Linking (e.g. index.html#programs)
+                    // 1. Setup IntersectionObserver for inner content fade-ins
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.style.opacity = '1';
+                                entry.target.style.transform = "translateY(0)";
+                                observer.unobserve(entry.target); // Trigger only once
+                            }
+                        });
+                    });
+                    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+                    // 2. Handle URL Hash for Deep Linking
                     const hash = window.location.hash.substring(1);
                     const validIds = ['main', 'programs', 'employees', 'financial', 'hr', 'policy'];
 
-                    if (hash && validIds.includes(hash)) {
-                        setTimeout(() => navTo(hash), 100);
-                    }
+                    setTimeout(() => {
+                        if (hash && validIds.includes(hash)) {
+                            navTo(hash);
+                        } else {
+                            navTo('main'); // Default
+                        }
+                    }, 100);
 
-                    else {
-                        // Default to Overview
-                        setTimeout(() => navTo('main'), 100);
+                    // 3. Particles Effect (Safe Limit)
+                    const pContainer = document.getElementById('particles');
+                    if (pContainer) {
+                        for (let i = 0; i < 30; i++) {
+                            let p = document.createElement('div');
+                            p.classList.add('particle');
+                            p.style.left = Math.random() * 100 + 'vw';
+                            p.style.width = Math.random() * 4 + 'px';
+                            p.style.height = p.style.width;
+                            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+                            p.style.opacity = Math.random() * 0.3;
+                            pContainer.appendChild(p);
+                        }
                     }
                 });
 
-                // --- SUB-NAV LOGIC (Global Scope) ---
+                // --- GLOBAL NAV LOGIC ---
                 window.navTo = function (pageId) {
-                    // 1. Fade Out Current Active
-                    const currentActive = document.querySelector('.page-view.active');
+                    console.log("Navigating to:", pageId);
 
-                    // Helper to activate new page
-                    const activateNewPage = () => {
-                        // Hide all
-                        document.querySelectorAll('.page-view').forEach(p => {
-                            p.classList.remove('active');
-                            p.classList.remove('fade-in-active');
-                        });
+                    // A. Hide All Pages
+                    document.querySelectorAll('.page-view').forEach(p => {
+                        p.classList.remove('active');
+                        p.classList.remove('fade-in-active');
+                    });
 
-                        // Show Target
-                        const targetPage = document.getElementById(pageId);
+                    // B. Show Target Page
+                    const targetPage = document.getElementById(pageId);
+                    if (targetPage) {
+                        targetPage.classList.add('active'); // set display:block
 
-                        console.log(`Soulamore Debug: Attempting to switch to '${pageId}'`); // DEBUG
+                        // Trigger fade-in after slight delay to allow rendering
+                        setTimeout(() => {
+                            targetPage.classList.add('fade-in-active'); // set opacity:1
 
-                        if (targetPage) {
-                            console.log(`Soulamore Debug: Found target page:`, targetPage); // DEBUG
-                            targetPage.classList.add('active');
-                            // Small delay to allow display:block to render before opacity change
-                            setTimeout(() => {
-                                targetPage.classList.add('fade-in-active');
-                                console.log(`Soulamore Debug: Added fade-in to`, targetPage); // DEBUG
-                            }, 50);
-
-                            // Removed automatic scroll to prevent "jerk"
-                        } else {
-                            console.error(`Soulamore Debug: Target page '${pageId}' NOT found!`); // DEBUG
-                        }
-                    };
-
-                    if (currentActive) {
-                        currentActive.classList.remove('fade-in-active');
-                        // Wait for transition before switching (200ms for quick feel)
-                        setTimeout(activateNewPage, 300);
+                            // Force refresh observer for children if needed
+                            // (But usually the display:block change is enough)
+                        }, 50);
                     } else {
-                        activateNewPage();
+                        console.error("Target page not found:", pageId);
                     }
 
-                    // 2. Button State
+                    // C. Update Buttons
                     document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
-
-                    const buttons = document.querySelectorAll('.sub-nav-container .workplace-btn');
-                    // Reset all
 
                     const mapping = {
                         'main': 0,
-                        // Plans(1) is a link
-                        // Guidelines(2) is a link
                         'programs': 3,
                         'employees': 4,
                         'financial': 5,
@@ -803,42 +815,13 @@
                         'policy': 7
                     };
 
-                    if (mapping[pageId] !== undefined && buttons[mapping[pageId]]) {
-                        buttons[mapping[pageId]].classList.add('active');
+                    const index = mapping[pageId];
+                    const buttons = document.querySelectorAll('.sub-nav-container .workplace-btn');
+
+                    if (index !== undefined && buttons[index]) {
+                        buttons[index].classList.add('active');
                     }
                 };
-
-                // Removed stray brace that was causing SyntaxError
-
-                // 3. Enforce Header Consistency
-                // The global components.js handles the island-nav look.
-
-                // Particles
-                const pContainer = document.getElementById('particles');
-
-                if (pContainer) {
-                    for (let i = 0; i < 40; i++) {
-                        let p = document.createElement('div');
-                        p.classList.add('particle');
-                        p.style.left = Math.random() * 100 + 'vw';
-                        p.style.width = Math.random() * 4 + 'px';
-                        p.style.height = p.style.width;
-                        p.style.animationDuration = Math.random() * 20 + 10 + 's';
-                        p.style.opacity = Math.random() * 0.3;
-                        pContainer.appendChild(p);
-                    }
-                }
-
-                // Fade In Observer
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.style.opacity = 1;
-                            entry.target.style.transform = "translateY(0)";
-                        }
-                    });
-                });
-                document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
             </script>
 </body>
 
