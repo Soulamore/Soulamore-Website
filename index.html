@@ -855,31 +855,30 @@
             </p>
         </div>
 
-        <!-- 3. WHY SOULAMORE (4 Pillars) -->
+        <!-- 3. OUR 4 PILLARS (The Core Goals) -->
         <div class="features-grid fade-in" style="margin-top: 50px; margin-bottom: 50px;">
             <div class="feature-box">
-                <i class="fas fa-user-secret f-icon"></i>
-                <h3>100% Anonymous</h3>
-                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">No names. No judgment. Just you and your
-                    thoughts.</p>
+                <i class="fas fa-brain f-icon" style="color:#a78bfa;"></i>
+                <h3>Mental</h3>
+                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">Navigating stress, anxiety, and emotional
+                    overwhelm.</p>
             </div>
             <div class="feature-box">
-                <i class="fas fa-users f-icon" style="color:var(--teal-glow);"></i>
-                <h3>Peer Support</h3>
-                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">Talk to students who actually get what you're
-                    going through.</p>
+                <i class="fas fa-coins f-icon" style="color:var(--gold-glow);"></i>
+                <h3>Financial</h3>
+                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">Managing money pressure and economic reality.
+                </p>
             </div>
             <div class="feature-box">
-                <i class="fas fa-feather-alt f-icon" style="color:#a78bfa;"></i>
-                <h3>Lightness First</h3>
-                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">Tools designed to lift the weight off your
-                    chest instantly.</p>
+                <i class="fas fa-running f-icon" style="color:var(--teal-glow);"></i>
+                <h3>Physical</h3>
+                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">Reconnecting with your body and breath.</p>
             </div>
             <div class="feature-box">
-                <i class="fas fa-shield-alt f-icon" style="color:var(--gold-glow);"></i>
-                <h3>Safe Space</h3>
-                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">A moderated, kindness-first community
-                    ecosystem.</p>
+                <i class="fas fa-graduation-cap f-icon" style="color:var(--peach-glow);"></i>
+                <h3>Academic</h3>
+                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">Handling grades, future panic, and career
+                    doubt.</p>
             </div>
         </div>
 
@@ -1039,12 +1038,19 @@
         }
 
         // 3. SHREDDER
-        function shredWorry() {
-            const inp = document.getElementById('worryText');
-            if (inp.value.trim() === "") return;
-            inp.classList.add('shredding');
+        // 4. SHREDDER (V2 Logic)
+        function shredIt() {
+            const inp = document.getElementById('shredInput');
+            if (inp.value.trim() === "") {
+                inp.placeholder = "Please type something first...";
+                return;
+            }
 
-            // Soften the experience with immediate feedback
+            // Animation
+            inp.style.transition = "1s";
+            inp.style.transform = "translateY(50px) scale(0.9)";
+            inp.style.opacity = "0";
+
             setTimeout(() => {
                 const nextSteps = `
                     <div class="fade-in">
@@ -1113,15 +1119,37 @@
         function clearChat() { /* No op */ }
         function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
 
-        // 5. BREATH GAME
+        // 5. BREATH GAME (With 4 Second Hold Timer)
+        let breathTimer;
+
         function holdBreath() {
-            document.getElementById('breathStatus').innerText = "Hold... Stay with it...";
-            document.querySelector('.game-circle').style.borderColor = "#F49F75";
-            document.getElementById('breathLabel').innerText = "Holding";
+            const status = document.getElementById('breathStatus');
+            const label = document.getElementById('breathLabel');
+            const circle = document.querySelector('.game-circle');
+
+            status.innerText = "Hold... Stay with it...";
+            circle.style.borderColor = "#F49F75";
+            label.innerText = "Holding";
+
+            // Clear any existing timer just in case
+            clearTimeout(breathTimer);
+
+            // Set timer for 4 seconds
+            breathTimer = setTimeout(() => {
+                status.innerText = "Release now...";
+                label.innerText = "Release";
+                circle.style.borderColor = "#4ECDC4"; // Change color to visual cue
+                circle.style.boxShadow = "0 0 30px #4ECDC4"; // Add glow
+            }, 4000);
         }
+
         function releaseBreath() {
+            // Clear timer if user releases early or after timer
+            clearTimeout(breathTimer);
+
             document.getElementById('breathStatus').innerText = "Release... Let it go.";
             document.querySelector('.game-circle').style.borderColor = "#4ECDC4";
+            document.querySelector('.game-circle').style.boxShadow = ""; // Remove glow
             document.getElementById('breathLabel').innerText = "Exhale";
         }
 
