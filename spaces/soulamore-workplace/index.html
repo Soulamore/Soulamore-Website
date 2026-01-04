@@ -152,24 +152,23 @@
         /* --- PAGE SECTIONS --- */
         .page-view {
             display: none;
-            padding: 40px 0 100px;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
         }
 
         .page-view.active {
             display: block;
-            animation: pageFade 0.5s ease-out;
+            /* Animation handled in JS for smoothness */
         }
 
-        @keyframes pageFade {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
+        .page-view.fade-in-active {
+            opacity: 1;
+        }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
         }
 
         /* --- UI COMPONENTS --- */
@@ -675,28 +674,70 @@
 
         // --- SUB-NAV LOGIC ---
         function navTo(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
-            // Deactivate all buttons
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            // 1. Fade Out Current Active
+            const currentActive = document.querySelector('.page-view.active');
 
-            // Show target page
-            const targetPage = document.getElementById(pageId);
-            if (targetPage) {
-                targetPage.classList.add('active');
-                // Scroll to top of page (since body scrolls now)
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Helper to activate new page
+            const activateNewPage = () => {
+                // Hide all
+                document.querySelectorAll('.page-view').forEach(p => {
+                    p.classList.remove('active');
+                    p.classList.remove('fade-in-active');
+                });
+
+                // Show Target
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                    // Small delay to allow display:block to render before opacity change
+                    setTimeout(() => {
+                        targetPage.classList.add('fade-in-active');
+                    }, 50);
+
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            };
+
+            if (currentActive) {
+                currentActive.classList.remove('fade-in-active');
+                // Wait for transition before switching (200ms for quick feel)
+                setTimeout(activateNewPage, 300);
+            } else {
+                activateNewPage();
             }
 
-            // Activate button
-            // Logic: find button with onclick="navTo('pageId')" or by index
-            // Simple approach: strict mapping or query selector
+            // 2. Button State
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            // Map IDs to Button Index (Strict Order: Main, Plans, Guidelines, Programs, Employees, Financial, HR, Policy)
+            // Plans(1) & Guidelines(2) are links, so we skip them in index mapping if using div only logic, 
+            // BUT here we have mixed types. Let's use more robust selector logic.
+
+            const buttons = document.querySelectorAll('.sub-nav-container .nav-btn');
+            // Reset all
+            buttons.forEach(btn => btn.classList.remove('active'));
+
             const mapping = {
-                'main': 0, 'programs': 1, 'employees': 2, 'financial': 3, 'hr': 4, 'policy': 5
+                'main': 0,
+                // Plans(1) is a link
+                // Guidelines(2) is a link
+                'programs': 3,
+                'employees': 4,
+                'financial': 5,
+                'hr': 6,
+                'policy': 7
             };
-            if (mapping[pageId] !== undefined) {
-                const buttons = document.querySelectorAll('.sub-nav-container .nav-btn');
-                if (buttons[mapping[pageId]]) buttons[mapping[pageId]].classList.add('active');
+
+            if (mapping[pageId] !== undefined && buttons[mapping[pageId]]) {
+                buttons[mapping[pageId]].classList.add('active');
+            }
+
+            // 3. Enforce Header Consistency
+            const header = document.querySelector('header');
+            if (header) {
+                header.style.setProperty('background', 'rgba(15, 23, 42, 0.95)', 'important');
+                header.style.setProperty('backdrop-filter', 'none', 'important');
+                header.style.setProperty('box-shadow', 'none', 'important');
+                header.style.setProperty('border', 'none', 'important');
             }
         }
 

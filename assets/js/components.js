@@ -563,6 +563,37 @@ function injectFooter() {
     }
 }
 
+// --- FAVICON INJECTION ---
+function injectFavicon() {
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+    }
+
+    const path = window.location.pathname;
+    let iconSVG = '';
+
+    // TEAL: #4ECDC4, PEACH: #F49F75, GOLD: #fbbf24
+
+    if (path.includes('soulamore-workplace')) {
+        // WORKPLACE (Briefcase) - Teal/Blue theme
+        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%234ECDC4" d="M128 480h256V80c0-26.5-21.5-48-48-48H176c-26.5 0-48 21.5-48 48v400zm64-400h128v32H192V80z"/><path fill="%234ECDC4" d="M32 128h448v352H32z"/></svg>`;
+    } else if (path.includes('soulamore-campus')) {
+        // CAMPUS (Grad Cap) - Blue/White
+        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="%234ECDC4" d="M320 32l-320 160h640L320 32z"/><path fill="%23F49F75" d="M112 256v128c0 70.7 93.1 128 208 128s208-57.3 208-128V256c-34.9 20.3-88.7 32-144 32s-109.1-11.7-144-32z"/></svg>`;
+    } else if (path.includes('physical-wellness') || path.includes('renu-dogra')) {
+        // PHYSICAL/RENU (Lotus/Flower) - Saffron/Orange
+        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23f59e0b" d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0 0 114.6 0 256s114.6 256 256 256zm0-48c-114.9 0-208-93.1-208-208S141.1 48 256 48s208 93.1 208 208-93.1 208-208 208z"/><circle cx="256" cy="256" r="64" fill="white"/></svg>`;
+    } else {
+        // DEFAULT (Simple Globe/Logo) - Teal
+        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="256" fill="%234ECDC4"/><path fill="%230f172a" d="M365 318c-23-14-55-19-61-12-5 5-2 37 13 58 12 18 10 32-1 32-23 0-51-38-51-38-46-63-98-35-98-35-36 12-57 32-73 52 35 34 83 55 136 55 106 0 192-86 192-192 0-35-9-68-26-96-8 30-14 62-31 76z"/></svg>`;
+    }
+
+    link.href = `data:image/svg+xml,${iconSVG}`;
+}
+
 // --- 5. ACTIVE STATE LOGIC ---
 
 function setActiveState() {
