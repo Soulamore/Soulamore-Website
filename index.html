@@ -1239,7 +1239,13 @@
 
             // BACKEND: Submit as a visual "shred" vent
             if (window.SoulBackend && window.SoulBackend.submitVent) {
-                window.SoulBackend.submitVent(inp.value, 'shred');
+                // Return the promise so we can catch errors
+                window.SoulBackend.submitVent(inp.value, 'shred')
+                    .then(() => console.log("Shredded to DB"))
+                    .catch(err => {
+                        console.error("Shred Error:", err);
+                        alert("Database Error: " + err.message + "\n\nTip: Check your Firestore 'Rules' tab.");
+                    });
             } else {
                 console.warn("Backend not ready, shredding visually only.");
             }
