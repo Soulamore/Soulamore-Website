@@ -222,16 +222,17 @@
             margin-bottom: 20px;
         }
 
-        /* --- TAG SELECTION (Hidden Checkbox) --- */
+        /* --- TAG SELECTION (Updated for Reliability) --- */
         .tag-item {
             position: relative;
         }
 
-        .tag-item input {
+        .tag-item .hidden-box {
             position: absolute;
             opacity: 0;
             width: 0;
             height: 0;
+            cursor: pointer;
         }
 
         .tag-item .check-label {
@@ -244,9 +245,11 @@
             font-size: 0.85rem;
             text-align: center;
             transition: 0.2s;
+            user-select: none;
         }
 
-        .tag-item input:checked+.check-label {
+        /* When input (sibling) is checked, style the label */
+        .tag-item .hidden-box:checked+.check-label {
             background: var(--teal-glow);
             color: var(--deep-space);
             font-weight: 700;
@@ -351,22 +354,22 @@
                     <div class="grid-2">
                         <div>
                             <label style="font-size:0.85rem; margin-bottom:5px; display:block;">Full Name</label>
-                            <input type="text" class="input-box" required>
+                            <input type="text" name="fullName" class="input-box" required>
                         </div>
                         <div>
                             <label style="font-size:0.85rem; margin-bottom:5px; display:block;">Email</label>
-                            <input type="email" class="input-box" required>
+                            <input type="email" name="email" class="input-box" required>
                         </div>
                     </div>
                     <div class="grid-2">
                         <div>
                             <label style="font-size:0.85rem; margin-bottom:5px; display:block;">Phone (Country
                                 Code)</label>
-                            <input type="tel" class="input-box" required>
+                            <input type="tel" name="phone" class="input-box" required>
                         </div>
                         <div>
                             <label style="font-size:0.85rem; margin-bottom:5px; display:block;">Location</label>
-                            <select class="input-box" required>
+                            <select name="location" class="input-box" required>
                                 <option value="" disabled selected>Select Region...</option>
                                 <option>India (Delhi/NCR)</option>
                                 <option>India (Mumbai)</option>
@@ -382,7 +385,7 @@
                     <div class="grid-2">
                         <div>
                             <label style="font-size:0.85rem; margin-bottom:5px; display:block;">Qualification</label>
-                            <select class="input-box" required>
+                            <select name="qualification" class="input-box" required>
                                 <option value="" disabled selected>Select Highest Degree...</option>
                                 <option>M.Phil (Clinical Psych)</option>
                                 <option>M.Sc / M.A. Psychology</option>
@@ -394,28 +397,90 @@
                         <div>
                             <label style="font-size:0.85rem; margin-bottom:5px; display:block;">License / Reg
                                 Number</label>
-                            <input type="text" class="input-box" required>
+                            <input type="text" name="license" class="input-box" required>
                         </div>
                     </div>
+
+                    <style>
+                        /* Local override for this form's specific needs */
+                        select option {
+                            background-color: #0f172a;
+                            color: white;
+                        }
+
+                        /* Fix for tag selection interaction */
+                        .tag-item-label {
+                            display: block;
+                            padding: 10px;
+                            background: rgba(255, 255, 255, 0.03);
+                            border: 1px solid var(--border-glass);
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 0.85rem;
+                            text-align: center;
+                            transition: 0.2s;
+                            position: relative;
+                            user-select: none;
+                        }
+
+                        .tag-item-label input {
+                            position: absolute;
+                            opacity: 0;
+                            cursor: pointer;
+                            height: 0;
+                            width: 0;
+                        }
+
+                        .tag-item-label:has(input:checked),
+                        .tag-item-label.active {
+                            /* Fallback for browsers not supporting :has, though JS usually handles this or :checked + label pattern */
+                            background: var(--teal-glow);
+                            color: var(--deep-space);
+                            font-weight: 700;
+                            border-color: var(--teal-glow);
+                        }
+
+                        /* Explicit checked state styling using the input inside */
+                        .tag-item-label input:checked+span {
+                            /* If we separate text, but here we just style the label parent if :has is supported. 
+                               Since :has is distinct, let's stick to the reliable peer.html method: Input THEN Label */
+                        }
+                    </style>
 
                     <label style="font-size:0.85rem; margin-top:15px; display:block; margin-bottom:10px;">Areas of
                         Expertise
                         (Select all that apply)</label>
                     <div class="check-grid">
-                        <div class="tag-item"><input type="checkbox"><span class="check-label">Anxiety</span></div>
-                        <div class="tag-item"><input type="checkbox"><span class="check-label">Depression</span></div>
-                        <div class="tag-item"><input type="checkbox"><span class="check-label">Trauma / PTSD</span>
+                        <!-- Switched to Input + Label pattern with IDs for 100% click reliability -->
+                        <div class="tag-item">
+                            <input type="checkbox" id="exp_anxiety" class="hidden-box">
+                            <label for="exp_anxiety" class="check-label">Anxiety</label>
                         </div>
-                        <div class="tag-item"><input type="checkbox"><span class="check-label">Relationships</span>
+                        <div class="tag-item">
+                            <input type="checkbox" id="exp_depression" class="hidden-box">
+                            <label for="exp_depression" class="check-label">Depression</label>
                         </div>
-                        <div class="tag-item"><input type="checkbox"><span class="check-label">Adolescents</span>
+                        <div class="tag-item">
+                            <input type="checkbox" id="exp_ptsd" class="hidden-box">
+                            <label for="exp_ptsd" class="check-label">Trauma / PTSD</label>
                         </div>
-                        <div class="tag-item"><input type="checkbox"><span class="check-label">Grief</span></div>
+                        <div class="tag-item">
+                            <input type="checkbox" id="exp_relationships" class="hidden-box">
+                            <label for="exp_relationships" class="check-label">Relationships</label>
+                        </div>
+                        <div class="tag-item">
+                            <input type="checkbox" id="exp_adolescents" class="hidden-box">
+                            <label for="exp_adolescents" class="check-label">Adolescents</label>
+                        </div>
+                        <div class="tag-item">
+                            <input type="checkbox" id="exp_grief" class="hidden-box">
+                            <label for="exp_grief" class="check-label">Grief</label>
+                        </div>
                     </div>
 
                     <label style="font-size:0.85rem; margin-top:15px; display:block; margin-bottom:10px;">Why Soulamore?
                         (Reflective)</label>
-                    <textarea class="input-box" rows="4" style="resize:none;"
+                    <textarea name="motivation" class="input-box" rows="4" style="resize:none;"
                         placeholder="How do you see yourself contributing to our ecosystem?" required></textarea>
 
                     <button type="submit" class="action-btn" id="psychSubmitBtn">Submit Application</button>
@@ -462,16 +527,117 @@
         tags.forEach(tag => {
             tag.addEventListener('click', () => {
                 tag.classList.toggle('active');
+                checkCompass(); // Update compass on click
             });
         });
 
         function toggleVal(el) {
-            el.classList.toggle('active');
+            // handled by event listener above, but kept for inline onclick compatibility if needed
+            // el.classList.toggle('active'); 
+            // checkCompass();
+        }
+
+        function checkCompass() {
             const activeCount = document.querySelectorAll('.val-tag.active').length;
             if (activeCount >= 3) {
                 document.getElementById('psychCompass').classList.add('compass-active');
                 document.getElementById('valMsg').style.display = 'block';
+            } else {
+                document.getElementById('psychCompass').classList.remove('compass-active');
+                document.getElementById('valMsg').style.display = 'none';
             }
+        }
+
+        // --- SUBMISSION LOGIC ---
+        function submitPsychApp() {
+            const form = document.getElementById('psychAppForm');
+
+            // 1. Collect Basic Fields
+            const data = {
+                fullName: form.querySelector('input[name="fullName"]')?.value || '',
+                email: form.querySelector('input[name="email"]')?.value || '',
+                phone: form.querySelector('input[name="phone"]')?.value || '',
+                location: form.querySelector('select[name="location"]')?.value || '',
+                qualification: form.querySelector('select[name="qualification"]')?.value || '',
+                license: form.querySelector('input[name="license"]')?.value || '',
+                motivation: form.querySelector('textarea[name="motivation"]')?.value || ''
+            };
+
+            // 2. Collect Expertise (Checkboxes)
+            const expertise = [];
+            const checkboxes = form.querySelectorAll('.check-grid input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    const label = cb.nextElementSibling;
+                    if (label) expertise.push(label.innerText.trim());
+                }
+            });
+            data.expertise = expertise;
+
+            // 3. Collect Values (Tags)
+            const values = [];
+            document.querySelectorAll('.val-tag.active').forEach(tag => {
+                values.push(tag.innerText.trim());
+            });
+            data.values = values;
+
+            // Validate
+            if (!data.fullName || !data.email || !data.license) {
+                alert("Please complete all required fields (Name, Email, License).");
+                return;
+            }
+
+            const btn = document.getElementById('psychSubmitBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            btn.disabled = true;
+
+            // Retry / Timeout Logic
+            let retryCount = 0;
+            const maxRetries = 10;
+
+            function trySubmit() {
+                if (window.SoulBackend && window.SoulBackend.submitApp) {
+                    console.log('Submitting psychologist application:', data);
+
+                    // Add timeout
+                    const timeoutPromise = new Promise((_, reject) => {
+                        setTimeout(() => reject(new Error('Submission timeout after 30 seconds')), 30000);
+                    });
+
+                    Promise.race([
+                        window.SoulBackend.submitApp('psychologist', data),
+                        timeoutPromise
+                    ]).then(success => {
+                        if (success) {
+                            console.log('Psychologist application saved!');
+                            window.location.href = 'psychologist-thank-you.html';
+                        } else {
+                            alert('Failed to save application. Please check console for details.');
+                            btn.disabled = false;
+                            btn.innerHTML = originalText;
+                        }
+                    }).catch(err => {
+                        console.error("Submission Error:", err);
+                        alert('Error submitting application: ' + err.message);
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    });
+
+                } else {
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        console.log("Backend not loaded yet. Retrying... (" + retryCount + ")");
+                        setTimeout(trySubmit, 300);
+                    } else {
+                        alert('Backend service unavailable. Please refresh.');
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                }
+            }
+
+            trySubmit();
         }
     </script>
     <script src="../assets/js/soulbot-beta.js"></script>

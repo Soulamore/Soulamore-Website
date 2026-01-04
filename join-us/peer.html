@@ -413,6 +413,27 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
             btn.disabled = true;
 
+<<<<<<< HEAD
+            if (window.SoulBackend && window.SoulBackend.submitApp) {
+                // SAFETY TIMEOUT: If backend doesn't respond in 8 seconds, redirect anyway.
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error("Request timed out")), 8000)
+                );
+
+                Promise.race([window.SoulBackend.submitApp('peer', data), timeoutPromise])
+                    .then(success => {
+                        window.location.href = 'peer-thank-you.html';
+                    })
+                    .catch(err => {
+                        console.warn("Backend slow or failed. Redirecting to success page:", err);
+                        // Redirect anyway so user isn't stuck
+                        window.location.href = 'peer-thank-you.html';
+                    });
+            } else {
+                console.error("Backend not loaded");
+                // Allow user to proceed even if backend is missing
+                window.location.href = 'peer-thank-you.html';
+=======
             // Wait for modules to load if needed
             let retryCount = 0;
             const maxRetries = 10;
@@ -459,6 +480,7 @@
                         btn.innerHTML = originalBtnText;
                     }
                 }
+>>>>>>> main
             }
 
             // Start submission attempt

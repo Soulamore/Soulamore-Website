@@ -1230,11 +1230,24 @@
 
         // 3. SHREDDER
         // 4. SHREDDER (V2 Logic)
-        function shredIt() {
+        async function shredIt() {
             const inp = document.getElementById('shredInput');
             if (inp.value.trim() === "") {
                 inp.placeholder = "Please type something first...";
                 return;
+            }
+
+            // BACKEND: Submit as a visual "shred" vent
+            if (window.SoulBackend && window.SoulBackend.submitVent) {
+                // Return the promise so we can catch errors
+                window.SoulBackend.submitVent(inp.value, 'shred')
+                    .then(() => console.log("Shredded to DB"))
+                    .catch(err => {
+                        console.error("Shred Error:", err);
+                        alert("Database Error: " + err.message + "\n\nTip: Check your Firestore 'Rules' tab.");
+                    });
+            } else {
+                console.warn("Backend not ready, shredding visually only.");
             }
 
             // Animation
