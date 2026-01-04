@@ -43,10 +43,13 @@ export async function handleConfession(text, email = null, phone = null) {
 
 // --- 3. APPLICATIONS (Join Us) ---
 export async function handleApplication(type, data) {
+    // user requested separate collections for easier sorting
+    const collectionName = type === 'psychologist' ? 'psychologists' : 'peers';
+
     try {
-        console.log("Attempting to save application...", type, data);
-        const docRef = await addDoc(collection(db, "applications"), {
-            type: type, // 'peer' or 'psychologist'
+        console.log(`Attempting to save application to ${collectionName}...`, data);
+        const docRef = await addDoc(collection(db, collectionName), {
+            type: type, // Keeping type for redundancy check
             ...data,
             status: "new",
             timestamp: serverTimestamp()
