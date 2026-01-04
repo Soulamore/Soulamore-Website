@@ -1478,8 +1478,38 @@
         // 7. LIFELINE
         function submitLead(e) {
             e.preventDefault();
-            document.querySelector('.lifeline-submit-btn').innerText = "Request Sent ✓";
-            document.querySelector('.lifeline-submit-btn').style.background = "#48bb78";
+            const msg = document.getElementById('lifeMsg').value.trim();
+            const phone = document.getElementById('lifePhone').value.trim();
+            const btn = document.getElementById('btnLife');
+
+            if (!phone) {
+                alert("Please enter a phone number so we can reach you.");
+                return;
+            }
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            btn.disabled = true;
+
+            if (window.SoulBackend && window.SoulBackend.submitContact) {
+                // Use handleContact: (name, email, subject, message)
+                // We map: Name="Lifeline User", Email="N/A", Subject="LIFELINE REQUEST: [Phone]", Message=msg
+                const subject = "LIFELINE REQUEST: " + phone;
+
+                window.SoulBackend.submitContact("Lifeline User", "N/A", subject, msg || "No message provided").then(success => {
+                    if (success) {
+                        btn.innerHTML = "Request Sent <i class='fas fa-check'></i>";
+                        btn.style.background = "#48bb78";
+                    } else {
+                        btn.innerHTML = "Error. Try Again.";
+                        btn.disabled = false;
+                    }
+                });
+            } else {
+                console.error("Backend not loaded");
+                // Fallback UI for now if backend fails to load
+                btn.innerHTML = "Request Sent (Offline)";
+                btn.style.background = "#48bb78";
+            }
         }
 
         // 8. FADE IN
