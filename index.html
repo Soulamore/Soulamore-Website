@@ -1284,15 +1284,27 @@
         }
 
         function startHold() {
-            if (breathState !== "idle") return;
-            // Step 1: Inhale (4s)
+            // Allow restart if idle or success (success implies idle but with glow)
+            if (breathState !== "idle" && breathState !== "success") return;
+
+            // Clean slate start
+            resetBreathGame();
             runInhale();
         }
 
         function stopHold() {
-            // If user releases at any point, reset
-            resetBreathGame();
-            document.getElementById('breathStatus').innerText = "Released too soon. Keep holding.";
+            // If completed successfully, just reset state to idle but KEEP the glow
+            if (breathState === "success") {
+                breathState = "idle";
+                updateBreathUI("Press & Hold", "To start again", "#4ECDC4", "circle-idle");
+                return;
+            }
+
+            // If user releases early (while inhaling/holding/exhaling)
+            if (breathState !== "idle") {
+                resetBreathGame();
+                document.getElementById('breathStatus').innerText = "Released too soon. Keep holding.";
+            }
         }
 
         function runInhale() {
@@ -1328,8 +1340,9 @@
 
             cycleTimer = setTimeout(() => {
                 // Success!
-                breathState = "idle";
-                // Don't reset text immediately, show success
+                breathState = "success"; // Mark as success so stopHold knows not to show error
+
+                // Show completion message
                 const label = document.getElementById('breathLabel');
                 label.innerText = "Done";
                 document.getElementById('breathStatus').innerText = "Great job.";
@@ -1340,14 +1353,8 @@
                 const card = document.getElementById('breathAuthCard');
                 if (card) {
                     card.classList.add('glow-success');
-                    setTimeout(() => card.classList.remove('glow-success'), 4000);
+                    setTimeout(() => card.classList.remove('glow-success'), 5000); // 5s Glow
                 }
-
-                // Prevent stopHold from resetting immediately by setting a flag or just leaving state as idle but handling the mouseup logically
-                // Since state is idle, stopHold() will call resetBreathGame() which sets text back to "Press & Hold".
-                // We actually WANT that if they release now. 
-                // But to show "Done" for a second, let's delay the reset within stopHold if it was a success? 
-                // Actually, standard behavior: Release -> Reset to start. That's fine.
             }, 4000);
         }
 
