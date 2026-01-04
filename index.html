@@ -1060,13 +1060,15 @@
                 style="margin:0; text-align:center; width:100%; display:flex; justify-content:center;">
                 <div class="glass-card" id="breathAuthCard"
                     style="padding:50px; border-radius:30px; width:100%; max-width:800px; transition: all 1s ease;">
-                    <h2 style="font-size:2rem; margin-bottom:10px;">Need a moment?</h2>
+                    <h2 style="font-size:2rem; margin-bottom:10px;">Hold on to a moment</h2>
                     <div class="game-circle" id="gameCircle" onmousedown="startHold()" onmouseup="stopHold()"
                         ontouchstart="startHold()" ontouchend="stopHold()" style="margin: 40px auto;">
                         <span id="breathLabel"
-                            style="pointer-events:none; font-weight:700; color:white; font-size:1.2rem;">Inhale</span>
+                            style="pointer-events:none; font-weight:700; color:white; font-size:1.2rem;">Press &
+                            Hold</span>
                     </div>
-                    <p id="breathStatus" style="font-size:1rem; opacity:0.8; height:20px;">Watch the circle...</p>
+                    <p id="breathStatus" style="font-size:1rem; opacity:0.8; height:20px;">Keep holding to complete the
+                        cycle.</p>
                 </div>
             </div>
 
@@ -1257,16 +1259,32 @@
             clearTimeout(cycleTimer);
             clearInterval(countdownInterval);
             breathState = "idle";
-            updateBreathUI("Breathe", "Press & Hold to Start", "#4ECDC4", "circle-idle");
+            updateBreathUI("Press & Hold", "To start the cycle", "#4ECDC4", "circle-idle");
 
             // Remove success glow if present
-            const card = document.getElementById('breathAuthCard'); // We will add this ID
+            const card = document.getElementById('breathAuthCard');
             if (card) card.classList.remove('glow-success');
+        }
+
+        function createCountdown(duration, callback) {
+            let count = duration;
+            // Immediate update
+            document.getElementById('breathLabel').innerText = count;
+
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    document.getElementById('breathLabel').innerText = count;
+                } else {
+                    clearInterval(countdownInterval);
+                    if (callback) callback();
+                }
+            }, 1000);
         }
 
         function startHold() {
             if (breathState !== "idle") return;
-
             // Step 1: Inhale (4s)
             runInhale();
         }
@@ -1274,12 +1292,15 @@
         function stopHold() {
             // If user releases at any point, reset
             resetBreathGame();
-            document.getElementById('breathStatus').innerText = "Released too soon. Press to try again.";
+            document.getElementById('breathStatus').innerText = "Released too soon. Keep holding.";
         }
 
         function runInhale() {
             breathState = "inhaling";
-            updateBreathUI("Inhale", "Keep holding...", "#4ECDC4", "circle-inhale");
+            updateBreathUI(4, "Inhale deeply... Keep holding...", "#4ECDC4", "circle-inhale");
+
+            // Start Countdown 4->1
+            createCountdown(4);
 
             cycleTimer = setTimeout(() => {
                 runHold();
@@ -1288,17 +1309,10 @@
 
         function runHold() {
             breathState = "holding";
-            let count = 4;
-            updateBreathUI(count, "Hold... Keep holding...", "#F49F75", "circle-hold");
+            updateBreathUI(4, "Hold breath... Keep holding...", "#F49F75", "circle-hold");
 
-            countdownInterval = setInterval(() => {
-                count--;
-                if (count > 0) {
-                    document.getElementById('breathLabel').innerText = count;
-                } else {
-                    clearInterval(countdownInterval);
-                }
-            }, 1000);
+            // Start Countdown 4->1
+            createCountdown(4);
 
             cycleTimer = setTimeout(() => {
                 runExhale();
@@ -1306,34 +1320,34 @@
         }
 
         function runExhale() {
-            clearInterval(countdownInterval); // Ensure hold timer stops
             breathState = "exhaling";
-            let count = 4;
-            updateBreathUI("Exhale", "Exhale slowly... Keep holding...", "#4ECDC4", "circle-exhale");
+            updateBreathUI(4, "Exhale slowly... Keep holding...", "#4ECDC4", "circle-exhale");
 
-            countdownInterval = setInterval(() => {
-                count--;
-                if (count > 0) {
-                    document.getElementById('breathStatus').innerText = `Exhale slowly... ${count}`;
-                } else {
-                    clearInterval(countdownInterval);
-                }
-            }, 1000);
+            // Start Countdown 4->1
+            createCountdown(4);
 
             cycleTimer = setTimeout(() => {
                 // Success!
-                breathState = "idle"; // Reset state so stopHold doesn't show error
-                updateBreathUI("Done", "Great job.", "#4ECDC4", "circle-idle");
+                breathState = "idle";
+                // Don't reset text immediately, show success
+                const label = document.getElementById('breathLabel');
+                label.innerText = "Done";
+                document.getElementById('breathStatus').innerText = "Great job.";
+                document.getElementById('gameCircle').className = "game-circle circle-idle";
+                document.getElementById('gameCircle').style.borderColor = "#4ECDC4";
 
                 // Trigger Light Up Effect
-                const card = document.getElementById('breathAuthCard'); // Assuming ID added to parent
+                const card = document.getElementById('breathAuthCard');
                 if (card) {
                     card.classList.add('glow-success');
-                    // Remove after a few seconds automatically
                     setTimeout(() => card.classList.remove('glow-success'), 4000);
                 }
 
-                // Stop the 'stopHold' from triggering an error by unbinding or ignoring
+                // Prevent stopHold from resetting immediately by setting a flag or just leaving state as idle but handling the mouseup logically
+                // Since state is idle, stopHold() will call resetBreathGame() which sets text back to "Press & Hold".
+                // We actually WANT that if they release now. 
+                // But to show "Done" for a second, let's delay the reset within stopHold if it was a success? 
+                // Actually, standard behavior: Release -> Reset to start. That's fine.
             }, 4000);
         }
 
