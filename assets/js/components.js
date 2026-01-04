@@ -303,8 +303,8 @@ const NAV_DATA = [
                 href: 'spaces/soulamore-workplace/index.html',
                 type: 'submenu',
                 children: [
-                    { label: 'Plans & Pricing', href: 'spaces/soulamore-workplace/plans.html' },
-                    { label: 'Guidelines', href: 'spaces/soulamore-workplace/guidelines.html' }
+                    { label: 'Plans & Pricing', href: 'spaces/soulamore-workplace/index.html#plans' },
+                    { label: 'Guidelines', href: 'spaces/soulamore-workplace/index.html#guidelines' }
                 ]
             },
             {
@@ -313,7 +313,6 @@ const NAV_DATA = [
                 href: 'spaces/soulamore-away.html',
                 type: 'submenu',
                 children: [
-                    { label: 'Overview', href: 'spaces/soulamore-away.html' },
                     { label: 'Away Resources', href: 'spaces/soulamore-away/resources.html' }
                 ]
             }
