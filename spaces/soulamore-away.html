@@ -69,7 +69,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 150px 24px 100px;
             position: relative;
             z-index: 5;
         }
@@ -108,7 +108,7 @@
 
         /* --- HERO --- */
         .hero {
-            padding: 150px 0 100px;
+            padding: 0 0 100px;
             text-align: center;
             position: relative;
         }
@@ -1013,16 +1013,48 @@
             isPlaying = !isPlaying;
         }
 
-        // --- POSTCARD ---
+        <!-- MODULE: Backend -->
+    </script>
+    <script type="module" src="../assets/js/firebase-config.js"></script>
+    <script type="module" src="../assets/js/data-handler.js"></script>
+
+    <script>
+        // --- POSTCARD LOGIC ---
         function sendPostcard() {
-            const inp = document.getElementById('messageText');
-            const card = document.getElementById('postcardContainer');
-            if (inp.value.trim() === "") return;
-            card.classList.add('flying');
-            setTimeout(() => {
-                card.style.display = 'none';
-                document.getElementById('postSuccess').style.display = 'block';
-            }, 1500);
+            const txt = document.getElementById('messageText');
+            const val = txt.value.trim();
+            const btn = document.querySelector('.send-btn');
+
+            if (val.length > 5) {
+                // UI Feedback
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+                // Call Backend
+                if (window.SoulBackend && window.SoulBackend.submitPostcard) {
+                    window.SoulBackend.submitPostcard(val, "WebUser").then(success => {
+                        if (success) {
+                            // Transformation Animation
+                            const card = document.getElementById('postcardContainer');
+                            card.style.transform = "rotateX(90deg)"; // Fold up
+                            card.style.opacity = "0";
+
+                            setTimeout(() => {
+                                card.style.display = 'none';
+                                const successMsg = document.getElementById('postSuccess');
+                                successMsg.style.display = 'block';
+                                successMsg.classList.add('fade-in');
+                            }, 500);
+                        } else {
+                            btn.innerText = "Error. Try again.";
+                        }
+                    });
+                } else {
+                    console.error("Backend not loaded");
+                }
+            } else {
+                txt.style.borderColor = 'var(--peach-glow)';
+                txt.placeholder = "Please write a bit more...";
+            }
         }
 
         // --- FADE IN ---

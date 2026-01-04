@@ -67,7 +67,7 @@
         .container {
             max-width: 1100px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 150px 24px 100px;
             position: relative;
             z-index: 5;
         }
@@ -184,7 +184,7 @@
 
         /* --- HERO SECTION --- */
         .hero {
-            padding: 150px 0 100px;
+            padding: 0 0 100px;
             text-align: center;
             position: relative;
         }
@@ -704,18 +704,18 @@
                 <!-- RIGHT: FORM -->
                 <div class="form-panel">
                     <div id="formContent">
-                        <form onsubmit="handleRelease(event)">
-                            <textarea class="typing-area" placeholder="Start typing here... No one knows it's you."
-                                required></textarea>
+                        <form id="confessionForm" onsubmit="event.preventDefault(); submitConfession();">
+                            <textarea id="confessionText" class="typing-area"
+                                placeholder="Start typing here... No one knows it's you." required></textarea>
 
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
-                                <input type="email" placeholder="Email (Optional)"
+                                <input type="email" id="confessionEmail" placeholder="Email (Optional)"
                                     style="background:transparent; border:1px solid var(--border-glass); padding:12px; border-radius:8px; color:white; width:100%;">
-                                <input type="tel" placeholder="Phone (Optional)"
+                                <input type="tel" id="confessionPhone" placeholder="Phone (Optional)"
                                     style="background:transparent; border:1px solid var(--border-glass); padding:12px; border-radius:8px; color:white; width:100%;">
                             </div>
 
-                            <button type="submit" class="release-btn">
+                            <button type="submit" class="release-btn" id="confessionSubmitBtn">
                                 Release to the Universe <i class="fas fa-paper-plane"></i>
                             </button>
                         </form>
@@ -820,24 +820,79 @@
         // Initialize bubbles
         setInterval(createThought, 1500);
 
-        // --- AUDIO TOGGLE ---
+        <!-- AUDIO LOGIC -->
+    </script>
+    <script>
         const audio = document.getElementById('ambientAudio');
         const visualizer = document.getElementById('audioVisualizer');
         const audioText = document.getElementById('audioText');
+        const control = document.querySelector('.audio-control');
         let isPlaying = false;
 
         function toggleAudio() {
-            if (isPlaying) {
-                audio.pause();
-                visualizer.classList.remove('playing');
-                audioText.innerText = "Play Audio";
-            } else {
-                audio.volume = 0.3;
+            if (!isPlaying) {
                 audio.play();
-                visualizer.classList.add('playing');
-                audioText.innerText = "Pause";
+                control.classList.add('playing');
+                audioText.innerText = "Pause Audio";
+            } else {
+                audio.pause();
+                control.classList.remove('playing');
+                audioText.innerText = "Play Audio";
             }
             isPlaying = !isPlaying;
+        }
+
+        // --- MODULE: Backend ---
+    </script>
+    <script type="module" src="../../assets/js/firebase-config.js"></script>
+    <script type="module" src="../../assets/js/data-handler.js"></script>
+
+    <script>
+        // --- CONFESSION SUBMISSION ---
+        function submitConfession() {
+            const text = document.getElementById('confessionText').value;
+            const email = document.getElementById('confessionEmail').value;
+            const phone = document.getElementById('confessionPhone').value;
+            const btn = document.getElementById('confessionSubmitBtn');
+
+            if (text.length < 5) return;
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Releasing...';
+            btn.disabled = true;
+
+            if (window.SoulBackend && window.SoulBackend.submitConfession) {
+                window.SoulBackend.submitConfession(text, email, phone).then(success => {
+                    if (success) {
+                        // Success Animation logic from original script
+                        showSuccessState();
+                    } else {
+                        btn.innerHTML = 'Error. Try Again.';
+                        btn.disabled = false;
+                    }
+                });
+            } else {
+                console.error("Backend not loaded");
+            }
+        }
+
+        function showSuccessState() {
+            const formPanel = document.getElementById('formContent');
+            const successOverlay = document.getElementById('successState');
+
+            formPanel.style.opacity = '0';
+            successOverlay.style.display = 'flex';
+            setTimeout(() => {
+                successOverlay.style.opacity = '1';
+                successOverlay.style.transform = 'scale(1)';
+                // Confetti
+                createStars();
+            }, 100);
+        }
+
+        // --- BACKGROUND THOUGHTS ---
+        // (Existing logic preserved if needed, or simplified)
+        function createStars() {
+            // ... simple confetti logic
         }
 
         // --- STATS COUNT UP ---
@@ -866,24 +921,20 @@
         const stats = document.querySelector('.stats-bar');
         if (stats) observer.observe(stats);
 
-        // --- FORM SUBMIT SIMULATION ---
-        function handleRelease(e) {
-            e.preventDefault();
-            const btn = document.querySelector('.release-btn');
-            const formContent = document.getElementById('formContent');
+        const formContent = document.getElementById('formContent');
 
-            // 1. Change button state
-            btn.innerHTML = '<i class="fas fa-star fa-spin"></i> Sending...';
+        // 1. Change button state
+        btn.innerHTML = '<i class="fas fa-star fa-spin"></i> Sending...';
 
-            // 2. Add flying animation to table container
-            formContent.classList.add('flying-away');
+        // 2. Add flying animation to table container
+        formContent.classList.add('flying-away');
 
-            // 3. Wait for animation to finish then show success
-            setTimeout(() => {
-                formContent.style.display = 'none';
-                formContent.classList.remove('flying-away'); // Reset for next time if needed
-                document.getElementById('successState').style.display = 'flex';
-            }, 1500);
+        // 3. Wait for animation to finish then show success
+        setTimeout(() => {
+            formContent.style.display = 'none';
+            formContent.classList.remove('flying-away'); // Reset for next time if needed
+            document.getElementById('successState').style.display = 'flex';
+        }, 1500);
         }
 
         // --- FADE IN ---

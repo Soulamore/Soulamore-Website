@@ -87,7 +87,7 @@
         .container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 40px 24px 100px;
+            padding: 150px 24px 100px;
             position: relative;
             z-index: 5;
         }
@@ -245,7 +245,7 @@
                     <p>Turn your lived experience into someone else's lifeline.</p>
                 </div>
 
-                <form action="peer-thank-you.html"> <!-- Simulating submission to Thank You page -->
+                <form id="peerAppForm" onsubmit="event.preventDefault(); submitPeerApp();">
                     <div class="form-card">
                         <h3
                             style="margin-bottom:20px; border-bottom:1px solid var(--border-glass); padding-bottom:10px;">
@@ -325,9 +325,9 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="action-btn">Submit Application</button>
-                </form>
+                    <button type="submit" class="action-btn" id="fullSubmitBtn">Submit Application</button>
             </div>
+            </form>
 
         </div>
     </main>
@@ -345,6 +345,49 @@
 
     <script src="../assets/js/components.js"></script>
     <script src="../assets/js/main.js"></script>
+    <!-- MODULE: Backend -->
+    <script type="module" src="../assets/js/firebase-config.js"></script>
+    <script type="module" src="../assets/js/data-handler.js"></script>
+
+    <script>
+        function submitPeerApp() {
+            // Collecting Data (Simplified for Demo, ideally IDs should be on inputs)
+            // Strategy: Since inputs didn't have IDs in previous snippet, 
+            // we will grab them by querySelector order or assume user adds them.
+            // For robustness, let's just grab all 'input' and 'textarea' values into a generic object
+            // But to be precise, let's target the known structure.
+
+            const inputs = document.querySelectorAll('.form-card input, .form-card textarea');
+            let data = {};
+            inputs.forEach((input, index) => {
+                if (input.type !== 'submit' && input.type !== 'checkbox') {
+                    // Use placeholder or label as key proxy if name/id missing
+                    let key = input.getAttribute('placeholder') || 'field_' + index;
+                    data[key] = input.value;
+                }
+                if (input.type === 'checkbox' && input.checked) {
+                    data['interests'] = (data['interests'] || []).concat(input.nextElementSibling.innerText);
+                }
+            });
+
+            const btn = document.getElementById('fullSubmitBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            btn.disabled = true;
+
+            if (window.SoulBackend && window.SoulBackend.submitApp) {
+                window.SoulBackend.submitApp('peer', data).then(success => {
+                    if (success) {
+                        window.location.href = 'peer-thank-you.html';
+                    } else {
+                        btn.innerHTML = 'Error. Try Again.';
+                        btn.disabled = false;
+                    }
+                });
+            } else {
+                console.error("Backend not loaded");
+            }
+        }
+    </script>
     <script>
         const particleContainer = document.getElementById('particles');
         for (let i = 0; i < 30; i++) {

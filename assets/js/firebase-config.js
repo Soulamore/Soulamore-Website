@@ -9,14 +9,15 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // TODO: User to provide these keys from Firebase Console > Project Settings
+// Live Configuration (Soulamore)
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
+    apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
     authDomain: "soulamore-f0a64.firebaseapp.com",
     projectId: "soulamore-f0a64",
-    storageBucket: "soulamore-f0a64.appspot.com",
-    messagingSenderId: "SENDER_ID",
-    appId: "APP_ID",
-    measurementId: "G-MEASUREMENT_ID"
+    storageBucket: "soulamore-f0a64.firebasestorage.app",
+    messagingSenderId: "649985161002",
+    appId: "1:649985161002:web:66141929d4acd4451a5053",
+    measurementId: "G-2K2Z1Q2D1W"
 };
 
 // Initialize Firebase

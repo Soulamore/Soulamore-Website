@@ -57,9 +57,48 @@ export async function handleApplication(type, data) {
     }
 }
 
+// --- 4. CONTACT FORM ---
+export async function handleContact(name, email, subject, message) {
+    try {
+        await addDoc(collection(db, "contacts"), {
+            name: name,
+            email: email,
+            subject: subject,
+            message: message,
+            status: "unread",
+            timestamp: serverTimestamp()
+        });
+        return true;
+    } catch (e) {
+        console.error("Error saving contact: ", e);
+        return false;
+    }
+}
+
+// --- 5. POSTCARD (Soulamore Away) ---
+export async function handlePostcard(message, city = "Unknown") {
+    try {
+        // Simple scrub for postcards as they are public
+        const cleanMessage = window.PIIScrubber ? window.PIIScrubber.scrubStrict(message) : message;
+
+        await addDoc(collection(db, "postcards"), {
+            message: cleanMessage,
+            originCity: city,
+            likes: 0,
+            timestamp: serverTimestamp()
+        });
+        return true;
+    } catch (e) {
+        console.error("Error sending postcard: ", e);
+        return false;
+    }
+}
+
 // Make globally available for inline HTML onclicks (via a bridge helper if needed)
 window.SoulBackend = {
     submitVent: handleVentSubmission,
     submitConfession: handleConfession,
-    submitApp: handleApplication
+    submitApp: handleApplication,
+    submitContact: handleContact,
+    submitPostcard: handlePostcard
 };
