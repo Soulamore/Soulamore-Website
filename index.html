@@ -856,29 +856,22 @@
         </div>
 
         <!-- 3. OUR 4 PILLARS (The Core Goals) -->
+        <!-- 3. OUR 4 PILLARS (Restored from Backup) -->
         <div class="features-grid" style="margin-top: 50px; margin-bottom: 50px;">
             <div class="feature-box">
-                <i class="fas fa-brain f-icon" style="color:#a78bfa;"></i>
-                <h3>Mental</h3>
-                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">Navigating stress, anxiety, and emotional
-                    overwhelm.</p>
+                <div class="f-icon">💙</div>
+                <h3>Heartfelt Connections</h3>
+                <p style="font-size:0.9rem; opacity:0.7;">Genuine empathy and emotional support.</p>
             </div>
             <div class="feature-box">
-                <i class="fas fa-coins f-icon" style="color:var(--gold-glow);"></i>
-                <h3>Financial</h3>
-                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">Managing money pressure and economic reality.
-                </p>
+                <div class="f-icon">🛡️</div>
+                <h3>Sanctuary of Trust</h3>
+                <p style="font-size:0.9rem; opacity:0.7;">Confidentiality and safety first.</p>
             </div>
             <div class="feature-box">
-                <i class="fas fa-running f-icon" style="color:var(--teal-glow);"></i>
-                <h3>Physical</h3>
-                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">Reconnecting with your body and breath.</p>
-            </div>
-            <div class="feature-box">
-                <i class="fas fa-graduation-cap f-icon" style="color:var(--peach-glow);"></i>
-                <h3>Academic</h3>
-                <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">Handling grades, future panic, and career
-                    doubt.</p>
+                <div class="f-icon">🕯️</div>
+                <h3>Guiding Light</h3>
+                <p style="font-size:0.9rem; opacity:0.7;">Peers who have triumphed over adversity.</p>
             </div>
         </div>
 
@@ -1128,6 +1121,9 @@
             const circle = document.querySelector('.game-circle');
 
             status.innerText = "Hold... Stay with it...";
+            status.style.fontSize = "1rem"; // Normal size
+            status.style.color = "rgba(255,255,255,0.7)";
+
             circle.style.borderColor = "#F49F75";
             label.innerText = "Holding";
 
@@ -1136,10 +1132,17 @@
 
             // Set timer for 4 seconds
             breathTimer = setTimeout(() => {
-                status.innerText = "Release now...";
+                status.innerText = "RELEASE NOW...";
+                status.style.fontSize = "1.5rem"; // BIGGER
+                status.style.color = "#4ECDC4"; // TEAL
+                status.style.fontWeight = "bold";
+
                 label.innerText = "Release";
                 circle.style.borderColor = "#4ECDC4"; // Change color to visual cue
                 circle.style.boxShadow = "0 0 30px #4ECDC4"; // Add glow
+
+                // Haptic feedback if available (mobile)
+                if (navigator.vibrate) navigator.vibrate(200);
             }, 4000);
         }
 
@@ -1147,7 +1150,12 @@
             // Clear timer if user releases early or after timer
             clearTimeout(breathTimer);
 
-            document.getElementById('breathStatus').innerText = "Release... Let it go.";
+            const status = document.getElementById('breathStatus');
+            status.innerText = "Release... Let it go.";
+            status.style.fontSize = "0.9rem"; // Reset size
+            status.style.color = "rgba(255,255,255,0.7)";
+            status.style.fontWeight = "normal";
+
             document.querySelector('.game-circle').style.borderColor = "#4ECDC4";
             document.querySelector('.game-circle').style.boxShadow = ""; // Remove glow
             document.getElementById('breathLabel').innerText = "Exhale";
