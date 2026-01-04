@@ -1233,58 +1233,99 @@
         function clearChat() { /* No op */ }
         function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
 
-        // 5. BREATH GAME (With 4 Second Hold Timer)
+        // 5. BREATH GAME (4-4-4 Cycle Logic)
         let breathTimer;
+        let breathInterval;
+        let breathState = "idle"; // idle, holding, exhaling
 
         function holdBreath() {
+            // Prevent restarting if already exhaling or unexpected state
+            if (breathState === "exhaling") return;
+            breathState = "holding";
+
             const status = document.getElementById('breathStatus');
             const label = document.getElementById('breathLabel');
             const circle = document.querySelector('.game-circle');
 
-            status.innerText = "Hold... Stay with it...";
-            status.style.fontSize = "1rem"; // Normal size
-            status.style.color = "rgba(255,255,255,0.7)";
-
+            // Initial State
             circle.style.borderColor = "#F49F75";
-            label.innerText = "Holding";
+            let count = 4;
+            label.innerText = count;
+            status.innerText = "Hold... Stay with it...";
+            status.style.color = "rgba(255,255,255,0.9)";
 
-            // Clear any existing timer just in case
+            // Clear previous timers
+            clearInterval(breathInterval);
             clearTimeout(breathTimer);
 
-            // Set timer for 4 seconds
-            breathTimer = setTimeout(() => {
-                status.innerText = "You can release now.";
-                status.style.fontSize = "1.2rem"; // Readable but not shouting
-                status.style.color = "#4ECDC4"; // TEAL
-                status.style.fontWeight = "bold";
+            // Start Countdown Interval
+            breathInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    label.innerText = count;
+                } else {
+                    // Time's up -> Release Prompt
+                    clearInterval(breathInterval);
+                    label.innerText = "Release";
+                    status.innerText = "You can release now.";
+                    status.style.color = "#4ECDC4";
+                    status.style.fontWeight = "bold";
 
-                label.innerText = "Release";
-                circle.style.borderColor = "#4ECDC4";
-                circle.style.boxShadow = "0 0 30px #4ECDC4";
+                    // Haptic feedback
+                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
 
-                // Haptic feedback
-                if (navigator.vibrate) navigator.vibrate(200);
-            }, 4000);
+                    // Set visual cue
+                    circle.style.borderColor = "#4ECDC4";
+                    circle.style.boxShadow = "0 0 30px #4ECDC4";
+                }
+            }, 1000); // Update every second
         }
 
         function releaseBreath() {
-            // Clear timer if user releases early or after timer
-            clearTimeout(breathTimer);
+            // Only trigger exhale cycle if we were holding
+            if (breathState !== "holding") return;
+            breathState = "exhaling";
 
             const status = document.getElementById('breathStatus');
             const label = document.getElementById('breathLabel');
             const circle = document.querySelector('.game-circle');
 
-            // Override everything to ensure "Exhale" state
-            status.innerText = "Release... Let it go.";
-            status.style.fontSize = "0.9rem"; // Reset size
+            clearInterval(breathInterval); // Stop holding counter if partial
+            clearTimeout(breathTimer);
+
+            // Reset visual cues
+            circle.style.borderColor = "#4ECDC4";
+            circle.style.boxShadow = "";
+
+            // Start Exhale Countdown
+            let count = 4;
+            label.innerText = count;
+            status.innerText = "Exhale slowly...";
             status.style.color = "rgba(255,255,255,0.7)";
             status.style.fontWeight = "normal";
 
-            label.innerText = "Exhale"; // Force Label
+            breathInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    label.innerText = count;
+                    status.innerText = `Exhale slowly... ${count}`;
+                } else {
+                    // Cycle Complete
+                    clearInterval(breathInterval);
+                    resetBreathGame();
+                }
+            }, 1000);
+        }
 
+        function resetBreathGame() {
+            breathState = "idle";
+            const status = document.getElementById('breathStatus');
+            const label = document.getElementById('breathLabel');
+            const circle = document.querySelector('.game-circle');
+
+            label.innerText = "Inhale";
+            status.innerText = "Ready? Click & Hold to breathe.";
             circle.style.borderColor = "#4ECDC4";
-            circle.style.boxShadow = ""; // Remove glow logic if stuck
         }
 
         // 6. ORACLE
