@@ -377,7 +377,16 @@ function generateSubmenuHTML(children, rootPath) {
 
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
-    <a href="${rootPath}index.html" class="nav-logo"><img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo"></a>
+    <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
+        <!-- INLINE SVG LOGO (Fixes visibility and path issues) -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 60" style="height: 40px; width: auto;">
+            <!-- Icon -->
+            <circle cx="30" cy="30" r="20" fill="#4ECDC4"/>
+            <path fill="#0f172a" d="M38 35c-2-1-5-1-6 0 0 0 0 3 1 5 1 1 1 2 0 2-2 0-4-3-4-3-3-5-8-3-8-3-3 1-4 2-6 4 3 3 7 4 11 4 9 0 16-7 16-16 0-3-1-6-2-8-1 2-1 4-2 5z"/>
+            <!-- Text -->
+            <text x="65" y="40" font-family="'Outfit', sans-serif" font-weight="700" font-size="28" fill="#f8fafc">Soulamore</text>
+        </svg>
+    </a>
 
     <nav class="nav-links">
         
@@ -416,7 +425,13 @@ const getFooterHTML = (rootPath) => `
         
         <!-- BRAND COLUMN -->
         <div class="footer-brand">
-            <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; margin-bottom: 20px;">
+             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 60" style="height: 50px; margin-bottom: 20px;">
+                <!-- Icon -->
+                <circle cx="30" cy="30" r="20" fill="#4ECDC4"/>
+                <path fill="#0f172a" d="M38 35c-2-1-5-1-6 0 0 0 0 3 1 5 1 1 1 2 0 2-2 0-4-3-4-3-3-5-8-3-8-3-3 1-4 2-6 4 3 3 7 4 11 4 9 0 16-7 16-16 0-3-1-6-2-8-1 2-1 4-2 5z"/>
+                <!-- Text -->
+                <text x="65" y="40" font-family="'Outfit', sans-serif" font-weight="700" font-size="28" fill="#f8fafc">Soulamore</text>
+            </svg>
             <p style="font-size:0.9rem; opacity:0.6; line-height:1.6;">
                 Your sanctuary for mental wellness. <br>
                 Tech meets empathy.
@@ -478,6 +493,7 @@ function getRootPath() {
     // 2-Levels Deep Check
     if (location.pathname.includes('/spaces/campus/') ||
         location.pathname.includes('/spaces/soulamore-away/') ||
+        location.pathname.includes('/spaces/soulamore-workplace/') || /* ADDED LINE */
         location.pathname.includes('/our-peers/physical-wellness/') ||
         location.pathname.includes('/our-peers/academic-wellness/') ||
         location.pathname.includes('/our-peers/mental-wellness/') ||
