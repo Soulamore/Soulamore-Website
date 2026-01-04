@@ -796,8 +796,14 @@
                         setTimeout(() => {
                             targetPage.classList.add('fade-in-active'); // set opacity:1
 
-                            // Force refresh observer for children if needed
-                            // (But usually the display:block change is enough)
+                            // FORCE SHOW CHILDREN: Manually set opacity for inner fade-in elements
+                            // This bypasses the IntersectionObserver which might not trigger for newly visible tabs
+                            targetPage.querySelectorAll('.fade-in').forEach(el => {
+                                el.style.opacity = '1';
+                                el.style.transform = 'translateY(0)';
+                                el.style.animation = 'none'; // Stop CSS animation interference
+                            });
+
                         }, 50);
                     } else {
                         console.error("Target page not found:", pageId);
@@ -806,8 +812,11 @@
                     // C. Update Buttons
                     document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
 
+                    // Fixed Mapping to match HTML structure
                     const mapping = {
                         'main': 0,
+                        'plans': 1, // Link (won't stay active on this page usually, but mapped for correct index)
+                        'guidelines': 2, // Link
                         'programs': 3,
                         'employees': 4,
                         'financial': 5,
