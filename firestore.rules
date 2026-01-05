@@ -83,6 +83,11 @@ service cloud.firestore {
       allow update, delete: if request.auth != null;
     }
 
+    // Presence System (Live User Count)
+    match /active_souls/{document=**} {
+      allow read, write: if true; // Public for anonymous presence
+    }
+    
     // Default: Deny all other access
     match /{document=**} {
       allow read, write: if false;
