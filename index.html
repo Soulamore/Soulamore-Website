@@ -659,9 +659,21 @@
             grid-template-columns: 1fr;
         }
 
+        /* Tools Grid (3 Items) - Added for specific 3-column layout */
+        .responsive-tools-grid {
+            display: grid;
+            gap: 25px;
+            grid-template-columns: 1fr;
+            /* Mobile: 1 col */
+        }
+
         @media (min-width: 600px) {
             .responsive-compass-grid {
                 /* Tablet: 2 Columns */
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .responsive-tools-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
@@ -670,6 +682,11 @@
             .responsive-compass-grid {
                 /* Desktop: 4 Columns (User Request) */
                 grid-template-columns: repeat(4, 1fr);
+            }
+
+            /* Tools grid needs 3 columns on desktop to fill width */
+            .responsive-tools-grid {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
@@ -1112,9 +1129,8 @@
                             Different moments need different kinds of support. Choose what feels easiest.
                         </p>
 
-
-                        <div class="responsive-compass-grid"
-                            style="max-width:1200px; margin:0 auto; display:grid; gap:25px; padding-bottom: 20px;">
+                        <div class="responsive-tools-grid"
+                            style="max-width:1200px; margin:0 auto; padding-bottom: 20px;">
                             <!-- CARD 1: 5-STEP RESET -->
                             <div class="glass-card hover-cyan"
                                 style="padding:40px; border-radius:30px; height: 100%; display: flex; flex-direction: column;">
@@ -1175,92 +1191,80 @@
                 <p style="opacity:0.7; margin-bottom: 50px; max-width:600px; margin-left:auto; margin-right:auto;">
                     Sometimes tools help. Sometimes it helps more to talk to someone who’s been there.
                 </p>
-
-                <!-- Controls -->
-                <div
-                    style="display: flex; justify-content: flex-end; gap: 10px; max-width: 1200px; margin: 0 auto 20px auto; padding-right: 10px;">
-                    <button onclick="scrollPeers(-1)"
-                        style="background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.2s;"><i
-                            class="fas fa-chevron-left"></i></button>
-                    <button onclick="scrollPeers(1)"
-                        style="background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.2s;"><i
-                            class="fas fa-chevron-right"></i></button>
-                </div>
-
-                <!-- Horizontal Scroll Container -->
-                <div class="peer-grid hide-scrollbar" id="peerCarousel"
-                    style="display:flex; gap:25px; max-width:1200px; margin:0 auto; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                <!-- Static Grid for Peers -->
+                <div class="responsive-compass-grid" style="max-width:1200px; margin:0 auto; padding-bottom: 20px;">
 
                     <!-- Peer Card 1: Aditya -->
                     <div class="peer-card"
-                        style="min-width: 260px; flex: 1; scroll-snap-align: start; background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <div style="font-size:1.4rem; font-weight:700; color:white;">Aditya</div>
-                            <div
-                                style="font-size:0.7rem; color:var(--teal-glow); border:1px solid var(--teal-glow); padding:2px 8px; border-radius:10px;">
-                                ONLINE</div>
+                        style="background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
+                        <div class="peer-header"
+                            style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
+                            <h3 style="font-size:1.5rem; margin:0; color:white;">Aditya</h3>
+                            <span class="status-badge"
+                                style="font-size:0.7rem; padding:4px 10px; border-radius:20px; border:1px solid #4ECDC4; color:#4ECDC4; text-transform:uppercase; letter-spacing:1px;">Online</span>
                         </div>
-                        <p style="opacity:0.8; font-size:0.95rem; margin-bottom:25px;">Here to help you navigate
-                            academic pressure and self-discovery.</p>
-                        <a href="company/about.html" class="nav-btn"
-                            style="display:inline-block; padding:8px 20px; border-radius:50px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); font-size:0.9rem; width:100%; text-align:center; margin-top: auto;">Talk
-                            to a Peer</a>
+                        <p style="font-size:0.95rem; line-height:1.6; opacity:0.8; margin-bottom:25px;">Here to help
+                            you navigate
+                            academic pressure and
+                            self-discovery.</p>
+                        <button class="connect-btn" onclick="openLiveChat()"
+                            style="margin-top:auto; width:100%; padding:12px; background:transparent; border:1px solid rgba(255,255,255,0.2); border-radius:50px; color:white; font-size:0.9rem; cursor:pointer; transition:0.3s;">Talk
+                            to a Peer</button>
                     </div>
 
                     <!-- Peer Card 2: Lakshit -->
                     <div class="peer-card"
-                        style="min-width: 260px; flex: 1; scroll-snap-align: start; background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <div style="font-size:1.4rem; font-weight:700; color:white;">Lakshit</div>
-                            <div
-                                style="font-size:0.7rem; color:var(--peach-glow); border:1px solid var(--peach-glow); padding:2px 8px; border-radius:10px;">
-                                AWAY</div>
+                        style="background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
+                        <div class="peer-header"
+                            style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
+                            <h3 style="font-size:1.5rem; margin:0; color:white;">Lakshit</h3>
+                            <span class="status-badge"
+                                style="font-size:0.7rem; padding:4px 10px; border-radius:20px; border:1px solid #F49F75; color:#F49F75; text-transform:uppercase; letter-spacing:1px;">Away</span>
                         </div>
-                        <p style="opacity:0.8; font-size:0.95rem; margin-bottom:25px;">Ready to listen about
-                            relationships, stress, and finding balance.</p>
-                        <a href="our-peers/index.html" class="nav-btn"
-                            style="display:inline-block; padding:8px 20px; border-radius:50px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); font-size:0.9rem; width:100%; text-align:center; margin-top: auto;">Talk
-                            to a Peer</a>
+                        <p style="font-size:0.95rem; line-height:1.6; opacity:0.8; margin-bottom:25px;">Ready to
+                            listen about
+                            relationships, stress, and
+                            finding balance.</p>
+                        <button class="connect-btn" onclick="openLiveChat()"
+                            style="margin-top:auto; width:100%; padding:12px; background:transparent; border:1px solid rgba(255,255,255,0.2); border-radius:50px; color:white; font-size:0.9rem; cursor:pointer; transition:0.3s;">Talk
+                            to a Peer</button>
                     </div>
 
                     <!-- Peer Card 3: Aarti -->
                     <div class="peer-card"
-                        style="min-width: 260px; flex: 1; scroll-snap-align: start; background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <div style="font-size:1.4rem; font-weight:700; color:white;">Aarti</div>
-                            <div
-                                style="font-size:0.7rem; color:var(--teal-glow); border:1px solid var(--teal-glow); padding:2px 8px; border-radius:10px;">
-                                ONLINE</div>
+                        style="background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
+                        <div class="peer-header"
+                            style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
+                            <h3 style="font-size:1.5rem; margin:0; color:white;">Aarti</h3>
+                            <span class="status-badge"
+                                style="font-size:0.7rem; padding:4px 10px; border-radius:20px; border:1px solid #4ECDC4; color:#4ECDC4; text-transform:uppercase; letter-spacing:1px;">Online</span>
                         </div>
-                        <p style="opacity:0.8; font-size:0.95rem; margin-bottom:25px;">Available to chat about
-                            anxiety,
-                            emotional wellness, or just venting.</p>
-                        <a href="our-peers/index.html" class="nav-btn"
-                            style="display:inline-block; padding:8px 20px; border-radius:50px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); font-size:0.9rem; width:100%; text-align:center; margin-top: auto;">Talk
-                            to a Peer</a>
+                        <p style="font-size:0.95rem; line-height:1.6; opacity:0.8; margin-bottom:25px;">Available to
+                            chat about
+                            anxiety, emotional
+                            wellness, or just venting.</p>
+                        <button class="connect-btn" onclick="openLiveChat()"
+                            style="margin-top:auto; width:100%; padding:12px; background:transparent; border:1px solid rgba(255,255,255,0.2); border-radius:50px; color:white; font-size:0.9rem; cursor:pointer; transition:0.3s;">Talk
+                            to a Peer</button>
                     </div>
 
-                    <!-- Peer Card 4: Renu -->
+                    <!-- Peer Card 4: Renu Dogra (FEATURED) -->
                     <div class="peer-card"
-                        style="min-width: 260px; flex: 1; scroll-snap-align: start; background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <div style="font-size:1.4rem; font-weight:700; color:white;">Renu</div>
-                            <div
-                                style="font-size:0.7rem; color:var(--gold-glow); border:1px solid var(--gold-glow); padding:2px 8px; border-radius:10px;">
-                                SESSION</div>
+                        style="background:rgba(30, 41, 59, 0.8); padding:30px; border-radius:24px; border:1px solid #F49F75; text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(244, 159, 117, 0.1); display: flex; flex-direction: column;">
+                        <div class="peer-header"
+                            style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
+                            <h3 style="font-size:1.5rem; margin:0; color:white;">Renu</h3>
+                            <span class="status-badge"
+                                style="font-size:0.7rem; padding:4px 10px; border-radius:20px; background: rgba(244, 159, 117, 0.2); border:1px solid #F49F75; color:#F49F75; text-transform:uppercase; letter-spacing:1px;">Sessions</span>
                         </div>
-                        <p style="opacity:0.8; font-size:0.95rem; margin-bottom:25px;">Certified Yoga Teacher
-                            helping
-                            you reconnect with physical calmness.</p>
-                        <a href="our-peers/physical-wellness/renu-dogra.html" class="nav-btn"
-                            style="display:inline-block; padding:8px 20px; border-radius:50px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); font-size:0.9rem; width:100%; text-align:center; margin-top: auto;">Book
+                        <p style="font-size:0.95rem; line-height:1.6; opacity:0.8; margin-bottom:25px;">Certified
+                            Yoga Teacher
+                            helping you reconnect with
+                            physical calmness.</p>
+                        <a href="our-peers/physical-wellness/renu-dogra.html" class="connect-btn"
+                            style="margin-top:auto; display:block; text-align:center; text-decoration:none; width:100%; padding:12px; background:linear-gradient(135deg, #F49F75, #fbbf24); border:none; border-radius:50px; color:#0f172a; font-weight:700; font-size:0.9rem; cursor:pointer; transition:0.3s;">Book
                             Session</a>
                     </div>
-
                 </div>
             </div>
         </section>

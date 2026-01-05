@@ -3,14 +3,22 @@
     if (window.self !== window.top) return;
 
     // 0.1 Session Check: Show only once per session
-    // Remove this line during testing if you want to see it every time
-    if (sessionStorage.getItem('soulamore_preview_seen')) {
+    // Check if user has already seen the popup (session based)
+    const hasSeenPopup = sessionStorage.getItem('soulamore_launch_popup_seen');
+
+    // FORCE TEST: Check for URL param
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceTest = urlParams.get('test-popup');
+
+    // If popup has been seen and not forced, exit early
+    if (hasSeenPopup && forceTest !== 'true') {
         console.log('Launch preview already seen this session.');
         return;
     }
 
-    // Mark as seen immediately
-    sessionStorage.setItem('soulamore_preview_seen', 'true');
+    // Mark as seen immediately (this will prevent it from showing again in the same session,
+    // unless 'test-popup=true' is present in the URL)
+    sessionStorage.setItem('soulamore_launch_popup_seen', 'true');
 
     // 0.2 Performance: Only load iframe on Desktop
     // Mobile users hide it via CSS anyway, so let's save their data
@@ -153,50 +161,47 @@
     btn.innerText = '...';
     btn.disabled = true;
 
-    // Use the global backend handler if available
-    if (window.SoulBackend && window.SoulBackend.submitNewsletter) {
-        if (window.handleNewsletter) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    // Robust check for the backend function
+    const submitFn = (window.SoulBackend && window.SoulBackend.submitNewsletter)
+        ? window.SoulBackend.submitNewsletter
+        : (window.handleNewsletter ? window.handleNewsletter : null);
 
-            window.handleNewsletter(email).then(success => {
-                if (success) {
-                    // Success UI
-                    btn.innerHTML = '<i class="fas fa-check"></i>';
-                    btn.style.background = "#48bb78";
-                    emailEl.value = "";
+    if (submitFn) {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-                    // Show success message inside the input placeholder temporarily
-                    const originalPlaceholder = emailEl.placeholder;
-                    emailEl.placeholder = "Welcome to the family!";
+        submitFn(email).then(success => {
+            if (success) {
+                // Success UI
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                btn.style.background = "#48bb78";
+                emailEl.value = "";
 
-                    setTimeout(() => {
-                        window.closeLaunchPopup();
-                        // Reset button
-                        btn.innerHTML = 'Join';
-                        btn.style.background = "var(--primary-gradient)"; // Reset to original if needed, or specific color
-                        emailEl.placeholder = originalPlaceholder;
-                    }, 2000);
-                } else {
-                    btn.innerHTML = 'Retry';
-                }
-            });
-        } else {
-            console.error("handleNewsletter function not found!");
-            btn.innerHTML = 'Error';
-        }
+                // Show success message inside the input placeholder temporarily
+                const originalPlaceholder = emailEl.placeholder;
+                emailEl.placeholder = "Welcome to the family!";
+
+                setTimeout(() => {
+                    window.closeLaunchPopup();
+                    // Reset button
+                    btn.innerHTML = 'Join';
+                    btn.style.background = "var(--primary-gradient)"; // Reset to original if needed, or specific color
+                    emailEl.placeholder = originalPlaceholder;
+                }, 2000);
+            } else {
+                btn.innerHTML = 'Try Again';
+            }
+        }).catch(e => {
+            console.error(e);
+            btn.innerHTML = 'Try Again';
+        });
     } else {
-        // Fallback if backend not ready yet
-        setTimeout(() => {
-            if (window.SoulBackend && window.SoulBackend.submitNewsletter) {
-                window.SoulBackend.submitNewsletter(email).then(success => {
-                    if (success) {
-                        btn.innerHTML = '<i class="fas fa-check"></i>';
-                        btn.style.background = '#48bb78';
-                    } else {
-                        btn.innerText = 'Err';
-                        btn.disabled = false;
-                    }
-                });
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        btn.style.background = '#48bb78';
+    } else {
+        btn.innerText = 'Err';
+        btn.disabled = false;
+    }
+});
             }
         }, 1000);
     }

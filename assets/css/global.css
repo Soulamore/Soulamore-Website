@@ -183,10 +183,13 @@ header.island-nav {
     display: flex;
     gap: 12px;
     align-items: center;
-    /* CENTER THE MENU ITEMS OPTICALLY */
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    /* SAFE CENTERING using Flexbox */
+    position: static;
+    flex: 1;
+    /* Take up remaining space */
+    justify-content: center;
+    /* Center items within that space */
+    transform: none;
 }
 
 .nav-links a {
@@ -1227,51 +1230,72 @@ body.no-scroll {
 }
 
 /* --- STANDARDIZED TOOL HEADERS --- */
-/* --- STANDARDIZED TOOL HEADERS --- */
 .tool-header {
-    position: absolute;
-    top: 160px;
-    /* Moved down further to clear header */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 1200px;
+    position: fixed;
+    /* FIXED positioning to stay on top even if scrolled */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: #0f172a;
+    /* Solid Background to cover Global Header */
     display: flex;
     justify-content: center;
-    /* Centered content */
     align-items: center;
-    padding: 15px 30px;
-    background: transparent;
-    /* Removed background */
-    backdrop-filter: none;
-    /* Removed blur */
-    border: none;
-    /* Removed border */
-    z-index: 99999;
-    /* Extremely high z-index to ensure clickability */
-    pointer-events: none;
-    /* Allow clicks through to elements below */
+    z-index: 2147483647;
+    /* MAX Z-INDEX to beat EVERYTHING */
+    padding: 0 40px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
 }
 
-/* Ensure buttons are still clickable */
-.tool-header .back-btn,
-.tool-header h2 {
-    pointer-events: auto;
+/* Ensure buttons are clickable */
+.tool-header button,
+.tool-header .back-btn {
+    pointer-events: auto !important;
+    cursor: pointer;
+    z-index: 2147483648;
+    /* Even higher */
 }
 
-.tool-header h2 {
-    font-size: 2rem;
-    /* Increased size */
-    margin: 0 auo;
-    color: var(--starlight);
-    font-weight: 700;
-    text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    /* Added shadow for readability */
+/* Back Button Positioning */
+.tool-header .back-btn {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
+    left: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 10px 25px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    transition: 0.2s;
+}
+
+.tool-header .back-btn:hover {
+    background: var(--alert-red);
+    border-color: var(--alert-red);
+    color: white;
+}
+
+/* Title Centering */
+.tool-header h2 {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    margin: 0;
+    pointer-events: none;
     text-align: center;
+}
+
+left: 50%;
+transform: translateX(-50%);
+width: 100%;
+text-align: center;
 }
 
 .tool-header .back-btn {
@@ -1315,26 +1339,21 @@ body.no-scroll {
 
 /* --- LIVE USER WIDGET (Global) --- */
 .live-pill {
-    position: fixed;
-    top: 160px;
-    /* Moved down to match tool header and avoid nav overlap */
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(15, 23, 42, 0.9);
+    position: relative;
+    /* Unpinned */
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(15, 23, 42, 0.6);
     border: 1px solid var(--peach-glow);
     padding: 8px 20px;
     border-radius: 50px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 20002;
-    /* Above everything */
     backdrop-filter: blur(10px);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     font-family: 'Outfit', sans-serif;
     font-size: 0.85rem;
     color: white;
-    animation: slideDown 0.5s ease-out;
+    /* Removed fixed positioning and animation that caused overlap */
 }
 
 .live-dot {

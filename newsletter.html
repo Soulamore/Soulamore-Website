@@ -16,8 +16,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-    <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/data-handler.js"></script> <!-- Contains handleNewsletter -->
+    <script type="module" src="assets/js/firebase-config.js"></script>
+    <script type="module" src="assets/js/data-handler.js"></script> <!-- Contains handleNewsletter -->
     <script src="assets/js/components.js"></script>
 
     <style>
@@ -182,15 +182,27 @@
             msg.innerText = "";
 
             try {
-                // Use the global handleNewsletter function from data-handler.js
-                const success = await handleNewsletter(email);
+                // Use the shared backend handleNewsletter function if available
+                let success = false;
+                // Check SoulBackend (module exposed) or global function
+                const submitFn = (window.SoulBackend && window.SoulBackend.submitNewsletter)
+                    ? window.SoulBackend.submitNewsletter
+                    : (window.handleNewsletter ? window.handleNewsletter : null);
+
+                if (submitFn) {
+                    success = await submitFn(email);
+                } else {
+                    console.error("Newsletter backend function missing.");
+                    throw new Error("Backend not loaded");
+                }
 
                 if (success) {
                     btn.innerHTML = 'Welcome Home <i class="fas fa-check"></i>';
                     btn.style.background = "#48bb78"; // Green
                     msg.style.color = "#48bb78";
                     msg.innerText = "You've successfully joined the list.";
-                    emailInput.value = "";
+                    const emailInput = document.getElementById('newsPageEmail');
+                    if (emailInput) emailInput.value = "";
                 } else {
                     throw new Error("Submission returned false");
                 }
