@@ -283,8 +283,8 @@ function setupFavicon(rootPath) {
     const PEACH = '%23F49F75'; // #F49F75 encoded
     const path = window.location.pathname;
 
-    // Default Logo
-    let iconHref = rootPath + 'assets/images/logo.png';
+    // Default Logo (Use Symbol to avoid squeezing)
+    let iconHref = rootPath + 'assets/images/favicon_symbol.png';
 
     // Special Pages (SVG Data URIs)
     if (path.includes('vent-box')) {
@@ -993,7 +993,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { injectHeader(); } catch (e) { console.error("Header Injection Failed:", e); }
     try { injectFooter(); } catch (e) { console.error("Footer Injection Failed:", e); }
     try { injectSoulBotWidget(); } catch (e) { console.error("SoulBot Widget Failed:", e); }
-    try { injectFavicon(); } catch (e) { console.error("Favicon Injection Failed:", e); }
+    try { setupFavicon(window.location.pathname.includes('/spaces/') ? '../../' : ''); } catch (e) { console.error("Favicon Injection Failed:", e); }
 
     // 2. Set Active State
     try { setActiveState(); } catch (e) { console.warn("Active State Error:", e); }
