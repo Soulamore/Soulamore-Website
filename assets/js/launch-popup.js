@@ -68,6 +68,10 @@
                 .tool-btn { width: 100%; justify-content: center; padding: 12px; } 
                 .count-box { min-width: 50px; padding: 5px 10px; }
                 .badge { margin-bottom: 15px; }
+                
+                /* Stack Newsletter on Mobile */
+                .newsletter-input-group { flex-direction: column; }
+                #popupEmail, #btnPopupEmail { width: 100%; padding: 12px !important; }
             }
         </style>
 
@@ -100,13 +104,13 @@
 
                 <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
                      <div style="font-size: 0.85rem; margin-bottom: 10px; font-weight: 600; color: #e2e8f0;">Get updates when we launch:</div>
-                     <div style="display: flex; gap: 8px;">
+                     <div class="newsletter-input-group" style="display: flex; gap: 8px;">
                         <input type="email" id="popupEmail" placeholder="your@email.com" style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 8px; color: white; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.9rem;">
                         <button onclick="submitPopupEmail()" id="btnPopupEmail" style="background: var(--teal-glow, #4ECDC4); color: #0f172a; border: none; padding: 0 15px; border-radius: 8px; font-weight: 700; cursor: pointer; transition:0.2s;">Join</button>
                      </div>
                 </div>
 
-                <div style="margin-top:auto; font-size:0.85rem; opacity:0.7; color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif;">
+                <div style="margin-top:auto; font-size:0.85rem; opacity:0.7; color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 10px;">
                     If you’re a peer or psychologist aligned with our mission, reach out at <a href="mailto:contact.soulamore@gmail.com" style="color:#4ECDC4; text-decoration:underline;">contact.soulamore@gmail.com</a>. We’d love to hear from you.
                 </div>
             </div>
@@ -147,67 +151,64 @@
         if (h) h.innerText = String(hours).padStart(2, '0');
         if (m) m.innerText = String(mins).padStart(2, '0');
     }
-    if (m) m.innerText = String(mins).padStart(2, '0');
-}
 
     // 4. Expose Popup Email Submit to Global Scope (since button uses onclick="submitPopupEmail()")
     window.submitPopupEmail = function () {
-    const emailEl = document.getElementById('popupEmail');
-    const btn = document.getElementById('btnPopupEmail');
-    const email = emailEl.value.trim();
+        const emailEl = document.getElementById('popupEmail');
+        const btn = document.getElementById('btnPopupEmail');
+        const email = emailEl.value.trim();
 
-    if (!email) return;
+        if (!email) return;
 
-    btn.innerText = '...';
-    btn.disabled = true;
+        btn.innerText = '...';
+        btn.disabled = true;
 
-    // Robust check for the backend function
-    const submitFn = (window.SoulBackend && window.SoulBackend.submitNewsletter)
-        ? window.SoulBackend.submitNewsletter
-        : (window.handleNewsletter ? window.handleNewsletter : null);
+        // Robust check for the backend function
+        const submitFn = (window.SoulBackend && window.SoulBackend.submitNewsletter)
+            ? window.SoulBackend.submitNewsletter
+            : (window.handleNewsletter ? window.handleNewsletter : null);
 
-    if (submitFn) {
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        if (submitFn) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-        submitFn(email).then(success => {
-            if (success) {
-                // Success UI
-                btn.innerHTML = '<i class="fas fa-check"></i>';
-                btn.style.background = "#48bb78";
-                emailEl.value = "";
+            submitFn(email).then(success => {
+                if (success) {
+                    // Success UI
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    btn.style.background = "#48bb78";
+                    emailEl.value = "";
 
-                // Show success message inside the input placeholder temporarily
-                const originalPlaceholder = emailEl.placeholder;
-                emailEl.placeholder = "Welcome to the family!";
+                    // Show success message inside the input placeholder temporarily
+                    const originalPlaceholder = emailEl.placeholder;
+                    emailEl.placeholder = "Welcome to the family!";
 
-                setTimeout(() => {
-                    window.closeLaunchPopup();
-                    // Reset button
-                    btn.innerHTML = 'Join';
-                    btn.style.background = "var(--primary-gradient)"; // Reset to original if needed, or specific color
-                    emailEl.placeholder = originalPlaceholder;
-                }, 2000);
-            } else {
-                btn.innerHTML = 'Try Again';
-            }
-        }).catch(e => {
-            console.error(e);
-            btn.innerHTML = 'Try Again';
-        });
-    } else {
-        btn.innerHTML = '<i class="fas fa-check"></i>';
-        btn.style.background = '#48bb78';
-    } else {
-        btn.innerText = 'Err';
-        btn.disabled = false;
-    }
-});
-            }
-        }, 1000);
-    }
-};
+                    setTimeout(() => {
+                        document.getElementById('launchPopup').style.display = 'none';
+                        // Reset button
+                        btn.innerHTML = 'Join';
+                        btn.style.background = "var(--teal-glow, #4ECDC4)";
+                        btn.disabled = false;
+                        emailEl.placeholder = originalPlaceholder;
+                    }, 2000);
+                } else {
+                    btn.innerHTML = 'Err';
+                    btn.disabled = false;
+                }
+            }).catch(e => {
+                console.error(e);
+                btn.innerHTML = 'Err';
+                btn.disabled = false;
+            });
+        } else {
+            // Fallback if backend not ready
+            console.warn("Backend not ready");
+            btn.innerHTML = 'Err';
+            btn.disabled = false;
+        }
+    };
 
-setInterval(updateLaunchTimer, 1000);
-updateLaunchTimer();
+    // 5. Timer Loop
+    setInterval(updateLaunchTimer, 1000);
+    updateLaunchTimer();
 
-}) ();
+})(); // END IIFE
