@@ -383,7 +383,7 @@
         function submitPeerApp() {
             console.log("Submit button clicked - checking form...");
             const form = document.getElementById('peerAppForm');
-
+            
             // Collect basic fields using direct element queries
             const data = {
                 fullName: form.querySelector('input[name="fullName"]')?.value || '',
@@ -419,16 +419,16 @@
             // Wait for modules to load if needed
             let retryCount = 0;
             const maxRetries = 10;
-
+            
             function trySubmit() {
                 if (window.SoulBackend && window.SoulBackend.submitApp) {
                     console.log('Submitting peer application:', data);
-
+                    
                     // Add timeout to prevent hanging
                     const timeoutPromise = new Promise((_, reject) => {
                         setTimeout(() => reject(new Error('Submission timeout after 30 seconds')), 30000);
                     });
-
+                    
                     Promise.race([
                         window.SoulBackend.submitApp('peer', data),
                         timeoutPromise
@@ -463,10 +463,9 @@
                     }
                 }
             }
-        }
 
-        // Start submission attempt
-        trySubmit();
+            // Start submission attempt
+            trySubmit();
         }
     </script>
     <script>
