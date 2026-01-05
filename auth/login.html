@@ -316,18 +316,25 @@
                 } catch (error) {
                     console.error('Error signing in:', error);
                     let errorMessage = 'Failed to sign in with Google. ';
+                    let showAlert = true;
                     
                     if (error.code === 'auth/configuration-not-found') {
                         errorMessage += 'Google authentication is not enabled in Firebase Console. Please enable it in Firebase Console > Authentication > Sign-in method > Google.';
                     } else if (error.code === 'auth/unauthorized-domain') {
-                        errorMessage = 'This domain is not authorized for Google sign-in. Please add your domain (soulamore.com, www.soulamore.com, or localhost) to Firebase Console > Authentication > Settings > Authorized domains.';
+                        errorMessage = 'This domain is not authorized for Google sign-in. Please add your domain (soulamore.com, www.soulamore.com) to Firebase Console > Authentication > Settings > Authorized domains.';
                     } else if (error.code === 'auth/popup-closed-by-user') {
-                        errorMessage = 'Sign-in cancelled.';
+                        // Don't show alert for user cancellation - it's expected behavior
+                        showAlert = false;
+                        console.log('User cancelled sign-in');
+                    } else if (error.code === 'auth/popup-blocked') {
+                        errorMessage = 'Popup was blocked by your browser. Please allow popups for this site and try again.';
                     } else {
                         errorMessage += error.message;
                     }
                     
-                    alert(errorMessage);
+                    if (showAlert) {
+                        alert(errorMessage);
+                    }
                     googleSignInBtn.disabled = false;
                     googleSignInBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
                 }
