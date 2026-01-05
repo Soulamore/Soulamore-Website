@@ -45,19 +45,21 @@
             @keyframes scrollApp { 0% { transform: translateY(0); } 20% { transform: translateY(-20%); } 50% { transform: translateY(-20%); } 70% { transform: translateY(-5%); } 100% { transform: translateY(0); } }
 
             /* Responsive */
+            /* Responsive */
             @media(max-width: 900px) {
-                .popup-card { grid-template-columns: 1fr; height: 95vh; overflow-y: auto; }
+                .popup-card { grid-template-columns: 1fr; height: auto; max-height: 85vh; overflow-y: auto; }
                 .popup-visual { display: none !important; }
-                .popup-content { padding: 40px 30px; }
-                .pop-h1 { font-size: 2.2rem; }
+                .popup-content { padding: 30px 20px; }
+                .pop-h1 { font-size: 2rem; }
             }
             @media(max-width: 480px) {
-                .popup-content { padding: 30px 20px; }
-                .pop-h1 { font-size: 1.8rem; margin-bottom: 15px; }
-                .pop-desc { font-size: 0.95rem; }
+                .popup-content { padding: 25px 20px; }
+                .pop-h1 { font-size: 1.6rem; margin-bottom: 15px; }
+                .pop-desc { font-size: 0.9rem; }
                 .tool-links { gap: 8px; }
-                .tool-btn { width: 100%; justify-content: center; padding: 10px; } 
-                .count-box { min-width: 60px; padding: 8px 10px; }
+                .tool-btn { width: 100%; justify-content: center; padding: 12px; } 
+                .count-box { min-width: 50px; padding: 5px 10px; }
+                .badge { margin-bottom: 15px; }
             }
         </style>
 
