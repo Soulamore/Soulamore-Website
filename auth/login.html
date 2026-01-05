@@ -257,10 +257,10 @@
 
             <div class="divider"><span>OR</span></div>
 
-            <button class="social-btn"><i class="fab fa-google"></i> Continue with Google</button>
+            <button class="social-btn" id="googleSignInBtn"><i class="fab fa-google"></i> Continue with Google</button>
 
             <div class="alt-link">
-                New here? <a href="join-us.html">Create an account</a>
+                New here? <a href="../join-us/index.html">Create an account</a>
             </div>
             <div class="alt-link" style="margin-top: 10px; font-size: 0.85rem;">
                 Are you a Professional? <a href="professional-dashboard.html" style="color: var(--teal-glow);">Access
@@ -280,6 +280,66 @@
 
     <script src="../assets/js/components.js"></script>
     <script src="../assets/js/main.js"></script>
+    <!-- Firebase Auth -->
+    <script type="module" src="../assets/js/firebase-config.js"></script>
+    <script type="module">
+        import { auth, googleProvider } from "../assets/js/firebase-config.js";
+        import { signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Google Sign In Button
+        const googleSignInBtn = document.getElementById('googleSignInBtn');
+        if (googleSignInBtn) {
+            googleSignInBtn.addEventListener('click', async () => {
+                try {
+                    googleSignInBtn.disabled = true;
+                    googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+                    
+                    const result = await signInWithPopup(auth, googleProvider);
+                    const user = result.user;
+                    
+                    console.log('Signed in successfully:', user.displayName, user.email);
+                    
+                    // Create/update user profile in Firestore
+                    const { createOrUpdateUserProfile } = await import("../assets/js/profile-handler.js");
+                    await createOrUpdateUserProfile(user);
+                    
+                    // Store user info in sessionStorage
+                    sessionStorage.setItem('user', JSON.stringify({
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        email: user.email,
+                        photoURL: user.photoURL
+                    }));
+                    
+                    // Redirect to home page
+                    window.location.href = '../index.html';
+                } catch (error) {
+                    console.error('Error signing in:', error);
+                    let errorMessage = 'Failed to sign in with Google. ';
+                    
+                    if (error.code === 'auth/configuration-not-found') {
+                        errorMessage += 'Google authentication is not enabled in Firebase Console. Please enable it in Firebase Console > Authentication > Sign-in method > Google.';
+                    } else if (error.code === 'auth/popup-closed-by-user') {
+                        errorMessage = 'Sign-in cancelled.';
+                    } else {
+                        errorMessage += error.message;
+                    }
+                    
+                    alert(errorMessage);
+                    googleSignInBtn.disabled = false;
+                    googleSignInBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
+                }
+            });
+        }
+
+        // Check if user is already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, redirect to home
+                window.location.href = '../index.html';
+            }
+        });
+    </script>
     <script>
         // --- PARTICLES ---
         const particleContainer = document.getElementById('particles');

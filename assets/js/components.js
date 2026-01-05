@@ -357,15 +357,28 @@ const NAV_DATA = [
                 label: 'Soulamore Workplace',
                 href: 'spaces/soulamore-workplace/index.html',
                 type: 'submenu',
+                icon: 'fas fa-briefcase',
                 children: [
                     { label: 'Plans & Pricing', href: 'spaces/soulamore-workplace/index.html#plans' },
                     { label: 'Guidelines', href: 'spaces/soulamore-workplace/index.html#guidelines' }
                 ]
             },
             {
+                id: 'nav-institutions',
+                label: 'Institutions',
+                href: 'spaces/campus/institutions.html',
+                icon: 'fas fa-university'
+            },
+            {
+                id: 'nav-schools',
+                label: 'Schools',
+                href: 'spaces/schools/index.html',
+                icon: 'fas fa-school'
+            },
+            {
                 id: 'nav-away',
                 label: 'Soulamore Away',
-                href: 'spaces/soulamore-away.html',
+                href: 'spaces/soulamore-away/index.html',
                 type: 'submenu',
                 children: [
                     { label: 'Away Resources', href: 'spaces/soulamore-away/resources.html' }
@@ -495,7 +508,7 @@ const getHeaderHTML = (rootPath) => `
     <div class="auth-box">
             <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
             <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
-            <a href="${rootPath}login.html" class="nav-btn">Log In / Sign Up</a>
+            <a href="${rootPath}auth/login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
     
     <button class="mobile-toggle" aria-label="Toggle Navigation">
@@ -539,7 +552,7 @@ const getFooterHTML = (rootPath) => `
         <div class="footer-col">
             <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Community</h4>
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
-                <li><a href="${rootPath}spaces/soulamore-campus.html">Campus Ambassadors</a></li>
+                <li><a href="${rootPath}spaces/campus/campus-ambassadors.html">Campus Ambassadors</a></li>
                 <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
                 <li><a href="${rootPath}community/forum.html">Discussion Forum</a></li>
                 <li><a href="${rootPath}join-us/index.html">Join the Team</a></li>

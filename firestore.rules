@@ -2,6 +2,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    // --- USER PROFILES ---
+    match /users/{userId} {
+      allow read: if request.auth != null; // Any authenticated user can read
+      allow create: if request.auth != null && request.auth.uid == userId; // Users can create their own profile
+      allow update, delete: if request.auth != null && request.auth.uid == userId; // Users can only update/delete their own profile
+    }
+    
     // --- ACTIVE FEATURES (Backend Connected) ---
 
     // Peer Application Forms
@@ -83,6 +90,11 @@ service cloud.firestore {
       allow update, delete: if request.auth != null;
     }
 
+    // Presence System (Live User Count)
+    match /active_souls/{document=**} {
+      allow read, write: if true; // Public for anonymous presence
+    }
+    
     // Default: Deny all other access
     match /{document=**} {
       allow read, write: if false;
