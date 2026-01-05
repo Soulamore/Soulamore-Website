@@ -179,6 +179,17 @@ try {
                 padding: 8px 0 !important;
             }
 
+            /* HOVER BRIDGE: PREVENT GAP CLOSING */
+            .dropdown-content::before {
+                content: "" !important;
+                position: absolute !important;
+                top: -10px !important; /* Bridge the gap upwards */
+                left: 0 !important;
+                width: 100% !important;
+                height: 10px !important;
+                background: transparent !important;
+            }
+
             /* SHOW ON HOVER (Direct Child Only) */
             .dropdown:hover > .dropdown-content {
                 display: block !important;
@@ -197,12 +208,21 @@ try {
                 top: 0 !important;
                 left: 100% !important;
                 margin-top: -10px !important; /* Align with top */
+                margin-left: 10px !important; /* THE GAP */
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
                 border: 1px solid rgba(255,255,255,0.1) !important;
                 border-left: 1px solid rgba(255,255,255,0.1) !important; /* Reset border */
                 background: rgba(15, 23, 42, 0.98) !important; /* Solid bg */
                 padding-left: 0 !important; /* Reset padding */
                 min-width: 200px !important;
+            }
+
+            /* HOVER BRIDGE FOR SIDE FLYOUT */
+            .dropdown-content .dropdown-content::before {
+                top: 0 !important;
+                left: -15px !important; /* Bridge back to parent */
+                width: 15px !important;
+                height: 100% !important;
             }
 
             /* Level 3: Deep Nested */
@@ -251,8 +271,43 @@ try {
     console.error("Soulamore: Style injection failed", e);
 }
 
+// --- FAVICON MANAGER (Peach Branding) ---
+function setupFavicon(rootPath) {
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+    }
 
-// Duplicate listener removed. Please refer to footer execution.
+    const PEACH = '%23F49F75'; // #F49F75 encoded
+    const path = window.location.pathname;
+
+    // Default Logo
+    let iconHref = rootPath + 'assets/images/logo.png';
+
+    // Special Pages (SVG Data URIs)
+    if (path.includes('vent-box')) {
+        // Fire Icon
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M200.3 66.8c12.3-15.8 35.1-15.9 47.6-.2l13.9 17.5c18.5 23.3 54 26.3 76.2 6.5l8.7-7.8c16.3-14.5 41.8-10.7 53.6 7.9 23.3 36.6 63 94.7 44.8 169.3-18.4 75.3-69.8 126.8-132.8 135-66.2 8.6-130.6-32.9-158.7-98.3-25.1-58.4-14.8-119.3 12.3-162.7 10.3-16.5 23-32.1 35.3-48.4zm-14.9 378.6c59.9 8.6 117.9-20.9 146-69.5 26.6-45.9 22.9-106.3-8.8-149.7-8.1-11.1-12.7-22.3-13.6-33.1-6.1 4.5-12.6 8.5-19.4 11.7-29.3 13.7-65 4.9-88.7-19.8-5-5.2-9.6-10.8-13.8-16.9-15.6 27.6-26.6 57.1-32.3 87.7-6.1 33.1.6 66.9 17.5 95.8 19.3 33 55.4 69.4 113.1 93.8z'/></svg>`;
+    } else if (path.includes('confession-box')) {
+        // Ghost Icon
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M256 96c31.1 0 61.2 6.7 88.5 19.1 27.3 12.4 51.6 29.8 70.8 50.8 19.2 21 33.5 45.4 42.1 72.1 8.6 26.7 10.6 55 6.1 82.8-5.3 32.8-21.6 62.7-45.1 85.5-23.5 22.7-53.9 36.3-86.3 38.3-1.6.1-3.2.1-4.8.1-18.4 0-36.2-3.8-52.6-10.7-16.3 6.9-34.1 10.7-52.6 10.7-1.6 0-3.3 0-4.9-.1-32.4-1.9-62.8-15.6-86.3-38.3-23.5-22.7-39.8-52.7-45.1-85.5-4.5-27.8-2.5-56.1 6.1-82.8 8.6-26.7 22.9-51.1 42.1-72.1 19.2-21 43.5-38.4 70.8-50.8C194.8 102.7 224.9 96 256 96zm0-32C114.6 64 0 178.6 0 320c0 36.6 7.7 71.3 21.7 103.3C38.4 461.3 75.2 489 119.5 491.5c1.6.1 3.3.1 4.9.1 14.9 0 29.2-2.5 42.8-7.2 4.1-1.4 8.1-3 12-4.8 1.9-2.8 4-5.5 6.3-8.1 18.2-20.7 41.6-35.9 67-43.8 1.1-.3 2.3-.6 3.4-1 25.4 7.9 48.9 23.1 67 43.8 2.3 2.6 4.4 5.3 6.3 8.1 4 1.8 8 3.4 12 4.8 13.6 4.7 27.9 7.2 42.8 7.2 1.6 0 3.3-.1 4.9-.1 44.3-2.5 81-30.2 97.8-68.2C407.5 401.7 416 391.3 416 320 416 178.6 301.4 64 160 64c-32.5 0-63.5 6.1-92.4 17.1-19.1 7.2-36.1 17.6-50.4 30.7z'/></svg>`;
+    } else if (path.includes('renu-dogra')) {
+        // Lotus/Om
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M256 160c-52.9 0-96 43.1-96 96s43.1 96 96 96 96-43.1 96-96-43.1-96-96-96zm-17.7-93.5C227.8 77.4 212 96 198.8 113.8c-28.9 39.1-38.3 42.8-49 53.5-32 32-58.3 12.8-58.3 12.8-21.5-13.6-54.8 10-63.2 24.3-9.5 16.2.7 34.6 2.3 37.4 39.4 66.8 95.7 66.8 95.7 66.8 15.6 0 34.4 3.7 34.4 19.3v.1c0 15.6-18.8 19.3-34.4 19.3 0 0-56.3 0-95.7-66.8-1.7-2.8-11.8-21.2-2.3-37.4 8.5-14.3 41.7-37.9 63.2-24.3 0 0 26.3 19.2 58.3-12.8 10.7-10.7 20.1-14.4 49-53.5 13.2-17.8 29-36.4 39.5-47.3 3.9-4.1 10.6-4.1 14.5 0 10.5 10.9 26.3 29.5 39.5 47.3 28.9 39.1 38.3 42.8 49 53.5 32 32 58.3 12.8 58.3 12.8 21.5-13.6 54.8 10 63.2 24.3 9.5 16.2-.7 34.6-2.3 37.4-39.4-66.8-95.7-66.8-95.7-66.8-15.6 0-34.4-3.7-34.4-19.3v-.1c0-15.6 18.8-19.3 34.4-19.3 0 0 56.3 0 95.7 66.8 1.7 2.8 11.8 21.2 2.3 37.4-8.5 14.3-41.7 37.9-63.2 24.3 0 0-26.3 19.2-58.3 12.8-10.7 10.7-20.1 14.4-49 53.5-13.2 17.8-29 36.4-39.5 47.3-3.9 4.1-10.6 4.1-14.5 0z'/></svg>`;
+    } else if (path.includes('5-step-reset')) {
+        // Leaf Icon
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M440.5 88.5C397.9 45.3 340.5 24 286 24c-92.6 0-176.4 56.5-212 141.5-17.8 42.5-19.3 90.7-4.1 134.4 15.2 43.7 45.4 79.9 85.3 102.4C195.1 425 242.9 432 288 432c6.2 0 12.5-.2 18.7-.5 47.8-2.6 88-29.4 116.6-66.4 28.6-37 43.1-83.3 40.8-132.8l-.2-3.8c7.8-20.1 13.9-40.8 18.3-62.2 4.4-21.4 6.7 43.2-6.7 43.2 13.4 0 26.8-5.2 37-15.6l9.6 9.6c20.5 20.5 53.6 20.5 74.1 0s20.5-53.6 0-74.1l-68-68c-20.5-20.5-53.6-20.5-74.1 0z'/></svg>`;
+    }
+
+    link.href = iconHref;
+}
+
+// execute setup
+// setupFavicon(rootPath); // This needs to run after rootPath is defined or just use logical path
+// Moving execution to end of file
+
 
 // --- 1. DATA CONFIGURATION ---
 
@@ -396,7 +451,10 @@ function generateSubmenuHTML(children, rootPath) {
             const style = child.style ? `style="${child.style}"` : '';
             html += `
             <div class="dropdown-submenu">
-                <a href="${child.href === '#' ? '#' : rootPath + child.href}" id="${child.id || ''}" ${style}>${child.label}</a>
+                <a href="${child.href === '#' ? '#' : rootPath + child.href}" id="${child.id || ''}" ${style}>
+                    ${child.label}
+                    <i class="fas fa-chevron-right" style="float: right; font-size: 0.8em; margin-top: 3px; opacity: 0.7;"></i>
+                </a>
                 <div class="dropdown-content">
                     ${generateSubmenuHTML(child.children, rootPath)}
                 </div>
@@ -437,7 +495,7 @@ const getHeaderHTML = (rootPath) => `
     <div class="auth-box">
             <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
             <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
-            <a href="${rootPath}login.html" class="nav-btn">Log In / Sign Up</a>
+            <a href="${rootPath}auth/login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
     
     <button class="mobile-toggle" aria-label="Toggle Navigation">
@@ -851,7 +909,7 @@ function injectSoulBotWidget() {
 
             /* MOBILE TWEAKS */
             @media (max-width: 768px) {
-                #soulbot-widget-container { bottom: 20px; right: 20px; }
+                #soulbot-widget-container { bottom: 130px !important; right: 20px; }
                 #sb-window { width: 90vw; right: 5vw; bottom: 90px; height: 60vh; }
             }
         </style>

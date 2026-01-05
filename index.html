@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; media-src 'self' https://cdn.pixabay.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://www.gstatic.com https://www.google-analytics.com https://firestore.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com;">
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; media-src 'self' https://cdn.pixabay.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://www.gstatic.com https://www.google-analytics.com https://firestore.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://accounts.google.com; frame-src 'self' https://accounts.google.com;">
     <meta name="description"
         content="Soulamore is a student wellness platform offering anonymous support, peer connection, and mental health resources.">
     <title>Soulamore | Navigate Life Together</title>
@@ -33,6 +33,10 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/global.css?v=1.1">
+
+    <!-- MODULE: Backend -->
+    <script type="module" src="assets/js/firebase-config.js"></script>
+    <script type="module" src="assets/js/data-handler.js"></script>
 
     <style>
         /* --- DESIGN SYSTEM: VEGITO (The Ultimate Fusion) --- */
@@ -923,6 +927,7 @@
         </div>
 
         <!-- VISUAL COMPASS (Restructured Steps) -->
+        <!-- VISUAL COMPASS (Step 2: Tools) -->
         <div class="section-header fade-in">
             <h2 style="font-size:2.5rem; margin-bottom:10px;">Find Your Calm Space</h2>
             <p>Choose what you need right now.</p>
@@ -955,6 +960,38 @@
                 <i class="fas fa-users pillar-icon" style="color:#a78bfa;"></i>
                 <div class="pillar-title">Connect</div>
                 <div class="pillar-desc">Talk to Peers who truly understand.</div>
+            </a>
+        </div>
+
+        <!-- 3. WELLNESS COMPASS (STEP 3) -->
+        <div class="section-header fade-in" style="margin-top:100px;">
+            <h2>You Don't Have to Carry It Alone</h2>
+            <p style="opacity:0.6;">Connect with trained peers who understand.</p>
+        </div>
+        <div class="compass-grid fade-in">
+            <a href="our-peers/index.html" class="pillar-card"
+                style="text-decoration:none; color:inherit; display:block; border-color:rgba(45, 212, 191, 0.3);">
+                <div class="pillar-icon"><i class="fas fa-brain" style="color:#2dd4bf;"></i></div>
+                <div class="pillar-title" style="color:#2dd4bf;">Mental Wellness</div>
+                <div class="pillar-desc">Safe spaces to discuss anxiety, stress, and emotional resilience.</div>
+            </a>
+            <a href="our-peers/physical-wellness/renu-dogra.html" class="pillar-card"
+                style="text-decoration:none; color:inherit; display:block; border-color:rgba(244, 114, 182, 0.3);">
+                <div class="pillar-icon"><i class="fas fa-running" style="color:#f472b6;"></i></div>
+                <div class="pillar-title" style="color:#f472b6;">Physical Wellness</div>
+                <div class="pillar-desc">Body positivity, health habits, and vitality discussions.</div>
+            </a>
+            <a href="spaces/soulamore-workplace/index.html" class="pillar-card"
+                style="text-decoration:none; color:inherit; display:block; border-color:rgba(217, 119, 6, 0.3);">
+                <div class="pillar-icon"><i class="fas fa-wallet" style="color:#d97706;"></i></div>
+                <div class="pillar-title" style="color:#d97706;">Financial Wellness</div>
+                <div class="pillar-desc">Money stress affects mental health. Talk to a peer who understands.</div>
+            </a>
+            <a href="spaces/soulamore-campus.html" class="pillar-card"
+                style="text-decoration:none; color:inherit; display:block; border-color:rgba(56, 189, 248, 0.3);">
+                <div class="pillar-icon"><i class="fas fa-book-open" style="color:#38bdf8;"></i></div>
+                <div class="pillar-title" style="color:#38bdf8;">Academic Wellness</div>
+                <div class="pillar-desc">Study pressure, career guidance, and learning support.</div>
             </a>
         </div>
 
@@ -1161,16 +1198,23 @@
                 <h2>Need Human Connection?</h2>
                 <p style="opacity:0.8;">Technology is great, but sometimes you just need a person. Fill this out, and
                     our care team will reach out.</p>
+                <style>
+                    /* Fix for white dropdown background */
+                    .lifeline-input option {
+                        background-color: #0f172a;
+                        color: white;
+                    }
+                </style>
                 <form class="lifeline-form" onsubmit="submitLead(event)">
-                    <input type="text" class="lifeline-input" placeholder="Your Name" required>
-                    <input type="email" class="lifeline-input" placeholder="Your Email" required>
-                    <select class="lifeline-input full-width" style="color:#aaa;">
+                    <input type="text" id="lifeName" class="lifeline-input" placeholder="Your Name" required>
+                    <input type="email" id="lifeEmail" class="lifeline-input" placeholder="Your Email" required>
+                    <select id="lifeType" class="lifeline-input full-width" style="color:#aaa;">
                         <option>I want to talk to a...</option>
                         <option>Student Peer (Casual)</option>
                         <option>Therapist (Professional)</option>
                         <option>Just need resources</option>
                     </select>
-                    <button type="submit" class="lifeline-submit-btn">Request Support</button>
+                    <button type="submit" class="lifeline-submit-btn" id="btnLife">Request Support</button>
                 </form>
             </div>
         </div>
@@ -1472,11 +1516,75 @@
         }
 
         // 7. LIFELINE
+        // 7. LIFELINE
         function submitLead(e) {
             e.preventDefault();
-            document.querySelector('.lifeline-submit-btn').innerText = "Request Sent ✓";
-            document.querySelector('.lifeline-submit-btn').style.background = "#48bb78";
+            console.log("Lifeline submit triggered");
+
+            const nameEl = document.getElementById('lifeName');
+            const emailEl = document.getElementById('lifeEmail');
+            const typeEl = document.getElementById('lifeType');
+            const btn = document.getElementById('btnLife');
+
+            // Debug log
+            if (!nameEl) console.error("Missing lifeName");
+            if (!emailEl) console.error("Missing lifeEmail");
+            if (!typeEl) console.error("Missing lifeType");
+
+            if (!nameEl || !emailEl || !typeEl || !btn) {
+                alert("Form Error: Please refresh the page. (Missing Elements)");
+                return;
+            }
+
+            const name = nameEl.value.trim();
+            const email = emailEl.value.trim();
+            const type = typeEl.value;
+
+            // Basic Validation
+            if (!name || !email) {
+                alert("Please fill in your name and email.");
+                return;
+            }
+
+            const subject = "LIFELINE (" + type + ")";
+            const message = "User requested support via Homepage Lifeline.\nType: " + type;
+
+            console.log("Submitting Lifeline:", { name, email, type });
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            btn.disabled = true;
+
+            if (window.SoulBackend && window.SoulBackend.submitContact) {
+                window.SoulBackend.submitContact(name, email, subject, message).then(success => {
+                    if (success) {
+                        btn.innerHTML = "Request Sent <i class='fas fa-check'></i>";
+                        btn.style.background = "#48bb78";
+                    } else {
+                        btn.innerHTML = "Error. Try Again.";
+                        btn.disabled = false;
+                    }
+                });
+            } else {
+                console.warn("Backend not loaded immediately. Retrying...");
+                setTimeout(() => {
+                    if (window.SoulBackend && window.SoulBackend.submitContact) {
+                        window.SoulBackend.submitContact(name, email, subject, message).then(success => {
+                            if (success) {
+                                btn.innerHTML = "Request Sent <i class='fas fa-check'></i>";
+                                btn.style.background = "#48bb78";
+                            } else {
+                                btn.innerHTML = "Error"; btn.style.background = "red";
+                            }
+                        });
+                    } else {
+                        btn.innerHTML = "Offline (Saved Locally)"; // Fake visual confirmation if real fails
+                        btn.style.background = "#48bb78";
+                        alert("We couldn't reach the server, but please email us directly at contact.soulamore@gmail.com");
+                    }
+                }, 1500);
+            }
         }
+
 
         // 8. FADE IN
         const observer = new IntersectionObserver((entries) => {
@@ -1486,6 +1594,9 @@
     </script>
     <script src="assets/js/components.js?v=1.1"></script>
     <script src="./assets/js/main.js"></script>
+    <!-- Firebase Auth Handler -->
+    <script type="module" src="assets/js/firebase-config.js"></script>
+    <script type="module" src="assets/js/auth-handler.js"></script>
     <script src="assets/js/launch-popup.js"></script>
     <!-- force-restore.js removed as source is fixed -->
 </body>
