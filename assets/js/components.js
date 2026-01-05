@@ -179,6 +179,17 @@ try {
                 padding: 8px 0 !important;
             }
 
+            /* HOVER BRIDGE: PREVENT GAP CLOSING */
+            .dropdown-content::before {
+                content: "" !important;
+                position: absolute !important;
+                top: -10px !important; /* Bridge the gap upwards */
+                left: 0 !important;
+                width: 100% !important;
+                height: 10px !important;
+                background: transparent !important;
+            }
+
             /* SHOW ON HOVER (Direct Child Only) */
             .dropdown:hover > .dropdown-content {
                 display: block !important;
@@ -197,12 +208,21 @@ try {
                 top: 0 !important;
                 left: 100% !important;
                 margin-top: -10px !important; /* Align with top */
+                margin-left: 10px !important; /* THE GAP */
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
                 border: 1px solid rgba(255,255,255,0.1) !important;
                 border-left: 1px solid rgba(255,255,255,0.1) !important; /* Reset border */
                 background: rgba(15, 23, 42, 0.98) !important; /* Solid bg */
                 padding-left: 0 !important; /* Reset padding */
                 min-width: 200px !important;
+            }
+
+            /* HOVER BRIDGE FOR SIDE FLYOUT */
+            .dropdown-content .dropdown-content::before {
+                top: 0 !important;
+                left: -15px !important; /* Bridge back to parent */
+                width: 15px !important;
+                height: 100% !important;
             }
 
             /* Level 3: Deep Nested */
@@ -396,7 +416,10 @@ function generateSubmenuHTML(children, rootPath) {
             const style = child.style ? `style="${child.style}"` : '';
             html += `
             <div class="dropdown-submenu">
-                <a href="${child.href === '#' ? '#' : rootPath + child.href}" id="${child.id || ''}" ${style}>${child.label}</a>
+                <a href="${child.href === '#' ? '#' : rootPath + child.href}" id="${child.id || ''}" ${style}>
+                    ${child.label}
+                    <i class="fas fa-chevron-right" style="float: right; font-size: 0.8em; margin-top: 3px; opacity: 0.7;"></i>
+                </a>
                 <div class="dropdown-content">
                     ${generateSubmenuHTML(child.children, rootPath)}
                 </div>
