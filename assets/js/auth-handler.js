@@ -5,17 +5,21 @@
 
 import { auth } from "./firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { createOrUpdateUserProfile } from "./profile-handler.js";
 
 // Initialize auth state
 let currentUser = null;
 
 // Listen for auth state changes
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     updateAuthUI(user);
     
-    // Store user info in sessionStorage
+    // Store user info in sessionStorage and create/update profile
     if (user) {
+        // Create or update user profile in Firestore
+        await createOrUpdateUserProfile(user);
+        
         sessionStorage.setItem('user', JSON.stringify({
             uid: user.uid,
             displayName: user.displayName,
@@ -53,6 +57,9 @@ function updateAuthUI(user) {
                 } else {
                     userIconBtn.innerHTML = '<i class="fas fa-user-circle"></i>';
                 }
+                // Make icon clickable to go to profile
+                userIconBtn.href = 'profile.html';
+                userIconBtn.onclick = null;
             }
         } else {
             // User is not logged in
@@ -97,11 +104,25 @@ function showUserMenu(user) {
         backdrop-filter: blur(10px);
     `;
     
-    menu.innerHTML = `
+        menu.innerHTML = `
         <div style="padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 10px;">
             <div style="font-weight: 600; color: white;">${user.displayName || 'User'}</div>
             <div style="font-size: 0.85rem; opacity: 0.7; color: #e2e8f0;">${user.email}</div>
         </div>
+        <a href="profile.html" style="
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 8px;
+            color: #4ECDC4;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 500;
+            margin-bottom: 10px;
+            transition: 0.2s;
+        ">View Profile</a>
         <button id="logoutBtn" style="
             width: 100%;
             padding: 10px;
