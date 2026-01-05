@@ -155,15 +155,35 @@
 
     // Use the global backend handler if available
     if (window.SoulBackend && window.SoulBackend.submitNewsletter) {
-        window.SoulBackend.submitNewsletter(email).then(success => {
-            if (success) {
-                btn.innerHTML = '<i class="fas fa-check"></i>';
-                btn.style.background = '#48bb78';
-            } else {
-                btn.innerText = 'Err';
-                btn.disabled = false;
-            }
-        });
+        if (window.handleNewsletter) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            window.handleNewsletter(email).then(success => {
+                if (success) {
+                    // Success UI
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    btn.style.background = "#48bb78";
+                    emailEl.value = "";
+
+                    // Show success message inside the input placeholder temporarily
+                    const originalPlaceholder = emailEl.placeholder;
+                    emailEl.placeholder = "Welcome to the family!";
+
+                    setTimeout(() => {
+                        window.closeLaunchPopup();
+                        // Reset button
+                        btn.innerHTML = 'Join';
+                        btn.style.background = "var(--primary-gradient)"; // Reset to original if needed, or specific color
+                        emailEl.placeholder = originalPlaceholder;
+                    }, 2000);
+                } else {
+                    btn.innerHTML = 'Retry';
+                }
+            });
+        } else {
+            console.error("handleNewsletter function not found!");
+            btn.innerHTML = 'Error';
+        }
     } else {
         // Fallback if backend not ready yet
         setTimeout(() => {
