@@ -39,6 +39,13 @@ service cloud.firestore {
       allow update, delete: if request.auth != null;
     }
 
+    // Newsletter Subscriptions
+    match /newsletters/{document=**} {
+      allow read: if request.auth != null;
+      allow create: if true; // Public subscription
+      allow update, delete: if request.auth != null;
+    }
+
     // Soulamore Away (Postcards)
     match /postcards/{document=**} {
       allow read: if true; // Public read (Gallery)
