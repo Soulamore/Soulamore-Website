@@ -90,6 +90,14 @@
                     <a href="https://www.instagram.com/soulamore_/" target="_blank" class="tool-btn"><i class="fab fa-instagram"></i> Join us on IG</a>
                 </div>
 
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
+                     <div style="font-size: 0.85rem; margin-bottom: 10px; font-weight: 600; color: #e2e8f0;">Get updates when we launch:</div>
+                     <div style="display: flex; gap: 8px;">
+                        <input type="email" id="popupEmail" placeholder="your@email.com" style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 8px; color: white; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.9rem;">
+                        <button onclick="submitPopupEmail()" id="btnPopupEmail" style="background: var(--teal-glow, #4ECDC4); color: #0f172a; border: none; padding: 0 15px; border-radius: 8px; font-weight: 700; cursor: pointer; transition:0.2s;">Join</button>
+                     </div>
+                </div>
+
                 <div style="margin-top:auto; font-size:0.85rem; opacity:0.7; color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif;">
                     If you’re a peer or psychologist aligned with our mission, reach out at <a href="mailto:contact.soulamore@gmail.com" style="color:#4ECDC4; text-decoration:underline;">contact.soulamore@gmail.com</a>. We’d love to hear from you.
                 </div>
@@ -131,7 +139,70 @@
         if (h) h.innerText = String(hours).padStart(2, '0');
         if (m) m.innerText = String(mins).padStart(2, '0');
     }
-    setInterval(updateLaunchTimer, 1000);
-    updateLaunchTimer();
+    if (m) m.innerText = String(mins).padStart(2, '0');
+}
 
-})();
+    // 4. Expose Popup Email Submit to Global Scope (since button uses onclick="submitPopupEmail()")
+    window.submitPopupEmail = function () {
+    const emailEl = document.getElementById('popupEmail');
+    const btn = document.getElementById('btnPopupEmail');
+    const email = emailEl.value.trim();
+
+    if (!email) return;
+
+    btn.innerText = '...';
+    btn.disabled = true;
+
+    // Use the global backend handler if available
+    if (window.SoulBackend && window.SoulBackend.submitNewsletter) {
+        if (window.handleNewsletter) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            window.handleNewsletter(email).then(success => {
+                if (success) {
+                    // Success UI
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    btn.style.background = "#48bb78";
+                    emailEl.value = "";
+
+                    // Show success message inside the input placeholder temporarily
+                    const originalPlaceholder = emailEl.placeholder;
+                    emailEl.placeholder = "Welcome to the family!";
+
+                    setTimeout(() => {
+                        window.closeLaunchPopup();
+                        // Reset button
+                        btn.innerHTML = 'Join';
+                        btn.style.background = "var(--primary-gradient)"; // Reset to original if needed, or specific color
+                        emailEl.placeholder = originalPlaceholder;
+                    }, 2000);
+                } else {
+                    btn.innerHTML = 'Retry';
+                }
+            });
+        } else {
+            console.error("handleNewsletter function not found!");
+            btn.innerHTML = 'Error';
+        }
+    } else {
+        // Fallback if backend not ready yet
+        setTimeout(() => {
+            if (window.SoulBackend && window.SoulBackend.submitNewsletter) {
+                window.SoulBackend.submitNewsletter(email).then(success => {
+                    if (success) {
+                        btn.innerHTML = '<i class="fas fa-check"></i>';
+                        btn.style.background = '#48bb78';
+                    } else {
+                        btn.innerText = 'Err';
+                        btn.disabled = false;
+                    }
+                });
+            }
+        }, 1000);
+    }
+};
+
+setInterval(updateLaunchTimer, 1000);
+updateLaunchTimer();
+
+}) ();

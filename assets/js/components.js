@@ -336,19 +336,20 @@ const NAV_DATA = [
     {
         id: 'nav-spaces',
         label: 'Spaces',
-        icon: 'fas fa-rocket',
+        icon: 'fas fa-layer-group',
         href: '#',
         type: 'dropdown',
         children: [
             {
                 id: 'nav-campus',
                 label: 'Soulamore Campus',
-                href: 'spaces/soulamore-campus.html',
+                // HREF FIXED: Pointing to the correct index file
+                href: 'spaces/campus/index.html',
                 type: 'submenu',
                 children: [
-                    { label: 'What is Campus?', href: 'spaces/campus/what-is-campus.html' },
-                    { label: 'Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
-                    { label: 'For Institutions', href: 'spaces/campus/institutions.html' },
+                    { id: 'nav-schools', label: 'Schools', href: 'spaces/campus/schools.html' },
+                    { id: 'nav-institutions', label: 'Institutions', href: 'spaces/campus/institutions.html' },
+                    { id: 'nav-campus-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
                     { label: 'Student Resources', href: 'spaces/campus/student-resources.html' }
                 ]
             },
@@ -362,18 +363,6 @@ const NAV_DATA = [
                     { label: 'Plans & Pricing', href: 'spaces/soulamore-workplace/index.html#plans' },
                     { label: 'Guidelines', href: 'spaces/soulamore-workplace/index.html#guidelines' }
                 ]
-            },
-            {
-                id: 'nav-institutions',
-                label: 'Institutions',
-                href: 'spaces/campus/institutions.html',
-                icon: 'fas fa-university'
-            },
-            {
-                id: 'nav-schools',
-                label: 'Schools',
-                href: 'spaces/schools/index.html',
-                icon: 'fas fa-school'
             },
             {
                 id: 'nav-away',
@@ -563,8 +552,9 @@ const getFooterHTML = (rootPath) => `
         <div class="footer-col">
             <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Company</h4>
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
-                <li><a href="${rootPath}company/about.html">Our Story</a></li>
-                <li><a href="${rootPath}company/contact.html">Contact Us</a></li>
+                <li><a href="${rootPath}tools/index.html">Tools</a></li>
+                <li><a href="${rootPath}newsletter.html">Newsletter</a></li>
+                <li><a href="${rootPath}company/contact.html">Contact</a></li>
                 <li><a href="${rootPath}company/legal.html">Privacy & Legal</a></li>
                 <li><a href="${rootPath}get-help-now.html" style="color:var(--ember-red); font-weight:600;">Crisis Resources</a></li>
             </ul>
