@@ -689,8 +689,10 @@ function injectFavicon() {
         // SOULAMORE AWAY - PEACH EARTH (GLOBE)
         iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="256" fill="%23F49F75"/><path fill="%230f172a" d="M365 318c-23-14-55-19-61-12-5 5-2 37 13 58 12 18 10 32-1 32-23 0-51-38-51-38-46-63-98-35-98-35-36 12-57 32-73 52 35 34 83 55 136 55 106 0 192-86 192-192 0-35-9-68-26-96-8 30-14 62-31 76z"/></svg>`;
     } else {
-        // DEFAULT (Soulamore Logo/Leaf) - PEACH
-        iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%23F49F75' d='M440.5 88.5C397.9 45.3 340.5 24 286 24c-92.6 0-176.4 56.5-212 141.5-17.8 42.5-19.3 90.7-4.1 134.4 15.2 43.7 45.4 79.9 85.3 102.4C195.1 425 242.9 432 288 432c6.2 0 12.5-.2 18.7-.5 47.8-2.6 88-29.4 116.6-66.4 28.6-37 43.1-83.3 40.8-132.8l-.2-3.8c7.8-20.1 13.9-40.8 18.3-62.2 4.4-21.4 6.7 43.2-6.7 43.2 13.4 0 26.8-5.2 37-15.6l9.6 9.6c20.5 20.5 53.6 20.5 74.1 0s20.5-53.6 0-74.1l-68-68c-20.5-20.5-53.6-20.5-74.1 0z'/></svg>`;
+        // DEFAULT: Use the official PNG to ensure correct Branding
+        // We cannot easily SVG-ify the complex logo, so we use the image file.
+        link.href = `${rootPath}assets/images/favicon_symbol.png`;
+        return;
     }
 
     link.href = `data:image/svg+xml,${iconSVG}`;
