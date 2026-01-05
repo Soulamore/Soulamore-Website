@@ -7,6 +7,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // TODO: User to provide these keys from Firebase Console > Project Settings
 // Live Configuration (Soulamore)
@@ -25,8 +26,11 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 // Use default Firestore database (native Firestore, not MongoDB-compatible)
 const db = getFirestore(app);
+// Initialize Firebase Authentication
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 
-// Export for use in data-handler.js test
-export { db, collection, addDoc, serverTimestamp };
+// Export for use in other modules
+export { db, collection, addDoc, serverTimestamp, auth, googleProvider };
 
 console.log("Firebase initialized.");
