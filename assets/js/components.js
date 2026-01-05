@@ -851,7 +851,7 @@ function injectSoulBotWidget() {
 
             /* MOBILE TWEAKS */
             @media (max-width: 768px) {
-                #soulbot-widget-container { bottom: 20px; right: 20px; }
+                #soulbot-widget-container { bottom: 130px !important; right: 20px; }
                 #sb-window { width: 90vw; right: 5vw; bottom: 90px; height: 60vh; }
             }
         </style>
