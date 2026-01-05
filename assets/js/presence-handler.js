@@ -1,6 +1,7 @@
 /**
  * Presence Handler for Soulamore
  * Tracks active users anonymously via Firestore to show "Live Users" count.
+ * Features: Country Detection, Page-Specific Counting.
  */
 import { db, collection, addDoc, doc, onSnapshot, updateDoc, deleteDoc, serverTimestamp, query, where, getDocs } from "./firebase-config.js";
 
@@ -10,12 +11,27 @@ const HEARTBEAT_INTERVAL = 30000; // 30 seconds
 // Generate a session ID for this tab
 const sessionId = 'soul_' + Math.random().toString(36).substr(2, 9);
 let docRef = null;
+let userCountry = "Unknown";
+
+// 1. Fetch User Country (IP-based, lightweight)
+async function detectCountry() {
+    try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        userCountry = data.country_name || "Unknown";
+    } catch (e) {
+        console.warn("Country detection failed, defaulting to Unknown.");
+    }
+}
 
 async function startPresence() {
     try {
+        await detectCountry();
+
         // Create initial presence document
         docRef = await addDoc(collection(db, PRESENCE_COLLECTION), {
             page: window.location.pathname,
+            country: userCountry,
             lastActive: serverTimestamp(),
             device: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
         });
@@ -34,51 +50,96 @@ async function startPresence() {
             if (docRef) deleteDoc(docRef);
         });
 
-        // Start listening for count
-        listenToPresence();
+        // Start listening
+        initializeListeners();
 
     } catch (e) {
         console.error("Presence system failed:", e);
     }
 }
 
-function listenToPresence() {
-    // Listen to changes in the active_souls collection
-    // Note: In a high-traffic app, we'd use a cloud function to aggregate this counter.
-    // For now, client-side counting is fine for < 100 concurrents.
+function initializeListeners() {
+    // 1. Soulamore Away: Listen for users from MY country
+    if (window.location.href.includes('soulamore-away')) {
+        listenToCountryPeers();
+    }
+    // 2. Campus: Listen for students (users on campus pages)
+    else if (window.location.href.includes('campus')) {
+        listenToStudentPeers();
+    }
+    // 3. Confession: Listen for people on this specific page
+    else if (window.location.href.includes('confession')) {
+        listenToConfessionPeers();
+    }
+    // Default Global Listener (optional)
+}
+
+// --- SPECIFIC LISTENERS ---
+
+function listenToCountryPeers() {
+    // Query: Active users active in last minute AND matching country
+    // Note: Requires composite index if high scale. For now, client filter ok for small data.
     const q = query(
         collection(db, PRESENCE_COLLECTION),
-        where("lastActive", ">", new Date(Date.now() - 60000)) // Active in last minute
+        where("lastActive", ">", new Date(Date.now() - 60000)),
+        where("country", "==", userCountry)
     );
 
     onSnapshot(q, (snapshot) => {
-        const count = snapshot.size; // Total documents found
-        updateUI(count);
+        const count = snapshot.size;
+        updateWidget(`soulamore-away`, count, userCountry);
     });
 }
 
-function updateUI(count) {
-    // Update any element with class 'live-count-display'
-    const displays = document.querySelectorAll('.live-count-display');
-    displays.forEach(el => {
-        el.innerText = count > 1 ? `${count} peers online` : `1 peer online`;
-    });
+function listenToStudentPeers() {
+    // Query: Active users whose 'page' contains 'campus'
+    // Firestore textual search is limited. We might need to just query all active and filter client-side 
+    // OR add a 'section' field to document.
+    // For simplicity/speed: Query all active, filter in JS.
+    const q = query(
+        collection(db, PRESENCE_COLLECTION),
+        where("lastActive", ">", new Date(Date.now() - 60000))
+    );
 
-    // Update specific "Status Dots" in peer cards
-    const statusDots = document.querySelectorAll('.status-dot');
-    statusDots.forEach(dot => {
-        // If we have > 5 people, show "Online" as confirmed.
-        // If low, maybe show "Away" or just keep "Online" for positivity.
-        // For Soulamore, let's keep it "Online" but maybe pulse faster if crowded.
-        if (count > 10) {
-            dot.classList.add('high-traffic'); // Add CSS for faster pulse?
-        }
+    onSnapshot(q, (snapshot) => {
+        let count = 0;
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.page && data.page.includes('campus')) count++;
+        });
+        updateWidget('campus', count);
     });
+}
 
-    // Optional: Global widget text
-    const widgetText = document.getElementById('global-live-count');
-    if (widgetText) {
-        widgetText.innerText = count;
+function listenToConfessionPeers() {
+    const q = query(
+        collection(db, PRESENCE_COLLECTION),
+        where("lastActive", ">", new Date(Date.now() - 60000))
+    );
+
+    onSnapshot(q, (snapshot) => {
+        let count = 0;
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.page && data.page.includes('confession')) count++;
+        });
+        updateWidget('confession', count);
+    });
+}
+
+// --- UI UPDATER ---
+function updateWidget(type, count, extraLabel = "") {
+    const display = document.querySelector('.live-count-display');
+    if (!display) return;
+
+    if (type === 'soulamore-away') {
+        // "X peers from India online"
+        const label = count > 1 ? `${count} peers from ${extraLabel} online` : `You are the first from ${extraLabel}`;
+        display.innerText = label;
+    } else if (type === 'campus') {
+        display.innerText = `${count} students online`;
+    } else if (type === 'confession') {
+        display.innerText = `${count} souls here with you`;
     }
 }
 
@@ -88,3 +149,4 @@ if (document.readyState === 'loading') {
 } else {
     startPresence();
 }
+

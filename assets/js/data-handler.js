@@ -60,12 +60,7 @@ export async function handleConfession(text, email = null, phone = null) {
 export async function handleApplication(type, data) {
     // user requested separate collections for easier sorting
     // user requested separate collections for easier sorting
-<<<<<<< HEAD
-    // Reverting 'peers' to 'applications' temporarily to fix permission/live issues
-    const collectionName = type === 'psychologist' ? 'psychologists' : 'applications';
-=======
     const collectionName = type === 'psychologist' ? 'psychologists' : 'peers';
->>>>>>> backend
 
     try {
         console.log(`Attempting to save application to ${collectionName}...`, data);
@@ -139,5 +134,36 @@ window.SoulBackend = {
     submitConfession: handleConfession,
     submitApp: handleApplication,
     submitContact: handleContact,
-    submitPostcard: handlePostcard
+    submitPostcard: handlePostcard,
+    getAggregateStats: getAggregateStats
 };
+
+// --- 7. AGGREGATE STATS (Vent/Shred Counts) ---
+export async function getAggregateStats(type) {
+    // Note: Reading collection size can be expensive ($$$) if millions of docs.
+    // For small/medium scale (<50k), getCountFromServer is optimized.
+    try {
+        if (type === 'daily_vents') {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const q = query(collection(db, "vents"), where("timestamp", ">=", today));
+            // For older SDKs that don't support getCount, we fallback to getDocs.
+            // But we should use getCountFromServer if possible.
+            // Assuming recent SDK:
+            const snapshot = await getDocs(q);
+            return snapshot.size;
+        }
+
+        else if (type === 'total_shreds') {
+            const q = collection(db, "shreds");
+            // const snapshot = await getCountFromServer(q); // Preferred
+            const snapshot = await getDocs(q); // Fallback
+            return snapshot.size; // .data().count;
+        }
+        return 0;
+    } catch (e) {
+        console.error("Stats error:", e);
+        return 0;
+    }
+}
