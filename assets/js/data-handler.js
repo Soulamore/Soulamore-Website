@@ -60,8 +60,12 @@ export async function handleConfession(text, email = null, phone = null) {
 export async function handleApplication(type, data) {
     // user requested separate collections for easier sorting
     // user requested separate collections for easier sorting
+<<<<<<< HEAD
     // Reverting 'peers' to 'applications' temporarily to fix permission/live issues
     const collectionName = type === 'psychologist' ? 'psychologists' : 'applications';
+=======
+    const collectionName = type === 'psychologist' ? 'psychologists' : 'peers';
+>>>>>>> backend
 
     try {
         console.log(`Attempting to save application to ${collectionName}...`, data);
@@ -128,20 +132,6 @@ export async function handlePostcard(message, city = "Unknown") {
     }
 }
 
-// --- 6. 5-STEP RESET (Gratitude) ---
-export async function handleResetSubmission(items) {
-    try {
-        await addDoc(collection(db, "resets"), {
-            items: items,
-            timestamp: serverTimestamp()
-        });
-        return true;
-    } catch (e) {
-        console.error("Error saving reset items: ", e);
-        return false;
-    }
-}
-
 // Make globally available for inline HTML onclicks (via a bridge helper if needed)
 window.SoulBackend = {
     submitVent: handleVentSubmission,
@@ -149,6 +139,5 @@ window.SoulBackend = {
     submitConfession: handleConfession,
     submitApp: handleApplication,
     submitContact: handleContact,
-    submitPostcard: handlePostcard,
-    submitReset: handleResetSubmission
+    submitPostcard: handlePostcard
 };
