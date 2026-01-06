@@ -284,17 +284,55 @@
     <script type="module" src="../assets/js/firebase-config.js"></script>
     <script type="module">
         import { auth, googleProvider } from "../assets/js/firebase-config.js";
-        import { signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Check for redirect result (if user was redirected back from Google)
+        getRedirectResult(auth).then((result) => {
+            if (result) {
+                const user = result.user;
+                console.log('Signed in via redirect:', user.displayName, user.email);
+                
+                // Create/update user profile in Firestore
+                import("../assets/js/profile-handler.js").then(({ createOrUpdateUserProfile }) => {
+                    createOrUpdateUserProfile(user);
+                });
+                
+                // Store user info in sessionStorage
+                sessionStorage.setItem('user', JSON.stringify({
+                    uid: user.uid,
+                    displayName: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL
+                }));
+                
+                // Redirect to home page
+                window.location.href = '../index.html';
+            }
+        }).catch((error) => {
+            console.error('Redirect sign-in error:', error);
+        });
 
         // Google Sign In Button
         const googleSignInBtn = document.getElementById('googleSignInBtn');
         if (googleSignInBtn) {
             googleSignInBtn.addEventListener('click', async () => {
+                // Safety timeout to reset button if something goes wrong (30 seconds)
+                const resetTimeout = setTimeout(() => {
+                    googleSignInBtn.disabled = false;
+                    googleSignInBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
+                    console.warn('Sign-in timeout - resetting button');
+                }, 30000);
+                
                 try {
                     googleSignInBtn.disabled = true;
                     googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
                     
+                    console.log('Attempting Google sign-in...');
+                    console.log('Auth domain:', auth.config.authDomain);
+                    console.log('Current origin:', window.location.origin);
+                    
                     const result = await signInWithPopup(auth, googleProvider);
+                    clearTimeout(resetTimeout);
                     const user = result.user;
                     
                     console.log('Signed in successfully:', user.displayName, user.email);
@@ -314,20 +352,51 @@
                     // Redirect to home page
                     window.location.href = '../index.html';
                 } catch (error) {
+                    clearTimeout(resetTimeout);
                     console.error('Error signing in:', error);
+                    console.error('Error code:', error.code);
+                    console.error('Error message:', error.message);
+                    console.error('Full error:', JSON.stringify(error, null, 2));
+                    
                     let errorMessage = 'Failed to sign in with Google. ';
+                    let showAlert = true;
+                    let useRedirect = false;
                     
                     if (error.code === 'auth/configuration-not-found') {
                         errorMessage += 'Google authentication is not enabled in Firebase Console. Please enable it in Firebase Console > Authentication > Sign-in method > Google.';
+                    } else if (error.code === 'auth/unauthorized-domain') {
+                        errorMessage = `This domain (${window.location.hostname}) is not authorized for Google sign-in. Please add your domain to Firebase Console > Authentication > Settings > Authorized domains.`;
+                        useRedirect = true; // Try redirect as fallback
                     } else if (error.code === 'auth/popup-closed-by-user') {
-                        errorMessage = 'Sign-in cancelled.';
+                        // Don't show alert for user cancellation - it's expected behavior
+                        showAlert = false;
+                        console.log('User cancelled sign-in - popup was closed');
+                    } else if (error.code === 'auth/popup-blocked') {
+                        errorMessage = 'Popup was blocked by your browser. Trying redirect method instead...';
+                        useRedirect = true;
+                        showAlert = false; // Don't show alert, just try redirect
                     } else {
-                        errorMessage += error.message;
+                        errorMessage += `${error.message} (Code: ${error.code})`;
                     }
                     
-                    alert(errorMessage);
+                    // Always reset button state
                     googleSignInBtn.disabled = false;
                     googleSignInBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
+                    
+                    // If popup is blocked or domain issue, try redirect method
+                    if (useRedirect) {
+                        console.log('Attempting sign-in with redirect method...');
+                        try {
+                            await signInWithRedirect(auth, googleProvider);
+                            // User will be redirected to Google, then back to this page
+                            // The getRedirectResult() handler above will process the result
+                        } catch (redirectError) {
+                            console.error('Redirect sign-in also failed:', redirectError);
+                            alert(`Both popup and redirect methods failed. Error: ${redirectError.message}`);
+                        }
+                    } else if (showAlert) {
+                        alert(errorMessage);
+                    }
                 }
             });
         }

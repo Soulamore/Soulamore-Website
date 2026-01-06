@@ -3,7 +3,7 @@
  * Handles: Vents, Confessions, Applications, and Soulbot Leads.
  */
 
-import { db, collection, addDoc, serverTimestamp } from "./firebase-config.js";
+import { db, collection, addDoc, serverTimestamp, query, onSnapshot, orderBy } from "./firebase-config.js";
 
 // --- 1. VENT BOX (Anonymous) ---
 // --- 1. VENT BOX (Anonymous) ---
@@ -127,6 +127,32 @@ export async function handlePostcard(message, city = "Unknown") {
     }
 }
 
+// --- 9. LIVE AGGREGATE STATS (Real-time) ---
+export function subscribeToShredCount(callback) {
+    // Listen to 'vents' collection
+    // Optimization: For large datasets, use a distributed counter extension.
+    // For current scale (<20k), snapshot size is acceptable.
+    const q = query(collection(db, "vents"));
+
+    // Return unsubscribe function
+    return onSnapshot(q, (snapshot) => {
+        if (callback) callback(snapshot.size);
+    }, (error) => {
+        console.error("Error subscribing to shred stats:", error);
+    });
+}
+
+// Make globally available for inline HTML onclicks (via a bridge helper if needed)
+// --- 10. NEWSLETTER LIVE COUNT ---
+export function subscribeToNewsletterCount(callback) {
+    const q = query(collection(db, "newsletters"));
+    return onSnapshot(q, (snapshot) => {
+        if (callback) callback(snapshot.size);
+    }, (error) => {
+        console.error("Error subscribing to newsletter stats:", error);
+    });
+}
+
 // Make globally available for inline HTML onclicks (via a bridge helper if needed)
 window.SoulBackend = {
     submitVent: handleVentSubmission,
@@ -136,7 +162,9 @@ window.SoulBackend = {
     submitContact: handleContact,
     submitPostcard: handlePostcard,
     submitNewsletter: handleNewsletter,
-    getAggregateStats: getAggregateStats
+    getAggregateStats: getAggregateStats,
+    subscribeToShredCount: subscribeToShredCount,
+    subscribeToNewsletterCount: subscribeToNewsletterCount
 };
 
 // --- 8. NEWSLETTER SUBSCRIPTION ---

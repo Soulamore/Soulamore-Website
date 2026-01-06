@@ -16,7 +16,6 @@
         :root {
             --bg-deep: #050510;
             --accent: #4ECDC4;
-            --danger: #FF6B6B;
             --text-light: #f1f5f9;
         }
 
@@ -56,29 +55,6 @@
             text-shadow: 0 0 10px rgba(78, 205, 196, 0.8);
             font-size: 1.5rem;
             font-weight: 700;
-        }
-
-        .heat-container {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            z-index: 5;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        .heat-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #4ECDC4, #FF6B6B);
-            transition: width 0.1s linear;
         }
 
         .exit-btn {
@@ -150,51 +126,15 @@
             background: linear-gradient(to right, #fff, #4ECDC4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 25px;
-            /* Added spacing */
         }
 
         .subtitle {
-            margin-bottom: 50px;
-            /* Increased from default */
-            line-height: 1.6;
-        }
-
-        /* GUIDANCE MESSAGE SYSTEM */
-        #guidance-container {
-            position: fixed;
-            top: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: clamp(280px, 90vw, 360px);
-            padding: 12px 18px;
-            background: rgba(10, 10, 25, 0.65);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 20px;
-            color: rgba(255, 255, 255, 0.92);
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(13px, 2.5vw, 15px);
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 400px;
             text-align: center;
-            line-height: 1.5;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-            z-index: 1000;
-            box-shadow: 0 0 20px rgba(78, 205, 196, 0.1);
-        }
-
-        #guidance-container.visible {
-            opacity: 1;
-            transform: translateX(-50%) translateY(-5px);
-        }
-
-        @media (max-width: 600px) {
-            #guidance-container {
-                top: 12%;
-                width: 85%;
-            }
+            margin-bottom: 40px;
+            line-height: 1.6;
         }
 
         .btn {
@@ -213,6 +153,20 @@
         .btn:hover {
             transform: scale(1.05);
             box-shadow: 0 0 50px rgba(78, 205, 196, 0.6);
+        }
+
+        .key-hint {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        .key {
+            border: 1px solid white;
+            padding: 5px 10px;
+            border-radius: 5px;
         }
 
         /* --- END CARD PREVIEW --- */
@@ -240,20 +194,11 @@
     <canvas id="gameCanvas"></canvas>
 
     <!-- HUD -->
-    <div class="ui-layer" id="hud" style="opacity:0; align-items: center;">
-        <a href="../index.html" class="exit-btn" style="text-decoration:none; padding:8px 15px; margin-right:auto;"><i
-                class="fas fa-arrow-left"></i> Home</a>
-
-        <div class="hud-stats" style="position:absolute; left:50%; transform:translateX(-50%);">
+    <div class="ui-layer" id="hud" style="opacity:0;">
+        <div class="hud-stats">
             <span id="distDisplay">0</span> <span style="font-size:0.8rem; opacity:0.7;">LY</span>
         </div>
-
-        <button class="exit-btn" onclick="endGame()" style="margin-left:auto;">Stop & Rest</button>
-    </div>
-
-    <!-- HEAT BAR -->
-    <div class="heat-container" id="heatContainer">
-        <div class="heat-bar" id="heatBar"></div>
+        <button class="exit-btn" onclick="endGame()">Stop & Rest</button>
     </div>
 
     <!-- MILESTONE POPUP -->
@@ -262,183 +207,73 @@
     </div>
 
     <!-- START SCREEN -->
-    <!-- START SCREEN -->
-    <a href="../index.html" class="exit-btn"
-        style="position:fixed; top:20px; left:20px; z-index:9999; display:flex; gap:10px;"><i
-            class="fas fa-arrow-left"></i> Back</a>
-
-    <style>
-        .key-cap {
-            display: inline-block;
-            padding: 4px 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 0.9em;
-            margin: 0 2px;
-            color: #4ECDC4;
-            box-shadow: 0 2px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: rgba(78, 205, 196, 0.1);
-            border: 1px solid rgba(78, 205, 196, 0.3);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            color: #4ECDC4;
-            margin-bottom: 20px;
-        }
-
-        /* MOBILE HUD OPTIMIZATION */
-        @media (max-width: 600px) {
-            .hud-stats {
-                font-size: 1.1rem !important;
-                width: 100px;
-            }
-
-            #distDisplay {
-                font-size: 1.4rem;
-            }
-
-            .exit-btn {
-                padding: 6px 12px !important;
-                font-size: 0.85rem !important;
-            }
-        }
-    </style>
-
-    <div id="guidance-container"></div>
     <div id="startScreen" class="overlay active">
-        <div class="badge"><i class="fas fa-headphones"></i> Sound Recommended</div>
-        <div class="title" style="margin-bottom:10px;">Drop It.</div>
-        <h3 style="margin-bottom:30px; font-weight:400; opacity:0.7;">Mental Space Shooter</h3>
-
+        <div class="title">Drop It.</div>
         <div class="subtitle">
-            Blast away the heavy thoughts. Keep what matters.<br><br>
-            <span class="desktop-hint"><span class="key-cap">WASD</span> to Fly. <span class="key-cap">SPACE</span> to
-                Fire.</span>
-            <span class="mobile-hint" style="display:none; color:#4ECDC4;">👆 Drag to Fly.<br>🔥 Drag to Bottom Zone to
-                Channel Fire.</span>
-            <style>
-                @media (hover: none) and (pointer: coarse) {
-                    .desktop-hint {
-                        display: none;
-                    }
-
-                    .mobile-hint {
-                        display: inline-block !important;
-                    }
-                }
-            </style>
+            Navigate the void.<br>
+            <strong>Arrow Keys (or WASD)</strong> to Fly.<br>
+            <strong>SPACE (or Tap)</strong> to Fire Positive Energy.<br>
+            <strong>SPACE (Near Enemies)</strong> to Pulse & Push them away!<br>
         </div>
-        <button id="igniteBtn" class="btn" style="z-index:99999; pointer-events:auto !important; cursor:pointer;">IGNITE
-            ENGINE <i class="fas fa-rocket"></i></button>
+        <button class="btn" onclick="startGame()">Ignite Engines</button>
     </div>
 
-    <!-- Fire Zone Visual -->
-    <div id="fireZone"
-        style="position:fixed; bottom:0; left:0; width:100%; height:15vh; background:linear-gradient(to top, rgba(239, 68, 68, 0.3), transparent); pointer-events:none; opacity:0; transition:opacity 0.5s; display:flex; justify-content:center; align-items:flex-end; padding-bottom:20px; font-weight:bold; letter-spacing:2px; color:rgba(255,255,255,0.7); text-transform:uppercase;">
-        CHANNEL ZONE
-    </div>
-    <style>
-        @media (hover: none) and (pointer: coarse) {
-            .active-game #fireZone {
-                opacity: 1 !important;
-            }
-        }
-    </style>
     <!-- END SCREEN -->
     <div id="endScreen" class="overlay">
         <h2 style="margin-bottom:10px; font-size:2rem;">Journey Paused</h2>
         <div class="card-preview">
             <img id="generatedPreview" style="width:100%; height:100%; object-fit:cover;" />
         </div>
-        <div style="display:flex; flex-direction:column; gap:15px; align-items:center; width:100%; max-width:300px;">
-            <!-- Primary Actions -->
-            <button id="shareBtn" class="btn" onclick="webShare()"
-                style="width:100%; background: linear-gradient(135deg, #4ECDC4 0%, #2ecc71 100%);">
-                Share Story <i class="fas fa-share-alt"></i>
-            </button>
-
-            <button id="downBtn" class="btn" onclick="downloadImage()"
-                style="width:100%; background: rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
-                Download Image <i class="fas fa-download"></i>
-            </button>
-
-            <!-- Secondary -->
+        <div style="display:flex; gap:10px;">
+            <button class="btn" onclick="downloadShare()">Share Story <i class="fas fa-share-alt"></i></button>
             <button class="btn" onclick="location.reload()"
-                style="width:100%; background:transparent; border:1px solid rgba(78, 205, 196, 0.5); color:#4ECDC4; box-shadow:none;">
-                Fly Again <i class="fas fa-redo"></i>
-            </button>
+                style="background:transparent; border:1px solid white; color:white; box-shadow:none;">Fly Again</button>
         </div>
-        <p style="opacity: 0.7; margin-top: 10px; font-size: 0.9rem;">
-            <i class="fas fa-volume-up"></i> Sound Recommended
-        </p>
-        <div style="display:flex; gap:20px; margin-top:20px; font-size:1.1rem;">
-            <a href="../index.html" style="color:rgba(255,255,255,0.6); text-decoration:none; transition:0.3s;"
-                onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.6)'"><i
-                    class="fas fa-home"></i> Home</a>
-            <a href="../tools/mental-playground.html"
-                style="color:rgba(255,255,255,0.6); text-decoration:none; transition:0.3s;"
-                onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.6)'"><i
-                    class="fas fa-brain"></i> Playground</a>
-            <a href="../peers.html" style="color:rgba(255,255,255,0.6); text-decoration:none; transition:0.3s;"
-                onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.6)'"><i
-                    class="fas fa-users"></i> Peers</a>
-        </div>
-    </div>
     </div>
 
     <!-- TEMPLATE FOR SHARE GENERATOR -->
     <div id="shareTemplate">
         <div id="shareContainerInner"
-            style="width: 1080px; height: 1920px; font-family: 'Outfit', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; padding: 90px; box-sizing: border-box; background-color: #000; background: radial-gradient(circle at 50% 15%, #2a2a55 0%, #050510 70%); text-align:center;">
+            style="width: 1080px; height: 1920px; font-family: 'Outfit', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; padding: 100px; box-sizing: border-box; background-color: #000; text-align:center;">
 
             <!-- Logo (Sourced via Base64 logic below to guarantee load) -->
-            <img id="tpl_logo" src="" style="width: 450px; margin-bottom: 20px; margin-top:20px;" alt="Soulamore">
-            <!-- Fallback Text if Logo breaks -->
-            <h1 style="display:none; font-size:5rem; margin-bottom:20px; margin-top:20px;">SOULAMORE</h1>
+            <img id="tpl_logo" src="" style="width: 280px; margin-bottom: 20px; margin-top:40px;" alt="Soulamore"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <h1 style="display:none; font-size:4rem; margin-bottom:20px; margin-top:40px;">SOULAMORE</h1>
 
-            <!-- Big Stats (Resized) -->
-            <div style="margin-top:200px; margin-bottom:60px;">
-                <div
-                    style="font-size:1.6rem; opacity:0.6; letter-spacing:5px; margin-bottom:5px; font-weight:600; text-transform:uppercase;">
-                    MY JOURNEY</div>
-                <div style="font-size:18rem; font-weight:900; line-height:0.85; color:#fff; text-shadow:0 0 100px rgba(255,255,255,0.6);"
+            <!-- Big Stats -->
+            <div style="margin-top:50px; margin-bottom:50px;">
+                <div style="font-size:1.5rem; opacity:0.6; letter-spacing:4px; margin-bottom:10px; font-weight:700;">MY
+                    JOURNEY</div>
+                <div style="font-size:11rem; font-weight:700; line-height:1; color:#fff; text-shadow:0 0 50px rgba(255,255,255,0.3);"
                     id="tpl_shareDist">0</div>
-                <div style="font-size:1.8rem; opacity:0.7; font-weight:400; letter-spacing:1px;">Light Years Travelled
-                </div>
+                <div style="font-size:2.5rem; opacity:0.8;">Light Years Travelled</div>
             </div>
 
             <!-- List of Dropped Items -->
             <div
-                style="background:rgba(255,255,255,0.06); padding:60px 40px; border-radius:50px; width:90%; border:2px solid rgba(255,255,255,0.15); margin-bottom:40px; margin-top:20px; box-shadow: 0 0 60px rgba(255,255,255,0.1);">
+                style="background:rgba(255,255,255,0.08); padding:60px 50px; border-radius:40px; width:85%; border:2px solid rgba(255,255,255,0.15); margin-bottom:40px; margin-top:30px;">
                 <div
-                    style="font-size:2rem; opacity:0.9; text-transform:uppercase; letter-spacing:3px; margin-bottom:30px; font-weight:800;">
+                    style="font-size:1.8rem; opacity:0.8; text-transform:uppercase; letter-spacing:3px; margin-bottom:40px; font-weight:700;">
                     TODAY I CRUSHED:</div>
                 <div id="tpl_droppedList"
-                    style="font-size:3rem; color:#fff; line-height:1.3; font-weight:800; display:flex; flex-wrap:wrap; justify-content:center; gap:20px; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                    style="font-size:3.5rem; color:#fff; line-height:1.4; font-weight:700; display:flex; flex-wrap:wrap; justify-content:center; gap:25px;">
                 </div>
 
                 <!-- Social Hook Inside Box -->
                 <div
-                    style="margin-top:50px; padding-top:40px; border-top:1px solid rgba(255,255,255,0.2); font-size:2.2rem; font-style:italic; opacity:1; line-height:1.4;">
+                    style="margin-top:50px; padding-top:40px; border-top:1px solid rgba(255,255,255,0.2); font-size:1.8rem; font-style:italic; opacity:0.9; line-height:1.5;">
                     "I burst these worries today.<br>What will you let go of?"
                 </div>
             </div>
 
             <!-- Random Quote (Bottom) -->
-            <div style="margin-top:auto; font-size:3rem; max-width:900px; line-height:1.4; opacity:1; font-weight:600;"
+            <div style="margin-top:auto; font-size:2.2rem; max-width:850px; line-height:1.5; opacity:0.9;"
                 id="tpl_shareQuote"></div>
 
             <!-- Branding Footer -->
             <div
-                style="margin-top:60px; margin-bottom:40px; font-size:1.6rem; opacity:0.6; letter-spacing:3px; text-transform:uppercase;">
+                style="margin-top:80px; margin-bottom:40px; font-size:1.5rem; opacity:0.5; letter-spacing:2px; text-transform:uppercase;">
                 Find your peace at soulamore.com
             </div>
 
@@ -446,19 +281,27 @@
     </div>
 
 
-    <script src="../assets/js/logo.js?v=2"></script>
     <script>
         /* --- ASSETS PRELOADER --- */
-        // Safe Logo Handling: Avoid name collision with external const
-        let internalLogo = "";
-        if (typeof logoBase64 !== 'undefined') {
-            internalLogo = logoBase64;
-            console.log("Logo Loaded from external file.");
-        } else {
-            console.warn("Logo.js failed. Using empty fallback.");
-        }
+        let logoBase64 = "";
 
-        // Legacy Preloader Removed (Now using external logo.js)
+        // Convert Logo to Base64 immediately to avoid CORS/Loading issues in Html2Canvas
+        (function preloadLogo() {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.src = '../assets/images/logo.png';
+            img.onload = function () {
+                const c = document.createElement('canvas');
+                c.width = img.width;
+                c.height = img.height;
+                const ctx = c.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                logoBase64 = c.toDataURL('image/png');
+            };
+            img.onerror = function () {
+                console.log("Logo failed to load via JS");
+            };
+        })();
 
         /* --- GAME ENGINE --- */
         const canvas = document.getElementById('gameCanvas');
@@ -466,227 +309,14 @@
         let width, height;
         let running = false;
         let speed = 0;
-        let maxSpeed = 3.5; // Zen Cap (Reduced from 5)
+        let maxSpeed = 8; // FIXED: Capped speed at 8 (Zen mode)
         let distance = 0;
         let score = 0;
         let droppedWords = [];
         let pulses = [];
-
-        // Heat System
-        let heat = 0;
-        const maxHeat = 100;
-        let overheated = false;
-        let fireRateCounter = 0;
+        let lastFired = 0; // Cooldown tracker
 
         let keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false, " ": false };
-        let isTouchFiring = false;
-
-        // GUIDANCE MESSAGES DATA
-        // INTRUSIVE POPUP CONTENT (The "Ads")
-        const thoughtContent = [
-            // CORE
-            { title: "DID YOU KNOW?", body: "Soulamore gives your thoughts a safe place to land." },
-            { title: "REMINDER", body: "Soulamore creates space without asking you to perform." },
-            { title: "NOTE", body: "Soulamore is to unload mental weight gently." },
-
-            // CONFESSION
-            { title: "CONFESS", body: "The Confession Box lets you share thoughts anonymously." },
-            { title: "PRIVACY", body: "Soulamore’s Confession Box keeps your identity out of it." },
-
-            // PEER SUPPORT
-            { title: "CONNECT", body: "Soulamore Peer Support connects you with real people." },
-            { title: "LISTEN", body: "Peer Support focuses on understanding, not fixing." },
-
-            // SOULBOT
-            { title: "SOULBOT", body: "SoulBot helps you sort thoughts when they feel tangled." },
-            { title: "REFLECT", body: "SoulBot listens anytime without judgment." },
-
-            // CAMPUS
-            { title: "STUDENTS", body: "Soulamore Campus supports students under quiet pressure." },
-            { title: "STRESS?", body: "Soulamore Campus helps when expectations pile up." },
-
-            // AWAY
-            { title: "FAR FROM HOME?", body: "Soulamore Away listens when home feels far." },
-
-            // PLAYGROUND
-            { title: "PLAY", body: "Soulamore Playground tools help release stress interactively." },
-            { title: "RESET", body: "Mental Playground tools help break mental loops." },
-
-            // ANCHOR
-            { title: "BREATHE", body: "Soulamore is a place to breathe." },
-            { title: "YOU ARE OK", body: "Soulamore supports you without rushing." }
-        ];
-
-        const guidanceMessages = [
-            // --- CORE SOULAMORE (Feature) ---
-            { text: "Soulamore gives your thoughts a safe place to land.", type: "feature" },
-            { text: "Soulamore is designed for moments when your mind feels crowded.", type: "feature" },
-            { text: "Soulamore helps you pause without needing answers.", type: "feature" },
-            { text: "Soulamore exists for thoughts you don’t know how to explain.", type: "feature" },
-            { text: "Soulamore creates space without asking you to perform.", type: "feature" },
-            { text: "Soulamore is a place to unload mental weight gently.", type: "feature" },
-            { text: "Soulamore supports reflection without pressure.", type: "feature" },
-            { text: "Soulamore helps when holding things quietly gets heavy.", type: "feature" },
-            { text: "Soulamore makes room for unfinished feelings.", type: "feature" },
-
-            // --- CONFESSION BOX (Feature) ---
-            { text: "The Soulamore Confession Box lets you share thoughts anonymously.", type: "feature" },
-            { text: "The Confession Box helps when saying things out loud feels hard.", type: "feature" },
-            { text: "Soulamore’s Confession Box accepts honesty without names.", type: "feature" },
-            { text: "The Confession Box gives your thoughts a private release.", type: "feature" },
-            { text: "Soulamore Confession Box is for unsaid words.", type: "feature" },
-            { text: "The Confession Box allows you to write without judgment.", type: "feature" },
-            { text: "Soulamore’s Confession Box keeps your identity out of it.", type: "feature" },
-            { text: "The Confession Box helps unload thoughts safely.", type: "feature" },
-            { text: "The Confession Box gives heavy thoughts somewhere to go.", type: "feature" },
-
-            // --- PEER SUPPORT (Feature) ---
-            { text: "Soulamore Peer Support lets you talk to someone who listens.", type: "feature" },
-            { text: "Peer Support on Soulamore focuses on understanding, not fixing.", type: "feature" },
-            { text: "Soulamore Peer Support connects you with real people.", type: "feature" },
-            { text: "Peer Support helps when you don’t want advice.", type: "feature" },
-            { text: "Soulamore Peer Support offers calm, human listening.", type: "feature" },
-            { text: "Peer Support is for conversations without judgment.", type: "feature" },
-            { text: "Soulamore Peer Support values being heard.", type: "feature" },
-            { text: "Peer Support lets you speak without rehearsing.", type: "feature" },
-            { text: "Peer Support can make emotional weight feel lighter.", type: "feature" },
-
-            // --- SOULAMORE AWAY (Feature) ---
-            { text: "Soulamore Away supports people living away from home.", type: "feature" },
-            { text: "Soulamore Away helps when distance makes emotions louder.", type: "feature" },
-            { text: "Soulamore Away is built for relocation and loneliness.", type: "feature" },
-            { text: "Soulamore Away listens when home feels far.", type: "feature" },
-            { text: "Soulamore Away supports expats and people in transition.", type: "feature" },
-            { text: "Soulamore Away understands cultural and emotional shifts.", type: "feature" },
-            { text: "Soulamore Away helps when starting over feels heavy.", type: "feature" },
-            { text: "Soulamore Away creates connection across distance.", type: "feature" },
-            { text: "Soulamore Away supports adjustment without pressure.", type: "feature" },
-
-            // --- SOULAMORE CAMPUS (Feature) ---
-            { text: "Soulamore Campus supports students under quiet pressure.", type: "feature" },
-            { text: "Soulamore Campus helps with academic stress.", type: "feature" },
-            { text: "Soulamore Campus is built for overwhelmed students.", type: "feature" },
-            { text: "Soulamore Campus supports burnout and exam pressure.", type: "feature" },
-            { text: "Soulamore Campus understands invisible student stress.", type: "feature" },
-            { text: "Soulamore Campus helps when expectations pile up.", type: "feature" },
-            { text: "Soulamore Campus supports mental wellbeing in education.", type: "feature" },
-            { text: "Soulamore Campus is for students who feel behind.", type: "feature" },
-            { text: "Soulamore Campus helps when campus life feels heavy.", type: "feature" },
-
-            // --- SOULBOT (Feature) ---
-            { text: "SoulBot helps you sort thoughts when they feel tangled.", type: "feature" },
-            { text: "SoulBot listens anytime without judgment.", type: "feature" },
-            { text: "SoulBot helps you reflect through conversation.", type: "feature" },
-            { text: "SoulBot is available when talking to people feels hard.", type: "feature" },
-            { text: "SoulBot supports emotional clarity through writing.", type: "feature" },
-            { text: "SoulBot helps you name what you’re feeling.", type: "feature" },
-            { text: "SoulBot is designed for late-night overthinking.", type: "feature" },
-            { text: "SoulBot offers calm responses without pressure.", type: "feature" },
-            { text: "SoulBot helps you pause and process.", type: "feature" },
-
-            // --- MENTAL PLAYGROUND (Feature) ---
-            { text: "Soulamore Playground tools help release stress interactively.", type: "feature" },
-            { text: "Mental Playground tools turn release into action.", type: "feature" },
-            { text: "Soulamore Playground offers playful emotional resets.", type: "feature" },
-            { text: "Mental Playground helps shift your headspace.", type: "feature" },
-            { text: "Soulamore Playground tools help unwind the mind.", type: "feature" },
-            { text: "Mental Playground makes emotional release feel lighter.", type: "feature" },
-            { text: "Soulamore Playground supports calm through interaction.", type: "feature" },
-            { text: "Mental Playground tools help break mental loops.", type: "feature" },
-            { text: "Soulamore Playground is for hands-on emotional relief.", type: "feature" },
-
-            // --- TALKING & RELEASE (Feature) ---
-            { text: "Soulamore Peer Support shows how talking can ease weight.", type: "feature" },
-            { text: "The Confession Box shows writing can release pressure.", type: "feature" },
-            { text: "SoulBot shows clarity can come from reflection.", type: "feature" },
-            { text: "Soulamore Away shows distance doesn’t cancel support.", type: "feature" },
-            { text: "Soulamore Campus shows stress doesn’t need silence.", type: "feature" },
-            { text: "Mental Playground shows release can feel playful.", type: "feature" },
-            { text: "Peer Support shows listening can change how things feel.", type: "feature" },
-            { text: "The Confession Box shows anonymity can feel safe.", type: "feature" },
-            { text: "SoulBot shows emotions can be explored gently.", type: "feature" },
-            { text: "Soulamore shows support can be flexible.", type: "feature" },
-
-            // --- FINDING SUPPORT (Stat/Awareness) ---
-            { text: "Soulamore helps you find the right kind of support.", type: "stat" },
-            { text: "Soulamore guides you from self-help to human support.", type: "stat" },
-            { text: "Soulamore helps match you with peers or professionals.", type: "stat" },
-            { text: "Soulamore supports different needs at different times.", type: "stat" },
-            { text: "Soulamore helps you choose support at your pace.", type: "stat" },
-            { text: "Soulamore adapts to how heavy things feel.", type: "stat" },
-            { text: "Soulamore helps you explore support without commitment.", type: "stat" },
-            { text: "Soulamore supports gradual steps toward help.", type: "stat" },
-            { text: "Soulamore lets you start small.", type: "stat" },
-            { text: "Soulamore supports emotional decision-making.", type: "stat" },
-
-            // --- CLOSING / ANCHOR (Stat/Awareness) ---
-            { text: "Soulamore is here when you’re ready.", type: "stat" },
-            { text: "Soulamore supports you without rushing.", type: "stat" },
-            { text: "Soulamore respects your pace.", type: "stat" },
-            { text: "Soulamore gives space before solutions.", type: "stat" },
-            { text: "Soulamore supports emotional honesty.", type: "stat" },
-            { text: "Soulamore makes room for imperfect thoughts.", type: "stat" },
-            { text: "Soulamore helps carry what feels heavy.", type: "stat" },
-            { text: "Soulamore is built around listening.", type: "stat" },
-            { text: "Soulamore supports quiet strength.", type: "stat" },
-            { text: "Soulamore is a place to breathe.", type: "stat" }
-        ];
-
-        let guidanceState = {
-            lastShownTime: 0,
-            shownCount: 0,
-            active: false,
-            history: [],
-            maxPerSession: 8,
-            interval: 25000 // 25 seconds
-        };
-
-        function updateGuidanceSystem(timestamp) {
-            if (!running || guidanceState.active || guidanceState.shownCount >= guidanceState.maxPerSession) return;
-            if (dangerMode || rescueItem) return; // Silent during chaos
-
-            if (timestamp - guidanceState.lastShownTime > guidanceState.interval) {
-                showGuidanceMessage(timestamp);
-            }
-        }
-
-        function showGuidanceMessage(timestamp) {
-            const container = document.getElementById('guidance-container');
-
-            // Selection Logic: 80% Feature, 20% Stat
-            // Filter available messages ensuring no immediate repeats
-            let pool = [];
-            const isFeatureRound = Math.random() < 0.8;
-
-            if (isFeatureRound) {
-                pool = guidanceMessages.filter(m => m.type === 'feature');
-            } else {
-                pool = guidanceMessages.filter(m => m.type === 'stat');
-            }
-
-            // Exclude last 3 shown to ensure variety
-            const recentText = guidanceState.history.slice(-3);
-            pool = pool.filter(m => !recentText.includes(m.text));
-
-            // Fallback if pool empty
-            if (pool.length === 0) pool = guidanceMessages;
-
-            const selected = pool[Math.floor(Math.random() * pool.length)];
-
-            // Render
-            container.innerText = selected.text;
-            container.classList.add('visible');
-            guidanceState.active = true;
-            guidanceState.shownCount++;
-            guidanceState.history.push(selected.text);
-            guidanceState.lastShownTime = timestamp;
-
-            // Hide after 4.5s
-            setTimeout(() => {
-                container.classList.remove('visible');
-                guidanceState.active = false;
-            }, 4500);
-        }
 
         /* Audio */
         let audioCtx;
@@ -716,14 +346,6 @@
                 g.gain.setValueAtTime(0.03, t);
                 g.gain.linearRampToValueAtTime(0, t + 0.1);
                 o.start(t); o.stop(t + 0.1);
-            } else if (type === 'overheat') {
-                // Buzz sound
-                o.type = 'sawtooth';
-                o.frequency.setValueAtTime(150, t);
-                o.frequency.linearRampToValueAtTime(80, t + 0.5);
-                g.gain.setValueAtTime(0.1, t);
-                g.gain.linearRampToValueAtTime(0, t + 0.5);
-                o.start(t); o.stop(t + 0.5);
             } else if (type === 'explode') {
                 o.type = 'sawtooth';
                 o.frequency.setValueAtTime(100, t);
@@ -742,25 +364,14 @@
         }
 
         /* Entities & Content */
-        let player = { x: 0, y: 0, r: 20, color: '#4ECDC4' };
+        const player = { x: 0, y: 0, r: 20, color: '#4ECDC4' };
         const stars = [];
         const celestials = [];
         const dust = [];
         const missiles = [];
         const explosions = [];
-        const rescueParticles = []; // NEW: Magical particles
-        let rescueItem = null; // Hope Orb
-        let dangerMode = false;
 
-        // Prepare Logo for Rescue Orb
-        const rescueLogo = new Image();
-        // Use the symbol favicon
-        rescueLogo.src = '../assets/images/favicon_symbol.png';
-        const words = ["Anxiety", "Depression", "Burnout", "Doomscrolling", "Imposter Syndrome", "Gaslighting", "Ghosting", "FOMO", "Overthinking", "Situationship", "Toxic Positivity", "Social Battery", "Comparison", "Expectations", "Loneliness", "Regret"];
-
-        // INTRUSIVE POPUP CONTENT CONFIG
-        const enablePopups = true; // Easy toggle to reverse
-        const popups = [];
+        const words = ["Fear", "Doubt", "Debt", "Ego", "Time", "Past", "Loss", "Envy", "Pain", "Guilt", "Work", "Bills", "Stress", "Exes", "Lies", "Hate"];
 
         const quotes = [
             "You are not behind. You are just becoming at your own pace.",
@@ -818,590 +429,23 @@
         /* Inputs */
         window.addEventListener('keydown', e => {
             keys[e.key] = true;
+            // PREVENT RAPID FIRE ON HOLD
+            if (e.code === 'Space' && !e.repeat) fireMissile();
         });
         window.addEventListener('keyup', e => keys[e.key] = false);
-
-        /* Touch Support - MOVEMENT & FIRE ZONE */
-        canvas.addEventListener('touchstart', e => {
-            e.preventDefault();
-            const t = e.touches[0];
-            player.x = t.clientX;
-            player.y = t.clientY - 60;
-            // Check Fire Zone (Bottom 15%)
-            if (player.y > window.innerHeight * 0.85) isTouchFiring = true;
-            else isTouchFiring = false;
-        }, { passive: false });
-
-        canvas.addEventListener('touchmove', e => {
-            e.preventDefault();
-            const t = e.touches[0];
-            player.x = t.clientX;
-            player.y = t.clientY - 60;
-            // Check Fire Zone
-            if (player.y > window.innerHeight * 0.85) isTouchFiring = true;
-            else isTouchFiring = false;
-        }, { passive: false });
-
-        canvas.addEventListener('touchend', e => {
-            e.preventDefault();
-            isTouchFiring = false;
-        }, { passive: false });
-
-
-        /* Main Loop */
-        function loop() {
-            // --- ALWAYS RENDER BACKGROUND ---
-
-            // 0. Update Base Speed (Idle vs Running)
-            if (!running) speed = 0.5; // Slow drift when idle
-            else speed = 4.7; // 1.5x Fast (was 3.1)
-
-            // 1. Draw Background (Dynamic 100 LY Shift)
-            // 1. Draw Background (Dynamic 100 LY Shift)
-            const phase = Math.floor(distance / 100);
-            const targetHue = (240 + (phase * 40)) % 360;
-            if (!window.bgHue) window.bgHue = 240;
-            window.bgHue += (targetHue - window.bgHue) * 0.02;
-
-            ctx.fillStyle = `hsla(${window.bgHue}, 40%, 8%, 1)`; // No Trail (1.0)
-            ctx.fillRect(0, 0, width, height);
-
-            // 2. Stars (Always Move)
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            stars.forEach(s => {
-                s.y += speed * s.z;
-                if (s.y > height) {
-                    s.y = 0;
-                    s.x = Math.random() * width;
-                }
-                const streakLen = speed * s.z * 0.6;
-                ctx.beginPath();
-                ctx.fillRect(s.x, s.y, Math.max(1, s.z * 0.8), streakLen);
-            });
-
-            // 3. Celestials (Always Move but reduced spawn in idle)
-            if (true) { // Always allowing celestials
-                if (Math.random() < (running ? 0.0005 : 0.0001)) spawnCelestial();
-
-                // GUIDANCE SYSTEM UPDATE
-                updateGuidanceSystem(performance.now());
-
-                celestials.forEach((c, idx) => {
-                    c.y += speed * c.z;
-                    if (c.y > height + 200) celestials.splice(idx, 1);
-
-                    // Draw Celestial
-                    ctx.save();
-                    ctx.globalAlpha = 0.3;
-                    ctx.translate(c.x, c.y);
-                    if (c.type === 'planet') {
-                        const grad = ctx.createRadialGradient(-c.r / 3, -c.r / 3, c.r / 10, 0, 0, c.r);
-                        grad.addColorStop(0, c.color1);
-                        grad.addColorStop(1, c.color2);
-                        ctx.fillStyle = grad;
-                        ctx.beginPath();
-                        ctx.arc(0, 0, c.r, 0, Math.PI * 2);
-                        ctx.fill();
-                        if (c.hasRing) {
-                            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-                            ctx.lineWidth = 4;
-                            ctx.beginPath();
-                            ctx.ellipse(0, 0, c.r * 1.8, c.r * 0.4, 0.5, 0, Math.PI * 2);
-                            ctx.stroke();
-                        }
-                    } else {
-                        ctx.rotate(distance * 0.002);
-                        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, c.r);
-                        grad.addColorStop(0, 'rgba(255,255,255,0.8)');
-                        grad.addColorStop(0.4, c.color1);
-                        grad.addColorStop(1, 'transparent');
-                        ctx.fillStyle = grad;
-                        for (let arm = 0; arm < 3; arm++) {
-                            ctx.rotate((Math.PI * 2) / 3);
-                            ctx.beginPath();
-                            ctx.ellipse(c.r / 2, 0, c.r, c.r / 3, 0.2, 0, Math.PI * 2);
-                            ctx.fill();
-                        }
-                    }
-                    ctx.restore();
-                });
-            }
-
-            // SPAWN POPUPS (Intrusive Thoughts)
-            // Reduced spawn rate from 0.002 to 0.001 (Less overwhelming)
-            if (running && enablePopups && Math.random() < 0.001) {
-                spawnPopup();
-            }
-
-            // --- GAME LOGIC (ONLY WHEN RUNNING) ---
-            if (running) {
-                // Input & Firing
-                if ((keys[' '] || keys.Space || isTouchFiring) && !overheated) {
-                    if (fireRateCounter <= 0) {
-                        fireMissile();
-                        fireRateCounter = 5;
-                    }
-                }
-                fireRateCounter--;
-
-                // Heat Logic
-                if (!overheated && !keys[' '] && !keys.Space && !isTouchFiring) {
-                    heat = Math.max(0, heat - 1.0);
-                }
-                updateHeatVisuals();
-
-                // Ambient Logic
-                let bgR = 5, bgG = 5, bgB = 16;
-                let closestDist = Infinity;
-                let closestColor = null;
-                celestials.forEach(c => {
-                    const dx = c.x - width / 2;
-                    const dy = c.y - height / 2;
-                    const d = Math.sqrt(dx * dx + dy * dy);
-                    if (d < closestDist) {
-                        closestDist = d;
-                        closestColor = c.color1;
-                    }
-                });
-                // Ambient Logic
-                // (Removed for Performance)
-
-                distance += speed * 0.06;
-
-                // Player Movement
-                const moveSpeed = 12; // 1.5x Faster (was 8)
-                if (keys.ArrowUp || keys.w) player.y -= moveSpeed;
-                if (keys.ArrowDown || keys.s) player.y += moveSpeed;
-                if (keys.ArrowLeft || keys.a) player.x -= moveSpeed;
-                if (keys.ArrowRight || keys.d) player.x += moveSpeed;
-                player.x = Math.max(20, Math.min(width - 20, player.x));
-                player.y = Math.max(20, Math.min(height - 20, player.y));
-
-                // Missiles
-                ctx.fillStyle = overheated ? '#FF6B6B' : '#C4FFF9';
-                // Shadows removed for performance
-                for (let i = missiles.length - 1; i >= 0; i--) {
-                    let m = missiles[i];
-                    m.y += m.vy;
-                    if (m.vx) m.x += m.vx;
-                    ctx.beginPath();
-                    ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
-                    ctx.fill();
-                    if (m.y < -50 || m.x < -100 || m.x > width + 100) missiles.splice(i, 1);
-                    else {
-                        // CHECK POPUP COLLISION
-                        // We need to check collisions for missiles against popups too
-                        for (let j = popups.length - 1; j >= 0; j--) {
-                            let p = popups[j];
-                            // Hitbox logic
-                            // Popup Box: p.x, p.y, p.w, p.h
-                            // X Button: p.x + p.w - 22, p.y + 2, 20x20
-
-                            // Check if missile hits the BOX
-                            if (m.x > p.x && m.x < p.x + p.w && m.y > p.y && m.y < p.y + p.h) {
-                                // Hit the box!
-                                missiles.splice(i, 1); // remove missile
-
-                                // HITBOX LOGIC: Only the Close Button (Top Right) kills it INSTANTLY
-                                // Button is approx 35x35 at top right
-                                const btnSize = 35;
-                                const isCloseHit = (m.x > (p.x + p.w - btnSize) && m.y < (p.y + btnSize));
-
-                                if (isCloseHit) {
-                                    // CRITICAL HIT - INSTANT DESTROY
-                                    createExplosion(m.x, m.y);
-                                    popups.splice(j, 1); // Close popup
-                                    sfx('explode');
-                                    score += 500; // Bonus points
-                                } else {
-                                    // BODY HIT - DAMAGE (Tanky)
-                                    p.hp--;
-                                    if (p.hp <= 0) {
-                                        // DESTROYED BY DAMAGE
-                                        createExplosion(m.x, m.y);
-                                        popups.splice(j, 1);
-                                        sfx('explode');
-                                        score += 500;
-                                    } else {
-                                        // RESIST / SHAKE
-                                        sfx('shoot'); // Just a thud
-                                        p.x += (Math.random() - 0.5) * 5;
-                                        p.y -= 2; // Knockback
-                                        p.isNew = false;
-                                    }
-                                }
-                                break; // Stop checking other collisions for this missile
-                            }
-                        }
-                    }
-                }
-
-                // Pulses
-                for (let i = pulses.length - 1; i >= 0; i--) {
-                    let p = pulses[i];
-                    p.r += 10;
-                    p.opacity -= 0.08;
-                    if (p.opacity <= 0) { pulses.splice(i, 1); continue; }
-                    ctx.strokeStyle = `rgba(78, 205, 196, ${p.opacity})`;
-                    ctx.lineWidth = 5;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-
-                // Dust (Words)
-                const baseRate = 0.025; // Increased from 0.012 for more challenge
-                const diffFactor = Math.min(0.04, distance / 20000); // Ramp up faster (20k instead of 30k)
-                const spawnRate = baseRate + diffFactor;
-                if (Math.random() < 0.015) {
-                    const word = words[Math.floor(Math.random() * words.length)];
-                    // Dynamic Radius based on text length to prevent overflow
-                    // Base 45px + 4px per character roughly
-                    const r = Math.max(45, 30 + word.length * 5);
-
-                    dust.push({
-                        x: Math.random() * (width - 100) + 50, // Keep onscreen
-                        y: -100,
-                        text: word,
-                        r: r,
-                        attached: false,
-                        cleared: false,
-                        driftX: (Math.random() - 0.5) * 4,
-                        driftY: 3 + Math.random() * 3, // slightly slower fall for larger items
-                        hp: Math.floor(r / 20) // HP scales with size (2-5 hits)
-                    });
-                }
-
-                for (let i = dust.length - 1; i >= 0; i--) {
-                    const d = dust[i];
-                    if (!d.cleared) {
-                        for (let j = missiles.length - 1; j >= 0; j--) {
-                            let m = missiles[j];
-                            let dx = m.x - d.x;
-                            let dy = m.y - d.y;
-                            if (Math.sqrt(dx * dx + dy * dy) < d.r + m.r) {
-                                // HIT LOGIC
-                                m.life = 0; // Destroy missile
-                                missiles.splice(j, 1);
-                                createExplosion(d.x, d.y); // Small hit fx
-
-                                d.hp--;
-                                if (d.hp <= 0) {
-                                    sfx('explode');
-                                    droppedWords.push(d.text);
-                                    dust.splice(i, 1);
-                                    gotoNextDust = true;
-                                } else {
-                                    // Hit reaction
-                                    sfx('shoot'); // quiet hit sound
-                                    d.r *= 0.9; // Shrink slightly
-                                    d.y -= 10; // Push back
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    if (typeof gotoNextDust !== 'undefined' && gotoNextDust) {
-                        var gotoNextDust = false;
-                        continue;
-                    }
-
-                    if (!d.attached) {
-                        const approachSpeed = (speed * 0.3) + 2;
-                        d.y += approachSpeed + (d.driftY || 0);
-                        d.x += (d.driftX || 0);
-                        if (d.driftX) d.driftX *= 0.95;
-                        if (d.driftY) d.driftY *= 0.95;
-
-                        const dx = player.x - d.x;
-                        const dy = player.y - d.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-
-                        if (dist < 350) {
-                            const forceMult = 5.0;
-                            const angle = Math.atan2(dy, dx);
-                            const intensity = 1 - (dist / 350);
-                            d.x += Math.cos(angle) * (forceMult * intensity);
-                            d.y += Math.sin(angle) * (forceMult * intensity);
-                        }
-
-                        if (dist < (player.r + d.r - 10)) {
-                            d.attached = true;
-                            d.offsetX = d.x - player.x;
-                            d.offsetY = d.y - player.y;
-                            sfx('attach');
-                        }
-                    } else {
-                        d.x = player.x + d.offsetX;
-                        d.y = player.y + d.offsetY;
-                        d.offsetX *= 0.995;
-                        d.offsetY *= 0.995;
-                    }
-                    if (d.y > height + 400 || d.y < -200 || d.x < -100 || d.x > width + 100) dust.splice(i, 1);
-                } // END DUST LOOP
-
-                // DANGER & RESCUE LOGIC (Runs once per frame)
-                const attachedCount = dust.filter(d => d.attached).length;
-                if (attachedCount > 3) {
-                    if (!dangerMode) {
-                        dangerMode = true;
-                        sfx('overheat'); // Warning sound
-                    }
-                    player.color = '#FF4136'; // Red Danger
-                    // Shake
-                    player.x += (Math.random() - 0.5) * 5;
-
-                    // Spawn Rescue Chance
-                    if (!rescueItem && Math.random() < 0.01) {
-                        rescueItem = { x: Math.random() * width, y: -50, r: 25 };
-                    }
-                } else {
-                    dangerMode = false;
-                    player.color = '#4ECDC4';
-                }
-
-                if (rescueItem) {
-                    rescueItem.y += 3;
-                    // Draw Rescue (Soulamore Logo Payload)
-                    ctx.save();
-                    // Peach Glow (#F49F75)
-                    ctx.shadowColor = '#F49F75';
-                    ctx.shadowBlur = 30;
-
-                    // Draw Image if loaded, else fallback to circle
-                    if (rescueLogo.complete && rescueLogo.naturalHeight !== 0) {
-                        ctx.drawImage(rescueLogo, rescueItem.x - rescueItem.r, rescueItem.y - rescueItem.r, rescueItem.r * 2, rescueItem.r * 2);
-                    } else {
-                        ctx.fillStyle = '#F49F75';
-                        ctx.beginPath();
-                        ctx.arc(rescueItem.x, rescueItem.y, rescueItem.r, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                    ctx.restore();
-
-                    // Collision with Player
-                    const dx = player.x - rescueItem.x;
-                    const dy = player.y - rescueItem.y;
-                    if (Math.sqrt(dx * dx + dy * dy) < player.r + rescueItem.r) {
-                        try {
-                            sfx('milestone'); // Success sound
-
-                            // MAGIC EXPLOSION
-                            if (typeof createRescueExplosion === 'function') {
-                                createRescueExplosion(player.x, player.y);
-                            }
-
-                            // SAFE REMOVAL: Loop backwards and splice
-                            let freedCount = 0;
-                            for (let k = dust.length - 1; k >= 0; k--) {
-                                if (dust[k].attached) {
-                                    // Chain reaction explosions on the enemies being cleared
-                                    if (typeof createRescueExplosion === 'function') {
-                                        createRescueExplosion(dust[k].x, dust[k].y, true);
-                                    }
-                                    droppedWords.push(dust[k].text);
-                                    dust.splice(k, 1);
-                                    freedCount++;
-                                }
-                            }
-
-                            // Visual Feedback for Rescue
-                            if (freedCount >= 0) { // Always show, even if 0 freed, for positive reinforcement
-                                const rescueMsg = document.createElement('div');
-                                rescueMsg.innerText = "MIND CLEARED";
-                                rescueMsg.style.position = "fixed"; // Interact with viewport directly
-                                rescueMsg.style.top = "40%";
-                                rescueMsg.style.left = "50%";
-                                rescueMsg.style.transform = "translate(-50%, -50%)";
-                                rescueMsg.style.color = "#F49F75";
-                                rescueMsg.style.fontSize = "clamp(2rem, 5vw, 4rem)"; // Responsive font
-                                rescueMsg.style.fontFamily = "Outfit, sans-serif";
-                                rescueMsg.style.fontWeight = "bold";
-                                rescueMsg.style.textShadow = "0 0 30px #F49F75, 0 0 10px white";
-                                rescueMsg.style.zIndex = "9999";
-                                rescueMsg.style.pointerEvents = "none";
-                                rescueMsg.style.whiteSpace = "nowrap"; // Prevent wrapping
-                                rescueMsg.style.animation = "floatUpFade 2.5s forwards cubic-bezier(0.25, 1, 0.5, 1)";
-                                document.body.appendChild(rescueMsg);
-                                setTimeout(() => rescueMsg.remove(), 2500);
-                            }
-
-                            rescueItem = null;
-                            dangerMode = false;
-                            player.color = '#4ECDC4';
-
-                        } catch (e) {
-                            console.error("Rescue Logic Crash detected:", e);
-                            // Fallback to prevent game freeze
-                            rescueItem = null;
-                            dangerMode = false;
-                        }
-                    }
-
-                    if (rescueItem && rescueItem.y > height + 50) rescueItem = null;
-                }
-
-                // DRAW POPUPS
-                popups.forEach((p, i) => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-
-                    // Draw Window Body
-                    ctx.save();
-                    ctx.translate(p.x, p.y);
-
-                    // Shadow (Disable on mobile)
-                    if (width > 600) {
-                        ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                        ctx.fillRect(5, 5, p.w, p.h);
-                    }
-
-                    // Main Box
-                    ctx.fillStyle = '#1e1b4b'; // Dark Blue
-                    ctx.strokeStyle = '#F49F75'; // Peach Border
-                    ctx.lineWidth = 2;
-                    ctx.fillRect(0, 0, p.w, p.h);
-                    ctx.strokeRect(0, 0, p.w, p.h);
-
-                    // Title Bar
-                    ctx.fillStyle = '#F49F75';
-                    ctx.fillRect(0, 0, p.w, 25);
-
-                    // X Button (The Weak Point)
-                    ctx.fillStyle = '#FF4136'; // Red
-                    ctx.fillRect(p.w - 25, 0, 25, 25);
-                    ctx.fillStyle = '#FFF';
-                    ctx.font = 'bold 16px sans-serif';
-                    ctx.fillText('X', p.w - 18, 18);
-
-                    // Title Text (Left Aligned, avoiding X button)
-                    ctx.fillStyle = '#1e1b4b';
-                    ctx.font = 'bold 12px sans-serif';
-                    ctx.textAlign = 'left';
-                    ctx.fillText(p.content.title, 5, 17);
-
-                    // Body Text (Centered with Wrapping)
-                    ctx.textAlign = 'center';
-                    ctx.fillStyle = '#FFF';
-                    ctx.font = '14px sans-serif';
-                    // ctx.fillText(p.content.body, p.w / 2, 55); // OLD (No Wrap)
-                    wrapText(ctx, p.content.body, p.w / 2, 50, p.w - 20, 18);
-
-                    // Instruction overlay (first few times)
-                    if (p.isNew) {
-                        ctx.fillStyle = '#F49F75';
-                        ctx.font = '10px sans-serif';
-                        ctx.textAlign = 'right';
-                        ctx.fillText('SHOOT THE [X]', p.w, -5);
-                    }
-
-                    ctx.restore();
-
-                    // Despawn
-                    if (p.y > height + 100) popups.splice(i, 1);
-                });
-
-                // Particles
-                for (let i = explosions.length - 1; i >= 0; i--) {
-                    let e = explosions[i];
-                    e.life--;
-                    e.x += e.vx;
-                    e.y += e.vy;
-                    ctx.globalAlpha = Math.max(0, e.life / 30); // Valid alpha
-                    ctx.fillStyle = e.color || '#F49F75';
-                    ctx.beginPath();
-                    ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
-                    ctx.fill();
-                    if (e.life <= 0) explosions.splice(i, 1);
-                }
-
-                // Rescue Particles (Magical)
-                for (let i = rescueParticles.length - 1; i >= 0; i--) {
-                    let p = rescueParticles[i];
-                    p.life--;
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.r *= 0.95; // Shrink
-
-                    ctx.save();
-                    ctx.globalAlpha = Math.max(0, p.life / 60);
-                    // Optimization: Disable Shadow Blur on particles
-                    if (width > 600) {
-                        ctx.shadowBlur = 10;
-                        ctx.shadowColor = p.color;
-                    }
-                    ctx.fillStyle = p.color;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-
-                    if (p.life <= 0) rescueParticles.splice(i, 1);
-                }
-                ctx.globalAlpha = 1;
-
-                // Draw Dust/Player
-                checkMilestone(distance);
-
-                // OPTIMIZATION: DOM Throttling
-                const currentDist = Math.floor(distance);
-                if (window.lastDistDisplay !== currentDist) {
-                    document.getElementById('distDisplay').innerText = currentDist;
-                    window.lastDistDisplay = currentDist;
-                }
-
-                dust.forEach(d => {
-                    ctx.beginPath();
-                    ctx.fillStyle = d.attached ? 'rgba(255, 80, 80, 0.3)' : 'rgba(20, 20, 40, 0.8)';
-                    ctx.strokeStyle = d.attached ? '#ff6b6b' : 'rgba(255,255,255,0.8)';
-                    ctx.lineWidth = 2;
-                    ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.stroke();
-                    ctx.fillStyle = 'white';
-                    ctx.font = '700 13px Outfit';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(d.text, d.x, d.y);
-                });
-
-                // Player Visuals
-                // Optimization: Simple gradient for everyone, saves overhead
-                const glow = ctx.createRadialGradient(player.x, player.y, player.r / 2, player.x, player.y, player.r * 2.5);
-                glow.addColorStop(0, player.color);
-                glow.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = glow;
-                ctx.beginPath();
-                ctx.arc(player.x, player.y, player.r * 2.5, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#fff';
-                ctx.beginPath();
-                ctx.arc(player.x, player.y, player.r / 2, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            requestAnimationFrame(loop);
-        }
+        window.addEventListener('touchstart', (e) => {
+            fireMissile();
+        });
 
         function fireMissile() {
-            heat += 2.0; // Lower heat per shot
-            if (heat >= 100) {
-                overheated = true;
-                heat = 100;
-                sfx('overheat');
-                setTimeout(() => {
-                    overheated = false; // Quick Cooldown (1.5s)
-                    heat = 0;
-                }, 1500);
-                return;
-            }
+            if (!running) return;
+            // COOLDOWN CHECK (200ms)
+            const now = Date.now();
+            if (now - lastFired < 200) return;
+            lastFired = now;
 
             sfx('shoot');
-            // Mobile Optimization: Single Stream vs Spread
-            const isMobile = window.innerWidth < 600;
-            const angles = isMobile ? [0] : [0, -0.3, 0.3];
-
+            const angles = [0, -0.3, 0.3];
             angles.forEach(a => {
                 missiles.push({
                     x: player.x,
@@ -1427,96 +471,240 @@
             });
         }
 
-        // Helper for Canvas Text Wrapping
-        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-            const words = text.split(' ');
-            let line = '';
-            let lines = [];
+        /* Main Loop */
+        function loop() {
+            if (!running) return;
+            ctx.fillStyle = 'rgba(5, 5, 16, 0.5)';
+            ctx.fillRect(0, 0, width, height);
 
-            for (let n = 0; n < words.length; n++) {
-                const testLine = line + words[n] + ' ';
-                const metrics = ctx.measureText(testLine);
-                const testWidth = metrics.width;
-                if (testWidth > maxWidth && n > 0) {
-                    lines.push(line);
-                    line = words[n] + ' ';
-                } else {
-                    line = testLine;
+            const attachedCount = dust.filter(d => d.attached).length;
+            // Speed Calculation: Max speed capped at 8. Attached worries reduce it.
+            const targetSpeed = Math.max(2, maxSpeed - (attachedCount * 3));
+            speed += (targetSpeed - speed) * 0.05;
+            distance += speed * 0.1;
+            if (Math.random() < 0.002) spawnCelestial();
+
+            // Player
+            const moveSpeed = 5; // Fixed at 5 (Zen)
+            if (keys.ArrowUp || keys.w) player.y -= moveSpeed;
+            if (keys.ArrowDown || keys.s) player.y += moveSpeed;
+            if (keys.ArrowLeft || keys.a) player.x -= moveSpeed;
+            if (keys.ArrowRight || keys.d) player.x += moveSpeed;
+            player.x = Math.max(20, Math.min(width - 20, player.x));
+            player.y = Math.max(20, Math.min(height - 20, player.y));
+
+            // Stars
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            stars.forEach(s => {
+                s.y += speed * s.z;
+                if (s.y > height) {
+                    s.y = 0;
+                    s.x = Math.random() * width;
                 }
+                const streakLen = speed * s.z * 0.6;
+                ctx.beginPath();
+                ctx.fillRect(s.x, s.y, Math.max(1, s.z * 0.8), streakLen);
+            });
+
+            // Celestials
+            celestials.forEach((c, idx) => {
+                c.y += speed * c.z;
+                if (c.y > height + 200) celestials.splice(idx, 1);
+                ctx.save();
+                ctx.translate(c.x, c.y);
+                if (c.type === 'planet') {
+                    const grad = ctx.createRadialGradient(-c.r / 3, -c.r / 3, c.r / 10, 0, 0, c.r);
+                    grad.addColorStop(0, c.color1);
+                    grad.addColorStop(1, c.color2);
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, c.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (c.hasRing) {
+                        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                        ctx.lineWidth = 4;
+                        ctx.beginPath();
+                        ctx.ellipse(0, 0, c.r * 1.8, c.r * 0.4, 0.5, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                } else {
+                    ctx.rotate(distance * 0.002);
+                    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, c.r);
+                    grad.addColorStop(0, 'rgba(255,255,255,0.8)');
+                    grad.addColorStop(0.4, c.color1);
+                    grad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad;
+                    for (let arm = 0; arm < 3; arm++) {
+                        ctx.rotate((Math.PI * 2) / 3);
+                        ctx.beginPath();
+                        ctx.ellipse(c.r / 2, 0, c.r, c.r / 3, 0.2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                ctx.restore();
+            });
+
+            // Missiles
+            ctx.fillStyle = '#C4FFF9';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#4ECDC4';
+            for (let i = missiles.length - 1; i >= 0; i--) {
+                let m = missiles[i];
+                m.y += m.vy;
+                if (m.vx) m.x += m.vx;
+                ctx.beginPath();
+                ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+                ctx.fill();
+                if (m.y < -50 || m.x < -100 || m.x > width + 100) missiles.splice(i, 1);
             }
-            lines.push(line);
+            ctx.shadowBlur = 0;
 
-            // Draw line by line centered
-            for (let k = 0; k < lines.length; k++) {
-                ctx.fillText(lines[k], x, y + (k * lineHeight));
-            }
-        }
-
-        // Input Handling
-        function getMousePos(evt) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
-            const clientY = evt.clientY || (evt.touches && evt.touches[0].clientY);
-            return {
-                x: (clientX - rect.left) * scaleX,
-                y: (clientY - rect.top) * scaleY
-            };
-        }
-
-        function updateHeatVisuals() {
-            const bar = document.getElementById('heatBar');
-            bar.style.width = heat + '%';
-
-            if (overheated) {
-                // Red Glow
-                player.color = '#FF6B6B';
-                document.getElementById('heatContainer').style.boxShadow = '0 0 15px #FF6B6B';
-                // Pulse effect in logic could go here, but color shift is enough
-            } else {
-                // Interpolate Color back to Teal
-                document.getElementById('heatContainer').style.boxShadow = 'none';
-                if (heat > 50) player.color = '#FFAA6B'; // Orange warning
-                else player.color = '#4ECDC4';
+            // Pulses
+            for (let i = pulses.length - 1; i >= 0; i--) {
+                let p = pulses[i];
+                p.r += 10;
+                p.opacity -= 0.08;
+                if (p.opacity <= 0) { pulses.splice(i, 1); continue; }
+                ctx.strokeStyle = `rgba(78, 205, 196, ${p.opacity})`;
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.stroke();
             }
 
-            // UI UPDATE (Restored)
-            const hb = document.getElementById('heatBar');
-            if (hb) hb.style.width = Math.min(100, Math.max(0, heat)) + '%';
-        }
+            // Dust
+            const baseRate = 0.012;
+            const diffFactor = Math.min(0.025, distance / 30000); // Reduced diff factor for Zen
+            const spawnRate = baseRate + diffFactor;
+            if (Math.random() < spawnRate) {
+                dust.push({
+                    x: Math.random() * width,
+                    y: -100,
+                    text: words[Math.floor(Math.random() * words.length)],
+                    r: 30 + Math.random() * 20,
+                    attached: false,
+                    cleared: false,
+                    driftX: (Math.random() - 0.5),
+                    driftY: 2 + Math.random() * 3
+                });
+            }
 
+            for (let i = dust.length - 1; i >= 0; i--) {
+                const d = dust[i];
+                if (!d.cleared) {
+                    for (let j = missiles.length - 1; j >= 0; j--) {
+                        let m = missiles[j];
+                        let dx = m.x - d.x;
+                        let dy = m.y - d.y;
+                        if (Math.sqrt(dx * dx + dy * dy) < d.r + m.r) {
+                            createExplosion(d.x, d.y);
+                            sfx('explode');
+                            droppedWords.push(d.text);
+                            missiles.splice(j, 1);
+                            dust.splice(i, 1);
+                            gotoNextDust = true;
+                            break;
+                        }
+                    }
+                }
+                if (typeof gotoNextDust !== 'undefined' && gotoNextDust) {
+                    var gotoNextDust = false;
+                    continue;
+                }
+
+                if (!d.attached) {
+                    const approachSpeed = (speed * 0.3) + 2;
+                    d.y += approachSpeed + (d.driftY || 0);
+                    d.x += (d.driftX || 0);
+                    if (d.driftX) d.driftX *= 0.95;
+                    if (d.driftY) d.driftY *= 0.95;
+
+                    const dx = player.x - d.x;
+                    const dy = player.y - d.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 350) {
+                        const forceMult = 5.5; // BUFFED: Gravity Force Increased
+                        const angle = Math.atan2(dy, dx);
+                        const intensity = 1 - (dist / 350);
+                        d.x += Math.cos(angle) * (forceMult * intensity);
+                        d.y += Math.sin(angle) * (forceMult * intensity);
+                    }
+
+                    if (dist < (player.r + d.r - 10)) {
+                        d.attached = true;
+                        d.offsetX = d.x - player.x;
+                        d.offsetY = d.y - player.y;
+                        sfx('attach');
+                    }
+                } else {
+                    d.x = player.x + d.offsetX;
+                    d.y = player.y + d.offsetY;
+                    d.offsetX *= 0.995;
+                    d.offsetY *= 0.995;
+                }
+                if (d.y > height + 100 || d.y < -200 || d.x < -100 || d.x > width + 100) dust.splice(i, 1);
+            }
+
+            // Particles
+            for (let i = explosions.length - 1; i >= 0; i--) {
+                let e = explosions[i];
+                e.life--;
+                e.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life--;
+                    ctx.fillStyle = `rgba(255, 200, 100, ${p.life / 30})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                if (e.life <= 0) explosions.splice(i, 1);
+            }
+
+            // Draw Dust/Player
+            checkMilestone(distance);
+            document.getElementById('distDisplay').innerText = Math.floor(distance);
+            dust.forEach(d => {
+                ctx.beginPath();
+                ctx.fillStyle = d.attached ? 'rgba(255, 80, 80, 0.3)' : 'rgba(20, 20, 40, 0.8)';
+                ctx.strokeStyle = d.attached ? '#ff6b6b' : 'rgba(255,255,255,0.8)';
+                ctx.lineWidth = 2;
+                ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = 'white';
+                ctx.font = '700 16px Outfit';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(d.text, d.x, d.y);
+            });
+            const glow = ctx.createRadialGradient(player.x, player.y, player.r / 2, player.x, player.y, player.r * 3);
+            glow.addColorStop(0, player.color);
+            glow.addColorStop(1, 'rgba(78, 205, 196, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.r * 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.r / 2, 0, Math.PI * 2);
+            ctx.fill();
+            requestAnimationFrame(loop);
+        }
 
         function createExplosion(x, y) {
-            for (let i = 0; i < 8; i++) {
-                explosions.push({
+            let parts = [];
+            for (let k = 0; k < 10; k++) {
+                parts.push({
                     x: x, y: y,
                     vx: (Math.random() - 0.5) * 5,
                     vy: (Math.random() - 0.5) * 5,
-                    life: 20,
-                    r: Math.random() * 3 + 2,
-                    color: '#FFF'
+                    size: Math.random() * 3,
+                    life: 30
                 });
             }
-        }
-
-        // Scheduler removed - logic moved to main loop usage
-
-        function spawnPopup() {
-            const w = 300; // Wider
-            const h = 120; // Taller
-            const x = Math.random() * (width - w);
-            popups.push({
-                x: x,
-                y: -150, // Start higher up
-                w: w,
-                h: h,
-                vx: (Math.random() - 0.5) * 0.5,
-                vy: 0.3 + Math.random() * 0.5, // Slower drift
-                content: thoughtContent[Math.floor(Math.random() * thoughtContent.length)], // Renamed from adContent
-                isNew: true,
-                hp: 20 // Tanky! Needs ~20 hits to destroy via body, or 1 hit via X button
-            });
+            explosions.push({ x: x, y: y, life: 30, particles: parts });
         }
         function spawnCelestial() {
             const types = ['planet', 'galaxy'];
@@ -1549,214 +737,85 @@
             el.classList.add('show');
             setTimeout(() => el.classList.remove('show'), 2000);
         }
-        /* --- GAME INIT --- */
-        function initGame() {
-            console.log("Ignite Clicked");
-            try {
-                // Audio (might be blocked, so wrap in try)
-                try { initAudio(); } catch (e) { console.warn("Audio init failed", e); }
-
-                // Hide Start Screen (Explicit ID)
-                const startScreen = document.getElementById('startScreen');
-                if (startScreen) {
-                    startScreen.classList.remove('active');
-                    startScreen.style.display = 'none'; // Force hide
-                } else {
-                    // Fallback
-                    const overlay = document.querySelector('.overlay');
-                    if (overlay) overlay.classList.remove('active');
-                }
-
-                // Show HUD & Heat Bar (Restored)
-                const hud = document.getElementById('hud');
-                if (hud) hud.style.opacity = '1';
-
-                const heatCont = document.getElementById('heatContainer');
-                if (heatCont) heatCont.style.opacity = '1';
-
-                const endScreen = document.getElementById('endScreen');
-                if (endScreen) endScreen.classList.remove('active');
-
-                // Reset Stats
-                score = 0;
-                distance = 0;
-                heat = 0;
-                droppedWords = [];
-                pulses = [];
-                overheated = false;
-                running = true;
-                // Loop is global
-
-            } catch (e) {
-                alert("Game Start Error: " + e.message);
-                console.error(e);
-            }
+        function startGame() {
+            document.getElementById('startScreen').classList.remove('active');
+            document.getElementById('hud').style.opacity = 1;
+            initAudio();
+            running = true;
+            resize();
+            loop();
         }
-
-        // Alias for safety
-        function startGame() { initGame(); }
 
         /* --- SHARE CARD GENERATION --- */
         function endGame() {
             running = false;
             document.getElementById('hud').style.opacity = 0;
-            document.getElementById('heatContainer').style.opacity = 0;
             document.getElementById('endScreen').classList.add('active');
 
             const randColor = palettes[Math.floor(Math.random() * palettes.length)];
             const randQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
-            // Store for sharing
-            window.lastGameData = { color: randColor, quote: randQuote };
+            // Set logo src from Base64 to ensure it loads
+            if (logoBase64) document.getElementById('tpl_logo').src = logoBase64;
 
-            // Set Favicon Symbol or Fallback Text
-            const logoEl = document.getElementById('tpl_logo');
-            const titleEl = logoEl ? logoEl.nextElementSibling : null;
-
-            if (logoEl) {
-                if (logoBase64 && logoBase64.length > 200) {
-                    logoEl.src = logoBase64;
-                    logoEl.style.display = 'block';
-                    if (titleEl) titleEl.style.display = 'none';
-                } else {
-                    logoEl.style.display = 'none';
-                    if (titleEl) titleEl.style.display = 'block';
-                }
-                logoEl.style.backgroundColor = "transparent";
-                logoEl.style.borderRadius = "0";
-                logoEl.style.padding = "0";
-            }
-
-            if (typeof generateImage === 'function') {
-                // Generate preview only first
-                generateImage(randColor, randQuote, true);
-            }
+            generateImage(randColor, randQuote, true);
         }
 
-        // New Independent Functions
-        async function webShare() {
-            const btn = document.getElementById('shareBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+        function generateImage(bgColor, quote, isPreview) {
+            const tpl = document.getElementById('shareTemplate');
+            const clone = tpl.cloneNode(true);
+            clone.id = "activeShareCapture";
+            clone.style.display = "flex";
+            clone.style.position = "fixed";
+            clone.style.top = "0px";
+            clone.style.left = "0px";
+            clone.style.zIndex = "-9999";
+            clone.style.opacity = "1";
 
-            try {
-                const blob = await generateImage(null, null, false, true); // Get Blob
-                if (!blob) throw new Error("Image Generation Failed");
+            const inner = clone.querySelector('#shareContainerInner');
+            inner.style.background = bgColor;
 
-                const file = new File([blob], "soulamore-journey.png", { type: "image/png" });
+            clone.querySelector('#tpl_shareDist').innerText = Math.floor(distance);
+            clone.querySelector('#tpl_shareQuote').innerHTML = `"${quote}"`;
 
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({
-                        files: [file],
-                        title: 'My Soulamore Journey',
-                        text: 'I just cleared my mind on Soulamore.',
-                    });
-                    btn.innerHTML = 'Shared! <i class="fas fa-check"></i>';
-                } else {
-                    throw new Error("Web Share not supported");
-                }
-            } catch (err) {
-                console.warn("Share failed, falling back to download", err);
-                downloadImage(); // Fallback
-                btn.innerHTML = originalText;
+            let uniqueDrops = [...new Set(droppedWords)];
+            if (uniqueDrops.length > 8) uniqueDrops = uniqueDrops.slice(uniqueDrops.length - 8);
+            if (uniqueDrops.length === 0) {
+                clone.querySelector('#tpl_droppedList').innerHTML = '<span style="opacity:0.5; font-size:1.5rem;">Nothing... yet.</span>';
+            } else {
+                clone.querySelector('#tpl_droppedList').innerHTML = uniqueDrops.map(w =>
+                    `<span>${w}</span>`
+                ).join(' <span style="opacity:0.4">•</span> ');
             }
-            setTimeout(() => btn.innerHTML = originalText, 3000);
+
+            document.body.appendChild(clone);
+
+            setTimeout(() => {
+                html2canvas(inner, {
+                    scale: isPreview ? 0.3 : 1,
+                    useCORS: true,
+                    backgroundColor: null,
+                    scrollX: 0,
+                    scrollY: -window.scrollY
+                }).then(canvas => {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    if (isPreview) {
+                        document.getElementById('generatedPreview').src = dataUrl;
+                    } else {
+                        const link = document.createElement('a');
+                        link.download = `soulamore-journey-${Math.floor(distance)}.png`;
+                        link.href = dataUrl;
+                        link.click();
+                        const btn = document.querySelector('button[onclick="downloadShare()"]');
+                        if (btn) btn.innerHTML = 'Share Story <i class="fas fa-check"></i>';
+                    }
+                    if (document.body.contains(clone)) document.body.removeChild(clone);
+                }).catch(err => {
+                    console.error("Capture error:", err);
+                    if (document.body.contains(clone)) document.body.removeChild(clone);
+                });
+            }, 600); // 600ms safe wait
         }
-
-        async function downloadImage() {
-            const btn = document.getElementById('downBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-            try {
-                const dataUrl = await generateImage(null, null, false, false); // Get DataURL
-                const link = document.createElement('a');
-                link.download = `soulamore-journey-${Date.now()}.png`;
-                link.href = dataUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (e) {
-                alert("Download failed. Please try again.");
-            }
-            btn.innerHTML = 'Download Image <i class="fas fa-download"></i>';
-        }
-
-        // Refactored Generator (Returns Promise)
-        function generateImage(forceColor, forceQuote, isPreview, returnBlob) {
-            return new Promise((resolve, reject) => {
-                const tpl = document.getElementById('shareTemplate');
-                const clone = tpl.cloneNode(true);
-                clone.id = "activeShareCapture";
-                clone.style.display = "flex";
-                clone.style.position = "fixed";
-                clone.style.top = "0px";
-                clone.style.left = "0px";
-                clone.style.zIndex = "-9999";
-                clone.style.opacity = "1";
-
-                // Consistency check for inputs (use existing if null passed aka button click)
-                // In a real refactor we'd store these state vars better, but for now we trust the DOM or pass nulls
-                // actually, let's grab from the DOM if null, or random logic is duplicated. 
-                // ideally endGame calls this once to set preview, then we just re-capture the existing preview? 
-                // No, we need high-res. We can grab values from the DOM if needed or just re-generate.
-                // Simpler: Reuse the values generated in endGame? 
-                // Let's just grab current values from the invisible tpl if possible or just re-render.
-
-                // For simplicity/speed in this patch: Re-read the inputs from the PREVIEW currently on screen?
-                // Or just expect them to be passed? 
-                // FIX: Let's assume endGame sets global vars for the last result, or we just re-read the hud.
-                // Let's rely on the clone logic using the SAME data as `endGame` OR just reading global `distance`.
-
-                const inner = clone.querySelector('#shareContainerInner');
-                // Re-apply randoms if provided, else use last (we need to store them if we want exact match)
-                // Hack: We'll just re-use the preview logic if arguments are null? 
-                // Better: Let's store `lastEndGameData` global.
-
-                if (window.lastGameData) {
-                    inner.style.background = window.lastGameData.color;
-                    clone.querySelector('#tpl_shareQuote').innerHTML = `"${window.lastGameData.quote}"`;
-                }
-
-                clone.querySelector('#tpl_shareDist').innerText = Math.floor(distance);
-
-                let uniqueDrops = [...new Set(droppedWords)];
-                if (uniqueDrops.length > 5) uniqueDrops = uniqueDrops.slice(uniqueDrops.length - 5);
-                if (uniqueDrops.length === 0) {
-                    clone.querySelector('#tpl_droppedList').innerHTML = '<span style="opacity:0.5; font-size:1.5rem;">Nothing... yet.</span>';
-                } else {
-                    clone.querySelector('#tpl_droppedList').innerHTML = uniqueDrops.map(w =>
-                        `<span>${w}</span>`
-                    ).join(' <span style="opacity:0.4">•</span> ');
-                }
-
-                document.body.appendChild(clone);
-
-                setTimeout(() => {
-                    html2canvas(inner, {
-                        scale: isPreview ? 0.35 : 2, // Higher res for output
-                        useCORS: true,
-                        allowTaint: true,
-                        backgroundColor: null,
-                        scrollX: 0,
-                        scrollY: -window.scrollY
-                    }).then(canvas => {
-                        document.body.removeChild(clone);
-                        if (isPreview) {
-                            const previewImg = document.getElementById('generatedPreview');
-                            if (previewImg) previewImg.src = canvas.toDataURL('image/png');
-                            resolve(true);
-                        } else {
-                            if (returnBlob) {
-                                canvas.toBlob(blob => resolve(blob), 'image/png');
-                            } else {
-                                resolve(canvas.toDataURL('image/png'));
-                            }
-                        }
-                    }).catch(reject);
-                }, 100);
-            });
-        }
-
 
         function downloadShare() {
             const btn = event.currentTarget;
@@ -1766,82 +825,6 @@
             generateImage(randColor, randQuote, false);
         }
 
-        function createRescueExplosion(x, y, isSmall = false) {
-            const count = isSmall ? 10 : 30;
-            const size = isSmall ? 2 : 4;
-            const speed = isSmall ? 5 : 10;
-
-            // Particles
-            for (let i = 0; i < count; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const v = Math.random() * speed;
-                rescueParticles.push({
-                    x: x, y: y,
-                    vx: Math.cos(angle) * v,
-                    vy: Math.sin(angle) * v,
-                    life: 60,
-                    r: Math.random() * size + 2,
-                    color: Math.random() > 0.5 ? '#F49F75' : '#FFD700' // Peach or Gold
-                });
-            }
-
-            // Shockwave Ring
-            if (!isSmall) {
-                pulses.push({
-                    x: x, y: y,
-                    r: 10,
-                    maxR: 300,
-                    opacity: 1,
-                    color: '#F49F75'
-                });
-            }
-        }
-
-        // Start Background Animation
-        resize();
-        loop();
-
-        (function () {
-            // ... listener logic ...
-        })();
-    </script>
-
-    <!-- NUCLEAR EVENT HANDLER (Safety Script) -->
-    <script>
-        (function () {
-            console.log("--- NUCLEAR SAFETY SCRIPT STARTED ---");
-            const btn = document.getElementById('igniteBtn');
-
-            if (!btn) {
-                console.error("Button Missing!");
-                return;
-            }
-
-            // Check if Main Engine Loaded
-            if (typeof initGame !== 'function') {
-                btn.style.backgroundColor = "red";
-                btn.innerText = "ERROR LOADING ENGINE";
-                btn.onclick = function () {
-                    alert("CRITICAL ERROR:\nThe game engine failed to load.\nThis usually means a SyntaxError or Ad-Blocker blocked the main script.\nPlease check console.");
-                };
-                return;
-            }
-
-            // Attach Robust Listeners
-            const ignite = function (e) {
-                if (e) { e.preventDefault(); e.stopPropagation(); }
-                console.log("NUCLEAR CLICK");
-                try {
-                    initGame();
-                } catch (err) {
-                    alert("Runtime Error: " + err.message);
-                }
-            };
-
-            btn.addEventListener('touchstart', ignite, { passive: false });
-            btn.addEventListener('click', ignite);
-            console.log("--- NUCLEAR LISTENERS ATTACHED ---");
-        })();
     </script>
 </body>
 

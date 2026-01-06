@@ -86,7 +86,9 @@ function listenToCountryPeers() {
     );
 
     onSnapshot(q, (snapshot) => {
-        const count = snapshot.size;
+        let count = snapshot.size;
+        // Optimistic UI: If I am here, count is at least 1.
+        if (count < 1) count = 1;
         updateWidget(`soulamore-away`, count, userCountry);
     });
 }

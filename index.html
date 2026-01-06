@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; media-src 'self' https://cdn.pixabay.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://www.gstatic.com https://www.google-analytics.com https://firestore.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://accounts.google.com; frame-src 'self' https://accounts.google.com;">
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; media-src 'self' https://cdn.pixabay.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://www.gstatic.com https://www.google-analytics.com https://firestore.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://accounts.google.com; frame-src 'self' https://accounts.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
     <meta name="description"
         content="Soulamore is a student wellness platform offering anonymous support, peer connection, and mental health resources.">
     <title>Soulamore | Navigate Life Together</title>
@@ -16,7 +16,7 @@
     <meta property="og:title" content="Soulamore | Navigate Life Together">
     <meta property="og:description"
         content="A safe, anonymous ecosystem for mental wellness. Connect with peers, vent freely, and find your calm space.">
-    <meta property="og:image" content="https://soulamore-f0a64.web.app/assets/images/social-preview.png">
+    <meta property="og:image" content="https://soulamore-f0a64.web.app/assets/images/social-preview.png?v=2">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
@@ -24,7 +24,7 @@
     <meta name="twitter:title" content="Soulamore | Navigate Life Together">
     <meta name="twitter:description"
         content="A safe, anonymous ecosystem for mental wellness. Connect with peers, vent freely, and find your calm space.">
-    <meta name="twitter:image" content="https://soulamore-f0a64.web.app/assets/images/social-preview.png">
+    <meta name="twitter:image" content="https://soulamore-f0a64.web.app/assets/images/social-preview.png?v=2">
 
     <!-- Fonts -->
     <link
@@ -442,6 +442,12 @@
         .compass-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
 
@@ -1185,6 +1191,9 @@
                     placeholder="Type something heavy here... (e.g., 'I feel like I'm failing')"></textarea>
                 <div style="text-align: center;">
                     <button class="shred-btn" onclick="shredIt()">SHRED IT <i class="fas fa-trash-alt"></i></button>
+                    <div id="homeShredCount"
+                        style="margin-top: 10px; font-size: 0.9rem; opacity: 0.7; font-family: 'Outfit';">Loading
+                        thoughts released...</div>
                 </div>
                 <div id="shredMessage"
                     style="text-align: center; margin-top: 15px; color: var(--teal-glow); font-weight: 600; opacity: 0;">
@@ -1317,8 +1326,8 @@
                             Different moments need different kinds of support. Choose what feels easiest.
                         </p>
 
-                        <div class="responsive-tools-grid"
-                            style="max-width:1200px; margin:0 auto; padding-bottom: 20px;">
+
+                        <div class="grid-3 fade-in" style="max-width:1200px; margin:0 auto; padding-bottom: 20px;">
                             <!-- CARD 1: 5-STEP RESET -->
                             <div class="glass-card hover-cyan"
                                 style="padding:40px; border-radius:30px; height: 100%; display: flex; flex-direction: column;">
@@ -1557,6 +1566,9 @@
                 <button type="submit" class="lifeline-submit-btn" id="btnNewsIndex"
                     style="width: auto; min-width: 150px; margin: 0;">Subscribe</button>
             </form>
+            <div id="newsletterCount" style="margin-top: 15px; font-size: 0.9rem; opacity: 0.6; font-family: 'Outfit';">
+                Joined by ... souls
+            </div>
         </div>
     </section>
 
@@ -1958,6 +1970,55 @@
         }
 
 
+        // --- SHREDDER LOGIC (Home) ---
+        function shredIt() {
+            const inp = document.getElementById('shredInput');
+            const msg = document.getElementById('shredMessage');
+            const val = inp.value.trim();
+
+            if (!val) return;
+
+            // Visual Shred Effect
+            inp.style.transition = "all 0.8s ease-in";
+            inp.style.transform = "translateY(50px) scaleY(0) skewX(20deg)";
+            inp.style.opacity = "0";
+
+            // Backend Submit
+            if (window.SoulBackend && window.SoulBackend.submitVent) {
+                window.SoulBackend.submitVent(val, 'shred_home');
+            }
+
+            setTimeout(() => {
+                inp.value = "";
+                inp.style.display = "none";
+                msg.style.opacity = "1";
+
+                // Reset after 3s
+                setTimeout(() => {
+                    inp.style.display = "block";
+                    inp.style.transform = "none";
+                    inp.style.opacity = "1";
+                    msg.style.opacity = "0";
+                }, 3000);
+            }, 800);
+        }
+
+        // Live Count Subscription
+        window.addEventListener('load', () => {
+            // Wait for backend to be ready or check interval
+            const startSub = () => {
+                if (window.SoulBackend && window.SoulBackend.subscribeToShredCount) {
+                    window.SoulBackend.subscribeToShredCount((count) => {
+                        const el = document.getElementById('homeShredCount');
+                        if (el) el.innerText = count + " heavy thoughts released.";
+                    });
+                } else {
+                    setTimeout(startSub, 500);
+                }
+            };
+            startSub();
+        });
+
         // 8. FADE IN
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = 1; entry.target.style.transform = "translateY(0)"; } });
@@ -1971,6 +2032,36 @@
     <script type="module" src="assets/js/auth-handler.js"></script>
     <script src="assets/js/launch-popup.js"></script>
     <!-- force-restore.js removed as source is fixed -->
+    <!-- STICKY PROMO (Under Construction) -->
+    <div
+        style="position:fixed; bottom:30px; right:30px; width:300px; padding:25px; background:rgba(15, 23, 42, 0.95); border:1px solid rgba(78, 205, 196, 0.3); border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.5); z-index:9999; backdrop-filter:blur(10px); transform:rotate(-2deg); transition:0.3s; animation: float 6s ease-in-out infinite;">
+        <div
+            style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); width:40%; height:8px; background:rgba(78, 205, 196, 0.5); border-radius:4px;">
+        </div>
+        <h3 style="color:#4ECDC4; font-size:1.2rem; margin-bottom:10px;">⚡ Wiring Backend...</h3>
+        <p style="font-size:0.95rem; opacity:0.8; margin-bottom:20px; line-height:1.5;">We're connecting the
+            Soul-Engine. While you wait...</p>
+        <a href="tools/drop-it.html"
+            style="display:block; text-align:center; background:linear-gradient(135deg, #4ECDC4, #2a9d8f); color:#0f172a; font-weight:700; padding:12px; border-radius:12px; text-decoration:none; box-shadow:0 0 20px rgba(78, 205, 196, 0.4); transition:0.2s;">
+            Play "Drop It" <i class="fas fa-rocket"></i>
+        </a>
+    </div>
+    <style>
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(-2deg);
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(-2deg);
+            }
+
+            100% {
+                transform: translateY(0px) rotate(-2deg);
+            }
+        }
+    </style>
+
 </body>
 
 </html>
