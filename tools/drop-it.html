@@ -1250,9 +1250,11 @@
                     ctx.save();
                     ctx.translate(p.x, p.y);
 
-                    // Shadow
-                    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                    ctx.fillRect(5, 5, p.w, p.h);
+                    // Shadow (Disable on mobile)
+                    if (width > 600) {
+                        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                        ctx.fillRect(5, 5, p.w, p.h);
+                    }
 
                     // Main Box
                     ctx.fillStyle = '#1e1b4b'; // Dark Blue
@@ -1305,7 +1307,7 @@
                     e.life--;
                     e.x += e.vx;
                     e.y += e.vy;
-                    ctx.globalAlpha = e.life / 30;
+                    ctx.globalAlpha = Math.max(0, e.life / 30); // Valid alpha
                     ctx.fillStyle = e.color || '#F49F75';
                     ctx.beginPath();
                     ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
@@ -1322,9 +1324,12 @@
                     p.r *= 0.95; // Shrink
 
                     ctx.save();
-                    ctx.globalAlpha = p.life / 60;
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = p.color;
+                    ctx.globalAlpha = Math.max(0, p.life / 60);
+                    // Optimization: Disable Shadow Blur on particles
+                    if (width > 600) {
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = p.color;
+                    }
                     ctx.fillStyle = p.color;
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
@@ -1337,7 +1342,14 @@
 
                 // Draw Dust/Player
                 checkMilestone(distance);
-                document.getElementById('distDisplay').innerText = Math.floor(distance);
+
+                // OPTIMIZATION: DOM Throttling
+                const currentDist = Math.floor(distance);
+                if (window.lastDistDisplay !== currentDist) {
+                    document.getElementById('distDisplay').innerText = currentDist;
+                    window.lastDistDisplay = currentDist;
+                }
+
                 dust.forEach(d => {
                     ctx.beginPath();
                     ctx.fillStyle = d.attached ? 'rgba(255, 80, 80, 0.3)' : 'rgba(20, 20, 40, 0.8)';
@@ -1354,13 +1366,15 @@
                 });
 
                 // Player Visuals
-                const glow = ctx.createRadialGradient(player.x, player.y, player.r / 2, player.x, player.y, player.r * 3);
+                // Optimization: Simple gradient for everyone, saves overhead
+                const glow = ctx.createRadialGradient(player.x, player.y, player.r / 2, player.x, player.y, player.r * 2.5);
                 glow.addColorStop(0, player.color);
                 glow.addColorStop(1, 'rgba(0,0,0,0)');
                 ctx.fillStyle = glow;
                 ctx.beginPath();
-                ctx.arc(player.x, player.y, player.r * 3, 0, Math.PI * 2);
+                ctx.arc(player.x, player.y, player.r * 2.5, 0, Math.PI * 2);
                 ctx.fill();
+
                 ctx.fillStyle = '#fff';
                 ctx.beginPath();
                 ctx.arc(player.x, player.y, player.r / 2, 0, Math.PI * 2);
