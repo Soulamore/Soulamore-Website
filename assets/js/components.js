@@ -685,12 +685,16 @@ function injectFavicon() {
     } else if (path.includes('physical-wellness') || path.includes('renu-dogra')) {
         // PHYSICAL/RENU (Lotus/Flower) - Saffron/Orange
         iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23f59e0b" d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0 0 114.6 0 256s114.6 256 256 256zm0-48c-114.9 0-208-93.1-208-208S141.1 48 256 48s208 93.1 208 208-93.1 208-208 208z"/><circle cx="256" cy="256" r="64" fill="white"/></svg>`;
-    } else {
-        // DEFAULT (Simple Globe/Logo) - Teal
-        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="256" fill="%234ECDC4"/><path fill="%230f172a" d="M365 318c-23-14-55-19-61-12-5 5-2 37 13 58 12 18 10 32-1 32-23 0-51-38-51-38-46-63-98-35-98-35-36 12-57 32-73 52 35 34 83 55 136 55 106 0 192-86 192-192 0-35-9-68-26-96-8 30-14 62-31 76z"/></svg>`;
+    } else if (path.includes('soulamore-away')) {
+        // SOULAMORE AWAY (Earth/Globe) - Peach
+        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23F49F75" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256zM208.4 208H16C23.51 113.8 97.23 37.98 191.6 29.35C199.1 63.86 205.1 82.25 208.4 208zM240 208H467.6C458.7 131.6 405.2 68.34 329.8 41.59C341.3 76.84 374.3 125.1 240 208zM492.6 304H272C384.8 322.2 411.3 400.9 414.9 418.5C460.7 391.2 491.5 344.8 496 291.9C495.2 296 493.9 300.1 492.6 304zM240 256H16.37C17.06 268 18.67 279.7 21 291.1C65.57 326.6 96.09 377.9 123.4 468.9C189.9 439.4 235.6 381.1 240 256z"/></svg>`;
     }
 
-    link.href = `data:image/svg+xml,${iconSVG}`;
+    // Only override if we have a specific SVG for this section. 
+    // Otherwise, we respect the static <link> tag already present in the HTML.
+    if (iconSVG) {
+        link.href = `data:image/svg+xml,${iconSVG}`;
+    }
 }
 
 // --- 5. ACTIVE STATE LOGIC ---
