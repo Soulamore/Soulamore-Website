@@ -962,24 +962,33 @@
                                 // Hit the box!
                                 missiles.splice(i, 1); // remove missile
 
-                                // HITBOX LOGIC: Only the Close Button (Top Right) kills it
-                                // Button is approx 30x30 at top right
+                                // HITBOX LOGIC: Only the Close Button (Top Right) kills it INSTANTLY
+                                // Button is approx 35x35 at top right
                                 const btnSize = 35;
                                 const isCloseHit = (m.x > (p.x + p.w - btnSize) && m.y < (p.y + btnSize));
 
                                 if (isCloseHit) {
-                                    // CRITICAL HIT - DESTROY
+                                    // CRITICAL HIT - INSTANT DESTROY
                                     createExplosion(m.x, m.y);
                                     popups.splice(j, 1); // Close popup
                                     sfx('explode');
                                     score += 500; // Bonus points
                                 } else {
-                                    // BODY HIT - RESIST
-                                    sfx('shoot'); // Just a thud
-                                    // Shake and Push Up slightly
-                                    p.x += (Math.random() - 0.5) * 5;
-                                    p.y -= 2; // Knockback
-                                    p.isNew = false; // Stop showing instruction
+                                    // BODY HIT - DAMAGE (Tanky)
+                                    p.hp--;
+                                    if (p.hp <= 0) {
+                                        // DESTROYED BY DAMAGE
+                                        createExplosion(m.x, m.y);
+                                        popups.splice(j, 1);
+                                        sfx('explode');
+                                        score += 500;
+                                    } else {
+                                        // RESIST / SHAKE
+                                        sfx('shoot'); // Just a thud
+                                        p.x += (Math.random() - 0.5) * 5;
+                                        p.y -= 2; // Knockback
+                                        p.isNew = false;
+                                    }
                                 }
                                 break; // Stop checking other collisions for this missile
                             }
@@ -1422,7 +1431,8 @@
                 vx: (Math.random() - 0.5) * 0.5,
                 vy: 0.3 + Math.random() * 0.5, // Slower drift
                 content: adContent[Math.floor(Math.random() * adContent.length)],
-                isNew: true
+                isNew: true,
+                hp: 20 // Tanky! Needs ~20 hits to destroy via body, or 1 hit via X button
             });
         }
         function spawnCelestial() {
