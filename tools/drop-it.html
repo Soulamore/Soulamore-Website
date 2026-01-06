@@ -1475,24 +1475,39 @@
         }
         /* --- GAME INIT --- */
         function initGame() {
-            initAudio(); // Unlock audio
+            console.log("Ignite Clicked");
+            try {
+                // Audio (might be blocked, so wrap in try)
+                try { initAudio(); } catch (e) { console.warn("Audio init failed", e); }
 
-            // Hide Overlays
-            const overlay = document.querySelector('.overlay');
-            if (overlay) overlay.classList.remove('active');
+                // Hide Start Screen (Explicit ID)
+                const startScreen = document.getElementById('startScreen');
+                if (startScreen) {
+                    startScreen.classList.remove('active');
+                    startScreen.style.display = 'none'; // Force hide
+                } else {
+                    // Fallback
+                    const overlay = document.querySelector('.overlay');
+                    if (overlay) overlay.classList.remove('active');
+                }
 
-            const endScreen = document.getElementById('endScreen');
-            if (endScreen) endScreen.classList.remove('active');
+                const endScreen = document.getElementById('endScreen');
+                if (endScreen) endScreen.classList.remove('active');
 
-            // Reset Stats
-            score = 0;
-            distance = 0;
-            heat = 0;
-            droppedWords = [];
-            pulses = [];
-            overheated = false;
-            running = true;
-            // loop is already running globally
+                // Reset Stats
+                score = 0;
+                distance = 0;
+                heat = 0;
+                droppedWords = [];
+                pulses = [];
+                overheated = false;
+                running = true;
+                // Loop is global
+
+            } catch (e) {
+                alert("Game Start Error: " + e.message);
+                console.error(e);
+            }
         }
 
         // Alias for safety
