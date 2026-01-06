@@ -434,6 +434,12 @@
             gap: 20px;
         }
 
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
         .pillar-card {
             background: var(--navy-glass);
             border: 1px solid var(--border-glass);
@@ -1001,6 +1007,9 @@
                     placeholder="Type something heavy here... (e.g., 'I feel like I'm failing')"></textarea>
                 <div style="text-align: center;">
                     <button class="shred-btn" onclick="shredIt()">SHRED IT <i class="fas fa-trash-alt"></i></button>
+                    <div id="homeShredCount"
+                        style="margin-top: 10px; font-size: 0.9rem; opacity: 0.7; font-family: 'Outfit';">Loading
+                        thoughts released...</div>
                 </div>
                 <div id="shredMessage"
                     style="text-align: center; margin-top: 15px; color: var(--teal-glow); font-weight: 600; opacity: 0;">
@@ -1113,8 +1122,7 @@
                         </p>
 
 
-                        <div class="responsive-compass-grid"
-                            style="max-width:1200px; margin:0 auto; display:grid; gap:25px; padding-bottom: 20px;">
+                        <div class="grid-3 fade-in" style="max-width:1200px; margin:0 auto; padding-bottom: 20px;">
                             <!-- CARD 1: 5-STEP RESET -->
                             <div class="glass-card hover-cyan"
                                 style="padding:40px; border-radius:30px; height: 100%; display: flex; flex-direction: column;">
@@ -1765,6 +1773,55 @@
             }
         }
 
+
+        // --- SHREDDER LOGIC (Home) ---
+        function shredIt() {
+            const inp = document.getElementById('shredInput');
+            const msg = document.getElementById('shredMessage');
+            const val = inp.value.trim();
+
+            if (!val) return;
+
+            // Visual Shred Effect
+            inp.style.transition = "all 0.8s ease-in";
+            inp.style.transform = "translateY(50px) scaleY(0) skewX(20deg)";
+            inp.style.opacity = "0";
+
+            // Backend Submit
+            if (window.SoulBackend && window.SoulBackend.submitVent) {
+                window.SoulBackend.submitVent(val, 'shred_home');
+            }
+
+            setTimeout(() => {
+                inp.value = "";
+                inp.style.display = "none";
+                msg.style.opacity = "1";
+
+                // Reset after 3s
+                setTimeout(() => {
+                    inp.style.display = "block";
+                    inp.style.transform = "none";
+                    inp.style.opacity = "1";
+                    msg.style.opacity = "0";
+                }, 3000);
+            }, 800);
+        }
+
+        // Live Count Subscription
+        window.addEventListener('load', () => {
+            // Wait for backend to be ready or check interval
+            const startSub = () => {
+                if (window.SoulBackend && window.SoulBackend.subscribeToShredCount) {
+                    window.SoulBackend.subscribeToShredCount((count) => {
+                        const el = document.getElementById('homeShredCount');
+                        if (el) el.innerText = count + " heavy thoughts released.";
+                    });
+                } else {
+                    setTimeout(startSub, 500);
+                }
+            };
+            startSub();
+        });
 
         // 8. FADE IN
         const observer = new IntersectionObserver((entries) => {

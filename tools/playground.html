@@ -168,8 +168,8 @@
             flex-direction: column;
             opacity: 0;
             transition: opacity 0.5s;
-            padding-top: 160px;
-            /* Space for Global Header + Tool Header */
+            padding-top: 80px;
+            /* Reduced padding since header is moved up */
         }
 
         .activity-overlay.active {
@@ -1025,8 +1025,7 @@
             inp.style.transform = "translateY(50px) scale(0.8) skew(20deg)";
             inp.style.opacity = "0";
 
-            // Particle Explosion (CSS)
-            // Simple reset for demo
+            // Reset
             setTimeout(() => {
                 inp.value = "";
                 inp.style.transform = "none";
@@ -1034,6 +1033,21 @@
                 inp.placeholder = "It is gone. You are safe.";
             }, 1500);
         }
+
+        // Subscribe to live count
+        window.addEventListener('load', () => {
+            const startSub = () => {
+                if (window.SoulBackend && window.SoulBackend.subscribeToShredCount) {
+                    window.SoulBackend.subscribeToShredCount((count) => {
+                        const el = document.getElementById('shred-count-display');
+                        if (el) el.innerText = "Total thoughts released: " + count;
+                    });
+                } else {
+                    setTimeout(startSub, 500);
+                }
+            };
+            startSub();
+        });
 
         // --- 2. MANDALA LOGIC ---
         const mCanvas = document.getElementById('mandala-canvas');
