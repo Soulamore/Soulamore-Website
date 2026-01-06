@@ -77,7 +77,7 @@
             /* Phone Mockup */
             .notch { position: absolute; top:0; left:50%; transform:translateX(-50%); width:90px; height:18px; background:#1e293b; border-bottom-left-radius:10px; border-bottom-right-radius:10px; z-index:10; }
             .screen-content { width: 100%; height: 100%; overflow: hidden; background: #0f172a; }
-            .site-iframe { width: 100%; height: 100%; border: none; opacity: 0; transition: opacity 0.5s ease; animation: none; } /* No scroll animation for live site */
+            .site-iframe { width: 100%; height: 100%; border: none; opacity: 1; transition: opacity 0.5s ease; animation: none; } /* Opacity 1 to show site */
 
             .newsletter-box {
                 background: rgba(255,255,255,0.03); 
