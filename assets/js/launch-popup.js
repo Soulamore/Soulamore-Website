@@ -23,8 +23,9 @@
     // 0.2 Performance: Only load iframe on Desktop
     // Mobile users hide it via CSS anyway, so let's save their data
     const isDesktop = window.innerWidth > 900;
+    // Use an image instead of iframe for stability
     const iframeHTML = isDesktop
-        ? `<iframe src="/index.html" class="site-iframe" scrolling="no" onload="this.style.opacity='1'"></iframe>`
+        ? `<img src="assets/images/social-preview.png" class="site-iframe" style="object-fit: cover;" alt="App Preview">`
         : `<!-- Phone View Hidden on Mobile -->`;
 
     // 1. Create the Popup HTML Structure
