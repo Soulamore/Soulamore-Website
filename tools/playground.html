@@ -1005,10 +1005,16 @@
         }
 
         function closeApp() {
-            document.querySelectorAll('.activity-overlay').forEach(el => el.classList.remove('active'));
-            if (audioCtx) audioCtx.suspend(); // Stop sound
-            stopBubbles();
+            document.querySelectorAll('.activity-overlay').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Cleanup Logic
+            if (audioCtx) audioCtx.suspend(); // Stop sound bath
+            stopBubbles(); // Stop bubble popper
+            if (typeof stopInflate === 'function') stopInflate(); // Stop balloon inflation
         }
+        window.closeApp = closeApp; // Ensure global access
 
         // --- 1. SHREDDER LOGIC ---
         function shredIt() {

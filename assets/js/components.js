@@ -327,6 +327,8 @@ const NAV_DATA = [
         type: 'dropdown',
         children: [
             { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html', style: 'color:var(--ember-orange);' },
+            { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
+            { id: 'nav-soulrider', label: 'Soul Rider (Beta)', href: 'tools/soul-rider.html', style: 'color:#F49F75;' },
             { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
             { id: 'nav-play', label: 'Mental Playground', href: 'tools/playground.html' },
             { id: 'nav-soulbot', label: 'SoulBot AI', href: 'tools/soulbot.html' },
@@ -677,11 +679,11 @@ function injectFavicon() {
     // TEAL: #4ECDC4, PEACH: #F49F75, GOLD: #fbbf24
 
     if (path.includes('soulamore-workplace')) {
-        // WORKPLACE (Briefcase) - Teal/Blue theme
-        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%234ECDC4" d="M128 480h256V80c0-26.5-21.5-48-48-48H176c-26.5 0-48 21.5-48 48v400zm64-400h128v32H192V80z"/><path fill="%234ECDC4" d="M32 128h448v352H32z"/></svg>`;
+        // WORKPLACE (Briefcase) - PEACH
+        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23F49F75" d="M128 480h256V80c0-26.5-21.5-48-48-48H176c-26.5 0-48 21.5-48 48v400zm64-400h128v32H192V80z"/><path fill="%23F49F75" d="M32 128h448v352H32z"/></svg>`;
     } else if (path.includes('soulamore-campus')) {
-        // CAMPUS (Grad Cap) - Blue/White
-        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="%234ECDC4" d="M320 32l-320 160h640L320 32z"/><path fill="%23F49F75" d="M112 256v128c0 70.7 93.1 128 208 128s208-57.3 208-128V256c-34.9 20.3-88.7 32-144 32s-109.1-11.7-144-32z"/></svg>`;
+        // CAMPUS (Grad Cap) - PEACH
+        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="%23F49F75" d="M320 32l-320 160h640L320 32z"/><path fill="%23F49F75" d="M112 256v128c0 70.7 93.1 128 208 128s208-57.3 208-128V256c-34.9 20.3-88.7 32-144 32s-109.1-11.7-144-32z"/></svg>`;
     } else if (path.includes('physical-wellness') || path.includes('renu-dogra')) {
         // PHYSICAL/RENU (Lotus/Flower) - Saffron/Orange
         iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23f59e0b" d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0 0 114.6 0 256s114.6 256 256 256zm0-48c-114.9 0-208-93.1-208-208S141.1 48 256 48s208 93.1 208 208-93.1 208-208 208z"/><circle cx="256" cy="256" r="64" fill="white"/></svg>`;
@@ -1000,7 +1002,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { injectHeader(); } catch (e) { console.error("Header Injection Failed:", e); }
     try { injectFooter(); } catch (e) { console.error("Footer Injection Failed:", e); }
     try { injectSoulBotWidget(); } catch (e) { console.error("SoulBot Widget Failed:", e); }
-    try { setupFavicon(window.location.pathname.includes('/spaces/') ? '../../' : ''); } catch (e) { console.error("Favicon Injection Failed:", e); }
+    try { injectFavicon(); } catch (e) { console.error("Favicon Injection Failed:", e); }
 
     // 2. Set Active State
     try { setActiveState(); } catch (e) { console.warn("Active State Error:", e); }

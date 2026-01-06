@@ -253,6 +253,17 @@
             font-weight: 300;
         }
 
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+                padding: 0 20px;
+            }
+        }
+
         /* DUAL CTA BUTTONS */
         .hero-actions {
             display: flex;
@@ -665,9 +676,21 @@
             grid-template-columns: 1fr;
         }
 
+        /* Tools Grid (3 Items) - Added for specific 3-column layout */
+        .responsive-tools-grid {
+            display: grid;
+            gap: 25px;
+            grid-template-columns: 1fr;
+            /* Mobile: 1 col */
+        }
+
         @media (min-width: 600px) {
             .responsive-compass-grid {
                 /* Tablet: 2 Columns */
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .responsive-tools-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
@@ -676,6 +699,11 @@
             .responsive-compass-grid {
                 /* Desktop: 4 Columns (User Request) */
                 grid-template-columns: repeat(4, 1fr);
+            }
+
+            /* Tools grid needs 3 columns on desktop to fill width */
+            .responsive-tools-grid {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
@@ -977,6 +1005,162 @@
         <header id="main-header"></header>
 
         <!-- HERO SECTION -->
+
+        <!-- PROMO STICKER (Fixed Position - Hanging Off Left - Tape Effect) -->
+
+
+
+
+
+        <style>
+            @keyframes sticker-bounce {
+
+                0%,
+                100% {
+                    transform: rotate(-10deg) translateY(0);
+                }
+
+                50% {
+                    transform: rotate(-10deg) translateY(-10px);
+                }
+            }
+
+            .promo-sticker {
+                position: absolute;
+                top: 180px;
+                left: -200px;
+                /* Moved significantly left to avoid overlap */
+                width: 260px;
+                background: rgba(15, 23, 42, 0.95);
+                border: 1px solid rgba(78, 205, 196, 0.4);
+                /* Slightly brighter border */
+                border-radius: 20px;
+                padding: 20px;
+                z-index: 90;
+                /* Lighter shade of teal for the glow */
+                box-shadow: 0 10px 40px rgba(127, 255, 212, 0.15);
+                backdrop-filter: blur(10px);
+                transform: rotate(-10deg);
+                /* 10 degree tilt */
+                animation: sticker-bounce 3s ease-in-out infinite;
+                /* Automatic Bounce */
+                transition: transform 0.3s, box-shadow 0.3s;
+                transform-origin: top left;
+            }
+
+            .sticker-header {
+                font-weight: 700;
+                color: #4ECDC4;
+                margin-bottom: 5px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .sticker-content {
+                font-size: 0.85rem;
+                opacity: 0.7;
+                margin-bottom: 15px;
+                line-height: 1.4;
+                color: white;
+            }
+
+            .tape-strip {
+                position: absolute;
+                top: -12px;
+                left: 40%;
+                width: 50px;
+                height: 15px;
+                /* Thinner */
+                background: rgba(127, 255, 212, 0.3);
+                /* Lighter Teal Tape */
+                backdrop-filter: blur(5px);
+                transform: rotate(-5deg);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            }
+
+            .promo-sticker:hover {
+                animation-play-state: paused;
+                transform: rotate(0deg) scale(1.05) translateY(0);
+                border-color: #4ECDC4;
+                box-shadow: 0 15px 50px rgba(78, 205, 196, 0.3);
+                z-index: 100;
+            }
+
+            .play-btn {
+                display: block;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 8px 15px;
+                border-radius: 50px;
+                text-decoration: none;
+                color: white;
+                font-size: 0.9rem;
+                transition: 0.3s;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .play-btn:hover {
+                background: rgba(78, 205, 196, 0.2);
+                border-color: #4ECDC4;
+                color: #4ECDC4;
+            }
+
+            @media (max-width: 768px) {
+                .hero-btns {
+                    flex-direction: column;
+                    align-items: center;
+                    margin-bottom: 0px;
+                    /* Remove bottom margin from buttons, sticker handles spacing */
+                }
+
+                .promo-sticker {
+                    position: relative !important;
+                    /* Static flow */
+                    top: auto;
+                    left: auto;
+                    right: auto;
+                    bottom: auto;
+                    transform: none !important;
+                    /* Reset tilt */
+
+                    /* THE PERFECT SPACING - UPDATED */
+                    margin: 40px auto 40px auto;
+
+                    width: 90%;
+                    max-width: 340px;
+                    animation: none;
+                    text-align: center;
+                    box-shadow: 0 5px 20px rgba(78, 205, 196, 0.15);
+                    /* Softer shadow for mobile section */
+                }
+
+                .tape-strip {
+                    display: none;
+                    /* Remove tape on mobile for cleaner look */
+                }
+
+                /* Override Hero Padding for better mobile spacing */
+                .hero {
+                    padding-bottom: 20px !important;
+                }
+
+                /* Override Next Section Margin to remove huge gap */
+                #tools.section-header {
+                    margin-top: 0px !important;
+                }
+
+                .promo-sticker {
+                    margin: 40px auto 20px auto;
+                    /* Top Gap: 40px. */
+                    /* Bottom Gap: 20px (margin) + 20px (hero pad) + 0px (header margin) = 40px. */
+                    /* RESULT: Symmetrical 40px Spacing. */
+                }
+            }
+        </style>
+
         <div class="hero fade-in">
             <h1>You Don’t Have to<br>Carry Everything Alone.</h1>
             <p>
@@ -999,7 +1183,7 @@
             </div>
 
             <!-- SHREDDER TOOL (Immediate Value) -->
-            <div class="shredder-box" id="tools" style="margin-top:60px;">
+            <div class="shredder-box" style="margin-top:60px;">
                 <h3 style="margin-bottom:15px; text-align:center; color:rgba(255,255,255,0.7); font-size:1rem;">
                     TRY IT
                     NOW: RELEASE A THOUGHT</h3>
@@ -1017,12 +1201,26 @@
                 </div>
             </div>
 
+            <!-- Promo Sticker (Moved here for Mobile Flow) -->
+            <div class="promo-sticker">
+                <div class="tape-strip"></div>
+                <div class="sticker-header">
+                    <i class="fas fa-bolt" style="color:#FFDD57;"></i> Wiring Backend...
+                </div>
+                <div class="sticker-content">
+                    We're connecting the Soul-Engine. While you wait...
+                </div>
+                <a href="tools/drop-it.html" class="play-btn">
+                    Play "Drop It" 🚀
+                </a>
+            </div>
+
             <div class="breathing-glow"></div>
         </div>
 
         <!-- VISUAL COMPASS (Restructured Steps) -->
         <!-- VISUAL COMPASS (Step 2: Tools) -->
-        <div class="section-header fade-in">
+        <div class="section-header fade-in" id="tools" style="scroll-margin-top: 140px;">
             <h2 style="font-size:2.5rem; margin-bottom:10px;">Find Your Calm Space</h2>
             <p>Choose what you need right now.</p>
         </div>
@@ -1033,6 +1231,13 @@
                 <i class="fas fa-trash-alt pillar-icon"></i>
                 <div class="pillar-title">Release</div>
                 <div class="pillar-desc">Vent Box & destruction tools for heavy emotions.</div>
+            </a>
+
+            <!-- 1.5 DROP IT (NEW GAME) -->
+            <a href="tools/drop-it.html" class="pillar-card" style="border-color:#4ECDC4;">
+                <i class="fas fa-gamepad pillar-icon" style="color:#4ECDC4;"></i>
+                <div class="pillar-title" style="color:#4ECDC4;">Drop It</div>
+                <div class="pillar-desc">Mental Space Shooter. Blast away heavy thoughts.</div>
             </a>
 
             <!-- 2. RESET -->
@@ -1183,92 +1388,80 @@
                 <p style="opacity:0.7; margin-bottom: 50px; max-width:600px; margin-left:auto; margin-right:auto;">
                     Sometimes tools help. Sometimes it helps more to talk to someone who’s been there.
                 </p>
-
-                <!-- Controls -->
-                <div
-                    style="display: flex; justify-content: flex-end; gap: 10px; max-width: 1200px; margin: 0 auto 20px auto; padding-right: 10px;">
-                    <button onclick="scrollPeers(-1)"
-                        style="background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.2s;"><i
-                            class="fas fa-chevron-left"></i></button>
-                    <button onclick="scrollPeers(1)"
-                        style="background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.2s;"><i
-                            class="fas fa-chevron-right"></i></button>
-                </div>
-
-                <!-- Horizontal Scroll Container -->
-                <div class="peer-grid hide-scrollbar" id="peerCarousel"
-                    style="display:flex; gap:25px; max-width:1200px; margin:0 auto; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                <!-- Static Grid for Peers -->
+                <div class="responsive-compass-grid" style="max-width:1200px; margin:0 auto; padding-bottom: 20px;">
 
                     <!-- Peer Card 1: Aditya -->
                     <div class="peer-card"
-                        style="min-width: 260px; flex: 1; scroll-snap-align: start; background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <div style="font-size:1.4rem; font-weight:700; color:white;">Aditya</div>
-                            <div
-                                style="font-size:0.7rem; color:var(--teal-glow); border:1px solid var(--teal-glow); padding:2px 8px; border-radius:10px;">
-                                ONLINE</div>
+                        style="background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
+                        <div class="peer-header"
+                            style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
+                            <h3 style="font-size:1.5rem; margin:0; color:white;">Aditya</h3>
+                            <span class="status-badge"
+                                style="font-size:0.7rem; padding:4px 10px; border-radius:20px; border:1px solid #4ECDC4; color:#4ECDC4; text-transform:uppercase; letter-spacing:1px;">Online</span>
                         </div>
-                        <p style="opacity:0.8; font-size:0.95rem; margin-bottom:25px;">Here to help you navigate
-                            academic pressure and self-discovery.</p>
-                        <a href="company/about.html" class="nav-btn"
-                            style="display:inline-block; padding:8px 20px; border-radius:50px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); font-size:0.9rem; width:100%; text-align:center; margin-top: auto;">Talk
-                            to a Peer</a>
+                        <p style="font-size:0.95rem; line-height:1.6; opacity:0.8; margin-bottom:25px;">Here to help
+                            you navigate
+                            academic pressure and
+                            self-discovery.</p>
+                        <button class="connect-btn" onclick="openLiveChat()"
+                            style="margin-top:auto; width:100%; padding:12px; background:transparent; border:1px solid rgba(255,255,255,0.2); border-radius:50px; color:white; font-size:0.9rem; cursor:pointer; transition:0.3s;">Talk
+                            to a Peer</button>
                     </div>
 
                     <!-- Peer Card 2: Lakshit -->
                     <div class="peer-card"
-                        style="min-width: 260px; flex: 1; scroll-snap-align: start; background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <div style="font-size:1.4rem; font-weight:700; color:white;">Lakshit</div>
-                            <div
-                                style="font-size:0.7rem; color:var(--peach-glow); border:1px solid var(--peach-glow); padding:2px 8px; border-radius:10px;">
-                                AWAY</div>
+                        style="background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
+                        <div class="peer-header"
+                            style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
+                            <h3 style="font-size:1.5rem; margin:0; color:white;">Lakshit</h3>
+                            <span class="status-badge"
+                                style="font-size:0.7rem; padding:4px 10px; border-radius:20px; border:1px solid #F49F75; color:#F49F75; text-transform:uppercase; letter-spacing:1px;">Away</span>
                         </div>
-                        <p style="opacity:0.8; font-size:0.95rem; margin-bottom:25px;">Ready to listen about
-                            relationships, stress, and finding balance.</p>
-                        <a href="our-peers/index.html" class="nav-btn"
-                            style="display:inline-block; padding:8px 20px; border-radius:50px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); font-size:0.9rem; width:100%; text-align:center; margin-top: auto;">Talk
-                            to a Peer</a>
+                        <p style="font-size:0.95rem; line-height:1.6; opacity:0.8; margin-bottom:25px;">Ready to
+                            listen about
+                            relationships, stress, and
+                            finding balance.</p>
+                        <button class="connect-btn" onclick="openLiveChat()"
+                            style="margin-top:auto; width:100%; padding:12px; background:transparent; border:1px solid rgba(255,255,255,0.2); border-radius:50px; color:white; font-size:0.9rem; cursor:pointer; transition:0.3s;">Talk
+                            to a Peer</button>
                     </div>
 
                     <!-- Peer Card 3: Aarti -->
                     <div class="peer-card"
-                        style="min-width: 260px; flex: 1; scroll-snap-align: start; background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <div style="font-size:1.4rem; font-weight:700; color:white;">Aarti</div>
-                            <div
-                                style="font-size:0.7rem; color:var(--teal-glow); border:1px solid var(--teal-glow); padding:2px 8px; border-radius:10px;">
-                                ONLINE</div>
+                        style="background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
+                        <div class="peer-header"
+                            style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
+                            <h3 style="font-size:1.5rem; margin:0; color:white;">Aarti</h3>
+                            <span class="status-badge"
+                                style="font-size:0.7rem; padding:4px 10px; border-radius:20px; border:1px solid #4ECDC4; color:#4ECDC4; text-transform:uppercase; letter-spacing:1px;">Online</span>
                         </div>
-                        <p style="opacity:0.8; font-size:0.95rem; margin-bottom:25px;">Available to chat about
-                            anxiety,
-                            emotional wellness, or just venting.</p>
-                        <a href="our-peers/index.html" class="nav-btn"
-                            style="display:inline-block; padding:8px 20px; border-radius:50px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); font-size:0.9rem; width:100%; text-align:center; margin-top: auto;">Talk
-                            to a Peer</a>
+                        <p style="font-size:0.95rem; line-height:1.6; opacity:0.8; margin-bottom:25px;">Available to
+                            chat about
+                            anxiety, emotional
+                            wellness, or just venting.</p>
+                        <button class="connect-btn" onclick="openLiveChat()"
+                            style="margin-top:auto; width:100%; padding:12px; background:transparent; border:1px solid rgba(255,255,255,0.2); border-radius:50px; color:white; font-size:0.9rem; cursor:pointer; transition:0.3s;">Talk
+                            to a Peer</button>
                     </div>
 
-                    <!-- Peer Card 4: Renu -->
+                    <!-- Peer Card 4: Renu Dogra (FEATURED) -->
                     <div class="peer-card"
-                        style="min-width: 260px; flex: 1; scroll-snap-align: start; background:rgba(30, 41, 59, 0.6); padding:30px; border-radius:24px; border:1px solid var(--border-glass); text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <div style="font-size:1.4rem; font-weight:700; color:white;">Renu</div>
-                            <div
-                                style="font-size:0.7rem; color:var(--gold-glow); border:1px solid var(--gold-glow); padding:2px 8px; border-radius:10px;">
-                                SESSION</div>
+                        style="background:rgba(30, 41, 59, 0.8); padding:30px; border-radius:24px; border:1px solid #F49F75; text-align:left; transition:0.3s; box-shadow: 0 10px 30px rgba(244, 159, 117, 0.1); display: flex; flex-direction: column;">
+                        <div class="peer-header"
+                            style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
+                            <h3 style="font-size:1.5rem; margin:0; color:white;">Renu</h3>
+                            <span class="status-badge"
+                                style="font-size:0.7rem; padding:4px 10px; border-radius:20px; background: rgba(244, 159, 117, 0.2); border:1px solid #F49F75; color:#F49F75; text-transform:uppercase; letter-spacing:1px;">Sessions</span>
                         </div>
-                        <p style="opacity:0.8; font-size:0.95rem; margin-bottom:25px;">Certified Yoga Teacher
-                            helping
-                            you reconnect with physical calmness.</p>
-                        <a href="our-peers/physical-wellness/renu-dogra.html" class="nav-btn"
-                            style="display:inline-block; padding:8px 20px; border-radius:50px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); font-size:0.9rem; width:100%; text-align:center; margin-top: auto;">Book
+                        <p style="font-size:0.95rem; line-height:1.6; opacity:0.8; margin-bottom:25px;">Certified
+                            Yoga Teacher
+                            helping you reconnect with
+                            physical calmness.</p>
+                        <a href="our-peers/physical-wellness/renu-dogra.html" class="connect-btn"
+                            style="margin-top:auto; display:block; text-align:center; text-decoration:none; width:100%; padding:12px; background:linear-gradient(135deg, #F49F75, #fbbf24); border:none; border-radius:50px; color:#0f172a; font-weight:700; font-size:0.9rem; cursor:pointer; transition:0.3s;">Book
                             Session</a>
                     </div>
-
                 </div>
             </div>
         </section>
