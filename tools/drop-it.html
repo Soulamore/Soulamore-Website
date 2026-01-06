@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Drop It | Soulamore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0B0E14;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* SPACE BACKGROUND & STARS */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at center, #1a1e29 0%, #0B0E14 100%);
+        }
+
+        /* MAIN GAME CANVAS */
+        canvas#gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* UI OVERLAY */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(11, 14, 20, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            transition: opacity 0.5s;
+            pointer-events: all;
+        }
+
+        .overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .title {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4ECDC4, #F49F75);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4ECDC4, #2CB5AC);
+            border: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            color: #0f172a;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        /* GUIDANCE MESSAGE SYSTEM */
+        #guidance-container {
+            position: fixed;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: clamp(280px, 90vw, 360px);
+            padding: 12px 18px;
+            background: rgba(10, 10, 25, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.92);
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(13px, 2.5vw, 15px);
+            text-align: center;
+            line-height: 1.5;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.1);
+        }
+
+        #guidance-container.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
+        }
+
+        /* SOUND TOGGLE */
+        #audioToggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 200;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        /* HEAT BAR */
+        #heatContainer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        #heatBar {
+            width: 0%;
+            height: 100%;
+            background: #4ECDC4;
+            transition: width 0.1s, background 0.3s;
+        }
+
+        #heatBar.overheat {
+            background: #FF4136;
+        }
+
+        @media (max-width: 600px) {
+            .title {
+                font-size: 3rem;
+            }
+
+            #guidance-container {
+                top: 12%;
+                width: 85%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="bgCanvas"></div> <!-- Static BG -->
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="guidance-container"></div>
+    <div id="heatContainer">
+        <div id="heatBar"></div>
+    </div>
+
+    <div id="audioToggle" onclick="toggleAudio()"><i class="fas fa-volume-mute"></i></div>
+
+    <!-- START SCREEN -->
+    <div id="startScreen" class="overlay">
+        <div class="title">DROP IT.</div>
+        <div class="subtitle">Shoot down your worries.<br>If they get too heavy, let them go.</div>
+        <button class="btn" onclick="startGame()">Ignite Engines</button>
+        <div style="margin-top:20px; font-size:0.8rem; opacity:0.5;">Headphones Recommended</div>
+        <div style="margin-top:10px; font-size:0.8rem; opacity:0.5;">Tap Space or Screen to Fire</div>
+    </div>
+
+    <!-- GAME OVER / SHARE SCREEN -->
+    <div id="endScreen" class="overlay hidden">
+        <div style="font-size: 2rem; font-weight:800; margin-bottom:10px;">SESSION COMPLETE</div>
+        <div style="font-size: 1rem; opacity:0.7; margin-bottom: 30px;" id="finalScore">Objects Cleared: 0</div>
+
+        <div id="sharePreview"
+            style="background:#1a1e29; padding:20px; border-radius:12px; margin-bottom:20px; text-align:center; max-width:80%;">
+            <!-- Canvas snapshot will go here -->
+            <img id="generatedPreview" style="max-width:100%; border-radius:8px; display:none;">
+        </div>
+
+        <button class="btn" onclick="downloadShare()">Share Card</button>
+        <div style="margin-top:10px; cursor:pointer; opacity:0.6; text-decoration:underline;"
+            onclick="location.reload()">Play Again</div>
+    </div>
+
+    <script src="../assets/js/components.js"></script>
+    <script>
+        // --- GAME ENGINE ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let running = false;
+        let audioCtx;
+        let muted = true;
+
+        // State
+        let score = 0;
+        let heat = 0;
+        let overheated = false;
+        let dust = [];
+        let missiles = [];
+        let particles = [];
+        let celestials = [];
+        let popups = []; // Intrusive Ads
+        let player = { x: 0, y: 0, r: 20, color: '#4ECDC4' };
+
+        // Guidance System
+        const guidanceMessages = [
+            // --- CORE SOULAMORE ---
+            { text: "Soulamore gives your thoughts a safe place to land.", type: "feature" },
+            { text: "Soulamore is designed for moments when your mind feels crowded.", type: "feature" },
+            { text: "Soulamore helps you pause without needing answers.", type: "feature" },
+            { text: "Soulamore exists for thoughts you don’t know how to explain.", type: "feature" },
+            // --- CONFESSION BOX ---
+            { text: "The Confession Box lets you share thoughts anonymously.", type: "feature" },
+            { text: "It helps when saying things out loud feels hard.", type: "feature" },
+            // --- PEER SUPPORT ---
+            { text: "Soulamore Peer Support lets you talk to someone who listens.", type: "feature" },
+            { text: "Peer Support focuses on understanding, not fixing.", type: "feature" },
+            // --- AWAY ---
+            { text: "Soulamore Away supports people living away from home.", type: "feature" },
+            { text: "It helps when distance makes emotions louder.", type: "feature" },
+            // --- CAMPUS ---
+            { text: "Soulamore Campus supports students under quiet pressure.", type: "feature" },
+            { text: "It helps with academic stress, burnout, and overwhelm.", type: "feature" },
+            // --- STATS ---
+            { text: "Soulamore helps you find the right kind of support.", type: "stat" },
+            { text: "Soulamore is here when you’re ready.", type: "stat" }
+        ];
+
+        let guidanceState = {
+            lastShownTime: 0,
+            shownCount: 0,
+            active: false,
+            history: [],
+            maxPerSession: 8,
+            interval: 25000 // 25s
+        };
+
+        const words = ["Anxiety", "Doubt", "Fear", "Stress", "Regret", "FOMO", "Guilt", "Shame", "Panic", "Noise", "Ego", "Envy", "Burnout", "Lies", "Chaos"];
+        const ads = [
+            { title: "WARNING", body: "You are awkward." },
+            { title: "ERROR 404", body: "Motivation not found." },
+            { title: "REMINDER", body: "They are judging you." },
+            { title: "ALERT", body: "Cringe Memory #802." }
+        ];
+
+        // --- INIT ---
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            player.x = width / 2;
+            player.y = height - 100;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function startGame() {
+            if (!audioCtx) initAudio();
+            document.getElementById('startScreen').classList.add('hidden');
+            running = true;
+            loop();
+        }
+
+        // --- INPUT ---
+        let keys = {};
+        window.addEventListener('keydown', e => keys[e.key] = true);
+        window.addEventListener('keyup', e => keys[e.key] = false);
+
+        canvas.addEventListener('mousedown', fireMissile);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); fireMissile(); }, { passive: false });
+
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
+            const clientY = evt.clientY || (evt.touches && evt.touches[0].clientY);
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        // --- LOGIC ---
+        function fireMissile() {
+            if (!running || overheated) return;
+            missiles.push({ x: player.x, y: player.y - 20, vy: -15, life: 60 });
+            heat += 10;
+            sfx('shoot');
+            if (heat >= 100) {
+                overheated = true;
+                sfx('overheat');
+                setTimeout(() => { overheated = false; heat = 0; }, 2000);
+            }
+        }
+
+        function spawnPopup() {
+            const w = 240, h = 120;
+            const content = ads[Math.floor(Math.random() * ads.length)];
+            popups.push({
+                x: Math.random() * (width - w),
+                y: Math.random() * (height / 2),
+                w: w, h: h,
+                content: content,
+                dx: (Math.random() - 0.5) * 2,
+                dy: (Math.random() - 0.5) * 2
+            });
+        }
+
+        function createExplosion(x, y, color = '#F49F75') {
+            for (let i = 0; i < 8; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    life: 30, color: color,
+                    size: Math.random() * 3 + 1
+                });
+            }
+        }
+
+        function updateGuidanceSystem(now) {
+            if (guidanceState.active || guidanceState.shownCount >= guidanceState.maxPerSession) return;
+            if (now - guidanceState.lastShownTime > guidanceState.interval) {
+                showGuidance();
+            }
+        }
+
+        function showGuidance() {
+            const container = document.getElementById('guidance-container');
+            // Weighting
+            const type = Math.random() < 0.8 ? 'feature' : 'stat';
+            let pool = guidanceMessages.filter(m => m.type === type && !guidanceState.history.includes(m.text));
+            if (pool.length === 0) pool = guidanceMessages; // Reset pool
+
+            const msg = pool[Math.floor(Math.random() * pool.length)];
+            container.innerText = msg.text;
+            container.classList.add('visible');
+            guidanceState.active = true;
+            guidanceState.shownCount++;
+            guidanceState.history.push(msg.text);
+            guidanceState.lastShownTime = performance.now();
+
+            setTimeout(() => {
+                container.classList.remove('visible');
+                guidanceState.active = false;
+            }, 4500);
+        }
+
+        // --- LOOP ---
+        function loop() {
+            if (!running) return;
+            ctx.clearRect(0, 0, width, height);
+
+            // 1. Stars/Bg (Simple)
+            if (Math.random() < 0.1) ctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
+
+            // 2. Player Input (Follow Mouse X)
+            // (Simplified: Click to shoot, maybe tap to move? No, stationary shooter for now or mouse follow)
+            // Let's implement mouse follow for X.
+            // Actually, let's keep it simple: Mouse moves player X.
+            canvas.onmousemove = (e) => {
+                const pos = getMousePos(e);
+                player.x = pos.x;
+            };
+            canvas.ontouchmove = (e) => {
+                const pos = getMousePos(e);
+                player.x = pos.x;
+            };
+
+            // 3. Draw Player
+            ctx.fillStyle = overheated ? '#FF4136' : player.color;
+            ctx.beginPath();
+            ctx.moveTo(player.x, player.y - 30);
+            ctx.lineTo(player.x - 20, player.y + 20);
+            ctx.lineTo(player.x + 20, player.y + 20);
+            ctx.fill();
+
+            // 4. Missiles
+            for (let i = missiles.length - 1; i >= 0; i--) {
+                let m = missiles[i];
+                m.y += m.vy;
+                ctx.fillStyle = '#4ECDC4';
+                ctx.fillRect(m.x - 2, m.y, 4, 10);
+                if (m.y < 0) missiles.splice(i, 1);
+
+                // Collision: Dust
+                for (let j = dust.length - 1; j >= 0; j--) {
+                    let d = dust[j];
+                    const dist = Math.hypot(m.x - d.x, m.y - d.y);
+                    if (dist < d.r) {
+                        d.hp--;
+                        missiles.splice(i, 1);
+                        createExplosion(m.x, m.y, '#FFF');
+                        if (d.hp <= 0) {
+                            dust.splice(j, 1);
+                            score++;
+                            createExplosion(d.x, d.y, '#F49F75');
+                            sfx('explode');
+                        }
+                        break;
+                    }
+                }
+
+                // Collision: Popups (Anywhere hit)
+                for (let k = popups.length - 1; k >= 0; k--) {
+                    let p = popups[k];
+                    if (m.x > p.x && m.x < p.x + p.w && m.y > p.y && m.y < p.y + p.h) {
+                        popups.splice(k, 1);
+                        missiles.splice(i, 1); // remove missile? yes
+                        createExplosion(m.x, m.y, '#FF4136');
+                        sfx('explode');
+                        score += 5;
+                        break;
+                    }
+                }
+            }
+
+            // 5. Dust (Enemies)
+            if (Math.random() < 0.015) {
+                const txt = words[Math.floor(Math.random() * words.length)];
+                dust.push({
+                    x: Math.random() * (width - 100) + 50,
+                    y: -50,
+                    text: txt,
+                    r: 40 + txt.length * 2,
+                    hp: 2,
+                    vy: 1 + Math.random() * 2
+                });
+            }
+            dust.forEach((d, i) => {
+                d.y += d.vy;
+                ctx.fillStyle = `rgba(255, 255, 255, 0.1)`;
+                ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = 'white'; ctx.stroke();
+
+                ctx.fillStyle = 'white';
+                ctx.font = '14px Outfit';
+                ctx.textAlign = 'center';
+                ctx.fillText(d.text, d.x, d.y + 5);
+
+                if (d.y > height + 50) dust.splice(i, 1);
+            });
+
+            // 6. Popups (Intrusive Ads)
+            // Spawn Rate: 0.001
+            const enableAds = true;
+            if (enableAds && Math.random() < 0.001) spawnPopup();
+
+            popups.forEach((p, i) => {
+                p.x += p.dx; p.y += p.dy;
+                // Bounce
+                if (p.x < 0 || p.x + p.w > width) p.dx *= -1;
+                if (p.y < 0 || p.y + p.h > height / 2) p.dy *= -1;
+
+                // Draw Window
+                ctx.fillStyle = '#e2e8f0'; ctx.fillRect(p.x, p.y, p.w, p.h);
+                // Title Bar
+                ctx.fillStyle = '#FF813F'; ctx.fillRect(p.x, p.y, p.w, 30);
+                // X Btn
+                ctx.fillStyle = '#FF4136'; ctx.fillRect(p.x + p.w - 30, p.y, 30, 30);
+                ctx.fillStyle = 'white'; ctx.fillText("X", p.x + p.w - 15, p.y + 20);
+                ctx.fillText(p.content.title, p.x + 10, p.y + 20);
+
+                // Body
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(p.x + 5, p.y + 35, p.w - 10, p.h - 40);
+                ctx.fillStyle = 'white'; ctx.fillText(p.content.body, p.x + p.w / 2, p.y + 70);
+            });
+
+            // 7. Particles
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy; p.life--;
+                ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+                if (p.life <= 0) particles.splice(i, 1);
+            });
+
+            // 8. Guidance
+            updateGuidanceSystem(performance.now());
+
+            // 9. Heat UI
+            heat = Math.max(0, heat - 0.5);
+            document.getElementById('heatBar').style.width = heat + "%";
+            if (heat > 90) document.getElementById('heatBar').classList.add('overheat');
+            else document.getElementById('heatBar').classList.remove('overheat');
+
+            requestAnimationFrame(loop);
+        }
+
+        // --- AUDIO ---
+        function initAudio() {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            muted = false;
+            document.querySelector('#audioToggle i').className = "fas fa-volume-up";
+        }
+        function toggleAudio() {
+            if (!audioCtx) initAudio();
+            else {
+                muted = !muted;
+                document.querySelector('#audioToggle i').className = muted ? "fas fa-volume-mute" : "fas fa-volume-up";
+            }
+        }
+        function sfx(type) {
+            if (muted || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.connect(g); g.connect(audioCtx.destination);
+
+            const t = audioCtx.currentTime;
+            if (type === 'shoot') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(200, t); osc.frequency.exponentialRampToValueAtTime(100, t + 0.1);
+                g.gain.setValueAtTime(0.05, t); g.gain.linearRampToValueAtTime(0, t + 0.1);
+                osc.start(t); osc.stop(t + 0.1);
+            } else if (type === 'explode') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, t); osc.frequency.linearRampToValueAtTime(50, t + 0.2);
+                g.gain.setValueAtTime(0.05, t); g.gain.linearRampToValueAtTime(0, t + 0.2);
+                osc.start(t); osc.stop(t + 0.2);
+            } else if (type === 'overheat') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(500, t);
+                g.gain.setValueAtTime(0.05, t); g.gain.linearRampToValueAtTime(0, t + 0.5);
+                osc.start(t); osc.stop(t + 0.5);
+            }
+        }
+    </script>
+</body>
+
+</html>
