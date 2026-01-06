@@ -319,7 +319,7 @@
                 }
             </style>
         </div>
-        <button class="btn" onclick="startGame()">Ignite Engines</button>
+        <button class="btn" onclick="initGame()">IGNITE ENGINE <i class="fas fa-rocket"></i></button>
     </div>
 
     <!-- Fire Zone Visual -->
@@ -1473,14 +1473,23 @@
             el.classList.add('show');
             setTimeout(() => el.classList.remove('show'), 2000);
         }
-        function startGame() {
-            if (running) return;
-            document.getElementById('startScreen').classList.remove('active');
-            document.getElementById('hud').style.opacity = 1;
-            document.getElementById('heatContainer').style.opacity = 1;
-            initAudio();
+        /* --- GAME INIT --- */
+        function initGame() {
+            // Hide Overlays
+            document.querySelector('.overlay').classList.remove('active');
+            document.getElementById('endScreen').classList.remove('active');
+
+            // Reset Stats
+            score = 0;
+            distance = 0;
+            heat = 0;
+            droppedWords = [];
+            pulses = [];
+            overheated = false;
             running = true;
-            resize();
+
+            // Start Loop
+            update();
         }
 
         /* --- SHARE CARD GENERATION --- */
