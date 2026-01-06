@@ -1475,7 +1475,8 @@
         }
         /* --- GAME INIT --- */
         function initGame() {
-            console.log("Igniting Engine...");
+            initAudio(); // Unlock audio
+
             // Hide Overlays
             const overlay = document.querySelector('.overlay');
             if (overlay) overlay.classList.remove('active');
@@ -1491,9 +1492,7 @@
             pulses = [];
             overheated = false;
             running = true;
-
-            // Start Loop
-            loop();
+            // loop() runs globally, so we just set running=true
         }
 
         // Alias for safety
@@ -1510,22 +1509,18 @@
             const randQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
             // Set Favicon Symbol or Fallback Text
-            // Set Favicon Symbol or Fallback Text
             const logoEl = document.getElementById('tpl_logo');
             const titleEl = logoEl ? logoEl.nextElementSibling : null;
 
             if (logoEl) {
-                // Hardcoded Base64 is guaranteed to be valid if injection succeeds
                 if (logoBase64 && logoBase64.length > 200) {
                     logoEl.src = logoBase64;
                     logoEl.style.display = 'block';
                     if (titleEl) titleEl.style.display = 'none';
                 } else {
-                    // Should never happen if injection works
                     logoEl.style.display = 'none';
                     if (titleEl) titleEl.style.display = 'block';
                 }
-                // Reset styles
                 logoEl.style.backgroundColor = "transparent";
                 logoEl.style.borderRadius = "0";
                 logoEl.style.padding = "0";
