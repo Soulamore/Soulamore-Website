@@ -1,462 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Drop It | Soulamore</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Html2Canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="../assets/js/logo.js"></script>
-
-    <style>
-        :root {
-            --bg-deep: #050510;
-            --accent: #4ECDC4;
-            --danger: #FF6B6B;
-            --text-light: #f1f5f9;
-        }
-
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-deep);
-            color: var(--text-light);
-            touch-action: none;
-            user-select: none;
-            cursor: crosshair;
-        }
-
-        #gameCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        /* --- UI OVERLAYS --- */
-        .ui-layer {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            z-index: 5;
-            display: flex;
-            justify-content: space-between;
-            pointer-events: none;
-        }
-
-        .hud-stats {
-            text-shadow: 0 0 10px rgba(78, 205, 196, 0.8);
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .heat-container {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            z-index: 5;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        .heat-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #4ECDC4, #FF6B6B);
-            transition: width 0.1s linear;
-        }
-
-        .exit-btn {
-            pointer-events: all;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 50px;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-            transition: 0.3s;
-        }
-
-        .exit-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .milestone-popup {
-            position: fixed;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 4rem;
-            font-weight: 700;
-            color: var(--accent);
-            text-shadow: 0 0 30px var(--accent);
-            opacity: 0;
-            transition: 0.5s;
-            z-index: 8;
-            pointer-events: none;
-            text-align: center;
-        }
-
-        .milestone-popup.show {
-            opacity: 1;
-            top: 50%;
-        }
-
-        /* Start/End Screens */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            background: rgba(5, 5, 16, 0.85);
-            backdrop-filter: blur(10px);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 1s;
-        }
-
-        .overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .title {
-            font-size: 4rem;
-            font-weight: 700;
-            text-shadow: 0 0 30px rgba(78, 205, 196, 0.5);
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #fff, #4ECDC4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 25px;
-            /* Added spacing */
-        }
-
-        .subtitle {
-            margin-bottom: 50px;
-            /* Increased from default */
-            line-height: 1.6;
-        }
-
-        /* GUIDANCE MESSAGE SYSTEM */
-        #guidance-container {
-            position: fixed;
-            top: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: clamp(280px, 90vw, 360px);
-            padding: 12px 18px;
-            background: rgba(10, 10, 25, 0.65);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 20px;
-            color: rgba(255, 255, 255, 0.92);
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(13px, 2.5vw, 15px);
-            text-align: center;
-            line-height: 1.5;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-            z-index: 1000;
-            box-shadow: 0 0 20px rgba(78, 205, 196, 0.1);
-        }
-
-        #guidance-container.visible {
-            opacity: 1;
-            transform: translateX(-50%) translateY(-5px);
-        }
-
-        @media (max-width: 600px) {
-            #guidance-container {
-                top: 12%;
-                width: 85%;
-            }
-        }
-
-        .btn {
-            background: var(--accent);
-            color: var(--bg-deep);
-            padding: 15px 50px;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 0 30px rgba(78, 205, 196, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 50px rgba(78, 205, 196, 0.6);
-        }
-
-        /* --- END CARD PREVIEW --- */
-        .card-preview {
-            width: 280px;
-            aspect-ratio: 9/16;
-            background: #111;
-            border-radius: 12px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-            margin-bottom: 20px;
-            overflow: hidden;
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* --- HIDDEN HIGH-RES TEMPLATE --- */
-        #shareTemplate {
-            display: none;
-        }
-    </style>
-</head>
-
-<body>
-
-    <canvas id="gameCanvas"></canvas>
-
-    <!-- HUD -->
-    <div class="ui-layer" id="hud" style="opacity:0; align-items: center;">
-        <a href="../index.html" class="exit-btn" style="text-decoration:none; padding:8px 15px; margin-right:auto;"><i
-                class="fas fa-arrow-left"></i> Home</a>
-
-        <div class="hud-stats" style="position:absolute; left:50%; transform:translateX(-50%);">
-            <span id="distDisplay">0</span> <span style="font-size:0.8rem; opacity:0.7;">LY</span>
-        </div>
-
-        <button class="exit-btn" onclick="endGame()" style="margin-left:auto;">Stop & Rest</button>
-    </div>
-
-    <!-- HEAT BAR -->
-    <div class="heat-container" id="heatContainer">
-        <div class="heat-bar" id="heatBar"></div>
-    </div>
-
-    <!-- MILESTONE POPUP -->
-    <div class="milestone-popup" id="milestoneMsg">
-        100 LY<br><span style="font-size:1.5rem; color:white; font-weight:400;">Keep Flying</span>
-    </div>
-
-    <!-- START SCREEN -->
-    <!-- START SCREEN -->
-    <a href="../index.html" class="exit-btn"
-        style="position:fixed; top:20px; left:20px; z-index:9999; display:flex; gap:10px;"><i
-            class="fas fa-arrow-left"></i> Back</a>
-
-    <style>
-        .key-cap {
-            display: inline-block;
-            padding: 4px 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 0.9em;
-            margin: 0 2px;
-            color: #4ECDC4;
-            box-shadow: 0 2px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: rgba(78, 205, 196, 0.1);
-            border: 1px solid rgba(78, 205, 196, 0.3);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            color: #4ECDC4;
-            margin-bottom: 20px;
-        }
-
-        /* MOBILE HUD OPTIMIZATION */
-        @media (max-width: 600px) {
-            .hud-stats {
-                font-size: 1.1rem !important;
-                width: 100px;
-            }
-
-            #distDisplay {
-                font-size: 1.4rem;
-            }
-
-            .exit-btn {
-                padding: 6px 12px !important;
-                font-size: 0.85rem !important;
-            }
-        }
-    </style>
-
-    <div id="guidance-container"></div>
-    <div id="startScreen" class="overlay active">
-        <div class="badge"><i class="fas fa-headphones"></i> Sound Recommended</div>
-        <div class="title" style="margin-bottom:10px;">Drop It.</div>
-        <h3 style="margin-bottom:30px; font-weight:400; opacity:0.7;">Mental Space Shooter</h3>
-
-        <div class="subtitle">
-            Blast away the heavy thoughts. Keep what matters.<br><br>
-            <span class="desktop-hint"><span class="key-cap">WASD</span> to Fly. <span class="key-cap">SPACE</span> to
-                Fire.</span>
-            <span class="mobile-hint" style="display:none; color:#4ECDC4;">👆 Drag to Fly.<br>🔥 Drag to Bottom Zone to
-                Channel Fire.</span>
-            <style>
-                @media (hover: none) and (pointer: coarse) {
-                    .desktop-hint {
-                        display: none;
-                    }
-
-                    .mobile-hint {
-                        display: inline-block !important;
-                    }
-                }
-            </style>
-        </div>
-        <button id="igniteBtn" class="btn" style="z-index:99999; pointer-events:auto !important; cursor:pointer;">IGNITE
-            ENGINE <i class="fas fa-rocket"></i></button>
-    </div>
-
-    <!-- Fire Zone Visual -->
-    <div id="fireZone"
-        style="position:fixed; bottom:0; left:0; width:100%; height:15vh; background:linear-gradient(to top, rgba(239, 68, 68, 0.3), transparent); pointer-events:none; opacity:0; transition:opacity 0.5s; display:flex; justify-content:center; align-items:flex-end; padding-bottom:20px; font-weight:bold; letter-spacing:2px; color:rgba(255,255,255,0.7); text-transform:uppercase;">
-        CHANNEL ZONE
-    </div>
-    <style>
-        @media (hover: none) and (pointer: coarse) {
-            .active-game #fireZone {
-                opacity: 1 !important;
-            }
-        }
-    </style>
-    <!-- END SCREEN -->
-    <div id="endScreen" class="overlay">
-        <h2 style="margin-bottom:10px; font-size:2rem;">Journey Paused</h2>
-        <div class="card-preview">
-            <img id="generatedPreview" style="width:100%; height:100%; object-fit:cover;" />
-        </div>
-        <div style="display:flex; flex-direction:column; gap:15px; align-items:center; width:100%; max-width:300px;">
-            <!-- Primary Actions -->
-            <button id="shareBtn" class="btn" onclick="webShare()"
-                style="width:100%; background: linear-gradient(135deg, #4ECDC4 0%, #2ecc71 100%);">
-                Share Story <i class="fas fa-share-alt"></i>
-            </button>
-
-            <button id="downBtn" class="btn" onclick="downloadImage()"
-                style="width:100%; background: rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
-                Download Image <i class="fas fa-download"></i>
-            </button>
-
-            <!-- Secondary -->
-            <button class="btn" onclick="location.reload()"
-                style="width:100%; background:transparent; border:1px solid rgba(78, 205, 196, 0.5); color:#4ECDC4; box-shadow:none;">
-                Fly Again <i class="fas fa-redo"></i>
-            </button>
-        </div>
-        <p style="opacity: 0.7; margin-top: 10px; font-size: 0.9rem;">
-            <i class="fas fa-volume-up"></i> Sound Recommended
-        </p>
-        <div style="display:flex; gap:20px; margin-top:20px; font-size:1.1rem;">
-            <a href="../index.html" style="color:rgba(255,255,255,0.6); text-decoration:none; transition:0.3s;"
-                onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.6)'"><i
-                    class="fas fa-home"></i> Home</a>
-            <a href="../tools/mental-playground.html"
-                style="color:rgba(255,255,255,0.6); text-decoration:none; transition:0.3s;"
-                onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.6)'"><i
-                    class="fas fa-brain"></i> Playground</a>
-            <a href="../peers.html" style="color:rgba(255,255,255,0.6); text-decoration:none; transition:0.3s;"
-                onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.6)'"><i
-                    class="fas fa-users"></i> Peers</a>
-        </div>
-    </div>
-    </div>
-
-    <!-- TEMPLATE FOR SHARE GENERATOR -->
-    <div id="shareTemplate">
-        <div id="shareContainerInner"
-            style="width: 1080px; height: 1920px; font-family: 'Outfit', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; padding: 90px; box-sizing: border-box; background-color: #000; background: radial-gradient(circle at 50% 15%, #2a2a55 0%, #050510 70%); text-align:center;">
-
-            <!-- Logo (Sourced via Base64 logic below to guarantee load) -->
-            <img id="tpl_logo" src="" style="width: 450px; margin-bottom: 20px; margin-top:20px;" alt="Soulamore">
-            <!-- Fallback Text if Logo breaks -->
-            <h1 style="display:none; font-size:5rem; margin-bottom:20px; margin-top:20px;">SOULAMORE</h1>
-
-            <!-- Big Stats (Resized) -->
-            <div style="margin-top:200px; margin-bottom:60px;">
-                <div
-                    style="font-size:1.6rem; opacity:0.6; letter-spacing:5px; margin-bottom:5px; font-weight:600; text-transform:uppercase;">
-                    MY JOURNEY</div>
-                <div style="font-size:18rem; font-weight:900; line-height:0.85; color:#fff; text-shadow:0 0 100px rgba(255,255,255,0.6);"
-                    id="tpl_shareDist">0</div>
-                <div style="font-size:1.8rem; opacity:0.7; font-weight:400; letter-spacing:1px;">Light Years Travelled
-                </div>
-            </div>
-
-            <!-- List of Dropped Items -->
-            <div
-                style="background:rgba(255,255,255,0.06); padding:60px 40px; border-radius:50px; width:90%; border:2px solid rgba(255,255,255,0.15); margin-bottom:40px; margin-top:20px; box-shadow: 0 0 60px rgba(255,255,255,0.1);">
-                <div
-                    style="font-size:2rem; opacity:0.9; text-transform:uppercase; letter-spacing:3px; margin-bottom:30px; font-weight:800;">
-                    TODAY I CRUSHED:</div>
-                <div id="tpl_droppedList"
-                    style="font-size:3rem; color:#fff; line-height:1.3; font-weight:800; display:flex; flex-wrap:wrap; justify-content:center; gap:20px; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
-                </div>
-
-                <!-- Social Hook Inside Box -->
-                <div
-                    style="margin-top:50px; padding-top:40px; border-top:1px solid rgba(255,255,255,0.2); font-size:2.2rem; font-style:italic; opacity:1; line-height:1.4;">
-                    "I burst these worries today.<br>What will you let go of?"
-                </div>
-            </div>
-
-            <!-- Random Quote (Bottom) -->
-            <div style="margin-top:auto; font-size:3rem; max-width:900px; line-height:1.4; opacity:1; font-weight:600;"
-                id="tpl_shareQuote"></div>
-
-            <!-- Branding Footer -->
-            <div
-                style="margin-top:60px; margin-bottom:40px; font-size:1.6rem; opacity:0.6; letter-spacing:3px; text-transform:uppercase;">
-                Find your peace at soulamore.com
-            </div>
-
-        </div>
-    </div>
-
-
-    <script src="../assets/js/logo.js?v=2"></script>
-    <script>
-        /* --- ASSETS PRELOADER --- */
-        // Safe Logo Handling: Avoid name collision with external const
-        let internalLogo = "";
-        if (typeof logoBase64 !== 'undefined') {
-            internalLogo = logoBase64;
-            console.log("Logo Loaded from external file.");
-        } else {
-            console.warn("Logo.js failed. Using empty fallback.");
-        }
+        let logoBase64 = (typeof LOGO_DATA !== 'undefined') ? LOGO_DATA : "";
 
         // Legacy Preloader Removed (Now using external logo.js)
 
@@ -758,8 +300,8 @@
         rescueLogo.src = '../assets/images/favicon_symbol.png';
         const words = ["Anxiety", "Depression", "Burnout", "Doomscrolling", "Imposter Syndrome", "Gaslighting", "Ghosting", "FOMO", "Overthinking", "Situationship", "Toxic Positivity", "Social Battery", "Comparison", "Expectations", "Loneliness", "Regret"];
 
-        // INTRUSIVE POPUP CONTENT CONFIG
-        const enablePopups = true; // Easy toggle to reverse
+        // INTRUSIVE ADS CONFIG
+        const enableAds = true; // Easy toggle to reverse
         const popups = [];
 
         const quotes = [
@@ -929,7 +471,7 @@
 
             // SPAWN POPUPS (Intrusive Thoughts)
             // Reduced spawn rate from 0.002 to 0.001 (Less overwhelming)
-            if (running && enablePopups && Math.random() < 0.001) {
+            if (running && enableAds && Math.random() < 0.001) {
                 spawnPopup();
             }
 
@@ -1278,12 +820,11 @@
                     ctx.textAlign = 'left';
                     ctx.fillText(p.content.title, 5, 17);
 
-                    // Body Text (Centered with Wrapping)
+                    // Body Text (Centered in the dark blue area)
                     ctx.textAlign = 'center';
                     ctx.fillStyle = '#FFF';
                     ctx.font = '14px sans-serif';
-                    // ctx.fillText(p.content.body, p.w / 2, 55); // OLD (No Wrap)
-                    wrapText(ctx, p.content.body, p.w / 2, 50, p.w - 20, 18);
+                    ctx.fillText(p.content.body, p.w / 2, 55);
 
                     // Instruction overlay (first few times)
                     if (p.isNew) {
@@ -1413,31 +954,6 @@
             });
         }
 
-        // Helper for Canvas Text Wrapping
-        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-            const words = text.split(' ');
-            let line = '';
-            let lines = [];
-
-            for (let n = 0; n < words.length; n++) {
-                const testLine = line + words[n] + ' ';
-                const metrics = ctx.measureText(testLine);
-                const testWidth = metrics.width;
-                if (testWidth > maxWidth && n > 0) {
-                    lines.push(line);
-                    line = words[n] + ' ';
-                } else {
-                    line = testLine;
-                }
-            }
-            lines.push(line);
-
-            // Draw line by line centered
-            for (let k = 0; k < lines.length; k++) {
-                ctx.fillText(lines[k], x, y + (k * lineHeight));
-            }
-        }
-
         // Input Handling
         function getMousePos(evt) {
             const rect = canvas.getBoundingClientRect();
@@ -1466,10 +982,6 @@
                 if (heat > 50) player.color = '#FFAA6B'; // Orange warning
                 else player.color = '#4ECDC4';
             }
-
-            // UI UPDATE (Restored)
-            const hb = document.getElementById('heatBar');
-            if (hb) hb.style.width = Math.min(100, Math.max(0, heat)) + '%';
         }
 
 
@@ -1553,13 +1065,6 @@
                     if (overlay) overlay.classList.remove('active');
                 }
 
-                // Show HUD & Heat Bar (Restored)
-                const hud = document.getElementById('hud');
-                if (hud) hud.style.opacity = '1';
-
-                const heatCont = document.getElementById('heatContainer');
-                if (heatCont) heatCont.style.opacity = '1';
-
                 const endScreen = document.getElementById('endScreen');
                 if (endScreen) endScreen.classList.remove('active');
 
@@ -1592,9 +1097,6 @@
             const randColor = palettes[Math.floor(Math.random() * palettes.length)];
             const randQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
-            // Store for sharing
-            window.lastGameData = { color: randColor, quote: randQuote };
-
             // Set Favicon Symbol or Fallback Text
             const logoEl = document.getElementById('tpl_logo');
             const titleEl = logoEl ? logoEl.nextElementSibling : null;
@@ -1613,136 +1115,110 @@
                 logoEl.style.padding = "0";
             }
 
-            if (typeof generateImage === 'function') {
-                // Generate preview only first
-                generateImage(randColor, randQuote, true);
-            }
+            if (typeof generateImage === 'function') generateImage(randColor, randQuote, true);
         }
 
-        // New Independent Functions
-        async function webShare() {
-            const btn = document.getElementById('shareBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+        function generateImage(bgColor, quote, isPreview) {
+            const tpl = document.getElementById('shareTemplate');
+            const clone = tpl.cloneNode(true);
+            clone.id = "activeShareCapture";
+            clone.style.display = "flex";
+            clone.style.position = "fixed";
+            clone.style.top = "0px";
+            clone.style.left = "0px";
+            clone.style.zIndex = "-9999";
+            clone.style.opacity = "1";
 
-            try {
-                const blob = await generateImage(null, null, false, true); // Get Blob
-                if (!blob) throw new Error("Image Generation Failed");
+            const inner = clone.querySelector('#shareContainerInner');
+            inner.style.background = bgColor;
 
-                const file = new File([blob], "soulamore-journey.png", { type: "image/png" });
+            clone.querySelector('#tpl_shareDist').innerText = Math.floor(distance);
+            clone.querySelector('#tpl_shareQuote').innerHTML = `"${quote}"`;
 
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({
-                        files: [file],
-                        title: 'My Soulamore Journey',
-                        text: 'I just cleared my mind on Soulamore.',
-                    });
-                    btn.innerHTML = 'Shared! <i class="fas fa-check"></i>';
-                } else {
-                    throw new Error("Web Share not supported");
-                }
-            } catch (err) {
-                console.warn("Share failed, falling back to download", err);
-                downloadImage(); // Fallback
-                btn.innerHTML = originalText;
+            let uniqueDrops = [...new Set(droppedWords)];
+            if (uniqueDrops.length > 5) uniqueDrops = uniqueDrops.slice(uniqueDrops.length - 5);
+            if (uniqueDrops.length === 0) {
+                clone.querySelector('#tpl_droppedList').innerHTML = '<span style="opacity:0.5; font-size:1.5rem;">Nothing... yet.</span>';
+            } else {
+                clone.querySelector('#tpl_droppedList').innerHTML = uniqueDrops.map(w =>
+                    `<span>${w}</span>`
+                ).join(' <span style="opacity:0.4">•</span> ');
             }
-            setTimeout(() => btn.innerHTML = originalText, 3000);
-        }
 
-        async function downloadImage() {
-            const btn = document.getElementById('downBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            document.body.appendChild(clone);
 
-            try {
-                const dataUrl = await generateImage(null, null, false, false); // Get DataURL
-                const link = document.createElement('a');
-                link.download = `soulamore-journey-${Date.now()}.png`;
-                link.href = dataUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (e) {
-                alert("Download failed. Please try again.");
-            }
-            btn.innerHTML = 'Download Image <i class="fas fa-download"></i>';
-        }
+            setTimeout(() => {
+                html2canvas(inner, {
+                    scale: isPreview ? 0.3 : 1,
+                    useCORS: true,
+                    backgroundColor: null,
+                    scrollX: 0,
+                    scrollY: -window.scrollY
+                }).then(canvas => {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    if (isPreview) {
+                        const previewImg = document.getElementById('generatedPreview');
+                        if (previewImg) previewImg.src = dataUrl;
+                    } else {
+                        // Attempt Download
+                        const link = document.createElement('a');
+                        link.download = `soulamore-journey-${Math.floor(distance)}.png`;
+                        link.href = dataUrl;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
 
-        // Refactored Generator (Returns Promise)
-        function generateImage(forceColor, forceQuote, isPreview, returnBlob) {
-            return new Promise((resolve, reject) => {
-                const tpl = document.getElementById('shareTemplate');
-                const clone = tpl.cloneNode(true);
-                clone.id = "activeShareCapture";
-                clone.style.display = "flex";
-                clone.style.position = "fixed";
-                clone.style.top = "0px";
-                clone.style.left = "0px";
-                clone.style.zIndex = "-9999";
-                clone.style.opacity = "1";
+                        // Mobile Fallback: Update the preview image too, so they can long-press
+                        document.getElementById('generatedPreview').src = dataUrl;
 
-                // Consistency check for inputs (use existing if null passed aka button click)
-                // In a real refactor we'd store these state vars better, but for now we trust the DOM or pass nulls
-                // actually, let's grab from the DOM if null, or random logic is duplicated. 
-                // ideally endGame calls this once to set preview, then we just re-capture the existing preview? 
-                // No, we need high-res. We can grab values from the DOM if needed or just re-generate.
-                // Simpler: Reuse the values generated in endGame? 
-                // Let's just grab current values from the invisible tpl if possible or just re-render.
+                        const btn = document.querySelector('button[onclick="downloadShare()"]');
+                        if (btn) btn.innerHTML = 'Share Story <i class="fas fa-check"></i>';
 
-                // For simplicity/speed in this patch: Re-read the inputs from the PREVIEW currently on screen?
-                // Or just expect them to be passed? 
-                // FIX: Let's assume endGame sets global vars for the last result, or we just re-read the hud.
-                // Let's rely on the clone logic using the SAME data as `endGame` OR just reading global `distance`.
-
-                const inner = clone.querySelector('#shareContainerInner');
-                // Re-apply randoms if provided, else use last (we need to store them if we want exact match)
-                // Hack: We'll just re-use the preview logic if arguments are null? 
-                // Better: Let's store `lastEndGameData` global.
-
-                if (window.lastGameData) {
-                    inner.style.background = window.lastGameData.color;
-                    clone.querySelector('#tpl_shareQuote').innerHTML = `"${window.lastGameData.quote}"`;
-                }
-
-                clone.querySelector('#tpl_shareDist').innerText = Math.floor(distance);
-
-                let uniqueDrops = [...new Set(droppedWords)];
-                if (uniqueDrops.length > 5) uniqueDrops = uniqueDrops.slice(uniqueDrops.length - 5);
-                if (uniqueDrops.length === 0) {
-                    clone.querySelector('#tpl_droppedList').innerHTML = '<span style="opacity:0.5; font-size:1.5rem;">Nothing... yet.</span>';
-                } else {
-                    clone.querySelector('#tpl_droppedList').innerHTML = uniqueDrops.map(w =>
-                        `<span>${w}</span>`
-                    ).join(' <span style="opacity:0.4">•</span> ');
-                }
-
-                document.body.appendChild(clone);
-
-                setTimeout(() => {
-                    html2canvas(inner, {
-                        scale: isPreview ? 0.35 : 2, // Higher res for output
-                        useCORS: true,
-                        allowTaint: true,
-                        backgroundColor: null,
-                        scrollX: 0,
-                        scrollY: -window.scrollY
-                    }).then(canvas => {
-                        document.body.removeChild(clone);
-                        if (isPreview) {
-                            const previewImg = document.getElementById('generatedPreview');
-                            if (previewImg) previewImg.src = canvas.toDataURL('image/png');
-                            resolve(true);
+                        // 3. Add Logo (Restored with Base64 for reliability)
+                        const logoImg = document.createElement('img');
+                        // Use Base64 if available (loaded from logo.js), else fallback to path
+                        if (typeof logoBase64 !== 'undefined' && logoBase64) {
+                            logoImg.src = logoBase64;
                         } else {
-                            if (returnBlob) {
-                                canvas.toBlob(blob => resolve(blob), 'image/png');
-                            } else {
-                                resolve(canvas.toDataURL('image/png'));
-                            }
+                            logoImg.src = '../assets/images/logo.png';
                         }
-                    }).catch(reject);
-                }, 100);
-            });
-        }
+                        logoImg.crossOrigin = "anonymous"; // Important for html2canvas
+                        logoImg.style.width = '180px';
+                        logoImg.style.marginBottom = '20px';
+                        logoImg.style.display = 'block';
+                        inner.insertBefore(logoImg, inner.firstChild);
 
+                        // 4. Add "My Journey" label
+                        const label = document.createElement('div');
+                        label.innerText = 'MY JOURNEY';
+                        label.style.fontSize = '1.2rem';
+                        label.style.color = '#4ECDC4';
+                        label.style.marginBottom = '10px';
+                        inner.insertBefore(label, logoImg.nextSibling);
+
+                        // Interaction Feedback
+                        const toast = document.createElement('div');
+                        toast.innerText = "Image Captured! If download didn't start, long-press the image above.";
+                        toast.style.position = 'fixed';
+                        toast.style.bottom = '20px';
+                        toast.style.left = '50%';
+                        toast.style.transform = 'translateX(-50%)';
+                        toast.style.background = 'rgba(0,0,0,0.8)';
+                        toast.style.color = '#4ECDC4';
+                        toast.style.padding = '15px 25px';
+                        toast.style.borderRadius = '30px';
+                        toast.style.zIndex = '999999';
+                        document.body.appendChild(toast);
+                        setTimeout(() => toast.remove(), 4000);
+                    }
+                    if (document.body.contains(clone)) document.body.removeChild(clone);
+                }).catch(err => {
+                    console.error("Capture error:", err);
+                    if (document.body.contains(clone)) document.body.removeChild(clone);
+                    alert("Capture failed. Please try screenshotting the result.");
+                });
+            }, 600); // 600ms safe wait
+        }
 
         function downloadShare() {
             const btn = event.currentTarget;
@@ -1786,49 +1262,3 @@
         // Start Background Animation
         resize();
         loop();
-
-        (function () {
-            // ... listener logic ...
-        })();
-    </script>
-
-    <!-- NUCLEAR EVENT HANDLER (Safety Script) -->
-    <script>
-        (function () {
-            console.log("--- NUCLEAR SAFETY SCRIPT STARTED ---");
-            const btn = document.getElementById('igniteBtn');
-
-            if (!btn) {
-                console.error("Button Missing!");
-                return;
-            }
-
-            // Check if Main Engine Loaded
-            if (typeof initGame !== 'function') {
-                btn.style.backgroundColor = "red";
-                btn.innerText = "ERROR LOADING ENGINE";
-                btn.onclick = function () {
-                    alert("CRITICAL ERROR:\nThe game engine failed to load.\nThis usually means a SyntaxError or Ad-Blocker blocked the main script.\nPlease check console.");
-                };
-                return;
-            }
-
-            // Attach Robust Listeners
-            const ignite = function (e) {
-                if (e) { e.preventDefault(); e.stopPropagation(); }
-                console.log("NUCLEAR CLICK");
-                try {
-                    initGame();
-                } catch (err) {
-                    alert("Runtime Error: " + err.message);
-                }
-            };
-
-            btn.addEventListener('touchstart', ignite, { passive: false });
-            btn.addEventListener('click', ignite);
-            console.log("--- NUCLEAR LISTENERS ATTACHED ---");
-        })();
-    </script>
-</body>
-
-</html>
