@@ -319,7 +319,8 @@
                 }
             </style>
         </div>
-        <button class="btn" onclick="initGame()">IGNITE ENGINE <i class="fas fa-rocket"></i></button>
+        <button id="igniteBtn" class="btn" style="z-index:99999; pointer-events:auto !important; cursor:pointer;">IGNITE
+            ENGINE <i class="fas fa-rocket"></i></button>
     </div>
 
     <!-- Fire Zone Visual -->
@@ -450,7 +451,7 @@
 
         // GUIDANCE MESSAGES DATA
         // INTRUSIVE POPUP CONTENT (The "Ads")
-        const adContent = [
+        const thoughtContent = [
             // CORE
             { title: "DID YOU KNOW?", body: "Soulamore gives your thoughts a safe place to land." },
             { title: "REMINDER", body: "Soulamore creates space without asking you to perform." },
@@ -1437,7 +1438,7 @@
                 h: h,
                 vx: (Math.random() - 0.5) * 0.5,
                 vy: 0.3 + Math.random() * 0.5, // Slower drift
-                content: adContent[Math.floor(Math.random() * adContent.length)],
+                content: thoughtContent[Math.floor(Math.random() * thoughtContent.length)], // Renamed from adContent
                 isNew: true,
                 hp: 20 // Tanky! Needs ~20 hits to destroy via body, or 1 hit via X button
             });
@@ -1688,6 +1689,31 @@
         // Start Background Animation
         resize();
         loop();
+
+        /* --- ROBUST EVENT HANDLING (NUCLEAR FIX) --- */
+        (function () {
+            const btn = document.getElementById('igniteBtn');
+            if (btn) {
+                console.log("Attaching Nuclear Listeners to Ignite Button");
+
+                // Touch: Prevent ghost clicks
+                btn.addEventListener('touchstart', function (e) {
+                    e.preventDefault(); // Stop mouse emulation
+                    e.stopPropagation();
+                    console.log("TouchStart Triggered");
+                    initGame();
+                }, { passive: false });
+
+                // Click: Fallback for desktop
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log("Click Triggered");
+                    initGame();
+                });
+            } else {
+                console.error("CRITICAL: Ignite Button not found!");
+            }
+        })();
     </script>
 </body>
 
