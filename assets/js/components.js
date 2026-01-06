@@ -327,6 +327,8 @@ const NAV_DATA = [
         type: 'dropdown',
         children: [
             { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html', style: 'color:var(--ember-orange);' },
+            { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
+            { id: 'nav-soulrider', label: 'Soul Rider (Beta)', href: 'tools/soul-rider.html', style: 'color:#F49F75;' },
             { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
             { id: 'nav-play', label: 'Mental Playground', href: 'tools/playground.html' },
             { id: 'nav-soulbot', label: 'SoulBot AI', href: 'tools/soulbot.html' },
