@@ -1492,7 +1492,7 @@
             pulses = [];
             overheated = false;
             running = true;
-            // loop() runs globally, so we just set running=true
+            // loop is already running globally
         }
 
         // Alias for safety
@@ -1526,7 +1526,7 @@
                 logoEl.style.padding = "0";
             }
 
-            generateImage(randColor, randQuote, true);
+            if (typeof generateImage === 'function') generateImage(randColor, randQuote, true);
         }
 
         function generateImage(bgColor, quote, isPreview) {
@@ -1568,7 +1568,8 @@
                 }).then(canvas => {
                     const dataUrl = canvas.toDataURL('image/png');
                     if (isPreview) {
-                        document.getElementById('generatedPreview').src = dataUrl;
+                        const previewImg = document.getElementById('generatedPreview');
+                        if (previewImg) previewImg.src = dataUrl;
                     } else {
                         // Attempt Download
                         const link = document.createElement('a');
