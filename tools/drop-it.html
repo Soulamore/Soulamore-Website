@@ -1556,15 +1556,19 @@
                         const btn = document.querySelector('button[onclick="downloadShare()"]');
                         if (btn) btn.innerHTML = 'Share Story <i class="fas fa-check"></i>';
 
-                        // 3. Add Logo (Restored)
+                        // 3. Add Logo (Restored with Base64 for reliability)
                         const logoImg = document.createElement('img');
-                        // Version 2 logo path (adjust if needed to match successful loads)
-                        logoImg.src = '../assets/images/logo.png';
+                        // Use Base64 if available (loaded from logo.js), else fallback to path
+                        if (typeof logoBase64 !== 'undefined' && logoBase64) {
+                            logoImg.src = logoBase64;
+                        } else {
+                            logoImg.src = '../assets/images/logo.png';
+                        }
                         logoImg.crossOrigin = "anonymous"; // Important for html2canvas
                         logoImg.style.width = '180px';
                         logoImg.style.marginBottom = '20px';
                         logoImg.style.display = 'block';
-                        inner.insertBefore(logoImg, inner.firstChild); // Changed wrapper to inner
+                        inner.insertBefore(logoImg, inner.firstChild);
 
                         // 4. Add "My Journey" label
                         const label = document.createElement('div');
@@ -1572,7 +1576,7 @@
                         label.style.fontSize = '1.2rem';
                         label.style.color = '#4ECDC4';
                         label.style.marginBottom = '10px';
-                        inner.insertBefore(label, logoImg.nextSibling); // Insert after logo
+                        inner.insertBefore(label, logoImg.nextSibling);
 
                         // Interaction Feedback
                         const toast = document.createElement('div');
