@@ -24,8 +24,9 @@
     const isDesktop = window.innerWidth > 900;
     // RESTORED IFRAME for "Live Site" preview
     // Added pointer-events: none so users can't click inside the preview
+    // Added timestamp to force refresh and bypass cache for the sticker fix
     const iframeHTML = isDesktop
-        ? `<iframe src="./index.html" class="site-iframe" style="pointer-events: none;" title="App Preview"></iframe>`
+        ? `<iframe src="./index.html?v=${new Date().getTime()}" class="site-iframe" style="pointer-events: none;" title="App Preview"></iframe>`
         : `<!-- Phone View Hidden on Mobile -->`;
 
     // 1. Create the Popup HTML Structure
@@ -50,7 +51,7 @@
             }
 
             .popup-content {
-                padding: 40px 35px; /* Compact padding */
+                padding: 20px 35px 35px 35px; /* Reduced top padding (20px) to move badge UP */
                 display: flex; 
                 flex-direction: column; 
                 justify-content: center; /* Center vertically */
@@ -58,7 +59,7 @@
                 height: 100%;
             }
 
-            .badge { background: rgba(78, 205, 196, 0.1); color: #4ECDC4; border: 1px solid #4ECDC4; padding: 4px 12px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; letter-spacing: 1px; width: fit-content; margin-bottom: 15px; font-family: 'Plus Jakarta Sans', sans-serif; }
+            .badge { background: rgba(78, 205, 196, 0.1); color: #4ECDC4; border: 1px solid #4ECDC4; padding: 4px 12px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; letter-spacing: 1px; width: fit-content; margin-bottom: 10px; font-family: 'Plus Jakarta Sans', sans-serif; }
             .pop-h1 { font-family: 'Outfit', sans-serif; font-size: 2.5rem; line-height: 1.1; margin-bottom: 12px; color: white; text-shadow: 0 0 25px rgba(255, 255, 255, 0.5); }
             .pop-desc { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.95rem; opacity: 0.9; margin-bottom: 20px; color: #f8fafc; line-height: 1.5; }
             
