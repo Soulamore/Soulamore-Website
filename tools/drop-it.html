@@ -962,19 +962,23 @@
                                 // Hit the box!
                                 missiles.splice(i, 1); // remove missile
 
-                                // Did it hit the POPUP?
-                                // ULTRA-HITBOX: Tapping ANYWHERE on the popup destroys it.
-                                if (m.x > p.x && m.x < p.x + p.w && m.y > p.y && m.y < p.y + p.h) {
-                                    // CRITICAL HIT
+                                // HITBOX LOGIC: Only the Close Button (Top Right) kills it
+                                // Button is approx 30x30 at top right
+                                const btnSize = 35;
+                                const isCloseHit = (m.x > (p.x + p.w - btnSize) && m.y < (p.y + btnSize));
+
+                                if (isCloseHit) {
+                                    // CRITICAL HIT - DESTROY
                                     createExplosion(m.x, m.y);
                                     popups.splice(j, 1); // Close popup
                                     sfx('explode');
                                     score += 500; // Bonus points
                                 } else {
-                                    // Hit the body (ineffective)
+                                    // BODY HIT - RESIST
                                     sfx('shoot'); // Just a thud
-                                    // Shake the popup
+                                    // Shake and Push Up slightly
                                     p.x += (Math.random() - 0.5) * 5;
+                                    p.y -= 2; // Knockback
                                     p.isNew = false; // Stop showing instruction
                                 }
                                 break; // Stop checking other collisions for this missile
@@ -1403,17 +1407,20 @@
             }
         }
 
+        // SCHEDULER: 10 seconds check
+        setInterval(scheduler, 10000);
+
         function spawnPopup() {
-            const w = 200;
-            const h = 80;
+            const w = 300; // Wider
+            const h = 120; // Taller
             const x = Math.random() * (width - w);
             popups.push({
                 x: x,
-                y: -100,
+                y: -150, // Start higher up
                 w: w,
                 h: h,
                 vx: (Math.random() - 0.5) * 0.5,
-                vy: 0.5 + Math.random(), // Slow drift down
+                vy: 0.3 + Math.random() * 0.5, // Slower drift
                 content: adContent[Math.floor(Math.random() * adContent.length)],
                 isNew: true
             });
