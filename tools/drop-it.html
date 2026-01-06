@@ -1690,29 +1690,46 @@
         resize();
         loop();
 
-        /* --- ROBUST EVENT HANDLING (NUCLEAR FIX) --- */
         (function () {
+            // ... listener logic ...
+        })();
+    </script>
+
+    <!-- NUCLEAR EVENT HANDLER (Safety Script) -->
+    <script>
+        (function () {
+            console.log("--- NUCLEAR SAFETY SCRIPT STARTED ---");
             const btn = document.getElementById('igniteBtn');
-            if (btn) {
-                console.log("Attaching Nuclear Listeners to Ignite Button");
 
-                // Touch: Prevent ghost clicks
-                btn.addEventListener('touchstart', function (e) {
-                    e.preventDefault(); // Stop mouse emulation
-                    e.stopPropagation();
-                    console.log("TouchStart Triggered");
-                    initGame();
-                }, { passive: false });
-
-                // Click: Fallback for desktop
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    console.log("Click Triggered");
-                    initGame();
-                });
-            } else {
-                console.error("CRITICAL: Ignite Button not found!");
+            if (!btn) {
+                console.error("Button Missing!");
+                return;
             }
+
+            // Check if Main Engine Loaded
+            if (typeof initGame !== 'function') {
+                btn.style.backgroundColor = "red";
+                btn.innerText = "ERROR LOADING ENGINE";
+                btn.onclick = function () {
+                    alert("CRITICAL ERROR:\nThe game engine failed to load.\nThis usually means a SyntaxError or Ad-Blocker blocked the main script.\nPlease check console.");
+                };
+                return;
+            }
+
+            // Attach Robust Listeners
+            const ignite = function (e) {
+                if (e) { e.preventDefault(); e.stopPropagation(); }
+                console.log("NUCLEAR CLICK");
+                try {
+                    initGame();
+                } catch (err) {
+                    alert("Runtime Error: " + err.message);
+                }
+            };
+
+            btn.addEventListener('touchstart', ignite, { passive: false });
+            btn.addEventListener('click', ignite);
+            console.log("--- NUCLEAR LISTENERS ATTACHED ---");
         })();
     </script>
 </body>
