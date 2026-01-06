@@ -143,6 +143,17 @@ export function subscribeToShredCount(callback) {
 }
 
 // Make globally available for inline HTML onclicks (via a bridge helper if needed)
+// --- 10. NEWSLETTER LIVE COUNT ---
+export function subscribeToNewsletterCount(callback) {
+    const q = query(collection(db, "newsletters"));
+    return onSnapshot(q, (snapshot) => {
+        if (callback) callback(snapshot.size);
+    }, (error) => {
+        console.error("Error subscribing to newsletter stats:", error);
+    });
+}
+
+// Make globally available for inline HTML onclicks (via a bridge helper if needed)
 window.SoulBackend = {
     submitVent: handleVentSubmission,
     submitEcho: handleEcho,
@@ -152,7 +163,8 @@ window.SoulBackend = {
     submitPostcard: handlePostcard,
     submitNewsletter: handleNewsletter,
     getAggregateStats: getAggregateStats,
-    subscribeToShredCount: subscribeToShredCount
+    subscribeToShredCount: subscribeToShredCount,
+    subscribeToNewsletterCount: subscribeToNewsletterCount
 };
 
 // --- 8. NEWSLETTER SUBSCRIPTION ---
