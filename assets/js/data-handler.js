@@ -135,8 +135,39 @@ window.SoulBackend = {
     submitApp: handleApplication,
     submitContact: handleContact,
     submitPostcard: handlePostcard,
+    submitNewsletter: handleNewsletter,
     getAggregateStats: getAggregateStats
 };
+
+// --- 8. NEWSLETTER SUBSCRIPTION ---
+async function handleNewsletter(email) {
+    if (!email || !email.includes('@')) return false;
+
+    try {
+        // Attempt to get location data (City/State)
+        let locationData = { city: "Unknown", region: "Unknown", country: "Unknown" };
+        try {
+            const ipRes = await fetch('https://ipapi.co/json/');
+            const ipJson = await ipRes.json();
+            if (ipJson.city) locationData.city = ipJson.city;
+            if (ipJson.region) locationData.region = ipJson.region;
+            if (ipJson.country_name) locationData.country = ipJson.country_name;
+        } catch (e) {
+            console.warn("Location fetch failed for newsletter:", e);
+        }
+
+        await addDoc(collection(db, "newsletters"), {
+            email: email,
+            location: locationData,
+            timestamp: serverTimestamp(),
+            source: window.location.pathname
+        });
+        return true;
+    } catch (e) {
+        console.error("Newsletter error:", e);
+        return false;
+    }
+}
 
 // --- 7. AGGREGATE STATS (Vent/Shred Counts) ---
 export async function getAggregateStats(type) {
