@@ -8,8 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script src="../assets/js/html2canvas.min.js"></script>
-    <script src="../assets/js/logo.js"></script>
+    <script src="../assets/js/html2canvas.min.js?v=FIX_MOBILE_06"></script>
+    <script src="../assets/js/logo.js?v=FIX_MOBILE_06"></script>
     <script>
         // Suppress "Wiring Backend" / Launch Popup on this specific tool page
         sessionStorage.setItem('soulamore_launch_popup_seen', 'true');
@@ -128,6 +128,7 @@
             margin-bottom: 10px;
             background: linear-gradient(to right, #fff, #4ECDC4);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -218,638 +219,671 @@
             <strong>SPACE (or Tap)</strong> to Fire Positive Energy.<br>
             <strong>SPACE (Near Enemies)</strong> to Pulse & Push them away!<br>
         </div>
-        <button class="btn" onclick="startGame()" ontouchstart="startGame()">Ignite Engines</button>
-    </div>
+        <button class="btn" style="touch-action: manipulation;" onclick="startGame()"
+            ontouchstart="event.stopPropagation(); startGame()"
+            ontouchend="event.preventDefault(); event.stopPropagation(); startGame()">Ignite
+            Engines</button>
 
-    <!-- END SCREEN -->
-    <div id="endScreen" class="overlay">
-        <h2 style="margin-bottom:10px; font-size:2rem;">Journey Paused</h2>
-        <div class="card-preview">
-            <img id="generatedPreview" style="width:100%; height:100%; object-fit:cover;" />
-        </div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn" onclick="downloadShare()">Share Story <i class="fas fa-share-alt"></i></button>
-            <button class="btn" onclick="location.reload()"
-                style="background:transparent; border:1px solid white; color:white; box-shadow:none;">Fly Again</button>
-        </div>
-    </div>
+        <!-- Mobile Back Button -->
+        <a href="../index.html" class="mobile-back-btn" ontouchstart="event.stopPropagation()">
+            <i class="fas fa-chevron-left"></i> Back
+        </a>
+        <style>
+            .mobile-back-btn {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                padding: 10px 15px;
+                border-radius: 50px;
+                text-decoration: none;
+                font-family: 'Outfit';
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                z-index: 99999;
+                pointer-events: all;
+            }
+        </style>
 
-    <!-- TEMPLATE FOR SHARE GENERATOR -->
-    <div id="shareTemplate">
-        <div id="shareContainerInner"
-            style="width: 1080px; height: 1920px; font-family: 'Outfit', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; padding: 100px; box-sizing: border-box; background-color: #000; text-align:center;">
-
-            <!-- Logo (Sourced via Base64 logic below to guarantee load) -->
-            <img id="tpl_logo" src="" style="width: 280px; margin-bottom: 20px; margin-top:40px;" alt="Soulamore"
-                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <h1 style="display:none; font-size:4rem; margin-bottom:20px; margin-top:40px;">SOULAMORE</h1>
-
-            <!-- Big Stats -->
-            <div style="margin-top:50px; margin-bottom:50px;">
-                <div style="font-size:1.5rem; opacity:0.6; letter-spacing:4px; margin-bottom:10px; font-weight:700;">MY
-                    JOURNEY</div>
-                <div style="font-size:11rem; font-weight:700; line-height:1; color:#fff; text-shadow:0 0 50px rgba(255,255,255,0.3);"
-                    id="tpl_shareDist">0</div>
-                <div style="font-size:2.5rem; opacity:0.8;">Light Years Travelled</div>
+        <!-- END SCREEN -->
+        <div id="endScreen" class="overlay">
+            <h2 style="margin-bottom:10px; font-size:2rem;">Journey Paused</h2>
+            <div class="card-preview">
+                <img id="generatedPreview" style="width:100%; height:100%; object-fit:cover;" />
             </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn" onclick="downloadShare()">Share Story <i class="fas fa-share-alt"></i></button>
+                <button class="btn" onclick="location.reload()"
+                    style="background:transparent; border:1px solid white; color:white; box-shadow:none;">Fly
+                    Again</button>
+            </div>
+        </div>
 
-            <!-- List of Dropped Items -->
-            <div
-                style="background:rgba(255,255,255,0.08); padding:60px 50px; border-radius:40px; width:85%; border:2px solid rgba(255,255,255,0.15); margin-bottom:40px; margin-top:30px;">
-                <div
-                    style="font-size:1.8rem; opacity:0.8; text-transform:uppercase; letter-spacing:3px; margin-bottom:40px; font-weight:700;">
-                    TODAY I CRUSHED:</div>
-                <div id="tpl_droppedList"
-                    style="font-size:3.5rem; color:#fff; line-height:1.4; font-weight:700; display:flex; flex-wrap:wrap; justify-content:center; gap:25px;">
+        <!-- TEMPLATE FOR SHARE GENERATOR -->
+        <div id="shareTemplate">
+            <div id="shareContainerInner"
+                style="width: 1080px; height: 1920px; font-family: 'Outfit', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; padding: 100px; box-sizing: border-box; background-color: #000; text-align:center;">
+
+                <!-- Logo (Sourced via Base64 logic below to guarantee load) -->
+                <img id="tpl_logo" src="" style="width: 280px; margin-bottom: 20px; margin-top:40px;" alt="Soulamore"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <h1 style="display:none; font-size:4rem; margin-bottom:20px; margin-top:40px;">SOULAMORE</h1>
+
+                <!-- Big Stats -->
+                <div style="margin-top:50px; margin-bottom:50px;">
+                    <div
+                        style="font-size:1.5rem; opacity:0.6; letter-spacing:4px; margin-bottom:10px; font-weight:700;">
+                        MY
+                        JOURNEY</div>
+                    <div style="font-size:11rem; font-weight:700; line-height:1; color:#fff; text-shadow:0 0 50px rgba(255,255,255,0.3);"
+                        id="tpl_shareDist">0</div>
+                    <div style="font-size:2.5rem; opacity:0.8;">Light Years Travelled</div>
                 </div>
 
-                <!-- Social Hook Inside Box -->
+                <!-- List of Dropped Items -->
                 <div
-                    style="margin-top:50px; padding-top:40px; border-top:1px solid rgba(255,255,255,0.2); font-size:1.8rem; font-style:italic; opacity:0.9; line-height:1.5;">
-                    "I burst these worries today.<br>What will you let go of?"
+                    style="background:rgba(255,255,255,0.08); padding:60px 50px; border-radius:40px; width:85%; border:2px solid rgba(255,255,255,0.15); margin-bottom:40px; margin-top:30px;">
+                    <div
+                        style="font-size:1.8rem; opacity:0.8; text-transform:uppercase; letter-spacing:3px; margin-bottom:40px; font-weight:700;">
+                        TODAY I CRUSHED:</div>
+                    <div id="tpl_droppedList"
+                        style="font-size:3.5rem; color:#fff; line-height:1.4; font-weight:700; display:flex; flex-wrap:wrap; justify-content:center; gap:25px;">
+                    </div>
+
+                    <!-- Social Hook Inside Box -->
+                    <div
+                        style="margin-top:50px; padding-top:40px; border-top:1px solid rgba(255,255,255,0.2); font-size:1.8rem; font-style:italic; opacity:0.9; line-height:1.5;">
+                        "I burst these worries today.<br>What will you let go of?"
+                    </div>
                 </div>
+
+                <!-- Random Quote (Bottom) -->
+                <div style="margin-top:auto; font-size:2.2rem; max-width:850px; line-height:1.5; opacity:0.9;"
+                    id="tpl_shareQuote"></div>
+
+                <!-- Branding Footer -->
+                <div
+                    style="margin-top:80px; margin-bottom:40px; font-size:1.5rem; opacity:0.5; letter-spacing:2px; text-transform:uppercase;">
+                    Find your peace at soulamore.com
+                </div>
+
             </div>
-
-            <!-- Random Quote (Bottom) -->
-            <div style="margin-top:auto; font-size:2.2rem; max-width:850px; line-height:1.5; opacity:0.9;"
-                id="tpl_shareQuote"></div>
-
-            <!-- Branding Footer -->
-            <div
-                style="margin-top:80px; margin-bottom:40px; font-size:1.5rem; opacity:0.5; letter-spacing:2px; text-transform:uppercase;">
-                Find your peace at soulamore.com
-            </div>
-
         </div>
-    </div>
 
 
-    <script>
-        /* --- ASSETS PRELOADER --- */
-        let logoBase64 = "";
+        <script>
+            /* --- ASSETS PRELOADER --- */
+            let logoBase64 = "";
 
-        // Convert Logo to Base64 immediately to avoid CORS/Loading issues in Html2Canvas
-        (function preloadLogo() {
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.src = '../assets/images/logo.png';
-            img.onload = function () {
-                const c = document.createElement('canvas');
-                c.width = img.width;
-                c.height = img.height;
-                const ctx = c.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                logoBase64 = c.toDataURL('image/png');
-            };
-            img.onerror = function () {
-                console.log("Logo failed to load via JS");
-            };
-        })();
+            // Convert Logo to Base64 immediately to avoid CORS/Loading issues in Html2Canvas
+            (function preloadLogo() {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.src = '../assets/images/logo.png';
+                img.onload = function () {
+                    const c = document.createElement('canvas');
+                    c.width = img.width;
+                    c.height = img.height;
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    logoBase64 = c.toDataURL('image/png');
+                };
+                img.onerror = function () {
+                    console.log("Logo failed to load via JS");
+                };
+            })();
 
-        /* --- GAME ENGINE --- */
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let running = false;
-        let speed = 0;
-        let maxSpeed = 8; // FIXED: Capped speed at 8 (Zen mode)
-        let distance = 0;
-        let score = 0;
-        let droppedWords = [];
-        let pulses = [];
-        let lastFired = 0; // Cooldown tracker
+            /* --- GAME ENGINE --- */
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let running = false;
+            let speed = 0;
+            let maxSpeed = 8; // FIXED: Capped speed at 8 (Zen mode)
+            let distance = 0;
+            let score = 0;
+            let droppedWords = [];
+            let pulses = [];
+            let lastFired = 0; // Cooldown tracker
 
-        let keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false, " ": false };
+            let keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false, " ": false };
 
-        /* Audio */
-        let audioCtx;
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
-        function sfx(type) {
-            if (!audioCtx) return;
-            const o = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            o.connect(g);
-            g.connect(audioCtx.destination);
-            const t = audioCtx.currentTime;
-
-            if (type === 'attach') {
-                o.frequency.setValueAtTime(120, t);
-                o.frequency.exponentialRampToValueAtTime(60, t + 0.3);
-                g.gain.setValueAtTime(0.1, t);
-                g.gain.linearRampToValueAtTime(0.01, t + 0.3);
-                o.start(t); o.stop(t + 0.3);
-            } else if (type === 'shoot') {
-                o.type = 'square';
-                o.frequency.setValueAtTime(400, t);
-                o.frequency.exponentialRampToValueAtTime(100, t + 0.1);
-                g.gain.setValueAtTime(0.03, t);
-                g.gain.linearRampToValueAtTime(0, t + 0.1);
-                o.start(t); o.stop(t + 0.1);
-            } else if (type === 'explode') {
-                o.type = 'sawtooth';
-                o.frequency.setValueAtTime(100, t);
-                o.frequency.exponentialRampToValueAtTime(30, t + 0.2);
-                g.gain.setValueAtTime(0.05, t);
-                g.gain.linearRampToValueAtTime(0, t + 0.2);
-                o.start(t); o.stop(t + 0.2);
-            } else if (type === 'milestone') {
-                o.type = 'sine';
-                o.frequency.setValueAtTime(440, t);
-                o.frequency.setValueAtTime(880, t + 0.2);
-                g.gain.setValueAtTime(0.1, t);
-                g.gain.linearRampToValueAtTime(0, t + 1.0);
-                o.start(t); o.stop(t + 1.0);
-            }
-        }
-
-        /* Entities & Content */
-        const player = { x: 0, y: 0, r: 20, color: '#4ECDC4' };
-        const stars = [];
-        const celestials = [];
-        const dust = [];
-        const missiles = [];
-        const explosions = [];
-
-        const words = ["Fear", "Doubt", "Debt", "Ego", "Time", "Past", "Loss", "Envy", "Pain", "Guilt", "Work", "Bills", "Stress", "Exes", "Lies", "Hate"];
-
-        const quotes = [
-            "You are not behind. You are just becoming at your own pace.",
-            "You don’t have to earn rest to deserve it.",
-            "Who you are on tired days still counts.",
-            "Being gentle with yourself is not self-indulgence; it’s self-respect.",
-            "You are allowed to outgrow versions of yourself.",
-            "You are more than what you manage to hold together.",
-            "Some days, surviving quietly is strength.",
-            "Not every thought needs your attention.",
-            "Anxiety often sounds urgent, but it isn’t always true.",
-            "Some worries soften when you let them be unfinished.",
-            "Even quiet tears are a form of release.",
-            "You are allowed to feel heavy without fixing it immediately.",
-            "Healing is not linear; it loops, pauses, and revisits.",
-            "You’re allowed to heal without an audience.",
-            "Protecting your peace is not selfish.",
-            "You don’t have to hold everything by yourself.",
-            "You’re not meant to carry this alone.",
-            "Not everything needs closure today.",
-            "Strength can look like softness.",
-            "Resilience doesn’t always roar; sometimes it breathes.",
-            "You’re still here — that matters.",
-            "You don’t have to see the future to keep going."
-        ];
-
-        const palettes = [
-            'radial-gradient(circle at center, #1e1b4b 0%, #000 100%)',
-            'radial-gradient(circle at center, #4c1d95 0%, #000 100%)',
-            'radial-gradient(circle at center, #be123c 0%, #000 100%)',
-            'radial-gradient(circle at center, #047857 0%, #000 100%)',
-            'radial-gradient(circle at center, #0e7490 0%, #000 100%)',
-            'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
-        ];
-
-        function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-            player.x = width / 2;
-            player.y = height * 0.8;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        for (let i = 0; i < 80; i++) {
-            stars.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                z: Math.random() * 2 + 0.5
-            });
-        }
-
-        /* Inputs */
-        window.addEventListener('keydown', e => {
-            keys[e.key] = true;
-            // PREVENT RAPID FIRE ON HOLD
-            if (e.code === 'Space' && !e.repeat) fireMissile();
-        });
-        window.addEventListener('keyup', e => keys[e.key] = false);
-        // Mobile Controls (Restored)
-        let touchStartX = 0;
-        let touchStartY = 0;
-
-        window.addEventListener('touchstart', (e) => {
-            if (!running) return; // Stop passing through to game logic if not running
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-            player.x = touchStartX; // Instant jump
-        }, { passive: false });
-
-        window.addEventListener('touchmove', (e) => {
-            if (!running) return; // Allow UI interaction (scrolling/clicking) if paused
-            e.preventDefault(); // Prevent scroll only when playing
-            player.x = e.touches[0].clientX;
-        }, { passive: false });
-
-        window.addEventListener('touchend', (e) => {
-            const touchEndY = e.changedTouches[0].clientY;
-            if (touchEndY - touchStartY > 50) {
-                fireMissile(); // Pull-to-fire
-            }
-        });
-
-        function fireMissile() {
-            if (!running) return;
-            // COOLDOWN CHECK (200ms)
-            const now = Date.now();
-            if (now - lastFired < 200) return;
-            lastFired = now;
-
-            sfx('shoot');
-            const isMobile = window.innerWidth < 600;
-            const angles = isMobile ? [0] : [0, -0.3, 0.3];
-            angles.forEach(a => {
-                missiles.push({
-                    x: player.x,
-                    y: player.y - 20,
-                    vx: Math.sin(a) * 10,
-                    vy: -15,
-                    r: 6
-                });
-            });
-            // Shockwave
-            pulses.push({ x: player.x, y: player.y, r: 0, opacity: 1 });
-            dust.forEach(d => {
-                const dx = d.x - player.x;
-                const dy = d.y - player.y;
-                if (Math.sqrt(dx * dx + dy * dy) < 250) {
-                    d.attached = false;
-                    const angle = Math.atan2(dy, dx);
-                    d.driftX = Math.cos(angle) * 5;
-                    d.driftY = Math.sin(angle) * 5;
-                    d.x += Math.cos(angle) * 30;
-                    d.y += Math.sin(angle) * 30;
+            /* Audio */
+            let audioCtx;
+            function initAudio() {
+                try {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                } catch (e) {
+                    console.warn("Audio Context failed to initialize", e);
                 }
-            });
-        }
-
-        /* Main Loop */
-        function loop() {
-            if (!running) return;
-            ctx.fillStyle = 'rgba(5, 5, 16, 0.5)';
-            ctx.fillRect(0, 0, width, height);
-
-            const attachedCount = dust.filter(d => d.attached).length;
-            // Speed Calculation: Max speed capped at 8. Attached worries reduce it.
-            const targetSpeed = Math.max(2, maxSpeed - (attachedCount * 3));
-            speed += (targetSpeed - speed) * 0.05;
-            distance += speed * 0.1;
-            if (Math.random() < 0.002) spawnCelestial();
-
-            // Player
-            const moveSpeed = 5; // Fixed at 5 (Zen)
-            if (keys.ArrowUp || keys.w) player.y -= moveSpeed;
-            if (keys.ArrowDown || keys.s) player.y += moveSpeed;
-            if (keys.ArrowLeft || keys.a) player.x -= moveSpeed;
-            if (keys.ArrowRight || keys.d) player.x += moveSpeed;
-            player.x = Math.max(20, Math.min(width - 20, player.x));
-            player.y = Math.max(20, Math.min(height - 20, player.y));
-
-            // Stars
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            stars.forEach(s => {
-                s.y += speed * s.z;
-                if (s.y > height) {
-                    s.y = 0;
-                    s.x = Math.random() * width;
-                }
-                const streakLen = speed * s.z * 0.6;
-                ctx.beginPath();
-                ctx.fillRect(s.x, s.y, Math.max(1, s.z * 0.8), streakLen);
-            });
-
-            // Celestials
-            celestials.forEach((c, idx) => {
-                c.y += speed * c.z;
-                if (c.y > height + 200) celestials.splice(idx, 1);
-                ctx.save();
-                ctx.translate(c.x, c.y);
-                if (c.type === 'planet') {
-                    const grad = ctx.createRadialGradient(-c.r / 3, -c.r / 3, c.r / 10, 0, 0, c.r);
-                    grad.addColorStop(0, c.color1);
-                    grad.addColorStop(1, c.color2);
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, c.r, 0, Math.PI * 2);
-                    ctx.fill();
-                    if (c.hasRing) {
-                        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-                        ctx.lineWidth = 4;
-                        ctx.beginPath();
-                        ctx.ellipse(0, 0, c.r * 1.8, c.r * 0.4, 0.5, 0, Math.PI * 2);
-                        ctx.stroke();
-                    }
-                } else {
-                    ctx.rotate(distance * 0.002);
-                    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, c.r);
-                    grad.addColorStop(0, 'rgba(255,255,255,0.8)');
-                    grad.addColorStop(0.4, c.color1);
-                    grad.addColorStop(1, 'transparent');
-                    ctx.fillStyle = grad;
-                    for (let arm = 0; arm < 3; arm++) {
-                        ctx.rotate((Math.PI * 2) / 3);
-                        ctx.beginPath();
-                        ctx.ellipse(c.r / 2, 0, c.r, c.r / 3, 0.2, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                }
-                ctx.restore();
-            });
-
-            // Missiles
-            ctx.fillStyle = '#C4FFF9';
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#4ECDC4';
-            for (let i = missiles.length - 1; i >= 0; i--) {
-                let m = missiles[i];
-                m.y += m.vy;
-                if (m.vx) m.x += m.vx;
-                ctx.beginPath();
-                ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
-                ctx.fill();
-                if (m.y < -50 || m.x < -100 || m.x > width + 100) missiles.splice(i, 1);
-            }
-            ctx.shadowBlur = 0;
-
-            // Pulses
-            for (let i = pulses.length - 1; i >= 0; i--) {
-                let p = pulses[i];
-                p.r += 10;
-                p.opacity -= 0.08;
-                if (p.opacity <= 0) { pulses.splice(i, 1); continue; }
-                ctx.strokeStyle = `rgba(78, 205, 196, ${p.opacity})`;
-                ctx.lineWidth = 5;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                ctx.stroke();
             }
 
-            // Dust
-            const baseRate = 0.012;
-            const diffFactor = Math.min(0.025, distance / 30000); // Reduced diff factor for Zen
-            const spawnRate = baseRate + diffFactor;
-            if (Math.random() < spawnRate) {
-                dust.push({
+            function sfx(type) {
+                if (!audioCtx) return;
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.connect(g);
+                g.connect(audioCtx.destination);
+                const t = audioCtx.currentTime;
+
+                if (type === 'attach') {
+                    o.frequency.setValueAtTime(120, t);
+                    o.frequency.exponentialRampToValueAtTime(60, t + 0.3);
+                    g.gain.setValueAtTime(0.1, t);
+                    g.gain.linearRampToValueAtTime(0.01, t + 0.3);
+                    o.start(t); o.stop(t + 0.3);
+                } else if (type === 'shoot') {
+                    o.type = 'square';
+                    o.frequency.setValueAtTime(400, t);
+                    o.frequency.exponentialRampToValueAtTime(100, t + 0.1);
+                    g.gain.setValueAtTime(0.03, t);
+                    g.gain.linearRampToValueAtTime(0, t + 0.1);
+                    o.start(t); o.stop(t + 0.1);
+                } else if (type === 'explode') {
+                    o.type = 'sawtooth';
+                    o.frequency.setValueAtTime(100, t);
+                    o.frequency.exponentialRampToValueAtTime(30, t + 0.2);
+                    g.gain.setValueAtTime(0.05, t);
+                    g.gain.linearRampToValueAtTime(0, t + 0.2);
+                    o.start(t); o.stop(t + 0.2);
+                } else if (type === 'milestone') {
+                    o.type = 'sine';
+                    o.frequency.setValueAtTime(440, t);
+                    o.frequency.setValueAtTime(880, t + 0.2);
+                    g.gain.setValueAtTime(0.1, t);
+                    g.gain.linearRampToValueAtTime(0, t + 1.0);
+                    o.start(t); o.stop(t + 1.0);
+                }
+            }
+
+            /* Entities & Content */
+            const player = { x: 0, y: 0, r: 20, color: '#4ECDC4' };
+            const stars = [];
+            const celestials = [];
+            const dust = [];
+            const missiles = [];
+            const explosions = [];
+
+            const words = ["Fear", "Doubt", "Debt", "Ego", "Time", "Past", "Loss", "Envy", "Pain", "Guilt", "Work", "Bills", "Stress", "Exes", "Lies", "Hate"];
+
+            const quotes = [
+                "You are not behind. You are just becoming at your own pace.",
+                "You don’t have to earn rest to deserve it.",
+                "Who you are on tired days still counts.",
+                "Being gentle with yourself is not self-indulgence; it’s self-respect.",
+                "You are allowed to outgrow versions of yourself.",
+                "You are more than what you manage to hold together.",
+                "Some days, surviving quietly is strength.",
+                "Not every thought needs your attention.",
+                "Anxiety often sounds urgent, but it isn’t always true.",
+                "Some worries soften when you let them be unfinished.",
+                "Even quiet tears are a form of release.",
+                "You are allowed to feel heavy without fixing it immediately.",
+                "Healing is not linear; it loops, pauses, and revisits.",
+                "You’re allowed to heal without an audience.",
+                "Protecting your peace is not selfish.",
+                "You don’t have to hold everything by yourself.",
+                "You’re not meant to carry this alone.",
+                "Not everything needs closure today.",
+                "Strength can look like softness.",
+                "Resilience doesn’t always roar; sometimes it breathes.",
+                "You’re still here — that matters.",
+                "You don’t have to see the future to keep going."
+            ];
+
+            const palettes = [
+                'radial-gradient(circle at center, #1e1b4b 0%, #000 100%)',
+                'radial-gradient(circle at center, #4c1d95 0%, #000 100%)',
+                'radial-gradient(circle at center, #be123c 0%, #000 100%)',
+                'radial-gradient(circle at center, #047857 0%, #000 100%)',
+                'radial-gradient(circle at center, #0e7490 0%, #000 100%)',
+                'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
+            ];
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                player.x = width / 2;
+                player.y = height * 0.8;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for (let i = 0; i < 80; i++) {
+                stars.push({
                     x: Math.random() * width,
-                    y: -100,
-                    text: words[Math.floor(Math.random() * words.length)],
-                    r: 30 + Math.random() * 20,
-                    attached: false,
-                    cleared: false,
-                    driftX: (Math.random() - 0.5),
-                    driftY: 2 + Math.random() * 3
+                    y: Math.random() * height,
+                    z: Math.random() * 2 + 0.5
                 });
             }
 
-            for (let i = dust.length - 1; i >= 0; i--) {
-                const d = dust[i];
-                if (!d.cleared) {
-                    for (let j = missiles.length - 1; j >= 0; j--) {
-                        let m = missiles[j];
-                        let dx = m.x - d.x;
-                        let dy = m.y - d.y;
-                        if (Math.sqrt(dx * dx + dy * dy) < d.r + m.r) {
-                            createExplosion(d.x, d.y);
-                            sfx('explode');
-                            droppedWords.push(d.text);
-                            missiles.splice(j, 1);
-                            dust.splice(i, 1);
-                            gotoNextDust = true;
-                            break;
+            /* Inputs */
+            window.addEventListener('keydown', e => {
+                keys[e.key] = true;
+                // PREVENT RAPID FIRE ON HOLD
+                if (e.code === 'Space' && !e.repeat) fireMissile();
+            });
+            window.addEventListener('keyup', e => keys[e.key] = false);
+            // Mobile Controls (Restored)
+            let touchStartX = 0;
+            let touchStartY = 0;
+
+            window.addEventListener('touchstart', (e) => {
+                if (!running) return; // Stop passing through to game logic if not running
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                player.x = touchStartX; // Instant jump
+            }, { passive: false });
+
+            window.addEventListener('touchmove', (e) => {
+                if (!running) return; // Allow UI interaction (scrolling/clicking) if paused
+                e.preventDefault(); // Prevent scroll only when playing
+                player.x = e.touches[0].clientX;
+            }, { passive: false });
+
+            window.addEventListener('touchend', (e) => {
+                const touchEndY = e.changedTouches[0].clientY;
+                if (touchEndY - touchStartY > 50) {
+                    fireMissile(); // Pull-to-fire
+                }
+            });
+
+            function fireMissile() {
+                if (!running) return;
+                // COOLDOWN CHECK (200ms)
+                const now = Date.now();
+                if (now - lastFired < 200) return;
+                lastFired = now;
+
+                sfx('shoot');
+                const isMobile = window.innerWidth < 600;
+                const angles = isMobile ? [0] : [0, -0.3, 0.3];
+                angles.forEach(a => {
+                    missiles.push({
+                        x: player.x,
+                        y: player.y - 20,
+                        vx: Math.sin(a) * 10,
+                        vy: -15,
+                        r: 6
+                    });
+                });
+                // Shockwave
+                pulses.push({ x: player.x, y: player.y, r: 0, opacity: 1 });
+                dust.forEach(d => {
+                    const dx = d.x - player.x;
+                    const dy = d.y - player.y;
+                    if (Math.sqrt(dx * dx + dy * dy) < 250) {
+                        d.attached = false;
+                        const angle = Math.atan2(dy, dx);
+                        d.driftX = Math.cos(angle) * 5;
+                        d.driftY = Math.sin(angle) * 5;
+                        d.x += Math.cos(angle) * 30;
+                        d.y += Math.sin(angle) * 30;
+                    }
+                });
+            }
+
+            /* Main Loop */
+            function loop() {
+                if (!running) return;
+                ctx.fillStyle = 'rgba(5, 5, 16, 0.5)';
+                ctx.fillRect(0, 0, width, height);
+
+                const attachedCount = dust.filter(d => d.attached).length;
+                // Speed Calculation: Max speed capped at 8. Attached worries reduce it.
+                const targetSpeed = Math.max(2, maxSpeed - (attachedCount * 3));
+                speed += (targetSpeed - speed) * 0.05;
+                distance += speed * 0.1;
+                if (Math.random() < 0.002) spawnCelestial();
+
+                // Player
+                const moveSpeed = 5; // Fixed at 5 (Zen)
+                if (keys.ArrowUp || keys.w) player.y -= moveSpeed;
+                if (keys.ArrowDown || keys.s) player.y += moveSpeed;
+                if (keys.ArrowLeft || keys.a) player.x -= moveSpeed;
+                if (keys.ArrowRight || keys.d) player.x += moveSpeed;
+                player.x = Math.max(20, Math.min(width - 20, player.x));
+                player.y = Math.max(20, Math.min(height - 20, player.y));
+
+                // Stars
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                stars.forEach(s => {
+                    s.y += speed * s.z;
+                    if (s.y > height) {
+                        s.y = 0;
+                        s.x = Math.random() * width;
+                    }
+                    const streakLen = speed * s.z * 0.6;
+                    ctx.beginPath();
+                    ctx.fillRect(s.x, s.y, Math.max(1, s.z * 0.8), streakLen);
+                });
+
+                // Celestials
+                celestials.forEach((c, idx) => {
+                    c.y += speed * c.z;
+                    if (c.y > height + 200) celestials.splice(idx, 1);
+                    ctx.save();
+                    ctx.translate(c.x, c.y);
+                    if (c.type === 'planet') {
+                        const grad = ctx.createRadialGradient(-c.r / 3, -c.r / 3, c.r / 10, 0, 0, c.r);
+                        grad.addColorStop(0, c.color1);
+                        grad.addColorStop(1, c.color2);
+                        ctx.fillStyle = grad;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, c.r, 0, Math.PI * 2);
+                        ctx.fill();
+                        if (c.hasRing) {
+                            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                            ctx.lineWidth = 4;
+                            ctx.beginPath();
+                            ctx.ellipse(0, 0, c.r * 1.8, c.r * 0.4, 0.5, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                    } else {
+                        ctx.rotate(distance * 0.002);
+                        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, c.r);
+                        grad.addColorStop(0, 'rgba(255,255,255,0.8)');
+                        grad.addColorStop(0.4, c.color1);
+                        grad.addColorStop(1, 'transparent');
+                        ctx.fillStyle = grad;
+                        for (let arm = 0; arm < 3; arm++) {
+                            ctx.rotate((Math.PI * 2) / 3);
+                            ctx.beginPath();
+                            ctx.ellipse(c.r / 2, 0, c.r, c.r / 3, 0.2, 0, Math.PI * 2);
+                            ctx.fill();
                         }
                     }
-                }
-                if (typeof gotoNextDust !== 'undefined' && gotoNextDust) {
-                    var gotoNextDust = false;
-                    continue;
-                }
+                    ctx.restore();
+                });
 
-                if (!d.attached) {
-                    const approachSpeed = (speed * 0.3) + 2;
-                    d.y += approachSpeed + (d.driftY || 0);
-                    d.x += (d.driftX || 0);
-                    if (d.driftX) d.driftX *= 0.95;
-                    if (d.driftY) d.driftY *= 0.95;
-
-                    const dx = player.x - d.x;
-                    const dy = player.y - d.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-
-                    if (dist < 350) {
-                        const forceMult = 5.5; // BUFFED: Gravity Force Increased
-                        const angle = Math.atan2(dy, dx);
-                        const intensity = 1 - (dist / 350);
-                        d.x += Math.cos(angle) * (forceMult * intensity);
-                        d.y += Math.sin(angle) * (forceMult * intensity);
-                    }
-
-                    if (dist < (player.r + d.r - 10)) {
-                        d.attached = true;
-                        d.offsetX = d.x - player.x;
-                        d.offsetY = d.y - player.y;
-                        sfx('attach');
-                    }
-                } else {
-                    d.x = player.x + d.offsetX;
-                    d.y = player.y + d.offsetY;
-                    d.offsetX *= 0.995;
-                    d.offsetY *= 0.995;
-                }
-                if (d.y > height + 100 || d.y < -200 || d.x < -100 || d.x > width + 100) dust.splice(i, 1);
-            }
-
-            // Particles
-            for (let i = explosions.length - 1; i >= 0; i--) {
-                let e = explosions[i];
-                e.life--;
-                e.particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.life--;
-                    ctx.fillStyle = `rgba(255, 200, 100, ${p.life / 30})`;
+                // Missiles
+                ctx.fillStyle = '#C4FFF9';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#4ECDC4';
+                for (let i = missiles.length - 1; i >= 0; i--) {
+                    let m = missiles[i];
+                    m.y += m.vy;
+                    if (m.vx) m.x += m.vx;
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
                     ctx.fill();
-                });
-                if (e.life <= 0) explosions.splice(i, 1);
-            }
+                    if (m.y < -50 || m.x < -100 || m.x > width + 100) missiles.splice(i, 1);
+                }
+                ctx.shadowBlur = 0;
 
-            // Draw Dust/Player
-            checkMilestone(distance);
-            document.getElementById('distDisplay').innerText = Math.floor(distance);
-            dust.forEach(d => {
-                ctx.beginPath();
-                ctx.fillStyle = d.attached ? 'rgba(255, 80, 80, 0.3)' : 'rgba(20, 20, 40, 0.8)';
-                ctx.strokeStyle = d.attached ? '#ff6b6b' : 'rgba(255,255,255,0.8)';
-                ctx.lineWidth = 2;
-                ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
-                ctx.fillStyle = 'white';
-                ctx.font = '700 16px Outfit';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(d.text, d.x, d.y);
-            });
-            const glow = ctx.createRadialGradient(player.x, player.y, player.r / 2, player.x, player.y, player.r * 3);
-            glow.addColorStop(0, player.color);
-            glow.addColorStop(1, 'rgba(78, 205, 196, 0)');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, player.r * 3, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, player.r / 2, 0, Math.PI * 2);
-            ctx.fill();
-            requestAnimationFrame(loop);
-        }
+                // Pulses
+                for (let i = pulses.length - 1; i >= 0; i--) {
+                    let p = pulses[i];
+                    p.r += 10;
+                    p.opacity -= 0.08;
+                    if (p.opacity <= 0) { pulses.splice(i, 1); continue; }
+                    ctx.strokeStyle = `rgba(78, 205, 196, ${p.opacity})`;
+                    ctx.lineWidth = 5;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
 
-        function createExplosion(x, y) {
-            let parts = [];
-            for (let k = 0; k < 10; k++) {
-                parts.push({
-                    x: x, y: y,
-                    vx: (Math.random() - 0.5) * 5,
-                    vy: (Math.random() - 0.5) * 5,
-                    size: Math.random() * 3,
-                    life: 30
-                });
-            }
-            explosions.push({ x: x, y: y, life: 30, particles: parts });
-        }
-        function spawnCelestial() {
-            const types = ['planet', 'galaxy'];
-            const type = types[Math.floor(Math.random() * types.length)];
-            const colors = ['#4ECDC4', '#FF6B6B', '#C44DFF', '#FFE66D'];
-            celestials.push({
-                x: Math.random() * width,
-                y: -300,
-                z: 0.1 + Math.random() * 0.2,
-                r: 50 + Math.random() * 100,
-                type: type,
-                color1: colors[Math.floor(Math.random() * colors.length)],
-                color2: colors[Math.floor(Math.random() * colors.length)],
-                hasRing: Math.random() > 0.5
-            });
-        }
-        let lastMilestone = 0;
-        const milestones = [100, 500, 1000, 2000, 5000, 10000];
-        function checkMilestone(d) {
-            const m = milestones.find(val => d >= val && lastMilestone < val);
-            if (m) {
-                lastMilestone = m;
-                sfx('milestone');
-                showPopup(`${m} LY`, "Keep Flying");
-            }
-        }
-        function showPopup(main, sub) {
-            const el = document.getElementById('milestoneMsg');
-            el.innerHTML = `${main}<br><span style="font-size:1.5rem; color:white; font-weight:400;">${sub}</span>`;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 2000);
-        }
-        function startGame() {
-            document.getElementById('startScreen').classList.remove('active');
-            document.getElementById('hud').style.opacity = 1;
-            initAudio();
-            running = true;
-            resize();
-            loop();
-        }
+                // Dust
+                const baseRate = 0.012;
+                const diffFactor = Math.min(0.025, distance / 30000); // Reduced diff factor for Zen
+                const spawnRate = baseRate + diffFactor;
+                if (Math.random() < spawnRate) {
+                    dust.push({
+                        x: Math.random() * width,
+                        y: -100,
+                        text: words[Math.floor(Math.random() * words.length)],
+                        r: 30 + Math.random() * 20,
+                        attached: false,
+                        cleared: false,
+                        driftX: (Math.random() - 0.5),
+                        driftY: 2 + Math.random() * 3
+                    });
+                }
 
-        /* --- SHARE CARD GENERATION --- */
-        function endGame() {
-            running = false;
-            document.getElementById('hud').style.opacity = 0;
-            document.getElementById('endScreen').classList.add('active');
-
-            const randColor = palettes[Math.floor(Math.random() * palettes.length)];
-            const randQuote = quotes[Math.floor(Math.random() * quotes.length)];
-
-            // Set logo src from Base64 to ensure it loads
-            if (logoBase64) document.getElementById('tpl_logo').src = logoBase64;
-
-            generateImage(randColor, randQuote, true);
-        }
-
-        function generateImage(bgColor, quote, isPreview) {
-            const tpl = document.getElementById('shareTemplate');
-            const clone = tpl.cloneNode(true);
-            clone.id = "activeShareCapture";
-            clone.style.display = "flex";
-            clone.style.position = "fixed";
-            clone.style.top = "0px";
-            clone.style.left = "0px";
-            clone.style.zIndex = "-9999";
-            clone.style.opacity = "1";
-
-            const inner = clone.querySelector('#shareContainerInner');
-            inner.style.background = bgColor;
-
-            clone.querySelector('#tpl_shareDist').innerText = Math.floor(distance);
-            clone.querySelector('#tpl_shareQuote').innerHTML = `"${quote}"`;
-
-            let uniqueDrops = [...new Set(droppedWords)];
-            if (uniqueDrops.length > 8) uniqueDrops = uniqueDrops.slice(uniqueDrops.length - 8);
-            if (uniqueDrops.length === 0) {
-                clone.querySelector('#tpl_droppedList').innerHTML = '<span style="opacity:0.5; font-size:1.5rem;">Nothing... yet.</span>';
-            } else {
-                clone.querySelector('#tpl_droppedList').innerHTML = uniqueDrops.map(w =>
-                    `<span>${w}</span>`
-                ).join(' <span style="opacity:0.4">•</span> ');
-            }
-
-            document.body.appendChild(clone);
-
-            setTimeout(() => {
-                html2canvas(inner, {
-                    scale: isPreview ? 0.3 : 1,
-                    useCORS: true,
-                    backgroundColor: null,
-                    scrollX: 0,
-                    scrollY: -window.scrollY
-                }).then(canvas => {
-                    const dataUrl = canvas.toDataURL('image/png');
-                    if (isPreview) {
-                        document.getElementById('generatedPreview').src = dataUrl;
-                    } else {
-                        const link = document.createElement('a');
-                        link.download = `soulamore-journey-${Math.floor(distance)}.png`;
-                        link.href = dataUrl;
-                        link.click();
-                        const btn = document.querySelector('button[onclick="downloadShare()"]');
-                        if (btn) btn.innerHTML = 'Share Story <i class="fas fa-check"></i>';
+                for (let i = dust.length - 1; i >= 0; i--) {
+                    const d = dust[i];
+                    if (!d.cleared) {
+                        for (let j = missiles.length - 1; j >= 0; j--) {
+                            let m = missiles[j];
+                            let dx = m.x - d.x;
+                            let dy = m.y - d.y;
+                            if (Math.sqrt(dx * dx + dy * dy) < d.r + m.r) {
+                                createExplosion(d.x, d.y);
+                                sfx('explode');
+                                droppedWords.push(d.text);
+                                missiles.splice(j, 1);
+                                dust.splice(i, 1);
+                                gotoNextDust = true;
+                                break;
+                            }
+                        }
                     }
-                    if (document.body.contains(clone)) document.body.removeChild(clone);
-                }).catch(err => {
-                    console.error("Capture error:", err);
-                    if (document.body.contains(clone)) document.body.removeChild(clone);
+                    if (typeof gotoNextDust !== 'undefined' && gotoNextDust) {
+                        var gotoNextDust = false;
+                        continue;
+                    }
+
+                    if (!d.attached) {
+                        const approachSpeed = (speed * 0.3) + 2;
+                        d.y += approachSpeed + (d.driftY || 0);
+                        d.x += (d.driftX || 0);
+                        if (d.driftX) d.driftX *= 0.95;
+                        if (d.driftY) d.driftY *= 0.95;
+
+                        const dx = player.x - d.x;
+                        const dy = player.y - d.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < 350) {
+                            const forceMult = 5.5; // BUFFED: Gravity Force Increased
+                            const angle = Math.atan2(dy, dx);
+                            const intensity = 1 - (dist / 350);
+                            d.x += Math.cos(angle) * (forceMult * intensity);
+                            d.y += Math.sin(angle) * (forceMult * intensity);
+                        }
+
+                        if (dist < (player.r + d.r - 10)) {
+                            d.attached = true;
+                            d.offsetX = d.x - player.x;
+                            d.offsetY = d.y - player.y;
+                            sfx('attach');
+                        }
+                    } else {
+                        d.x = player.x + d.offsetX;
+                        d.y = player.y + d.offsetY;
+                        d.offsetX *= 0.995;
+                        d.offsetY *= 0.995;
+                    }
+                    if (d.y > height + 100 || d.y < -200 || d.x < -100 || d.x > width + 100) dust.splice(i, 1);
+                }
+
+                // Particles
+                for (let i = explosions.length - 1; i >= 0; i--) {
+                    let e = explosions[i];
+                    e.life--;
+                    e.particles.forEach(p => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.life--;
+                        ctx.fillStyle = `rgba(255, 200, 100, ${p.life / 30})`;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                    if (e.life <= 0) explosions.splice(i, 1);
+                }
+
+                // Draw Dust/Player
+                checkMilestone(distance);
+                document.getElementById('distDisplay').innerText = Math.floor(distance);
+                dust.forEach(d => {
+                    ctx.beginPath();
+                    ctx.fillStyle = d.attached ? 'rgba(255, 80, 80, 0.3)' : 'rgba(20, 20, 40, 0.8)';
+                    ctx.strokeStyle = d.attached ? '#ff6b6b' : 'rgba(255,255,255,0.8)';
+                    ctx.lineWidth = 2;
+                    ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.fillStyle = 'white';
+                    ctx.font = '700 16px Outfit';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(d.text, d.x, d.y);
                 });
-            }, 600); // 600ms safe wait
-        }
+                const glow = ctx.createRadialGradient(player.x, player.y, player.r / 2, player.x, player.y, player.r * 3);
+                glow.addColorStop(0, player.color);
+                glow.addColorStop(1, 'rgba(78, 205, 196, 0)');
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, player.r * 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, player.r / 2, 0, Math.PI * 2);
+                ctx.fill();
+                requestAnimationFrame(loop);
+            }
 
-        function downloadShare() {
-            const btn = event.currentTarget;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-            const randColor = palettes[Math.floor(Math.random() * palettes.length)];
-            const randQuote = quotes[Math.floor(Math.random() * quotes.length)];
-            generateImage(randColor, randQuote, false);
-        }
+            function createExplosion(x, y) {
+                let parts = [];
+                for (let k = 0; k < 10; k++) {
+                    parts.push({
+                        x: x, y: y,
+                        vx: (Math.random() - 0.5) * 5,
+                        vy: (Math.random() - 0.5) * 5,
+                        size: Math.random() * 3,
+                        life: 30
+                    });
+                }
+                explosions.push({ x: x, y: y, life: 30, particles: parts });
+            }
+            function spawnCelestial() {
+                const types = ['planet', 'galaxy'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                const colors = ['#4ECDC4', '#FF6B6B', '#C44DFF', '#FFE66D'];
+                celestials.push({
+                    x: Math.random() * width,
+                    y: -300,
+                    z: 0.1 + Math.random() * 0.2,
+                    r: 50 + Math.random() * 100,
+                    type: type,
+                    color1: colors[Math.floor(Math.random() * colors.length)],
+                    color2: colors[Math.floor(Math.random() * colors.length)],
+                    hasRing: Math.random() > 0.5
+                });
+            }
+            let lastMilestone = 0;
+            const milestones = [100, 500, 1000, 2000, 5000, 10000];
+            function checkMilestone(d) {
+                const m = milestones.find(val => d >= val && lastMilestone < val);
+                if (m) {
+                    lastMilestone = m;
+                    sfx('milestone');
+                    showPopup(`${m} LY`, "Keep Flying");
+                }
+            }
+            function showPopup(main, sub) {
+                const el = document.getElementById('milestoneMsg');
+                el.innerHTML = `${main}<br><span style="font-size:1.5rem; color:white; font-weight:400;">${sub}</span>`;
+                el.classList.add('show');
+                setTimeout(() => el.classList.remove('show'), 2000);
+            }
+            function startGame() {
+                document.getElementById('startScreen').classList.remove('active');
+                document.getElementById('hud').style.opacity = 1;
+                initAudio();
+                running = true;
+                resize();
+                loop();
+            }
 
-    </script>
+            /* --- SHARE CARD GENERATION --- */
+            function endGame() {
+                running = false;
+                document.getElementById('hud').style.opacity = 0;
+                document.getElementById('endScreen').classList.add('active');
+
+                const randColor = palettes[Math.floor(Math.random() * palettes.length)];
+                const randQuote = quotes[Math.floor(Math.random() * quotes.length)];
+
+                // Set logo src from Base64 to ensure it loads
+                if (logoBase64) document.getElementById('tpl_logo').src = logoBase64;
+
+                generateImage(randColor, randQuote, true);
+            }
+
+            function generateImage(bgColor, quote, isPreview) {
+                const tpl = document.getElementById('shareTemplate');
+                const clone = tpl.cloneNode(true);
+                clone.id = "activeShareCapture";
+                clone.style.display = "flex";
+                clone.style.position = "fixed";
+                clone.style.top = "0px";
+                clone.style.left = "0px";
+                clone.style.zIndex = "-9999";
+                clone.style.opacity = "1";
+
+                const inner = clone.querySelector('#shareContainerInner');
+                inner.style.background = bgColor;
+
+                clone.querySelector('#tpl_shareDist').innerText = Math.floor(distance);
+                clone.querySelector('#tpl_shareQuote').innerHTML = `"${quote}"`;
+
+                let uniqueDrops = [...new Set(droppedWords)];
+                if (uniqueDrops.length > 8) uniqueDrops = uniqueDrops.slice(uniqueDrops.length - 8);
+                if (uniqueDrops.length === 0) {
+                    clone.querySelector('#tpl_droppedList').innerHTML = '<span style="opacity:0.5; font-size:1.5rem;">Nothing... yet.</span>';
+                } else {
+                    clone.querySelector('#tpl_droppedList').innerHTML = uniqueDrops.map(w =>
+                        `<span>${w}</span>`
+                    ).join(' <span style="opacity:0.4">•</span> ');
+                }
+
+                document.body.appendChild(clone);
+
+                setTimeout(() => {
+                    html2canvas(inner, {
+                        scale: isPreview ? 0.3 : 1,
+                        useCORS: true,
+                        backgroundColor: null,
+                        scrollX: 0,
+                        scrollY: -window.scrollY
+                    }).then(canvas => {
+                        const dataUrl = canvas.toDataURL('image/png');
+                        if (isPreview) {
+                            document.getElementById('generatedPreview').src = dataUrl;
+                        } else {
+                            const link = document.createElement('a');
+                            link.download = `soulamore-journey-${Math.floor(distance)}.png`;
+                            link.href = dataUrl;
+                            link.click();
+                            const btn = document.querySelector('button[onclick="downloadShare()"]');
+                            if (btn) btn.innerHTML = 'Share Story <i class="fas fa-check"></i>';
+                        }
+                        if (document.body.contains(clone)) document.body.removeChild(clone);
+                    }).catch(err => {
+                        console.error("Capture error:", err);
+                        if (document.body.contains(clone)) document.body.removeChild(clone);
+                    });
+                }, 600); // 600ms safe wait
+            }
+
+            function downloadShare() {
+                const btn = event.currentTarget;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                const randColor = palettes[Math.floor(Math.random() * palettes.length)];
+                const randQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                generateImage(randColor, randQuote, false);
+            }
+
+        </script>
 </body>
 
 </html>
