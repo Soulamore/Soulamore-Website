@@ -438,13 +438,15 @@
         let touchStartY = 0;
 
         window.addEventListener('touchstart', (e) => {
+            if (!running) return; // Stop passing through to game logic if not running
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
             player.x = touchStartX; // Instant jump
         }, { passive: false });
 
         window.addEventListener('touchmove', (e) => {
-            e.preventDefault(); // Prevent scroll
+            if (!running) return; // Allow UI interaction (scrolling/clicking) if paused
+            e.preventDefault(); // Prevent scroll only when playing
             player.x = e.touches[0].clientX;
         }, { passive: false });
 
