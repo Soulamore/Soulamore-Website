@@ -8,8 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script src="../assets/js/html2canvas.min.js?v=FIX_MOBILE_07"></script>
-    <script src="../assets/js/logo.js?v=FIX_MOBILE_07"></script>
+    <script src="../assets/js/html2canvas.min.js?v=DEBUG_01"></script>
+    <script src="../assets/js/logo.js?v=DEBUG_01"></script>
     <script>
         // Suppress "Wiring Backend" / Launch Popup on this specific tool page
         sessionStorage.setItem('soulamore_launch_popup_seen', 'true');
@@ -194,6 +194,26 @@
 </head>
 
 <body>
+    <!-- DEBUG CONSOLE -->
+    <div id="debugConsole"
+        style="position:fixed; top:0; left:0; width:100%; height:200px; background:rgba(0,0,0,0.9); color:#00ff00; font-family:monospace; font-size:14px; overflow-y:scroll; z-index:999999999; pointer-events:none; border-bottom:2px solid #00ff00; padding:10px;">
+        === DEBUG CONSOLE ACTIVE ===<br>
+    </div>
+    <script>
+        function dbg(msg) {
+            const el = document.getElementById('debugConsole');
+            if (el) {
+                const time = new Date().toISOString().split('T')[1].slice(0, 8);
+                el.innerHTML = `[${time}] ${msg}<br>` + el.innerHTML;
+            }
+            console.log(msg);
+        }
+        window.onerror = function (msg, url, line) {
+            dbg(`❌ ERROR: ${msg} (Line ${line})`);
+            return false;
+        };
+        dbg("System Init: Page Loaded.");
+    </script>
 
     <canvas id="gameCanvas"></canvas>
 
@@ -353,9 +373,12 @@
             let audioCtx;
             function initAudio() {
                 try {
+                    dbg("Audio: Initializing Context...");
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
+                    dbg("Audio: Success. State: " + audioCtx.state);
                 } catch (e) {
+                    dbg("Audio Error: " + e.message);
                     console.warn("Audio Context failed to initialize", e);
                 }
             }
@@ -795,19 +818,28 @@
             }
             let gameStarted = false;
             function handleStart(e) {
+                dbg("Event Triggered: " + (e ? e.type : 'manual call'));
                 if (e) {
                     e.preventDefault();
                     e.stopPropagation();
                 }
-                if (gameStarted) return;
+                if (gameStarted) {
+                    dbg("Ignored: Game already started.");
+                    return;
+                }
                 gameStarted = true;
+                dbg("Action: Starting Game Sequence...");
                 startGame();
             }
 
             function startGame() {
                 // Ensure we don't start multiple times
-                if (!document.getElementById('startScreen').classList.contains('active')) return;
+                if (!document.getElementById('startScreen').classList.contains('active')) {
+                    dbg("Start Aborted: Overlay not active.");
+                    return;
+                }
 
+                dbg("Game Start: Hiding Overlay, Init Audio.");
                 document.getElementById('startScreen').classList.remove('active');
                 document.getElementById('hud').style.opacity = 1;
                 initAudio();
