@@ -433,8 +433,26 @@
             if (e.code === 'Space' && !e.repeat) fireMissile();
         });
         window.addEventListener('keyup', e => keys[e.key] = false);
+        // Mobile Controls (Restored)
+        let touchStartX = 0;
+        let touchStartY = 0;
+
         window.addEventListener('touchstart', (e) => {
-            fireMissile();
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            player.x = touchStartX; // Instant jump
+        }, { passive: false });
+
+        window.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // Prevent scroll
+            player.x = e.touches[0].clientX;
+        }, { passive: false });
+
+        window.addEventListener('touchend', (e) => {
+            const touchEndY = e.changedTouches[0].clientY;
+            if (touchEndY - touchStartY > 50) {
+                fireMissile(); // Pull-to-fire
+            }
         });
 
         function fireMissile() {
@@ -445,7 +463,8 @@
             lastFired = now;
 
             sfx('shoot');
-            const angles = [0, -0.3, 0.3];
+            const isMobile = window.innerWidth < 600;
+            const angles = isMobile ? [0] : [0, -0.3, 0.3];
             angles.forEach(a => {
                 missiles.push({
                     x: player.x,
