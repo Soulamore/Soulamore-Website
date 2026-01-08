@@ -14,6 +14,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/global.css">
 
+    <!-- FIREBASE INTEGRATION -->
+    <script type="module" src="../../assets/js/firebase-config.js"></script>
+    <script type="module" src="../../assets/js/data-handler.js"></script>
+
     <style>
         /* --- PAGE THEME: EXAM (Peach/Teal) --- */
         :root {
@@ -30,28 +34,59 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--soft-bg);
+            background-color: #E5E9F0;
+            /* Darker BG for contrast */
             color: var(--navy);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-top: 0;
+            /* REMOVED PADDING */
         }
 
-        /* --- HERO --- */
+        /* FIX: FORCE HEADER TO FLOAT */
+        header {
+            position: fixed !important;
+            top: 20px;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .page-wrapper {
+            padding-top: 0 !important;
+            /* Fix visual gap */
+        }
+
+        /* --- HERO (Seamless Polish) --- */
         .hero {
-            padding: 120px 0 60px;
-            background: linear-gradient(180deg, #fff5f0 0%, var(--soft-bg) 100%);
+            position: relative;
+            padding: 200px 0 40px;
+            /* Increased top padding */
+            background: linear-gradient(180deg, #FFE5D9 0%, #E5E9F0 100%);
+            /* Richer Peach */
+            margin-bottom: 10px;
+            /* Minimal gap before content */
+            overflow: hidden;
             text-align: center;
+            /* RESTORED ALIGNMENT */
         }
 
         .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 15px;
             color: var(--navy);
+            position: relative;
+            z-index: 2;
+            /* Ensure text sits above blobs */
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: #555;
-            max-width: 700px;
-            margin: 0 auto;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
         }
 
         .hero-icon {
@@ -59,6 +94,37 @@
             margin-bottom: 20px;
             display: block;
             animation: float 3s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- DECORATIVE BLOBS (Design Parity) --- */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.5;
+            z-index: -1;
+            /* FIXED LAYER */
+        }
+
+        .blob-1 {
+            top: -50px;
+            left: -100px;
+            width: 300px;
+            height: 300px;
+            background: #FFD166;
+            /* Sunny Yellow */
+        }
+
+        .blob-2 {
+            bottom: 0;
+            right: -50px;
+            width: 250px;
+            height: 250px;
+            background: #F49F75;
+            /* Peach */
+            opacity: 0.3;
         }
 
         @keyframes float {
@@ -75,14 +141,19 @@
             }
         }
 
-        /* --- CONTENT CARDS --- */
+        /* --- CONTENT CARDS (Light Glass) --- */
         .card {
-            background: var(--white);
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            /* Slightly higher opacity */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
             padding: 40px;
             margin-bottom: 30px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(0, 0, 0, 0.03);
+            box-shadow: 0 10px 40px rgba(26, 43, 69, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 2;
         }
 
         .section-title {
@@ -91,6 +162,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            color: var(--navy) !important;
+            /* FORCE OVERRIDE */
         }
 
         .section-title i {
@@ -116,14 +189,17 @@
             color: var(--teal);
         }
 
-        /* --- TOOLS (90 Sec Reset) --- */
+        /* --- TOOLS (Upgraded 90 Sec Reset) --- */
         .tool-box {
-            background: #EAFBF9;
-            /* Soft Teal BG */
-            border-left: 5px solid var(--teal);
-            padding: 25px;
-            border-radius: 8px;
-            margin: 20px 0;
+            background: #FFF5F0;
+            /* Soft Peach, not Teal */
+            border-left: 5px solid var(--primary);
+            /* Peach Border */
+            padding: 30px;
+            border-radius: 16px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(244, 159, 117, 0.1);
         }
 
         .breathing-circle {
@@ -177,6 +253,7 @@
             color: white;
             border-radius: 20px;
             margin: 40px 0;
+            /* --- REMOVED CONFLICTING LEGACY RULES (page-wrapper, hero override) --- */
         }
 
         /* --- CONFESSION BOX CARD (NEW) --- */
@@ -386,12 +463,10 @@
     <main class="page-wrapper">
         <!-- HERO -->
         <section class="hero">
-            <div class="container fade-in">
-                <!-- Breadcrumb -->
-                <div class="breadcrumbs">
-                    <a href="../../index.html">Home</a> &gt; <a href="index.html">Campus</a> &gt; <a
-                        href="student-resources.html">Resources</a> &gt; Exam Pressure
-                </div>
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="container fade-in" style="position: relative; z-index: 2;">
+                <!-- Breadcrumb Removed -->
 
                 <div class="hero-icon">📘</div>
                 <h1>Exam Pressure</h1>
@@ -404,13 +479,18 @@
                             class="fab fa-facebook"></i></a>
                 </div>
                 <p>When marks start feeling heavier than you.</p>
-                <div style="margin-top: 30px; font-style: italic; color: var(--primary);">
-                    "Feeling pressured does not mean you’re weak. It means you care."
-                </div>
             </div>
         </section>
 
         <div class="container">
+
+            <!-- VALIDATION (Moved from Hero) -->
+            <div class="card fade-in" style="border-left: 5px solid var(--primary);">
+                <h3 style="color: var(--navy);">First: Take a breath.</h3>
+                <p style="font-size: 1.1rem; margin-top: 10px; font-style: italic;">
+                    "Feeling pressured does not mean you’re weak. It means you care."
+                </p>
+            </div>
 
             <!-- SECTION: WHAT IT IS -->
             <div class="card fade-in">

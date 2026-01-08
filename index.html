@@ -32,7 +32,7 @@
         rel="stylesheet">
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/global.css?v=FIX_MOBILE_BUTTON_PROMINENCE">
+    <link rel="stylesheet" href="assets/css/global.css?v=FINAL_LAPTOP_FIX">
 
     <!-- MODULE: Backend -->
     <script type="module" src="assets/js/firebase-config.js"></script>
@@ -112,7 +112,8 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
+            width: 94%;
             margin: 0 auto;
             padding: 0 24px;
             position: relative;
@@ -222,7 +223,7 @@
                 height: 5px;
             }
 
-            50% {
+            - 50% {
                 height: 15px;
             }
         }
@@ -668,7 +669,8 @@
 
         /* RESPONSIVE GRID FIX */
         .responsive-compass-grid {
-            max-width: 1200px;
+            max-width: 1300px;
+            width: 94%;
             margin: 0 auto;
             display: grid;
             gap: 20px;
@@ -676,12 +678,151 @@
             grid-template-columns: 1fr;
         }
 
+        /* PROMO STICKER (Fixed Position - Hanging Off Left - Tape Effect) */
+        @keyframes sticker-bounce {
+
+            0%,
+            100% {
+                transform: rotate(-10deg) translateY(0);
+            }
+
+            50% {
+                transform: rotate(-10deg) translateY(-10px);
+            }
+        }
+
+        .promo-sticker {
+            position: absolute;
+            top: 180px;
+            left: -200px;
+            /* Moved significantly left to avoid overlap */
+            width: 260px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            border-radius: 20px;
+            padding: 20px;
+            z-index: 90;
+            box-shadow: 0 10px 40px rgba(127, 255, 212, 0.15);
+            backdrop-filter: blur(10px);
+            transform: rotate(-10deg);
+            animation: sticker-bounce 3s ease-in-out infinite;
+            transition: transform 0.3s, box-shadow 0.3s;
+            transform-origin: top left;
+        }
+
+        .sticker-header {
+            font-weight: 700;
+            color: #4ECDC4;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sticker-content {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            color: white;
+        }
+
+        .tape-strip {
+            position: absolute;
+            top: -12px;
+            left: 40%;
+            width: 50px;
+            height: 15px;
+            background: rgba(127, 255, 212, 0.3);
+            backdrop-filter: blur(5px);
+            transform: rotate(-5deg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .promo-sticker:hover {
+            animation-play-state: paused;
+            transform: rotate(0deg) scale(1.05) translateY(0);
+            border-color: #4ECDC4;
+            box-shadow: 0 15px 50px rgba(78, 205, 196, 0.3);
+            z-index: 100;
+        }
+
+        .play-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 50px;
+            text-decoration: none;
+            color: white;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .play-btn:hover {
+            background: rgba(78, 205, 196, 0.2);
+            border-color: #4ECDC4;
+            color: #4ECDC4;
+        }
+
+        @media (max-width: 1500px) {
+            .hero-btns {
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 0px;
+            }
+
+            .promo-sticker {
+                position: relative !important;
+                top: auto;
+                left: auto;
+                right: auto;
+                bottom: auto;
+                transform: none !important;
+                margin: 40px auto 40px auto;
+                width: 90%;
+                max-width: 340px;
+                animation: none;
+                text-align: center;
+                box-shadow: 0 5px 20px rgba(78, 205, 196, 0.15);
+            }
+
+            .tape-strip {
+                display: none;
+            }
+
+            .hero {
+                padding-bottom: 20px !important;
+            }
+
+            #tools.section-header {
+                margin-top: 0px !important;
+            }
+
+            .promo-sticker {
+                margin: 0px auto 30px auto !important;
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                transform: none !important;
+                width: 90% !important;
+                max-width: 340px !important;
+                display: block !important;
+                z-index: 100 !important;
+            }
+        }
+
         /* Tools Grid (3 Items) - Added for specific 3-column layout */
         .responsive-tools-grid {
             display: grid;
             gap: 25px;
             grid-template-columns: 1fr;
-            /* Mobile: 1 col */
+            max-width: 1300px;
+            width: 94%;
+            margin: 0 auto;
         }
 
         @media (min-width: 600px) {
@@ -1021,154 +1162,7 @@
         <!-- STANDARD HEADER INJECTION POINT -->
         <header id="main-header"></header>
 
-        <!-- PROMO STICKER (Fixed Position - Hanging Off Left - Tape Effect) -->
-        <style>
-            @keyframes sticker-bounce {
 
-                0%,
-                100% {
-                    transform: rotate(-10deg) translateY(0);
-                }
-
-                50% {
-                    transform: rotate(-10deg) translateY(-10px);
-                }
-            }
-
-            .promo-sticker {
-                position: absolute;
-                top: 180px;
-                left: -200px;
-                /* Moved significantly left to avoid overlap */
-                width: 260px;
-                background: rgba(15, 23, 42, 0.95);
-                border: 1px solid rgba(78, 205, 196, 0.4);
-                /* Slightly brighter border */
-                border-radius: 20px;
-                padding: 20px;
-                z-index: 90;
-                /* Lighter shade of teal for the glow */
-                box-shadow: 0 10px 40px rgba(127, 255, 212, 0.15);
-                backdrop-filter: blur(10px);
-                transform: rotate(-10deg);
-                /* 10 degree tilt */
-                animation: sticker-bounce 3s ease-in-out infinite;
-                /* Automatic Bounce */
-                transition: transform 0.3s, box-shadow 0.3s;
-                transform-origin: top left;
-            }
-
-            .sticker-header {
-                font-weight: 700;
-                color: #4ECDC4;
-                margin-bottom: 5px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .sticker-content {
-                font-size: 0.85rem;
-                opacity: 0.7;
-                margin-bottom: 15px;
-                line-height: 1.4;
-                color: white;
-            }
-
-            .tape-strip {
-                position: absolute;
-                top: -12px;
-                left: 40%;
-                width: 50px;
-                height: 15px;
-                /* Thinner */
-                background: rgba(127, 255, 212, 0.3);
-                /* Lighter Teal Tape */
-                backdrop-filter: blur(5px);
-                transform: rotate(-5deg);
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-            }
-
-            .promo-sticker:hover {
-                animation-play-state: paused;
-                transform: rotate(0deg) scale(1.05) translateY(0);
-                border-color: #4ECDC4;
-                box-shadow: 0 15px 50px rgba(78, 205, 196, 0.3);
-                z-index: 100;
-            }
-
-            .play-btn {
-                display: block;
-                background: rgba(255, 255, 255, 0.05);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                padding: 8px 15px;
-                border-radius: 50px;
-                text-decoration: none;
-                color: white;
-                font-size: 0.9rem;
-                transition: 0.3s;
-                text-align: center;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .play-btn:hover {
-                background: rgba(78, 205, 196, 0.2);
-                border-color: #4ECDC4;
-                color: #4ECDC4;
-            }
-
-            @media (max-width: 768px) {
-                .hero-btns {
-                    flex-direction: column;
-                    align-items: center;
-                    margin-bottom: 0px;
-                    /* Remove bottom margin from buttons, sticker handles spacing */
-                }
-
-                .promo-sticker {
-                    position: relative !important;
-                    /* Static flow */
-                    top: auto;
-                    left: auto;
-                    right: auto;
-                    bottom: auto;
-                    transform: none !important;
-                    /* Reset tilt */
-
-                    /* THE PERFECT SPACING - UPDATED */
-                    margin: 40px auto 40px auto;
-
-                    width: 90%;
-                    max-width: 340px;
-                    animation: none;
-                    text-align: center;
-                    box-shadow: 0 5px 20px rgba(78, 205, 196, 0.15);
-                    /* Softer shadow for mobile section */
-                }
-
-                .tape-strip {
-                    display: none;
-                    /* Remove tape on mobile for cleaner look */
-                }
-
-                /* Override Hero Padding for better mobile spacing */
-                .hero {
-                    padding-bottom: 20px !important;
-                }
-
-                /* Override Next Section Margin to remove huge gap */
-                #tools.section-header {
-                    margin-top: 0px !important;
-                }
-
-                .promo-sticker {
-                    margin: 10px auto 30px auto;
-                    /* Reduced Top Gap: 10px */
-                    /* Softer Bottom Gap: 30px */
-                }
-            }
-        </style>
 
 
 
@@ -1177,6 +1171,24 @@
 
 
         <div class="hero fade-in">
+
+            <!-- PROMO STICKER RESTORED -->
+            <div class="promo-sticker"
+                style="display: block !important; visibility: visible !important; opacity: 1 !important;">
+                <div class="tape-strip"></div>
+                <div class="sticker-header">
+                    <i class="fas fa-bolt" style="color:#FFDD57;"></i> Wiring Backend...
+                </div>
+                <div class="sticker-content">
+                    We're connecting the Soul-Engine. While you wait...
+                </div>
+                <a href="tools/drop-it.html" class="play-btn">
+                    Play "Drop It" 🚀
+                </a>
+            </div>
+
+
+
             <h1>You Don’t Have to<br>Carry Everything Alone.</h1>
             <p>
                 Soulamore helps you let go of heavy thoughts, reset your mind, and find support when
@@ -1216,19 +1228,7 @@
                 </div>
             </div>
 
-            <!-- Promo Sticker (Moved here for Mobile Flow) -->
-            <div class="promo-sticker">
-                <div class="tape-strip"></div>
-                <div class="sticker-header">
-                    <i class="fas fa-bolt" style="color:#FFDD57;"></i> Wiring Backend...
-                </div>
-                <div class="sticker-content">
-                    We're connecting the Soul-Engine. While you wait...
-                </div>
-                <a href="tools/drop-it.html" class="play-btn">
-                    Play "Drop It" 🚀
-                </a>
-            </div>
+
 
 
             <div class="breathing-glow"></div>
@@ -1249,13 +1249,6 @@
                 <div class="pillar-desc">Vent Box & destruction tools for heavy emotions.</div>
             </a>
 
-            <!-- 1.5 DROP IT (NEW GAME) -->
-            <a href="tools/drop-it.html" class="pillar-card" style="border-color:#4ECDC4;">
-                <i class="fas fa-gamepad pillar-icon" style="color:#4ECDC4;"></i>
-                <div class="pillar-title" style="color:#4ECDC4;">Drop It</div>
-                <div class="pillar-desc">Mental Space Shooter. Blast away heavy thoughts.</div>
-            </a>
-
             <!-- 2. RESET -->
             <a href="tools/5-step-reset.html" class="pillar-card" style="border-color:var(--teal-glow);">
                 <i class="fas fa-wind pillar-icon"></i>
@@ -1264,11 +1257,12 @@
             </a>
 
             <!-- 3. REFLECT -->
-            <div class="pillar-card" onclick="alert('Journaling coming soon!')">
+            <a href="spaces/campus/student-resources.html#journal" class="pillar-card"
+                style="border-color:var(--peach-glow); cursor:pointer;">
                 <i class="fas fa-book-open pillar-icon" style="color:var(--peach-glow);"></i>
                 <div class="pillar-title">Reflect</div>
                 <div class="pillar-desc">Guided prompts to understand your feelings.</div>
-            </div>
+            </a>
 
             <!-- 4. CONNECT -->
             <a href="our-peers/index.html" class="pillar-card">
@@ -1334,7 +1328,7 @@
 
                 <!-- 2. WHAT WOULD HELP RIGHT NOW? (Restored Tools) -->
                 <section id="relief-coping" style="padding: 50px 0; position: relative; z-index: 2;">
-                    <div class="container" style="max-width: 1200px; margin: 0 auto;">
+                    <div class="container" style="max-width: 1300px; width: 94%; margin: 0 auto;">
                         <h2 class="section-title text-center" style="margin-bottom: 10px;">What Would Help Right Now?
                         </h2>
                         <p
@@ -1343,7 +1337,7 @@
                         </p>
 
 
-                        <div class="grid-3 fade-in" style="max-width:1200px; margin:0 auto; padding-bottom: 20px;">
+                        <div class="grid-3 fade-in" style="max-width:1300px; margin:0 auto; padding-bottom: 20px;">
                             <!-- CARD 1: 5-STEP RESET -->
                             <div class="glass-card hover-cyan"
                                 style="padding:40px; border-radius:30px; height: 100%; display: flex; flex-direction: column;">
@@ -1405,7 +1399,7 @@
                     Sometimes tools help. Sometimes it helps more to talk to someone who’s been there.
                 </p>
                 <!-- Static Grid for Peers -->
-                <div class="responsive-compass-grid" style="max-width:1200px; margin:0 auto; padding-bottom: 20px;">
+                <div class="responsive-compass-grid" style="max-width:1300px; margin:0 auto; padding-bottom: 20px;">
 
                     <!-- Peer Card 1: Aditya -->
                     <div class="peer-card"
@@ -1576,7 +1570,13 @@
 
     <!-- NEWSLETTER SECTION -->
     <section class="newsletter-section fade-in"
-        style="margin-bottom: 0; padding-bottom: 100px; padding-top: 50px; background: transparent;">
+        style="margin-bottom: 0; padding-bottom: 100px; padding-top: 50px; background: transparent; position: relative;">
+
+        <!-- Decoration Particles (Added) -->
+        <div id="newsletter-particles"
+            style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden;">
+        </div>
+
         <div class="newsletter-container">
             <h2 class="newsletter-h2">Stay Connected</h2>
             <p class="newsletter-desc">
@@ -1585,16 +1585,74 @@
                 <br><br>
                 <em style="font-size: 0.9rem; opacity: 0.8;">No spam. Just soul.</em>
             </p>
-            <form class="newsletter-form" onsubmit="submitNewsletterIndex(event)">
+            <form class="newsletter-form" onsubmit="submitNewsletterIndex(event)" style="position:relative;">
                 <input type="email" id="newsEmailIndex" class="lifeline-input" placeholder="Your email address" required
                     style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1);">
                 <button type="submit" class="lifeline-submit-btn" id="btnNewsIndex"
-                    style="width: auto; min-width: 150px; margin: 0;">Subscribe</button>
+                    style="width: auto; min-width: 150px; margin: 0; position:relative; overflow:hidden;">
+                    <span id="btnText">Subscribe</span>
+                    <i class="fas fa-paper-plane" id="planeIcon"
+                        style="display:none; position:absolute; left:50%; top:50%; transform:translate(-50%, -50%);"></i>
+                </button>
             </form>
             <div id="newsletterCount" style="margin-top: 15px; font-size: 0.9rem; opacity: 0.6; font-family: 'Outfit';">
                 Joined by ... souls
             </div>
         </div>
+
+        <style>
+            /* FLYING ANIMATIONS */
+            @keyframes flyAway {
+                0% {
+                    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                    left: 50%;
+                    opacity: 1;
+                }
+
+                20% {
+                    transform: translate(-50%, -50%) scale(0.8) rotate(-10deg);
+                    /* Pull back */
+                }
+
+                100% {
+                    left: 200%;
+                    top: -100%;
+                    transform: translate(-50%, -50%) scale(0.5) rotate(45deg);
+                    opacity: 0;
+                }
+            }
+
+            .plane-flying {
+                display: block !important;
+                animation: flyAway 1.2s ease-in forwards;
+            }
+
+            .float-envelope {
+                position: absolute;
+                color: rgba(78, 205, 196, 0.1);
+                animation: floatUpParticle 10s linear infinite;
+            }
+
+            @keyframes floatUpParticle {
+                from {
+                    transform: translateY(100px) rotate(0deg);
+                    opacity: 0;
+                }
+
+                10% {
+                    opacity: 0.5;
+                }
+
+                90% {
+                    opacity: 0.5;
+                }
+
+                to {
+                    transform: translateY(-300px) rotate(20deg);
+                    opacity: 0;
+                }
+            }
+        </style>
     </section>
 
     <!-- STANDARDIZED FOOTER -->
@@ -2049,6 +2107,59 @@
             entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = 1; entry.target.style.transform = "translateY(0)"; } });
         });
         document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        // 7. NEWSLETTER WITH PAPER PLANE
+        function submitNewsletterIndex(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnNewsIndex');
+            const txt = document.getElementById('btnText');
+            const icon = document.getElementById('planeIcon');
+            const emailInp = document.getElementById('newsEmailIndex');
+
+            if (!emailInp.value) return;
+
+            // 1. Transform Button
+            txt.style.opacity = '0';
+            icon.style.display = 'block';
+
+            // 2. Fly Away interaction
+            setTimeout(() => {
+                icon.classList.add('plane-flying');
+                btn.style.background = 'transparent';
+                btn.style.border = '1px solid var(--teal-glow)';
+
+                // BACKEND SUBMISSION
+                if (window.SoulBackend && window.SoulBackend.submitLead) {
+                    window.SoulBackend.submitLead('Subscriber', emailInp.value, 'Newsletter')
+                        .then(() => console.log("Subscribed"));
+                }
+            }, 100);
+
+            // 3. Reset after animation
+            setTimeout(() => {
+                btn.innerHTML = "<span style='color:var(--teal-glow); font-weight:700;'>Welcome Aboard! ✨</span>";
+                emailInp.value = "";
+
+                // Create burst of celebration particles
+                for (let i = 0; i < 10; i++) createEnvelope();
+            }, 1300);
+        }
+
+        // Newsletter Atmosphere
+        function createEnvelope() {
+            const container = document.getElementById('newsletter-particles');
+            if (!container) return;
+            const el = document.createElement('i');
+            el.className = 'fas fa-envelope float-envelope';
+            el.style.left = Math.random() * 100 + '%';
+            el.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            el.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 10000);
+        }
+
+        // Init background particles
+        setInterval(createEnvelope, 2000);
+
     </script>
     <script src="assets/js/components.js?v=1.1"></script>
     <script src="./assets/js/main.js"></script>
