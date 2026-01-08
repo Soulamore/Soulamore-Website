@@ -1015,8 +1015,8 @@
             }
 
             // SPAWN POPUPS (Intrusive Thoughts)
-            // Reduced spawn rate from 0.002 to 0.001 (Less overwhelming)
-            if (running && enablePopups && Math.random() < 0.0015) {
+            // Spawn Rate Increased (0.0015 -> 0.003)
+            if (running && enablePopups && Math.random() < 0.003) {
                 spawnPopup();
             }
 
@@ -1137,10 +1137,10 @@
                 }
 
                 // Dust (Words)
-                const baseRate = 0.035; // Increased for 1.25x challenge
-                const diffFactor = Math.min(0.04, distance / 20000); // Ramp up faster (20k instead of 30k)
+                const baseRate = 0.045; // Increased spawn rate (was 0.035)
+                const diffFactor = Math.min(0.06, distance / 15000); // Ramp up faster
                 const spawnRate = baseRate + diffFactor;
-                if (Math.random() < 0.015) {
+                if (Math.random() < 0.025) { // Spawn more often (was 0.015)
                     const word = words[Math.floor(Math.random() * words.length)];
                     // Dynamic Radius based on text length to prevent overflow
                     // Base 45px + 4px per character roughly
@@ -1154,8 +1154,8 @@
                         attached: false,
                         cleared: false,
                         driftX: (Math.random() - 0.5) * 4,
-                        driftY: 3 + Math.random() * 3, // slightly slower fall for larger items
-                        hp: Math.floor(r / 20) // HP scales with size (2-5 hits)
+                        driftY: 1 + Math.random() * 2, // SLOWER FALL (was 3 + random*3)
+                        hp: Math.floor(r / 15) // Slightly Tankier (was /20)
                     });
                 }
 
@@ -1194,20 +1194,23 @@
                     }
 
                     if (!d.attached) {
-                        const approachSpeed = (speed * 0.3) + 2;
+                        // REBALANCED SPEED: Readable but relentless
+                        const approachSpeed = (speed * 0.15) + 1.5; // Much Slower (was speed*0.3 + 2)
                         d.y += approachSpeed + (d.driftY || 0);
                         d.x += (d.driftX || 0);
-                        if (d.driftX) d.driftX *= 0.95;
-                        if (d.driftY) d.driftY *= 0.95;
+                        if (d.driftX) d.driftX *= 0.98;
+                        if (d.driftY) d.driftY *= 0.98;
 
                         const dx = player.x - d.x;
                         const dy = player.y - d.y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
 
-                        if (dist < 350) {
-                            const forceMult = 5.0;
+                        // INCREASED TRACKING DIFFICULTY
+                        // They start chasing from further away and pull harder
+                        if (dist < 550) { // Range increased (was 350)
+                            const forceMult = 7.0; // Force increased (was 5.0)
                             const angle = Math.atan2(dy, dx);
-                            const intensity = 1 - (dist / 350);
+                            const intensity = Math.pow(1 - (dist / 550), 2); // Non-linear pull
                             d.x += Math.cos(angle) * (forceMult * intensity);
                             d.y += Math.sin(angle) * (forceMult * intensity);
                         }
@@ -1707,51 +1710,147 @@
         }
 
         // New Independent Functions
+        // NEW: Robust Fallback Modal for Mobile
+        function showSaveModal(blob) {
+            const url = URL.createObjectURL(blob);
+            const overlay = document.createElement('div');
+            overlay.id = 'saveModalOverlay';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.92)';
+            overlay.style.zIndex = '100000';
+            overlay.style.display = 'flex';
+            overlay.style.flexDirection = 'column';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.backdropFilter = 'blur(10px)';
+            overlay.style.opacity = '0';
+            overlay.style.transition = 'opacity 0.3s';
+
+            // Image Container
+            const imgCont = document.createElement('div');
+            imgCont.style.position = 'relative';
+            imgCont.style.display = 'flex';
+            imgCont.style.flexDirection = 'column';
+            imgCont.style.alignItems = 'center';
+
+            // Image
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.maxHeight = '65vh';
+            img.style.maxWidth = '85vw';
+            img.style.borderRadius = '12px';
+            img.style.boxShadow = '0 0 40px rgba(78, 205, 196, 0.3)';
+            img.style.marginBottom = '25px';
+            img.style.border = '2px solid rgba(255,255,255,0.1)';
+
+            // Instructions
+            const text = document.createElement('div');
+            text.innerHTML = '<span style="font-size:2rem; display:block; margin-bottom:10px;">👆</span>Long Press Image<br><span style="font-size:0.9em; opacity:0.7;">to Share or Save to Photos</span>';
+            text.style.color = 'white';
+            text.style.textAlign = 'center';
+            text.style.fontFamily = 'Outfit, sans-serif';
+            text.style.fontSize = '1.3rem';
+            text.style.fontWeight = '600';
+            text.style.lineHeight = '1.4';
+
+            // Close Button
+            const closeBtn = document.createElement('button');
+            closeBtn.innerText = 'Done';
+            closeBtn.style.marginTop = '30px';
+            closeBtn.style.padding = '12px 40px';
+            closeBtn.style.background = 'rgba(255,255,255,0.15)';
+            closeBtn.style.border = '1px solid rgba(255,255,255,0.4)';
+            closeBtn.style.color = 'white';
+            closeBtn.style.borderRadius = '50px';
+            closeBtn.style.fontSize = '1.1rem';
+            closeBtn.style.fontWeight = '600';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.onclick = () => {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    if (document.body.contains(overlay)) document.body.removeChild(overlay);
+                    URL.revokeObjectURL(url);
+                }, 300);
+            };
+
+            imgCont.appendChild(img);
+            imgCont.appendChild(text);
+            overlay.appendChild(imgCont);
+            overlay.appendChild(closeBtn);
+            document.body.appendChild(overlay);
+
+            // Animate In
+            requestAnimationFrame(() => overlay.style.opacity = '1');
+        }
+
         async function webShare() {
             const btn = document.getElementById('shareBtn');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
 
             try {
-                const blob = await generateImage(null, null, false, true); // Get Blob
-                if (!blob) throw new Error("Image Generation Failed");
+                // Generate Blob
+                const blob = await generateImage(null, null, false, true);
+                if (!blob) throw new Error("Image Capture Failed");
 
-                const file = new File([blob], "soulamore-journey.png", { type: "image/png" });
+                const file = new File([blob], "soulamore-story.png", { type: "image/png" });
 
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                // Optimistic Share (Try/Catch is robust enough)
+                if (navigator.share) {
                     await navigator.share({
                         files: [file],
-                        title: 'My Soulamore Journey',
-                        text: 'I just cleared my mind on Soulamore.',
+                        title: 'My Soulamore',
+                        text: 'Cleared my mind on Soulamore.',
                     });
                     btn.innerHTML = 'Shared! <i class="fas fa-check"></i>';
                 } else {
-                    throw new Error("Web Share not supported");
+                    throw new Error("Navigator Share not available");
                 }
             } catch (err) {
-                console.warn("Share failed, falling back to download", err);
-                downloadImage(); // Fallback
-                btn.innerHTML = originalText;
+                console.warn("Share failed (likely not supported for files):", err);
+                // Fallback to Modal
+                showSaveModal(await generateImage(null, null, false, true).catch(e => null) || new Blob());
+                btn.innerHTML = 'Image Ready <i class="fas fa-check"></i>';
             }
-            setTimeout(() => btn.innerHTML = originalText, 3000);
+            setTimeout(() => btn.innerHTML = originalText, 4000);
         }
 
-        async function downloadImage() {
+        async function downloadImage(forceOpen = false) {
             const btn = document.getElementById('downBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            const originalText = btn.innerHTML;
+            if (!forceOpen) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
             try {
-                const dataUrl = await generateImage(null, null, false, false); // Get DataURL
+                const blob = await generateImage(null, null, false, true); // Get Blob
+                const url = URL.createObjectURL(blob);
+
+                // Strategy: Link Click (Works on Android/Desktop)
                 const link = document.createElement('a');
-                link.download = `soulamore-journey-${Date.now()}.png`;
-                link.href = dataUrl;
+                link.download = `soulamore-${Date.now()}.png`;
+                link.href = url;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+
+                // Fallback for iOS (Link click doesn't auto-download blobs sometimes)
+                // If we are on mobile, we also open it in a new tab just in case the download was blocked
+                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    setTimeout(() => window.open(url, '_blank'), 100);
+                }
+
+                setTimeout(() => URL.revokeObjectURL(url), 10000);
+
             } catch (e) {
-                alert("Download failed. Please try again.");
+                console.error(e);
+                alert("Download failed. Showing verification image.");
+                const b = await generateImage(null, null, false, true).catch(e => null);
+                if (b) showSaveModal(b);
             }
-            btn.innerHTML = 'Download Image <i class="fas fa-download"></i>';
+            if (!forceOpen) btn.innerHTML = 'Download Image <i class="fas fa-download"></i>';
         }
 
         // Refactored Generator (Returns Promise)
