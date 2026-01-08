@@ -2326,76 +2326,88 @@
     </script>
 
 
-    function createRescueExplosion(x, y, isSmall = false) {
-    const count = isSmall ? 10 : 30;
-    const size = isSmall ? 2 : 4;
-    const speed = isSmall ? 5 : 10;
+    <script>
+        function createRescueExplosion(x, y, isSmall = false) {
+            const count = isSmall ? 10 : 30;
+            const size = isSmall ? 2 : 4;
+            const speed = isSmall ? 5 : 10;
 
-    // Particles
-    for (let i = 0; i < count; i++) { const angle=Math.random() * Math.PI * 2; const v=Math.random() * speed;
-        rescueParticles.push({ x: x, y: y, vx: Math.cos(angle) * v, vy: Math.sin(angle) * v, life: 60, r: Math.random()
-        * size + 2, color: Math.random()> 0.5 ? '#F49F75' : '#FFD700' // Peach or Gold
-        });
+            // Particles
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const v = Math.random() * speed;
+                rescueParticles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * v,
+                    vy: Math.sin(angle) * v,
+                    life: 60,
+                    r: Math.random() * size + 2,
+                    color: Math.random() > 0.5 ? '#F49F75' : '#FFD700' // Peach or Gold
+                });
+            }
+
+            // Shockwave Ring
+            if (!isSmall) {
+                pulses.push({
+                    x: x,
+                    y: y,
+                    r: 10,
+                    maxR: 300,
+                    opacity: 1,
+                    color: '#F49F75'
+                });
+            }
         }
+    </script>
+    }
 
-        // Shockwave Ring
-        if (!isSmall) {
-        pulses.push({
-        x: x, y: y,
-        r: 10,
-        maxR: 300,
-        opacity: 1,
-        color: '#F49F75'
-        });
-        }
-        }
+    // Start Background Animation
+    resize();
+    loop();
 
-        // Start Background Animation
-        resize();
-        loop();
+    (function () {
+    // ... listener logic ...
+    })();
+    </script>
 
+    <!-- NUCLEAR EVENT HANDLER (Safety Script) -->
+    <script>
         (function () {
-        // ... listener logic ...
-        })();
-        </script>
+            console.log("--- NUCLEAR SAFETY SCRIPT STARTED ---");
+            const btn = document.getElementById('igniteBtn');
 
-        <!-- NUCLEAR EVENT HANDLER (Safety Script) -->
-        <script>
-            (function () {
-                console.log("--- NUCLEAR SAFETY SCRIPT STARTED ---");
-                const btn = document.getElementById('igniteBtn');
+            if (!btn) {
+                console.error("Button Missing!");
+                return;
+            }
 
-                if (!btn) {
-                    console.error("Button Missing!");
-                    return;
-                }
-
-                // Check if Main Engine Loaded
-                if (typeof initGame !== 'function') {
-                    btn.style.backgroundColor = "red";
-                    btn.innerText = "ERROR LOADING ENGINE";
-                    btn.onclick = function () {
-                        alert("CRITICAL ERROR:\nThe game engine failed to load.\nThis usually means a SyntaxError or Ad-Blocker blocked the main script.\nPlease check console.");
-                    };
-                    return;
-                }
-
-                // Attach Robust Listeners
-                const ignite = function (e) {
-                    if (e) { e.preventDefault(); e.stopPropagation(); }
-                    console.log("NUCLEAR CLICK");
-                    try {
-                        initGame();
-                    } catch (err) {
-                        alert("Runtime Error: " + err.message);
-                    }
+            // Check if Main Engine Loaded
+            if (typeof initGame !== 'function') {
+                btn.style.backgroundColor = "red";
+                btn.innerText = "ERROR LOADING ENGINE";
+                btn.onclick = function () {
+                    alert("CRITICAL ERROR:\nThe game engine failed to load.\nThis usually means a SyntaxError or Ad-Blocker blocked the main script.\nPlease check console.");
                 };
+                return;
+            }
 
-                btn.addEventListener('touchstart', ignite, { passive: false });
-                btn.addEventListener('click', ignite);
-                console.log("--- NUCLEAR LISTENERS ATTACHED ---");
-            })();
-        </script>
+            // Attach Robust Listeners
+            const ignite = function (e) {
+                if (e) { e.preventDefault(); e.stopPropagation(); }
+                console.log("NUCLEAR CLICK");
+                try {
+                    initGame();
+                } catch (err) {
+                    alert("Runtime Error: " + err.message);
+                }
+            };
+
+            btn.addEventListener('touchstart', ignite, { passive: false });
+            btn.addEventListener('click', ignite);
+            console.log("--- NUCLEAR LISTENERS ATTACHED ---");
+        })();
+    </script>
 </body>
 
 </html>
