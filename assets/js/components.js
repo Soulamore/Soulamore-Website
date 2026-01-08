@@ -442,7 +442,7 @@ function generateNavHTML(rootPath) {
     });
 
     // Mobile-Only Help Link (Appended at the end of nav-links)
-    html += `<a href="${rootPath}get-help-now.html" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Get Help Now</a>`;
+    html += `<a href="${rootPath}get-help-now.html" id="mobile-destruct-trigger" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Get Help Now</a>`;
 
     return html;
 }
