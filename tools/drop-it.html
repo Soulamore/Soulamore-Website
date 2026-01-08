@@ -1710,6 +1710,83 @@
         }
 
         // New Independent Functions
+        // NEW: Robust Fallback Modal for Mobile
+        function showSaveModal(blob) {
+            const url = URL.createObjectURL(blob);
+            const overlay = document.createElement('div');
+            overlay.id = 'saveModalOverlay';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.92)';
+            overlay.style.zIndex = '100000';
+            overlay.style.display = 'flex';
+            overlay.style.flexDirection = 'column';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.backdropFilter = 'blur(10px)';
+            overlay.style.opacity = '0';
+            overlay.style.transition = 'opacity 0.3s';
+
+            // Image Container
+            const imgCont = document.createElement('div');
+            imgCont.style.position = 'relative';
+            imgCont.style.display = 'flex';
+            imgCont.style.flexDirection = 'column';
+            imgCont.style.alignItems = 'center';
+
+            // Image
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.maxHeight = '65vh';
+            img.style.maxWidth = '85vw';
+            img.style.borderRadius = '12px';
+            img.style.boxShadow = '0 0 40px rgba(78, 205, 196, 0.3)';
+            img.style.marginBottom = '25px';
+            img.style.border = '2px solid rgba(255,255,255,0.1)';
+
+            // Instructions
+            const text = document.createElement('div');
+            text.innerHTML = '<span style="font-size:2rem; display:block; margin-bottom:10px;">👆</span>Long Press Image<br><span style="font-size:0.9em; opacity:0.7;">to Share or Save to Photos</span>';
+            text.style.color = 'white';
+            text.style.textAlign = 'center';
+            text.style.fontFamily = 'Outfit, sans-serif';
+            text.style.fontSize = '1.3rem';
+            text.style.fontWeight = '600';
+            text.style.lineHeight = '1.4';
+
+            // Close Button
+            const closeBtn = document.createElement('button');
+            closeBtn.innerText = 'Done';
+            closeBtn.style.marginTop = '30px';
+            closeBtn.style.padding = '12px 40px';
+            closeBtn.style.background = 'rgba(255,255,255,0.15)';
+            closeBtn.style.border = '1px solid rgba(255,255,255,0.4)';
+            closeBtn.style.color = 'white';
+            closeBtn.style.borderRadius = '50px';
+            closeBtn.style.fontSize = '1.1rem';
+            closeBtn.style.fontWeight = '600';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.onclick = () => {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    if (document.body.contains(overlay)) document.body.removeChild(overlay);
+                    URL.revokeObjectURL(url);
+                }, 300);
+            };
+
+            imgCont.appendChild(img);
+            imgCont.appendChild(text);
+            overlay.appendChild(imgCont);
+            overlay.appendChild(closeBtn);
+            document.body.appendChild(overlay);
+
+            // Animate In
+            requestAnimationFrame(() => overlay.style.opacity = '1');
+        }
+
         async function webShare() {
             const btn = document.getElementById('shareBtn');
             const originalText = btn.innerHTML;
@@ -1731,22 +1808,18 @@
                     });
                     btn.innerHTML = 'Shared! <i class="fas fa-check"></i>';
                 } else {
-                    // 2. Fallback: Copy to Clipboard (iOS/Android compatible in some contexts)
-                    try {
-                        await navigator.clipboard.write([
-                            new ClipboardItem({ [blob.type]: blob })
-                        ]);
-                        alert("Image copied to clipboard! You can paste it into Instagram Stories.");
-                        btn.innerHTML = 'Copied! <i class="fas fa-copy"></i>';
-                    } catch (clipErr) {
-                        throw new Error("Share API not supported");
-                    }
+                    // 2. Fallback to Modal (More reliable than Clipboard on some Androids)
+                    showSaveModal(blob);
+                    btn.innerHTML = 'Image Ready <i class="fas fa-check"></i>';
                 }
             } catch (err) {
                 console.warn("Share failed:", err);
-                // 3. Ultimate Fallback: Download it
-                alert("Opening image... Long press it to save/share!");
-                downloadImage(true); // Open in new tab mode
+                // 3. Ultimate Fallback: Modal
+                try {
+                    const blob = await generateImage(null, null, false, true);
+                    showSaveModal(blob);
+                } catch (e) { alert("Could not generate image."); }
+
                 btn.innerHTML = originalText;
             }
             setTimeout(() => btn.innerHTML = originalText, 4000);
@@ -1759,28 +1832,21 @@
 
             try {
                 const blob = await generateImage(null, null, false, true); // Get Blob
-                const url = URL.createObjectURL(blob);
 
-                // Strategy: Try automatic download first
-                const link = document.createElement('a');
-                link.download = `soulamore-${Date.now()}.png`;
-                link.href = url;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                // Mobile Safari often ignores programatic clicks.
-                // If it was a "Share Fallback" or just to be safe, we can also open it.
-                if (forceOpen || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-                    // Small delay to let the download attempt happen
-                    setTimeout(() => {
-                        // Open blob in new tab so user can long-press save
-                        window.open(url, '_blank');
-                    }, 500);
+                // On Mobile, prefer the Modal immediately
+                if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                    showSaveModal(blob);
+                } else {
+                    // Desktop: Auto Download
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = `soulamore-${Date.now()}.png`;
+                    link.href = url;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    setTimeout(() => URL.revokeObjectURL(url), 10000);
                 }
-
-                setTimeout(() => URL.revokeObjectURL(url), 10000); // Cleanup
-
             } catch (e) {
                 alert("Could not generate image. Please screenshot instead.");
                 console.error(e);
