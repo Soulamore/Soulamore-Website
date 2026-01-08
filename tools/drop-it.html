@@ -1137,10 +1137,10 @@
                 }
 
                 // Dust (Words)
-                const baseRate = 0.045; // Increased spawn rate (was 0.035)
-                const diffFactor = Math.min(0.06, distance / 15000); // Ramp up faster
+                const baseRate = 0.036; // Tuned: Reduced by 10% (was 0.040)
+                const diffFactor = Math.min(0.06, distance / 18000); // Ramp up slower
                 const spawnRate = baseRate + diffFactor;
-                if (Math.random() < 0.025) { // Spawn more often (was 0.015)
+                if (Math.random() < 0.018) { // Tuned: Reduced spawn chance (was 0.020)
                     const word = words[Math.floor(Math.random() * words.length)];
                     // Dynamic Radius based on text length to prevent overflow
                     // Base 45px + 4px per character roughly
@@ -1154,8 +1154,8 @@
                         attached: false,
                         cleared: false,
                         driftX: (Math.random() - 0.5) * 4,
-                        driftY: 1 + Math.random() * 2, // SLOWER FALL (was 3 + random*3)
-                        hp: Math.floor(r / 15) // Slightly Tankier (was /20)
+                        driftY: 1 + Math.random() * 2, // Slow Fall
+                        hp: Math.floor(r / 15)
                     });
                 }
 
@@ -1195,7 +1195,7 @@
 
                     if (!d.attached) {
                         // REBALANCED SPEED: Readable but relentless
-                        const approachSpeed = (speed * 0.15) + 1.5; // Much Slower (was speed*0.3 + 2)
+                        const approachSpeed = (speed * 0.15) + 1.5; // Much Slower
                         d.y += approachSpeed + (d.driftY || 0);
                         d.x += (d.driftX || 0);
                         if (d.driftX) d.driftX *= 0.98;
@@ -1205,12 +1205,12 @@
                         const dy = player.y - d.y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
 
-                        // INCREASED TRACKING DIFFICULTY
+                        // INCREASED TRACKING DIFFICULTY (Reduced 10%)
                         // They start chasing from further away and pull harder
-                        if (dist < 550) { // Range increased (was 350)
-                            const forceMult = 7.0; // Force increased (was 5.0)
+                        if (dist < 400) { // Tuned: Reduced range (was 450)
+                            const forceMult = 5.4; // Tuned: Reduced pull (was 6.0)
                             const angle = Math.atan2(dy, dx);
-                            const intensity = Math.pow(1 - (dist / 550), 2); // Non-linear pull
+                            const intensity = Math.pow(1 - (dist / 400), 2); // Non-linear pull
                             d.x += Math.cos(angle) * (forceMult * intensity);
                             d.y += Math.sin(angle) * (forceMult * intensity);
                         }
@@ -1332,8 +1332,8 @@
                 }
 
                 // SPAWN POPUPS (Intrusive Thoughts)
-                // Tuned Spawn Rate: (was 0.0015 -> 0.003 -> 0.0022)
-                if (running && enablePopups && Math.random() < 0.0022) {
+                // Tuned Spawn Rate: Reduced 10% (was 0.0022 -> 0.0020)
+                if (running && enablePopups && Math.random() < 0.0020) {
                     spawnPopup();
                 }
 
