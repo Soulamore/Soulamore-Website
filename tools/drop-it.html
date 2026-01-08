@@ -1015,8 +1015,8 @@
             }
 
             // SPAWN POPUPS (Intrusive Thoughts)
-            // Reduced spawn rate from 0.002 to 0.001 (Less overwhelming)
-            if (running && enablePopups && Math.random() < 0.0015) {
+            // Spawn Rate Increased (0.0015 -> 0.003)
+            if (running && enablePopups && Math.random() < 0.003) {
                 spawnPopup();
             }
 
@@ -1137,10 +1137,10 @@
                 }
 
                 // Dust (Words)
-                const baseRate = 0.035; // Increased for 1.25x challenge
-                const diffFactor = Math.min(0.04, distance / 20000); // Ramp up faster (20k instead of 30k)
+                const baseRate = 0.045; // Increased spawn rate (was 0.035)
+                const diffFactor = Math.min(0.06, distance / 15000); // Ramp up faster
                 const spawnRate = baseRate + diffFactor;
-                if (Math.random() < 0.015) {
+                if (Math.random() < 0.025) { // Spawn more often (was 0.015)
                     const word = words[Math.floor(Math.random() * words.length)];
                     // Dynamic Radius based on text length to prevent overflow
                     // Base 45px + 4px per character roughly
@@ -1154,8 +1154,8 @@
                         attached: false,
                         cleared: false,
                         driftX: (Math.random() - 0.5) * 4,
-                        driftY: 3 + Math.random() * 3, // slightly slower fall for larger items
-                        hp: Math.floor(r / 20) // HP scales with size (2-5 hits)
+                        driftY: 1 + Math.random() * 2, // SLOWER FALL (was 3 + random*3)
+                        hp: Math.floor(r / 15) // Slightly Tankier (was /20)
                     });
                 }
 
@@ -1194,20 +1194,23 @@
                     }
 
                     if (!d.attached) {
-                        const approachSpeed = (speed * 0.3) + 2;
+                        // REBALANCED SPEED: Readable but relentless
+                        const approachSpeed = (speed * 0.15) + 1.5; // Much Slower (was speed*0.3 + 2)
                         d.y += approachSpeed + (d.driftY || 0);
                         d.x += (d.driftX || 0);
-                        if (d.driftX) d.driftX *= 0.95;
-                        if (d.driftY) d.driftY *= 0.95;
+                        if (d.driftX) d.driftX *= 0.98;
+                        if (d.driftY) d.driftY *= 0.98;
 
                         const dx = player.x - d.x;
                         const dy = player.y - d.y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
 
-                        if (dist < 350) {
-                            const forceMult = 5.0;
+                        // INCREASED TRACKING DIFFICULTY
+                        // They start chasing from further away and pull harder
+                        if (dist < 550) { // Range increased (was 350)
+                            const forceMult = 7.0; // Force increased (was 5.0)
                             const angle = Math.atan2(dy, dx);
-                            const intensity = 1 - (dist / 350);
+                            const intensity = Math.pow(1 - (dist / 550), 2); // Non-linear pull
                             d.x += Math.cos(angle) * (forceMult * intensity);
                             d.y += Math.sin(angle) * (forceMult * intensity);
                         }
