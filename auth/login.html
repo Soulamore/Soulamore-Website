@@ -221,7 +221,7 @@
             cursor: pointer;
         }
     </style>
-    <link rel="icon" href="./assets/images/favicon_symbol.png" type="image/x-icon">
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
 </head>
 
 <body>
@@ -260,7 +260,7 @@
             <button class="social-btn" id="googleSignInBtn"><i class="fab fa-google"></i> Continue with Google</button>
 
             <div class="alt-link">
-                New here? <a href="../join-us/index.html">Create an account</a>
+                New here? <a href="signup.html">Create an account</a>
             </div>
             <div class="alt-link" style="margin-top: 10px; font-size: 0.85rem;">
                 Are you a Professional? <a href="professional-dashboard.html" style="color: var(--teal-glow);">Access
@@ -291,12 +291,12 @@
             if (result) {
                 const user = result.user;
                 console.log('Signed in via redirect:', user.displayName, user.email);
-                
+
                 // Create/update user profile in Firestore
                 import("../assets/js/profile-handler.js").then(({ createOrUpdateUserProfile }) => {
                     createOrUpdateUserProfile(user);
                 });
-                
+
                 // Store user info in sessionStorage
                 sessionStorage.setItem('user', JSON.stringify({
                     uid: user.uid,
@@ -304,7 +304,7 @@
                     email: user.email,
                     photoURL: user.photoURL
                 }));
-                
+
                 // Redirect to home page
                 window.location.href = '../index.html';
             }
@@ -322,25 +322,25 @@
                     googleSignInBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
                     console.warn('Sign-in timeout - resetting button');
                 }, 30000);
-                
+
                 try {
                     googleSignInBtn.disabled = true;
                     googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-                    
+
                     console.log('Attempting Google sign-in...');
                     console.log('Auth domain:', auth.config.authDomain);
                     console.log('Current origin:', window.location.origin);
-                    
+
                     const result = await signInWithPopup(auth, googleProvider);
                     clearTimeout(resetTimeout);
                     const user = result.user;
-                    
+
                     console.log('Signed in successfully:', user.displayName, user.email);
-                    
+
                     // Create/update user profile in Firestore
                     const { createOrUpdateUserProfile } = await import("../assets/js/profile-handler.js");
                     await createOrUpdateUserProfile(user);
-                    
+
                     // Store user info in sessionStorage
                     sessionStorage.setItem('user', JSON.stringify({
                         uid: user.uid,
@@ -348,7 +348,7 @@
                         email: user.email,
                         photoURL: user.photoURL
                     }));
-                    
+
                     // Redirect to home page
                     window.location.href = '../index.html';
                 } catch (error) {
@@ -357,11 +357,11 @@
                     console.error('Error code:', error.code);
                     console.error('Error message:', error.message);
                     console.error('Full error:', JSON.stringify(error, null, 2));
-                    
+
                     let errorMessage = 'Failed to sign in with Google. ';
                     let showAlert = true;
                     let useRedirect = false;
-                    
+
                     if (error.code === 'auth/configuration-not-found') {
                         errorMessage += 'Google authentication is not enabled in Firebase Console. Please enable it in Firebase Console > Authentication > Sign-in method > Google.';
                     } else if (error.code === 'auth/unauthorized-domain') {
@@ -378,11 +378,11 @@
                     } else {
                         errorMessage += `${error.message} (Code: ${error.code})`;
                     }
-                    
+
                     // Always reset button state
                     googleSignInBtn.disabled = false;
                     googleSignInBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
-                    
+
                     // If popup is blocked or domain issue, try redirect method
                     if (useRedirect) {
                         console.log('Attempting sign-in with redirect method...');

@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Problem Wall | Soulamore</title>
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Global CSS (Base styles) -->
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <!-- MODULES: Header Injection -->
+    <script src="../assets/js/components.js"></script>
+
+    <style>
+        /* --- 1. CORE THEME: DAYBREAK (Light & Airy) --- */
+        :root {
+            --paper-white: #fffefb;
+            --ink-black: #1e293b;
+            --soft-sky: #f0f9ff;
+            --mist-gray: #e2e8f0;
+            --highlight-blue: #38bdf8;
+            --peach: #F49F75;
+            --teal: #4ECDC4;
+            --warm-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
+            /* Performance: Reduce variable usage in heavy animations */
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            /* Throttled gradient for performance */
+            background-image:
+                radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(78, 205, 196, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(244, 159, 117, 0.05) 0%, transparent 50%);
+            color: var(--ink-black);
+            overflow: hidden;
+            /* Infinite canvas handles scroll */
+            height: 100vh;
+            width: 100vw;
+            will-change: background-image;
+            /* HW Acceleration hint */
+        }
+
+        /* --- 2. HEADER OVERRIDE (Daybreak Theme) --- */
+        /* We use specific selectors to override global.css styles injected by components.js */
+
+        /* Force Light Theme on the Island Nav */
+        header.island-nav {
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Light Theme Links */
+        header.island-nav .nav-links a {
+            color: #475569 !important;
+            /* Slate-600 */
+        }
+
+        header.island-nav .nav-links a:hover {
+            color: #4ECDC4 !important;
+            /* Teal */
+        }
+
+        header.island-nav .nav-links i {
+            color: #94a3b8 !important;
+            /* Slate-400 */
+        }
+
+        header.island-nav .nav-links a:hover i {
+            color: #4ECDC4 !important;
+        }
+
+        /* Logo Text Dark */
+        header.island-nav .nav-logo {
+            filter: none !important;
+            opacity: 1 !important;
+        }
+
+        /* Dropdown Menus (Light Mode) */
+        header.island-nav .dropdown-content {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        header.island-nav .dropdown-content a {
+            color: #475569 !important;
+        }
+
+        /* Header Buttons Override (Force Visibility) */
+        header.island-nav .nav-btn,
+        header.island-nav .lifeline-btn {
+            background: #0f172a !important;
+            /* Dark Slate */
+            border: 1px solid #0f172a !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        header.island-nav .nav-btn:hover,
+        header.island-nav .lifeline-btn:hover {
+            background: #4ECDC4 !important;
+            /* Teal Highlight */
+            border-color: #4ECDC4 !important;
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        header.island-nav .nav-btn {
+            background: white !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        }
+
+        header.island-nav .nav-btn:hover {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+
+        /* Header Glow States (Interactive) */
+        header.island-nav.glow-red {
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.3) !important;
+            border-color: rgba(239, 68, 68, 0.4) !important;
+            transition: 0.3s ease;
+        }
+
+        header.island-nav.glow-yellow {
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.3) !important;
+            border-color: rgba(251, 191, 36, 0.4) !important;
+            transition: 0.3s ease;
+        }
+
+        header.island-nav.glow-orange {
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.3) !important;
+            border-color: rgba(249, 115, 22, 0.4) !important;
+            transition: 0.3s ease;
+        }
+
+        /* --- 3. LIVE ACTIVITY BAR --- */
+        .live-activity-bar {
+            position: fixed;
+            top: 100px;
+            /* Below header */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #64748b;
+            z-index: 900;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            pointer-events: none;
+            /* Let clicks pass */
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+
+            100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+        }
+
+        /* --- 4. INFINITE CANVAS & NOTES --- */
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            cursor: grab;
+            position: relative;
+            touch-action: none;
+        }
+
+        #viewport:active {
+            cursor: grabbing;
+        }
+
+        #infinite-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5000px;
+            /* Large canvas */
+            height: 5000px;
+            /* Centering initially */
+            transform-origin: center center;
+            /* Dot Grid Pattern */
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 30px 30px;
+            /* Hardware Acceleration */
+            will-change: transform;
+            /* Smoother transition/interp */
+        }
+
+        /* HERO TEXT ON CANVAS */
+        .wall-hero {
+            position: absolute;
+            top: 2450px;
+            /* Center of 5000px canvas */
+            left: 2500px;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            /* Let clicks pass through to canvas */
+            z-index: 0;
+        }
+
+        .wall-hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 4rem;
+            color: #1e293b;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .wall-hero p {
+            font-size: 1.2rem;
+            color: #64748b;
+        }
+
+        /* NOTE CARD STYLING */
+        .note {
+            position: absolute;
+            width: 280px;
+            background: var(--paper-white);
+            padding: 25px;
+            border-radius: 2px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            /* Reduced initial shadow for perf */
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #334155;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            /* Faster transition */
+            cursor: default;
+            user-select: none;
+            overflow: hidden;
+            /* Promote to own layer for perf */
+            will-change: transform;
+        }
+
+        .note:hover {
+            transform: scale(1.02) rotate(0deg) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            z-index: 10;
+        }
+
+        /* Glow States (Simplified box-shadows for perf) */
+        .note.glow-red {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4) !important;
+            border-color: rgba(239, 68, 68, 0.4) !important;
+        }
+
+        .note.glow-yellow {
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4) !important;
+            border-color: rgba(251, 191, 36, 0.4) !important;
+        }
+
+        .note.glow-orange {
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.4) !important;
+            border-color: rgba(249, 115, 22, 0.4) !important;
+        }
+
+        /* Tape effect */
+        .note::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 40px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .note-meta {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ACTIONS */
+        .note-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.1s;
+            /* Fast visual feedback */
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .action-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .heart-btn:hover {
+            color: #ef4444;
+            background: #fee2e2;
+        }
+
+        .flower-btn:hover {
+            color: #eab308;
+            background: #fef9c3;
+        }
+
+        .candle-btn:hover {
+            color: #f97316;
+            background: #ffedd5;
+        }
+
+        /* Animation Classes */
+        .pop-active {
+            animation: pop 0.3s;
+        }
+
+        @keyframes pop {
+            50% {
+                transform: scale(1.3);
+            }
+        }
+
+        /* --- 5. UI OVERLAYS (FAB STACK) --- */
+        .fab-stack-container {
+            position: fixed;
+            bottom: 40px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .fab-btn {
+            width: 55px;
+            /* Unified Size */
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-decoration: none;
+            position: relative;
+        }
+
+        .fab-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 1. SoulBot (Teal) */
+        .fab-soulbot {
+            background: #4ECDC4;
+            color: white;
+        }
+
+        /* 2. Center View (White) */
+        .fab-center {
+            background: white;
+            color: var(--ink-black);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            /* Ensure visibility on light bg */
+        }
+
+        .fab-center:hover {
+            color: var(--teal);
+        }
+
+        /* 3. Write (Dark - Main) */
+        .fab-write {
+            background: var(--ink-black);
+            color: white;
+            font-size: 1.5rem;
+        }
+
+
+        /* WRITER MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .writer-card {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .modal-overlay.active .writer-card {
+            transform: translateY(0);
+        }
+
+        .writer-textarea {
+            width: 100%;
+            height: 150px;
+            border: none;
+            resize: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.2rem;
+            color: var(--ink-black);
+            outline: none;
+            margin-bottom: 20px;
+        }
+
+        .writer-textarea::placeholder {
+            color: #cbd5e1;
+        }
+
+        .post-btn {
+            background: var(--ink-black);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            float: right;
+            transition: 0.3s;
+        }
+
+        .post-btn:hover {
+            background: var(--teal);
+            transform: translateY(-2px);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        /* --- 6. STATS WIDGET (Right Side) --- */
+        .global-stats {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 90;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+
+        .stat-item:hover {
+            opacity: 1;
+            transform: translateX(-5px);
+        }
+
+        .stat-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .stat-text h4 {
+            font-family: 'Outfit';
+            font-size: 1.2rem;
+            margin: 0;
+            color: #1e293b;
+        }
+
+        .stat-text span {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media(max-width: 768px) {
+            .global-stats {
+                display: none;
+                /* Hide on mobile to declutter */
+            }
+
+            .wall-hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- --- HEADER (INJECTED BY COMPONENTS.JS) --- -->
+    <header class="island-nav" id="main-header"></header>
+    <script>
+        // Force header injection if it hasn't happened yet
+        if (typeof injectHeader === 'function') injectHeader();
+    </script>
+
+    <!-- LIVE COUNTER -->
+    <div class="live-activity-bar">
+        <div class="live-dot"></div>
+        <span id="userCount">142</span> people here right now
+    </div>
+
+    <!-- GLOBAL STATS (SIDEBAR) -->
+    <div class="global-stats">
+        <div class="stat-item">
+            <div class="stat-icon-box" style="background: #ffe4e6; color: #ef4444;">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div class="stat-text">
+                <h4 id="totalHearts">0</h4>
+                <span>Hearts given</span>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon-box" style="background: #fef9c3; color: #eab308;">
+                <i class="fas fa-spa"></i>
+            </div>
+            <div class="stat-text">
+                <h4 id="totalFlowers">0</h4>
+                <span>Flowers offered</span>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon-box" style="background: #ffedd5; color: #f97316;">
+                <i class="fas fa-fire-alt"></i>
+            </div>
+            <div class="stat-text">
+                <h4 id="totalCandles">0</h4>
+                <span>Candles lit</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFINITE CANVAS WRAPPER -->
+    <div id="viewport">
+        <div id="infinite-canvas">
+
+            <!-- HERO TEXT (Part of Canvas) -->
+            <div class="wall-hero">
+                <h1>The Problem Wall</h1>
+                <p>A place where pain is seen, not solved.</p>
+            </div>
+
+            <!-- DYNAMIC NOTES CONTAINER -->
+            <div id="notes-container"></div>
+
+        </div>
+    </div>
+
+    <!-- FAB STACK (Bottom Right) -->
+    <div class="fab-stack-container">
+
+        <!-- 2. Center/Reset (Middle) -->
+        <div class="fab-btn fab-center" onclick="resetView()" title="Center View">
+            <i class="fas fa-compress-arrows-alt"></i>
+        </div>
+
+        <!-- 3. Write (Bottom - Main) -->
+        <div class="fab-btn fab-write" onclick="openWriter()" title="Share a Burden">
+            <i class="fas fa-plus"></i>
+        </div>
+
+    </div>
+
+    <!-- WRITING MODAL -->
+    <div class="modal-overlay" id="writeModal">
+        <div class="writer-card">
+            <button class="close-modal" onclick="closeWriter()"><i class="fas fa-times"></i></button>
+            <h3 style="font-family:'Outfit'; margin-bottom:20px; font-size:1.5rem;">Leave a burden.</h3>
+            <textarea class="writer-textarea" id="noteInput" placeholder="I feel..."></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.8rem; color:#94a3b8;"><i class="fas fa-shield-alt"></i> Anonymous &
+                    Filtered</span>
+                <button class="post-btn" onclick="postNote()">Post It</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CONFIG & STATE ---
+        const CONFIG = {
+            width: 5000,
+            height: 5000,
+            initialNotes: 25, /* Increased count */
+            spawnRadius: 800 /* Restrict initial spawn to center area */
+        };
+
+        const STATE = {
+            scale: 1,
+            panning: false,
+            pointX: 0,
+            pointY: 0,
+            startX: 0,
+            startY: 0,
+            animationFrame: null
+        };
+
+        const OBSCENE_WORDS = ["fuck", "shit", "bitch", "asshole", "cunt", "dick", "pussy", "whore", "slut", "bastard"];
+
+        // --- 2. INITIALIZATION ---
+        const canvas = document.getElementById('infinite-canvas');
+        const viewport = document.getElementById('viewport');
+        const notesContainer = document.getElementById('notes-container');
+
+        // Center the canvas on load
+        window.onload = () => {
+            // Force header injection again to be safe
+            if (window.injectHeader) window.injectHeader();
+
+            // Calculate center position: (Viewport Width - Canvas Width) / 2
+            STATE.pointX = (window.innerWidth - CONFIG.width) / 2;
+            STATE.pointY = (window.innerHeight - CONFIG.height) / 2;
+
+            updateTransform(); // Apply initial transform
+            generateRandomNotes();
+            startFakeLiveActivity();
+        };
+
+        // --- 3. CANVAS LOGIC (PAN & ZOOM) - OPTIMIZED ---
+        viewport.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.note') || e.target.closest('.wall-hero')) return;
+            STATE.panning = true;
+            STATE.startX = e.clientX - STATE.pointX;
+            STATE.startY = e.clientY - STATE.pointY;
+            viewport.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mouseup', () => {
+            STATE.panning = false;
+            viewport.style.cursor = 'grab';
+        });
+
+        // Throttled Mouse Move
+        let lastFrame = 0;
+        window.addEventListener('mousemove', (e) => {
+            const now = Date.now();
+            if (now - lastFrame < 16) return; // Cap at ~60fps
+            lastFrame = now;
+
+            // A. Pan Logic
+            if (STATE.panning) {
+                e.preventDefault();
+                STATE.pointX = e.clientX - STATE.startX;
+                STATE.pointY = e.clientY - STATE.startY;
+                requestAnimationFrame(updateTransform); // Synced with repaint
+            }
+
+            // B. Background Gradient Logic (Only update every 3rd frame loosely)
+            if (Math.random() > 0.6) {
+                const xPercent = (e.clientX / window.innerWidth) * 100 + '%';
+                const yPercent = (e.clientY / window.innerHeight) * 100 + '%';
+                document.body.style.setProperty('--mouse-x', xPercent);
+                document.body.style.setProperty('--mouse-y', yPercent);
+            }
+        });
+
+        // Zoom (Wheel)
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const xs = (e.clientX - STATE.pointX) / STATE.scale;
+            const ys = (e.clientY - STATE.pointY) / STATE.scale;
+            const delta = -e.deltaY;
+
+            (delta > 0) ? (STATE.scale *= 1.1) : (STATE.scale /= 1.1);
+
+            // Limit Zoom limits
+            STATE.scale = Math.min(Math.max(0.4, STATE.scale), 2.5);
+
+            STATE.pointX = e.clientX - xs * STATE.scale;
+            STATE.pointY = e.clientY - ys * STATE.scale;
+
+            requestAnimationFrame(updateTransform);
+        }, { passive: false });
+
+        function updateTransform() {
+            // Using 3D transform for GPU acceleration
+            canvas.style.transform = `translate3d(${STATE.pointX}px, ${STATE.pointY}px, 0) scale(${STATE.scale})`;
+        }
+
+        function resetView(focusX = null, focusY = null) {
+            // Default to center of canvas
+            const canvasCenterX = CONFIG.width / 2;
+            const canvasCenterY = CONFIG.height / 2;
+
+            const targetPointX = focusX !== null ? focusX : canvasCenterX;
+            const targetPointY = focusY !== null ? focusY : canvasCenterY;
+
+            // Calculate translation to put targetPoint at viewport center
+            // Formula: Translation = (Viewport/2) - (TargetPoint * Scale)
+            // Assuming Scale = 1 for reset
+            const targetX = (window.innerWidth / 2) - targetPointX;
+            const targetY = (window.innerHeight / 2) - targetPointY;
+            const targetScale = 1;
+
+            canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
+
+            STATE.pointX = targetX;
+            STATE.pointY = targetY;
+            STATE.scale = targetScale;
+            updateTransform();
+
+            // Disable transition after animation to prevent drag lag
+            setTimeout(() => {
+                canvas.style.transition = "";
+            }, 1200);
+        }
+
+        // --- 4. NOTE GENERATION (FIXED) ---
+        // --- 4. NOTE GENERATION (SMARTER) ---
+        const sampleTexts = [
+            "I feel so behind everyone else.",
+            "I'm afraid I'll never be good enough.",
+            "I miss who I used to be.",
+            "Everything feels too loud today.",
+            "I just need a hug.",
+            "University is overwhelming.",
+            "I pretend I'm okay.",
+            "Is it okay to not have a plan?",
+            "I feel lonely even with friends.",
+            "I'm tired of the noise.",
+            "Does anyone else feel this lost?",
+            "I wish I could pause time.",
+            "My anxiety is winning today.",
+            "Smiling is exhausting.",
+            "I want to be heard.",
+            "Just getting by is hard enough.",
+            "I miss my childhood.",
+            "The future scares me."
+        ];
+
+        // Track placed notes for collision detection
+        const placedNotes = [];
+        // Global Logic to Track real stats
+        let globalStats = { heart: 0, flower: 0, candle: 0 };
+
+        function generateRandomNotes() {
+            const centerX = CONFIG.width / 2;
+            const centerY = CONFIG.height / 2;
+            const timeOffsets = ["2m ago", "5m ago", "12m ago", "1h ago", "2h ago", "1d ago"];
+
+            // Shuffle method to pick unique texts
+            const textPool = [...sampleTexts].sort(() => 0.5 - Math.random());
+
+            let count = 0;
+            let attempts = 0;
+
+            // Reset Global Stats on Regen
+            globalStats = { heart: 0, flower: 0, candle: 0 };
+
+            while (count < CONFIG.initialNotes && attempts < 2000) {
+                attempts++;
+
+                // Random position within radius
+                const offsetX = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
+                const offsetY = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
+
+                // 1. EXPANDED EXCLUSION ZONE (Center Text)
+                // Expanded STRICTLY for "The Problem Wall" text overlap prevention
+                // Must correspond to text width (~1200px) and height (~400px)
+                if (Math.abs(offsetX) < 650 && Math.abs(offsetY) < 350) continue;
+
+                // 2. COLLISION CHECK (Simple distance)
+                let collision = false;
+                for (let note of placedNotes) {
+                    const dx = note.x - offsetX;
+                    const dy = note.y - offsetY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 340) { // Slight increase in buffer
+                        collision = true;
+                        break;
+                    }
+                }
+                if (collision) continue;
+
+                // Success - Place Note
+                const reactions = {
+                    heart: Math.floor(Math.random() * 12),
+                    flower: Math.floor(Math.random() * 8),
+                    candle: Math.floor(Math.random() * 5)
+                };
+
+                // Add to Global Stats
+                globalStats.heart += reactions.heart;
+                globalStats.flower += reactions.flower;
+                globalStats.candle += reactions.candle;
+
+                const time = timeOffsets[Math.floor(Math.random() * timeOffsets.length)];
+
+                // Pick text from shuffled pool (clone pool if exhausted)
+                if (count >= textPool.length) {
+                    textPool.sort(() => 0.5 - Math.random());
+                }
+                const text = textPool[count % textPool.length];
+
+                createNoteElement(
+                    text,
+                    centerX + offsetX,
+                    centerY + offsetY,
+                    time,
+                    reactions
+                );
+
+                placedNotes.push({ x: offsetX, y: offsetY });
+                count++;
+            }
+
+            // SET INITIAL STATDOM
+            updateStatDisplay();
+        }
+
+        function updateStatDisplay() {
+            const h = document.getElementById('totalHearts');
+            const f = document.getElementById('totalFlowers');
+            const c = document.getElementById('totalCandles');
+
+            if (h) h.innerText = globalStats.heart.toLocaleString();
+            if (f) f.innerText = globalStats.flower.toLocaleString();
+            if (c) c.innerText = globalStats.candle.toLocaleString();
+        }
+
+        function createNoteElement(text, x, y, timeLabel, reactionCounts = { heart: 0, flower: 0, candle: 0 }) {
+            const el = document.createElement('div');
+            el.className = 'note';
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            // Random slight rotation
+            el.style.transform = `rotate(${Math.random() * 6 - 3}deg)`;
+
+            el.innerHTML = `
+                ${text}
+                <div class="note-meta">
+                    <span style="opacity:0.6;">Anonymous</span>
+                    <span style="font-size:0.75rem;">${timeLabel}</span>
+                </div>
+                <!-- REACTION BAR -->
+                <div class="note-actions">
+                    <button class="action-btn heart-btn" onclick="react(this, 'heart')">
+                        <i class="fas fa-heart"></i> <span class="count">${reactionCounts.heart}</span>
+                    </button>
+                    <button class="action-btn flower-btn" onclick="react(this, 'flower')">
+                        <i class="fas fa-spa"></i> <span class="count">${reactionCounts.flower}</span>
+                    </button>
+                    <button class="action-btn candle-btn" onclick="react(this, 'candle')">
+                        <i class="fas fa-fire-alt"></i> <span class="count">${reactionCounts.candle}</span>
+                    </button>
+                </div>
+            `;
+
+            notesContainer.appendChild(el);
+        }
+
+        // --- 5. INTERACTION LOGIC ---
+        function react(btn, type) {
+            // 1. Visual Pop
+            btn.classList.add('pop-active');
+            setTimeout(() => btn.classList.remove('pop-active'), 300);
+
+            // 2. Increment Note Count
+            const countSpan = btn.querySelector('.count');
+            let val = parseInt(countSpan.innerText);
+            countSpan.innerText = val + 1;
+
+            // 3. Header & Global Stat Glow/Increment
+            const header = document.querySelector('header.island-nav');
+            const note = btn.closest('.note');
+
+            // --- HEADER GLOW ---
+            if (header) {
+                if (type === 'heart') {
+                    header.classList.add('glow-red');
+                    setTimeout(() => header.classList.remove('glow-red'), 400);
+                } else if (type === 'flower') {
+                    header.classList.add('glow-yellow');
+                    setTimeout(() => header.classList.remove('glow-yellow'), 400);
+                } else if (type === 'candle') {
+                    header.classList.add('glow-orange');
+                    setTimeout(() => header.classList.remove('glow-orange'), 400);
+                }
+            }
+
+            // --- NOTE GLOW (FULL CARD) ---
+            if (note) {
+                // Clear previous glows to allow switching
+                note.classList.remove('glow-red', 'glow-yellow', 'glow-orange');
+
+                // Add strong glow class to the whole card
+                if (type === 'heart') {
+                    note.classList.add('glow-red');
+                    setTimeout(() => note.classList.remove('glow-red'), 1000); // 1s Duration
+                } else if (type === 'flower') {
+                    note.classList.add('glow-yellow');
+                    setTimeout(() => note.classList.remove('glow-yellow'), 1000);
+                } else if (type === 'candle') {
+                    note.classList.add('glow-orange');
+                    setTimeout(() => note.classList.remove('glow-orange'), 1000);
+                }
+            }
+
+            // 4. Update Global Count in Sidebar (Fake Sync)
+            let globalId = '';
+            if (type === 'heart') globalId = 'totalHearts';
+            if (type === 'flower') globalId = 'totalFlowers';
+            if (type === 'candle') globalId = 'totalCandles';
+
+            const globalEl = document.getElementById(globalId);
+            if (globalEl) {
+                // Parse commas
+                let gVal = parseInt(globalEl.innerText.replace(/,/g, ''));
+                globalEl.innerText = (gVal + 1).toLocaleString();
+            }
+        }
+
+        function openWriter() {
+            document.getElementById('writeModal').classList.add('active');
+        }
+
+        function closeWriter() {
+            document.getElementById('writeModal').classList.remove('active');
+        }
+
+        function sanitizeText(text) {
+            let clean = text;
+            OBSCENE_WORDS.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                clean = clean.replace(regex, '***');
+            });
+            return clean;
+        }
+
+        function resetView(focusX = null, focusY = null) {
+            // Default to center if no focus provided
+            const finalX = focusX ?? (CONFIG.width / 2);
+            const finalY = focusY ?? (CONFIG.height / 2);
+
+            // Calculate Viewport Offset to center the point
+            const targetX = (window.innerWidth / 2) - finalX;
+            const targetY = (window.innerHeight / 2) - finalY;
+            const targetScale = 1;
+
+            // Simple transition logic
+            canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
+
+            STATE.pointX = targetX;
+            STATE.pointY = targetY;
+            STATE.scale = targetScale;
+            updateTransform();
+
+            setTimeout(() => {
+                canvas.style.transition = "";
+            }, 1200);
+        }
+
+        // --- 4. NOTE GENERATION (FIXED) ---
+        // ... (existing code for generating random notes) ...
+
+        function postNote() {
+            const input = document.getElementById('noteInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const cleanText = sanitizeText(text);
+
+            const centerX = CONFIG.width / 2;
+            const centerY = CONFIG.height / 2;
+
+            // Randomly choose a safe spot outside the exclusion zone
+            // Exclusion is roughly 650x350 from center
+            // We'll pick a spot either well above or well below
+
+            const side = Math.random() > 0.5 ? 1 : -1;
+            const safeOffsetY = (350 + 100 + Math.random() * 200) * side; // +/- 450 to 650px vertical offset
+            const safeOffsetX = (Math.random() * 800) - 400; // Spread horizontally
+
+            const noteX = centerX + safeOffsetX;
+            const noteY = centerY + safeOffsetY;
+
+            // Create Note
+            createNoteElement(cleanText, noteX, noteY, "Just now", { heart: 0, flower: 0, candle: 0 });
+
+            // Focus View on New Note
+            resetView(noteX, noteY);
+
+            closeWriter();
+            input.value = '';
+        }
+
+        // --- 6. FAKE LIVE COUNTERS ---
+        function startFakeLiveActivity() {
+            setInterval(() => {
+                const count = document.getElementById('userCount');
+                let val = parseInt(count.innerText);
+                val += Math.floor(Math.random() * 3) - 1; // +1, 0, or -1
+                if (val < 120) val = 120;
+                count.innerText = val;
+            }, 5000);
+
+            // Random gloal updates
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const types = ['totalHearts', 'totalFlowers', 'totalCandles'];
+                    const id = types[Math.floor(Math.random() * types.length)];
+                    const el = document.getElementById(id);
+                    if (el) {
+                        let gVal = parseInt(el.innerText.replace(/,/g, ''));
+                        el.innerText = (gVal + 1).toLocaleString();
+                    }
+                }
+            }, 2000);
+        }
+
+    </script>
+</body>
+
+</html>
