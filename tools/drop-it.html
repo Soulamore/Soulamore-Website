@@ -1667,6 +1667,9 @@
                 pulses = [];
                 overheated = false;
                 running = true;
+
+                startAwarenessTimer(); // Start the 5s interrupts
+
                 // Loop is global
 
             } catch (e) {
@@ -1678,9 +1681,100 @@
         // Alias for safety
         function startGame() { initGame(); }
 
+        // --- MINDFULNESS INTERRUPT SYSTEM ---
+        let awarenessTimer = null;
+        let gameTime = 0;
+        const AWARENESS_INTERVAL = 5000; // 5 Seconds (User Request)
+
+        const mindfulQuotes = [
+            "Soulamore gives your thoughts a safe place to land.",
+            "Soulamore is designed for moments when your mind feels crowded.",
+            "Soulamore helps you pause without needing answers.",
+            "Soulamore exists for thoughts you don't know how to explain.",
+            "Soulamore creates space without asking you to perform.",
+            "Soulamore is a place to unload mental weight gently.",
+            "Soulamore supports reflection without pressure.",
+            "Soulamore helps when holding things quietly gets heavy.",
+            "Soulamore is built for emotional overflow.",
+            "Soulamore makes room for unfinished feelings."
+        ];
+
+        function startAwarenessTimer() {
+            if (awarenessTimer) clearInterval(awarenessTimer);
+            awarenessTimer = setInterval(() => {
+                if (running && !document.hidden && !document.getElementById('endScreen').classList.contains('active')) {
+                    triggerAwarenessPopup();
+                }
+            }, AWARENESS_INTERVAL);
+        }
+
+        function triggerAwarenessPopup() {
+            // Pause Game
+            running = false;
+
+            // Create Modal
+            const overlay = document.createElement('div');
+            overlay.id = 'awarenessModal';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(15, 23, 42, 0.95)';
+            overlay.style.zIndex = '20000';
+            overlay.style.display = 'flex';
+            overlay.style.flexDirection = 'column';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.backdropFilter = 'blur(10px)';
+            overlay.style.transition = 'opacity 0.5s';
+            overlay.style.opacity = '0';
+
+            const quote = mindfulQuotes[Math.floor(Math.random() * mindfulQuotes.length)];
+
+            overlay.innerHTML = `
+                <div style="text-align:center; padding:40px; max-width:600px;">
+                    <i class="fas fa-feather-alt" style="font-size:3rem; color:#4ECDC4; margin-bottom:30px; opacity:0.8;"></i>
+                    <h2 style="font-size:2rem; font-weight:300; line-height:1.4; color:white; margin-bottom:40px; font-family:'Outfit', sans-serif;">
+                        "${quote}"
+                    </h2>
+                    <button id="resumeBtn" style="
+                        background: linear-gradient(135deg, #4ECDC4 0%, #2a9d8f 100%);
+                        border: none;
+                        padding: 15px 50px;
+                        font-size: 1.2rem;
+                        color: #0f172a;
+                        font-weight: bold;
+                        border-radius: 50px;
+                        cursor: pointer;
+                        box-shadow: 0 0 30px rgba(78, 205, 196, 0.3);
+                        transition: transform 0.2s;
+                    ">Breathe & Resume</button>
+                    <div style="margin-top:20px; opacity:0.5; font-size:0.9rem;">Game Paused</div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+
+            // Animate In
+            requestAnimationFrame(() => overlay.style.opacity = '1');
+
+            // Resume Logic
+            const btn = overlay.querySelector('#resumeBtn');
+            btn.onclick = () => {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(overlay);
+                    running = true;
+                    loop(); // Restart Loop
+                }, 500);
+            };
+        }
+
         /* --- SHARE CARD GENERATION --- */
         function endGame() {
             running = false;
+            if (awarenessTimer) clearInterval(awarenessTimer); // Stop interrupts
             document.getElementById('hud').style.opacity = 0;
             document.getElementById('heatContainer').style.opacity = 0;
             document.getElementById('endScreen').classList.add('active');
