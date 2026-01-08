@@ -1756,9 +1756,10 @@
         // --- MINDFULNESS INTERRUPT SYSTEM ---
         let awarenessTimer = null;
         let gameTime = 0;
-        const AWARENESS_INTERVAL = 30000; // 30 Seconds (Adjusted for better flow)
+        const AWARENESS_INTERVAL = 5000; // 5 Seconds (Non-intrusive)
 
         const mindfulQuotes = [
+            "Most people feel lighter after talking once.",
             "Soulamore gives your thoughts a safe place to land.",
             "Soulamore is designed for moments when your mind feels crowded.",
             "Soulamore helps you pause without needing answers.",
@@ -1781,66 +1782,56 @@
         }
 
         function triggerAwarenessPopup() {
-            // Pause Game
-            running = false;
+            // Non-intrusive Toast (No Pause)
+            const existing = document.getElementById('awarenessToast');
+            if (existing) existing.remove();
 
-            // Create Modal
-            const overlay = document.createElement('div');
-            overlay.id = 'awarenessModal';
-            overlay.style.position = 'fixed';
-            overlay.style.top = '0';
-            overlay.style.left = '0';
-            overlay.style.width = '100%';
-            overlay.style.height = '100%';
-            overlay.style.backgroundColor = 'rgba(15, 23, 42, 0.95)';
-            overlay.style.zIndex = '20000';
-            overlay.style.display = 'flex';
-            overlay.style.flexDirection = 'column';
-            overlay.style.alignItems = 'center';
-            overlay.style.justifyContent = 'center';
-            overlay.style.backdropFilter = 'blur(10px)';
-            overlay.style.transition = 'opacity 0.5s';
-            overlay.style.opacity = '0';
+            const toast = document.createElement('div');
+            toast.id = 'awarenessToast';
+            toast.innerText = mindfulQuotes[Math.floor(Math.random() * mindfulQuotes.length)];
 
-            const quote = mindfulQuotes[Math.floor(Math.random() * mindfulQuotes.length)];
+            // Style: Dark Pill, Top Center
+            Object.assign(toast.style, {
+                position: 'fixed',
+                top: '120px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: 'rgba(15, 23, 42, 0.95)',
+                color: 'white',
+                padding: '12px 30px',
+                borderRadius: '50px',
+                border: '1px solid rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(5px)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: '1.1rem',
+                fontWeight: '500',
+                zIndex: '20000',
+                opacity: '0',
+                transition: 'opacity 0.5s ease, transform 0.5s ease',
+                pointerEvents: 'none',
+                textAlign: 'center',
+                minWidth: '300px',
+                width: 'max-content',
+                maxWidth: '90%'
+            });
 
-            overlay.innerHTML = `
-                <div style="text-align:center; padding:40px; max-width:600px;">
-                    <i class="fas fa-feather-alt" style="font-size:3rem; color:#4ECDC4; margin-bottom:30px; opacity:0.8;"></i>
-                    <h2 style="font-size:2rem; font-weight:300; line-height:1.4; color:white; margin-bottom:40px; font-family:'Outfit', sans-serif;">
-                        "${quote}"
-                    </h2>
-                    <button id="resumeBtn" style="
-                        background: linear-gradient(135deg, #4ECDC4 0%, #2a9d8f 100%);
-                        border: none;
-                        padding: 15px 50px;
-                        font-size: 1.2rem;
-                        color: #0f172a;
-                        font-weight: bold;
-                        border-radius: 50px;
-                        cursor: pointer;
-                        box-shadow: 0 0 30px rgba(78, 205, 196, 0.3);
-                        transition: transform 0.2s;
-                    ">Breathe & Resume</button>
-                    <div style="margin-top:20px; opacity:0.5; font-size:0.9rem;">Game Paused</div>
-                </div>
-            `;
-
-            document.body.appendChild(overlay);
+            document.body.appendChild(toast);
 
             // Animate In
-            requestAnimationFrame(() => overlay.style.opacity = '1');
+            requestAnimationFrame(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(10px)';
+            });
 
-            // Resume Logic
-            const btn = overlay.querySelector('#resumeBtn');
-            btn.onclick = () => {
-                overlay.style.opacity = '0';
-                setTimeout(() => {
-                    document.body.removeChild(overlay);
-                    running = true;
-                    loop(); // Restart Loop
-                }, 500);
-            };
+            // Remove after 4s
+            setTimeout(() => {
+                if (toast && document.body.contains(toast)) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(-50%) translateY(0px)';
+                    setTimeout(() => toast.remove(), 500);
+                }
+            }, 4000);
         }
 
         /* --- SHARE CARD GENERATION --- */
@@ -2363,15 +2354,12 @@
             }
         }
     </script>
-    }
 
-    // Start Background Animation
-    resize();
-    loop();
-
-    (function () {
-    // ... listener logic ...
-    })();
+    <!-- Background Animation Start -->
+    <script>
+        // Start Background Animation
+        if (typeof resize === 'function') resize();
+        if (typeof loop === 'function') loop();
     </script>
 
     <!-- NUCLEAR EVENT HANDLER (Safety Script) -->
