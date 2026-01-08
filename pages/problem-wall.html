@@ -3,34 +3,37 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Problem Wall | Soulamore</title>
+
+    <!-- Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Global CSS (Base styles) -->
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <!-- MODULES: Header Injection -->
+    <script src="../assets/js/components.js"></script>
+
     <style>
-        /* --- THEME: DAYBREAK CANVAS --- */
+        /* --- 1. CORE THEME: DAYBREAK (Light & Airy) --- */
         :root {
-            --sky-bg: #f8fafc;
-            --paper-note: #ffffff;
-            --ink-text: #334155;
-            --soft-shadow: rgba(0, 0, 0, 0.03);
-            --border-faint: rgba(0, 0, 0, 0.05);
+            --paper-white: #fffefb;
+            --ink-black: #1e293b;
+            --soft-sky: #f0f9ff;
+            --mist-gray: #e2e8f0;
+            --highlight-blue: #38bdf8;
+            --peach: #F49F75;
+            --teal: #4ECDC4;
+            --warm-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 
-            /* Accents (Muted) */
-            --gentle-teal: #99f6e4;
-            --warm-peach: #ffedd5;
-            --soft-gold: #fef3c7;
-            --calm-blue: #e0f2fe;
-
-            /* Interaction */
-            --focus-glow: rgba(255, 255, 255, 0.8);
-            --reaction-hover: rgba(0, 0, 0, 0.02);
-
-            /* Logo Green */
-            --logo-green: #10b981;
+            /* Performance: Reduce variable usage in heavy animations */
+            --mouse-x: 50%;
+            --mouse-y: 50%;
         }
 
         * {
@@ -41,70 +44,146 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--sky-bg);
-            color: var(--ink-text);
+            background-color: #f8fafc;
+            /* Throttled gradient for performance */
+            background-image:
+                radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(78, 205, 196, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(244, 159, 117, 0.05) 0%, transparent 50%);
+            color: var(--ink-black);
+            overflow: hidden;
+            /* Infinite canvas handles scroll */
             height: 100vh;
             width: 100vw;
-            overflow: hidden;
-            /* Infinite Canvas Feeling */
-            position: relative;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(224, 242, 254, 0.4) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(255, 237, 213, 0.4) 0%, transparent 40%);
+            will-change: background-image;
+            /* HW Acceleration hint */
         }
 
-        h1,
-        h2,
-        h3 {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 400;
+        /* --- 2. HEADER OVERRIDE (Daybreak Theme) --- */
+        /* We use specific selectors to override global.css styles injected by components.js */
+
+        /* Force Light Theme on the Island Nav */
+        header.island-nav {
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
         }
 
-        /* --- HEADER REFINED (White Glassmorphism) --- */
-        .site-header {
+        /* Light Theme Links */
+        header.island-nav .nav-links a {
+            color: #475569 !important;
+            /* Slate-600 */
+        }
+
+        header.island-nav .nav-links a:hover {
+            color: #4ECDC4 !important;
+            /* Teal */
+        }
+
+        header.island-nav .nav-links i {
+            color: #94a3b8 !important;
+            /* Slate-400 */
+        }
+
+        header.island-nav .nav-links a:hover i {
+            color: #4ECDC4 !important;
+        }
+
+        /* Logo Text Dark */
+        header.island-nav .nav-logo {
+            /* Invert white logo to black */
+            filter: invert(1) brightness(0.5);
+            opacity: 0.9;
+        }
+
+        /* Dropdown Menus (Light Mode) */
+        header.island-nav .dropdown-content {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        header.island-nav .dropdown-content a {
+            color: #475569 !important;
+        }
+
+        /* Header Buttons Override (Force Visibility) */
+        header.island-nav .nav-btn,
+        header.island-nav .lifeline-btn {
+            background: #0f172a !important;
+            /* Dark Slate */
+            border: 1px solid #0f172a !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        header.island-nav .nav-btn:hover,
+        header.island-nav .lifeline-btn:hover {
+            background: #4ECDC4 !important;
+            /* Teal Highlight */
+            border-color: #4ECDC4 !important;
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        header.island-nav .nav-btn {
+            background: white !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        }
+
+        header.island-nav .nav-btn:hover {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+
+        /* Hide "Drop It" from the header if possible? 
+           Hard to remove specific items from injected JS without complex DOM manipulation.
+           We'll accept it being there for now as it's the "Global" header. 
+        */
+
+
+        /* Header Glow States (Interactive) */
+        header.island-nav.glow-red {
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.3) !important;
+            border-color: rgba(239, 68, 68, 0.4) !important;
+            transition: 0.3s ease;
+        }
+
+        header.island-nav.glow-yellow {
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.3) !important;
+            border-color: rgba(251, 191, 36, 0.4) !important;
+            transition: 0.3s ease;
+        }
+
+        header.island-nav.glow-orange {
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.3) !important;
+            border-color: rgba(249, 115, 22, 0.4) !important;
+            transition: 0.3s ease;
+        }
+
+        /* --- 3. LIVE ACTIVITY BAR --- */
+        .live-activity-bar {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
-        }
-
-        .logo {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.6rem;
-            color: #1e293b;
-            font-weight: 700;
-            text-decoration: none;
+            top: 100px;
+            /* Below header */
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .logo i {
-            color: var(--logo-green);
-        }
-
-        .header-stats {
-            position: fixed;
-            /* Fixed to stay under header */
-            top: 75px;
-            left: 40px;
             font-size: 0.85rem;
             color: #64748b;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            opacity: 0.9;
+            z-index: 900;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
             pointer-events: none;
-            z-index: 1000;
+            /* Let clicks pass */
         }
 
         .live-dot {
@@ -113,557 +192,410 @@
             background: #10b981;
             border-radius: 50%;
             box-shadow: 0 0 10px #10b981;
-            animation: pulse-green 2s infinite;
+            animation: pulseDot 2s infinite;
         }
 
-        @keyframes pulse-green {
+        @keyframes pulseDot {
             0% {
+                opacity: 0.5;
                 transform: scale(1);
-                opacity: 1;
             }
 
             50% {
+                opacity: 1;
                 transform: scale(1.2);
-                opacity: 0.7;
             }
 
             100% {
+                opacity: 0.5;
                 transform: scale(1);
-                opacity: 1;
             }
         }
 
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: #334155;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .nav-link:hover {
-            color: #0f172a;
-        }
-
-        .cta-btn {
-            background: #334155;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-
-        .cta-btn:hover {
-            background: #0f172a;
-            transform: translateY(-2px);
-        }
-
-        /* Mobile Menu Button */
-        .menu-toggle {
-            display: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #334155;
-        }
-
-        @media(max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .menu-toggle {
-                display: flex;
-            }
-
-            .site-header {
-                padding: 15px 20px;
-            }
-
-            .header-stats {
-                left: 20px;
-                top: 70px;
-                font-size: 0.75rem;
-            }
-        }
-
-        /* --- GLOBAL STATS WIDGET (Right Side) --- */
-        .global-stats {
-            position: fixed;
-            top: 120px;
-            right: 40px;
-            background: white;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 200;
-            pointer-events: auto;
-            width: 200px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.9rem;
-            color: #475569;
-        }
-
-        .stat-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-        }
-
-        .stat-val {
-            font-weight: 700;
-            color: #1e293b;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            opacity: 0.7;
-        }
-
-        @media(max-width: 768px) {
-            .global-stats {
-                top: auto;
-                bottom: 100px;
-                right: 20px;
-                width: auto;
-                padding: 12px;
-                flex-direction: row;
-                gap: 15px;
-                transform: scale(0.9);
-                transform-origin: bottom right;
-                background: rgba(255, 255, 255, 0.9);
-                backdrop-filter: blur(5px);
-            }
-
-            .stat-label {
-                display: none;
-            }
-        }
-
-        /* --- THE CANVAS CONTAINER --- */
-        #canvas-wrapper {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        /* --- 4. INFINITE CANVAS & NOTES --- */
+        #viewport {
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
             cursor: grab;
+            position: relative;
+            touch-action: none;
+        }
+
+        #viewport:active {
+            cursor: grabbing;
         }
 
         #infinite-canvas {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            transform-origin: 0 0;
-            /* Important for Matrix transforms */
-            transition: transform 0.1s ease-out;
+            width: 5000px;
+            /* Large canvas */
+            height: 5000px;
+            /* Centering initially */
+            transform-origin: center center;
+            /* Dot Grid Pattern */
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 30px 30px;
+            /* Hardware Acceleration */
+            will-change: transform;
+            /* Smoother transition/interp */
         }
 
-        /* --- THE NOTES --- */
-        .note {
-            position: absolute;
-            width: 300px;
-            background: var(--paper-note);
-            padding: 30px 25px;
-            border-radius: 4px;
-            box-shadow: 0 4px 20px var(--soft-shadow), 0 1px 3px var(--border-faint);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            backface-visibility: hidden;
-        }
-
-        .note:hover {
-            transform: scale(1.05) translateY(-5px) !important;
-            /* Override inline rotation slightly */
-            z-index: 100;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-            border-color: rgba(0, 0, 0, 0.08);
-        }
-
-        .note-text {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #1e293b;
-            margin-bottom: 25px;
-            font-weight: 400;
-        }
-
-        .note-meta {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            opacity: 0.7;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* REACTIONS ROW */
-        .reaction-row {
-            display: flex;
-            gap: 20px;
-            border-top: 1px solid var(--border-faint);
-            padding-top: 15px;
-            opacity: 0.7;
-            transition: 0.3s;
-        }
-
-        .note:hover .reaction-row {
-            opacity: 1;
-        }
-
-        .react-btn {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            color: #cbd5e1;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 500;
-        }
-
-        .react-btn span {
-            font-size: 0.8rem;
-        }
-
-        .react-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .react-btn.active {
-            color: #f472b6;
-        }
-
-        /* Active Heart */
-        .react-btn.flower.active {
-            color: #fbbf24;
-        }
-
-        /* Active Flower */
-        .react-btn.candle.active {
-            color: #f97316;
-        }
-
-        /* Active Candle */
-
-        /* --- UI OVERLAYS (Fixed) --- */
-        .ui-layer {
-            position: fixed;
-            pointer-events: none;
-            width: 100%;
-            height: 100%;
-            z-index: 200;
-            top: 0;
-            left: 0;
-        }
-
-        /* Hero / Title - Drifts on Canvas Level visually but fixed for now */
+        /* HERO TEXT ON CANVAS */
         .wall-hero {
             position: absolute;
-            top: 120px;
-            /* Below Header */
-            left: 50%;
-            transform: translateX(-50%);
+            top: 2450px;
+            /* Center of 5000px canvas */
+            left: 2500px;
+            transform: translate(-50%, -50%);
             text-align: center;
-            pointer-events: auto;
+            pointer-events: none;
+            /* Let clicks pass through to canvas */
+            z-index: 0;
         }
 
-        .wall-title {
-            font-size: 2.5rem;
-            color: var(--ink-text);
-            font-weight: 300;
+        .wall-hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 4rem;
+            color: #1e293b;
+            letter-spacing: -1px;
             margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(5px);
-            padding: 10px 30px;
-            border-radius: 50px;
+            opacity: 0.8;
         }
 
-        .wall-sub {
-            font-size: 1rem;
+        .wall-hero p {
+            font-size: 1.2rem;
             color: #64748b;
         }
 
-        /* Add Note FAB */
-        .fab-wrapper {
+        /* NOTE CARD STYLING */
+        .note {
             position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: auto;
-            text-align: center;
-            z-index: 500;
+            width: 280px;
+            background: var(--paper-white);
+            padding: 25px;
+            border-radius: 2px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            /* Reduced initial shadow for perf */
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #334155;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            /* Faster transition */
+            cursor: default;
+            user-select: none;
+            overflow: hidden;
+            /* Promote to own layer for perf */
+            will-change: transform;
         }
 
-        .add-note-btn {
-            background: #1e293b;
-            color: white;
+        .note:hover {
+            transform: scale(1.02) rotate(0deg) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            z-index: 10;
+        }
+
+        /* Glow States (Simplified box-shadows for perf) */
+        .note.glow-red {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4) !important;
+            border-color: rgba(239, 68, 68, 0.4) !important;
+        }
+
+        .note.glow-yellow {
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4) !important;
+            border-color: rgba(251, 191, 36, 0.4) !important;
+        }
+
+        .note.glow-orange {
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.4) !important;
+            border-color: rgba(249, 115, 22, 0.4) !important;
+        }
+
+        /* Tape effect */
+        .note::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 40px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .note-meta {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ACTIONS */
+        .note-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+        }
+
+        .action-btn {
+            background: none;
             border: none;
-            padding: 18px 40px;
-            border-radius: 50px;
-            font-family: 'Outfit';
-            font-size: 1.1rem;
-            font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: 0.3s;
+            font-size: 0.9rem;
+            color: #94a3b8;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 4px;
+            transition: 0.1s;
+            /* Fast visual feedback */
+            padding: 4px 8px;
+            border-radius: 6px;
         }
 
-        .add-note-btn:hover {
-            transform: scale(1.05) translateY(-2px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-            background: #0f172a;
+        .action-btn:hover {
+            background: #f1f5f9;
         }
 
-        /* Zoom Control */
-        .zoom-controls {
+        .heart-btn:hover {
+            color: #ef4444;
+            background: #fee2e2;
+        }
+
+        .flower-btn:hover {
+            color: #eab308;
+            background: #fef9c3;
+        }
+
+        .candle-btn:hover {
+            color: #f97316;
+            background: #ffedd5;
+        }
+
+        /* Animation Classes */
+        .pop-active {
+            animation: pop 0.3s;
+        }
+
+        @keyframes pop {
+            50% {
+                transform: scale(1.3);
+            }
+        }
+
+        /* --- 5. UI OVERLAYS (Floating Action Button) --- */
+        /* --- 5. UI OVERLAYS (FAB STACK) --- */
+        .fab-stack-container {
             position: fixed;
             bottom: 40px;
-            right: 40px;
-            pointer-events: auto;
+            right: 30px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            background: white;
-            padding: 10px;
-            border-radius: 50px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            gap: 12px;
+            align-items: center;
+            z-index: 100;
         }
 
-        .zoom-btn {
-            width: 40px;
-            height: 40px;
+        .fab-btn {
+            width: 55px;
+            /* Unified Size */
+            height: 55px;
             border-radius: 50%;
-            border: none;
-            background: #f1f5f9;
-            color: #334155;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-decoration: none;
+            position: relative;
         }
 
-        .zoom-btn:hover {
-            background: #e2e8f0;
+        .fab-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
 
-        /* --- WRITING MODAL --- */
+        /* 1. SoulBot (Teal) */
+        .fab-soulbot {
+            background: #4ECDC4;
+            color: white;
+        }
+
+        /* 2. Center View (White) */
+        .fab-center {
+            background: white;
+            color: var(--ink-black);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            /* Ensure visibility on light bg */
+        }
+
+        .fab-center:hover {
+            color: var(--teal);
+        }
+
+        /* 3. Write (Dark - Main) */
+        .fab-write {
+            background: var(--ink-black);
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        /* WRITER MODAL */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(248, 250, 252, 0.9);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            display: none;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0;
-            transition: opacity 0.5s;
         }
 
         .modal-overlay.active {
             opacity: 1;
-            pointer-events: auto;
+            pointer-events: all;
         }
 
-        .write-card {
+        .writer-card {
             background: white;
             width: 90%;
-            max-width: 600px;
-            padding: 60px 40px;
-            border-radius: 4px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
-            text-align: center;
+            max-width: 500px;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            transition: transform 0.3s;
             position: relative;
-            transform: translateY(30px);
-            transition: 0.5s;
         }
 
-        .modal-overlay.active .write-card {
+        .modal-overlay.active .writer-card {
             transform: translateY(0);
+        }
+
+        .writer-textarea {
+            width: 100%;
+            height: 150px;
+            border: none;
+            resize: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.2rem;
+            color: var(--ink-black);
+            outline: none;
+            margin-bottom: 20px;
+        }
+
+        .writer-textarea::placeholder {
+            color: #cbd5e1;
+        }
+
+        .post-btn {
+            background: var(--ink-black);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            float: right;
+            transition: 0.3s;
+        }
+
+        .post-btn:hover {
+            background: var(--teal);
+            transform: translateY(-2px);
         }
 
         .close-modal {
             position: absolute;
             top: 20px;
             right: 20px;
-            cursor: pointer;
-            font-size: 1.5rem;
-            opacity: 0.3;
-            transition: 0.2s;
-        }
-
-        .close-modal:hover {
-            opacity: 1;
-        }
-
-        .write-input {
-            width: 100%;
+            background: none;
             border: none;
-            border-bottom: 2px solid #f1f5f9;
-            padding: 20px;
-            font-family: 'Outfit';
-            font-size: 1.5rem;
-            color: #334155;
-            outline: none;
-            resize: none;
-            margin-bottom: 40px;
-            background: transparent;
-            text-align: center;
-        }
-
-        .write-input::placeholder {
-            color: #cbd5e1;
-        }
-
-        .write-input:focus {
-            border-color: var(--gentle-teal);
-        }
-
-        .options-row {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .option-pill {
-            padding: 10px 20px;
-            border-radius: 50px;
-            border: 1px solid #e2e8f0;
-            font-size: 0.9rem;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: 0.2s;
-            opacity: 0.6;
-            color: #64748b;
+            color: #94a3b8;
         }
 
-        .option-pill:hover,
-        .option-pill.selected {
-            border-color: #334155;
-            opacity: 1;
-            background: #f8fafc;
-            color: #334155;
-            font-weight: 500;
-        }
-
-        .submit-btn {
-            background: transparent;
-            border: 1px solid #334155;
-            color: #334155;
-            padding: 15px 50px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .submit-btn:hover {
-            background: #334155;
-            color: white;
-            box-shadow: 0 10px 20px rgba(51, 65, 85, 0.2);
-        }
-
-        /* --- TOAST --- */
-        .toast {
+        /* --- 6. STATS WIDGET (Right Side) --- */
+        .global-stats {
             position: fixed;
-            top: 130px;
-            /* Clear Header */
-            right: 50%;
-            transform: translateX(50%) translateY(-50px);
-            background: #1e293b;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 90;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            transition: 0.5s;
-            font-size: 1rem;
-            z-index: 2000;
-            opacity: 0;
-            pointer-events: none;
+            opacity: 0.8;
+            transition: 0.3s;
         }
 
-        .toast.show {
-            transform: translateX(50%) translateY(0);
+        .stat-item:hover {
             opacity: 1;
+            transform: translateX(-5px);
         }
 
-        /* --- MOBILE --- */
-        @media(max-width: 600px) {
-            .note {
-                width: 260px;
-                padding: 20px;
+        .stat-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .stat-text h4 {
+            font-family: 'Outfit';
+            font-size: 1.2rem;
+            margin: 0;
+            color: #1e293b;
+        }
+
+        .stat-text span {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media(max-width: 768px) {
+            .global-stats {
+                display: none;
+                /* Hide on mobile to declutter */
             }
 
-            .write-card {
-                padding: 40px 20px;
-            }
-
-            .write-input {
-                font-size: 1.2rem;
-            }
-
-            .options-row {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .zoom-controls {
-                bottom: 100px;
-                right: 20px;
-            }
-
-            .fab-wrapper {
-                bottom: 20px;
-                width: 90%;
-            }
-
-            .add-note-btn {
-                width: 100%;
-                justify-content: center;
+            .wall-hero h1 {
+                font-size: 2.5rem;
             }
         }
     </style>
@@ -671,376 +603,431 @@
 
 <body>
 
-    <!-- REFINED HEADER -->
-    <header class="site-header">
-        <a href="../index.html" class="logo">
-            <i class="fas fa-leaf"></i> Soulamore
-        </a>
-        <div class="nav-links">
-            <a href="../index.html" class="nav-link">Home</a>
-            <a href="#" class="nav-link" style="color:#1e293b; font-weight:700;">The Wall</a>
-            <!-- Removed Drop It -->
-        </div>
-        <a href="#" class="cta-btn">Get Help</a>
-        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
-    </header>
+    <!-- --- HEADER (INJECTED BY COMPONENTS.JS) --- -->
+    <header class="island-nav" id="main-header"></header>
+    <script>
+        // Force header injection if it hasn't happened yet
+        if (typeof injectHeader === 'function') injectHeader();
+    </script>
 
-    <!-- STATS UNDER HEADER -->
-    <div class="header-stats">
+    <!-- LIVE COUNTER -->
+    <div class="live-activity-bar">
         <div class="live-dot"></div>
         <span id="userCount">142</span> people here right now
     </div>
 
-    <!-- UI LAYER -->
-    <div class="ui-layer">
-
-        <!-- GLOBAL REACTION STATS -->
-        <div class="global-stats">
-            <div class="stat-item">
-                <div class="stat-icon" style="background:#fce7f3; color:#ec4899;">
-                    <i class="fas fa-heart"></i>
-                </div>
-                <div>
-                    <span class="stat-val" id="totalHearts">2,405</span>
-                    <span class="stat-label">Hearts given</span>
-                </div>
+    <!-- GLOBAL STATS (SIDEBAR) -->
+    <div class="global-stats">
+        <div class="stat-item">
+            <div class="stat-icon-box" style="background: #ffe4e6; color: #ef4444;">
+                <i class="fas fa-heart"></i>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon" style="background:#fef3c7; color:#f59e0b;">
-                    <i class="fas fa-spa"></i>
-                </div>
-                <div>
-                    <span class="stat-val" id="totalFlowers">892</span>
-                    <span class="stat-label">Flowers offered</span>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon" style="background:#ffedd5; color:#f97316;">
-                    <i class="fas fa-fire-alt"></i>
-                </div>
-                <div>
-                    <span class="stat-val" id="totalCandles">1,204</span>
-                    <span class="stat-label">Candles lit</span>
-                </div>
+            <div class="stat-text">
+                <h4 id="totalHearts">2,405</h4>
+                <span>Hearts given</span>
             </div>
         </div>
-
-        <div class="wall-hero">
-            <div class="wall-title">The Problem Wall</div>
-            <div class="wall-sub">A place where pain is seen, not solved.</div>
+        <div class="stat-item">
+            <div class="stat-icon-box" style="background: #fef9c3; color: #eab308;">
+                <i class="fas fa-spa"></i>
+            </div>
+            <div class="stat-text">
+                <h4 id="totalFlowers">892</h4>
+                <span>Flowers offered</span>
+            </div>
         </div>
-
-        <div class="zoom-controls">
-            <button class="zoom-btn" onclick="zoomCanvas(0.1)"><i class="fas fa-plus"></i></button>
-            <button class="zoom-btn" onclick="zoomCanvas(-0.1)"><i class="fas fa-minus"></i></button>
-        </div>
-
-        <div class="fab-wrapper">
-            <button class="add-note-btn" onclick="openWriter()">
-                <i class="fas fa-pen"></i> Add to Wall
-            </button>
-            <div style="font-size:0.8rem; opacity:0.6; margin-top:10px; color:#64748b;">Others are here with you.</div>
+        <div class="stat-item">
+            <div class="stat-icon-box" style="background: #ffedd5; color: #f97316;">
+                <i class="fas fa-fire-alt"></i>
+            </div>
+            <div class="stat-text">
+                <h4 id="totalCandles">1,204</h4>
+                <span>Candles lit</span>
+            </div>
         </div>
     </div>
 
-    <!-- CANVAS WRAPPER (For Panning) -->
-    <div id="canvas-wrapper">
+    <!-- INFINITE CANVAS WRAPPER -->
+    <div id="viewport">
         <div id="infinite-canvas">
-            <!-- Notes injected here -->
+
+            <!-- HERO TEXT (Part of Canvas) -->
+            <div class="wall-hero">
+                <h1>The Problem Wall</h1>
+                <p>A place where pain is seen, not solved.</p>
+            </div>
+
+            <!-- DYNAMIC NOTES CONTAINER -->
+            <div id="notes-container"></div>
+
         </div>
+    </div>
+
+    <!-- FAB STACK (Bottom Right) -->
+    <div class="fab-stack-container">
+
+        <!-- 1. SoulBot (Top) -->
+        <a href="../tools/soulbot.html" class="fab-btn fab-soulbot" title="Talk to SoulBot">
+            <i class="fas fa-robot"></i>
+        </a>
+
+        <!-- 2. Center/Reset (Middle) -->
+        <div class="fab-btn fab-center" onclick="resetView()" title="Center View">
+            <i class="fas fa-compress-arrows-alt"></i>
+        </div>
+
+        <!-- 3. Write (Bottom - Main) -->
+        <div class="fab-btn fab-write" onclick="openWriter()" title="Share a Burden">
+            <i class="fas fa-plus"></i>
+        </div>
+
     </div>
 
     <!-- WRITING MODAL -->
     <div class="modal-overlay" id="writeModal">
-        <div class="write-card">
-            <div class="close-modal" onclick="closeWriter()">&times;</div>
-            <h2 style="margin-bottom:10px; opacity:0.8; color:#334155;">Leave a burden here.</h2>
-            <p style="font-size:0.9rem; opacity:0.6; margin-bottom:40px; color:#64748b;">No one will judge. No one will
-                fix.</p>
-
-            <textarea id="noteInput" class="write-input" rows="1" placeholder="Write one thing you’re carrying..."
-                oninput="autoResize(this)"></textarea>
-
-            <div class="options-row">
-                <div class="option-pill" onclick="toggleOption(this)">Post only to Wall</div>
-                <div class="option-pill" onclick="toggleOption(this)">Open to Peer Support</div>
+        <div class="writer-card">
+            <button class="close-modal" onclick="closeWriter()"><i class="fas fa-times"></i></button>
+            <h3 style="font-family:'Outfit'; margin-bottom:20px; font-size:1.5rem;">Leave a burden.</h3>
+            <textarea class="writer-textarea" id="noteInput" placeholder="I feel..."></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.8rem; color:#94a3b8;"><i class="fas fa-shield-alt"></i> Anonymous &
+                    Filtered</span>
+                <button class="post-btn" onclick="postNote()">Post It</button>
             </div>
-
-            <button class="submit-btn" onclick="postNote()">Let it be seen</button>
         </div>
     </div>
 
-    <!-- TOAST -->
-    <div class="toast" id="toast">
-        <i class="fas fa-check-circle" style="color:#10b981;"></i>
-        <span>This was shared anonymously.</span>
-    </div>
-
     <script>
-        // --- CONTENT SAFETY: PROFANITY FILTER ---
-        const OBSCENE_WORDS = ["damn", "hell", "badword1", "badword2", "hate", "kill", "die", "ugly", "stupid", "idiot"];
-        // Note: Real deployment should use a comprehensive list or API. This is a client-side placeholder.
+        // --- 1. CONFIG & STATE ---
+        const CONFIG = {
+            width: 5000,
+            height: 5000,
+            initialNotes: 25, /* Increased count */
+            spawnRadius: 800 /* Restrict initial spawn to center area */
+        };
+
+        const STATE = {
+            scale: 1,
+            panning: false,
+            pointX: 0,
+            pointY: 0,
+            startX: 0,
+            startY: 0,
+            animationFrame: null
+        };
+
+        const OBSCENE_WORDS = ["fuck", "shit", "bitch", "asshole", "cunt", "dick", "pussy", "whore", "slut", "bastard"];
+
+        // --- 2. INITIALIZATION ---
+        const canvas = document.getElementById('infinite-canvas');
+        const viewport = document.getElementById('viewport');
+        const notesContainer = document.getElementById('notes-container');
+
+        // Center the canvas on load
+        window.onload = () => {
+            // Force header injection again to be safe
+            if (window.injectHeader) window.injectHeader();
+
+            // Calculate center position: (Viewport Width - Canvas Width) / 2
+            STATE.pointX = (window.innerWidth - CONFIG.width) / 2;
+            STATE.pointY = (window.innerHeight - CONFIG.height) / 2;
+
+            updateTransform(); // Apply initial transform
+            generateRandomNotes();
+            startFakeLiveActivity();
+        };
+
+        // --- 3. CANVAS LOGIC (PAN & ZOOM) - OPTIMIZED ---
+        viewport.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.note') || e.target.closest('.wall-hero')) return;
+            STATE.panning = true;
+            STATE.startX = e.clientX - STATE.pointX;
+            STATE.startY = e.clientY - STATE.pointY;
+            viewport.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mouseup', () => {
+            STATE.panning = false;
+            viewport.style.cursor = 'grab';
+        });
+
+        // Throttled Mouse Move
+        let lastFrame = 0;
+        window.addEventListener('mousemove', (e) => {
+            const now = Date.now();
+            if (now - lastFrame < 16) return; // Cap at ~60fps
+            lastFrame = now;
+
+            // A. Pan Logic
+            if (STATE.panning) {
+                e.preventDefault();
+                STATE.pointX = e.clientX - STATE.startX;
+                STATE.pointY = e.clientY - STATE.startY;
+                requestAnimationFrame(updateTransform); // Synced with repaint
+            }
+
+            // B. Background Gradient Logic (Only update every 3rd frame loosely)
+            if (Math.random() > 0.6) {
+                const xPercent = (e.clientX / window.innerWidth) * 100 + '%';
+                const yPercent = (e.clientY / window.innerHeight) * 100 + '%';
+                document.body.style.setProperty('--mouse-x', xPercent);
+                document.body.style.setProperty('--mouse-y', yPercent);
+            }
+        });
+
+        // Zoom (Wheel)
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const xs = (e.clientX - STATE.pointX) / STATE.scale;
+            const ys = (e.clientY - STATE.pointY) / STATE.scale;
+            const delta = -e.deltaY;
+
+            (delta > 0) ? (STATE.scale *= 1.1) : (STATE.scale /= 1.1);
+
+            // Limit Zoom limits
+            STATE.scale = Math.min(Math.max(0.4, STATE.scale), 2.5);
+
+            STATE.pointX = e.clientX - xs * STATE.scale;
+            STATE.pointY = e.clientY - ys * STATE.scale;
+
+            requestAnimationFrame(updateTransform);
+        }, { passive: false });
+
+        function updateTransform() {
+            // Using 3D transform for GPU acceleration
+            canvas.style.transform = `translate3d(${STATE.pointX}px, ${STATE.pointY}px, 0) scale(${STATE.scale})`;
+        }
+
+        function resetView() {
+            // Animate back to center
+            const targetX = (window.innerWidth - CONFIG.width) / 2;
+            const targetY = (window.innerHeight - CONFIG.height) / 2;
+            const targetScale = 1;
+
+            // Simple transition logic (could be tweened, but CSS transition on canvas handles it if enabled)
+            // We'll enable CSS transition for a moment
+            canvas.style.transition = "transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)";
+
+            STATE.pointX = targetX;
+            STATE.pointY = targetY;
+            STATE.scale = targetScale;
+            updateTransform();
+
+            // Disable transition after animation to prevent drag lag
+            setTimeout(() => {
+                canvas.style.transition = "";
+            }, 800);
+        }
+
+        // --- 4. NOTE GENERATION (FIXED) ---
+        // --- 4. NOTE GENERATION (SMARTER) ---
+        const sampleTexts = [
+            "I feel so behind everyone else.",
+            "I'm afraid I'll never be good enough.",
+            "I miss who I used to be.",
+            "Everything feels too loud today.",
+            "I just need a hug.",
+            "University is overwhelming.",
+            "I pretend I'm okay.",
+            "Is it okay to not have a plan?",
+            "I feel lonely even with friends.",
+            "I'm tired of the noise.",
+            "Does anyone else feel this lost?",
+            "I wish I could pause time.",
+            "My anxiety is winning today.",
+            "Smiling is exhausting.",
+            "I want to be heard.",
+            "Just getting by is hard enough.",
+            "I miss my childhood.",
+            "The future scares me."
+        ];
+
+        // Track placed notes for collision detection
+        const placedNotes = [];
+
+        function generateRandomNotes() {
+            const centerX = CONFIG.width / 2;
+            const centerY = CONFIG.height / 2;
+            const timeOffsets = ["2m ago", "5m ago", "12m ago", "1h ago", "2h ago", "1d ago"];
+
+            // Shuffle method to pick unique texts
+            const textPool = [...sampleTexts].sort(() => 0.5 - Math.random());
+
+            let count = 0;
+            let attempts = 0;
+
+            while (count < CONFIG.initialNotes && attempts < 1000) {
+                attempts++;
+
+                // Random position within radius
+                const offsetX = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
+                const offsetY = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
+
+                // 1. EXCLUSION ZONE (Center Text)
+                // Keep area 600px wide x 300px tall clear in center
+                if (Math.abs(offsetX) < 350 && Math.abs(offsetY) < 200) continue;
+
+                // 2. COLLISION CHECK (Simple distance)
+                let collision = false;
+                for (let note of placedNotes) {
+                    const dx = note.x - offsetX;
+                    const dy = note.y - offsetY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 320) { // Note width 280 + padding
+                        collision = true;
+                        break;
+                    }
+                }
+                if (collision) continue;
+
+                // Success - Place Note
+                const reactions = {
+                    heart: Math.floor(Math.random() * 12),
+                    flower: Math.floor(Math.random() * 8),
+                    candle: Math.floor(Math.random() * 5)
+                };
+                const time = timeOffsets[Math.floor(Math.random() * timeOffsets.length)];
+
+                // Pick text from shuffled pool (cycle if needed)
+                const text = textPool[count % textPool.length];
+
+                createNoteElement(
+                    text,
+                    centerX + offsetX,
+                    centerY + offsetY,
+                    time,
+                    reactions
+                );
+
+                placedNotes.push({ x: offsetX, y: offsetY });
+                count++;
+            }
+        }
+
+        function createNoteElement(text, x, y, timeLabel = "Just now", counts = { heart: 0, flower: 0, candle: 0 }) {
+            const note = document.createElement('div');
+            note.className = 'note';
+
+            const rotation = Math.random() * 6 - 3;
+            note.style.left = x + 'px';
+            note.style.top = y + 'px';
+            note.style.transform = `rotate(${rotation}deg)`;
+
+            note.innerHTML = `
+                <div class="note-content">${text}</div>
+                <div class="note-meta">
+                    <span>Anonymous</span>
+                    <span>${timeLabel}</span>
+                </div>
+                <div class="note-actions">
+                    <button class="action-btn heart-btn" onclick="react(this, 'heart')">
+                        <i class="fas fa-heart"></i> <span class="count">${counts.heart}</span>
+                    </button>
+                    <button class="action-btn flower-btn" onclick="react(this, 'flower')">
+                        <i class="fas fa-spa"></i> <span class="count">${counts.flower}</span>
+                    </button>
+                    <button class="action-btn candle-btn" onclick="react(this, 'candle')">
+                        <i class="fas fa-fire-alt"></i> <span class="count">${counts.candle}</span>
+                    </button>
+                </div>
+            `;
+            notesContainer.appendChild(note);
+        }
+
+        // --- 5. INTERACTION LOGIC (REACTION GLOWS) ---
+        function react(btn, type) {
+            // Stop propagation to prevent drag
+            event.stopPropagation();
+
+            // 1. Increment Count
+            const countSpan = btn.querySelector('.count');
+            let count = parseInt(countSpan.innerText);
+            countSpan.innerText = count + 1;
+
+            // 2. Animate Button
+            const icon = btn.querySelector('i');
+            icon.classList.add('pop-active');
+            setTimeout(() => icon.classList.remove('pop-active'), 300);
+
+            // 3. GLOW EFFECTS
+            const header = document.querySelector('header'); // Get injected header
+            const note = btn.closest('.note');
+
+            let glowClass = '';
+            let globalId = '';
+            if (type === 'heart') { glowClass = 'glow-red'; globalId = 'totalHearts'; }
+            if (type === 'flower') { glowClass = 'glow-yellow'; globalId = 'totalFlowers'; }
+            if (type === 'candle') { glowClass = 'glow-orange'; globalId = 'totalCandles'; }
+
+            // Apply to Header & Note
+            if (header) {
+                header.classList.add(glowClass);
+                setTimeout(() => header.classList.remove(glowClass), 1000);
+            }
+            note.classList.add(glowClass);
+            setTimeout(() => note.classList.remove(glowClass), 1000);
+
+            incrementStat(globalId, 1);
+        }
+
+        // --- 6. WRITER MODAL ---
+        function openWriter() {
+            document.getElementById('writeModal').classList.add('active');
+        }
+
+        function closeWriter() {
+            document.getElementById('writeModal').classList.remove('active');
+        }
 
         function sanitizeText(text) {
             let clean = text;
             OBSCENE_WORDS.forEach(word => {
-                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                const regex = new RegExp(word, 'gi');
                 clean = clean.replace(regex, '****');
             });
             return clean;
         }
 
-        // --- GLOBAL STATS FAKE LOGIC ---
-        // Slowly increment counts to simulate activity
-        function incrementStat(id, interval) {
-            const el = document.getElementById(id);
-            if (!el) return;
-
-            // Initial parse
-            let val = parseInt(el.innerText.replace(/,/g, ''));
-
-            setInterval(() => {
-                // Occasional update
-                if (Math.random() > 0.3) {
-                    val++;
-                    el.innerText = val.toLocaleString();
-
-                    // Little flash
-                    el.style.color = "#10b981";
-                    setTimeout(() => el.style.color = "#1e293b", 500);
-
-                    // Save to local storage for "persistence" feeling? No, simple is fine.
-                }
-            }, interval);
-        }
-
-        // Start Fake Stats - Slow Paced
-        incrementStat('userCount', 180000); // 3 mins per user roughly
-        incrementStat('totalHearts', 45000); // 45s
-        incrementStat('totalFlowers', 120000); // 2 mins
-        incrementStat('totalCandles', 90000); // 1.5 mins
-
-        // --- SEED DATA ---
-        const seedNotes = [
-            { text: "I feel like I'm failing everyone.", heart: 12, flower: 5, candle: 2 },
-            { text: "I miss someone who hurt me.", heart: 34, flower: 10, candle: 8 },
-            { text: "The silence in my apartment is too loud today.", heart: 5, flower: 2, candle: 0 },
-            { text: "I am tired of pretending I'm okay at work.", heart: 18, flower: 6, candle: 3 },
-            { text: "I don't know who I am anymore.", heart: 42, flower: 15, candle: 12 },
-            { text: "Everyone else seems to have it figured out.", heart: 8, flower: 1, candle: 1 },
-            { text: "I'm scared I'll never feel happy again.", heart: 25, flower: 8, candle: 4 },
-            { text: "I wish I could just pause time for a week.", heart: 50, flower: 20, candle: 10 }
-        ];
-
-        // --- CANVAS STATE ---
-        const wrapper = document.getElementById('canvas-wrapper');
-        const canvas = document.getElementById('infinite-canvas');
-
-        let scale = 1;
-        let panX = 0;
-        let panY = 0;
-        let isDragging = false;
-        let startX, startY;
-
-        function updateTransform() {
-            canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-        }
-
-        // --- PANNING ---
-        wrapper.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.note') || e.target.closest('.modal-overlay')) return;
-            isDragging = true;
-            startX = e.clientX - panX;
-            startY = e.clientY - panY;
-            wrapper.style.cursor = 'grabbing';
-        });
-
-        window.addEventListener('mouseup', () => {
-            isDragging = false;
-            wrapper.style.cursor = 'grab';
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            e.preventDefault();
-            panX = e.clientX - startX;
-            panY = e.clientY - startY;
-            updateTransform();
-        });
-
-        // Touch Panning
-        wrapper.addEventListener('touchstart', (e) => {
-            if (e.target.closest('.note')) return;
-            isDragging = true;
-            startX = e.touches[0].clientX - panX;
-            startY = e.touches[0].clientY - panY;
-        });
-
-        wrapper.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            e.preventDefault(); // Prevent standard scroll
-            panX = e.touches[0].clientX - startX;
-            panY = e.touches[0].clientY - startY;
-            updateTransform();
-        });
-
-        // --- ZOOMING ---
-        function zoomCanvas(delta) {
-            scale += delta;
-            // Clamp Zoom
-            scale = Math.min(Math.max(0.5, scale), 2);
-            updateTransform();
-        }
-
-        // Mouse Wheel Zoom
-        wrapper.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            const delta = e.deltaY > 0 ? -0.1 : 0.1;
-            zoomCanvas(delta);
-        }, { passive: false });
-
-
-        // --- NOTE CREATION ---
-        function initCanvas() {
-            // Center Canvas Initially (Approx view center)
-            panX = window.innerWidth / 2;
-            panY = window.innerHeight / 2;
-            updateTransform();
-
-            // Spawn Seed Notes around the center
-            seedNotes.forEach(data => {
-                const pos = getRandomPos();
-                createNoteElement(data.text, pos, data);
-            });
-        }
-
-        function getRandomPos() {
-            // Random scatter relative to center (0,0 is center of infinite canvas logic)
-            // Use a spread of +/- 800px
-            const spread = 800;
-            const x = (Math.random() - 0.5) * spread * 2;
-            const y = (Math.random() - 0.5) * spread * 1.5;
-            return { x, y };
-        }
-
-        function createNoteElement(text, pos, counts = { heart: 0, flower: 0, candle: 0 }) {
-            const note = document.createElement('div');
-            note.className = 'note';
-
-            // Random Rotation
-            const rot = (Math.random() - 0.5) * 6;
-
-            note.style.left = pos.x + 'px';
-            note.style.top = pos.y + 'px';
-            note.style.transform = `rotate(${rot}deg)`;
-
-            // Random Tint
-            const tints = ['#ffffff', '#fdfbf7', '#fefce8', '#f0f9ff'];
-            note.style.background = tints[Math.floor(Math.random() * tints.length)];
-
-            note.innerHTML = `
-                <div class="note-text">${text}</div>
-                <div class="note-meta">
-                    <span>Shared quietly</span>
-                </div>
-                <div class="reaction-row">
-                    <button class="react-btn" onclick="react(this, 'heart')">
-                        <i class="far fa-heart"></i> <span class="count">${counts.heart}</span>
-                    </button>
-                    <button class="react-btn flower" onclick="react(this, 'flower')">
-                        <i class="fas fa-spa"></i> <span class="count">${counts.flower}</span>
-                    </button>
-                    <button class="react-btn candle" onclick="react(this, 'candle')">
-                        <i class="fas fa-fire-alt"></i> <span class="count">${counts.candle}</span>
-                    </button>
-                </div>
-            `;
-
-            canvas.appendChild(note);
-        }
-
-        // --- REACTION LOGIC ---
-        function react(btn, type) {
-            event.stopPropagation();
-
-            // Toggle Active state locally
-            const icon = btn.querySelector('i');
-            const countSpan = btn.querySelector('.count');
-            let count = parseInt(countSpan.innerText);
-
-            if (!btn.classList.contains('active')) {
-                btn.classList.add('active');
-                count++;
-
-                // Icon Change for Heart
-                if (type === 'heart') icon.className = "fas fa-heart";
-
-                // Pulse Anim
-                btn.style.transform = "scale(1.4)";
-                setTimeout(() => btn.style.transform = "scale(1)", 200);
-
-            } else {
-                // Prevent removing care? Usually standard social apps allow un-liking.
-                // For Soulamore, maybe "care" implies permanence? 
-                // Let's allow toggle for now.
-                btn.classList.remove('active');
-                count--;
-                if (type === 'heart') icon.className = "far fa-heart";
-            }
-
-            countSpan.innerText = count;
-        }
-
-        // --- MODAL & WRITING ---
-        function openWriter() {
-            document.getElementById('writeModal').style.display = 'flex';
-            setTimeout(() => document.getElementById('writeModal').classList.add('active'), 10);
-        }
-
-        function closeWriter() {
-            document.getElementById('writeModal').classList.remove('active');
-            setTimeout(() => document.getElementById('writeModal').style.display = 'none', 500);
-        }
-
-        function toggleOption(el) {
-            document.querySelectorAll('.option-pill').forEach(p => p.classList.remove('selected'));
-            el.classList.add('selected');
-        }
-
-        function autoResize(el) {
-            el.style.height = 'auto';
-            el.style.height = el.scrollHeight + 'px';
-        }
-
         function postNote() {
-            let txt = document.getElementById('noteInput').value;
-            if (!txt.trim()) return;
+            const input = document.getElementById('noteInput');
+            const text = input.value.trim();
+            if (!text) return;
 
-            // SAFETY FILTER
-            txt = sanitizeText(txt);
+            const safeText = sanitizeText(text);
 
-            // Post at center of CURRENT view (inverted active pan)
-            // Center Canvas (0,0) + Pan Offset
-            // We want it to appear "in front" of user.
-            // Current center = -panX / scale
+            // Post near the center of view
+            const centerX = -STATE.pointX + (window.innerWidth / 2) / STATE.scale;
+            const centerY = -STATE.pointY + (window.innerHeight / 2) / STATE.scale;
 
-            const targetX = -panX / scale;
-            const targetY = -panY / scale;
+            const targetX = centerX + (Math.random() * 200 - 100);
+            const targetY = centerY + (Math.random() * 200 - 100);
 
-            createNoteElement(txt, { x: targetX + (Math.random() * 40 - 20), y: targetY + (Math.random() * 40 - 20) });
+            // New notes have 0 stats and "Just now"
+            createNoteElement(safeText, targetX, targetY, "Just now", { heart: 0, flower: 0, candle: 0 });
 
-            // Clear
-            document.getElementById('noteInput').value = "";
             closeWriter();
-
-            // Toast
-            const toast = document.getElementById('toast');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            input.value = '';
         }
 
-        // Init
-        initCanvas();
+        // --- 7. FAKE LIVE ACTIVITY (Optimized) ---
+        function startFakeLiveActivity() {
+            // Reduce frequency to avoid layout thrashing
+            setInterval(() => incrementStat('userCount', 1), 180000);
+            setInterval(() => incrementStat('totalHearts', 1), 45000);
+
+            // Stagger these
+            setTimeout(() => setInterval(() => incrementStat('totalFlowers', 1), 120000), 10000);
+            setTimeout(() => setInterval(() => incrementStat('totalCandles', 1), 90000), 20000);
+        }
+
+        function incrementStat(id, amount) {
+            const el = document.getElementById(id);
+            if (el) {
+                let val = parseInt(el.innerText.replace(/,/g, '')) || 0;
+                el.innerText = (val + amount).toLocaleString();
+                // Removed Flash Color change to prevent composite layer repaint on text
+            }
+        }
 
     </script>
 </body>

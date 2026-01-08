@@ -326,6 +326,7 @@ const NAV_DATA = [
         href: '#',
         type: 'dropdown',
         children: [
+            { id: 'nav-problemwall', label: 'The Problem Wall', href: 'pages/problem-wall.html', style: 'color:var(--ink-black); font-weight:600;' },
             { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html', style: 'color:var(--ember-orange);' },
             { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
             { id: 'nav-soulrider', label: 'Soul Rider (Beta)', href: 'tools/soul-rider.html', style: 'color:#F49F75;' },
@@ -590,6 +591,7 @@ function getRootPath() {
     // 1-Level Deep Check
     if (location.pathname.includes('/spaces/') ||
         location.pathname.includes('/join-us/') ||
+        location.pathname.includes('/pages/') ||
         location.pathname.includes('/our-peers/') ||
         location.pathname.includes('/our-psychologists/') ||
         location.pathname.includes('/tools/') ||
