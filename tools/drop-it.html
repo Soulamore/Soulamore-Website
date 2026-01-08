@@ -1793,14 +1793,14 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
 
             try {
-                // Generate Blob (High Res)
+                // Generate Blob
                 const blob = await generateImage(null, null, false, true);
                 if (!blob) throw new Error("Image Capture Failed");
 
                 const file = new File([blob], "soulamore-story.png", { type: "image/png" });
 
-                // 1. Try Native Share
-                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                // Optimistic Share (Try/Catch is robust enough)
+                if (navigator.share) {
                     await navigator.share({
                         files: [file],
                         title: 'My Soulamore',
@@ -1808,19 +1808,13 @@
                     });
                     btn.innerHTML = 'Shared! <i class="fas fa-check"></i>';
                 } else {
-                    // 2. Fallback to Modal (More reliable than Clipboard on some Androids)
-                    showSaveModal(blob);
-                    btn.innerHTML = 'Image Ready <i class="fas fa-check"></i>';
+                    throw new Error("Navigator Share not available");
                 }
             } catch (err) {
-                console.warn("Share failed:", err);
-                // 3. Ultimate Fallback: Modal
-                try {
-                    const blob = await generateImage(null, null, false, true);
-                    showSaveModal(blob);
-                } catch (e) { alert("Could not generate image."); }
-
-                btn.innerHTML = originalText;
+                console.warn("Share failed (likely not supported for files):", err);
+                // Fallback to Modal
+                showSaveModal(await generateImage(null, null, false, true).catch(e => null) || new Blob());
+                btn.innerHTML = 'Image Ready <i class="fas fa-check"></i>';
             }
             setTimeout(() => btn.innerHTML = originalText, 4000);
         }
@@ -1832,24 +1826,29 @@
 
             try {
                 const blob = await generateImage(null, null, false, true); // Get Blob
+                const url = URL.createObjectURL(blob);
 
-                // On Mobile, prefer the Modal immediately
-                if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-                    showSaveModal(blob);
-                } else {
-                    // Desktop: Auto Download
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.download = `soulamore-${Date.now()}.png`;
-                    link.href = url;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    setTimeout(() => URL.revokeObjectURL(url), 10000);
+                // Strategy: Link Click (Works on Android/Desktop)
+                const link = document.createElement('a');
+                link.download = `soulamore-${Date.now()}.png`;
+                link.href = url;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Fallback for iOS (Link click doesn't auto-download blobs sometimes)
+                // If we are on mobile, we also open it in a new tab just in case the download was blocked
+                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    setTimeout(() => window.open(url, '_blank'), 100);
                 }
+
+                setTimeout(() => URL.revokeObjectURL(url), 10000);
+
             } catch (e) {
-                alert("Could not generate image. Please screenshot instead.");
                 console.error(e);
+                alert("Download failed. Showing verification image.");
+                const b = await generateImage(null, null, false, true).catch(e => null);
+                if (b) showSaveModal(b);
             }
             if (!forceOpen) btn.innerHTML = 'Download Image <i class="fas fa-download"></i>';
         }
