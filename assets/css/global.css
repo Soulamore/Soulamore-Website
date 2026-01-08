@@ -25,10 +25,100 @@
     box-sizing: border-box;
 }
 
+html,
 body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden !important;
+    /* GLOBAL SCROLL KILLER */
+    width: 100%;
+    position: relative;
     font-family: var(--font-body);
     line-height: 1.6;
-    overflow-x: hidden;
+}
+
+/* --- SMART COMPACT DESKTOP (1151px - 1650px) --- */
+/* "The Creative Solution": Icons Only when space is tight */
+/* Extended range to 1650px to ensure no text overlaps on laptops */
+@media (min-width: 1151px) and (max-width: 1650px) {
+
+    /* CONSTANT ID-BASED OVERRIDE: 
+       Ensures this element NEVER appears above 1151px, 
+       regardless of any other class-based rules. 
+    */
+    #mobile-destruct-trigger {
+        display: none !important;
+    }
+
+    /* HIDE TEXT ROBUSTLY (No Spans Required) */
+    /* Target direct links and dropdown toggles */
+    .nav-links>a,
+    .nav-links>.dropdown>a {
+        font-size: 0 !important;
+        /* Hides text node */
+        gap: 0 !important;
+        padding: 0 10px !important;
+        /* Reduce padding */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* Force Icon Visibility & Size */
+    .nav-links>a>i,
+    .nav-links>.dropdown>a>i {
+        font-size: 1.4rem !important;
+        /* Bigger Icons */
+        margin: 0 !important;
+        color: var(--starlight);
+        transition: 0.3s;
+        display: inline-block !important;
+    }
+
+    /* Hide the Dropdown Chevron specifically */
+    .nav-links>.dropdown>a>.fa-chevron-down {
+        display: none !important;
+    }
+
+    .nav-links a:hover i {
+        color: var(--teaser-blue);
+        transform: scale(1.1);
+    }
+
+    .auth-box {
+        gap: 5px !important;
+    }
+
+    /* EXCEPTION: Keep text in buttons visible, if they inherit from 'a' */
+    .nav-btn {
+        padding: 8px 12px !important;
+        font-size: 0.85rem !important;
+        /* Keep text visible for buttons */
+    }
+
+    /* FIX: RESTORE FLOATING ISLAND (Synced with Top Block) */
+    header.island-nav {
+        width: 94% !important;
+        /* Safer than VW for scrollbars */
+        max-width: 1300px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        top: 15px !important;
+        /* Floating spacing */
+        border-radius: 50px !important;
+        /* Rounded corners */
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-bottom: none !important;
+        /* Use border scaling */
+        padding: 8px 30px !important;
+        background: rgba(15, 23, 42, 0.90) !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* HIDE DECORATIVE ELEMENTS THAT CAUSE SCROLL */
+    .promo-sticker {
+        display: none !important;
+    }
 }
 
 /* FORCE HEADER FONT (Override page-specific fonts) */
@@ -664,11 +754,15 @@ footer a {
     /* Hidden by default on desktop */
 }
 
-/* --- DEFENSIVE DESKTOP OVERRIDES (Force Correct Layout > 1024px) --- */
-@media (min-width: 1025px) {
+/* --- DEFENSIVE DESKTOP OVERRIDES (Force Correct Layout > 1200px) --- */
+@media (min-width: 1201px) {
 
-    /* FIX: Hide Mobile Help Link (Specific Selector) */
-    .nav-links .mobile-only-help {
+    /* NUCLEAR FIX: Never show mobile help button on desktop */
+    /* Applies from 1150px upwards, covering the transition gap */
+    /* SPECIFICITY BOOST: ID Selector (#) beats everything */
+    #mobile-destruct-trigger,
+    .nav-links .mobile-only-help,
+    .mobile-only-help {
         display: none !important;
     }
 
@@ -705,8 +799,8 @@ footer a {
 
 
 
-/* --- MOBILE / TABLET OPTIMIZATION (Up to 1024px) --- */
-@media (max-width: 1024px) {
+/* --- MOBILE / TABLET OPTIMIZATION (Up to 1150px) --- */
+@media (max-width: 1150px) {
 
 
     /* 1. Header Changes */
@@ -754,21 +848,34 @@ footer a {
         display: none !important;
     }
 
-    /* FIX: Header Mobile Styling */
+    /* EXCEPTION: Keep text in buttons visible, if they inherit from 'a' */
+    .nav-btn {
+        font-size: 0.85rem !important;
+    }
+
+    /* FIX: RESTORE FLOATING ISLAND (Laptop Mode) */
+    /* User requested gaps on sides ("remove this" pointing to edges) */
     header.island-nav {
-        width: 100%;
-        max-width: 100%;
-        border-radius: 0;
-        transform: none;
-        left: 0;
-        padding: 10px 15px;
-        background: var(--navy-glass);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: none;
-        border-bottom: 1px solid var(--border-glass);
-        justify-content: space-between;
-        z-index: 20000 !important;
+        width: 92% !important;
+        /* Safer than VW for scrollbars */
+        max-width: 1400px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        top: 20px !important;
+        /* Floating spacing */
+        border-radius: 50px !important;
+        /* Rounded corners */
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-bottom: none !important;
+        /* Use border scaling */
+        padding: 12px 30px !important;
+        background: rgba(15, 23, 42, 0.90) !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* HIDE DECORATIVE ELEMENTS THAT CAUSE SCROLL */
+    .promo-sticker {
+        display: none !important;
     }
 
     header.island-nav .nav-logo img {
@@ -781,6 +888,7 @@ footer a {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 0 !important;
     }
 
     /* Hide Desktop Elements */
@@ -1030,7 +1138,7 @@ footer a {
     /* ------------------------------- */
 
     /* Show Main Dropdown on Hover */
-    @media(hover: hover) and (min-width: 1150px) {
+    @media(hover: hover) and (min-width: 1201px) {
         .dropdown:hover>.dropdown-content {
             display: block;
             animation: fadeInUp 0.3s ease;
@@ -1071,31 +1179,61 @@ footer a {
             overflow-y: auto;
             overscroll-behavior: contain;
             -webkit-overflow-scrolling: touch;
+
+            /* NUCLEAR HIDE: Ensure it's absolutely gone when closed */
             transform: translateX(100%);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, visibility 0.4s;
             border-left: 1px solid var(--border-glass);
-            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            /* GHOST LINE FIX: Hide shadow when closed */
+            box-shadow: none;
             z-index: 99999 !important;
         }
 
         .nav-links.open {
             transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            /* Show shadow only when open */
         }
 
-        /* Mobile Only Help Button */
+        /* Mobile Only Help Button - PROMINENT & ON TOP */
+        #mobile-destruct-trigger.mobile-only-help,
         .mobile-only-help {
             display: flex !important;
+            order: -1;
+            /* VISUAL HOSTING: Moves to top of flex container */
             align-items: center;
             justify-content: center;
-            background: rgba(255, 107, 107, 0.15);
-            color: #ff6b6b !important;
-            border: 1px solid rgba(255, 107, 107, 0.4);
-            padding: 12px;
-            border-radius: 12px;
+
+            /* Prominent "Crisis" Styling (Solid Red) */
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+            color: white !important;
+            border: none !important;
+
+            padding: 16px 20px;
+            /* Generous padding */
+            border-radius: 50px;
+            /* Pill shape like desktop */
             font-weight: 700;
-            margin-top: 20px;
+            font-size: 1.1rem;
+            /* Larger text */
+
+            margin-top: 0;
+            margin-bottom: 25px;
+            /* Separation from rest of menu */
             width: 100%;
             text-align: center;
+
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+            /* Glowing Shadow */
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
     }
 }
