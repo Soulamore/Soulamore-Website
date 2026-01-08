@@ -1331,6 +1331,12 @@
                     if (rescueItem && rescueItem.y > height + 50) rescueItem = null;
                 }
 
+                // SPAWN POPUPS (Intrusive Thoughts)
+                // Tuned Spawn Rate: (was 0.0015 -> 0.003 -> 0.0022)
+                if (running && enablePopups && Math.random() < 0.0022) {
+                    spawnPopup();
+                }
+
                 // DRAW POPUPS
                 popups.forEach((p, i) => {
                     p.x += p.vx;
@@ -1799,13 +1805,17 @@
 
                 const file = new File([blob], "soulamore-story.png", { type: "image/png" });
 
-                // Optimistic Share (Try/Catch is robust enough)
+                // Optimistic Share with Timeout
                 if (navigator.share) {
-                    await navigator.share({
+                    const sharePromise = navigator.share({
                         files: [file],
                         title: 'My Soulamore',
                         text: 'Cleared my mind on Soulamore.',
                     });
+
+                    // If share takes too long (e.g. browser hangs), show modal? 
+                    // No, native share blocks main thread often. just await it.
+                    await sharePromise;
                     btn.innerHTML = 'Shared! <i class="fas fa-check"></i>';
                 } else {
                     throw new Error("Navigator Share not available");
