@@ -1716,45 +1716,76 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
 
             try {
-                const blob = await generateImage(null, null, false, true); // Get Blob
-                if (!blob) throw new Error("Image Generation Failed");
+                // Generate Blob (High Res)
+                const blob = await generateImage(null, null, false, true);
+                if (!blob) throw new Error("Image Capture Failed");
 
-                const file = new File([blob], "soulamore-journey.png", { type: "image/png" });
+                const file = new File([blob], "soulamore-story.png", { type: "image/png" });
 
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                // 1. Try Native Share
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
                         files: [file],
-                        title: 'My Soulamore Journey',
-                        text: 'I just cleared my mind on Soulamore.',
+                        title: 'My Soulamore',
+                        text: 'Cleared my mind on Soulamore.',
                     });
                     btn.innerHTML = 'Shared! <i class="fas fa-check"></i>';
                 } else {
-                    throw new Error("Web Share not supported");
+                    // 2. Fallback: Copy to Clipboard (iOS/Android compatible in some contexts)
+                    try {
+                        await navigator.clipboard.write([
+                            new ClipboardItem({ [blob.type]: blob })
+                        ]);
+                        alert("Image copied to clipboard! You can paste it into Instagram Stories.");
+                        btn.innerHTML = 'Copied! <i class="fas fa-copy"></i>';
+                    } catch (clipErr) {
+                        throw new Error("Share API not supported");
+                    }
                 }
             } catch (err) {
-                console.warn("Share failed, falling back to download", err);
-                downloadImage(); // Fallback
+                console.warn("Share failed:", err);
+                // 3. Ultimate Fallback: Download it
+                alert("Opening image... Long press it to save/share!");
+                downloadImage(true); // Open in new tab mode
                 btn.innerHTML = originalText;
             }
-            setTimeout(() => btn.innerHTML = originalText, 3000);
+            setTimeout(() => btn.innerHTML = originalText, 4000);
         }
 
-        async function downloadImage() {
+        async function downloadImage(forceOpen = false) {
             const btn = document.getElementById('downBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            const originalText = btn.innerHTML;
+            if (!forceOpen) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
             try {
-                const dataUrl = await generateImage(null, null, false, false); // Get DataURL
+                const blob = await generateImage(null, null, false, true); // Get Blob
+                const url = URL.createObjectURL(blob);
+
+                // Strategy: Try automatic download first
                 const link = document.createElement('a');
-                link.download = `soulamore-journey-${Date.now()}.png`;
-                link.href = dataUrl;
+                link.download = `soulamore-${Date.now()}.png`;
+                link.href = url;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+
+                // Mobile Safari often ignores programatic clicks.
+                // If it was a "Share Fallback" or just to be safe, we can also open it.
+                if (forceOpen || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                    // Small delay to let the download attempt happen
+                    setTimeout(() => {
+                        // Open blob in new tab so user can long-press save
+                        window.open(url, '_blank');
+                    }, 500);
+                }
+
+                setTimeout(() => URL.revokeObjectURL(url), 10000); // Cleanup
+
             } catch (e) {
-                alert("Download failed. Please try again.");
+                alert("Could not generate image. Please screenshot instead.");
+                console.error(e);
             }
-            btn.innerHTML = 'Download Image <i class="fas fa-download"></i>';
+            if (!forceOpen) btn.innerHTML = 'Download Image <i class="fas fa-download"></i>';
         }
 
         // Refactored Generator (Returns Promise)
