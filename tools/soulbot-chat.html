@@ -908,7 +908,18 @@
             }
         };
         window.handleSend = function() {
-            console.warn("SoulBot is loading... please wait a moment");
+            console.log("Stub handleSend called - checking if module loaded...");
+            // Check if the real handleSend exists in module scope (it won't, but we can check window)
+            if (window._realHandleSend && typeof window._realHandleSend === 'function') {
+                console.log("Calling real handleSend");
+                return window._realHandleSend();
+            }
+            console.warn("SoulBot module is still loading... please wait a moment. If this persists, check the console for CSP errors.");
+            // Show user-friendly message
+            const input = document.getElementById('userInput');
+            if (input && input.value.trim()) {
+                alert("SoulBot is still loading. Please check the browser console for errors. The Google Generative AI script may be blocked by Content Security Policy.");
+            }
         };
         window.sendPrompt = function(el) {
             if (el && typeof window.handleSend === 'function') {
@@ -1152,8 +1163,8 @@
 
         // Define handleSend FIRST so other functions can reference it
         async function handleSend() {
+            console.log("=== handleSend FUNCTION CALLED ==="); // Debug log
             try {
-                console.log("handleSend called"); // Debug log
                 const inputEl = getUserInput();
                 const btnEl = getSendBtn();
                 const emptyStateEl = getEmptyState();
@@ -1315,6 +1326,8 @@
         window.autoExpand = autoExpand;
         window.handleEnter = handleEnter;
         window.handleSend = handleSend;
+        window._realHandleSend = handleSend; // Also store as backup reference
+        console.log("Real handleSend function attached to window:", typeof window.handleSend);
 
         function appendMessage(role, text, container = null) {
             const messagesContainer = container || getMessagesContainer();
@@ -1478,15 +1491,29 @@
             // Send button click
             newBtn.addEventListener('click', function(e) {
                 e.preventDefault();
+                console.log("Send button clicked!");
                 const func = window.handleSend || handleSend;
                 if (typeof func === 'function') {
+                    console.log("Calling handleSend function");
                     func();
                 } else {
-                    console.error("handleSend not available");
+                    console.error("handleSend not available. Type:", typeof func, "window.handleSend:", typeof window.handleSend, "handleSend:", typeof handleSend);
                 }
             });
             
+            // Test: Add a direct click handler as backup
+            newBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("Direct onclick handler triggered");
+                if (window.handleSend) {
+                    window.handleSend();
+                }
+            };
+            
             console.log("Event listeners attached successfully");
+            console.log("Button element:", newBtn);
+            console.log("Input element:", newInput);
         }
 
         // Wait for everything to be ready, then set up listeners
