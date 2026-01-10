@@ -599,6 +599,118 @@
             transform: scale(1.2);
             border-color: white;
         }
+
+        /* --- THERAPIST RECOMMENDATION CARD --- */
+        .therapist-recommendation {
+            background: rgba(78, 205, 196, 0.1);
+            border: 2px solid var(--teal-glow);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(78, 205, 196, 0.2);
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .therapist-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .therapist-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--teal-glow), #2a9d8f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .therapist-info h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: var(--teal-glow);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .therapist-info p {
+            margin: 5px 0 0 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .therapist-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .therapist-badge {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid var(--teal-glow);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--teal-glow);
+        }
+
+        .therapist-cta {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .therapist-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .therapist-btn-primary {
+            background: var(--teal-glow);
+            color: #0f172a;
+        }
+
+        .therapist-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        .therapist-btn-secondary {
+            background: transparent;
+            color: var(--teal-glow);
+            border: 1px solid var(--teal-glow);
+        }
+
+        .therapist-btn-secondary:hover {
+            background: rgba(78, 205, 196, 0.1);
+        }
     </style>
 </head>
 
@@ -781,11 +893,14 @@
     <!-- LOGIC -->
     <script type="module">
         import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+        import { createConversation, addMessageToConversation, updateConversationDuration, recommendTherapist, getConversation } from "../assets/js/soulbot-handler.js";
+        import { auth } from "../assets/js/firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         // CONFIG (Same as soulbot.html)
         // CONFIG (Same as soulbot.html)
         // IMPORTANT: Never commit your API Key to GitHub!
-        const API_KEY = "YOUR_API_KEY_HERE"; // User must replace this locally
+        const API_KEY = "AIzaSyB0c4gekhIe-l3zlZb87JXYBj2rITqao1k";
         const genAI = new GoogleGenerativeAI(API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -797,10 +912,86 @@
         `;
 
         let chatHistory = [];
+        let conversationId = null;
+        let conversationStartTime = null;
+        let conversationTimer = null;
+        let recommendationShown = false;
+        let currentUserId = null;
+
         const messagesContainer = document.getElementById('messagesContainer');
         const emptyState = document.getElementById('emptyState');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
+
+        // Initialize conversation and get user ID
+        onAuthStateChanged(auth, async (user) => {
+            currentUserId = user ? user.uid : null;
+            if (!conversationId) {
+                await initConversation();
+            }
+        });
+
+        // Initialize conversation immediately (for anonymous users)
+        // Will be updated with user ID if logged in
+        initConversation();
+
+        async function initConversation() {
+            conversationId = await createConversation(currentUserId);
+            conversationStartTime = Date.now();
+            recommendationShown = false;
+            
+            // Start timer to check for recommendation after 5-10 minutes
+            startRecommendationTimer();
+            
+            console.log("Conversation started:", conversationId);
+        }
+
+        function startRecommendationTimer() {
+            // Clear any existing timer
+            if (conversationTimer) {
+                clearTimeout(conversationTimer);
+            }
+            
+            // Random time between 5-10 minutes (300000ms - 600000ms)
+            const minTime = 5 * 60 * 1000; // 5 minutes
+            const maxTime = 10 * 60 * 1000; // 10 minutes
+            const randomTime = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
+            
+            conversationTimer = setTimeout(async () => {
+                if (!recommendationShown && conversationId) {
+                    await checkAndRecommendTherapist();
+                }
+            }, randomTime);
+            
+            console.log(`Recommendation timer set for ${Math.round(randomTime / 1000 / 60)} minutes`);
+        }
+
+        async function checkAndRecommendTherapist() {
+            if (recommendationShown || !conversationId) return;
+            
+            // Only recommend if there's been meaningful conversation (at least 3 user messages)
+            const conversation = await getConversation(conversationId);
+            if (!conversation) return;
+            
+            const userMessages = (conversation.messages || []).filter(m => m.role === 'user');
+            if (userMessages.length < 3) {
+                // Not enough conversation yet, check again in 2 minutes
+                conversationTimer = setTimeout(checkAndRecommendTherapist, 2 * 60 * 1000);
+                return;
+            }
+            
+            // Calculate actual duration
+            const durationSeconds = Math.floor((Date.now() - conversationStartTime) / 1000);
+            await updateConversationDuration(conversationId, durationSeconds);
+            
+            // Get therapist recommendation
+            const therapist = await recommendTherapist(conversationId);
+            
+            if (therapist) {
+                showTherapistRecommendation(therapist);
+                recommendationShown = true;
+            }
+        }
 
         // --- UI FUNCTIONS ---
 
@@ -845,12 +1036,22 @@
             const text = userInput.value.trim();
             if (!text) return;
 
+            // Ensure conversation is initialized
+            if (!conversationId) {
+                await initConversation();
+            }
+
             // UI Updates
             userInput.value = "";
             userInput.style.height = 'auto';
             emptyState.classList.add('hidden');
 
             appendMessage('user', text);
+
+            // Save user message to Firestore
+            if (conversationId) {
+                await addMessageToConversation(conversationId, 'user', text);
+            }
 
             // Add Thinking Placeholder
             const thinkingId = appendThinking();
@@ -863,6 +1064,9 @@
                 if (crisisKeywords.some(w => text.toLowerCase().includes(w))) {
                     removeThinking(thinkingId);
                     appendCrisisCard();
+                    if (conversationId) {
+                        await addMessageToConversation(conversationId, 'bot', 'CRISIS_ALERT', { type: 'crisis' });
+                    }
                     return;
                 }
 
@@ -881,15 +1085,40 @@
 
                 if (response.includes("CRISIS_ALERT")) {
                     appendCrisisCard();
+                    if (conversationId) {
+                        await addMessageToConversation(conversationId, 'bot', 'CRISIS_ALERT', { type: 'crisis' });
+                    }
                 } else {
                     appendMessage('bot', response);
                     chatHistory.push({ role: "user", parts: [{ text: text }] });
                     chatHistory.push({ role: "model", parts: [{ text: response }] });
+                    
+                    // Save bot message to Firestore
+                    if (conversationId) {
+                        await addMessageToConversation(conversationId, 'bot', response);
+                    }
+                    
+                    // Check if we should recommend a therapist (after meaningful conversation)
+                    // Trigger recommendation after 3-5 user messages if timer hasn't fired yet
+                    const conversation = conversationId ? await getConversation(conversationId) : null;
+                    if (conversation && !recommendationShown) {
+                        const userMessages = (conversation.messages || []).filter(m => m.role === 'user');
+                        const durationSeconds = Math.floor((Date.now() - conversationStartTime) / 1000);
+                        
+                        // Recommend if: 5+ minutes AND 5+ messages, OR 10+ messages regardless of time
+                        if ((durationSeconds >= 5 * 60 && userMessages.length >= 5) || userMessages.length >= 10) {
+                            await checkAndRecommendTherapist();
+                        }
+                    }
                 }
 
             } catch (err) {
                 removeThinking(thinkingId);
-                appendMessage('bot', "I'm having a little trouble connecting. Please try again in a moment.");
+                const errorMsg = "I'm having a little trouble connecting. Please try again in a moment.";
+                appendMessage('bot', errorMsg);
+                if (conversationId) {
+                    await addMessageToConversation(conversationId, 'bot', errorMsg, { type: 'error' });
+                }
                 console.error(err);
             }
         }
@@ -986,6 +1215,63 @@
 
         function formatText(text) {
             return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        }
+
+        function showTherapistRecommendation(therapist) {
+            const recommendationDiv = document.createElement('div');
+            recommendationDiv.className = 'therapist-recommendation';
+            recommendationDiv.innerHTML = `
+                <div class="therapist-header">
+                    <div class="therapist-avatar">${therapist.name.charAt(0).toUpperCase()}</div>
+                    <div class="therapist-info">
+                        <h3>${therapist.name}</h3>
+                        <p>${therapist.role || 'Therapist'}</p>
+                    </div>
+                </div>
+                <p style="margin-bottom: 15px; opacity: 0.9; line-height: 1.6;">
+                    Based on our conversation, I think ${therapist.name} might be a good match for you. 
+                    They specialize in areas that seem relevant to what you've been sharing.
+                </p>
+                ${therapist.tags && therapist.tags.length > 0 ? `
+                    <div class="therapist-badges">
+                        ${therapist.tags.slice(0, 5).map(tag => `<span class="therapist-badge">${tag}</span>`).join('')}
+                    </div>
+                ` : ''}
+                ${therapist.rating ? `
+                    <div style="margin: 15px 0; display: flex; align-items: center; gap: 10px;">
+                        <span style="color: #fbbf24; font-size: 1.2rem;">★</span>
+                        <span style="font-weight: 600;">${therapist.rating}</span>
+                        <span style="opacity: 0.7; font-size: 0.9rem;">(${therapist.reviews || 0} reviews)</span>
+                        ${therapist.online ? '<span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: auto;">Online</span>' : ''}
+                    </div>
+                ` : ''}
+                <div class="therapist-cta">
+                    <a href="../our-psychologists/psychologists.html?therapist=${therapist.id}" class="therapist-btn therapist-btn-primary">
+                        View Profile <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <button onclick="this.parentElement.parentElement.style.display='none'" class="therapist-btn therapist-btn-secondary">
+                        Maybe Later
+                    </button>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(recommendationDiv);
+            scrollToBottom();
+            
+            // Add a bot message introducing the recommendation
+            setTimeout(() => {
+                const introDiv = document.createElement('div');
+                introDiv.className = 'message-row';
+                introDiv.innerHTML = `
+                    <div class="msg-avatar bot-avatar"><i class="fas fa-ghost"></i></div>
+                    <div class="msg-content">
+                        <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; color: var(--teal-glow);">SoulBot</div>
+                        <div>I've been listening, and I think connecting with a professional therapist might be helpful. I've found someone who could be a good fit for you.</div>
+                    </div>
+                `;
+                messagesContainer.insertBefore(introDiv, recommendationDiv);
+                scrollToBottom();
+            }, 500);
         }
 
     </script>

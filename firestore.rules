@@ -101,6 +101,20 @@ service cloud.firestore {
     match /active_souls/{document=**} {
       allow read, write: if true; // Public for anonymous presence
     }
+
+    // SoulBot Conversations
+    match /soulbot_conversations/{document=**} {
+      allow read: if request.auth != null; // Authenticated users can read their own conversations
+      allow create: if true; // Anyone can start a conversation (anonymous or authenticated)
+      allow update: if request.auth != null || request.resource.data.userId == 'anonymous'; // Can update if authenticated or if it's anonymous
+      allow delete: if request.auth != null; // Only authenticated users can delete
+    }
+
+    // Therapists Collection (for therapist recommendations)
+    match /therapists/{document=**} {
+      allow read: if true; // Public read for therapist listings
+      allow create, update, delete: if request.auth != null; // Only authenticated admins can modify
+    }
     
     // Default: Deny all other access
     match /{document=**} {
