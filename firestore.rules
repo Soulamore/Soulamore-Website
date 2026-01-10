@@ -110,9 +110,13 @@ service cloud.firestore {
       // Allow create: anyone can create a conversation (anonymous or authenticated)
       allow create: if true;
       
-      // Allow update: authenticated users updating their own conversations, OR anonymous users updating anonymous conversations (userId is null)
-      allow update: if (request.auth != null && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid) 
-                    || (request.auth == null && resource.data.userId == null && request.resource.data.userId == null);
+      // Allow update: 
+      // - Authenticated users can update their own conversations (userId matches auth.uid)
+      // - Anonymous users can update anonymous conversations (existing userId is null AND new userId is also null)
+      // - Allow updates if conversation was created anonymously (userId is null) regardless of auth state
+      allow update: if (request.auth != null && resource.data.userId == request.auth.uid) 
+                    || (resource.data.userId == null && (!exists(request.resource.data.userId) || request.resource.data.userId == null))
+                    || (request.auth == null && resource.data.userId == null);
       
       // Allow delete: only authenticated users can delete their own conversations
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
