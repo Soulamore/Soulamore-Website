@@ -696,10 +696,9 @@
                                     onmouseout="this.style.borderColor='#cbd5e1'; this.style.color='#64748b'">Save as
                                     Draft</button>
                                 <button onclick="publishDraft()"
-                                    style="background:var(--teal-glow); color:#0f172a; padding:8px 25px; border-radius:50px; border:none; font-weight:700; cursor:pointer; font-size:0.85rem; box-shadow:0 0 15px rgba(45, 212, 191, 0.3); transition:0.2s;"
-                                    onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 0 20px rgba(45, 212, 191, 0.5)'"
-                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 0 15px rgba(45, 212, 191, 0.3)'"><i
-                                        class="fas fa-paper-plane"></i> Publish</button>
+                                    style="background: linear-gradient(135deg, var(--teal-glow), #2dd4bf); color: #0f172a; padding: 8px 24px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-paper-plane"></i> Publish
+                                </button>
                                 <div
                                     style="width: 35px; height: 35px; background: #e5e7eb; border-radius: 50%; margin-left: 15px; display: flex; align-items: center; justify-content: center; color: #6b7280;">
                                     <img src="../assets/images/google-icon.png"
@@ -1296,12 +1295,39 @@
                 return;
             }
 
-            container.innerHTML = drafts.map(d => `
-                <div id="draft-${d.id}" class="blog-list-item ${currentDraftId === d.id ? 'active' : ''}" onclick="loadDraft('${d.id}')">
-                    <div style="font-weight:600; color:white; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.title || "Untitled Draft"}</div>
-                    <div style="font-size:0.75rem; opacity:0.6;">${new Date(d.lastEdited).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                </div>
-            `).join('');
+            container.innerHTML = '';
+            if (drafts.length === 0) {
+                container.innerHTML = '<div style="font-size:0.8rem; opacity:0.5; font-style:italic;">No drafts yet.</div>';
+                return;
+            }
+
+            drafts.forEach(d => {
+                const safeId = String(d.id || '').replace(/[^a-zA-Z0-9\-\._]/g, '');
+
+                const item = document.createElement('div');
+                item.id = 'draft-' + safeId;
+                item.className = 'blog-list-item' + (currentDraftId === d.id ? ' active' : '');
+                item.onclick = function () { loadDraft(d.id); };
+
+                const titleDiv = document.createElement('div');
+                titleDiv.style.fontWeight = '600';
+                titleDiv.style.color = 'white';
+                titleDiv.style.whiteSpace = 'nowrap';
+                titleDiv.style.overflow = 'hidden';
+                titleDiv.style.textOverflow = 'ellipsis';
+                titleDiv.textContent = d.title || "Untitled Draft";
+
+                const dateDiv = document.createElement('div');
+                dateDiv.style.fontSize = '0.75rem';
+                dateDiv.style.opacity = '0.6';
+                if (d.lastEdited) {
+                    dateDiv.textContent = new Date(d.lastEdited).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+
+                item.appendChild(titleDiv);
+                item.appendChild(dateDiv);
+                container.appendChild(item);
+            });
         }
 
         function publishDraft() {

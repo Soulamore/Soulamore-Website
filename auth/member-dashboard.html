@@ -629,10 +629,18 @@
             div.style.maxWidth = '80%';
             div.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
 
-            div.innerHTML = `
-                <div style="font-size:0.7rem; opacity:0.6; margin-bottom:4px; text-align:${isUser ? 'right' : 'left'}">${sender}</div>
-                <div>${text}</div>
-            `;
+            const senderDiv = document.createElement('div');
+            senderDiv.style.fontSize = '0.7rem';
+            senderDiv.style.opacity = '0.6';
+            senderDiv.style.marginBottom = '4px';
+            senderDiv.style.textAlign = isUser ? 'right' : 'left';
+            senderDiv.textContent = sender;
+
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = text;
+
+            div.appendChild(senderDiv);
+            div.appendChild(messageDiv);
 
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
