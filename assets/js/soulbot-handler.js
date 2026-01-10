@@ -50,10 +50,12 @@ export async function addMessageToConversation(conversationId, role, text, metad
         const conversation = conversationSnap.data();
         const messages = conversation.messages || [];
         
+        // Use regular timestamp instead of serverTimestamp() for array elements
+        // Firestore doesn't support serverTimestamp() inside arrays
         const newMessage = {
             role: role, // 'user' or 'bot'
             text: text,
-            timestamp: serverTimestamp(),
+            timestamp: new Date(), // Use Date object instead of serverTimestamp() for arrays
             ...metadata
         };
         
@@ -65,8 +67,8 @@ export async function addMessageToConversation(conversationId, role, text, metad
         await updateDoc(conversationRef, {
             messages: messages,
             conversationTopics: topics,
-            lastMessageTime: serverTimestamp(),
-            updatedAt: serverTimestamp()
+            lastMessageTime: serverTimestamp(), // This is OK, it's not in an array
+            updatedAt: serverTimestamp() // This is OK, it's not in an array
         });
         
         return true;
