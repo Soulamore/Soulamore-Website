@@ -105,15 +105,19 @@ service cloud.firestore {
     // SoulBot Conversations
     match /soulbot_conversations/{conversationId} {
       // Allow read: authenticated users can read their own conversations, or anyone can read anonymous conversations
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid || resource.data.userId == null;
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid 
+                  || resource.data.userId == null 
+                  || resource.data.userId == 'anonymous';
       
       // Allow create: anyone can create a conversation (anonymous or authenticated)
       allow create: if true;
       
       // Allow update:
-      // - If conversation has userId == null (anonymous), allow updates from anyone
+      // - If conversation has userId == null or 'anonymous' (anonymous user), allow updates from anyone
       // - If conversation has userId (authenticated), only allow updates from that user
-      allow update: if resource.data.userId == null || (request.auth != null && resource.data.userId == request.auth.uid);
+      allow update: if resource.data.userId == null 
+                    || resource.data.userId == 'anonymous'
+                    || (request.auth != null && resource.data.userId == request.auth.uid);
       
       // Allow delete: only authenticated users can delete their own conversations
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;

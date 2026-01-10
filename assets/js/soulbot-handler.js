@@ -14,7 +14,7 @@ const THERAPISTS_COLLECTION = "therapists"; // You may want to create this colle
 export async function createConversation(userId = null) {
     try {
         const conversationData = {
-            userId: userId || 'anonymous',
+            userId: userId, // Keep as null for anonymous users (don't convert to string)
             startTime: serverTimestamp(),
             messages: [],
             duration: 0, // in seconds
@@ -26,7 +26,7 @@ export async function createConversation(userId = null) {
         };
         
         const docRef = await addDoc(collection(db, CONVERSATIONS_COLLECTION), conversationData);
-        console.log("Conversation created:", docRef.id);
+        console.log("Conversation created:", docRef.id, "userId:", userId);
         return docRef.id;
     } catch (error) {
         console.error("Error creating conversation:", error);
