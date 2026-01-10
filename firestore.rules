@@ -104,10 +104,10 @@ service cloud.firestore {
 
     // SoulBot Conversations
     match /soulbot_conversations/{document=**} {
-      allow read: if request.auth != null; // Authenticated users can read their own conversations
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || resource.data.userId == null); // Users can read their own conversations
       allow create: if true; // Anyone can start a conversation (anonymous or authenticated)
-      allow update: if request.auth != null || request.resource.data.userId == 'anonymous'; // Can update if authenticated or if it's anonymous
-      allow delete: if request.auth != null; // Only authenticated users can delete
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid || resource.data.userId == null || request.resource.data.userId == null; // Can update if authenticated (own conversation) or if anonymous (userId is null)
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid; // Only authenticated users can delete their own conversations
     }
 
     // Therapists Collection (for therapist recommendations)
