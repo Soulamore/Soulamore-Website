@@ -10,7 +10,7 @@ These scripts handle secure API key injection for the Gemini API in SoulBot.
 2. Click **Settings** → **Secrets and variables** → **Actions**
 3. Click **New repository secret**
 4. Name: `GEMINI_API_KEY`
-5. Value: `AIzaSyA2NG0zPSM-X7E5AGIJ508QmMs_mojphas` (your actual API key)
+5. Value: Your actual Gemini API key from Google Cloud Console
 6. Click **Add secret**
 
 Once this is added, GitHub Actions will automatically inject the API key during deployment when you push to `main`.
@@ -20,7 +20,7 @@ Once this is added, GitHub Actions will automatically inject the API key during 
 For local development, run:
 
 ```bash
-./scripts/setup-local-dev.sh AIzaSyA2NG0zPSM-X7E5AGIJ508QmMs_mojphas
+./scripts/setup-local-dev.sh YOUR_ACTUAL_API_KEY
 ```
 
 This will inject your API key into the HTML files for local testing.

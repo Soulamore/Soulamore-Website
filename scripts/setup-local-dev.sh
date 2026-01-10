@@ -8,7 +8,7 @@ GEMINI_API_KEY="${1:-}"
 
 if [ -z "$GEMINI_API_KEY" ]; then
     echo "Usage: ./scripts/setup-local-dev.sh YOUR_API_KEY"
-    echo "Example: ./scripts/setup-local-dev.sh AIzaSyA2NG0zPSM-X7E5AGIJ508QmMs_mojphas"
+    echo "Example: ./scripts/setup-local-dev.sh YOUR_GEMINI_API_KEY_HERE"
     exit 1
 fi
 
