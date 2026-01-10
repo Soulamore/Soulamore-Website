@@ -103,11 +103,23 @@ service cloud.firestore {
     }
 
     // SoulBot Conversations
-    match /soulbot_conversations/{document=**} {
-      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || resource.data.userId == null); // Users can read their own conversations
-      allow create: if true; // Anyone can start a conversation (anonymous or authenticated)
-      allow update: if request.auth != null && resource.data.userId == request.auth.uid || resource.data.userId == null || request.resource.data.userId == null; // Can update if authenticated (own conversation) or if anonymous (userId is null)
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid; // Only authenticated users can delete their own conversations
+    match /soulbot_conversations/{conversationId} {
+      // Allow read: authenticated users can read their own conversations, or anyone can read anonymous conversations
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid || resource.data.userId == null;
+      
+      // Allow create: anyone can create a conversation (anonymous or authenticated)
+      allow create: if true;
+      
+      // Allow update: 
+      // - Authenticated users can update their own conversations (userId matches auth.uid)
+      // - Anonymous users can update anonymous conversations (existing userId is null AND new userId is also null)
+      // - Allow updates if conversation was created anonymously (userId is null) regardless of auth state
+      allow update: if (request.auth != null && resource.data.userId == request.auth.uid) 
+                    || (resource.data.userId == null && (!exists(request.resource.data.userId) || request.resource.data.userId == null))
+                    || (request.auth == null && resource.data.userId == null);
+      
+      // Allow delete: only authenticated users can delete their own conversations
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
     // Therapists Collection (for therapist recommendations)
