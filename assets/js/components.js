@@ -542,7 +542,7 @@ const getHeaderHTML = (rootPath) => `
     </nav>
 
     <div class="auth-box">
-            <a href="${rootPath}get-help-now.html" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help Now</a>
+            <a href="${rootPath}get-help-now.html" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
             
             <!-- Ghost Profile Dropdown -->
             <div class="dropdown profile-dropdown" style="display: flex; align-items: center; justify-content: center;">
@@ -570,14 +570,13 @@ const getHeaderHTML = (rootPath) => `
                 </div>
                 
                 <div class="dropdown-content" style="left: auto !important; right: 0 !important; transform: translateX(10px); min-width: 200px !important;">
-                <div class="dropdown-content" style="left: auto !important; right: 0 !important; transform: translateX(10px); min-width: 200px !important;">
                     ${generateProfileMenu(rootPath)}
                     <div style="height:1px; background:rgba(255,255,255,0.1); margin:4px 0;"></div>
                     <a href="#" onclick="event.preventDefault(); sessionStorage.clear(); window.location.href='${rootPath}portal/login.html';"><i class="fas fa-sign-out-alt" style="margin-right:8px; width:20px; text-align:center;"></i> Log Out</a>
                 </div>
             </div>
 
-            <a href="${rootPath}portal/login.html" class="nav-btn" style="padding: 0 20px !important; white-space: nowrap; flex-shrink: 0;">Log In</a>
+            <a href="${rootPath}portal/login.html" class="nav-btn" style="padding: 0 15px !important; white-space: nowrap; flex-shrink: 0;">Log In</a>
     </div>
     
     <button class="mobile-toggle" aria-label="Toggle Navigation">
