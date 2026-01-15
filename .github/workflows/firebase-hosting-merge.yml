@@ -13,6 +13,12 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
+      - name: Inject Gemini API Key
+        run: |
+          chmod +x scripts/inject-api-key.sh
+          ./scripts/inject-api-key.sh
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
