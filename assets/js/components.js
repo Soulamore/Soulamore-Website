@@ -77,7 +77,7 @@ try {
                 object-fit: contain;
             }
             /* Button Consistency */
-            .nav-btn, .lifeline-btn {
+            .auth-box .nav-btn, .lifeline-btn {
                 background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)) !important;
                 border: 1px solid rgba(255,255,255,0.2) !important;
                 padding: 10px 24px !important;
@@ -94,20 +94,32 @@ try {
                 box-sizing: border-box !important;
                 font-size: 0.95rem !important;
             }
-            .nav-btn:hover, .lifeline-btn:hover {
+            .auth-box .nav-btn:hover, .lifeline-btn:hover {
                 background: white !important;
                 color: #0f172a !important;
                 transform: translateY(-2px);
             }
-            /* Specific override for Get Help to distinguish slightly if needed, or keep uniform */
+            /* Specific override for Get Help - More Premium, Less Error-Like */
             .lifeline-btn {
-                border-color: rgba(239, 68, 68, 0.5) !important; /* Red tint border */
-                background: rgba(239, 68, 68, 0.1) !important;
+                border: 1px solid #F49F75 !important;
+                background: transparent !important; /* Force Clear/Black */
+                color: #F49F75 !important;
+                box-shadow: 0 0 10px rgba(244, 159, 117, 0.1) !important;
+                justify-content: center !important; /* Ensure centered text */
             }
             .lifeline-btn:hover {
-                background: #ef4444 !important;
-                color: white !important;
+                background: rgba(220, 38, 38, 0.15) !important; /* RED Warning Tint */
+                color: #ef4444 !important; /* RED Warning Text */
                 border-color: #ef4444 !important;
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important;
+                transform: translateY(-2px);
+            }
+            .ghost-icon:hover {
+                background: rgba(78, 205, 196, 0.15) !important;
+                border-color: #4ECDC4 !important;
+                color: #4ECDC4 !important;
+                box-shadow: 0 0 20px rgba(78, 205, 196, 0.5); /* Stronger Blue Glow */
+                transform: translateY(-2px);
             }
         }
         /* MOBILE (Width <= 1150px) */
@@ -264,6 +276,20 @@ try {
             body { padding-bottom: 80px !important; } /* Space for FAB/Nav */
             .container { padding-left: 20px !important; padding-right: 20px !important; }
         }
+
+        /* BURNING ICON ANIMATION */
+        @keyframes burnGlow {
+            0% { text-shadow: 0 0 2px #ef4444, 0 0 5px #fca5a5; transform: scale(1); }
+            50% { text-shadow: 0 0 8px #ef4444, 0 0 12px #fbbf24; transform: scale(1.1); }
+            100% { text-shadow: 0 0 2px #ef4444, 0 0 5px #fca5a5; transform: scale(1); }
+        }
+        .burning-icon {
+            color: #ef4444 !important;
+            margin-left: 6px;
+            font-size: 0.85em;
+            animation: burnGlow 1.5s infinite ease-in-out;
+            display: inline-block;
+        }
     `;
     document.head.appendChild(style);
     // console.log("Soulamore: Critical styles v2 injected.");
@@ -313,69 +339,62 @@ function setupFavicon(rootPath) {
 
 const NAV_DATA = [
     {
-        id: 'nav-home',
-        label: 'Home',
-        icon: 'fas fa-home',
-        href: 'index.html',
-        type: 'link',
-    },
-    {
-        id: 'nav-tools',
-        label: 'Tools',
-        icon: 'fas fa-toolbox',
+        id: 'nav-spaces',
+        label: 'Find Your Space',
+        icon: 'fas fa-compass',
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-problemwall', label: 'The Problem Wall', href: 'pages/problem-wall.html', style: 'color:var(--ink-black); font-weight:600;' },
-            { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html', style: 'color:var(--ember-orange);' },
-            { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
-            { id: 'nav-soulrider', label: 'Soul Rider (Beta)', href: 'tools/soul-rider.html', style: 'color:#F49F75;' },
-            { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
-            { id: 'nav-play', label: 'Mental Playground', href: 'tools/playground.html' },
-            { id: 'nav-soulbot', label: 'SoulBot AI', href: 'tools/soulbot.html' },
-            { id: 'nav-confession', label: 'Confession Box', href: 'tools/confession-box/index.html' }
+            { id: 'nav-campus', label: 'For Students', href: 'spaces/campus/index.html', icon: 'fas fa-graduation-cap' },
+            { id: 'nav-workplace', label: 'For Workplaces', href: 'spaces/soulamore-workplace/index.html', icon: 'fas fa-briefcase' },
+            { id: 'nav-away', label: 'For Global/Expats', href: 'spaces/soulamore-away/index.html', icon: 'fas fa-globe-americas' }
         ]
     },
     {
-        id: 'nav-spaces',
-        label: 'Spaces',
-        icon: 'fas fa-layer-group',
+        id: 'nav-support',
+        label: 'Get Support',
+        icon: 'fas fa-hands-helping',
         href: '#',
         type: 'dropdown',
         children: [
             {
-                id: 'nav-campus',
-                label: 'Soulamore Campus',
-                // HREF FIXED: Pointing to the correct index file
-                href: 'spaces/campus/index.html',
+                id: 'nav-peers-group',
+                label: 'Talk to a Peer <i class="fas fa-fire burning-icon" title="Hot"></i>',
+                href: 'our-peers/about.html', /* Main Landing */
                 type: 'submenu',
                 children: [
-                    { id: 'nav-schools', label: 'Schools', href: 'spaces/campus/schools.html' },
-                    { id: 'nav-institutions', label: 'Institutions', href: 'spaces/campus/institutions.html' },
-                    { id: 'nav-campus-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
-                    { label: 'Student Resources', href: 'spaces/campus/student-resources.html' }
+                    { id: 'nav-meet-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
+                    { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'our-peers/about.html' },
+                    { id: 'nav-join-peer', label: 'Join as a Peer', href: 'join-us/peer.html' }
                 ]
             },
             {
-                id: 'nav-workplace',
-                label: 'Soulamore Workplace',
-                href: 'spaces/soulamore-workplace/index.html',
+                id: 'nav-psych-group',
+                label: 'Talk to a Psychologist <i class="fas fa-fire burning-icon" title="Hot"></i>',
+                href: 'our-psychologists/about.html', /* Main Landing */
                 type: 'submenu',
-                icon: 'fas fa-briefcase',
                 children: [
-                    { label: 'Plans & Pricing', href: 'spaces/soulamore-workplace/index.html#plans' },
-                    { label: 'Guidelines', href: 'spaces/soulamore-workplace/index.html#guidelines' }
+                    { id: 'nav-meet-psych', label: 'Meet Our Psychologists', href: 'our-psychologists/psychologists.html' },
+                    { id: 'nav-what-psych', label: 'What is Therapy?', href: 'our-psychologists/about.html' },
+                    { id: 'nav-join-psych', label: 'Join as a Psychologist', href: 'join-us/psychologist.html' }
                 ]
             },
-            {
-                id: 'nav-away',
-                label: 'Soulamore Away',
-                href: 'spaces/soulamore-away/index.html',
-                type: 'submenu',
-                children: [
-                    { label: 'Away Resources', href: 'spaces/soulamore-away/resources.html' }
-                ]
-            }
+            { id: 'nav-soulbot', label: 'SoulBot AI <span style="font-size:0.7em; background:var(--teal-glow); color:#0f172a; padding:2px 6px; border-radius:4px; margin-left:5px; font-weight:700;">Beta</span>', href: 'tools/soulbot.html', style: 'color:#F49F75; font-weight:700;' },
+            { id: 'nav-problemwall', label: 'The Problem Wall', href: 'pages/problem-wall.html' }
+        ]
+    },
+    {
+        id: 'nav-tools',
+        label: 'Self-Care Tools',
+        icon: 'fas fa-tools',
+        href: '#',
+        type: 'dropdown',
+        children: [
+            { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
+            { id: 'nav-playground', label: 'Mental Playground', href: 'tools/playground.html' },
+            { id: 'nav-cbox', label: 'Confession Box', href: 'tools/confession-box/index.html' },
+            { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html' },
+            { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html' }
         ]
     },
     {
@@ -385,29 +404,15 @@ const NAV_DATA = [
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
-            { id: 'nav-psych', label: 'Our Psychologists', href: 'our-psychologists/psychologists.html' },
-            { id: 'nav-support', label: 'Support Groups', href: 'community/support-groups.html' },
-            { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
             { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
-            { id: 'nav-calendar', label: 'Community Calendar', href: 'community/community-calendar.html' }
-        ]
-    },
-    {
-        id: 'nav-join',
-        label: 'Join Us',
-        icon: 'fas fa-hand-holding-heart',
-        href: '#',
-        type: 'dropdown',
-        children: [
-            { id: 'nav-join-peer', label: 'Apply as Peer', href: 'join-us/peer.html' },
-            { id: 'nav-join-psych', label: 'Apply as Psychologist', href: 'join-us/psychologist.html' }
+            { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
+            { id: 'nav-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' }
         ]
     },
     {
         id: 'nav-company',
         label: 'About',
-        icon: 'fas fa-building',
+        icon: 'fas fa-info-circle',
         href: '#',
         type: 'dropdown',
         children: [
@@ -443,7 +448,7 @@ function generateNavHTML(rootPath) {
     });
 
     // Mobile-Only Help Link (Appended at the end of nav-links)
-    html += `<a href="${rootPath}get-help-now.html" id="mobile-destruct-trigger" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Get Help Now</a>`;
+    html += `<a href="${rootPath}get-help-now.html" id="mobile-destruct-trigger" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Crisis Resources</a>`;
 
     return html;
 }
@@ -473,6 +478,46 @@ function generateSubmenuHTML(children, rootPath) {
     return html;
 }
 
+
+function generateProfileMenu(rootPath) {
+    // Default to 'user' if not set
+    const role = sessionStorage.getItem('userRole') || 'user';
+    let html = '';
+
+    if (role === 'peer') {
+        html += `
+            <div style="padding: 8px 12px; font-size: 0.75rem; opacity: 0.6; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;">PEER MODE</div>
+            <a href="${rootPath}portal/peer-dashboard.html"><i class="fas fa-columns" style="width:20px; text-align:center; color:var(--peach-glow);"></i> Peer Dashboard</a>
+            <a href="${rootPath}peer/sessions.html"><i class="fas fa-clock" style="width:20px; text-align:center;"></i> Sessions</a>
+            <a href="${rootPath}peer/journals.html"><i class="fas fa-book-open" style="width:20px; text-align:center;"></i> Shared Journals</a>
+            <a href="${rootPath}peer/availability.html"><i class="fas fa-toggle-on" style="width:20px; text-align:center;"></i> Availability</a>
+            <a href="${rootPath}peer/feedback.html"><i class="fas fa-star" style="width:20px; text-align:center;"></i> Feedback</a>
+            <a href="${rootPath}settings.html"><i class="fas fa-cog" style="width:20px; text-align:center;"></i> Settings</a>
+        `;
+    } else if (role === 'psychologist') {
+        html += `
+             <div style="padding: 8px 12px; font-size: 0.75rem; opacity: 0.6; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;">PRO MODE</div>
+            <a href="${rootPath}portal/psych-dashboard.html"><i class="fas fa-columns" style="width:20px; text-align:center; color:var(--teal-glow);"></i> Psych Dashboard</a>
+            <a href="${rootPath}psychologist/sessions.html"><i class="fas fa-calendar-check" style="width:20px; text-align:center;"></i> Sessions</a>
+            <a href="${rootPath}psychologist/journals.html"><i class="fas fa-book-medical" style="width:20px; text-align:center;"></i> Client Journals</a>
+            <a href="${rootPath}psychologist/profile.html"><i class="fas fa-user-md" style="width:20px; text-align:center;"></i> My Profile</a>
+            <a href="${rootPath}psychologist/feedback.html"><i class="fas fa-chart-line" style="width:20px; text-align:center;"></i> Reputation</a>
+            <a href="${rootPath}settings.html"><i class="fas fa-cog" style="width:20px; text-align:center;"></i> Settings</a>
+        `;
+    } else {
+        // Standard User
+        html += `
+            <a href="${rootPath}portal/user-dashboard.html"><i class="fas fa-home" style="width:20px; text-align:center;"></i> Dashboard</a>
+            <a href="${rootPath}journal/index.html"><i class="fas fa-feather-alt" style="width:20px; text-align:center;"></i> Journal</a>
+            <a href="${rootPath}dashboard/sessions.html"><i class="fas fa-video" style="width:20px; text-align:center;"></i> My Sessions</a>
+            <a href="${rootPath}dashboard/saved-blogs.html"><i class="fas fa-bookmark" style="width:20px; text-align:center;"></i> Saved Blogs</a>
+            <a href="${rootPath}settings.html"><i class="fas fa-cog" style="width:20px; text-align:center;"></i> Settings</a>
+            <a href="${rootPath}get-help-now.html" style="color:#ef4444;"><i class="fas fa-life-ring" style="width:20px; text-align:center;"></i> Help</a>
+        `;
+    }
+    return html;
+}
+
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
@@ -487,7 +532,7 @@ const getHeaderHTML = (rootPath) => `
             <div class="mp-info">
                 <span class="mp-name">Welcome, Friend</span>
                 <span class="mp-status">Guest</span>
-                <a href="${rootPath}login.html" class="mp-btn">Log In</a>
+                <a href="${rootPath}portal/login.html" class="mp-btn">Log In</a>
             </div>
         </div>
 
@@ -496,11 +541,43 @@ const getHeaderHTML = (rootPath) => `
 
     </nav>
 
-    <!-- Auth Group -->
     <div class="auth-box">
-            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
-            <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
-            <a href="${rootPath}auth/login.html" class="nav-btn">Log In / Sign Up</a>
+            <a href="${rootPath}get-help-now.html" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help Now</a>
+            
+            <!-- Ghost Profile Dropdown -->
+            <div class="dropdown profile-dropdown" style="display: flex; align-items: center; justify-content: center;">
+                <div class="ghost-icon" style="
+                    width: 40px; 
+                    height: 40px; 
+                    min-width: 40px; /* Prevent Squeeze */
+                    min-height: 40px; /* Prevent Squeeze */
+                    flex-shrink: 0;   /* Prevent Squeeze */
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    background: rgba(255,255,255,0.05); 
+                    border-radius: 50%; 
+                    margin: 0 8px;
+                    border: 1px solid rgba(255,255,255,0.1);
+                    color: var(--starlight);
+                    transition: 0.3s;
+                    cursor: pointer;
+                    position: relative;
+                " title="My Profile"
+                onmouseover="this.style.background='rgba(78, 205, 196, 0.15)'; this.style.color='#4ECDC4'; this.style.boxShadow='0 0 15px rgba(78, 205, 196, 0.4)';"
+                onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='var(--starlight)'; this.style.boxShadow='none';">
+                    <i class="fas fa-ghost"></i>
+                </div>
+                
+                <div class="dropdown-content" style="left: auto !important; right: 0 !important; transform: translateX(10px); min-width: 200px !important;">
+                <div class="dropdown-content" style="left: auto !important; right: 0 !important; transform: translateX(10px); min-width: 200px !important;">
+                    ${generateProfileMenu(rootPath)}
+                    <div style="height:1px; background:rgba(255,255,255,0.1); margin:4px 0;"></div>
+                    <a href="#" onclick="event.preventDefault(); sessionStorage.clear(); window.location.href='${rootPath}portal/login.html';"><i class="fas fa-sign-out-alt" style="margin-right:8px; width:20px; text-align:center;"></i> Log Out</a>
+                </div>
+            </div>
+
+            <a href="${rootPath}portal/login.html" class="nav-btn" style="padding: 0 25px !important; white-space: nowrap; flex-shrink: 0;">Log In / Sign Up</a>
     </div>
     
     <button class="mobile-toggle" aria-label="Toggle Navigation">
@@ -868,29 +945,35 @@ function injectSoulBotWidget() {
                 align-items: flex-end;
             }
             #soulbot-widget-fab {
-                width: 60px;
                 height: 60px;
+                padding: 0 25px;
                 background: var(--teal-glow, #4ECDC4);
-                border-radius: 50%;
+                border-radius: 50px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                gap: 10px;
                 cursor: pointer;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                 z-index: 9999;
-                transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 border: 2px solid rgba(255,255,255,0.2);
             }
             #soulbot-widget-fab:hover {
-                transform: scale(1.1) rotate(10deg);
+                transform: translateY(-5px);
                 box-shadow: 0 15px 40px rgba(78, 205, 196, 0.4);
             }
             #soulbot-widget-fab i {
                 color: #0f172a;
-                font-size: 1.8rem;
+                font-size: 1.5rem;
                 transition: transform 0.3s;
             }
-            #soulbot-widget-fab:hover i { transform: scale(1.1); }
+            #soulbot-widget-fab span {
+                color: #0f172a;
+                font-weight: 700;
+                font-size: 1rem;
+                white-space: nowrap;
+            }
 
             #sb-window {
                 width: 350px;
@@ -922,6 +1005,8 @@ function injectSoulBotWidget() {
             @media (max-width: 768px) {
                 #soulbot-widget-container { bottom: 130px !important; right: 20px; }
                 #sb-window { width: 90vw; right: 5vw; bottom: 90px; height: 60vh; }
+                #soulbot-widget-fab span { display: none; } /* Hide Label on Mobile to save space */
+                #soulbot-widget-fab { width: 60px; height: 60px; padding: 0; border-radius: 50%; }
             }
         </style>
         
@@ -929,7 +1014,7 @@ function injectSoulBotWidget() {
             <div id="sb-window">
                 <div class="sb-header">
                     <span style="font-weight:700; color:white;"><i class="fas fa-robot" style="color:#4ECDC4;"></i> SoulBot</span>
-                    <i class="fas fa-expand-alt" style="cursor:pointer; color: #94a3b8;" title="Full Screen" onclick="window.location.href='soulbot.html'"></i>
+                    <i class="fas fa-expand-alt" style="cursor:pointer; color: #94a3b8;" title="Full Screen" onclick="window.location.href='tools/soulbot.html'"></i>
                 </div>
                 <div class="sb-body" id="sb-chat-body">
                     <div class="sb-msg sb-msg-bot">Hi there. I'm here if you need to untangle a thought.</div>
@@ -941,6 +1026,7 @@ function injectSoulBotWidget() {
             </div>
             <div id="soulbot-widget-fab" onclick="toggleWidget()">
                 <i class="fas fa-robot"></i>
+                <span>Start Here</span>
             </div>
         </div>
     `;
@@ -950,12 +1036,25 @@ function injectSoulBotWidget() {
     window.toggleWidget = function () {
         const win = document.getElementById('sb-window');
         const fab = document.getElementById('soulbot-widget-fab');
+        const span = fab.querySelector('span');
+
         if (win.style.display === 'flex') {
             win.style.display = 'none';
-            fab.innerHTML = '<i class="fas fa-robot"></i>';
+            fab.querySelector('i').className = 'fas fa-robot';
+            fab.style.borderRadius = "50px";
+            fab.style.width = "auto";
+            fab.style.padding = "0 25px";
+            if (span) span.style.display = "inline";
         } else {
             win.style.display = 'flex';
-            fab.innerHTML = '<i class="fas fa-times"></i>';
+            fab.querySelector('i').className = 'fas fa-times';
+            // Collapse to circle when open
+            if (window.innerWidth > 768) {
+                fab.style.padding = "0";
+                fab.style.width = "60px";
+                fab.style.borderRadius = "50%";
+                if (span) span.style.display = "none";
+            }
             document.getElementById('sb-input').focus();
         }
     };
