@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peer Dashboard | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/dashboard-sidebar.css">
+    <style>
+        .side-link.active {
+            border-left-color: var(--peach-glow);
+            color: var(--peach-glow);
+            background: linear-gradient(90deg, rgba(244, 159, 117, 0.1), transparent);
+        }
+
+        .dash-card.glow {
+            box-shadow: 0 0 20px rgba(244, 159, 117, 0.1);
+            border-color: rgba(244, 159, 117, 0.3);
+        }
+
+        .tool-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--starlight);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tool-btn:hover {
+            background: rgba(244, 159, 117, 0.1);
+            border-color: var(--peach-glow);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOOL MODAL CONTAINER -->
+    <div id="toolModal" class="tool-modal-overlay">
+        <div class="tool-modal-content">
+            <div class="tool-modal-header">
+                <div class="tool-modal-title" id="modalTitle">Tool</div>
+                <button class="tool-close-btn" onclick="closeTool()"><i class="fas fa-times"></i></button>
+            </div>
+            <iframe id="toolFrame" class="tool-frame" src=""></iframe>
+        </div>
+    </div>
+
+    <!-- MOBILE TOGGLE -->
+    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar-lg" style="background: linear-gradient(135deg, #f97316, #fbbf24);">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <div class="user-info-text">
+                    <div class="name">Peer Portal</div>
+                    <div class="role">Verified Peer</div>
+                </div>
+            </div>
+
+            <div class="sidebar-nav">
+                <a href="#" class="side-link active" onclick="switchView('overview', this)"><i class="fas fa-home"></i>
+                    <span>Overview</span></a>
+                <a href="#" class="side-link" onclick="switchView('sessions', this)"><i class="fas fa-video"></i>
+                    <span>Sessions</span></a>
+                <a href="#" class="side-link" onclick="switchView('journals', this)"><i class="fas fa-book-open"></i>
+                    <span>Shared Journals</span></a>
+                <a href="#" class="side-link" onclick="switchView('availability', this)"><i
+                        class="fas fa-calendar-check"></i> <span>Availability</span></a>
+
+                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:10px 0;">
+                <div
+                    style="padding:10px 20px; font-size:0.75rem; opacity:0.5; text-transform:uppercase; font-weight:700;">
+                    Self Care</div>
+
+                <a href="#" onclick="openTool('../tools/journal.html', 'My Private Journal')" class="side-link"><i
+                        class="fas fa-feather-alt"></i> <span>My Journal</span></a>
+                <a href="#" class="side-link"><i class="fas fa-bookmark"></i> <span>Saved Blogs</span></a>
+                <a href="#" onclick="openTool('../tools/vent-box.html', 'Vent Box')" class="side-link"><i
+                        class="fas fa-fire"></i> <span>Vent Box</span></a>
+
+                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:10px 0;">
+                <a href="#" class="side-link"><i class="fas fa-user-shield"></i> <span>Get Supervision</span></a>
+                <a href="#" class="side-link"><i class="fas fa-cog"></i> <span>Settings</span></a>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+            </div>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content fade-in">
+
+            <div class="peer-header"
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:20px;">
+                <div class="ph-title">
+                    <h1 style="font-family:'Outfit'; color:var(--peach-glow); margin-bottom:5px;">Peer Dashboard</h1>
+                    <p>Thank you for supporting our community today.</p>
+                </div>
+                <!-- Status Toggle -->
+                <div class="status-toggle"
+                    style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:8px 16px; border-radius:30px; border:1px solid rgba(255,255,255,0.1); cursor:pointer;"
+                    onclick="this.classList.toggle('active')">
+                    <div class="status-indicator"
+                        style="width:10px; height:10px; border-radius:50%; background:#22c55e; box-shadow:0 0 10px #22c55e;">
+                    </div>
+                    <span>Available</span>
+                    <i class="fas fa-toggle-on" style="margin-left:5px; opacity:0.6;"></i>
+                </div>
+            </div>
+
+            <!-- VIEW: OVERVIEW -->
+            <div id="view-overview" class="view-section">
+                <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+                    <!-- LEFT -->
+                    <div style="display:flex; flex-direction:column; gap:25px;">
+                        <!-- SESSIONS SNAPSHOT -->
+                        <div class="dash-card">
+                            <div class="dc-header"
+                                style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                                <div style="font-family:'Outfit'; font-size:1.2rem; font-weight:700;">Today's Sessions
+                                </div>
+                                <button onclick="switchView('sessions')"
+                                    style="background:transparent; color:var(--peach-glow); border:none; cursor:pointer;">View
+                                    All</button>
+                            </div>
+                            <div class="session-item"
+                                style="background:rgba(255,255,255,0.03); border-radius:12px; padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                <div>
+                                    <div style="font-weight:700; color:var(--peach-glow);">14:00 - 14:45</div>
+                                    <div>Chat with <strong>Anonymous (User #429)</strong></div>
+                                </div>
+                                <button
+                                    style="background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2); padding:6px 12px; border-radius:6px; font-weight:600;">Prepare</button>
+                            </div>
+                            <div style="text-align:center; padding:20px; opacity:0.5; font-size:0.9rem;">No other
+                                sessions widely booked.</div>
+                        </div>
+
+                        <!-- JOURNAL OF PEER -->
+                        <div class="dash-card">
+                            <h3 style="margin-bottom:10px;">Your Reflections</h3>
+                            <p style="opacity:0.7; font-size:0.9rem; margin-bottom:15px;">Being a listener is hard. Take
+                                time to process your own feelings.</p>
+                            <button onclick="openTool('../tools/journal.html', 'My Private Journal')"
+                                style="width:100%; padding:12px; background:transparent; border:1px solid var(--peach-glow); color:var(--peach-glow); border-radius:8px; display:flex; align-items:center; justify-content:center; gap:10px;">
+                                <i class="fas fa-pen-nib"></i> Write in Private Journal
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT -->
+                    <div style="display:flex; flex-direction:column; gap:25px;">
+                        <div class="dash-card glow" style="text-align:center;">
+                            <div
+                                style="font-size:2.5rem; font-weight:700; font-family:'Outfit'; color:var(--peach-glow);">
+                                4.9</div>
+                            <div style="opacity:0.6;">Average Rating</div>
+                            <div style="color:#fbbf24; margin-top:5px;">★★★★★</div>
+                        </div>
+
+                        <div class="dash-card">
+                            <h4 style="margin-bottom:15px;">Quick Tools</h4>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                                <div class="tool-btn" onclick="openTool('../tools/vent-box.html', 'Vent Box')">Vent
+                                </div>
+                                <div class="tool-btn" onclick="openTool('../tools/5-step-reset.html', 'Reset')">Reset
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SESSIONS -->
+            <div id="view-sessions" class="view-section" style="display:none;">
+                <h2 style="margin-bottom:20px; font-family:'Outfit';">Manage Sessions</h2>
+                <div class="dash-card">
+                    <div style="margin-bottom:20px; display:flex; gap:10px;">
+                        <button
+                            style="padding:8px 15px; background:var(--peach-glow); color:#0f172a; border:none; border-radius:20px; font-weight:700;">Upcoming</button>
+                        <button
+                            style="padding:8px 15px; background:rgba(255,255,255,0.05); color:white; border:none; border-radius:20px;">Past
+                            History</button>
+                    </div>
+
+                    <table style="width:100%; border-collapse:collapse; text-align:left;">
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.1); opacity:0.6;">
+                            <th style="padding:15px;">Time</th>
+                            <th style="padding:15px;">User</th>
+                            <th style="padding:15px;">Topic (If Shared)</th>
+                            <th style="padding:15px;">Action</th>
+                        </tr>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <td style="padding:15px;">Today, 14:00</td>
+                            <td style="padding:15px;">StartDust_99</td>
+                            <td style="padding:15px;">Anxiety</td>
+                            <td style="padding:15px;">
+                                <button
+                                    style="background:#22c55e; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Join
+                                    Room</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:15px;">Tomorrow, 10:00</td>
+                            <td style="padding:15px;">BlueSky</td>
+                            <td style="padding:15px;">Loneliness</td>
+                            <td style="padding:15px;">
+                                <button
+                                    style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; border:none; color:white;">Reschedule</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VIEW: SHARED JOURNALS -->
+            <div id="view-journals" class="view-section" style="display:none;">
+                <h2 style="font-family:'Outfit'; margin-bottom:20px;">Shared with You</h2>
+                <div class="dash-card">
+                    <p style="opacity:0.7; margin-bottom:20px;">Users have shared these entries for context. Please read
+                        with empathy.</p>
+                    <div style="display:grid; gap:15px;">
+                        <!-- Item -->
+                        <div
+                            style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; border-left:3px solid var(--peach-glow); cursor:pointer;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                                <span style="font-weight:700;">Anonymous (User #882)</span>
+                                <span style="font-size:0.8rem; opacity:0.6;">Shared 2 hrs ago</span>
+                            </div>
+                            <div style="font-style:italic; opacity:0.8;">"I just feel like everyone is moving forward
+                                except me..."</div>
+                            <button
+                                style="margin-top:15px; background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 15px; border-radius:4px; font-size:0.8rem;">Read
+                                Full Entry</button>
+                        </div>
+                        <!-- Item -->
+                        <div
+                            style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; border-left:3px solid #fbbf24; cursor:pointer;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                                <span style="font-weight:700;">StarWalker</span>
+                                <span style="font-size:0.8rem; opacity:0.6;">Shared Yesterday</span>
+                            </div>
+                            <div style="font-style:italic; opacity:0.8;">"I finally stood up for myself today. It was
+                                terrifying but..."</div>
+                            <button
+                                style="margin-top:15px; background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 15px; border-radius:4px; font-size:0.8rem;">Read
+                                Full Entry</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: AVAILABILITY -->
+            <div id="view-availability" class="view-section" style="display:none;">
+                <h2 style="font-family:'Outfit'; margin-bottom:20px;">My Availability</h2>
+                <div class="dash-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <p style="opacity:0.7;">Click slots to toggle availability for the coming week.</p>
+                        <button
+                            style="background:var(--peach-glow); color:#0f172a; padding:8px 20px; border-radius:30px; font-weight:700; border:none;">Save
+                            Schedule</button>
+                    </div>
+
+                    <div
+                        style="display:grid; grid-template-columns: 100px repeat(7, 1fr); gap:5px; text-align:center; font-size:0.85rem;">
+                        <!-- Header -->
+                        <div></div>
+                        <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:6px;">Mon</div>
+                        <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:6px;">Tue</div>
+                        <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:6px;">Wed</div>
+                        <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:6px;">Thu</div>
+                        <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:6px;">Fri</div>
+                        <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:6px;">Sat</div>
+                        <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:6px;">Sun</div>
+
+                        <!-- Time Slots (Simplified) -->
+                        <div style="padding:10px; opacity:0.6;">Morning</div>
+                        <div class="slot available"></div>
+                        <div class="slot"></div>
+                        <div class="slot available"></div>
+                        <div class="slot"></div>
+                        <div class="slot"></div>
+                        <div class="slot available"></div>
+                        <div class="slot"></div>
+
+                        <div style="padding:10px; opacity:0.6;">Afternoon</div>
+                        <div class="slot"></div>
+                        <div class="slot available"></div>
+                        <div class="slot"></div>
+                        <div class="slot available"></div>
+                        <div class="slot available"></div>
+                        <div class="slot"></div>
+                        <div class="slot"></div>
+
+                        <div style="padding:10px; opacity:0.6;">Evening</div>
+                        <div class="slot available"></div>
+                        <div class="slot available"></div>
+                        <div class="slot available"></div>
+                        <div class="slot"></div>
+                        <div class="slot"></div>
+                        <div class="slot"></div>
+                        <div class="slot available"></div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <style>
+        .slot {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            height: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .slot:hover {
+            border-color: var(--peach-glow);
+        }
+
+        .slot.available {
+            background: var(--peach-glow);
+            box-shadow: 0 0 10px rgba(244, 159, 117, 0.4);
+            border-color: var(--peach-glow);
+        }
+    </style>
+
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        function handleLogout() { sessionStorage.clear(); window.location.href = 'logout.html'; }
+
+        function openTool(url, title) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('toolFrame').src = url;
+            document.getElementById('toolModal').classList.add('open');
+        }
+        function closeTool() {
+            document.getElementById('toolModal').classList.remove('open');
+            setTimeout(() => { document.getElementById('toolFrame').src = ''; }, 300);
+        }
+
+        // --- VIEW SWITCHING ---
+        function switchView(viewName, clickedLink) {
+            document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+            document.getElementById('view-' + viewName).style.display = 'block';
+
+            // Sidebar Active Update
+            if (clickedLink) {
+                document.querySelectorAll('.sidebar-nav .side-link').forEach(l => l.classList.remove('active'));
+                clickedLink.classList.add('active');
+            } else {
+                // Heuristic if manual
+                const nav = document.querySelectorAll('.sidebar-nav .side-link');
+                nav.forEach(l => l.classList.remove('active'));
+
+                if (viewName === 'overview') nav[0].classList.add('active');
+                if (viewName === 'sessions') nav[1].classList.add('active');
+                if (viewName === 'journals') nav[2].classList.add('active');
+                if (viewName === 'availability') nav[3].classList.add('active');
+            }
+        }
+
+        // Slot toggle logic
+        document.querySelectorAll('.slot').forEach(slot => {
+            slot.addEventListener('click', function () {
+                this.classList.toggle('available');
+            });
+        });
+    </script>
+</body>
+
+</html>

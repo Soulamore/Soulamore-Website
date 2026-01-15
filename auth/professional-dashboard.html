@@ -385,179 +385,212 @@
             font-family: 'Inter', sans-serif !important;
         }
 
-        .font-fun {
-            font-family: 'Patrick Hand', cursive !important;
-            font-size: 1.3rem !important;
+        /* --- CLEAN BLOGGER EDITOR STYLES --- */
+        :root {
+            --editor-bg: #f3f4f6;
+            --paper-bg: #ffffff;
+            --sidebar-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --accent-orange: #f97316;
+            /* Blogger orange-ish */
+            --text-main: #1f2937;
         }
 
-        /* Sticker Popup */
-        .sticker-popup {
-            position: absolute;
-            bottom: 60px;
-            right: 0;
+        /* Hub Styles */
+        .hub-card {
             background: white;
-            border-radius: 12px;
-            padding: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            display: none;
-            /* Toggled via JS */
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            z-index: 200;
-            width: 200px;
-            height: 200px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .hub-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-color: #d1d5db;
+        }
+
+        /* Editor Layout Grid */
+        .editor-layout {
+            display: grid;
+            grid-template-rows: 60px 40px 1fr;
+            /* Header, Toolbar, Content */
+            height: 100vh;
+            background: var(--editor-bg);
+            color: var(--text-main);
+        }
+
+        /* 1. Global Header */
+        .editor-header {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 20;
+        }
+
+        .editor-title-input {
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            width: 300px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .editor-title-input:hover {
+            background: #f9fafb;
+        }
+
+        /* 2. Fixed Toolbar */
+        .editor-toolbar-area {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        /* Override Quill Toolbar borders to blend in */
+        .ql-toolbar.ql-snow {
+            border: none !important;
+            padding: 8px 0 !important;
+        }
+
+        /* 3. Main Content Area (3 Columns) */
+        .editor-main {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            /* Nav | Paper | Settings */
+            overflow: hidden;
+            height: 100%;
+        }
+
+        /* Left Sidebar (Nav) */
+        .editor-left-sidebar {
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
             overflow-y: auto;
         }
 
-        .sticker-btn {
-            font-size: 1.5rem;
-            cursor: pointer;
-            text-align: center;
-            padding: 5px;
-            border-radius: 5px;
+        /* Center Canvas (The Paper) */
+        .editor-canvas-area {
+            background: var(--editor-bg);
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
         }
 
-        .sticker-btn:hover {
-            background: #f1f5f9;
+        .paper-sheet {
+            background: var(--paper-bg);
+            width: 850px;
+            /* A4-ish width */
+            min-height: 1000px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 60px;
+            border-radius: 2px;
+            color: #1f2937;
         }
 
-        /* Editor Canvas */
-        /* Editor Canvas (Cleaned up: Uses the definition at line 308) */
-
-        /* Ensure inputs on white paper are visible */
         #editor {
-            color: #0f172a !important;
-            /* Force dark text */
+            border: none !important;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            padding: 0 !important;
+            min-height: 500px;
         }
 
-        /* Title Input */
-        .premium-input {
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 3rem;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            width: 100%;
-            outline: none;
-            padding: 10px 0;
-            letter-spacing: -1px;
-        }
-
-        .premium-input::placeholder {
-            color: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Floating Dock */
-        .style-dock {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 10px 30px;
-            border-radius: 50px;
+        /* Right Sidebar (Settings) */
+        .editor-right-sidebar {
+            background: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
             display: flex;
-            align-items: center;
-            gap: 25px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            opacity: 0;
-            animation: slideUp 0.5s 0.5s forwards;
+            flex-direction: column;
+            overflow-y: auto;
         }
 
-        @keyframes slideUp {
-            to {
-                opacity: 1;
-                bottom: 40px;
-            }
+        /* Accordion Items in Right Sidebar */
+        .settings-item {
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .color-dot {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            transition: 0.3s;
-        }
-
-        .color-dot:hover {
-            transform: scale(1.2);
-            border-color: white;
-        }
-
-        /* Scrollbar Hide */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-
-        /* --- TAG CLOUD --- */
-        .tag-cloud {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .tag-pill {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--clinical-blue);
-            color: var(--starlight);
-            padding: 8px 16px;
-            border-radius: 50px;
+        .settings-header {
+            padding: 15px 20px;
             font-size: 0.9rem;
+            font-weight: 600;
+            color: #4b5563;
             cursor: pointer;
-            transition: 0.2s;
-            user-select: none;
-        }
-
-        .tag-pill:hover {
-            background: rgba(14, 165, 233, 0.1);
-        }
-
-        .tag-pill.selected {
-            background: var(--clinical-blue);
-            color: white;
-            box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
-        }
-
-        /* --- RICH TEXT TOOLBAR --- */
-        .rich-toolbar {
             display: flex;
-            gap: 5px;
-            margin-bottom: 5px;
-            background: rgba(255, 255, 255, 0.05);
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .settings-header:hover {
+            background: #f9fafb;
+            color: var(--accent-orange);
+        }
+
+        .settings-content {
+            padding: 0 20px 20px;
+            display: none;
+            /* Hidden by default */
+        }
+
+        .settings-content.open {
+            display: block;
+        }
+
+        /* Form elements for settings */
+        .setting-input {
+            width: 100%;
             padding: 8px;
-            border-radius: 8px 8px 0 0;
-            border: 1px solid var(--border-glass);
-            border-bottom: none;
-        }
-
-        .toolbar-btn {
-            background: transparent;
-            border: none;
-            color: #cbd5e1;
-            cursor: pointer;
-            padding: 4px 8px;
+            border: 1px solid #d1d5db;
             border-radius: 4px;
-            font-weight: bold;
+            font-size: 0.85rem;
+            margin-top: 5px;
         }
 
-        .toolbar-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+        /* Buttons */
+        .btn-draft {
+            background: #e5e7eb;
+            color: #374151;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 0.85rem;
+        }
+
+        .btn-draft:hover {
+            background: #d1d5db;
+        }
+
+        .btn-publish {
+            background: var(--accent-orange);
             color: white;
+            padding: 8px 20px;
+            border-radius: 4px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 5px rgba(249, 115, 22, 0.3);
+        }
+
+        .btn-publish:hover {
+            background: #ea580c;
         }
     </style>
 </head>
@@ -595,731 +628,480 @@
         <!-- MAIN -->
         <div class="main-content">
 
-            <!-- BLOG SYSTEM ROOT -->
+            <!-- BLOG SYSTEM ROOT (Refactored) -->
             <div id="tab-blogs" class="tab-content"
                 style="padding:0; height:100vh; overflow:hidden; background:var(--deep-space);">
 
-                <!-- VIEW 1: BLOG DASHBOARD (The Hub) -->
+                <!-- VIEW 1: BLOG HUB (Simplified) -->
                 <div id="blog-hub-view"
-                    style="padding:40px; max-width:1200px; margin:0 auto; overflow-y:auto; height:100%; position:relative;">
-
-                    <!-- BETA STICKER -->
+                    style="padding: 40px; max-width: 1000px; margin: 0 auto; height: 100%; overflow-y: auto;">
                     <div
-                        style="position:absolute; top:20px; right:20px; background:#fbbf24; color:#0f172a; padding:8px 16px; border-radius:50px; font-weight:800; font-size:0.85rem; transform:rotate(3deg); box-shadow:0 10px 20px rgba(0,0,0,0.2); z-index:100; border:2px solid white;">
-                        <i class="fas fa-hammer"></i> Wiring Backend...
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <h1 style="color: white; font-family: 'Outfit', sans-serif;">Blog Management</h1>
+                        <button onclick="createNewDraft()"
+                            style="background: var(--teal-glow); color: #0f172a; border: none; padding: 12px 24px; border-radius: 50px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-plus"></i> Create New Blog
+                        </button>
                     </div>
 
-                    <!-- Header -->
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-                        <div>
-                            <h1
-                                style="font-family:'Outfit', sans-serif; font-size:2rem; font-weight:700; color:white; margin-bottom:5px;">
-                                Blog Overview</h1>
-                            <p style="color:var(--text-dim);">Manage posts, track performance, and create with AI.</p>
+                    <div style="background: white; border-radius: 12px; overflow: hidden; min-height: 400px;">
+                        <div style="padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; gap: 20px;">
+                            <span
+                                style="font-weight: 600; color: #0f172a; border-bottom: 2px solid var(--teal-glow); padding-bottom: 18px;">All
+                                Posts</span>
+                            <span style="color: #64748b; cursor: pointer;">Drafts</span>
+                            <span style="color: #64748b; cursor: pointer;">Published</span>
                         </div>
-                        <div style="display:flex; gap:10px;">
-                            <button
-                                style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:white; padding:10px 20px; border-radius:8px;">More
-                                Actions <i class="fas fa-chevron-down"></i></button>
-                            <button onclick="createNewDraft()"
-                                style="background:var(--teal-glow); color:#0f172a; border:none; padding:10px 25px; border-radius:8px; font-weight:700; cursor:pointer;"><i
-                                    class="fas fa-plus"></i> Create New Post</button>
-                        </div>
-                    </div>
-
-                    <!-- AI Hero Section -->
-                    <div
-                        style="background:linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:40px; text-align:center; margin-bottom:40px; position:relative; overflow:hidden;">
-                        <div style="position:relative; z-index:2;">
-                            <div
-                                style="color:#a855f7; font-weight:600; margin-bottom:15px; display:flex; align-items:center; justify-content:center; gap:8px;">
-                                <i class="fas fa-sparkles"></i> Create faster with AI
-                            </div>
-                            <h2 style="font-size:1.5rem; color:white; margin-bottom:25px;">Describe a blog post you'd
-                                like to create</h2>
-
-                            <div style="max-width:600px; margin:0 auto; position:relative;">
-                                <textarea
-                                    placeholder="The more details you provide, the better. E.g., 'A guide on managing exam stress for university students'..."
-                                    style="width:100%; background:rgba(15,23,42,0.8); border:1px solid rgba(168, 85, 247, 0.5); border-radius:12px; padding:20px; color:white; font-family:'Inter', sans-serif; min-height:120px; outline:none; font-size:1rem;"></textarea>
+                        <div id="hub-post-list" style="padding: 20px;">
+                            <!-- Dynamic Content Here -->
+                            <div class="hub-card">
                                 <div
-                                    style="display:flex; justify-content:space-between; margin-top:10px; padding:0 10px;">
-                                    <button
-                                        style="background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 15px; border-radius:50px; font-size:0.8rem; cursor:pointer;"><i
-                                            class="fas fa-magic"></i> Enhance prompt</button>
-                                    <button
-                                        style="background:#a855f7; color:white; border:none; width:35px; height:35px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i
-                                            class="fas fa-arrow-right"></i></button>
+                                    style="width: 50px; height: 50px; background: #e2e8f0; border-radius: 4px; margin-right: 15px;">
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Analytics Row -->
-                    <h3 style="color:white; font-size:1.1rem; margin-bottom:20px;">Track your blog growth</h3>
-                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; margin-bottom:40px;">
-                        <div style="background:white; padding:20px; border-radius:12px; color:#0f172a;">
-                            <div style="font-size:0.9rem; font-weight:600; margin-bottom:10px;">Post views</div>
-                            <div style="font-size:1.8rem; font-weight:700;">124 <span
-                                    style="font-size:0.8rem; color:#ef4444; font-weight:500;">↓ 5%</span></div>
-                            <div style="height:30px; margin-top:10px; opacity:0.5;"><!-- Sparkline Mock --> <svg
-                                    width="100%" height="30">
-                                    <path d="M0,15 Q50,5 100,15 T200,10" fill="none" stroke="#3b82f6"
-                                        stroke-width="2" />
-                                </svg></div>
-                        </div>
-                        <div style="background:white; padding:20px; border-radius:12px; color:#0f172a;">
-                            <div style="font-size:0.9rem; font-weight:600; margin-bottom:10px;">Unique visitors</div>
-                            <div style="font-size:1.8rem; font-weight:700;">85 <span
-                                    style="font-size:0.8rem; color:#22c55e; font-weight:500;">↑ 12%</span></div>
-                            <div style="height:30px; margin-top:10px; opacity:0.5;"><svg width="100%" height="30">
-                                    <path d="M0,25 Q50,20 100,10 T200,5" fill="none" stroke="#22c55e"
-                                        stroke-width="2" />
-                                </svg></div>
-                        </div>
-                        <div style="background:white; padding:20px; border-radius:12px; color:#0f172a;">
-                            <div style="font-size:0.9rem; font-weight:600; margin-bottom:10px;">Avg. Read Time</div>
-                            <div style="font-size:1.8rem; font-weight:700;">4m 20s</div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Posts -->
-                    <div style="background:white; border-radius:12px; overflow:hidden;">
-                        <div
-                            style="padding:15px 25px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-                            <div style="font-weight:600; color:#0f172a;">Latest posts</div>
-                            <select style="border:1px solid #cbd5e1; padding:5px; border-radius:6px; font-size:0.8rem;">
-                                <option>Published</option>
-                            </select>
-                        </div>
-                        <div id="hub-post-list">
-                            <!-- Item -->
-                            <div
-                                style="padding:20px 25px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; hover:background:#f8fafc;">
-                                <div
-                                    style="width:40px; height:40px; background:#e2e8f0; border-radius:6px; margin-right:15px; background-image:url('../assets/images/calm-trees.jpg'); background-size:cover;">
+                                <div style="flex: 1;">
+                                    <h4 style="margin: 0; color: #1f2937;">Untitled Draft</h4>
+                                    <div style="font-size: 0.8rem; color: #6b7280;">Last edited: Just now</div>
                                 </div>
-                                <div style="flex:1;">
-                                    <div style="font-weight:600; color:#0f172a; font-size:0.95rem;">Navigating Exam
-                                        Stress</div>
-                                    <div style="font-size:0.8rem; color:#64748b;">Published • Jan 12, 2026</div>
-                                </div>
-                                <div style="color:#64748b; font-size:0.9rem; margin-right:30px;"><i
-                                        class="far fa-eye"></i> 45</div>
-                                <button style="background:transparent; border:none; color:#94a3b8; cursor:pointer;"><i
-                                        class="fas fa-ellipsis-h"></i></button>
+                                <span
+                                    style="font-size: 0.75rem; background: #f3f4f6; color: #4b5563; padding: 4px 8px; border-radius: 4px;">Draft</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- VIEW 2: EDITOR (Initially Hidden) -->
-                <div id="blog-editor-view" style="display:none; height:100%; position:relative;">
-                    <!-- BETA STICKER -->
-                    <div
-                        style="position:absolute; top:80px; right:40px; background:#fbbf24; color:#0f172a; padding:8px 16px; border-radius:50px; font-weight:800; font-size:0.85rem; transform:rotate(-3deg); box-shadow:0 10px 20px rgba(0,0,0,0.2); z-index:100; border:2px solid white; pointer-events:none;">
-                        <i class="fas fa-bolt"></i> Wiring Backend...
-                    </div>
+                <!-- VIEW 2: EDITOR (Clean Layout) -->
+                <div id="blog-editor-view" style="display:none; height:100%; width:100%;">
+                    <div class="editor-layout">
 
-                    <div style="display:grid; grid-template-columns: 260px 1fr; height:100%;">
-
-                        <!-- LEFT SIDEBAR: TEMPLATES & TOOLS -->
-                        <div class="blog-sidebar"
-                            style="background:#0f172a; border-right:1px solid var(--border-glass);">
-                            <div style="margin-bottom:20px; display:flex; align-items:center; gap:10px; cursor:pointer; opacity:0.75; padding:10px;"
-                                onclick="showBlogHub()">
-                                <i class="fas fa-arrow-left"></i> <span style="font-size:0.9rem; font-weight:600;">Back
-                                    to Hub</span>
-                            </div>
-
-                            <!-- Add Elements Button (Triggers Modal) -->
-                            <div style="padding:0 20px; margin-bottom:30px;">
-                                <button onclick="toggleElementsModal()"
-                                    style="width:100%; background:white; color:#0f172a; border:none; padding:12px; border-radius:50px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-                                    <i class="fas fa-plus-circle" style="font-size:1.1rem;"></i> Add Elements
-                                </button>
-                            </div>
-
-                            <div style="padding:0 20px; margin-bottom:30px;">
-                                <h4
-                                    style="color:var(--text-dim); font-size:0.7rem; text-transform:uppercase; font-weight:700; margin-bottom:15px;">
-                                    Tools</h4>
-                                <div onclick="toggleSettingsPanel()"
-                                    style="padding:10px; display:flex; gap:10px; align-items:center; color:white; cursor:pointer; border-radius:8px; opacity:0.8; transition:0.2s;">
-                                    <i class="fas fa-cog" style="color:#94a3b8;"></i> <span>Post Settings</span>
-                                </div>
+                        <!-- 1. Header -->
+                        <div class="editor-header">
+                            <div style="display: flex; align-items: center; gap: 20px;">
+                                <div onclick="showBlogHub()"
+                                    style="cursor: pointer; color: #6b7280; font-size: 1.2rem;"><i
+                                        class="fas fa-arrow-left"></i></div>
                                 <div
-                                    style="padding:10px; display:flex; gap:10px; align-items:center; color:white; cursor:pointer; border-radius:8px; opacity:0.8; transition:0.2s;">
-                                    <i class="fas fa-magic" style="color:#a855f7;"></i> <span>AI Assistant</span>
+                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #ff9a7b, #ff8c69); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow:hidden; box-shadow: 0 4px 12px rgba(255, 140, 105, 0.3);">
+                                    <img src="../assets/images/favicon_symbol.png"
+                                        style="width:70%; height:70%; object-fit:contain; filter: brightness(0) invert(1);">
                                 </div>
+                                <input type="text" class="editor-title-input" id="blogTitleInput"
+                                    placeholder="Post Title">
                             </div>
-
-                            <div style="padding:0 20px;">
-                                <h4
-                                    style="color:var(--text-dim); font-size:0.7rem; text-transform:uppercase; font-weight:700; margin-bottom:15px;">
-                                    Templates</h4>
-                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                                    <div onclick="applyTemplate('listicle')"
-                                        style="background:rgba(255,255,255,0.05); padding:15px 10px; border-radius:8px; text-align:center; cursor:pointer; border:1px solid transparent;">
-                                        <i class="fas fa-list" style="color:var(--teal-glow); margin-bottom:5px;"></i>
-                                        <div style="font-size:0.75rem;">Listicle</div>
-                                    </div>
-                                    <div onclick="applyTemplate('guide')"
-                                        style="background:rgba(255,255,255,0.05); padding:15px 10px; border-radius:8px; text-align:center; cursor:pointer; border:1px solid transparent;">
-                                        <i class="fas fa-book" style="color:#fbbf24; margin-bottom:5px;"></i>
-                                        <div style="font-size:0.75rem;">Guide</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <!-- MAIN EDITOR CANVAS -->
-                        <div
-                            style="position:relative; display:flex; flex-direction:column; overflow-y:auto; background:#1e293b;">
-                            <!-- Editor Background -->
-                            <!-- Top Bar -->
-                            <div
-                                style="padding:15px 30px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05);">
-                                <div style="color:var(--text-dim); font-size:0.9rem;">
-                                    <span id="saveIndicator">Saved</span>
-                                </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span id="saveIndicator"
+                                    style="font-size: 0.8rem; color: #9ca3af; margin-right: 10px;">Saved</span>
+                                <button onclick="saveCurrentDraft()"
+                                    style="background:transparent; color:#64748b; border:1px solid #cbd5e1; padding:8px 20px; border-radius:50px; font-weight:600; cursor:pointer; font-size:0.85rem; transition:0.2s;"
+                                    onmouseover="this.style.borderColor='#94a3b8'; this.style.color='#475569'"
+                                    onmouseout="this.style.borderColor='#cbd5e1'; this.style.color='#64748b'">Save as
+                                    Draft</button>
                                 <button onclick="publishDraft()"
-                                    style="background:white; color:#0f172a; padding:8px 30px; border-radius:50px; font-weight:700; border:none; cursor:pointer;">Publish</button>
-                            </div>
-
-                            <div style="flex:1; padding:40px; display:flex; justify-content:center;">
-                                <div class="editor-wrapper" id="mainCanvas">
-                                    <!-- Toolbar (Sticky) -->
-                                    <div id="toolbar-container"
-                                        style="position:sticky; top:0; z-index:10; background:inherit; border-radius:4px 4px 0 0;">
-                                        <span class="ql-formats">
-                                            <select class="ql-header">
-                                                <option value="1">Heading</option>
-                                                <option value="2">Subheading</option>
-                                                <option selected>Normal</option>
-                                            </select>
-                                        </span>
-                                        <span class="ql-formats">
-                                            <button class="ql-bold"></button>
-                                            <button class="ql-italic"></button>
-                                            <button class="ql-blockquote"></button>
-                                            <button class="ql-link"></button>
-                                        </span>
-                                        <span class="ql-formats">
-                                            <button class="ql-list" value="bullet"></button>
-                                            <button class="ql-image"></button>
-                                            <button style="width:auto; color:#F59E0B;" onclick="toggleStickers()"><i
-                                                    class="fas fa-smile"></i></button>
-                                        </span>
-                                    </div>
-
-                                    <!-- Cover & Title -->
-                                    <div id="coverImagePreview"
-                                        style="display:none; height:200px; background-size:cover; background-position:center; margin-bottom:20px; border-radius:4px;">
-                                    </div>
-                                    <input id="blogTitleInput" type="text" placeholder="Add Title"
-                                        style="width:100%; border:none; background:transparent; font-size:3rem; font-weight:800; color:inherit; outline:none; margin-bottom:10px; font-family:'Outfit', sans-serif; padding:0 30px;">
-
-                                    <!-- Editor -->
-                                    <div id="editor" class="font-serif"></div>
-
-                                    <!-- Stickers -->
-                                    <div id="stickerPopup" class="sticker-popup">
-                                        <div class="sticker-btn" onclick="insertSticker('✨')">✨</div>
-                                        <div class="sticker-btn" onclick="insertSticker('💌')">💌</div>
-                                        <div class="sticker-btn" onclick="insertSticker('💡')">💡</div>
-                                        <div class="sticker-btn" onclick="insertSticker('🌟')">🌟</div>
-                                        <div class="sticker-btn" onclick="insertSticker('💪')">💪</div>
-                                        <div class="sticker-btn" onclick="insertSticker('🧘')">🧘</div>
-                                        <div class="sticker-btn" onclick="insertSticker('🌸')">🌸</div>
-                                        <div class="sticker-btn" onclick="insertSticker('🚀')">🚀</div>
-                                        <div class="sticker-btn" onclick="insertSticker('🎉')">🎉</div>
-                                        <div class="sticker-btn" onclick="insertSticker('❤️')">❤️</div>
-                                        <div class="sticker-btn" onclick="insertSticker('🔥')">🔥</div>
-                                        <div class="sticker-btn" onclick="insertSticker('📝')">📝</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Style Dock (Bottom) -->
-                            <div class="style-dock">
-                                <!-- Styles -->
-                                <div style="display:flex; gap:10px; align-items:center;">
-                                    <div class="color-dot" style="background:#ffffff; border:1px solid #ccc;"
-                                        onclick="setTheme('paper')" title="Paper"></div>
-                                    <div class="color-dot" style="background:#1e1e1e;" onclick="setTheme('dark')"
-                                        title="Dark Mode"></div>
-                                </div>
-                                <div style="width:1px; height:20px; background:rgba(255,255,255,0.1);"></div>
-                                <div style="display:flex; gap:15px; font-size:0.8rem; font-weight:600; color:white;">
-                                    <span onclick="setFont('font-serif')"
-                                        style="cursor:pointer; font-family:'Lora', serif;">Serif</span>
-                                    <span onclick="setFont('font-sans')"
-                                        style="cursor:pointer; font-family:'Inter', sans-serif;">Sans</span>
-                                    <span onclick="setFont('font-fun')"
-                                        style="cursor:pointer; font-family:'Patrick Hand', cursive;">Fun</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- SLIDE-OUT SETTINGS PANEL -->
-                        <div id="settingsPanel"
-                            style="width:300px; background:white; position:absolute; right:0; top:0; bottom:0; padding:20px; transform:translateX(100%); transition:transform 0.3s ease; border-left:1px solid #e2e8f0; z-index:50;">
-                            <div
-                                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-                                <h3 style="color:#0f172a; margin:0; font-size:1.1rem;">Post Settings</h3>
-                                <button onclick="toggleSettingsPanel()"
-                                    style="background:transparent; border:none; font-size:1.2rem; cursor:pointer; color:#64748b;"><i
-                                        class="fas fa-times"></i></button>
-                            </div>
-
-                            <!-- Featured Image -->
-                            <div style="margin-bottom:20px;">
-                                <label
-                                    style="display:block; font-size:0.85rem; color:#64748b; margin-bottom:8px; font-weight:600;">Featured
-                                    Image</label>
-                                <div style="border:1px dashed #cbd5e1; border-radius:8px; height:120px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#f8fafc;"
-                                    onclick="triggerCoverUpload()">
-                                    <i class="fas fa-plus" style="color:#94a3b8; font-size:1.5rem;"></i>
-                                </div>
-                                <input type="file" id="coverUploadInput" style="display:none;"
-                                    onchange="handleCoverUpload(this)">
-                            </div>
-
-                            <!-- Excerpt -->
-                            <div style="margin-bottom:20px;">
-                                <label
-                                    style="display:block; font-size:0.85rem; color:#64748b; margin-bottom:8px; font-weight:600;">Excerpt</label>
-                                <textarea
-                                    style="width:100%; border:1px solid #cbd5e1; border-radius:6px; padding:10px; font-family:'Inter',sans-serif; height:80px; resize:none;"
-                                    placeholder="Short description..."></textarea>
-                                <div style="text-align:right; font-size:0.75rem; color:#94a3b8; margin-top:5px;">0/150
-                                </div>
-                            </div>
-
-                            <!-- Topic -->
-                            <div style="margin-bottom:20px;">
-                                <label
-                                    style="display:block; font-size:0.85rem; color:#64748b; margin-bottom:8px; font-weight:600;">Topic</label>
-                                <select id="blogCategoryInput"
-                                    style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                                    <option>Mental Wellness</option>
-                                    <option>Relationships</option>
-                                    <option>Student Life</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- ADD ELEMENTS MODAL (The Screenshot Implementation) -->
-                        <div id="elementsModal"
-                            style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:white; width:450px; border-radius:16px; padding:20px; z-index:200; box-shadow:0 20px 60px rgba(0,0,0,0.4); display:none; color:#0f172a;">
-                            <div
-                                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                                <h3 style="margin:0; font-size:1.2rem;">Add</h3>
-                                <button onclick="toggleElementsModal()"
-                                    style="background:transparent; border:none; font-size:1.2rem; cursor:pointer;"><i
-                                        class="fas fa-times"></i></button>
-                            </div>
-
-                            <!-- Section: Media -->
-                            <div style="margin-bottom:20px;">
-                                <h5 style="margin:0 0 10px 0; color:#64748b; font-size:0.8rem;">Media</h5>
-                                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;">
-                                    <div class="element-box" onclick="alert('Image')"><i class="far fa-image"></i> Image
-                                    </div>
-                                    <div class="element-box" onclick="alert('AI Image')"><i class="fas fa-sparkles"></i>
-                                        AI image</div>
-                                    <div class="element-box" onclick="alert('Video')"><i class="fas fa-video"></i> Video
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Section: Elements -->
-                            <div style="margin-bottom:20px;">
-                                <h5 style="margin:0 0 10px 0; color:#64748b; font-size:0.8rem;">Elements</h5>
-                                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;">
-                                    <div class="element-box"
-                                        onclick="quill.clipboard.dangerouslyPasteHTML(quill.getSelection().index, '<hr>')">
-                                        <i class="fas fa-minus"></i> Divider
-                                    </div>
-                                    <div class="element-box"
-                                        onclick="quill.clipboard.dangerouslyPasteHTML(quill.getSelection().index, '<button>Button</button>')">
-                                        <i class="fas fa-square"></i> Button
-                                    </div>
-                                    <div class="element-box" onclick="alert('Table')"><i class="fas fa-table"></i> Table
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <style>
-                            .element-box {
-                                border: 1px solid #e2e8f0;
-                                border-radius: 8px;
-                                padding: 15px;
-                                text-align: center;
-                                cursor: pointer;
-                                font-size: 0.85rem;
-                                font-weight: 500;
-                                display: flex;
-                                flex-direction: column;
-                                gap: 8px;
-                                align-items: center;
-                            }
-
-                            .element-box i {
-                                font-size: 1.2rem;
-                                color: #475569;
-                            }
-
-                            .element-box:hover {
-                                background: #f8fafc;
-                                border-color: #94a3b8;
-                            }
-                        </style>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- GUIDELINES TAB -->
-            <div id="tab-guidelines" class="tab-content">
-                <div class="page-title">Session Guidelines</div>
-
-                <!-- PEER GUIDELINES -->
-                <div id="peerGuidelines" style="display:none;">
-                    <div class="pro-card">
-                        <h3 style="color:var(--teal-glow); margin-bottom:20px;">Soulamore Peer Support Standards</h3>
-                        <p style="opacity:0.8; margin-bottom:20px;">Peer support sessions are an integral part of the
-                            Soulamore community, providing a safe and supportive space. To ensure the effectiveness and
-                            integrity of these sessions, please adhere to the following:</p>
-
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i
-                                        class="fas fa-user-shield"></i> Confidentiality</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Respect the confidentiality of all
-                                    participants. What is shared stays in the session, unless there is an immediate risk
-                                    of harm. Create an environment of trust.</p>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i
-                                        class="fas fa-ear-listen"></i> Active Listening</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Give full attention without interruption.
-                                    Validate feelings and refrain from unsolicited advice. Allow participants to express
-                                    themselves fully.</p>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i
-                                        class="fas fa-hand-holding-heart"></i> Empathy & Compassion</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Acknowledge emotions without trying to "fix"
-                                    them. Remember that validation goes a long way in fostering connection.</p>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i class="fas fa-ban"></i>
-                                    Boundaries</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Maintain appropriate boundaries. Avoid prying
-                                    into details participants aren't ready to share. Respect their pace.</p>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i class="fas fa-compass"></i>
-                                    Non-Directive Approach</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Encourage self-reflection with open-ended
-                                    questions. Avoid imposing your own solutions or agendas.</p>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i
-                                        class="fas fa-exclamation-triangle"></i> Safety & Crisis</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Prioritize safety. If there is risk of
-                                    self-harm, follow the crisis protocol immediately (Contact emergency
-                                    services/Escalate).</p>
-                            </div>
-                        </div>
-                        <div
-                            style="margin-top:30px; padding:20px; border:1px solid var(--teal-glow); border-radius:12px; text-align:center;">
-                            You are representing Soulamore's commitment to empathy. Your dedication ensures everyone
-                            feels heard and valued.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PSYCH GUIDELINES -->
-                <div id="psychGuidelines" style="display:none;">
-                    <div class="pro-card" style="border-color:var(--clinical-blue);">
-                        <h3 style="color:var(--clinical-blue); margin-bottom:20px;">Clinical Practice Standards</h3>
-                        <p style="opacity:0.8; margin-bottom:20px;">As a licensed professional on Soulamore, you uphold
-                            the highest standards of clinical ethics while fostering human connection.</p>
-
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i
-                                        class="fas fa-file-medical"></i> Clinical Confidentiality</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Strict adherence to mental health acts/HIPAA.
-                                    Maintain professional privilege unless there is a Duty to Warn/Protect.</p>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i
-                                        class="fas fa-notes-medical"></i> Scope of Practice</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Operate strictly within your licensure and
-                                    specialization. Refer out cases that require expertise beyond your scope (e.g.,
-                                    severe psychiatric episodes).</p>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i class="fas fa-user-md"></i>
-                                    Therapeutic Boundaries</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Maintain clear professional boundaries. Dual
-                                    relationships are prohibited. Ensure the therapeutic frame is secure and consistent.
-                                </p>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i class="fas fa-brain"></i>
-                                    Evidence-Based Care</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Utilize validated therapeutic modalities.
-                                    While the Soulamore tone is warm, your interventions should be clinically grounded.
-                                </p>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i class="fas fa-ambulance"></i>
-                                    Crisis Management</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Immediate intervention required for active
-                                    suicidality or homicidality. Follow local emergency protocols and document all risk
-                                    assessments.</p>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                                <h4 style="color:var(--starlight); margin-bottom:10px;"><i class="fas fa-users-cog"></i>
-                                    Cultural Competence</h4>
-                                <p style="font-size:0.9rem; opacity:0.7;">Practice with deep respect for diversity.
-                                    Continuously evaluate your own biases and strive for inclusive care.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- HOME TAB -->
-            <div id="tab-home" class="tab-content active">
-                <div class="page-title">
-                    <span>Performance Overview</span>
-                    <button class="btn-primary" style="font-size:0.9rem;">Go Online</button>
-                </div>
-                <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
-                    <div class="pro-card" style="text-align:center;">
-                        <div style="font-size:2rem; font-weight:700; color:var(--clinical-blue);">4.9</div>
-                        <div style="font-size:0.9rem; opacity:0.7;">Client Rating</div>
-                    </div>
-                    <div class="pro-card" style="text-align:center;">
-                        <div style="font-size:2rem; font-weight:700; color:var(--soft-teal);">12</div>
-                        <div style="font-size:0.9rem; opacity:0.7;">Sessions this Week</div>
-                    </div>
-                    <div class="pro-card" style="text-align:center;">
-                        <div style="font-size:2rem; font-weight:700; color:#fbbf24;">3</div>
-                        <div style="font-size:0.9rem; opacity:0.7;">Draft Stories</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CALENDAR CONFIG TAB -->
-            <div id="tab-calendar" class="tab-content">
-                <div class="page-title">Calendar Configuration</div>
-                <div class="pro-card">
-                    <h3 style="margin-bottom:15px;">SuperSaaS Integration</h3>
-                    <p style="opacity:0.7; margin-bottom:20px;">Connect your SuperSaaS schedule here. Use the "Link to
-                        this schedule" URL found in your SuperSaaS dashboard.</p>
-
-                    <form onsubmit="saveCalendar(event)">
-                        <div class="form-group">
-                            <label class="form-label">SuperSaaS Schedule URL</label>
-                            <input type="url" class="form-input" id="calUrl"
-                                placeholder="https://www.supersaas.com/schedule/your_account/your_schedule">
-                        </div>
-                        <button type="submit" class="btn-primary">Save Configuration</button>
-                    </form>
-
-                    <div id="calPreview" style="margin-top:30px; display:none;">
-                        <label class="form-label">Preview:</label>
-                        <iframe id="iframePreview" src="" width="100%" height="400" frameborder="0"
-                            style="border-radius:12px; border:1px solid var(--border-glass);"></iframe>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PROFILE EDITOR TAB -->
-            <div id="tab-profile" class="tab-content">
-                <div class="page-title">Edit Public Profile</div>
-
-                <form onsubmit="saveProfile(event)">
-                    <div class="pro-card">
-                        <h3 style="margin-bottom:20px;">Basic Details</h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Full Name</label>
-                                <input type="text" class="form-input" id="profName" value="Dr. Example">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Professional Title</label>
-                                <input type="text" class="form-input" id="profTitle" value="Clinical Psychologist">
-                            </div>
-                        </div>
-
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Category</label>
-                                <select class="form-select" id="profCategory">
-                                    <option>Mental Wellness</option>
-                                    <option>Physical Wellness</option>
-                                    <option>Financial Wellness</option>
-                                    <option>Academic Wellness</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Session Price (₹)</label>
-                                <input type="number" class="form-input" id="profPrice" value="1500">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="form-group">
-                                <label class="form-label">A short note from me</label>
-                                <div class="rich-toolbar">
-                                    <button type="button" class="toolbar-btn" onclick="insertFormat('**', '**')"><i
-                                            class="fas fa-bold"></i></button>
-                                    <button type="button" class="toolbar-btn" onclick="insertFormat('*', '*')"><i
-                                            class="fas fa-italic"></i></button>
-                                    <button type="button" class="toolbar-btn" onclick="insertFormat('\n• ', '')"><i
-                                            class="fas fa-list-ul"></i></button>
-                                </div>
-                                <textarea class="form-input" id="profBio" rows="6"
-                                    style="border-top-left-radius:0; border-top-right-radius:0;"
-                                    placeholder="Write like you’re welcoming someone into a quiet room..."></textarea>
-
-                                <!-- Sample Bio Guidance -->
+                                    style="background: linear-gradient(135deg, var(--teal-glow), #2dd4bf); color: #0f172a; padding: 8px 24px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-paper-plane"></i> Publish
+                                </button>
                                 <div
-                                    style="background:rgba(255,255,255,0.03); border:1px solid var(--border-glass); border-radius:8px; padding:15px; margin-top:10px;">
-                                    <div
-                                        style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-dim); margin-bottom:8px;">
-                                        Example (Tone Guide)</div>
-                                    <p style="font-size:0.9rem; opacity:0.7; font-style:italic; line-height:1.6;">
-                                        "I don’t believe people need fixing. Sometimes it helps to speak things out loud
-                                        without being interrupted or analyzed. You don’t have to know where to start
-                                        here. We can begin wherever you are."
+                                    style="width: 35px; height: 35px; background: #e5e7eb; border-radius: 50%; margin-left: 15px; display: flex; align-items: center; justify-content: center; color: #6b7280;">
+                                    <img src="../assets/images/google-icon.png"
+                                        style="width:100%; opacity:0; /* Placeholder for user avatar */"> A
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Toolbar -->
+                        <div class="editor-toolbar-area" id="toolbar-container">
+                            <!-- Quill Toolbar -->
+                            <span class="ql-formats">
+                                <select class="ql-header">
+                                    <option value="1">Heading</option>
+                                    <option value="2">Subheading</option>
+                                    <option selected>Normal</option>
+                                </select>
+                            </span>
+                            <span class="ql-formats">
+                                <button class="ql-bold"></button>
+                                <button class="ql-italic"></button>
+                                <button class="ql-underline"></button>
+                                <button class="ql-strike"></button>
+                            </span>
+                            <span class="ql-formats">
+                                <button class="ql-blockquote"></button>
+                                <button class="ql-code-block"></button>
+                            </span>
+                            <span class="ql-formats">
+                                <button class="ql-list" value="ordered"></button>
+                                <button class="ql-list" value="bullet"></button>
+                            </span>
+                            <span class="ql-formats">
+                                <button class="ql-link"></button>
+                                <button class="ql-image"></button>
+                            </span>
+                            <span class="ql-formats">
+                                <button class="ql-clean"></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GUIDELINES TAB -->
+                <div id="tab-guidelines" class="tab-content">
+                    <div class="page-title">Session Guidelines</div>
+
+                    <!-- PEER GUIDELINES -->
+                    <div id="peerGuidelines" style="display:none;">
+                        <div class="pro-card">
+                            <h3 style="color:var(--teal-glow); margin-bottom:20px;">Soulamore Peer Support Standards
+                            </h3>
+                            <p style="opacity:0.8; margin-bottom:20px;">Peer support sessions are an integral part of
+                                the
+                                Soulamore community, providing a safe and supportive space. To ensure the effectiveness
+                                and
+                                integrity of these sessions, please adhere to the following:</p>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i
+                                            class="fas fa-user-shield"></i> Confidentiality</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Respect the confidentiality of all
+                                        participants. What is shared stays in the session, unless there is an immediate
+                                        risk
+                                        of harm. Create an environment of trust.</p>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i
+                                            class="fas fa-ear-listen"></i> Active Listening</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Give full attention without interruption.
+                                        Validate feelings and refrain from unsolicited advice. Allow participants to
+                                        express
+                                        themselves fully.</p>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i
+                                            class="fas fa-hand-holding-heart"></i> Empathy & Compassion</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Acknowledge emotions without trying to
+                                        "fix"
+                                        them. Remember that validation goes a long way in fostering connection.</p>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i class="fas fa-ban"></i>
+                                        Boundaries</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Maintain appropriate boundaries. Avoid
+                                        prying
+                                        into details participants aren't ready to share. Respect their pace.</p>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i
+                                            class="fas fa-compass"></i>
+                                        Non-Directive Approach</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Encourage self-reflection with open-ended
+                                        questions. Avoid imposing your own solutions or agendas.</p>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i
+                                            class="fas fa-exclamation-triangle"></i> Safety & Crisis</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Prioritize safety. If there is risk of
+                                        self-harm, follow the crisis protocol immediately (Contact emergency
+                                        services/Escalate).</p>
+                                </div>
+                            </div>
+                            <div
+                                style="margin-top:30px; padding:20px; border:1px solid var(--teal-glow); border-radius:12px; text-align:center;">
+                                You are representing Soulamore's commitment to empathy. Your dedication ensures everyone
+                                feels heard and valued.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PSYCH GUIDELINES -->
+                    <div id="psychGuidelines" style="display:none;">
+                        <div class="pro-card" style="border-color:var(--clinical-blue);">
+                            <h3 style="color:var(--clinical-blue); margin-bottom:20px;">Clinical Practice Standards</h3>
+                            <p style="opacity:0.8; margin-bottom:20px;">As a licensed professional on Soulamore, you
+                                uphold
+                                the highest standards of clinical ethics while fostering human connection.</p>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i
+                                            class="fas fa-file-medical"></i> Clinical Confidentiality</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Strict adherence to mental health
+                                        acts/HIPAA.
+                                        Maintain professional privilege unless there is a Duty to Warn/Protect.</p>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i
+                                            class="fas fa-notes-medical"></i> Scope of Practice</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Operate strictly within your licensure and
+                                        specialization. Refer out cases that require expertise beyond your scope (e.g.,
+                                        severe psychiatric episodes).</p>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i
+                                            class="fas fa-user-md"></i>
+                                        Therapeutic Boundaries</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Maintain clear professional boundaries.
+                                        Dual
+                                        relationships are prohibited. Ensure the therapeutic frame is secure and
+                                        consistent.
                                     </p>
                                 </div>
-                            </div>
-
-                            <!-- PEER FIELDS -->
-                            <div id="peerFields"
-                                style="margin: 20px 0; border-top: 1px solid var(--border-glass); padding-top: 20px; display:none;">
-                                <h4 style="margin-bottom:15px; color:var(--teal-glow);">My Topics</h4>
-
-                                <div class="form-group">
-                                    <label class="form-label">Topics I’m comfortable supporting conversations
-                                        around</label>
-                                    <div class="tag-cloud" id="peerTagCloud"></div>
-                                    <input type="hidden" id="profStyle"> <!-- Stores selected tags -->
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i class="fas fa-brain"></i>
+                                        Evidence-Based Care</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Utilize validated therapeutic modalities.
+                                        While the Soulamore tone is warm, your interventions should be clinically
+                                        grounded.
+                                    </p>
                                 </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">This space may feel right if...</label>
-                                    <textarea class="form-input" id="profMatch" rows="4"
-                                        placeholder="• You're overthinking small things.&#10;• You feel emotionally tired without a clear reason.&#10;• You don't want advice, just someone to listen."></textarea>
-                                    <small style="opacity:0.6;">Write in first or second person. No diagnoses.</small>
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i
+                                            class="fas fa-ambulance"></i>
+                                        Crisis Management</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Immediate intervention required for active
+                                        suicidality or homicidality. Follow local emergency protocols and document all
+                                        risk
+                                        assessments.</p>
                                 </div>
-                            </div>
-
-                            <!-- PSYCH FIELDS -->
-                            <div id="psychFields"
-                                style="margin: 20px 0; border-top: 1px solid var(--border-glass); padding-top: 20px; display:none;">
-                                <h4 style="margin-bottom:15px; color:#3b82f6;">Clinical Profile</h4>
-
-                                <div class="form-group">
-                                    <label class="form-label">Professional Experience / Degrees</label>
-                                    <textarea class="form-input" id="profEdu" rows="3"
-                                        placeholder="• Master's in Clinical Psychology&#10;• PG Diploma in Counseling&#10;• PhD in Psychology"></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Topics I specialize in supporting</label>
-                                    <div class="tag-cloud" id="psychTagCloud"></div>
-                                    <input type="hidden" id="profTags"> <!-- Stores selected tags -->
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Session Format</label>
-                                    <select class="form-input" id="profFormat">
-                                        <option>Online (G-Meet / Zoom)</option>
-                                        <option>In-Person (Clinic)</option>
-                                        <option>Hybrid</option>
-                                    </select>
-                                </div>
-
-                                <!-- Match Text for Psych too? (User asked to replicate core shift) -->
-                                <div class="form-group">
-                                    <label class="form-label">This space may feel right if...</label>
-                                    <textarea class="form-input" id="profMatchPsych" rows="3"
-                                        placeholder="• You are looking for clinical diagnosis and treatment plan.&#10;• You need a structured approach to trauma recovery."></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Crisis Policy</label>
-                                    <textarea class="form-input" id="profCrisis" rows="3"
-                                        placeholder="I am not available for 24/7 emergency support. If you are in immediate danger, please contact local emergency services."></textarea>
+                                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                                    <h4 style="color:var(--starlight); margin-bottom:10px;"><i
+                                            class="fas fa-users-cog"></i>
+                                        Cultural Competence</h4>
+                                    <p style="font-size:0.9rem; opacity:0.7;">Practice with deep respect for diversity.
+                                        Continuously evaluate your own biases and strive for inclusive care.</p>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="pro-card">
-                            <h3 style="margin-bottom:20px;">Additional Details</h3>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label">Languages</label>
-                                    <input type="text" class="form-input" id="profLang" value="English, Hindi">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Years of Experience</label>
-                                    <input type="number" class="form-input" id="profExp" value="5">
-                                </div>
-                            </div>
-                        </div>
-                        <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">Upload a photo. We will
-                            automatically remove the background and apply the Soulamore accent ring.</p>
-
-                        <div class="pic-upload-area" onclick="document.getElementById('fileInput').click()">
-                            <!-- Hidden Input -->
-                            <input type="file" id="fileInput" style="display:none;" onchange="handleImageUpload(this)">
-
-                            <div id="uploadPlaceholder">
-                                <i class="fas fa-cloud-upload-alt" style="font-size:2rem; margin-bottom:10px;"></i>
-                                <div>Click to Upload Image</div>
-                            </div>
-
-                            <!-- Processing & Preview -->
-                            <div id="procOverlay" class="processing-overlay">
-                                <div style="color:var(--clinical-blue); margin-bottom:10px;"><i
-                                        class="fas fa-magic fa-spin"></i> Processing...</div>
-                            </div>
-                            <img id="previewImg" src="" class="preview-img">
-                        </div>
-                        <div style="text-align:center; margin-top:10px; font-size:0.8rem; opacity:0.6;">(Simulated AI
-                            Background Removal)</div>
                     </div>
 
-                    <button type="submit" class="btn-primary" style="width:100%; margin-bottom:40px;">Save Profile
-                        Changes</button>
-                </form>
-            </div>
-        </div>
+                </div>
 
-        <!-- JOURNAL TAB (Placeholder) -->
-        <div id="tab-journal" class="tab-content">
-            <div class="pro-card" style="text-align:center; padding:60px;">
-                <i class="fas fa-lock" style="font-size:3rem; margin-bottom:20px; color:#475569;"></i>
-                <h3>Private Journal</h3>
-                <p style="opacity:0.6;">This feature is currently locked for beta testing.</p>
-            </div>
-        </div>
+                <!-- HOME TAB -->
+                <div id="tab-home" class="tab-content active">
+                    <div class="page-title">
+                        <span>Performance Overview</span>
+                        <button class="btn-primary" style="font-size:0.9rem;">Go Online</button>
+                    </div>
+                    <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="pro-card" style="text-align:center;">
+                            <div style="font-size:2rem; font-weight:700; color:var(--clinical-blue);">4.9</div>
+                            <div style="font-size:0.9rem; opacity:0.7;">Client Rating</div>
+                        </div>
+                        <div class="pro-card" style="text-align:center;">
+                            <div style="font-size:2rem; font-weight:700; color:var(--soft-teal);">12</div>
+                            <div style="font-size:0.9rem; opacity:0.7;">Sessions this Week</div>
+                        </div>
+                        <div class="pro-card" style="text-align:center;">
+                            <div style="font-size:2rem; font-weight:700; color:#fbbf24;">3</div>
+                            <div style="font-size:0.9rem; opacity:0.7;">Draft Stories</div>
+                        </div>
+                    </div>
+                </div>
 
-    </div>
+                <!-- CALENDAR CONFIG TAB -->
+                <div id="tab-calendar" class="tab-content">
+                    <div class="page-title">Calendar Configuration</div>
+                    <div class="pro-card">
+                        <h3 style="margin-bottom:15px;">SuperSaaS Integration</h3>
+                        <p style="opacity:0.7; margin-bottom:20px;">Connect your SuperSaaS schedule here. Use the "Link
+                            to
+                            this schedule" URL found in your SuperSaaS dashboard.</p>
+
+                        <form onsubmit="saveCalendar(event)">
+                            <div class="form-group">
+                                <label class="form-label">SuperSaaS Schedule URL</label>
+                                <input type="url" class="form-input" id="calUrl"
+                                    placeholder="https://www.supersaas.com/schedule/your_account/your_schedule">
+                            </div>
+                            <button type="submit" class="btn-primary">Save Configuration</button>
+                        </form>
+
+                        <div id="calPreview" style="margin-top:30px; display:none;">
+                            <label class="form-label">Preview:</label>
+                            <iframe id="iframePreview" src="" width="100%" height="400" frameborder="0"
+                                style="border-radius:12px; border:1px solid var(--border-glass);"></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROFILE EDITOR TAB -->
+                <div id="tab-profile" class="tab-content">
+                    <div class="page-title">Edit Public Profile</div>
+
+                    <form onsubmit="saveProfile(event)">
+                        <div class="pro-card">
+                            <h3 style="margin-bottom:20px;">Basic Details</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-input" id="profName" value="Dr. Example">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Professional Title</label>
+                                    <input type="text" class="form-input" id="profTitle" value="Clinical Psychologist">
+                                </div>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-select" id="profCategory">
+                                        <option>Mental Wellness</option>
+                                        <option>Physical Wellness</option>
+                                        <option>Financial Wellness</option>
+                                        <option>Academic Wellness</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Session Price (₹)</label>
+                                    <input type="number" class="form-input" id="profPrice" value="1500">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label class="form-label">A short note from me</label>
+                                    <div class="rich-toolbar">
+                                        <button type="button" class="toolbar-btn" onclick="insertFormat('**', '**')"><i
+                                                class="fas fa-bold"></i></button>
+                                        <button type="button" class="toolbar-btn" onclick="insertFormat('*', '*')"><i
+                                                class="fas fa-italic"></i></button>
+                                        <button type="button" class="toolbar-btn" onclick="insertFormat('\n• ', '')"><i
+                                                class="fas fa-list-ul"></i></button>
+                                    </div>
+                                    <textarea class="form-input" id="profBio" rows="6"
+                                        style="border-top-left-radius:0; border-top-right-radius:0;"
+                                        placeholder="Write like you’re welcoming someone into a quiet room..."></textarea>
+
+                                    <!-- Sample Bio Guidance -->
+                                    <div
+                                        style="background:rgba(255,255,255,0.03); border:1px solid var(--border-glass); border-radius:8px; padding:15px; margin-top:10px;">
+                                        <div
+                                            style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-dim); margin-bottom:8px;">
+                                            Example (Tone Guide)</div>
+                                        <p style="font-size:0.9rem; opacity:0.7; font-style:italic; line-height:1.6;">
+                                            "I don’t believe people need fixing. Sometimes it helps to speak things out
+                                            loud
+                                            without being interrupted or analyzed. You don’t have to know where to start
+                                            here. We can begin wherever you are."
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- PEER FIELDS -->
+                                <div id="peerFields"
+                                    style="margin: 20px 0; border-top: 1px solid var(--border-glass); padding-top: 20px; display:none;">
+                                    <h4 style="margin-bottom:15px; color:var(--teal-glow);">My Topics</h4>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Topics I’m comfortable supporting conversations
+                                            around</label>
+                                        <div class="tag-cloud" id="peerTagCloud"></div>
+                                        <input type="hidden" id="profStyle"> <!-- Stores selected tags -->
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">This space may feel right if...</label>
+                                        <textarea class="form-input" id="profMatch" rows="4"
+                                            placeholder="• You're overthinking small things.&#10;• You feel emotionally tired without a clear reason.&#10;• You don't want advice, just someone to listen."></textarea>
+                                        <small style="opacity:0.6;">Write in first or second person. No
+                                            diagnoses.</small>
+                                    </div>
+                                </div>
+
+                                <!-- PSYCH FIELDS -->
+                                <div id="psychFields"
+                                    style="margin: 20px 0; border-top: 1px solid var(--border-glass); padding-top: 20px; display:none;">
+                                    <h4 style="margin-bottom:15px; color:#3b82f6;">Clinical Profile</h4>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Professional Experience / Degrees</label>
+                                        <textarea class="form-input" id="profEdu" rows="3"
+                                            placeholder="• Master's in Clinical Psychology&#10;• PG Diploma in Counseling&#10;• PhD in Psychology"></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Topics I specialize in supporting</label>
+                                        <div class="tag-cloud" id="psychTagCloud"></div>
+                                        <input type="hidden" id="profTags"> <!-- Stores selected tags -->
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Session Format</label>
+                                        <select class="form-input" id="profFormat">
+                                            <option>Online (G-Meet / Zoom)</option>
+                                            <option>In-Person (Clinic)</option>
+                                            <option>Hybrid</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Match Text for Psych too? (User asked to replicate core shift) -->
+                                    <div class="form-group">
+                                        <label class="form-label">This space may feel right if...</label>
+                                        <textarea class="form-input" id="profMatchPsych" rows="3"
+                                            placeholder="• You are looking for clinical diagnosis and treatment plan.&#10;• You need a structured approach to trauma recovery."></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Crisis Policy</label>
+                                        <textarea class="form-input" id="profCrisis" rows="3"
+                                            placeholder="I am not available for 24/7 emergency support. If you are in immediate danger, please contact local emergency services."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pro-card">
+                                <h3 style="margin-bottom:20px;">Additional Details</h3>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Languages</label>
+                                        <input type="text" class="form-input" id="profLang" value="English, Hindi">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Years of Experience</label>
+                                        <input type="number" class="form-input" id="profExp" value="5">
+                                    </div>
+                                </div>
+                            </div>
+                            <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">Upload a photo. We will
+                                automatically remove the background and apply the Soulamore accent ring.</p>
+
+                            <div class="pic-upload-area" onclick="document.getElementById('fileInput').click()">
+                                <!-- Hidden Input -->
+                                <input type="file" id="fileInput" style="display:none;"
+                                    onchange="handleImageUpload(this)">
+
+                                <div id="uploadPlaceholder">
+                                    <i class="fas fa-cloud-upload-alt" style="font-size:2rem; margin-bottom:10px;"></i>
+                                    <div>Click to Upload Image</div>
+                                </div>
+
+                                <!-- Processing & Preview -->
+                                <div id="procOverlay" class="processing-overlay">
+                                    <div style="color:var(--clinical-blue); margin-bottom:10px;"><i
+                                            class="fas fa-magic fa-spin"></i> Processing...</div>
+                                </div>
+                                <img id="previewImg" src="" class="preview-img">
+                            </div>
+                            <div style="text-align:center; margin-top:10px; font-size:0.8rem; opacity:0.6;">(Simulated
+                                AI
+                                Background Removal)</div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="width:100%; margin-bottom:40px;">Save Profile
+                            Changes</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- JOURNAL TAB (Placeholder) -->
+            <div id="tab-journal" class="tab-content">
+                <div class="pro-card" style="text-align:center; padding:60px;">
+                    <i class="fas fa-lock" style="font-size:3rem; margin-bottom:20px; color:#475569;"></i>
+                    <h3>Private Journal</h3>
+                    <p style="opacity:0.6;">This feature is currently locked for beta testing.</p>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <script>
@@ -1513,12 +1295,39 @@
                 return;
             }
 
-            container.innerHTML = drafts.map(d => `
-                <div id="draft-${d.id}" class="blog-list-item ${currentDraftId === d.id ? 'active' : ''}" onclick="loadDraft('${d.id}')">
-                    <div style="font-weight:600; color:white; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.title || "Untitled Draft"}</div>
-                    <div style="font-size:0.75rem; opacity:0.6;">${new Date(d.lastEdited).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                </div>
-            `).join('');
+            container.innerHTML = '';
+            if (drafts.length === 0) {
+                container.innerHTML = '<div style="font-size:0.8rem; opacity:0.5; font-style:italic;">No drafts yet.</div>';
+                return;
+            }
+
+            drafts.forEach(d => {
+                const safeId = String(d.id || '').replace(/[^a-zA-Z0-9\-\._]/g, '');
+
+                const item = document.createElement('div');
+                item.id = 'draft-' + safeId;
+                item.className = 'blog-list-item' + (currentDraftId === d.id ? ' active' : '');
+                item.onclick = function () { loadDraft(d.id); };
+
+                const titleDiv = document.createElement('div');
+                titleDiv.style.fontWeight = '600';
+                titleDiv.style.color = 'white';
+                titleDiv.style.whiteSpace = 'nowrap';
+                titleDiv.style.overflow = 'hidden';
+                titleDiv.style.textOverflow = 'ellipsis';
+                titleDiv.textContent = d.title || "Untitled Draft";
+
+                const dateDiv = document.createElement('div');
+                dateDiv.style.fontSize = '0.75rem';
+                dateDiv.style.opacity = '0.6';
+                if (d.lastEdited) {
+                    dateDiv.textContent = new Date(d.lastEdited).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+
+                item.appendChild(titleDiv);
+                item.appendChild(dateDiv);
+                container.appendChild(item);
+            });
         }
 
         function publishDraft() {
@@ -1569,6 +1378,8 @@
             // Reset editor
             quill.setText('');
             document.getElementById('blogTitleInput').value = '';
+            // New logic: ensure no modal is stuck open
+            document.getElementById('elementsModal').style.display = 'none';
             document.getElementById('coverImagePreview').style.display = 'none';
             currentDraftId = Date.now().toString(); // New ID
         }
@@ -1579,6 +1390,23 @@
                 panel.style.transform = 'translateX(100%)';
             } else {
                 panel.style.transform = 'translateX(0%)';
+            }
+        }
+
+        // Accordion Logic for Right Sidebar
+        function toggleSetting(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.fa-chevron-down');
+
+            // Toggle current
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+                header.style.color = '#4b5563';
+            } else {
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+                header.style.color = '#f97316'; // Accent color
             }
         }
 

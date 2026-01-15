@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychologist Dashboard | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/dashboard-sidebar.css">
+    <!-- Quill Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+    <style>
+        .side-link.active {
+            border-left-color: var(--teal-glow);
+            color: var(--teal-glow);
+            background: linear-gradient(90deg, rgba(78, 205, 196, 0.1), transparent);
+        }
+
+        .dash-card.glow {
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.1);
+            border-color: rgba(78, 205, 196, 0.3);
+        }
+
+        .tool-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--starlight);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tool-btn:hover {
+            background: rgba(78, 205, 196, 0.1);
+            border-color: var(--teal-glow);
+        }
+
+        .client-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        /* --- BLOG EDITOR STYLES (Ported & Enhanced) --- */
+        .blog-wrapper {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        .blog-wrapper.active {
+            display: flex;
+        }
+
+        /* Hub View */
+        .blog-hub-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .blog-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .blog-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blog-card:hover {
+            border-color: var(--teal-glow);
+            transform: translateY(-5px);
+        }
+
+        .bc-status {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+
+        .bc-title {
+            font-family: 'Outfit';
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .bc-meta {
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        /* Editor View */
+        .editor-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+            background: #0f172a;
+        }
+
+        .editor-header {
+            padding: 15px 30px;
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-workspace {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* The "Paper" */
+        .paper-container {
+            flex: 1;
+            background: #1e293b;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .paper-sheet {
+            width: 100%;
+            max-width: 800px;
+            min-height: 1000px;
+            background: white;
+            /* Paper is white */
+            color: #1e293b;
+            /* Ink is dark */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        /* Quill Overrides for "Paper Mode" */
+        #editor-container {
+            height: 100%;
+            border: none !important;
+            font-family: 'Georgia', serif;
+            font-size: 18px;
+        }
+
+        .ql-toolbar {
+            background: #f1f5f9;
+            border: none !important;
+            border-bottom: 1px solid #cbd5e1 !important;
+        }
+
+        .ql-container {
+            font-size: 18px;
+        }
+
+        /* Dark Mode Toggle for Paper */
+        .paper-sheet.dark-mode {
+            background: #0f172a;
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .paper-sheet.dark-mode .ql-editor {
+            color: #e2e8f0;
+        }
+
+        .editor-sidebar {
+            width: 300px;
+            background: rgba(30, 41, 59, 1);
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            color: white;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            opacity: 0.7;
+        }
+
+        .input-dark {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            color: white;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOOL MODAL CONTAINER -->
+    <div id="toolModal" class="tool-modal-overlay">
+        <div class="tool-modal-content">
+            <div class="tool-modal-header">
+                <div class="tool-modal-title" id="modalTitle">Tool</div>
+                <button class="tool-close-btn" onclick="closeTool()"><i class="fas fa-times"></i></button>
+            </div>
+            <iframe id="toolFrame" class="tool-frame" src=""></iframe>
+        </div>
+    </div>
+
+    <!-- BLOG EDITOR OVERLAY (Full Screen) -->
+    <div id="blogEditor" class="editor-layout" style="display:none;">
+        <div class="editor-header">
+            <div style="display:flex; align-items:center; gap:20px;">
+                <button onclick="closeEditor()"
+                    style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer;"><i
+                        class="fas fa-arrow-left"></i></button>
+                <div style="font-family:'Outfit'; font-size:1.2rem; font-weight:700;">Write Story</div>
+                <span id="saveStatus" style="font-size:0.8rem; opacity:0.5; margin-left:10px;">Unsaved</span>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button onclick="togglePaperMode()"
+                    style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:white; padding:8px 15px; border-radius:30px; cursor:pointer;"><i
+                        class="fas fa-adjust"></i> Theme</button>
+                <button onclick="saveDraft()"
+                    style="background:transparent; border:1px solid var(--teal-glow); color:var(--teal-glow); padding:8px 20px; border-radius:30px; cursor:pointer;">Save
+                    Draft</button>
+                <button
+                    style="background:var(--teal-glow); border:none; color:#0f172a; padding:8px 20px; border-radius:30px; font-weight:700; cursor:pointer;">Publish</button>
+            </div>
+        </div>
+
+        <div class="editor-workspace">
+            <div class="paper-container">
+                <div class="paper-sheet" id="paperSheet">
+                    <!-- Quill Toolbar & Editor -->
+                    <div id="editor-container"></div>
+                </div>
+            </div>
+
+            <div class="editor-sidebar">
+                <h3 style="margin-bottom:20px;">Settings</h3>
+                <div class="input-group">
+                    <label>Title</label>
+                    <input type="text" class="input-dark" id="blogTitle" placeholder="My Thoughtful Article...">
+                </div>
+                <div class="input-group">
+                    <label>Excerpt / Summary</label>
+                    <textarea class="input-dark" rows="4" placeholder="Brief description for the feed..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Tags</label>
+                    <input type="text" class="input-dark" placeholder="anxiety, tips, sleep...">
+                </div>
+                <div class="input-group">
+                    <label>Cover Image URL</label>
+                    <input type="text" class="input-dark" placeholder="https://...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar-lg" style="background: linear-gradient(135deg, var(--teal-glow), #2a9d8f);">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="user-info-text">
+                    <div class="name">Dr. Strange</div>
+                    <div class="role">Psychologist</div>
+                </div>
+            </div>
+
+            <div class="sidebar-nav">
+                <a href="#" class="side-link active" onclick="switchView('overview')"><i
+                        class="fas fa-hospital-user"></i> <span>Practice</span></a>
+                <a href="#" class="side-link" onclick="switchView('blogs')"><i class="fas fa-pen-nib"></i> <span>My
+                        Blogs</span></a>
+                <a href="#" class="side-link" onclick="switchView('clients', this)"><i class="fas fa-users"></i>
+                    <span>Clients</span></a>
+                <a href="#" class="side-link"><i class="fas fa-file-medical"></i> <span>Notes</span></a>
+                <a href="#" class="side-link"><i class="fas fa-file-invoice-dollar"></i> <span>Billing</span></a>
+
+                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:10px 0;">
+                <div
+                    style="padding:10px 20px; font-size:0.75rem; opacity:0.5; text-transform:uppercase; font-weight:700;">
+                    Personal</div>
+
+                <a href="#" onclick="openTool('../tools/journal.html', 'My Journal')" class="side-link"><i
+                        class="fas fa-feather-alt"></i> <span>My Journal</span></a>
+                <a href="#" class="side-link"><i class="fas fa-bookmark"></i> <span>Saved Blogs</span></a>
+                <a href="messaging.html" class="side-link"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+
+                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:10px 0;">
+                <a href="#" onclick="switchView('settings', this)" class="side-link"><i class="fas fa-cog"></i>
+                    <span>Settings</span></a>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+            </div>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content fade-in">
+
+            <!-- OVERVIEW VIEW -->
+            <div id="view-overview" class="view-section">
+                <header
+                    style="margin-bottom:40px; padding-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h1 style="font-family:'Outfit'; font-size:2rem; color:var(--teal-glow); margin-bottom:5px;">
+                            Clinical Dashboard</h1>
+                        <p style="opacity:0.7;">Practice Overview</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:0.9rem; opacity:0.5;">Next Appointment</div>
+                        <div style="font-weight:700; color:white;">Today, 3:00 PM</div>
+                    </div>
+                </header>
+
+                <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+
+                    <!-- LEFT -->
+                    <div style="display:flex; flex-direction:column; gap:25px;">
+
+                        <!-- APPOINTMENTS -->
+                        <div class="dash-card">
+                            <div class="dc-header"
+                                style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                                <div style="font-weight:700; font-size:1.1rem;">Upcoming Sessions</div>
+                                <button
+                                    style="background:var(--teal-glow); border:none; border-radius:5px; padding:5px 10px; font-weight:700; font-size:0.8rem; cursor:pointer;">+
+                                    Add</button>
+                            </div>
+
+                            <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+                                <tr style="border-bottom:1px solid rgba(255,255,255,0.1); opacity:0.6;">
+                                    <th style="text-align:left; padding:10px;">Time</th>
+                                    <th style="text-align:left; padding:10px;">Client</th>
+                                    <th style="text-align:left; padding:10px;">Type</th>
+                                    <th style="text-align:left; padding:10px;">Status</th>
+                                </tr>
+                                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding:15px 10px;">15:00</td>
+                                    <td style="padding:15px 10px; display:flex; gap:10px; align-items:center;">
+                                        <div class="client-avatar">JD</div> John D.
+                                    </td>
+                                    <td style="padding:15px 10px;">Initial Consultation</td>
+                                    <td style="padding:15px 10px;"><span
+                                            style="background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px; font-size:0.8rem;">Confirmed</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- CLINICIAN TOOLS -->
+                        <div class="dash-card">
+                            <h3 style="margin-bottom:15px;">Self-Care for Clinicians</h3>
+                            <p style="opacity:0.7; font-size:0.9rem; margin-bottom:15px;">Burnout prevention is ethical
+                                practice.</p>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                                <div class="tool-btn" onclick="openTool('../tools/5-step-reset.html', '5-Step Reset')">
+                                    <i class="fas fa-leaf" style="color:var(--peach-glow);"></i> 5-Step Reset
+                                </div>
+                                <div class="tool-btn" onclick="openTool('../tools/journal.html', 'Clinical Journal')">
+                                    <i class="fas fa-book" style="color:var(--teal-glow);"></i> Reflective Journal
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT -->
+                    <div style="display:flex; flex-direction:column; gap:25px;">
+                        <div class="dash-card glow" style="text-align:center;">
+                            <h4 style="margin-bottom:10px; opacity:0.8;">Active Clients</h4>
+                            <div style="font-size:3rem; font-weight:700; font-family:'Outfit'; color:var(--teal-glow);">
+                                12</div>
+                            <div style="color:#22c55e; font-size:0.85rem; margin-top:5px;">+2 this week</div>
+                        </div>
+
+                        <div class="dash-card">
+                            <h4 style="margin-bottom:15px;">Professional Resources</h4>
+                            <ul
+                                style="list-style:none; padding:0; opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                                <li><i class="fas fa-external-link-alt" style="margin-right:8px; opacity:0.5;"></i>
+                                    DSM-5 Reference</li>
+                                <li><i class="fas fa-external-link-alt" style="margin-right:8px; opacity:0.5;"></i>
+                                    Crisis Protocols</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BLOGS VIEW -->
+            <div id="view-blogs" class="view-section" style="display:none;">
+                <div class="blog-hub-header">
+                    <div>
+                        <h1 style="font-family:'Outfit'; font-size:2rem;">My Articles</h1>
+                        <p style="opacity:0.7;">Share your expertise with the Soulamore community.</p>
+                    </div>
+                    <button onclick="openEditor()"
+                        style="background:var(--teal-glow); color:#0f172a; padding:12px 25px; border-radius:30px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
+                        <i class="fas fa-plus"></i> Write New
+                    </button>
+                </div>
+
+                <div class="blog-list">
+                    <!-- Demo Item -->
+                    <div class="blog-card" onclick="openEditor()">
+                        <div class="bc-status" style="color:#fbbf24;">Draft</div>
+                        <div class="bc-title">Understanding High-Functioning Anxiety</div>
+                        <p style="font-size:0.9rem; opacity:0.7; margin-bottom:15px; line-height:1.5;">Ideally, this
+                            would be a snippet of the content. Anxiety often masquerades as...</p>
+                        <div class="bc-meta">Last edited: 2 hours ago</div>
+                    </div>
+                    <!-- Demo Item -->
+                    <div class="blog-card">
+                        <div class="bc-status" style="color:#22c55e;">Published</div>
+                        <div class="bc-title">5 Grounding Techniques for Panic Attacks</div>
+                        <p style="font-size:0.9rem; opacity:0.7; margin-bottom:15px; line-height:1.5;">A guide to quick
+                            relief when everything feels overwhelming.</p>
+                        <div class="bc-meta">Published: Oct 20</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: CLIENTS -->
+            <div id="view-clients" class="view-section" style="display:none;">
+                <h2 style="font-family:'Outfit'; margin-bottom:20px;">My Clients</h2>
+                <div class="dash-card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                        <input type="text" placeholder="Search patients..."
+                            style="padding:10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:30px; color:white; width:300px;">
+                        <button
+                            style="background:var(--teal-glow); color:#0f172a; border:none; padding:8px 20px; border-radius:30px; font-weight:700;">+
+                            New Patient</button>
+                    </div>
+
+                    <table style="width:100%; border-collapse:collapse; text-align:left;">
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.1); opacity:0.6;">
+                            <th style="padding:15px;">Name</th>
+                            <th style="padding:15px;">Status</th>
+                            <th style="padding:15px;">Next Session</th>
+                            <th style="padding:15px;">Last Assessment</th>
+                            <th style="padding:15px;">Action</th>
+                        </tr>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <td style="padding:15px; display:flex; align-items:center; gap:10px;">
+                                <div class="client-avatar">JD</div> John Doe
+                            </td>
+                            <td style="padding:15px;"><span
+                                    style="color:#22c55e; background:rgba(34, 197, 94, 0.1); padding:2px 8px; border-radius:4px; font-size:0.8rem;">Active</span>
+                            </td>
+                            <td style="padding:15px;">Today, 3:00 PM</td>
+                            <td style="padding:15px;">PHQ-9 (Severe)</td>
+                            <td style="padding:15px;"><button
+                                    style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:white; padding:5px 10px; border-radius:5px;">Profile</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:15px; display:flex; align-items:center; gap:10px;">
+                                <div class="client-avatar">AS</div> Alice Smith
+                            </td>
+                            <td style="padding:15px;"><span
+                                    style="color:#fbbf24; background:rgba(251, 191, 36, 0.1); padding:2px 8px; border-radius:4px; font-size:0.8rem;">On
+                                    Hold</span></td>
+                            <td style="padding:15px;">-</td>
+                            <td style="padding:15px;">GAD-7 (Moderate)</td>
+                            <td style="padding:15px;"><button
+                                    style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:white; padding:5px 10px; border-radius:5px;">Profile</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <!-- VIEW: SETTINGS / PROFILE -->
+            <div id="view-settings" class="view-section" style="display:none;">
+                <h2 style="font-family:'Outfit'; margin-bottom:20px;">Profile & Practice Settings</h2>
+                <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+
+                    <div style="display:flex; flex-direction:column; gap:25px;">
+                        <!-- PROFILE CARD -->
+                        <div class="dash-card">
+                            <h3 style="margin-bottom:20px;">Public Profile</h3>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                                <div class="input-group">
+                                    <label
+                                        style="display:block; font-size:0.8rem; margin-bottom:5px; opacity:0.7;">Display
+                                        Name</label>
+                                    <input type="text" class="input-dark" value="Dr. Strange"
+                                        style="width:100%; padding:10px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:6px;">
+                                </div>
+                                <div class="input-group">
+                                    <label
+                                        style="display:block; font-size:0.8rem; margin-bottom:5px; opacity:0.7;">Title /
+                                        Credential</label>
+                                    <input type="text" class="input-dark" value="Clinical Psychologist, PhD"
+                                        style="width:100%; padding:10px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:6px;">
+                                </div>
+                            </div>
+                            <div class="input-group" style="margin-top:20px;">
+                                <label style="display:block; font-size:0.8rem; margin-bottom:5px; opacity:0.7;">Bio /
+                                    About Me</label>
+                                <textarea rows="4"
+                                    style="width:100%; padding:10px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:6px;">Experienced in trauma-informed care and anxiety management...</textarea>
+                            </div>
+                            <div class="input-group" style="margin-top:20px;">
+                                <label
+                                    style="display:block; font-size:0.8rem; margin-bottom:5px; opacity:0.7;">Specialties
+                                    (Comma separated)</label>
+                                <input type="text" class="input-dark" value="Anxiety, Depression, Trauma, ADHD"
+                                    style="width:100%; padding:10px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:6px;">
+                            </div>
+                        </div>
+
+                        <!-- PRICING & AVAILABILITY -->
+                        <div class="dash-card">
+                            <h3 style="margin-bottom:20px;">Practice Details</h3>
+                            <div style="display:flex; gap:20px;">
+                                <div style="flex:1;">
+                                    <label
+                                        style="display:block; font-size:0.8rem; margin-bottom:5px; opacity:0.7;">Session
+                                        Rate (Hourly)</label>
+                                    <input type="text" value="$150.00"
+                                        style="width:100%; padding:10px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:6px;">
+                                </div>
+                                <div style="flex:1;">
+                                    <label
+                                        style="display:block; font-size:0.8rem; margin-bottom:5px; opacity:0.7;">Currency</label>
+                                    <select
+                                        style="width:100%; padding:10px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:6px;">
+                                        <option>USD ($)</option>
+                                        <option>EUR (€)</option>
+                                        <option>INR (₹)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:25px;">
+                        <div class="dash-card">
+                            <h3 style="margin-bottom:15px;">Actions</h3>
+                            <button
+                                style="width:100%; padding:12px; background:var(--teal-glow); color:#0f172a; font-weight:700; border:none; border-radius:30px; cursor:pointer;">Save
+                                Changes</button>
+                            <button
+                                style="width:100%; margin-top:10px; padding:12px; background:transparent; border:1px solid #ef4444; color:#ef4444; font-weight:700; border-radius:30px; cursor:pointer;">Pause
+                                Profile</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        function handleLogout() { sessionStorage.clear(); window.location.href = 'logout.html'; }
+
+        function openTool(url, title) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('toolFrame').src = url;
+            document.getElementById('toolModal').classList.add('open');
+        }
+        function closeTool() {
+            document.getElementById('toolModal').classList.remove('open');
+            setTimeout(() => { document.getElementById('toolFrame').src = ''; }, 300);
+        }
+
+        /* --- VIEW SWITCHING --- */
+        function switchView(viewName, clickedLink) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+            // Show target
+            document.getElementById('view-' + viewName).style.display = 'block';
+
+            // Update Active Link if passed
+            if (clickedLink) {
+                document.querySelectorAll('.sidebar-nav .side-link').forEach(el => el.classList.remove('active'));
+                clickedLink.classList.add('active');
+            } else {
+                // Heuristic for manual calls
+                document.querySelectorAll('.sidebar-nav .side-link').forEach(el => el.classList.remove('active'));
+                if (viewName === 'overview') document.querySelector('.sidebar-nav a:nth-child(1)').classList.add('active');
+                if (viewName === 'blogs') document.querySelector('.sidebar-nav a:nth-child(2)').classList.add('active');
+                if (viewName === 'settings') document.querySelector('.sidebar-nav a:last-child').classList.add('active');
+            }
+        }
+
+        /* --- BLOG EDITOR --- */
+        var quill;
+        function openEditor() {
+            document.getElementById('blogEditor').style.display = 'flex';
+            if (!quill) {
+                quill = new Quill('#editor-container', {
+                    theme: 'snow',
+                    placeholder: 'Start writing your story...',
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [1, 2, 3, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            ['blockquote', 'code-block'],
+                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                            ['link', 'image']
+                        ]
+                    }
+                });
+            }
+        }
+
+        function closeEditor() {
+            if (confirm('Close editor? Unsaved changes may be lost.')) {
+                document.getElementById('blogEditor').style.display = 'none';
+            }
+        }
+
+        function saveDraft() {
+            document.getElementById('saveStatus').innerText = 'Saved just now';
+            // Here we would save quill.root.innerHTML to Firebase
+            alert('Draft saved! (Simulated)');
+        }
+
+        function togglePaperMode() {
+            document.getElementById('paperSheet').classList.toggle('dark-mode');
+        }
+    </script>
+</body>
+
+</html>
