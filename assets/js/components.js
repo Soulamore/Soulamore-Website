@@ -577,7 +577,7 @@ const getHeaderHTML = (rootPath) => `
                 </div>
             </div>
 
-            <a href="${rootPath}portal/login.html" class="nav-btn" style="padding: 0 25px !important; white-space: nowrap; flex-shrink: 0;">Log In / Sign Up</a>
+            <a href="${rootPath}portal/login.html" class="nav-btn" style="padding: 0 20px !important; white-space: nowrap; flex-shrink: 0;">Log In</a>
     </div>
     
     <button class="mobile-toggle" aria-label="Toggle Navigation">
