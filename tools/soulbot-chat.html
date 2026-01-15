@@ -939,6 +939,7 @@
         
         // Import Firestore functions with error handling
         let createConversation, addMessageToConversation, updateConversationDuration, recommendTherapist, getConversation;
+        let checkRateLimit, validateMessageLength, getRateLimitInfo;
         let auth = null;
         let onAuthStateChanged = () => {};
         
@@ -951,6 +952,9 @@
                 updateConversationDuration = soulbotHandler.updateConversationDuration;
                 recommendTherapist = soulbotHandler.recommendTherapist;
                 getConversation = soulbotHandler.getConversation;
+                checkRateLimit = soulbotHandler.checkRateLimit;
+                validateMessageLength = soulbotHandler.validateMessageLength;
+                getRateLimitInfo = soulbotHandler.getRateLimitInfo;
                 
                 const firebaseConfig = await import("../assets/js/firebase-config.js");
                 auth = firebaseConfig.auth;
@@ -980,6 +984,9 @@
                 updateConversationDuration = async () => false;
                 recommendTherapist = async () => null;
                 getConversation = async () => null;
+                checkRateLimit = async () => ({ allowed: true }); // Allow if Firestore unavailable
+                validateMessageLength = (text) => text.length <= 2000;
+                getRateLimitInfo = async () => ({ requestsToday: 0, requestsPerMinute: 0, dailyLimit: 100, minuteLimit: 10 });
                 
                 // Initialize anyway (local-only mode)
                 conversationStartTime = Date.now();
@@ -1184,6 +1191,24 @@
                 }
 
                 console.log("Processing message:", text);
+
+                // Validate message length
+                if (validateMessageLength && !validateMessageLength(text)) {
+                    alert(`Message is too long. Please keep it under 2000 characters. Your message is ${text.length} characters.`);
+                    return;
+                }
+
+                // Check rate limits before processing
+                if (checkRateLimit && conversationId) {
+                    const rateLimitCheck = await checkRateLimit(currentUserId, conversationId);
+                    if (!rateLimitCheck.allowed) {
+                        alert(rateLimitCheck.reason || "Rate limit exceeded. Please try again later.");
+                        if (rateLimitCheck.retryAfter) {
+                            console.log(`Rate limited. Retry after ${rateLimitCheck.retryAfter} seconds`);
+                        }
+                        return;
+                    }
+                }
 
                 // Disable button and input during processing
                 btnEl.disabled = true;
