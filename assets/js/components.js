@@ -25,20 +25,20 @@ try {
         /* DESKTOP (Width > 1024px) */
         @media (min-width: 1024px) {
             header {
-                /* RESTORED ISLAND NAV STYLES - GLOBAL */
+                /* RESTORED ISLAND NAV STYLES - BACKUP MATCHED */
                 position: fixed !important;
-                top: 20px !important;
+                top: 15px !important;
                 left: 50% !important;
                 transform: translateX(-50%) !important;
                 width: 94% !important;
-                max-width: 1200px !important;
+                max-width: 1300px !important; /* Wider as per backup */
                 
-                /* Default Dark Glass Theme */
-                background: rgba(15, 23, 42, 0.7) !important;
+                /* Backup Dark Theme (Less Transparent) */
+                background: rgba(15, 23, 42, 0.90) !important;
                 backdrop-filter: blur(16px) !important;
                 -webkit-backdrop-filter: blur(16px);
-                border: 1px solid rgba(255, 255, 255, 0.08) !important;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important; /* Brighter border */
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important; /* Stronger shadow */
                 border-radius: 50px !important;
                 padding: 10px 25px !important;
                 
