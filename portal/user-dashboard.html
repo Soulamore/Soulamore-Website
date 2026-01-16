@@ -573,51 +573,10 @@
         });
 
 
-        /* SOULBOT CHAT LOGIC */
-        function sendMessage() {
-            const input = document.getElementById("soulbot-input");
-            const msg = input.value.trim();
-            if (!msg) return;
+        /* SOULBOT CHAT LOGIC - Deprecated (Handled by Module below) */
+        // kept empty to avoid reference errors if any onclicks linger, 
+        // though module overwrites window.sendMessage.
 
-            const container = document.getElementById("soulbot-messages");
-
-            // User Msg
-            const userBubble = document.createElement("div");
-            userBubble.style.alignSelf = "flex-end";
-            userBubble.style.background = "var(--teal-glow)";
-            userBubble.style.color = "#0f172a";
-            userBubble.style.padding = "12px 18px";
-            userBubble.style.borderRadius = "18px";
-            userBubble.style.borderBottomRightRadius = "4px";
-            userBubble.style.maxWidth = "80%";
-            userBubble.innerText = msg;
-            container.appendChild(userBubble);
-
-            input.value = "";
-            container.scrollTop = container.scrollHeight;
-
-            // Fake Reply
-            setTimeout(() => {
-                const botBubble = document.createElement("div");
-                botBubble.style.alignSelf = "flex-start";
-                botBubble.style.background = "rgba(255,255,255,0.05)";
-                botBubble.style.padding = "15px 20px";
-                botBubble.style.borderRadius = "18px";
-                botBubble.style.borderBottomLeftRadius = "4px";
-                botBubble.style.maxWidth = "80%";
-                botBubble.innerText = "I hear you. Tell me more about that...";
-                container.appendChild(botBubble);
-                container.scrollTop = container.scrollHeight;
-            }, 1000);
-        }
-
-        function clearChat() {
-            document.getElementById("soulbot-messages").innerHTML = `
-                <div style="align-self:flex-start; background:rgba(255,255,255,0.05); padding:15px 20px; border-radius:18px; border-bottom-left-radius:4px; max-width:80%;">
-                    Chat cleared. I am ready to listen again.
-                </div>
-            `;
-        }
 
         // Allow Enter Key
         document.getElementById("soulbot-input").addEventListener("keypress", function (e) {

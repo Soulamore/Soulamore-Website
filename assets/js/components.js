@@ -25,8 +25,25 @@ try {
         /* DESKTOP (Width > 1150px) */
         @media (min-width: 1151px) {
             header {
-                /* Let global.css island-nav handle positioning if present */
+                /* RESTORED ISLAND NAV STYLES - GLOBAL */
+                position: fixed !important;
+                top: 20px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: 94% !important;
+                max-width: 1200px !important;
+                
+                /* Default Dark Glass Theme (Overridden by specific pages if needed) */
+                background: rgba(15, 23, 42, 0.7) !important;
+                backdrop-filter: blur(16px) !important;
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+                border-radius: 50px !important;
+                padding: 10px 25px !important;
+                
                 z-index: 9999 !important;
+                transition: all 0.3s ease !important;
             }
             .mobile-profile-card, 
             .mobile-toggle,
