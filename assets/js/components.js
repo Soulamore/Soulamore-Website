@@ -22,8 +22,8 @@ try {
     const style = document.createElement('style');
     style.id = 'header-styles-v2'; // Changed ID to force refresh/avoid conflicts
     style.innerHTML = `
-        /* DESKTOP (Width > 1150px) */
-        @media (min-width: 1151px) {
+        /* DESKTOP (Width > 1024px) */
+        @media (min-width: 1024px) {
             header {
                 /* RESTORED ISLAND NAV STYLES - GLOBAL */
                 position: fixed !important;
