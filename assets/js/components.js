@@ -40,7 +40,7 @@ try {
                 border: 1px solid rgba(255, 255, 255, 0.15) !important; /* Brighter border */
                 box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important; /* Stronger shadow */
                 border-radius: 50px !important;
-                padding: 10px 25px !important;
+                padding: 8px 30px !important; /* BACKUP EXACT: 8px 30px */
                 
                 z-index: 9999 !important;
                 transition: all 0.3s ease !important;
@@ -59,7 +59,7 @@ try {
                 height: auto !important;
                 padding: 0 !important;
                 box-shadow: none !important;
-                gap: 15px !important; /* Tightened from 25px for fit */
+                gap: 30px !important; /* BACKUP EXACT: 30px gap */
                 align-items: center !important;
                 visibility: visible !important; /* Ensure visibility */
                 opacity: 1 !important;
@@ -67,7 +67,7 @@ try {
             .auth-box {
                 display: flex !important; /* Force Auth Box Visible */
                 align-items: center !important;
-                gap: 12px !important; /* Slightly reduced gap */
+                gap: 15px !important; /* Restored to 15px from backup */
             }
             .main-nav {
                 display: flex !important;
@@ -85,7 +85,7 @@ try {
                 flex-shrink: 0 !important; /* Critical: Prevent logo container shrinking */
                 display: flex;
                 align-items: center;
-                margin-right: 10px !important; /* Add small breathing room */
+                margin-right: 15px !important; /* Increased breathing room */
             }
             .nav-logo img {
                 height: 40px !important;
@@ -114,21 +114,6 @@ try {
             .auth-box .nav-btn:hover, .lifeline-btn:hover {
                 background: white !important;
                 color: #0f172a !important;
-                transform: translateY(-2px);
-            }
-            /* Specific override for Get Help - More Premium, Less Error-Like */
-            .lifeline-btn {
-                border: 1px solid #F49F75 !important;
-                background: transparent !important; /* Force Clear/Black */
-                color: #F49F75 !important;
-                box-shadow: 0 0 10px rgba(244, 159, 117, 0.1) !important;
-                justify-content: center !important; /* Ensure centered text */
-            }
-            .lifeline-btn:hover {
-                background: rgba(220, 38, 38, 0.15) !important; /* RED Warning Tint */
-                color: #ef4444 !important; /* RED Warning Text */
-                border-color: #ef4444 !important;
-                box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important;
                 transform: translateY(-2px);
             }
             .ghost-icon:hover {
