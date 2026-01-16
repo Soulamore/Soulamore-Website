@@ -644,15 +644,7 @@
     </div>
 
     <!-- UI LAYER -->
-    <!-- FORCE LIGHT THEME LOCALLY -->
-    <style>
-        html,
-        body {
-            background-color: #ffffff !important;
-            background: #ffffff !important;
-            color: #0f172a !important;
-        }
-    </style>
+    <!-- Theme Fix: Removed local white background override to match global dark theme -->
     <div class="ui-layer">
 
         <!-- GLOBAL REACTION STATS -->
@@ -898,7 +890,7 @@
                 note.style.background = tints[Math.floor(Math.random() * tints.length)];
 
                 note.innerHTML = `
-                <div class="note-text">${text}</div>
+                <div class="note-text"></div>
                 <div class="note-meta">
                     <span>Shared quietly</span>
                 </div>
@@ -914,6 +906,8 @@
                     </button>
                 </div>
             `;
+                // SAFE: Use textContent to prevent XSS
+                note.querySelector('.note-text').textContent = text;
 
                 canvas.appendChild(note);
             }
