@@ -18,10 +18,11 @@
 
 // --- CRITICAL CSS INJECTION ---
 // We inject this style to ensure consistency
-if (!document.getElementById('header-responsive-style')) {
-    const style = document.createElement('style');
-    style.id = 'header-responsive-style';
-    style.innerHTML = `
+try {
+    if (!document.getElementById('header-responsive-style')) {
+        const style = document.createElement('style');
+        style.id = 'header-responsive-style';
+        style.innerHTML = `
             /* DESKTOP (ISLAND) HEADER > 1151px (Backup Default) */
             @media (min-width: 1151px) {
                 header.island-nav {
@@ -75,6 +76,31 @@ if (!document.getElementById('header-responsive-style')) {
                     max-width: none !important;
                     margin: 0 !important;
                 }
+                
+                /* ICON HOVER EFFECTS (BACKUP STYLE) */
+                .nav-links i {
+                    color: rgba(255,255,255,0.8) !important; /* Default Light */
+                    margin-right: 8px !important;
+                    transition: all 0.3s ease !important;
+                }
+                .nav-links a:hover i {
+                    color: #4ECDC4 !important; /* TEAL HOVER (Backup) */
+                    transform: scale(1.1);
+                }
+                
+                .nav-logo {
+                    flex-shrink: 0 !important;
+                    display: flex;
+                    align-items: center;
+                    margin-right: 15px !important;
+                }
+                .nav-logo img {
+                    height: 40px !important;
+                    width: auto !important;
+                    flex-shrink: 0 !important;
+                    object-fit: contain;
+                }
+
                 /* Button Consistency */
                 .auth-box .nav-btn, .lifeline-btn {
                     background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)) !important;
@@ -94,6 +120,13 @@ if (!document.getElementById('header-responsive-style')) {
                     box-sizing: border-box !important;
                     font-size: 0.95rem !important;
                 }
+                .auth-box .nav-btn:hover {
+                    background: white !important;
+                    color: #0f172a !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 15px rgba(255,255,255,0.2) !important;
+                }
+
                 /* RESTORED BACKUP "GET HELP" STYLE */
                 .lifeline-btn {
                     border: 1px solid #F49F75 !important;
@@ -101,12 +134,22 @@ if (!document.getElementById('header-responsive-style')) {
                     color: #e2e8f0 !important;
                 }
                 .lifeline-btn i {
-                    color: #F49F75 !important;
+                    color: #F49F75 !important; /* Orange Icon only */
                 }
                 .lifeline-btn:hover {
                     background: rgba(244, 159, 117, 0.1) !important;
                     border-color: #F49F75 !important;
                     color: #F49F75 !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 15px rgba(244, 159, 117, 0.2) !important;
+                }
+                
+                .ghost-icon:hover {
+                    background: rgba(78, 205, 196, 0.15) !important;
+                    border-color: #4ECDC4 !important;
+                    color: #4ECDC4 !important;
+                    box-shadow: 0 0 20px rgba(78, 205, 196, 0.5); /* Stronger Blue Glow */
+                    transform: translateY(-2px);
                 }
             }
 
@@ -123,66 +166,182 @@ if (!document.getElementById('header-responsive-style')) {
                     align-items: center; 
                     gap: 10px; 
                 }
-                header.island-nav {
-                    /* RESET to default mobile behavior if needed, or let global.css handle it */
-                    /* Usually simple mobile header is simpler */
+                .main-nav {
+                     display: flex !important;
+                     justify-content: space-between !important;
+                     align-items: center !important;
+                     padding: 15px 20px !important;
+                }
+                .nav-logo img { height: 35px !important; }
+                header { 
+                    z-index: 9999 !important; 
+                    position: fixed !important; 
+                    width: 100% !important; 
+                    top: 0 !important;
+                    left: 0 !important;
+                    transform: none !important;
+                    border-radius: 0 !important;
+                    max-width: none !important;
+                    background: rgba(15, 23, 42, 0.95) !important;
                 }
             }
-            `;
-    document.head.appendChild(style);
-} justify - content: space - between!important;
-align - items: center!important;
-padding: 15px 20px!important;
+            
+            /* GLOBAL FOOTER FIX */
+            footer {
+                position: relative;
+                z-index: 100;
+                background: rgba(15, 23, 42, 0.95); /* Ensure visibility */
+                color: #e2e8f0;
+                border-top: 1px solid rgba(255, 255, 255, 0.1); /* Full Width Separator */
             }
-            .nav - logo img { height: 35px!important; }
-            header { z - index: 9999!important; position: fixed!important; width: 100 % !important; top: 0!important; }
-        }
-        /* GLOBAL FOOTER FIX */
-        footer {
-    position: relative;
-    z - index: 100;
-    background: rgba(15, 23, 42, 0.95); /* Ensure visibility */
-    color: #e2e8f0;
-    border - top: 1px solid rgba(255, 255, 255, 0.1); /* Full Width Separator */
-}
 
-        /* AGGRESSIVE LINK COLOR OVERRIDES */
-        /* Targets all header links and footer links */
-        header a, footer a {
-    color: #e2e8f0!important;
-    text - decoration: none!important;
-    transition: color 0.3s ease;
-}
-        header a: visited, footer a:visited {
-    color: #e2e8f0!important;
-}
-        header a: hover, footer a:hover {
-    color: #4ECDC4!important;
-}
+            /* AGGRESSIVE LINK COLOR OVERRIDES */
+            /* Targets all header links and footer links */
+            header a, footer a {
+                color: #e2e8f0!important;
+                text-decoration: none!important;
+                transition: color 0.3s ease;
+            }
+            header a:visited, footer a:visited {
+                color: #e2e8f0!important;
+            }
+            header a:hover, footer a:hover {
+                color: #4ECDC4!important;
+            }
 
-/* SPECIAL EXCEPTION: Mobile Menu & Dropdowns (Dark Theme Restoration) */
-@media(max - width: 1150px) {
-            .nav - links.open {
-        background: rgba(15, 23, 42, 0.98)!important; /* Dark Mobile Menu */
-    }
-            .nav - links.open a {
-        color: #e2e8f0!important; /* Light Text */
-    }
-}
-/* Dropdowns on Desktop */
-@media(min - width: 1151px) {
-            /* Level 1: Outer Dropdown (Lightest Border) */
-            .dropdown {
-        position: relative!important; /* CRITICAL: Fix absolute positioning context */
-    }
+            /* SPECIAL EXCEPTION: Mobile Menu & Dropdowns (Dark Theme Restoration) */
+            @media(max-width: 1150px) {
+                .nav-links.open {
+                    background: rgba(15, 23, 42, 0.98)!important; /* Dark Mobile Menu */
+                }
+                .nav-links.open a {
+                    color: #e2e8f0!important; /* Light Text */
+                }
+            }
+            /* Dropdowns on Desktop */
+            @media(min-width: 1151px) {
+                /* Level 1: Outer Dropdown (Lightest Border) */
+                .dropdown {
+                    position: relative!important; /* CRITICAL: Fix absolute positioning context */
+                }
 
-            .dropdown - content {
-        display: none!important; /* HIDE BY DEFAULT */
-        position: absolute!important; /* FIXED LAYOUT EXPLOSION */
-        top: 100 % !important;
-        left: 0!important;
-        z - index: 1000!important;
-        background: rgba(15, 23, 42, 0.95)!important;
+                .dropdown-content {
+                    display: none!important; /* HIDE BY DEFAULT */
+                    position: absolute!important; /* FIXED LAYOUT EXPLOSION */
+                    top: 100% !important;
+                    left: 0!important;
+                    z-index: 1000!important;
+                    background: rgba(15, 23, 42, 0.95)!important;
+                    border: 1px solid rgba(255, 255, 255, 0.1)!important;
+                    border-left: 4px solid rgba(78, 205, 196, 0.3)!important; /* Level 1: Lightest */
+                    backdrop-filter: blur(10px)!important;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5)!important;
+                    min-width: 200px!important; /* Reduced width */
+                    width: max-content!important; /* Allow expansion */
+                    border-radius: 12px!important;
+                    padding: 8px 0!important;
+                }
+
+                /* HOVER BRIDGE: PREVENT GAP CLOSING */
+                .dropdown-content::before {
+                    content: ""!important;
+                    position: absolute!important;
+                    top: -10px!important; /* Bridge the gap upwards */
+                    left: 0!important;
+                    width: 100% !important;
+                    height: 10px!important;
+                    background: transparent!important;
+                }
+
+                /* SHOW ON HOVER (Direct Child Only) */
+                .dropdown:hover > .dropdown-content {
+                    display: block!important;
+                }
+                .dropdown-submenu:hover > .dropdown-content {
+                    display: block!important;
+                }
+
+                /* Level 2: Nested Submenu (Flyout) */
+                .dropdown-submenu {
+                    position: relative!important; /* Anchor for flyout */
+                }
+
+                .dropdown-content.dropdown-content {
+                    position: absolute!important;
+                    top: 0!important;
+                    left: 100% !important;
+                    margin-top: -10px!important; /* Align with top */
+                    margin-left: 10px!important; /* THE GAP */
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5)!important;
+                    border: 1px solid rgba(255, 255, 255, 0.1)!important;
+                    border-left: 1px solid rgba(255, 255, 255, 0.1)!important; /* Reset border */
+                    background: rgba(15, 23, 42, 0.98)!important; /* Solid bg */
+                    padding-left: 0!important; /* Reset padding */
+                    min-width: 200px!important;
+                }
+
+                /* HOVER BRIDGE FOR SIDE FLYOUT */
+                .dropdown-content.dropdown-content::before {
+                    top: 0!important;
+                    left: -15px!important; /* Bridge back to parent */
+                    width: 15px!important;
+                    height: 100% !important;
+                }
+
+                /* Level 3: Deep Nested */
+                .dropdown-content.dropdown-content.dropdown-content {
+                    left: 100% !important;
+                    top: 0!important;
+                    margin-top: -5px!important;
+                }
+
+                .dropdown-content a, .dropdown-submenu a {
+                    color: #e2e8f0!important;
+                    display: block!important;
+                    margin: 2px 4px!important; /* Reduced margins */
+                    border-radius: 6px!important;
+                    padding: 6px 10px!important; /* Reduced padding */
+                    width: auto!important;
+                    box-sizing: border-box!important;
+                    font-size: 0.9rem!important; /* Smaller text */
+                }
+                .dropdown-content a:hover, .dropdown-submenu a:hover {
+                    background: rgba(255, 255, 255, 0.1)!important;
+                    color: #4ECDC4!important;
+                }
+
+                /* Prevent Header Scattering - Only for Auth Box & Main Nav Container */
+                .main-nav, .auth-box {
+                    flex-wrap: nowrap!important;
+                }
+                /* FORCE SINGLE LINE HEADER */
+                .nav-links {
+                    flex-wrap: nowrap!important;
+                    white-space: nowrap!important;
+                    justify-content: center!important;
+                }
+            }
+
+            /* MOBILE GLOBAL FIXES */
+            @media(max-width: 768px) {
+                body { padding-bottom: 80px!important; } /* Space for FAB/Nav */
+                .container { padding-left: 20px!important; padding-right: 20px!important; }
+            }
+
+            /* BURNING ICON ANIMATION */
+            @keyframes burnGlow {
+                0% { text-shadow: 0 0 2px #ef4444, 0 0 5px #fca5a5; transform: scale(1); }
+                50% { text-shadow: 0 0 8px #ef4444, 0 0 12px #fbbf24; transform: scale(1.1); }
+                100% { text-shadow: 0 0 2px #ef4444, 0 0 5px #fca5a5; transform: scale(1); }
+            }
+            .burning-icon {
+                color: #ef4444!important;
+                margin-left: 6px;
+                font-size: 0.85em;
+                animation: burnGlow 1.5s infinite ease-in-out;
+                display: inline-block;
+            }
+            `;
         border: 1px solid rgba(255, 255, 255, 0.1)!important;
         border - left: 4px solid rgba(78, 205, 196, 0.3)!important; /* Level 1: Lightest */
         backdrop - filter: blur(10px)!important;
