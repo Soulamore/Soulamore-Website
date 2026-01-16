@@ -40,7 +40,7 @@ try {
                 border: 1px solid rgba(255, 255, 255, 0.15) !important; /* Brighter border */
                 box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important; /* Stronger shadow */
                 border-radius: 50px !important;
-                padding: 8px 30px !important; /* BACKUP EXACT: 8px 30px */
+                padding: 8px 20px !important; /* Adjusted: Reduced S-padding to fit content */
                 
                 z-index: 9999 !important;
                 transition: all 0.3s ease !important;
@@ -59,7 +59,7 @@ try {
                 height: auto !important;
                 padding: 0 !important;
                 box-shadow: none !important;
-                gap: 30px !important; /* BACKUP EXACT: 30px gap */
+                gap: 18px !important; /* Adjusted: Reduced gap to prevent overflow */
                 align-items: center !important;
                 visibility: visible !important; /* Ensure visibility */
                 opacity: 1 !important;
