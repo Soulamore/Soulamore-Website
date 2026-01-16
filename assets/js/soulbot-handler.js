@@ -3,10 +3,11 @@
  * Manages conversation tracking, storage, and therapist recommendations
  */
 
-import { db, collection, addDoc, doc, getDoc, updateDoc, serverTimestamp, getDocs, query, where, limit, onSnapshot, orderBy } from "./firebase-config.js";
+import { db, collection, addDoc, doc, getDoc, updateDoc, setDoc, serverTimestamp, getDocs, query, where, limit, onSnapshot, orderBy } from "./firebase-config.js";
 
 const CONVERSATIONS_COLLECTION = "soulbot_conversations";
 const THERAPISTS_COLLECTION = "therapists";
+const USAGE_TRACKING_COLLECTION = "soulbot_usage"; // Track rate limits and usage
 
 /**
  * Subscribe to real-time conversation updates
@@ -27,6 +28,14 @@ export function subscribeToConversation(conversationId, callback) {
         console.error("Error subscribing to conversation:", error);
     });
 }
+
+// Rate limiting configuration
+const RATE_LIMITS = {
+    REQUESTS_PER_MINUTE: 10,      // Max 10 requests per minute per user
+    REQUESTS_PER_DAY: 100,        // Max 100 requests per day per user
+    MAX_MESSAGE_LENGTH: 2000,     // Max 2000 characters per message
+    MAX_CONVERSATION_DURATION: 30 * 60 * 1000 // 30 minutes max conversation
+};
 
 /**
  * Create a new conversation session
@@ -51,6 +60,139 @@ export async function createConversation(userId = null) {
     } catch (error) {
         console.error("Error creating conversation:", error);
         return null;
+    }
+}
+
+/**
+ * Check rate limits for a user
+ * @param {string|null} userId - User ID or null for anonymous
+ * @param {string} conversationId - Conversation ID for anonymous users
+ * @returns {Promise<{allowed: boolean, reason?: string, retryAfter?: number}>}
+ */
+export async function checkRateLimit(userId, conversationId = null) {
+    try {
+        const identifier = userId || `anon_${conversationId}`;
+        const now = Date.now();
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const currentMinute = Math.floor(now / 60000); // Minutes since epoch
+        
+        // Get or create usage document
+        const usageRef = doc(db, USAGE_TRACKING_COLLECTION, identifier);
+        const usageSnap = await getDoc(usageRef);
+        
+        let usage = usageSnap.exists() ? usageSnap.data() : {
+            userId: userId,
+            lastRequestTime: 0,
+            requestsThisMinute: 0,
+            minuteWindow: 0,
+            requestsToday: 0,
+            date: today,
+            totalRequests: 0
+        };
+        
+        // Reset daily counter if it's a new day
+        if (usage.date !== today) {
+            usage.requestsToday = 0;
+            usage.date = today;
+        }
+        
+        // Reset minute counter if it's a new minute
+        if (usage.minuteWindow !== currentMinute) {
+            usage.requestsThisMinute = 0;
+            usage.minuteWindow = currentMinute;
+        }
+        
+        // Check daily limit
+        if (usage.requestsToday >= RATE_LIMITS.REQUESTS_PER_DAY) {
+            return {
+                allowed: false,
+                reason: `Daily limit reached (${RATE_LIMITS.REQUESTS_PER_DAY} requests/day). Please try again tomorrow.`,
+                retryAfter: null // Next day
+            };
+        }
+        
+        // Check per-minute limit
+        if (usage.requestsThisMinute >= RATE_LIMITS.REQUESTS_PER_MINUTE) {
+            const retryAfter = 60 - (now % 60000) / 1000; // Seconds until next minute
+            return {
+                allowed: false,
+                reason: `Rate limit exceeded. Please wait ${Math.ceil(retryAfter)} seconds before trying again.`,
+                retryAfter: Math.ceil(retryAfter)
+            };
+        }
+        
+        // Update usage counters
+        usage.requestsThisMinute += 1;
+        usage.requestsToday += 1;
+        usage.totalRequests += 1;
+        usage.lastRequestTime = now;
+        
+        // Save to Firestore (non-blocking)
+        await setDoc(usageRef, usage, { merge: true }).catch(err => {
+            console.error("Error updating usage tracking:", err);
+        });
+        
+        return { allowed: true };
+    } catch (error) {
+        console.error("Error checking rate limit:", error);
+        // On error, allow the request (fail open) but log it
+        return { allowed: true };
+    }
+}
+
+/**
+ * Validate message length
+ * @param {string} text - Message text
+ * @returns {boolean} True if valid, false if too long
+ */
+export function validateMessageLength(text) {
+    return text.length <= RATE_LIMITS.MAX_MESSAGE_LENGTH;
+}
+
+/**
+ * Get rate limit info for a user
+ * @param {string|null} userId - User ID or null for anonymous
+ * @param {string} conversationId - Conversation ID for anonymous users
+ * @returns {Promise<{requestsToday: number, requestsPerMinute: number, dailyLimit: number, minuteLimit: number}>}
+ */
+export async function getRateLimitInfo(userId, conversationId = null) {
+    try {
+        const identifier = userId || `anon_${conversationId}`;
+        const usageRef = doc(db, USAGE_TRACKING_COLLECTION, identifier);
+        const usageSnap = await getDoc(usageRef);
+        
+        if (!usageSnap.exists()) {
+            return {
+                requestsToday: 0,
+                requestsPerMinute: 0,
+                dailyLimit: RATE_LIMITS.REQUESTS_PER_DAY,
+                minuteLimit: RATE_LIMITS.REQUESTS_PER_MINUTE
+            };
+        }
+        
+        const usage = usageSnap.data();
+        const today = new Date().toISOString().split('T')[0];
+        const now = Date.now();
+        const currentMinute = Math.floor(now / 60000);
+        
+        // Reset counters if needed
+        let requestsToday = usage.date === today ? usage.requestsToday : 0;
+        let requestsPerMinute = usage.minuteWindow === currentMinute ? usage.requestsThisMinute : 0;
+        
+        return {
+            requestsToday,
+            requestsPerMinute,
+            dailyLimit: RATE_LIMITS.REQUESTS_PER_DAY,
+            minuteLimit: RATE_LIMITS.REQUESTS_PER_MINUTE
+        };
+    } catch (error) {
+        console.error("Error getting rate limit info:", error);
+        return {
+            requestsToday: 0,
+            requestsPerMinute: 0,
+            dailyLimit: RATE_LIMITS.REQUESTS_PER_DAY,
+            minuteLimit: RATE_LIMITS.REQUESTS_PER_MINUTE
+        };
     }
 }
 
