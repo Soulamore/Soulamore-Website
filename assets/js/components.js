@@ -80,6 +80,7 @@ try {
             }
             .nav-links i {
                 color: #F49F75 !important; /* Force Peach Glow for Icons */
+                margin-right: 8px !important; /* Added spacing between icon and text */
             }
             .nav-logo {
                 flex-shrink: 0 !important; /* Critical: Prevent logo container shrinking */
@@ -106,6 +107,7 @@ try {
                 white-space: nowrap !important; /* Prevent text wrapping */
                 display: flex !important;
                 align-items: center !important;
+                justify-content: center !important;
                 gap: 8px !important;
                 height: 42px !important; /* Enforce explicit height */
                 box-sizing: border-box !important;
@@ -116,6 +118,22 @@ try {
                 color: #0f172a !important;
                 transform: translateY(-2px);
             }
+            
+            /* RESTORED BACKUP "GET HELP" STYLE */
+            .lifeline-btn {
+                border: 1px solid #F49F75 !important; /* Peach Border */
+                background: transparent !important;
+                color: #e2e8f0 !important; /* Light Text (Not Orange) */
+            }
+            .lifeline-btn i {
+                color: #F49F75 !important; /* Orange Icon only */
+            }
+            .lifeline-btn:hover {
+                background: rgba(244, 159, 117, 0.1) !important; /* Subtle Peach Tint */
+                border-color: #F49F75 !important;
+                color: #F49F75 !important; /* Text turns orange on hover */
+            }
+            
             .ghost-icon:hover {
                 background: rgba(78, 205, 196, 0.15) !important;
                 border-color: #4ECDC4 !important;
@@ -578,7 +596,7 @@ const getHeaderHTML = (rootPath) => `
                 </div>
             </div>
 
-            <a href="${rootPath}portal/login.html" class="nav-btn" style="padding: 0 15px !important; white-space: nowrap; flex-shrink: 0;">Log In</a>
+            <a href="${rootPath}portal/login.html" class="nav-btn" style="padding: 0 15px !important; white-space: nowrap; flex-shrink: 0;">Log In / Sign Up</a>
     </div>
     
     <button class="mobile-toggle" aria-label="Toggle Navigation">
