@@ -24,22 +24,23 @@ try {
     style.innerHTML = `
         /* DESKTOP (Width > 1150px) */
         @media (min-width: 1151px) {
-                /* REVERTED TO FULL WIDTH HEADER (Per Backup) */
+            header {
+                /* RESTORED ISLAND NAV STYLES - GLOBAL */
                 position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                transform: none !important;
-                width: 100% !important;
-                max-width: none !important;
+                top: 20px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: 94% !important;
+                max-width: 1200px !important;
                 
-                /* Standard Dark Glass Theme */
-                background: rgba(15, 23, 42, 0.85) !important;
-                backdrop-filter: blur(12px) !important;
-                -webkit-backdrop-filter: blur(12px);
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
-                border-radius: 0 !important; /* Remove Island Radius */
-                padding: 15px 30px !important;
+                /* Default Dark Glass Theme */
+                background: rgba(15, 23, 42, 0.7) !important;
+                backdrop-filter: blur(16px) !important;
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+                border-radius: 50px !important;
+                padding: 10px 25px !important;
                 
                 z-index: 9999 !important;
                 transition: all 0.3s ease !important;
