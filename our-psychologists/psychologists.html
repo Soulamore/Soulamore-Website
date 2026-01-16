@@ -251,44 +251,144 @@
     <script>
         const psychs = [
             {
+                id: 1,
                 name: "Palak Shori",
-                title: "Clinical Psychologist (Master's)",
-                quote: "My approach is holistic considering the physical, emotional, and social factors.",
+                role: "Clinical Psychologist (Master's)",
+                category: "Mental Wellness",
+                image: "https://via.placeholder.com/150/FF5733/FFFFFF?text=PS",
                 tags: ["Anxiety", "Depression", "Youth Counseling", "English", "Hindi"],
-                imgInitials: "PS",
-                link: "palak-shori.html"
+                rating: 4.9,
+                reviews: 120,
+                price: 1800,
+                exp: "8",
+                lang: "English, Hindi",
+                online: true,
+                verified: true
             },
-            // Placeholder for demonstration
             {
+                id: 2,
                 name: "Dr. Ananya Gupta",
-                title: "Senior Therapist (PhD)",
-                quote: "Healing begins when we start listening to ourselves.",
-                tags: ["Trauma", "Relationships", "Stress"],
-                imgInitials: "AG",
-                link: "#"
+                role: "Senior Therapist (PhD)",
+                category: "Relationship Counseling",
+                image: "https://via.placeholder.com/150/33FF57/FFFFFF?text=AG",
+                tags: ["Trauma", "Relationships", "Stress", "English"],
+                rating: 4.8,
+                reviews: 95,
+                price: 2500,
+                exp: "15",
+                lang: "English",
+                online: false,
+                verified: true
+            },
+            {
+                id: 3,
+                name: "Rahul Sharma",
+                role: "Counseling Psychologist",
+                category: "Career Guidance",
+                image: "https://via.placeholder.com/150/3357FF/FFFFFF?text=RS",
+                tags: ["Career", "Stress", "Motivation", "English", "Hindi"],
+                rating: 4.7,
+                reviews: 80,
+                price: 1500,
+                exp: "6",
+                lang: "English, Hindi",
+                online: true,
+                verified: false
+            },
+            {
+                id: 4,
+                name: "Priya Singh",
+                role: "Child Psychologist",
+                category: "Child & Adolescent Therapy",
+                image: "https://via.placeholder.com/150/FF33A1/FFFFFF?text=PS",
+                tags: ["Child", "Adolescent", "Parenting", "English"],
+                rating: 5.0,
+                reviews: 150,
+                price: 2000,
+                exp: "10",
+                lang: "English",
+                online: true,
+                verified: true
             }
         ];
+
+        // --- DYNAMIC INJECTION FOR DEMO ---
+        const myProfile = JSON.parse(localStorage.getItem('professional_profile'));
+        const myRole = localStorage.getItem('user_role');
+
+        if (myProfile && myRole === 'Psychologist') {
+            const myCard = {
+                id: 999,
+                name: myProfile.name,
+                role: myProfile.title || "Clinical Psychologist",
+                category: myProfile.category || "Mental Wellness",
+                image: myProfile.image,
+                tags: myProfile.tags || ["New", "Therapist"],
+                rating: 5.0,
+                reviews: 0,
+                price: myProfile.price || 1500,
+                exp: myProfile.exp || "5",
+                lang: myProfile.languages || "English",
+                online: true,
+                verified: true
+            };
+
+            psychs.unshift(myCard);
+        }
 
         function renderPsychs() {
             const grid = document.getElementById('psychGrid');
             const specVal = document.getElementById('specFilter').value;
             const langVal = document.getElementById('langFilter').value;
 
-            // Simplified filtering logic
             const filtered = psychs.filter(p => {
                 const specMatch = specVal === 'all' || p.tags.includes(specVal);
-                const langMatch = langVal === 'all' || p.tags.includes(langVal);
+                const langMatch = langVal === 'all' || p.lang.includes(langVal); // Changed to p.lang for language filtering
                 return specMatch && langMatch;
             });
 
-            grid.innerHTML = filtered.map(p => `
+            grid.innerHTML = filtered.map(psych => `
                 <div class="psych-card fade-in">
-                    <div class="avatar">${p.imgInitials}</div>
-                    <div class="name">${p.name}</div>
-                    <div class="title">${p.title}</div>
-                    <div class="quote">"${p.quote}"</div>
-                    <div class="tags">${p.tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('')}</div>
-                    <a href="${p.link}" class="view-btn">View Profile</a>
+                    <div class="pc-header">
+                        <div class="pc-avatar">
+                            <img src="${psych.image}" alt="${psych.name}">
+                            ${psych.online ? '<div class="online-dot"></div>' : ''}
+                        </div>
+                        ${psych.verified ? '<div class="verified-badge"><i class="fas fa-check-circle"></i> Verified</div>' : ''}
+                    </div>
+                    <div class="pc-body">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <h3 class="pc-name">${psych.name}</h3>
+                                <div class="pc-role">${psych.role}</div>
+                                ${psych.category ? `<div style="font-size:0.75rem; color:var(--clinical-blue); background:rgba(59, 130, 246, 0.1); display:inline-block; padding:2px 8px; border-radius:10px; margin-top:4px;">${psych.category}</div>` : ''}
+                            </div>
+                            <div class="pc-rating">
+                                <div style="font-weight:700; color:var(--clinical-blue); font-size:1.1rem;">${psych.rating}</div>
+                                <div style="font-size:0.7rem; opacity:0.6;">${psych.reviews} Reviews</div>
+                            </div>
+                        </div>
+                        
+                        <div class="pc-tags">
+                            ${psych.tags.map(tag => `<span>${tag}</span>`).join('')}
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; opacity:0.8; margin-top:15px; border-top:1px solid var(--border-glass); padding-top:10px;">
+                            <span><i class="fas fa-briefcase"></i> ${psych.exp}+ Yrs</span>
+                            <span><i class="fas fa-language"></i> ${psych.lang}</span>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; opacity:0.8; margin-top:15px; border-top:1px solid var(--border-glass); padding-top:10px;">
+                            <span><i class="fas fa-briefcase"></i> ${psych.exp}+ Yrs</span>
+                            <span><i class="fas fa-language"></i> ${psych.lang}</span>
+                        </div>
+
+                        <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
+                            <div style="font-weight:700; font-size:1.1rem;">₹${psych.price} <span style="font-size:0.8rem; font-weight:400; opacity:0.6;">/ session</span></div>
+                            <a href="profile.html?id=${psych.id}" class="pc-btn" style="text-decoration:none; margin-left:auto;">View Profile</a>
+                        </div>
+                        ${psych.id === 999 ? '<div style="text-align:center; font-size:0.7rem; margin-top:5px; opacity:0.5;">(This is You)</div>' : ''}
+                    </div>
                 </div>
             `).join('');
         }

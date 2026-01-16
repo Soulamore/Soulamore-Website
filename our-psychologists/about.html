@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Care | Soulamore</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <style>
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.85);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.7;
+            /* NUCLEAR FIX: Override global !important to prevent computed 'auto' */
+            overflow: visible !important;
+            margin: 0;
+            padding: 0;
+            height: auto !important;
+        }
+
+        html {
+            overflow-y: auto;
+            overflow-x: hidden;
+            /* Handle horizontal clip here */
+            scroll-behavior: smooth;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        /* HEADER SPACING */
+        .hero {
+            padding-top: 150px !important;
+        }
+
+        /* PARTICLES */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.15;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* DNA PATH */
+        #dna-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 5;
+            padding-bottom: 200px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 100px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            background: linear-gradient(to right, #fff, var(--teal-glow));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* DUAL CARDS */
+        .dual-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin: 80px 0;
+            align-items: start;
+        }
+
+        .path-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 24px;
+            transition: 0.4s ease-out;
+            position: relative;
+            transform: translateY(30px);
+            opacity: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .path-card.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .path-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .peer-card {
+            border-top: 4px solid var(--peach-glow);
+        }
+
+        .psych-card {
+            border-top: 4px solid var(--teal-glow);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .peer-icon {
+            color: var(--peach-glow);
+        }
+
+        .psych-icon {
+            color: var(--teal-glow);
+        }
+
+        .trust-note {
+            font-size: 0.85rem;
+            opacity: 0.6;
+            margin-top: 20px;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 15px;
+            font-style: italic;
+        }
+
+        /* SLIDER */
+        .slider-section {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-glass);
+            padding: 60px;
+            border-radius: 30px;
+            text-align: center;
+            margin: 100px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .slider-track {
+            width: 80%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 50px auto;
+            position: relative;
+        }
+
+        .slider-thumb {
+            width: 24px;
+            height: 24px;
+            background: var(--teal-glow);
+            border-radius: 50%;
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            cursor: grab;
+            box-shadow: 0 0 15px var(--teal-glow);
+            transition: left 0.1s;
+        }
+
+        .slider-thumb.dragging {
+            transition: none !important;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 0 auto;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .outcome-box {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            display: inline-block;
+            min-width: 300px;
+            transition: 0.3s;
+            opacity: 0;
+            transform: translateY(10px);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .outcome-box.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* WHY GRID */
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .why-item {
+            display: flex;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 20px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+        .why-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .why-item i {
+            color: var(--teal-glow);
+            font-size: 1.2rem;
+            margin-top: 4px;
+        }
+
+        /* CTA */
+        .cta-btn {
+            background: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+            color: var(--deep-space);
+            padding: 18px 50px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 30px;
+            font-size: 1.1rem;
+            transition: 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(78, 205, 196, 0.3);
+        }
+
+        @media(max-width: 768px) {
+
+            .dual-section,
+            .why-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            #dna-container {
+                opacity: 0.2;
+            }
+
+            .hero {
+                padding-top: 120px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PARTICLES -->
+    <div id="particles"></div>
+
+    <!-- DNA PATH -->
+    <div id="dna-container">
+        <svg width="100%" height="100%" id="svg-dna" style="overflow: visible;">
+            <path id="path-1" fill="none" stroke="var(--gold-glow)" stroke-width="1.5" stroke-opacity="0.3" />
+            <path id="path-2" fill="none" stroke="var(--teal-glow)" stroke-width="1.5" stroke-opacity="0.3" />
+        </svg>
+    </div>
+
+    <!-- MAIN SCROLL WRAPPER -->
+    <main>
+        <div class="container">
+
+            <!-- HERO -->
+            <section class="hero scroll-marker">
+                <p
+                    style="color:var(--teal-glow); font-weight:700; letter-spacing:2px; text-transform:uppercase; font-size:0.9rem;">
+                    Professional Care</p>
+                <h1>When You Need More Support.</h1>
+                <p>Sometimes, being understood is enough. And sometimes, it’s not. <br>We offer a clear path from Peer
+                    Support to Professional Care—without shame.</p>
+            </section>
+
+            <!-- DUAL PATH -->
+            <div class="dual-section scroll-marker">
+                <!-- Peer Card -->
+                <div class="path-card peer-card content-box">
+                    <i class="fas fa-hand-holding-heart card-icon peer-icon"></i>
+                    <h3>Step 1: Start Safe</h3>
+                    <p style="opacity:0.9; margin-bottom:15px; font-weight:300;">Many people begin with Peer Therapy.
+                        Talking to someone who has lived a similar experience reduces isolation.</p>
+                    <p style="font-size:0.9rem; font-style:italic; opacity:0.7;">"For some, that’s all they need. For
+                        others, it opens the door."</p>
+                </div>
+
+                <!-- Psych Card -->
+                <div class="path-card psych-card content-box">
+                    <i class="fas fa-user-md card-icon psych-icon"></i>
+                    <h3>Step 2: Go Deeper</h3>
+                    <p style="opacity:0.9; margin-bottom:15px; font-weight:300;">When emotions feel repetitive, stuck,
+                        or linked to trauma, professional guidance helps you understand <em>why</em>.</p>
+                    <div class="trust-note">
+                        <i class="fas fa-shield-alt"></i> Peers do not replace professional care when clinically needed.
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTERACTIVE SLIDER -->
+            <div class="slider-section scroll-marker content-box">
+                <h2>Where are you right now?</h2>
+                <p style="opacity:0.7; margin-bottom:30px;">Drag the slider to see what support fits best.</p>
+
+                <div class="slider-labels">
+                    <span>Just Venting</span>
+                    <span>Seeking Connection</span>
+                    <span>Heavy / Patterns</span>
+                </div>
+
+                <div class="slider-track" id="track">
+                    <div class="slider-thumb" id="thumb"></div>
+                </div>
+
+                <div class="outcome-box" id="outcome">
+                    <strong>Move the slider to check.</strong>
+                </div>
+            </div>
+
+            <!-- WHY THERAPY MATTERS -->
+            <div class="path-card scroll-marker content-box"
+                style="padding:60px; border-left:4px solid var(--teal-glow);">
+                <h2 style="color:var(--teal-glow);">Why Professional Therapy Matters</h2>
+                <div class="why-grid">
+                    <div class="why-item">
+                        <i class="fas fa-search"></i>
+                        <div><strong>Understanding Patterns</strong><br><small style="opacity:0.7;">Why feelings keep
+                                returning.</small></div>
+                    </div>
+                    <div class="why-item">
+                        <i class="fas fa-tools"></i>
+                        <div><strong>Clinical Tools</strong><br><small style="opacity:0.7;">Evidence-based
+                                techniques.</small></div>
+                    </div>
+                    <div class="why-item">
+                        <i class="fas fa-brain"></i>
+                        <div><strong>Emotional Insight</strong><br><small style="opacity:0.7;">Structure for your
+                                thoughts.</small></div>
+                    </div>
+                    <div class="why-item">
+                        <i class="fas fa-road"></i>
+                        <div><strong>Long-term Healing</strong><br><small style="opacity:0.7;">Guided wellness
+                                planning.</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HUMAN ANCHOR -->
+            <div class="scroll-marker content-box" style="margin-top:100px; text-align:center; opacity:0.8;">
+                <p style="font-size:1.1rem; font-style:italic;">
+                    "Many of our users start with peers. Some move on. Some come back. All are welcome."
+                </p>
+            </div>
+
+            <!-- FOOTER CTA -->
+            <div style="text-align:center; padding: 100px 0;" class="scroll-marker content-box">
+                <p style="font-size:1.2rem; opacity:0.9; margin-bottom:20px;">
+                    "When talking becomes work instead of relief, it may be time for guided support."
+                </p>
+                <a href="psychologists.html" class="cta-btn">Meet Our Psychologists</a>
+
+                <p class="disclaimer"
+                    style="margin-top:40px; font-size:0.85rem; opacity:0.5; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.4;">
+                    Soulamore Peer Support is a non-clinical service provided by individuals with lived experience.
+                    It is not a replacement for professional mental health therapy, medical advice, or crisis
+                    intervention. If you are in immediate danger, please contact your local emergency services.
+                </p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER INJECTION TARGET -->
+    <footer></footer>
+
+    <!-- HEADER/FOOTER INJECTION -->
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/main.js"></script>
+
+    <script>
+        // --- 1. DNA PATH ANIMATION ---
+        const path1 = document.getElementById('path-1');
+        const path2 = document.getElementById('path-2');
+        const dnaContainer = document.getElementById('dna-container');
+
+
+
+        // Cache dimensions
+        let pageHeight = document.documentElement.scrollHeight;
+        let pageWidth = window.innerWidth;
+
+        function updateDimensions() {
+            pageHeight = document.documentElement.scrollHeight;
+            pageWidth = window.innerWidth;
+            dnaContainer.style.height = pageHeight + 'px';
+        }
+
+        // Initial set and resize listener
+        updateDimensions();
+        window.addEventListener('resize', updateDimensions);
+
+        let offset = 0;
+        function animateDNA() {
+            offset += 1; // Speed of movement
+            const mid = pageWidth / 2;
+
+            let d1 = `M ${mid - 40} 0 `;
+            let d2 = `M ${mid + 40} 0 `;
+
+            // Use cached pageHeight
+            for (let y = -200; y < pageHeight + 200; y += 300) {
+                let waveY = y + (offset % 300);
+                d1 += `C ${mid + 80} ${waveY + 100}, ${mid - 40} ${waveY + 200}, ${mid - 40} ${waveY + 300} `;
+                d2 += `C ${mid - 120} ${waveY + 100}, ${mid + 40} ${waveY + 200}, ${mid + 40} ${waveY + 300} `;
+            }
+
+            path1.setAttribute('d', d1);
+            path2.setAttribute('d', d2);
+            requestAnimationFrame(animateDNA);
+        }
+
+        // Initialize
+        animateDNA();
+
+
+
+        // --- 2. SLIDER LOGIC ---
+        const track = document.getElementById('track');
+        const thumb = document.getElementById('thumb');
+        const outcome = document.getElementById('outcome');
+        let isDragging = false;
+
+        track.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', stopDrag);
+        track.addEventListener('touchstart', startDrag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('touchend', stopDrag);
+
+        function startDrag(e) {
+            isDragging = true;
+            thumb.classList.add('dragging');
+            drag(e);
+        }
+        function stopDrag() {
+            isDragging = false;
+            thumb.classList.remove('dragging');
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            const rect = track.getBoundingClientRect();
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let pos = clientX - rect.left;
+
+            if (pos < 0) pos = 0;
+            if (pos > rect.width) pos = rect.width;
+
+            thumb.style.left = (pos - 12) + 'px';
+
+            const percent = pos / rect.width;
+            outcome.classList.add('show');
+
+            if (percent < 0.33) {
+                outcome.innerHTML = "<span style='color:var(--peach-glow); font-size:1.1rem; font-weight:700;'>Start with a Peer.</span><br><small style='opacity:0.8;'>Great for shared experiences and venting.</small>";
+                thumb.style.background = "var(--peach-glow)";
+                thumb.style.boxShadow = "0 0 20px var(--peach-glow)";
+            } else if (percent < 0.66) {
+                outcome.innerHTML = "<span style='color:white; font-size:1.1rem; font-weight:700;'>Peer Support (1-on-1 or Group).</span><br><small style='opacity:0.8;'>Good for connection and feeling less alone.</small>";
+                thumb.style.background = "white";
+                thumb.style.boxShadow = "0 0 20px white";
+            } else {
+                outcome.innerHTML = "<span style='color:var(--teal-glow); font-size:1.1rem; font-weight:700;'>Consider a Psychologist.</span><br><small style='opacity:0.8;'>Best for deep patterns, trauma, and clinical tools.</small>";
+                thumb.style.background = "var(--teal-glow)";
+                thumb.style.boxShadow = "0 0 20px var(--teal-glow)";
+            }
+        }
+
+        // --- 3. PARTICLES ---
+        const pContainer = document.getElementById('particles');
+        for (let i = 0; i < 20; i++) {
+            let p = document.createElement('div'); p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw'; p.style.width = Math.random() * 3 + 'px';
+            p.style.height = p.style.width; p.style.animationDuration = Math.random() * 30 + 15 + 's';
+            p.style.height = p.style.width; p.style.animationDuration = Math.random() * 40 + 30 + 's';
+            p.style.opacity = Math.random() * 0.15; pContainer.appendChild(p);
+        }
+
+        // --- 4. FADE IN ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.path-card, .slider-section, .scroll-marker').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>

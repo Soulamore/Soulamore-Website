@@ -25,8 +25,25 @@ try {
         /* DESKTOP (Width > 1150px) */
         @media (min-width: 1151px) {
             header {
-                /* Let global.css island-nav handle positioning if present */
+                /* RESTORED ISLAND NAV STYLES - GLOBAL */
+                position: fixed !important;
+                top: 20px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: 94% !important;
+                max-width: 1200px !important;
+                
+                /* Default Dark Glass Theme (Overridden by specific pages if needed) */
+                background: rgba(15, 23, 42, 0.7) !important;
+                backdrop-filter: blur(16px) !important;
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+                border-radius: 50px !important;
+                padding: 10px 25px !important;
+                
                 z-index: 9999 !important;
+                transition: all 0.3s ease !important;
             }
             .mobile-profile-card, 
             .mobile-toggle,
@@ -77,7 +94,7 @@ try {
                 object-fit: contain;
             }
             /* Button Consistency */
-            .nav-btn, .lifeline-btn {
+            .auth-box .nav-btn, .lifeline-btn {
                 background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)) !important;
                 border: 1px solid rgba(255,255,255,0.2) !important;
                 padding: 10px 24px !important;
@@ -94,20 +111,32 @@ try {
                 box-sizing: border-box !important;
                 font-size: 0.95rem !important;
             }
-            .nav-btn:hover, .lifeline-btn:hover {
+            .auth-box .nav-btn:hover, .lifeline-btn:hover {
                 background: white !important;
                 color: #0f172a !important;
                 transform: translateY(-2px);
             }
-            /* Specific override for Get Help to distinguish slightly if needed, or keep uniform */
+            /* Specific override for Get Help - More Premium, Less Error-Like */
             .lifeline-btn {
-                border-color: rgba(239, 68, 68, 0.5) !important; /* Red tint border */
-                background: rgba(239, 68, 68, 0.1) !important;
+                border: 1px solid #F49F75 !important;
+                background: transparent !important; /* Force Clear/Black */
+                color: #F49F75 !important;
+                box-shadow: 0 0 10px rgba(244, 159, 117, 0.1) !important;
+                justify-content: center !important; /* Ensure centered text */
             }
             .lifeline-btn:hover {
-                background: #ef4444 !important;
-                color: white !important;
+                background: rgba(220, 38, 38, 0.15) !important; /* RED Warning Tint */
+                color: #ef4444 !important; /* RED Warning Text */
                 border-color: #ef4444 !important;
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important;
+                transform: translateY(-2px);
+            }
+            .ghost-icon:hover {
+                background: rgba(78, 205, 196, 0.15) !important;
+                border-color: #4ECDC4 !important;
+                color: #4ECDC4 !important;
+                box-shadow: 0 0 20px rgba(78, 205, 196, 0.5); /* Stronger Blue Glow */
+                transform: translateY(-2px);
             }
         }
         /* MOBILE (Width <= 1150px) */
@@ -264,6 +293,20 @@ try {
             body { padding-bottom: 80px !important; } /* Space for FAB/Nav */
             .container { padding-left: 20px !important; padding-right: 20px !important; }
         }
+
+        /* BURNING ICON ANIMATION */
+        @keyframes burnGlow {
+            0% { text-shadow: 0 0 2px #ef4444, 0 0 5px #fca5a5; transform: scale(1); }
+            50% { text-shadow: 0 0 8px #ef4444, 0 0 12px #fbbf24; transform: scale(1.1); }
+            100% { text-shadow: 0 0 2px #ef4444, 0 0 5px #fca5a5; transform: scale(1); }
+        }
+        .burning-icon {
+            color: #ef4444 !important;
+            margin-left: 6px;
+            font-size: 0.85em;
+            animation: burnGlow 1.5s infinite ease-in-out;
+            display: inline-block;
+        }
     `;
     document.head.appendChild(style);
     // console.log("Soulamore: Critical styles v2 injected.");
@@ -313,69 +356,62 @@ function setupFavicon(rootPath) {
 
 const NAV_DATA = [
     {
-        id: 'nav-home',
-        label: 'Home',
-        icon: 'fas fa-home',
-        href: 'index.html',
-        type: 'link',
-    },
-    {
-        id: 'nav-tools',
-        label: 'Tools',
-        icon: 'fas fa-toolbox',
+        id: 'nav-spaces',
+        label: 'Find Your Space',
+        icon: 'fas fa-compass',
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-problemwall', label: 'The Problem Wall', href: 'pages/problem-wall.html', style: 'color:var(--ink-black); font-weight:600;' },
-            { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html', style: 'color:var(--ember-orange);' },
-            { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
-            { id: 'nav-soulrider', label: 'Soul Rider (Beta)', href: 'tools/soul-rider.html', style: 'color:#F49F75;' },
-            { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
-            { id: 'nav-play', label: 'Mental Playground', href: 'tools/playground.html' },
-            { id: 'nav-soulbot', label: 'SoulBot AI', href: 'tools/soulbot.html' },
-            { id: 'nav-confession', label: 'Confession Box', href: 'tools/confession-box/index.html' }
+            { id: 'nav-campus', label: 'For Students', href: 'spaces/campus/index.html', icon: 'fas fa-graduation-cap' },
+            { id: 'nav-workplace', label: 'For Workplaces', href: 'spaces/soulamore-workplace/index.html', icon: 'fas fa-briefcase' },
+            { id: 'nav-away', label: 'For Global/Expats', href: 'spaces/soulamore-away/index.html', icon: 'fas fa-globe-americas' }
         ]
     },
     {
-        id: 'nav-spaces',
-        label: 'Spaces',
-        icon: 'fas fa-layer-group',
+        id: 'nav-support',
+        label: 'Get Support',
+        icon: 'fas fa-hands-helping',
         href: '#',
         type: 'dropdown',
         children: [
             {
-                id: 'nav-campus',
-                label: 'Soulamore Campus',
-                // HREF FIXED: Pointing to the correct index file
-                href: 'spaces/campus/index.html',
+                id: 'nav-peers-group',
+                label: 'Talk to a Peer <i class="fas fa-fire burning-icon" title="Hot"></i>',
+                href: 'our-peers/about.html', /* Main Landing */
                 type: 'submenu',
                 children: [
-                    { id: 'nav-schools', label: 'Schools', href: 'spaces/campus/schools.html' },
-                    { id: 'nav-institutions', label: 'Institutions', href: 'spaces/campus/institutions.html' },
-                    { id: 'nav-campus-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
-                    { label: 'Student Resources', href: 'spaces/campus/student-resources.html' }
+                    { id: 'nav-meet-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
+                    { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'our-peers/about.html' },
+                    { id: 'nav-join-peer', label: 'Join as a Peer', href: 'join-us/peer.html' }
                 ]
             },
             {
-                id: 'nav-workplace',
-                label: 'Soulamore Workplace',
-                href: 'spaces/soulamore-workplace/index.html',
+                id: 'nav-psych-group',
+                label: 'Talk to a Psychologist <i class="fas fa-fire burning-icon" title="Hot"></i>',
+                href: 'our-psychologists/about.html', /* Main Landing */
                 type: 'submenu',
-                icon: 'fas fa-briefcase',
                 children: [
-                    { label: 'Plans & Pricing', href: 'spaces/soulamore-workplace/index.html#plans' },
-                    { label: 'Guidelines', href: 'spaces/soulamore-workplace/index.html#guidelines' }
+                    { id: 'nav-meet-psych', label: 'Meet Our Psychologists', href: 'our-psychologists/psychologists.html' },
+                    { id: 'nav-what-psych', label: 'What is Therapy?', href: 'our-psychologists/about.html' },
+                    { id: 'nav-join-psych', label: 'Join as a Psychologist', href: 'join-us/psychologist.html' }
                 ]
             },
-            {
-                id: 'nav-away',
-                label: 'Soulamore Away',
-                href: 'spaces/soulamore-away/index.html',
-                type: 'submenu',
-                children: [
-                    { label: 'Away Resources', href: 'spaces/soulamore-away/resources.html' }
-                ]
-            }
+            { id: 'nav-soulbot', label: 'SoulBot AI <span style="font-size:0.7em; background:var(--teal-glow); color:#0f172a; padding:2px 6px; border-radius:4px; margin-left:5px; font-weight:700;">Beta</span>', href: 'tools/soulbot.html', style: 'color:#F49F75; font-weight:700;' },
+            { id: 'nav-problemwall', label: 'The Problem Wall', href: 'pages/problem-wall.html' }
+        ]
+    },
+    {
+        id: 'nav-tools',
+        label: 'Self-Care Tools',
+        icon: 'fas fa-tools',
+        href: '#',
+        type: 'dropdown',
+        children: [
+            { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
+            { id: 'nav-playground', label: 'Mental Playground', href: 'tools/playground.html' },
+            { id: 'nav-cbox', label: 'Confession Box', href: 'tools/confession-box/index.html' },
+            { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html' },
+            { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html' }
         ]
     },
     {
@@ -385,29 +421,15 @@ const NAV_DATA = [
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
-            { id: 'nav-psych', label: 'Our Psychologists', href: 'our-psychologists/psychologists.html' },
-            { id: 'nav-support', label: 'Support Groups', href: 'community/support-groups.html' },
-            { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
             { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
-            { id: 'nav-calendar', label: 'Community Calendar', href: 'community/community-calendar.html' }
-        ]
-    },
-    {
-        id: 'nav-join',
-        label: 'Join Us',
-        icon: 'fas fa-hand-holding-heart',
-        href: '#',
-        type: 'dropdown',
-        children: [
-            { id: 'nav-join-peer', label: 'Apply as Peer', href: 'join-us/peer.html' },
-            { id: 'nav-join-psych', label: 'Apply as Psychologist', href: 'join-us/psychologist.html' }
+            { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
+            { id: 'nav-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' }
         ]
     },
     {
         id: 'nav-company',
         label: 'About',
-        icon: 'fas fa-building',
+        icon: 'fas fa-info-circle',
         href: '#',
         type: 'dropdown',
         children: [
@@ -443,7 +465,7 @@ function generateNavHTML(rootPath) {
     });
 
     // Mobile-Only Help Link (Appended at the end of nav-links)
-    html += `<a href="${rootPath}get-help-now.html" id="mobile-destruct-trigger" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Get Help Now</a>`;
+    html += `<a href="${rootPath}get-help-now.html" id="mobile-destruct-trigger" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Crisis Resources</a>`;
 
     return html;
 }
@@ -473,6 +495,46 @@ function generateSubmenuHTML(children, rootPath) {
     return html;
 }
 
+
+function generateProfileMenu(rootPath) {
+    // Default to 'user' if not set
+    const role = sessionStorage.getItem('userRole') || 'user';
+    let html = '';
+
+    if (role === 'peer') {
+        html += `
+            <div style="padding: 8px 12px; font-size: 0.75rem; opacity: 0.6; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;">PEER MODE</div>
+            <a href="${rootPath}portal/peer-dashboard.html"><i class="fas fa-columns" style="width:20px; text-align:center; color:var(--peach-glow);"></i> Peer Dashboard</a>
+            <a href="${rootPath}peer/sessions.html"><i class="fas fa-clock" style="width:20px; text-align:center;"></i> Sessions</a>
+            <a href="${rootPath}peer/journals.html"><i class="fas fa-book-open" style="width:20px; text-align:center;"></i> Shared Journals</a>
+            <a href="${rootPath}peer/availability.html"><i class="fas fa-toggle-on" style="width:20px; text-align:center;"></i> Availability</a>
+            <a href="${rootPath}peer/feedback.html"><i class="fas fa-star" style="width:20px; text-align:center;"></i> Feedback</a>
+            <a href="${rootPath}settings.html"><i class="fas fa-cog" style="width:20px; text-align:center;"></i> Settings</a>
+        `;
+    } else if (role === 'psychologist') {
+        html += `
+             <div style="padding: 8px 12px; font-size: 0.75rem; opacity: 0.6; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;">PRO MODE</div>
+            <a href="${rootPath}portal/psych-dashboard.html"><i class="fas fa-columns" style="width:20px; text-align:center; color:var(--teal-glow);"></i> Psych Dashboard</a>
+            <a href="${rootPath}psychologist/sessions.html"><i class="fas fa-calendar-check" style="width:20px; text-align:center;"></i> Sessions</a>
+            <a href="${rootPath}psychologist/journals.html"><i class="fas fa-book-medical" style="width:20px; text-align:center;"></i> Client Journals</a>
+            <a href="${rootPath}psychologist/profile.html"><i class="fas fa-user-md" style="width:20px; text-align:center;"></i> My Profile</a>
+            <a href="${rootPath}psychologist/feedback.html"><i class="fas fa-chart-line" style="width:20px; text-align:center;"></i> Reputation</a>
+            <a href="${rootPath}settings.html"><i class="fas fa-cog" style="width:20px; text-align:center;"></i> Settings</a>
+        `;
+    } else {
+        // Standard User
+        html += `
+            <a href="${rootPath}portal/user-dashboard.html"><i class="fas fa-home" style="width:20px; text-align:center;"></i> Dashboard</a>
+            <a href="${rootPath}journal/index.html"><i class="fas fa-feather-alt" style="width:20px; text-align:center;"></i> Journal</a>
+            <a href="${rootPath}dashboard/sessions.html"><i class="fas fa-video" style="width:20px; text-align:center;"></i> My Sessions</a>
+            <a href="${rootPath}dashboard/saved-blogs.html"><i class="fas fa-bookmark" style="width:20px; text-align:center;"></i> Saved Blogs</a>
+            <a href="${rootPath}settings.html"><i class="fas fa-cog" style="width:20px; text-align:center;"></i> Settings</a>
+            <a href="${rootPath}get-help-now.html" style="color:#ef4444;"><i class="fas fa-life-ring" style="width:20px; text-align:center;"></i> Help</a>
+        `;
+    }
+    return html;
+}
+
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
@@ -487,7 +549,7 @@ const getHeaderHTML = (rootPath) => `
             <div class="mp-info">
                 <span class="mp-name">Welcome, Friend</span>
                 <span class="mp-status">Guest</span>
-                <a href="${rootPath}login.html" class="mp-btn">Log In</a>
+                <a href="${rootPath}portal/login.html" class="mp-btn">Log In</a>
             </div>
         </div>
 
@@ -496,11 +558,42 @@ const getHeaderHTML = (rootPath) => `
 
     </nav>
 
-    <!-- Auth Group -->
     <div class="auth-box">
-            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
-            <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
-            <a href="${rootPath}auth/login.html" class="nav-btn">Log In / Sign Up</a>
+            <a href="${rootPath}get-help-now.html" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
+            
+            <!-- Ghost Profile Dropdown -->
+            <div class="dropdown profile-dropdown" style="display: flex; align-items: center; justify-content: center;">
+                <div class="ghost-icon" style="
+                    width: 40px; 
+                    height: 40px; 
+                    min-width: 40px; /* Prevent Squeeze */
+                    min-height: 40px; /* Prevent Squeeze */
+                    flex-shrink: 0;   /* Prevent Squeeze */
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    background: rgba(255,255,255,0.05); 
+                    border-radius: 50%; 
+                    margin: 0 8px;
+                    border: 1px solid rgba(255,255,255,0.1);
+                    color: var(--starlight);
+                    transition: 0.3s;
+                    cursor: pointer;
+                    position: relative;
+                " title="My Profile"
+                onmouseover="this.style.background='rgba(78, 205, 196, 0.15)'; this.style.color='#4ECDC4'; this.style.boxShadow='0 0 15px rgba(78, 205, 196, 0.4)';"
+                onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='var(--starlight)'; this.style.boxShadow='none';">
+                    <i class="fas fa-ghost"></i>
+                </div>
+                
+                <div class="dropdown-content" style="left: auto !important; right: 0 !important; transform: translateX(10px); min-width: 200px !important;">
+                    ${generateProfileMenu(rootPath)}
+                    <div style="height:1px; background:rgba(255,255,255,0.1); margin:4px 0;"></div>
+                    <a href="#" onclick="event.preventDefault(); sessionStorage.clear(); window.location.href='${rootPath}portal/login.html';"><i class="fas fa-sign-out-alt" style="margin-right:8px; width:20px; text-align:center;"></i> Log Out</a>
+                </div>
+            </div>
+
+            <a href="${rootPath}portal/login.html" class="nav-btn" style="padding: 0 15px !important; white-space: nowrap; flex-shrink: 0;">Log In</a>
     </div>
     
     <button class="mobile-toggle" aria-label="Toggle Navigation">
@@ -591,13 +684,13 @@ function getRootPath() {
     // 1-Level Deep Check
     if (location.pathname.includes('/spaces/') ||
         location.pathname.includes('/join-us/') ||
-        location.pathname.includes('/pages/') ||
         location.pathname.includes('/our-peers/') ||
         location.pathname.includes('/our-psychologists/') ||
         location.pathname.includes('/tools/') ||
         location.pathname.includes('/community/') ||
         location.pathname.includes('/company/') ||
-        location.pathname.includes('/auth/')) {
+        location.pathname.includes('/auth/') ||
+        location.pathname.includes('/pages/')) {
         return "../";
     }
     return "";
@@ -606,6 +699,15 @@ function getRootPath() {
 // --- 4. INJECTION LOGIC ---
 
 function injectHeader() {
+    // ABORT if inside an iframe (Tool Popups)
+    if (window.self !== window.top) return;
+
+    // ABORT if on a Dashboard or Internal Portal Page (they have their own Sidebar)
+    if (location.pathname.includes('dashboard') ||
+        location.pathname.includes('messaging') ||
+        location.pathname.includes('journal') ||
+        location.pathname.includes('settings')) return;
+
     let headerElement = document.querySelector('header');
 
     // 1. Auto-Create Header if Missing (Robustness)
@@ -660,6 +762,9 @@ function injectHeader() {
 }
 
 function injectFooter() {
+    // ABORT if inside an iframe (Tool Popups)
+    if (window.self !== window.top) return;
+
     const footerElement = document.querySelector('footer');
     if (footerElement) {
         footerElement.innerHTML = getFooterHTML(getRootPath());
@@ -851,6 +956,14 @@ function injectSoulBotWidget() {
     // 2. Hide on SoulBot Page (it has its own full UI)
     if (window.location.pathname.includes('soulbot.html')) return;
 
+    // 3. ABORT if on a Dashboard/Portal Page (Use Tools Drawer instead)
+    if (location.pathname.includes('dashboard') ||
+        location.pathname.includes('portal') ||
+        location.pathname.includes('messaging')) {
+        injectToolsDrawer(); // Call the new drawer instead
+        return;
+    }
+
     // Fix: Create the widget element
     const widget = document.createElement('div');
     widget.id = 'soulbot-widget';
@@ -868,29 +981,35 @@ function injectSoulBotWidget() {
                 align-items: flex-end;
             }
             #soulbot-widget-fab {
-                width: 60px;
                 height: 60px;
+                padding: 0 25px;
                 background: var(--teal-glow, #4ECDC4);
-                border-radius: 50%;
+                border-radius: 50px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                gap: 10px;
                 cursor: pointer;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                 z-index: 9999;
-                transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 border: 2px solid rgba(255,255,255,0.2);
             }
             #soulbot-widget-fab:hover {
-                transform: scale(1.1) rotate(10deg);
+                transform: translateY(-5px);
                 box-shadow: 0 15px 40px rgba(78, 205, 196, 0.4);
             }
             #soulbot-widget-fab i {
                 color: #0f172a;
-                font-size: 1.8rem;
+                font-size: 1.5rem;
                 transition: transform 0.3s;
             }
-            #soulbot-widget-fab:hover i { transform: scale(1.1); }
+            #soulbot-widget-fab span {
+                color: #0f172a;
+                font-weight: 700;
+                font-size: 1rem;
+                white-space: nowrap;
+            }
 
             #sb-window {
                 width: 350px;
@@ -922,6 +1041,8 @@ function injectSoulBotWidget() {
             @media (max-width: 768px) {
                 #soulbot-widget-container { bottom: 130px !important; right: 20px; }
                 #sb-window { width: 90vw; right: 5vw; bottom: 90px; height: 60vh; }
+                #soulbot-widget-fab span { display: none; } /* Hide Label on Mobile to save space */
+                #soulbot-widget-fab { width: 60px; height: 60px; padding: 0; border-radius: 50%; }
             }
         </style>
         
@@ -929,7 +1050,7 @@ function injectSoulBotWidget() {
             <div id="sb-window">
                 <div class="sb-header">
                     <span style="font-weight:700; color:white;"><i class="fas fa-robot" style="color:#4ECDC4;"></i> SoulBot</span>
-                    <i class="fas fa-expand-alt" style="cursor:pointer; color: #94a3b8;" title="Full Screen" onclick="window.location.href='soulbot.html'"></i>
+                    <i class="fas fa-expand-alt" style="cursor:pointer; color: #94a3b8;" title="Full Screen" onclick="window.location.href='tools/soulbot.html'"></i>
                 </div>
                 <div class="sb-body" id="sb-chat-body">
                     <div class="sb-msg sb-msg-bot">Hi there. I'm here if you need to untangle a thought.</div>
@@ -941,6 +1062,7 @@ function injectSoulBotWidget() {
             </div>
             <div id="soulbot-widget-fab" onclick="toggleWidget()">
                 <i class="fas fa-robot"></i>
+                <span>Start Here</span>
             </div>
         </div>
     `;
@@ -950,12 +1072,25 @@ function injectSoulBotWidget() {
     window.toggleWidget = function () {
         const win = document.getElementById('sb-window');
         const fab = document.getElementById('soulbot-widget-fab');
+        const span = fab.querySelector('span');
+
         if (win.style.display === 'flex') {
             win.style.display = 'none';
-            fab.innerHTML = '<i class="fas fa-robot"></i>';
+            fab.querySelector('i').className = 'fas fa-robot';
+            fab.style.borderRadius = "50px";
+            fab.style.width = "auto";
+            fab.style.padding = "0 25px";
+            if (span) span.style.display = "inline";
         } else {
             win.style.display = 'flex';
-            fab.innerHTML = '<i class="fas fa-times"></i>';
+            fab.querySelector('i').className = 'fas fa-times';
+            // Collapse to circle when open
+            if (window.innerWidth > 768) {
+                fab.style.padding = "0";
+                fab.style.width = "60px";
+                fab.style.borderRadius = "50%";
+                if (span) span.style.display = "none";
+            }
             document.getElementById('sb-input').focus();
         }
     };
@@ -996,9 +1131,188 @@ function injectSoulBotWidget() {
     }
 }
 
+// --- 5. TOOLS DRAWER (Dashboard Only) ---
+function injectToolsDrawer() {
+    if (document.getElementById('tools-drawer-overlay')) return;
+
+    // Use root path logic similar to header
+    const rootPath = getRootPath();
+
+    const drawerHTML = `
+        <style>
+            .td-overlay {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5); z-index: 9998;
+                opacity: 0; pointer-events: none; transition: opacity 0.3s;
+                backdrop-filter: blur(4px);
+            }
+            .td-overlay.open { opacity: 1; pointer-events: auto; }
+
+            .td-drawer {
+                position: fixed; top: 0; right: 0; width: 320px; height: 100%;
+                background: var(--bg-surface, #1e293b);
+                border-left: 1px solid var(--border-soft, rgba(255,255,255,0.1));
+                box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+                z-index: 9999;
+                transform: translateX(100%);
+                transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                display: flex; flex-direction: column;
+                padding-top: 20px;
+            }
+            .td-drawer.open { transform: translateX(0); }
+
+            .td-fab {
+                position: fixed; top: 50%; right: -25px;
+                transform: translateY(-50%);
+                width: 55px; height: 55px;
+                background: var(--accent-secondary, #F49F75);
+                color: #0f172a;
+                border-radius: 50% 0 0 50%; /* Semi-circleish look initially */
+                border-radius: 50%; /* Full circle but offset */
+                display: flex; align-items: center; justify-content: flex-start;
+                padding-left: 14px;
+                font-size: 1.3rem;
+                cursor: pointer;
+                box-shadow: -2px 5px 20px rgba(0,0,0,0.2);
+                z-index: 9997;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                border: 2px solid rgba(255,255,255,0.2);
+                opacity: 0.8;
+            }
+            .td-fab:hover { 
+                right: 20px; 
+                opacity: 1;
+                transform: translateY(-50%) rotate(-10deg) scale(1.1);
+            }
+
+            .td-header { padding: 0 25px 20px; border-bottom: 1px solid var(--border-soft, rgba(255,255,255,0.05)); display:flex; justify-content:space-between; align-items:center;}
+            .td-body { flex: 1; padding: 25px; overflow-y: auto; display:flex; flex-direction:column; gap:15px; }
+            
+            .td-item {
+                display: flex; align-items: center; gap: 15px;
+                padding: 15px;
+                background: var(--bg-primary, rgba(0,0,0,0.2));
+                border: 1px solid var(--border-soft, rgba(255,255,255,0.05));
+                border-radius: 12px;
+                color: var(--text-primary, #f1f5f9);
+                text-decoration: none;
+                transition: 0.2s;
+            }
+            .td-item:hover {
+                transform: translateX(-5px);
+                border-color: var(--accent-primary, #4ECDC4);
+                background: var(--bg-elevated, rgba(255,255,255,0.05));
+            }
+            .td-icon { width: 35px; height: 35px; background: rgba(255,255,255,0.05); border-radius: 50%; display:flex; align-items:center; justify-content:center; }
+        </style>
+
+        <div class="td-overlay" id="tools-drawer-overlay" onclick="toggleToolsDrawer()"></div>
+        
+        <div class="td-drawer" id="tools-drawer">
+            <div class="td-header">
+                <h3 style="margin:0; font-family:'Outfit'; font-size:1.4rem;">Daily Tools</h3>
+                <button onclick="toggleToolsDrawer()" style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="td-body">
+                <a href="${rootPath}tools/vent-box.html" target="_blank" class="td-item">
+                    <div class="td-icon" style="color:#ef4444;"><i class="fas fa-fire"></i></div>
+                    <div>
+                        <div style="font-weight:600;">The Vent Box</div>
+                        <div style="font-size:0.8rem; opacity:0.6;">Burn your negative thoughts.</div>
+                    </div>
+                </a>
+                <a href="${rootPath}tools/5-step-reset.html" target="_blank" class="td-item">
+                    <div class="td-icon" style="color:#4ECDC4;"><i class="fas fa-leaf"></i></div>
+                    <div>
+                        <div style="font-weight:600;">5-Step Reset</div>
+                        <div style="font-size:0.8rem; opacity:0.6;">Quick grounding exercise.</div>
+                    </div>
+                </a>
+                <a href="${rootPath}tools/confession-box/index.html" target="_blank" class="td-item">
+                    <div class="td-icon" style="color:#F49F75;"><i class="fas fa-ghost"></i></div>
+                    <div>
+                        <div style="font-weight:600;">Confession Box</div>
+                        <div style="font-size:0.8rem; opacity:0.6;">Let go of a secret.</div>
+                    </div>
+                </a>
+                 <a href="${rootPath}tools/playground.html" target="_blank" class="td-item">
+                    <div class="td-icon" style="color:#fbbf24;"><i class="fas fa-gamepad"></i></div>
+                    <div>
+                        <div style="font-weight:600;">Playground</div>
+                        <div style="font-size:0.8rem; opacity:0.6;">Visual relaxation interactives.</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="td-fab" onclick="toggleToolsDrawer()" title="Open Tools">
+            <i class="fas fa-th-large"></i>
+        </div>
+    `;
+
+    const container = document.createElement('div');
+    container.innerHTML = drawerHTML;
+    document.body.appendChild(container);
+
+    window.toggleToolsDrawer = function () {
+        document.getElementById('tools-drawer-overlay').classList.toggle('open');
+        document.getElementById('tools-drawer').classList.toggle('open');
+    }
+}
+
+// --- 8. THEME ENGINE (New V2 Core) ---
+function initThemeEngine() {
+    // 1. Define Defaults
+    const DEFAULT_MODE = 'dark'; // Safe defaults
+    const DEFAULT_THEME = 'calm';
+
+    // 2. Load from Storage with Validation
+    let savedMode = localStorage.getItem('themeMode');
+    let savedTheme = localStorage.getItem('emotionalTheme');
+
+    // Validation: Reset if invalid/missing
+    if (!savedMode || !['light', 'dark'].includes(savedMode)) {
+        console.warn("Invalid Theme Mode detected, resetting to default.");
+        savedMode = DEFAULT_MODE;
+    }
+    if (!savedTheme) savedTheme = DEFAULT_THEME;
+
+    // 3. Apply to Body (The Source of Truth)
+    document.body.setAttribute('data-mode', savedMode);
+    document.body.setAttribute('data-theme', savedTheme);
+
+    console.log(`Soulamore Theme Engine: Applied ${savedMode} mode with ${savedTheme} theme.`);
+}
+
+// Global Setters (Accessible from any page via onclick)
+window.setThemeMode = function (mode) {
+    document.body.setAttribute('data-mode', mode);
+    localStorage.setItem('themeMode', mode);
+
+    // Update local UI if present (Simple class toggle for buttons with matching IDs)
+    // This is generic handling; specific pages may implement more complex logic if needed
+    document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+    const btn = document.getElementById('btn-mode-' + mode);
+    if (btn) btn.classList.add('active');
+};
+
+window.setEmotionalTheme = function (theme) {
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('emotionalTheme', theme);
+
+    // Update local UI
+    document.querySelectorAll('.theme-tag').forEach(btn => btn.classList.remove('active'));
+    const btn = document.getElementById('btn-theme-' + theme);
+    if (btn) btn.classList.add('active');
+};
+
+
 // --- 7. INITIALIZATION (CRITICAL: MUST RUN) ---
 document.addEventListener('DOMContentLoaded', () => {
     // console.log("Soulamore: Initializing...");
+
+    // 0. Init Theme FIRST (Before flicker)
+    try { initThemeEngine(); } catch (e) { console.error("Theme Engine Failed:", e); }
 
     // 1. Inject Components
     try { injectHeader(); } catch (e) { console.error("Header Injection Failed:", e); }

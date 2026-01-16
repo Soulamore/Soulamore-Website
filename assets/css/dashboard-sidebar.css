@@ -1,0 +1,436 @@
+/* Dashboard Sidebar Layout */
+:root {
+    --sidebar-width: 280px;
+}
+
+body {
+    overflow-x: hidden;
+    background: var(--bg-primary);
+}
+
+/* MAIN LAYOUT CONTAINER */
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--bg-primary);
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-primary);
+    /* Matches app background for calm continuity */
+    border-right: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, background 0.3s;
+}
+
+/* Slightly darken sidebar in light mode for separation */
+[data-mode='light'] .sidebar {
+    background: #f1f5f9;
+}
+
+.sidebar-header {
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.user-avatar-lg {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    box-shadow: none;
+}
+
+.user-info-text .name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.user-info-text .role {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* NAVIGATION */
+.sidebar-nav {
+    flex: 1;
+    padding: 30px 20px;
+    overflow-y: auto;
+}
+
+.side-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 20px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 12px;
+    margin-bottom: 5px;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+.side-link:hover {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    transform: translateX(3px);
+}
+
+.side-link.active {
+    background: rgba(78, 205, 196, 0.1);
+    border-left: 3px solid var(--accent-primary);
+    color: var(--accent-primary);
+    opacity: 1;
+}
+
+.side-link i {
+    width: 20px;
+    text-align: center;
+}
+
+/* BOTTOM SECTION */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid var(--border-soft);
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 600;
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-error);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    padding: 40px;
+    width: calc(100% - var(--sidebar-width));
+}
+
+/* MOBILE TOGGLE */
+.mobile-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 200;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-soft);
+    padding: 10px;
+    border-radius: 8px;
+    color: var(--text-primary);
+}
+
+@media (max-width: 900px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 20px;
+    }
+
+    .mobile-toggle {
+        display: block;
+    }
+}
+
+/* --- IMPROVED CARD STYLING (The Quiet Room Look) --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.dash-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    padding: 30px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), background 0.3s, border-color 0.3s;
+    box-shadow: var(--shadow-soft);
+    color: var(--text-secondary);
+}
+
+.dash-card h1,
+.dash-card h2,
+.dash-card h3,
+.dash-card h4 {
+    color: var(--text-primary);
+}
+
+.dash-card:hover {
+    background: var(--bg-elevated);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+[data-mode='light'] .dash-card:hover {
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+
+/* Link-Hover utility for clickable cards */
+.dash-card.link-hover {
+    cursor: pointer;
+}
+
+/* --- TOOL POPUP MODAL --- */
+.tool-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tool-modal-overlay.open {
+    display: flex;
+    opacity: 1;
+}
+
+.tool-modal-content {
+    background: var(--bg-primary);
+    width: 90%;
+    height: 90%;
+    max-width: 1200px;
+    border-radius: 20px;
+    border: 1px solid var(--border-soft);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-modal-header {
+    padding: 15px 25px;
+    background: var(--bg-surface);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.tool-modal-title {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.tool-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.tool-close-btn:hover {
+    color: var(--accent-error);
+    transform: rotate(90deg);
+}
+
+.tool-frame {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: var(--bg-primary);
+}
+
+/* --- INTERACTIVE ACTION ROWS --- */
+.action-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--bg-surface);
+    /* Stand out slightly from main bg */
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-soft);
+    /* Add border for better definition */
+    /* Prepare for border transition */
+    transition: all 0.2s ease;
+}
+
+.action-row:hover {
+    background: rgba(78, 205, 196, 0.05);
+    /* Very subtle teal tint */
+    border-color: var(--accent-primary);
+    transform: translateX(2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Specific Accent Colors for specific rows if needed, can be done via modifier classes */
+.action-row.peach:hover {
+    background: rgba(244, 159, 117, 0.05);
+    border-color: var(--accent-secondary);
+}
+
+/* --- SPECIFIC CARD HOVERS (Home Dashboard) --- */
+.card-peer {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card-peer:hover {
+    background: rgba(244, 159, 117, 0.1) !important;
+    border-color: var(--accent-secondary) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 25px -5px rgba(244, 159, 117, 0.15) !important;
+}
+
+.card-pro {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card-pro:hover {
+    background: rgba(78, 205, 196, 0.1) !important;
+    border-color: var(--teal-glow, #4ECDC4) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 25px -5px rgba(78, 205, 196, 0.15) !important;
+}
+
+/* --- MOOD BUTTONS --- */
+
+/* --- DASHBOARD BUTTONS --- */
+.btn-dash-primary {
+    background: var(--accent-primary);
+    color: #0f172a;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.2);
+    display: inline-block;
+}
+
+.btn-dash-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(78, 205, 196, 0.4);
+    filter: brightness(1.1);
+}
+
+.btn-dash-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+[data-mode='light'] .btn-dash-secondary {
+    background: #ffffff;
+    border-color: var(--border-soft);
+    color: var(--text-primary);
+}
+
+.btn-dash-secondary:hover {
+    background: var(--bg-elevated);
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mood-selector {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.mood-btn {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    padding: 15px 20px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    min-width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.mood-btn:hover {
+    background: var(--bg-elevated);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+}
+
+.mood-btn:active {
+    transform: scale(0.98);
+}

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Log in to your Soulamore space. Choose your role to access your personalized wellness dashboard.">
+    <title>Login | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <style>
+        /* --- RESTORED THEME FROM BACKUP --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px 40px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* --- LOGIN CARD --- */
+        .login-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 35px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 550px;
+            /* Slightly wider for slider */
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px);
+            position: relative;
+            z-index: 5;
+        }
+
+        .login-logo {
+            font-size: 2rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: block;
+            color: white;
+            text-decoration: none;
+        }
+
+        .login-logo i {
+            color: var(--teal-glow);
+        }
+
+        /* SLIDER CSS (Added from New Logic) */
+        .role-selector-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .role-slider-wrapper {
+            position: relative;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .role-track {
+            position: absolute;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5px;
+            /* Alignment fix */
+        }
+
+        .role-stop {
+            width: 32px;
+            /* Bigger touch target core */
+            height: 32px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            z-index: 2;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* EXPANDED HITBOX */
+        .role-stop::after {
+            content: '';
+            position: absolute;
+            top: -30px;
+            bottom: -50px;
+            left: -40px;
+            right: -40px;
+            z-index: 10;
+        }
+
+        .role-stop.active {
+            background: white;
+            color: var(--deep-space);
+            transform: scale(1.1);
+        }
+
+        .role-stop i {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            transition: 0.3s;
+        }
+
+        .role-thumb {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            /* Dynamic */
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            background: var(--peach-glow);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--peach-glow);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #0f172a;
+            transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s, box-shadow 0.3s;
+            pointer-events: none;
+            /* Let clicks pass to track */
+        }
+
+        .pulse-thumb {
+            animation: thumbPulse 2s infinite;
+        }
+
+        @keyframes thumbPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(244, 159, 117, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(244, 159, 117, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(244, 159, 117, 0);
+            }
+        }
+
+        /* LABELS */
+        .role-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: -15px;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .rl-item {
+            font-size: 0.75rem;
+            font-weight: 700;
+            opacity: 0.5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: relative;
+            z-index: 11;
+        }
+
+        /* Dynamic Text */
+        .role-info-display {
+            margin-top: 20px;
+            min-height: 80px;
+        }
+
+        .ri-title {
+            font-family: 'Outfit';
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            transition: color 0.3s;
+        }
+
+        .ri-desc {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            max-width: 90%;
+            margin: 0 auto 10px;
+            min-height: 40px;
+            transition: opacity 0.3s;
+        }
+
+        .ri-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: 0.3s;
+        }
+
+        .ri-badge.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* FORM STYLES (from Backup) */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-glass);
+            background: rgba(15, 23, 42, 0.6);
+            color: white;
+            font-family: inherit;
+            transition: 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: var(--teal-glow);
+            outline: none;
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .submit-btn {
+            background: var(--gradient-primary);
+            color: var(--deep-space);
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.2);
+        }
+
+        .social-btn {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-glass);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider {
+            margin: 30px 0;
+            border-top: 1px solid var(--border-glass);
+            position: relative;
+        }
+
+        .divider span {
+            background: #151e2e;
+            /* Matches approximate bg behind card */
+            padding: 0 10px;
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        /* MOBILE FIXES */
+        @media (max-width: 600px) {
+            .login-card {
+                width: 90% !important;
+                margin: 0 auto;
+                padding: 25px !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header></header>
+    <div id="particles"></div>
+
+    <main class="page-wrapper">
+        <div class="login-card fade-in">
+            <a href="../index.html" class="login-logo">
+                <img src="../assets/images/logo.png" alt="Soulamore" style="height: 60px; margin-bottom: 5px;">
+            </a>
+            <p style="opacity:0.7; margin-bottom:20px;">Welcome back to your space.</p>
+
+            <!-- MERGED: SLIDER COMPONENT -->
+            <div class="role-selector-container">
+                <div class="role-slider-wrapper">
+                    <div class="role-track">
+                        <div class="role-stop" onclick="setRole(0)"><i class="fas fa-user-astronaut"></i></div>
+                        <div class="role-stop" onclick="setRole(1)"><i class="fas fa-hands-helping"></i></div>
+                        <div class="role-stop" onclick="setRole(2)"><i class="fas fa-user-md"></i></div>
+                    </div>
+                    <div class="role-thumb pulse-thumb" id="roleThumb"><i class="fas fa-user-astronaut"></i></div>
+                </div>
+
+                <div class="role-labels">
+                    <span class="rl-item" onclick="setRole(0)">User</span>
+                    <span class="rl-item" onclick="setRole(1)">Peer</span>
+                    <span class="rl-item" onclick="setRole(2)">Pro</span>
+                </div>
+
+                <div class="role-info-display">
+                    <div class="ri-title" id="riTitle">I’m Here to Talk</div>
+                    <div class="ri-desc" id="riDesc">For personal reflection, peer support, and conversations.</div>
+                    <div class="ri-badge" id="riBadge"><i class="fas fa-check-circle"></i> Verified</div>
+                </div>
+            </div>
+
+            <!-- EMAIL FORM -->
+            <form onsubmit="event.preventDefault(); window.handleEmailLogin();">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="emailInput" class="form-input" placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="passInput" class="form-input" placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="submit-btn">Log In</button>
+
+                <div style="text-align:right; margin-top:10px;">
+                    <a href="forgot-password.html" style="font-size:0.85rem; opacity:0.6; text-decoration:none;">Forgot
+                        Password?</a>
+                </div>
+            </form>
+
+            <div class="divider"><span>OR</span></div>
+
+            <button class="social-btn" id="googleSignInBtn"><i class="fab fa-google"></i> Continue with Google</button>
+
+            <!-- DEV BYPASS BUTTON -->
+            <button onclick="handleDevBypass()"
+                style="background:transparent; border:none; color:rgba(255,255,255,0.3); font-size:0.75rem; width:100%; margin:10px 0; cursor:pointer; text-decoration:underline;">
+                <i class="fas fa-code"></i> Developer Preview (Skip Login)
+            </button>
+
+            <div style="font-size:0.9rem; margin-top:20px; opacity:0.7;">
+                New here? <a href="signup.html" style="color:var(--peach-glow); text-decoration:underline;">Create an
+                    account</a>
+            </div>
+
+        </div>
+    </main>
+
+    <footer></footer>
+
+    <!-- SCRIPTS -->
+    <script src="../assets/js/components.js"></script>
+
+    <!-- AUTH LOGIC (Modules) -->
+    <!-- AUTH LOGIC (Modules) -->
+    <script type="module">
+        import { loginWithGoogle, loginWithEmail } from "../assets/js/auth-service.js";
+        import { handleRoleRouting } from "../assets/js/auth-context.js";
+
+        // --- GOOGLE ---
+        const gBtn = document.getElementById('googleSignInBtn');
+        if (gBtn) {
+            gBtn.addEventListener('click', async () => {
+                const intent = sessionStorage.getItem('loginIntent') || 'user';
+                try {
+                    gBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+
+                    const result = await loginWithGoogle();
+
+                    if (result.success) {
+                        await handleRoleRouting(result.user, intent);
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (e) {
+                    console.error("Login Failed", e);
+                    alert("Sign In Error: " + e.message);
+                    gBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
+                }
+            });
+        }
+
+        // --- EMAIL LOGIN (Exported to Window) ---
+        window.handleEmailLogin = async function () {
+            const intent = sessionStorage.getItem('loginIntent') || 'user';
+            const email = document.getElementById('emailInput').value;
+            const pass = document.getElementById('passInput').value; // Assuming valid password input exists
+
+            if (!email || !pass) { alert("Please enter email and password"); return; }
+
+            try {
+                const result = await loginWithEmail(email, pass);
+                if (result.success) {
+                    await handleRoleRouting(result.user, intent);
+                } else {
+                    alert("Login Failed: " + result.error);
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Login Error: " + e.message);
+            }
+        }
+    </script>
+
+    <!-- SLIDER UI & BYPASS LOGIC (Global) -->
+    <script>
+        // --- 1. SLIDER LOGIC ---
+        const thumb = document.getElementById('roleThumb');
+        const riTitle = document.getElementById('riTitle');
+        const riDesc = document.getElementById('riDesc');
+        const riBadge = document.getElementById('riBadge');
+
+        const roles = [
+            { t: "I’m Here to Talk", d: "Personal reflection, support, and journaling.", c: "#F49F75", i: "fas fa-user-astronaut", v: false, code: "user" },
+            { t: "I’m a Peer", d: "Supporting others through lived experience.", c: "#F49F75", i: "fas fa-hands-helping", v: true, code: "peer" },
+            { t: "I’m a Psychologist", d: "Professional support and clinical guidance.", c: "#4ECDC4", i: "fas fa-user-md", v: true, code: "psychologist" }
+        ];
+
+        function setRole(index) {
+            const r = roles[index];
+            const pct = index * 50;
+
+            thumb.style.left = pct + '%';
+            thumb.style.background = r.c;
+            thumb.style.boxShadow = `0 0 20px ${r.c}`;
+            thumb.innerHTML = `<i class="${r.i}"></i>`;
+
+            riTitle.style.color = r.c;
+            riTitle.innerText = r.t;
+            riDesc.innerText = r.d;
+
+            if (r.v) {
+                riBadge.classList.add('visible');
+                riBadge.style.color = r.c;
+                riBadge.style.background = (r.code === 'psychologist') ? 'rgba(78, 205, 196, 0.2)' : 'rgba(244, 159, 117, 0.2)';
+                riBadge.style.border = `1px solid ${r.c}`;
+            } else {
+                riBadge.classList.remove('visible');
+            }
+
+            sessionStorage.setItem('loginIntent', r.code);
+        }
+
+        // Init
+        setRole(0);
+
+        // --- 2. DEV BYPASS ---
+        function handleDevBypass() {
+            const intent = sessionStorage.getItem('loginIntent') || 'user';
+            const btn = document.querySelector('button[onclick="handleDevBypass()"]');
+            if (btn) btn.innerHTML = 'Entered Dev Mode...';
+
+            const layoutUser = {
+                uid: 'dev-preview', displayName: 'Developer Preview', email: 'dev@soulamore.com', isDev: true
+            };
+            sessionStorage.setItem('user', JSON.stringify(layoutUser));
+            sessionStorage.setItem('userRole', intent);
+
+            setTimeout(() => { manualRedirect(intent); }, 500);
+        }
+
+        function manualRedirect(intent) {
+            let target = 'user-dashboard.html';
+            if (intent === 'peer') target = 'peer-dashboard.html';
+            if (intent === 'psychologist') target = 'psych-dashboard.html';
+            window.location.href = target;
+        }
+        window.manualRedirect = manualRedirect;
+
+        // --- 3. PARTICLES ---
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 4 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            particleContainer.appendChild(p);
+        }
+    </script>
+
+</body>
+
+</html>

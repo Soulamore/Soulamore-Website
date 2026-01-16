@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peer Support | Soulamore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.8);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --path-color: rgba(78, 205, 196, 0.15);
+            --border-glass: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+            width: 100%;
+        }
+
+        h1, h2, h3 { font-family: 'Outfit', sans-serif; }
+
+        #main-scroll {
+            height: 100%;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+
+        /* --- BACKGROUND --- */
+        #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .particle { position: absolute; background: white; border-radius: 50%; opacity: 0.1; animation: float linear infinite; }
+        @keyframes float { from { transform: translateY(100vh); } to { transform: translateY(-10vh); } }
+
+        #path-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* --- THE SPARK (Replaces Rocket) --- */
+        #rocket {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, var(--teal-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 20px var(--teal-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: top 0.15s ease-out, left 0.15s ease-out;
+        }
+        #rocket::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 15px white;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 5;
+            padding-bottom: 200px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 120px 0 100px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .timeline-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 250px; /* Reduced gap for better flow */
+            position: relative;
+            width: 100%;
+        }
+
+        .timeline-row.left { justify-content: flex-start; }
+        .timeline-row.right { justify-content: flex-end; }
+        .timeline-row.center { justify-content: center; }
+
+        .content-box {
+            width: 48%;
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 24px;
+            backdrop-filter: blur(12px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .content-box.visible { opacity: 1; transform: translateY(0); }
+
+        .step-title { font-size: 1.8rem; margin-bottom: 15px; color: var(--peach-glow); }
+        .step-text { font-size: 1.1rem; opacity: 0.85; margin-bottom: 15px; }
+        
+        .check-list { list-style: none; margin-top: 15px; }
+        .check-list li { margin-bottom: 12px; font-size: 1rem; display: flex; align-items: flex-start; }
+        .check-list i { color: var(--teal-glow); margin-right: 12px; margin-top: 5px; font-size: 0.9rem; }
+
+        /* GUIDANCE SECTION */
+        .guidance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        .guidance-card {
+            background: rgba(255,255,255,0.03);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid var(--border-glass);
+        }
+        .guidance-card h4 { color: var(--teal-glow); margin-bottom: 10px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        .cta-btn {
+            background: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+            color: var(--deep-space);
+            padding: 18px 45px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .cta-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(78, 205, 196, 0.4); }
+
+        .disclaimer {
+            margin-top: 40px;
+            font-size: 0.85rem;
+            opacity: 0.5;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.4;
+        }
+
+        @media(max-width: 768px) {
+            .timeline-row { margin-bottom: 120px; }
+            .content-box { width: 100% !important; padding: 30px; }
+            .guidance-grid { grid-template-columns: 1fr; }
+            #path-container { opacity: 0.15; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles"></div>
+
+    <div id="main-scroll">
+        
+        <div id="path-container">
+            <svg width="100%" height="100%" id="svg-el" style="overflow: visible;">
+                <path id="motion-path" d="" fill="none" stroke="var(--path-color)" stroke-width="2" stroke-dasharray="10,10" />
+            </svg>
+            <div id="rocket"></div>
+        </div>
+
+        <div class="container">
+            
+            <!-- 1. HERO -->
+            <div class="hero step-point" data-align="center">
+                <p style="color:var(--teal-glow); font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px;">The Peer Network</p>
+                <h1>Human-to-Human Healing.</h1>
+                <p style="max-width:700px; margin: 0 auto; font-size: 1.2rem; opacity: 0.9;">
+                    Guided by lived experience. Not doctors. Not counselors. <br>
+                    Just people who have been there and found their way through.
+                </p>
+            </div>
+
+            <!-- 2. CORE CONCEPT -->
+            <div class="timeline-row left step-point" data-align="left">
+                <div class="content-box">
+                    <h2 class="step-title">Not Clinical. Real.</h2>
+                    <p class="step-text">Soulamore’s Peer Network is built on resonance, not diagnosis. It is the relief of speaking to someone who doesn't need a textbook to understand you.</p>
+                    <p class="step-text">Peers are real people who have navigated burnout, heartbreak, or anxiety. They aren't here to "fix" you—they are here to walk with you.</p>
+                </div>
+            </div>
+
+            <!-- 3. EMOTIONAL RESONANCE -->
+            <div class="timeline-row right step-point" data-align="right">
+                <div class="content-box">
+                    <h2 class="step-title" style="color:var(--gold-glow);">The Feeling of Safety</h2>
+                    <ul class="check-list">
+                        <li><i class="fas fa-eye"></i> No explanations needed for your pain.</li>
+                        <li><i class="fas fa-heart"></i> Hearing "I get it" and knowing it's earned.</li>
+                        <li><i class="fas fa-leaf"></i> No clinical hierarchy. Just eye-level connection.</li>
+                    </ul>
+                    <p style="margin-top:15px; font-style:italic; opacity: 0.8;">When someone who survived the storm sits with you in the rain, your body finally believes shelter is possible.</p>
+                </div>
+            </div>
+
+            <!-- 4. WHO IT IS FOR -->
+            <div class="timeline-row center step-point" data-align="center">
+                <div class="content-box" style="width: 80%; text-align: center;">
+                    <h2 class="step-title" style="color:var(--teal-glow);">Is Peer Support for you?</h2>
+                    <div class="guidance-grid">
+                        <div class="guidance-card">
+                            <h4>This is for you if:</h4>
+                            <ul class="check-list">
+                                <li><i class="fas fa-check"></i> You feel alone in your experience.</li>
+                                <li><i class="fas fa-check"></i> You want to talk without being analyzed.</li>
+                                <li><i class="fas fa-check"></i> You need to see that recovery is real.</li>
+                            </ul>
+                        </div>
+                        <div class="guidance-card">
+                            <h4>This is not for:</h4>
+                            <ul class="check-list">
+                                <li><i class="fas fa-times"></i> Immediate clinical crisis or self-harm.</li>
+                                <li><i class="fas fa-times"></i> Formal psychiatric diagnosis.</li>
+                                <li><i class="fas fa-times"></i> Medication management.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. THE PROCESS -->
+            <div class="timeline-row left step-point" data-align="left">
+                <div class="content-box">
+                    <h2 class="step-title">Inside a Session</h2>
+                    <p class="step-text">You join a video call. There is no pressure to perform or "progress." The Peer listens, shares when relevant, and holds space for your story.</p>
+                    <p class="step-text">The goal isn't a cure; it's the dissolution of shame through shared identity.</p>
+                </div>
+            </div>
+
+            <!-- 6. FINAL CTA -->
+            <div class="timeline-row center step-point" data-align="center">
+                <div class="content-box" style="width:100%; border-color:var(--teal-glow); text-align: center;">
+                    <h2 style="margin-bottom:20px;">Be Understood.</h2>
+                    <p style="font-size:1.2rem; opacity:0.9; max-width:600px; margin:0 auto;">
+                        "Peer support is not about being helped. It’s about being understood by someone who earned that understanding the hard way."
+                    </p>
+                    <a href="/book-peer" class="cta-btn">Find a Peer Session</a>
+                    
+                    <p class="disclaimer">
+                        Soulamore Peer Support is a non-clinical service provided by individuals with lived experience. It is not a replacement for professional mental health therapy, medical advice, or crisis intervention. If you are in immediate danger, please contact your local emergency services.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const scrollContainer = document.getElementById('main-scroll');
+        const rocket = document.getElementById('rocket');
+        const svgPath = document.getElementById('motion-path');
+        const pathContainer = document.getElementById('path-container');
+        const contentContainer = document.querySelector('.container');
+        
+        let pathLength = 0;
+
+        function updatePath() {
+            const scrollHeight = contentContainer.scrollHeight;
+            pathContainer.style.height = scrollHeight + 'px';
+            
+            const points = document.querySelectorAll('.step-point');
+            let d = "";
+            let screenWidth = window.innerWidth;
+            
+            let prevX = screenWidth / 2;
+            let prevY = 0;
+            d += `M ${prevX} ${prevY} `;
+
+            points.forEach((point, index) => {
+                const align = point.getAttribute('data-align');
+                const y = point.offsetTop + (point.offsetHeight / 2);
+                let x = screenWidth / 2;
+                
+                if(screenWidth > 768) {
+                    if(align === 'left') x = (screenWidth / 2) + 200; 
+                    if(align === 'right') x = (screenWidth / 2) - 200;
+                }
+                
+                const cpY = (prevY + y) / 2;
+                d += `C ${prevX} ${cpY}, ${x} ${cpY}, ${x} ${y} `;
+                
+                prevX = x;
+                prevY = y;
+            });
+
+            d += `L ${screenWidth/2} ${scrollHeight}`;
+            svgPath.setAttribute('d', d);
+            pathLength = svgPath.getTotalLength();
+        }
+
+        function moveRocket() {
+            const scrollTop = scrollContainer.scrollTop;
+            const viewHeight = window.innerHeight;
+            const docHeight = scrollContainer.scrollHeight;
+            
+            const maxScroll = docHeight - viewHeight;
+            let scrollPercent = scrollTop / maxScroll;
+            scrollPercent = Math.max(0, Math.min(1, scrollPercent));
+
+            const point = svgPath.getPointAtLength(scrollPercent * pathLength);
+            
+            if (point) {
+                rocket.style.top = (point.y - 20) + 'px';
+                rocket.style.left = (point.x - 20) + 'px';
+            }
+        }
+
+        const resizeObserver = new ResizeObserver(() => {
+            updatePath();
+            moveRocket();
+        });
+        resizeObserver.observe(contentContainer);
+
+        scrollContainer.addEventListener('scroll', moveRocket);
+        window.addEventListener('resize', () => { updatePath(); moveRocket(); });
+
+        const fadeObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.content-box').forEach(el => fadeObserver.observe(el));
+
+        // Background Particles
+        const pContainer = document.getElementById('particles');
+        for(let i=0; i<40; i++) { 
+            let p = document.createElement('div'); p.classList.add('particle'); 
+            p.style.left=Math.random()*100+'vw'; p.style.width=Math.random()*3+'px'; 
+            p.style.height=p.style.width; p.style.animationDuration=Math.random()*30+20+'s'; 
+            p.style.opacity=Math.random()*0.2; pContainer.appendChild(p); 
+        }
+    </script>
+</body>
+</html>

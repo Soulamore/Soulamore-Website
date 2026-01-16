@@ -547,6 +547,13 @@
             }
         ];
 
+        // --- SIMULATION INJECTION ---
+        const userBlogs = JSON.parse(localStorage.getItem('community_blogs') || "[]");
+        if (userBlogs.length > 0) {
+            // Unshift so they appear first
+            posts.unshift(...userBlogs.reverse());
+        }
+
         // --- 2. RENDER LOGIC ---
         const grid = document.getElementById('blogGrid');
 
@@ -555,21 +562,60 @@
             posts.forEach(post => {
                 if (filter === 'all' || post.type === filter || post.topic === filter) {
                     const badgeClass = post.type === 'Psychologist' ? 'badge-psych' : 'badge-peer';
-                    const icon = post.type === 'Psychologist' ? '<i class="fas fa-user-md"></i>' : '<i class="fas fa-user"></i>';
+                    // keep icon HTML simple/static
+                    const iconHTML = post.type === 'Psychologist' ? '<i class="fas fa-user-md"></i>' : '<i class="fas fa-user"></i>';
 
                     const card = document.createElement('div');
                     card.className = 'blog-card fade-in';
                     card.onclick = () => openArticle(post);
-                    card.innerHTML = `
-                        <div class="card-img"><img src="${post.image}" alt="${post.title}"></div>
-                        <div class="card-badge ${badgeClass}">${icon} ${post.type}</div>
-                        <div class="card-content">
-                            <div class="card-meta"><span>${post.topic}</span><span>${post.date}</span></div>
-                            <h3 class="card-title">${post.title}</h3>
-                            <p class="card-excerpt">${post.excerpt}</p>
-                            <div class="read-more">Read Article <i class="fas fa-arrow-right"></i></div>
-                        </div>
-                    `;
+
+                    // Image (URL is assumed safe/system controlled, but we can't easily sanitize URL without param)
+                    // We construct inner HTML structure but insert text context safely
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = 'card-img';
+                    const img = document.createElement('img');
+                    img.src = post.image;
+                    img.alt = post.title;
+                    imgDiv.appendChild(img);
+
+                    const badgeDiv = document.createElement('div');
+                    badgeDiv.className = `card-badge ${badgeClass}`;
+                    badgeDiv.innerHTML = `${iconHTML} <span></span>`; // Use innerHTML for icon, text for type
+                    badgeDiv.querySelector('span').textContent = post.type;
+
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'card-content';
+
+                    const metaDiv = document.createElement('div');
+                    metaDiv.className = 'card-meta';
+                    const topicSpan = document.createElement('span');
+                    topicSpan.textContent = post.topic;
+                    const dateSpan = document.createElement('span');
+                    dateSpan.textContent = post.date;
+                    metaDiv.appendChild(topicSpan);
+                    metaDiv.appendChild(dateSpan);
+
+                    const titleH3 = document.createElement('h3');
+                    titleH3.className = 'card-title';
+                    titleH3.textContent = post.title;
+
+                    const excerptP = document.createElement('p');
+                    excerptP.className = 'card-excerpt';
+                    excerptP.textContent = post.excerpt;
+
+                    const readMoreDiv = document.createElement('div');
+                    readMoreDiv.className = 'read-more';
+                    readMoreDiv.innerHTML = 'Read Article <i class="fas fa-arrow-right"></i>';
+
+                    contentDiv.appendChild(metaDiv);
+                    contentDiv.appendChild(titleH3);
+                    contentDiv.appendChild(excerptP);
+                    contentDiv.appendChild(readMoreDiv);
+
+                    card.appendChild(imgDiv);
+                    card.appendChild(badgeDiv);
+                    card.appendChild(contentDiv);
+
                     grid.appendChild(card);
                 }
             });

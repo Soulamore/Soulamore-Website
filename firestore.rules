@@ -101,6 +101,46 @@ service cloud.firestore {
     match /active_souls/{document=**} {
       allow read, write: if true; // Public for anonymous presence
     }
+
+    // SoulBot Conversations
+    match /soulbot_conversations/{conversationId} {
+      // Allow read: authenticated users can read their own conversations, or anyone can read anonymous conversations
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid 
+                  || resource.data.userId == null 
+                  || resource.data.userId == 'anonymous';
+      
+      // Allow create: anyone can create a conversation (anonymous or authenticated)
+      allow create: if true;
+      
+      // Allow update:
+      // - If conversation has userId == null or 'anonymous' (anonymous user), allow updates from anyone
+      // - If conversation has userId (authenticated), only allow updates from that user
+      allow update: if resource.data.userId == null 
+                    || resource.data.userId == 'anonymous'
+                    || (request.auth != null && resource.data.userId == request.auth.uid);
+      
+      // Allow delete: only authenticated users can delete their own conversations
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // Therapists Collection (for therapist recommendations)
+    match /therapists/{document=**} {
+      allow read: if true; // Public read for therapist listings
+      allow create, update, delete: if request.auth != null; // Only authenticated admins can modify
+    }
+
+    // SoulBot Usage Tracking (for rate limiting)
+    match /soulbot_usage/{usageId} {
+      // Allow read: users can read their own usage stats
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid 
+                  || resource.data.userId == null;
+      
+      // Allow create/update: anyone can create/update usage tracking (for rate limiting)
+      allow create, update: if true;
+      
+      // Allow delete: only authenticated users can delete their own usage
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
     
     // Default: Deny all other access
     match /{document=**} {

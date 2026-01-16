@@ -602,6 +602,31 @@
             }
         ];
 
+        // --- DYNAMIC INJECTION FOR DEMO ---
+        // In a real app, this would fetch from backend. Here we check localStorage.
+        const myProfile = JSON.parse(localStorage.getItem('professional_profile'));
+        const myRole = localStorage.getItem('user_role');
+
+        if (myProfile && myRole === 'Peer') {
+            const myCard = {
+                id: 999,
+                name: myProfile.name,
+                role: myProfile.title || "Peer Listener",
+                category: myProfile.category || "Mental Wellness", // Default fallback
+                image: myProfile.image,
+                tags: myProfile.tags || ["New", "Listener"],
+                rating: 5.0,
+                reviews: 0,
+                price: "Free",
+                lang: myProfile.languages || "English",
+                online: true,
+                verified: true
+            };
+
+            // Add to top
+            peers.unshift(myCard);
+        }
+
         // --- FILTER STATE ---
         let currentCategory = 'all';
 
@@ -652,7 +677,13 @@
                     <div class="peer-name">${peer.name} ${priceBadge}</div>
                     <div class="grounding-line">"${peer.quote}"</div>
                     <div class="tags-row">${tagHTML}</div>
-                    <a href="${peer.profileUrl}" class="connect-btn">View Profile</a>
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; opacity:0.8; margin-top:15px; border-top:1px solid var(--border-glass); padding-top:10px;">
+                        <span><i class="fas fa-language"></i> ${peer.markers.lang}</span>
+                        <span>${peer.markers.price === "Free" ? "Volunteer" : "₹" + peer.markers.price + "/hr"}</span>
+                    </div>
+
+                    <a href="${peer.profileUrl || 'profile.html?id=' + peer.id}" class="pc-btn" style="text-align:center; text-decoration:none; display:block; margin-top:15px;">View Profile</a>
+                    ${peer.id === 999 ? '<div style="text-align:center; font-size:0.7rem; margin-top:5px; opacity:0.5;">(This is You)</div>' : ''}
                 `;
                 grid.appendChild(card);
             });
