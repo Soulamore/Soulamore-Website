@@ -470,9 +470,9 @@
     <script src="../assets/js/components.js"></script>
 
     <!-- AUTH LOGIC (Modules) -->
+    <!-- AUTH LOGIC (Modules) -->
     <script type="module">
-        import { auth, googleProvider } from "../assets/js/firebase-config.js";
-        import { signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { loginWithGoogle, loginWithEmail } from "../assets/js/auth-service.js";
         import { handleRoleRouting } from "../assets/js/auth-context.js";
 
         // --- GOOGLE ---
@@ -482,13 +482,16 @@
                 const intent = sessionStorage.getItem('loginIntent') || 'user';
                 try {
                     gBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
-                    const result = await signInWithPopup(auth, googleProvider);
-                    const user = result.user;
 
-                    // Route
-                    await handleRoleRouting(user, intent);
+                    const result = await loginWithGoogle();
+
+                    if (result.success) {
+                        await handleRoleRouting(result.user, intent);
+                    } else {
+                        throw new Error(result.error);
+                    }
                 } catch (e) {
-                    console.error(e);
+                    console.error("Login Failed", e);
                     alert("Sign In Error: " + e.message);
                     gBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
                 }
@@ -499,15 +502,20 @@
         window.handleEmailLogin = async function () {
             const intent = sessionStorage.getItem('loginIntent') || 'user';
             const email = document.getElementById('emailInput').value;
-            if (!email) { alert("Please enter email"); return; }
+            const pass = document.getElementById('passInput').value; // Assuming valid password input exists
 
-            // Mock
-            const mockUser = { uid: 'emailUser', email: email, displayName: email.split('@')[0] };
+            if (!email || !pass) { alert("Please enter email and password"); return; }
+
             try {
-                await handleRoleRouting(mockUser, intent);
+                const result = await loginWithEmail(email, pass);
+                if (result.success) {
+                    await handleRoleRouting(result.user, intent);
+                } else {
+                    alert("Login Failed: " + result.error);
+                }
             } catch (e) {
-                console.warn(e);
-                manualRedirect(intent);
+                console.error(e);
+                alert("Login Error: " + e.message);
             }
         }
     </script>
