@@ -14,13 +14,15 @@
     <style>
         /* --- VISUAL ENHANCEMENTS (Glows & Depth) --- */
         .dash-card.active-glow {
-            border: 1px solid var(--teal-glow);
-            box-shadow: 0 0 20px rgba(78, 205, 196, 0.15);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            box-shadow: none;
+            background: rgba(78, 205, 196, 0.02);
         }
 
         .dash-card.peach-glow {
-            border: 1px solid var(--peach-glow);
-            box-shadow: 0 0 20px rgba(244, 159, 117, 0.15);
+            border: 1px solid rgba(244, 159, 117, 0.3);
+            box-shadow: none;
+            background: rgba(244, 159, 117, 0.02);
         }
 
         .tool-btn {
@@ -99,32 +101,20 @@
 
             <div class="sidebar-nav">
                 <a href="#" class="side-link active" onclick="switchView('home', this)" data-view="home"><i
-                        class="fas fa-home"></i> <span>Overview</span></a>
-                <a href="#" class="side-link" onclick="switchView('bookings', this)" data-view="bookings"><i
-                        class="fas fa-calendar-alt"></i> <span>My Bookings</span></a>
-
-                <a href="#" onclick="openTool('../tools/journal.html', 'My Journal')" class="side-link"><i
+                        class="fas fa-home"></i> <span>Home</span></a>
+                <a href="#" class="side-link" onclick="switchView('journal', this)" data-view="journal"><i
                         class="fas fa-book"></i> <span>My Journal</span></a>
-                <a href="#" onclick="switchView('saved', this)" class="side-link"><i class="fas fa-bookmark"></i>
-                    <span>Saved Content</span></a>
+                <a href="#" class="side-link" onclick="switchView('bookings', this)" data-view="bookings"><i
+                        class="fas fa-calendar-alt"></i> <span>My Sessions</span></a>
+                <a href="#" class="side-link" onclick="switchView('soulbot', this)" data-view="soulbot"><i
+                        class="fas fa-robot"></i> <span>SoulBot AI</span></a>
                 <a href="messaging.html" class="side-link"><i class="fas fa-envelope"></i> <span>Messages</span></a>
-                <a href="#" onclick="openTool('../tools/soulbot.html', 'SoulBot AI')" class="side-link"><i
-                        class="fas fa-robot"></i> <span>Talk to SoulBot</span></a>
+                <a href="#" onclick="switchView('saved', this)" class="side-link"><i class="fas fa-bookmark"></i>
+                    <span>Saved</span></a>
 
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:10px 0;">
-
-                <div
-                    style="padding:10px 20px; font-size:0.75rem; opacity:0.5; text-transform:uppercase; font-weight:700;">
-                    Quick Tools</div>
-                <a href="#" onclick="openTool('../tools/vent-box.html', 'The Vent Box')" class="side-link"><i
-                        class="fas fa-fire"></i> <span>Vent Box</span></a>
-                <a href="#" onclick="openTool('../tools/5-step-reset.html', '5-Step Reset')" class="side-link"><i
-                        class="fas fa-leaf"></i> <span>5-Step Reset</span></a>
-                <a href="#" onclick="openTool('../tools/playground.html', 'Mental Playground')" class="side-link"><i
-                        class="fas fa-gamepad"></i> <span>Playground</span></a>
-
-                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:10px 0;">
-                <a href="#" class="side-link"><i class="fas fa-cog"></i> <span>Settings</span></a>
+                <a href="#" class="side-link" onclick="switchView('settings', this)" data-view="settings"><i
+                        class="fas fa-cog"></i> <span>Settings</span></a>
             </div>
 
             <div class="sidebar-footer">
@@ -135,144 +125,353 @@
         <!-- MAIN CONTENT -->
         <main class="main-content fade-in">
 
-            <!-- VIEW: OVERVIEW -->
-            <div id="view-home" class="view-section">
-                <header style="margin-bottom:30px;">
-                    <h1 style="font-family:'Outfit'; font-size:2.5rem; margin-bottom:10px;">Welcome Back.</h1>
-                    <p style="opacity:0.7;">Take a deep breath. You are safe here.</p>
-                </header>
+            <!-- VIEW: SETTINGS (Appearance & Preferences) -->
+            <div id="view-settings" class="view-section" style="display:none;">
+                <h2 style="font-family:'Outfit'; font-size:2rem; margin-bottom:10px;">Settings</h2>
+                <p style="opacity:0.7; margin-bottom:40px;">Customize your space to feel right for you.</p>
 
-                <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+                <div class="dashboard-grid" style="grid-template-columns: 1fr;">
 
-                    <!-- LEFT COLUMN -->
-                    <div style="display:flex; flex-direction:column; gap:30px;">
+                    <!-- APPEARANCE CARD -->
+                    <div class="dash-card">
+                        <h3 style="margin-bottom:20px;">Appearance & Atmosphere</h3>
 
-                        <!-- MOOD CARD -->
-                        <div class="dash-card">
-                            <h3 style="margin-bottom:20px;">How are you feeling right now?</h3>
-                            <div class="mood-selector" style="display:flex; gap:15px; flex-wrap:wrap;">
-                                <button class="mood-btn" onclick="logMood('Calm')">😌<br>Calm</button>
-                                <button class="mood-btn" onclick="logMood('Anxious')">😰<br>Anxious</button>
-                                <button class="mood-btn" onclick="logMood('Sad')">😔<br>Low</button>
-                                <button class="mood-btn" onclick="logMood('Happy')">😊<br>Hopeful</button>
-                                <button class="mood-btn" onclick="logMood('Overwhelmed')">🤯<br>Overwhelmed</button>
+                        <!-- Mode (Light/Dark) -->
+                        <div style="margin-bottom:30px;">
+                            <label style="display:block; margin-bottom:15px; font-weight:600; opacity:0.9;">Lighting
+                                Mode</label>
+                            <div style="display:flex; gap:15px;">
+                                <button onclick="setThemeMode('dark')" class="theme-btn active" id="btn-mode-dark">
+                                    <i class="fas fa-moon"></i> Dark
+                                </button>
+                                <button onclick="setThemeMode('light')" class="theme-btn" id="btn-mode-light">
+                                    <i class="fas fa-sun"></i> Light
+                                </button>
                             </div>
                         </div>
 
-                        <!-- SOULBOT EMBED -->
-                        <div class="dash-card active-glow" style="display:flex; gap:20px; align-items:center;">
-                            <div style="flex:1;">
-                                <h3 style="color:var(--teal-glow); margin-bottom:10px;"><i class="fas fa-robot"></i>
-                                    SoulBot is Online</h3>
-                                <p style="opacity:0.8; font-size:0.95rem; margin-bottom:15px;">I'm here to listen
-                                    without judgment. Want to talk about your day?</p>
-                                <button onclick="openTool('../tools/soulbot.html', 'SoulBot AI')"
-                                    style="background:var(--teal-glow); color:#0f172a; border:none; padding:10px 20px; border-radius:30px; font-weight:700; cursor:pointer;">Start
-                                    Chat</button>
+                        <!-- Emotional Theme -->
+                        <div style="margin-bottom:30px;">
+                            <label style="display:block; margin-bottom:15px; font-weight:600; opacity:0.9;">Emotional
+                                Theme</label>
+                            <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                                <button onclick="setEmotionalTheme('calm')" class="theme-tag active"
+                                    id="btn-theme-calm">🌊 Calm (Default)</button>
+                                <button onclick="setEmotionalTheme('neutral')" class="theme-tag"
+                                    id="btn-theme-neutral">🌫 Neutral</button>
+                                <button onclick="setEmotionalTheme('grounded')" class="theme-tag"
+                                    id="btn-theme-grounded">🌱 Grounded</button>
+                                <button onclick="setEmotionalTheme('warm')" class="theme-tag" id="btn-theme-warm">☀️
+                                    Warm</button>
+                                <button onclick="setEmotionalTheme('focus')" class="theme-tag" id="btn-theme-focus">🎯
+                                    Focus</button>
                             </div>
-                            <i class="fas fa-comments" style="font-size:4rem; opacity:0.1;"></i>
+                            <p style="font-size:0.85rem; opacity:0.6; margin-top:15px;">
+                                * Calm: Safety & Night Use | Neutral: Low Stimulation | Grounded: Stability | Warm:
+                                Encouragement | Focus: Clarity
+                            </p>
                         </div>
-
-                        <!-- RECENT ACTIVITY / SAVED -->
-                        <div class="dash-card">
-                            <h3 style="margin-bottom:20px;">Saved for Later</h3>
-                            <div style="display:flex; flex-direction:column; gap:10px;">
-                                <div
-                                    style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; border-left:3px solid var(--peach-glow);">
-                                    <div style="font-weight:600; font-size:0.95rem;">Article: Understanding Anxiety
-                                        Triggers</div>
-                                    <div style="font-size:0.8rem; opacity:0.6; margin-top:5px;">Saved 2 days ago • Blog
-                                    </div>
-                                </div>
-                                <div
-                                    style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; border-left:3px solid #fbbf24;">
-                                    <div style="font-weight:600; font-size:0.95rem;">Forum: "How do you handle exam
-                                        stress?"</div>
-                                    <div style="font-size:0.8rem; opacity:0.6; margin-top:5px;">Saved 5 hours ago • 12
-                                        new replies</div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
 
-                    <!-- RIGHT COLUMN (Quick Tools) -->
-                    <div style="display:flex; flex-direction:column; gap:30px;">
+                    <!-- ACCOUNT / PROFILE SECTION -->
+                    <div class="dash-card">
+                        <h3 style="margin-bottom:20px;">My Profile & Security</h3>
 
-                        <div class="dash-card peach-glow" style="text-align:center;">
-                            <h3 style="margin-bottom:20px;">Quick Relief</h3>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                                <div class="tool-btn" onclick="openTool('../tools/vent-box.html', 'Vent Box')">
-                                    <i class="fas fa-fire" style="color:#ef4444; font-size:1.5rem;"></i>
-                                    <span style="font-size:0.85rem;">Vent Box</span>
-                                </div>
-                                <div class="tool-btn"
-                                    onclick="openTool('../tools/confession-box/index.html', 'Confession Box')">
-                                    <i class="fas fa-ghost" style="color:var(--starlight); font-size:1.5rem;"></i>
-                                    <span style="font-size:0.85rem;">Confessing</span>
-                                </div>
-                                <div class="tool-btn" onclick="openTool('../tools/drop-it.html', 'Drop It')">
-                                    <i class="fas fa-hand-holding-water" style="color:#60a5fa; font-size:1.5rem;"></i>
-                                    <span style="font-size:0.85rem;">Drop It</span>
-                                </div>
-                                <div class="tool-btn" onclick="openTool('../tools/playground.html', 'Playground')">
-                                    <i class="fas fa-shapes" style="color:#fbbf24; font-size:1.5rem;"></i>
-                                    <span style="font-size:0.85rem;">Play</span>
-                                </div>
+                        <!-- Personal Details -->
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
+                            <div>
+                                <label style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:8px;">Full
+                                    Name</label>
+                                <input type="text" value="Aditya Harsh"
+                                    style="width:100%; padding:12px; background:var(--bg-primary); border:1px solid var(--border-soft); border-radius:10px; color:var(--text-primary); outline:none;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:8px;">Phone
+                                    Number</label>
+                                <input type="tel" value="+1 (555) 000-0000"
+                                    style="width:100%; padding:12px; background:var(--bg-primary); border:1px solid var(--border-soft); border-radius:10px; color:var(--text-primary); outline:none;">
                             </div>
                         </div>
 
+                        <!-- Login Info (Read Only) -->
+                        <div style="margin-bottom:25px;">
+                            <label style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:8px;">Login
+                                Method</label>
+                            <div
+                                style="display:flex; align-items:center; gap:10px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-soft); border-radius:10px;">
+                                <i class="fab fa-google" style="color:var(--text-secondary);"></i>
+                                <span
+                                    style="flex:1; color:var(--text-secondary); opacity:0.8;">aditya.harsh@example.com</span>
+                                <span
+                                    style="font-size:0.8rem; padding:2px 8px; background:var(--bg-elevated); border-radius:4px; opacity:0.6;">Verified</span>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div style="display:flex; gap:15px; border-top:1px solid var(--border-soft); padding-top:20px;">
+                            <button class="btn-dash-primary" style="padding:10px 25px; font-size:0.95rem;">Save
+                                Changes</button>
+                            <button class="btn-dash-secondary"
+                                onclick="alert('Password reset link sent to email.')">Change Password</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VIEW: SOULBOT CHAT -->
+            <div id="view-soulbot" class="view-section" style="display:none;">
+                <div class="soulbot-layout"
+                    style="display:grid; grid-template-columns: 1fr 300px; gap:20px; height:calc(100vh - 120px);">
+
+                    <!-- CHAT AREA -->
+                    <div class="dash-card link-hover"
+                        style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
+                        <!-- Header -->
+                        <div
+                            style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2);">
+                            <div style="display:flex; gap:15px; align-items:center;">
+                                <div
+                                    style="width:40px; height:40px; background:var(--teal-glow); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#0f172a; font-size:1.2rem;">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div>
+                                    <div style="font-family:'Outfit'; font-weight:700; font-size:1.1rem;">SoulBot AI
+                                    </div>
+                                    <div style="font-size:0.8rem; opacity:0.7; color:#22c55e;"><i class="fas fa-circle"
+                                            style="font-size:0.5rem; vertical-align:middle;"></i> Online & Ready to
+                                        Listen</div>
+                                </div>
+                            </div>
+                            <button onclick="clearChat()"
+                                style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem; cursor:pointer; opacity:0.7;">
+                                <i class="fas fa-trash-alt"></i> Clear Chat
+                            </button>
+                        </div>
+
+                        <!-- Messages -->
+                        <div id="soulbot-messages"
+                            style="flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:15px;">
+                            <!-- Welcome Msg -->
+                            <div class="chat-bubble bot">
+                                Hi there. I'm SoulBot. I'm not a therapist, but I'm here to listen without judgment.
+                                What's on your mind today?
+                            </div>
+                        </div>
+
+                        <!-- Input -->
+                        <div
+                            style="padding:20px; background:rgba(0,0,0,0.2); border-top:1px solid rgba(255,255,255,0.05); display:flex; gap:10px;">
+                            <input type="text" id="soulbot-input" placeholder="Type your message..."
+                                style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:12px 15px; border-radius:12px; color:white; outline:none;">
+                            <button onclick="sendMessage()"
+                                style="background:var(--teal-glow); color:#0f172a; border:none; width:45px; height:45px; border-radius:12px; font-size:1.1rem; cursor:pointer;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- HISTORY SIDEBAR -->
+                    <div style="display:flex; flex-direction:column; gap:20px;">
+                        <div class="dash-card" style="flex:1; display:flex; flex-direction:column;">
+                            <h3 style="margin-bottom:15px; font-size:1.1rem;">Past Conversations</h3>
+                            <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
+                                <div
+                                    style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; cursor:pointer; border-left:2px solid var(--teal-glow);">
+                                    <div style="font-size:0.9rem; font-weight:600;">Anxiety about exams</div>
+                                    <div style="font-size:0.8rem; opacity:0.6;">Yesterday</div>
+                                </div>
+                                <div
+                                    style="padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.05); border-radius:8px; cursor:pointer; opacity:0.7;">
+                                    <div style="font-size:0.9rem; font-weight:600;">Feeling lonely</div>
+                                    <div style="font-size:0.8rem; opacity:0.6;">3 days ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VIEW: HOME (The Quiet Room) -->
+            <div id="view-home" class="view-section">
+
+                <!-- LAYER 1: GROUNDING & PRIMARY ACTION -->
+                <div style="text-align:center; padding:40px 0 60px;">
+                    <h1 style="font-family:var(--font-heading); font-size:2rem; margin-bottom:10px;">Welcome back.</h1>
+                    <p style="opacity:0.8; font-size:1.1rem; margin-bottom:10px; color:var(--text-secondary);">Take a
+                        deep breath. You are safe here.</p>
+                    <p style="font-size:0.9rem; margin-bottom:40px; color:var(--text-muted); font-style:italic;">You can
+                        move at your own pace.</p>
+
+                    <!-- Primary Anchor: SoulBot -->
+                    <div
+                        style="max-width:600px; margin:0 auto; background: var(--bg-surface); border:1px solid var(--border-soft); border-radius:24px; padding:40px; text-align:center; box-shadow:var(--shadow-soft);">
+                        <i class="fas fa-robot"
+                            style="font-size:3rem; color:var(--accent-primary); margin-bottom:20px; opacity:0.9;"></i>
+                        <h2 style="font-family:var(--font-heading); font-size:1.5rem; margin-bottom:10px;">SoulBot is
+                            here with
+                            you.</h2>
+                        <p style="opacity:0.8; margin-bottom:30px; color:var(--text-secondary);">Start where you are.
+                            We'll figure out the rest
+                            together.</p>
+                        <button onclick="switchView('soulbot', null)" class="btn-dash-primary">
+                            Continue with SoulBot
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LAYER 2: REFLECTION (Secondary) -->
+                <div style="max-width:600px; margin:0 auto 40px;">
+                    <div class="dash-card link-hover"
+                        style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); padding: 25px; cursor:default;">
+                        <div>
+                            <h3 style="font-size:1.1rem; margin-bottom:5px;">Your Journal</h3>
+                            <p style="font-size:0.9rem; opacity:0.6;">Write or continue your reflection.</p>
+                        </div>
+                        <button onclick="switchView('journal', null)" class="btn-dash-secondary">
+                            Open Journal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LAYER 3: HUMAN SUPPORT (When ready) -->
+                <div style="max-width:600px; margin:0 auto; text-align:center;">
+                    <div
+                        style="font-size:0.9rem; opacity:0.5; margin-bottom:20px; text-transform:uppercase; letter-spacing:1px; font-weight:700;">
+                        When you want to talk to someone</div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                        <!-- Peer -->
+                        <div class="dash-card link-hover card-peer"
+                            onclick="window.location.href='../our-peers/about.html'"
+                            style="text-align:center; padding:25px; background:rgba(244, 159, 117, 0.05); border-color:rgba(244, 159, 117, 0.1); cursor:pointer;">
+                            <i class="fas fa-hands-helping"
+                                style="font-size:1.5rem; color:var(--peach-glow); margin-bottom:15px;"></i>
+                            <h4 style="margin-bottom:5px;">Talk to a Peer</h4>
+                            <p style="font-size:0.8rem; opacity:0.6;">Someone who gets it.</p>
+                        </div>
+
+                        <!-- Pro -->
+                        <div class="dash-card link-hover card-pro"
+                            onclick="window.location.href='../our-psychologists/about.html'"
+                            style="text-align:center; padding:25px; background:rgba(78, 205, 196, 0.05); border-color:rgba(78, 205, 196, 0.1); cursor:pointer;">
+                            <i class="fas fa-user-md"
+                                style="font-size:1.5rem; color:var(--teal-glow); margin-bottom:15px;"></i>
+                            <h4 style="margin-bottom:5px;">Professional Help</h4>
+                            <p style="font-size:0.8rem; opacity:0.6;">Guidance & Therapy.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- VIEW: BOOKINGS (Enhanced) -->
+            <div id="view-bookings" class="view-section" style="display:none;">
+                <h2 style="margin-bottom:10px;">My Sessions</h2>
+                <p style="opacity:0.7; margin-bottom:30px;">Manage your appointments with Peers and Psychologists.</p>
+
+                <!-- TABS -->
+                <div
+                    style="display:flex; gap:20px; border-bottom:1px solid var(--border-soft); margin-bottom:30px; padding-bottom:10px;">
+                    <div
+                        style="font-weight:700; color:var(--accent-primary); border-bottom:2px solid var(--accent-primary); padding-bottom:10px; cursor:pointer;">
+                        Upcoming</div>
+                    <div style="opacity:0.6; cursor:pointer;">History</div>
+                    <div style="opacity:0.6; cursor:pointer;">Feedback</div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- MAIN LIST -->
+                    <div class="dash-card" style="grid-column: span 1;">
+                        <h3 style="margin-bottom:20px;">Upcoming Sessions</h3>
+
+                        <!-- Empty State Placeholder -->
+                        <div
+                            style="text-align:center; padding:40px; background:var(--bg-primary); border-radius:12px; border:1px dashed var(--border-soft);">
+                            <i class="fas fa-calendar-check"
+                                style="font-size:2rem; opacity:0.3; margin-bottom:15px;"></i>
+                            <p style="opacity:0.7;">No upcoming sessions scheduled.</p>
+                            <button onclick="window.location.href='../our-peers/about.html'" class="btn-dash-primary"
+                                style="margin-top:10px; font-size:0.9rem; padding:10px 25px;">Book a Session</button>
+                        </div>
+                    </div>
+
+                    <!-- SIDEBAR: FIND HELP -->
+                    <div style="display:flex; flex-direction:column; gap:20px;">
+                        <!-- Book New -->
                         <div class="dash-card">
-                            <h3>Connect</h3>
-                            <a href="../our-peers/about.html"
-                                style="display:block; margin-top:15px; text-decoration:none; color:white; background:rgba(244, 159, 117, 0.2); padding:15px; border-radius:12px; border:1px solid var(--peach-glow);">
-                                <div style="font-weight:700; color:var(--peach-glow);">Find a Peer</div>
-                                <div style="font-size:0.85rem; opacity:0.8;">Talk to someone who gets it.</div>
-                            </a>
-                            <a href="../our-psychologists/about.html"
-                                style="display:block; margin-top:10px; text-decoration:none; color:white; background:rgba(78, 205, 196, 0.2); padding:15px; border-radius:12px; border:1px solid var(--teal-glow);">
-                                <div style="font-weight:700; color:var(--teal-glow);">Professional Help</div>
-                                <div style="font-size:0.85rem; opacity:0.8;">Book a session today.</div>
-                            </a>
+                            <h4 style="margin-bottom:15px;">Find Support</h4>
+                            <div onclick="openTool('../our-peers/index.html', 'Browse Peers')" class="action-row peach">
+                                <div
+                                    style="width:35px; height:35px; background:rgba(244, 159, 117, 0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--accent-secondary);">
+                                    <i class="fas fa-hands-helping"></i>
+                                </div>
+                                <div style="font-size:0.9rem;">Browse Peer Listeners</div>
+                            </div>
+                            <div onclick="openTool('../our-psychologists/psychologists.html', 'Browse Psychologists')"
+                                class="action-row">
+                                <div
+                                    style="width:35px; height:35px; background:rgba(78, 205, 196, 0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--accent-primary);">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <div style="font-size:0.9rem;">Find a Psychologist</div>
+                            </div>
+                            <div onclick="window.open('https://www.supersaas.com/', '_blank')" class="action-row">
+                                <div
+                                    style="width:35px; height:35px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div style="font-size:0.9rem;">SuperSaaS Calendar</div>
+                            </div>
+                        </div>
+
+                        <!-- Credits -->
+                        <div class="dash-card" style="position:relative; overflow:hidden;">
+                            <h4 style="margin-bottom:5px;">Wallet</h4>
+                            <div style="font-size:2rem; font-weight:700; color:var(--text-primary);">$0.00</div>
+                            <div style="font-size:0.8rem; opacity:0.6; margin-bottom:15px;">Available Credits</div>
+                            <button
+                                style="width:100%; padding:10px; background:var(--bg-elevated); border:1px solid var(--border-soft); color:var(--text-primary); border-radius:8px; cursor:pointer;">Add
+                                Funds</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- VIEW: BOOKINGS (Restored) -->
-            <div id="view-bookings" class="view-section" style="display:none;">
-                <h2 style="margin-bottom:30px;">My Sessions & Bookings</h2>
-
-                <div class="dash-card">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
-                        <span style="font-weight:600; opacity:0.7;">History & Upcoming</span>
-                        <a href="../our-peers/about.html" style="color:var(--teal-glow); font-size:0.9rem;">Book New
-                            Session</a>
+            <!-- VIEW: JOURNAL (New) -->
+            <div id="view-journal" class="view-section" style="display:none;">
+                <div style="display:grid; grid-template-columns: 250px 1fr; gap:20px; height:calc(100vh - 120px);">
+                    <!-- Sidebar -->
+                    <div class="dash-card" style="padding:15px; display:flex; flex-direction:column;">
+                        <button
+                            style="width:100%; padding:12px; background:var(--accent-primary); color:#0f172a; border:none; border-radius:8px; font-weight:700; cursor:pointer; margin-bottom:20px;"><i
+                                class="fas fa-plus"></i> New Entry</button>
+                        <div
+                            style="font-size:0.8rem; opacity:0.6; text-transform:uppercase; margin-bottom:10px; font-weight:700;">
+                            Recent</div>
+                        <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:5px;">
+                            <div
+                                style="padding:10px; background:var(--bg-elevated); border-radius:6px; font-size:0.9rem; cursor:pointer;">
+                                Morning Thoughts <br><span style="font-size:0.7em; opacity:0.5;">Today</span></div>
+                            <div
+                                style="padding:10px; border-radius:6px; font-size:0.9rem; cursor:pointer; opacity:0.7;">
+                                Weekly Reflection <br><span style="font-size:0.7em; opacity:0.5;">3 days ago</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <table style="width:100%; border-collapse:collapse; text-align:left;">
-                        <tr style="border-bottom:1px solid rgba(255,255,255,0.1); opacity:0.6;">
-                            <th style="padding:15px;">Date</th>
-                            <th style="padding:15px;">Listener/Therapist</th>
-                            <th style="padding:15px;">Type</th>
-                            <th style="padding:15px;">Action</th>
-                        </tr>
-                        <!-- Demo Data -->
-                        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                            <td style="padding:15px;">24 Oct, 2:00 PM</td>
-                            <td style="padding:15px;">Peer Aditi</td>
-                            <td style="padding:15px;">Peer Listening</td>
-                            <td style="padding:15px;"><span
-                                    style="color:var(--teal-glow); background:rgba(78, 205, 196, 0.1); padding:4px 10px; border-radius:5px; font-size:0.8rem;">Upcoming</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding:15px; opacity:0.6;">20 Oct, 10:00 AM</td>
-                            <td style="padding:15px; opacity:0.6;">Dr. Stone</td>
-                            <td style="padding:15px; opacity:0.6;">Therapy</td>
-                            <td style="padding:15px;"><span style="opacity:0.5; font-size:0.8rem;">Completed</span></td>
-                        </tr>
-                    </table>
+                    <!-- Editor -->
+                    <div class="dash-card" style="display:flex; flex-direction:column; padding:30px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                            <input type="text" value="Morning Thoughts"
+                                style="background:transparent; border:none; font-size:1.5rem; font-family:var(--font-heading); color:var(--text-primary); width:100%; outline:none;">
+                            <div style="opacity:0.5; font-size:0.9rem;">Saved</div>
+                        </div>
+                        <textarea
+                            style="flex:1; background:transparent; border:none; resize:none; font-family:var(--font-body); font-size:1.1rem; line-height:1.6; color:var(--text-secondary); outline:none;"
+                            placeholder="Start writing..."></textarea>
+                    </div>
                 </div>
             </div>
 
@@ -319,6 +518,7 @@
     </div>
 
     <!-- SCRIPTS -->
+    <script src="../assets/js/components.js?v=3" onerror="console.error('Failed to load components.js')"></script>
     <script>
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
         function handleLogout() { sessionStorage.clear(); window.location.href = 'logout.html'; }
@@ -341,9 +541,12 @@
             }
         }
 
-        // Initial view load
+        // Initial view load function to check URL parameters or default
         document.addEventListener('DOMContentLoaded', () => {
-            switchView('home'); // Load the home view by default
+            // Check if there is a 'view' query param, otherwise default to home
+            // For now just defaulting to home, but logic is easy to extend
+            // Also restore selected theme
+            switchView('home');
         });
 
         // --- MODAL LOGIC ---
@@ -362,6 +565,168 @@
         function logMood(mood) {
             alert(`Mood tracked: ${mood}. This would be saved to your private journal.`);
         }
+
+        // Initialize View
+        document.addEventListener('DOMContentLoaded', () => {
+            // Just default to home, theme is handled by components.js
+            switchView('home');
+        });
+
+
+        /* SOULBOT CHAT LOGIC */
+        function sendMessage() {
+            const input = document.getElementById("soulbot-input");
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const container = document.getElementById("soulbot-messages");
+
+            // User Msg
+            const userBubble = document.createElement("div");
+            userBubble.style.alignSelf = "flex-end";
+            userBubble.style.background = "var(--teal-glow)";
+            userBubble.style.color = "#0f172a";
+            userBubble.style.padding = "12px 18px";
+            userBubble.style.borderRadius = "18px";
+            userBubble.style.borderBottomRightRadius = "4px";
+            userBubble.style.maxWidth = "80%";
+            userBubble.innerText = msg;
+            container.appendChild(userBubble);
+
+            input.value = "";
+            container.scrollTop = container.scrollHeight;
+
+            // Fake Reply
+            setTimeout(() => {
+                const botBubble = document.createElement("div");
+                botBubble.style.alignSelf = "flex-start";
+                botBubble.style.background = "rgba(255,255,255,0.05)";
+                botBubble.style.padding = "15px 20px";
+                botBubble.style.borderRadius = "18px";
+                botBubble.style.borderBottomLeftRadius = "4px";
+                botBubble.style.maxWidth = "80%";
+                botBubble.innerText = "I hear you. Tell me more about that...";
+                container.appendChild(botBubble);
+                container.scrollTop = container.scrollHeight;
+            }, 1000);
+        }
+
+        function clearChat() {
+            document.getElementById("soulbot-messages").innerHTML = `
+                <div style="align-self:flex-start; background:rgba(255,255,255,0.05); padding:15px 20px; border-radius:18px; border-bottom-left-radius:4px; max-width:80%;">
+                    Chat cleared. I am ready to listen again.
+                </div>
+            `;
+        }
+
+        // Allow Enter Key
+        document.getElementById("soulbot-input").addEventListener("keypress", function (e) {
+            if (e.key === "Enter") sendMessage();
+        });
+
+        // Initialize View with Deep Linking
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Check for URL Param ?view=xxx
+            const urlParams = new URLSearchParams(window.location.search);
+            const viewParam = urlParams.get('view');
+
+            if (viewParam) {
+                switchView(viewParam);
+            } else {
+                switchView('home');
+            }
+        });
+    </script>
+    <script type="module">
+        import { createConversation, addMessageToConversation, subscribeToConversation } from "../assets/js/soulbot-handler.js";
+
+        let currentConversationId = localStorage.getItem('soulbot_conversation_id');
+        let unsubscribe = null;
+        const msgContainer = document.getElementById('soulbot-messages');
+        const inputField = document.getElementById('soulbot-input');
+
+        // --- INITIALIZATION ---
+        async function initSoulBotChat() {
+            if (!currentConversationId) {
+                // Create new conversation
+                // TODO: Pass actual userId if logged in
+                currentConversationId = await createConversation("anonymous_user");
+                if (currentConversationId) {
+                    localStorage.setItem('soulbot_conversation_id', currentConversationId);
+                }
+            }
+
+            // Subscribe to updates
+            if (currentConversationId) {
+                if (unsubscribe) unsubscribe(); // Clear old sub if any
+                unsubscribe = subscribeToConversation(currentConversationId, renderMessages);
+            }
+        }
+
+        // --- RENDER LOGIC ---
+        function renderMessages(conversationData) {
+            if (!conversationData || !conversationData.messages) return;
+
+            // Clear current (simple re-render for MVP)
+            msgContainer.innerHTML = '';
+
+            // Add Welcome Message Always
+            if (conversationData.messages.length === 0) {
+                msgContainer.innerHTML = `
+                    <div class="chat-bubble bot">
+                        Hi there. I'm SoulBot. I'm not a therapist, but I'm here to listen without judgment.
+                        What's on your mind today?
+                    </div>`;
+            }
+
+            conversationData.messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `chat-bubble ${msg.role === 'user' ? 'user' : 'bot'}`;
+                // Simple text rendering (could add markdown support later)
+                div.innerText = msg.text;
+                msgContainer.appendChild(div);
+            });
+
+            // Scroll to bottom
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+        }
+
+        // --- GLOBAL ACTIONS (Expose to window for onclick) ---
+        window.sendMessage = async function () {
+            const text = inputField.value.trim();
+            if (!text) return;
+
+            // UI: Clear immediately for responsiveness
+            inputField.value = '';
+
+            // Core: Send to Backend
+            if (currentConversationId) {
+                await addMessageToConversation(currentConversationId, 'user', text);
+
+                // Mock Bot Reply (Temporary until Cloud Function/Backend Service is active)
+                // In a real app, a Cloud Function triggers on Firestore write.
+                // Here we simulate it locally for demonstration if needed, 
+                // BUT the robust way is backend. 
+                // For now, let's let the user know if no backend is responding.
+                // setTimeout(() => addMessageToConversation(currentConversationId, 'bot', "I hear you. (AI Backend Integration required for full reply)"), 1000);
+            }
+        };
+
+        window.clearChat = function () {
+            if (confirm("Start a new conversation?")) {
+                localStorage.removeItem('soulbot_conversation_id');
+                currentConversationId = null;
+                initSoulBotChat();
+            }
+        };
+
+        // --- EVENT LISTENERS ---
+        inputField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') window.sendMessage();
+        });
+
+        // Start
+        initSoulBotChat();
     </script>
 </body>
 

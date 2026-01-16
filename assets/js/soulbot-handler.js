@@ -3,10 +3,30 @@
  * Manages conversation tracking, storage, and therapist recommendations
  */
 
-import { db, collection, addDoc, doc, getDoc, updateDoc, serverTimestamp, getDocs, query, where, limit } from "./firebase-config.js";
+import { db, collection, addDoc, doc, getDoc, updateDoc, serverTimestamp, getDocs, query, where, limit, onSnapshot, orderBy } from "./firebase-config.js";
 
 const CONVERSATIONS_COLLECTION = "soulbot_conversations";
-const THERAPISTS_COLLECTION = "therapists"; // You may want to create this collection or use existing psychologists collection
+const THERAPISTS_COLLECTION = "therapists";
+
+/**
+ * Subscribe to real-time conversation updates
+ */
+export function subscribeToConversation(conversationId, callback) {
+    if (!conversationId) return () => { };
+
+    const conversationRef = doc(db, CONVERSATIONS_COLLECTION, conversationId);
+
+    // Return the unsubscribe function
+    return onSnapshot(conversationRef, (doc) => {
+        if (doc.exists()) {
+            callback({ id: doc.id, ...doc.data() });
+        } else {
+            console.log("No such conversation!");
+        }
+    }, (error) => {
+        console.error("Error subscribing to conversation:", error);
+    });
+}
 
 /**
  * Create a new conversation session
@@ -24,7 +44,7 @@ export async function createConversation(userId = null) {
             sentiment: null,
             createdAt: serverTimestamp()
         };
-        
+
         const docRef = await addDoc(collection(db, CONVERSATIONS_COLLECTION), conversationData);
         console.log("Conversation created:", docRef.id, "userId:", userId);
         return docRef.id;
@@ -41,15 +61,15 @@ export async function addMessageToConversation(conversationId, role, text, metad
     try {
         const conversationRef = doc(db, CONVERSATIONS_COLLECTION, conversationId);
         const conversationSnap = await getDoc(conversationRef);
-        
+
         if (!conversationSnap.exists()) {
             console.error("Conversation not found:", conversationId);
             return false;
         }
-        
+
         const conversation = conversationSnap.data();
         const messages = conversation.messages || [];
-        
+
         // Use regular timestamp instead of serverTimestamp() for array elements
         // Firestore doesn't support serverTimestamp() inside arrays
         const newMessage = {
@@ -58,19 +78,19 @@ export async function addMessageToConversation(conversationId, role, text, metad
             timestamp: new Date(), // Use Date object instead of serverTimestamp() for arrays
             ...metadata
         };
-        
+
         messages.push(newMessage);
-        
+
         // Extract topics/keywords from message (simple keyword extraction)
         const topics = extractTopics(text, conversation.conversationTopics || []);
-        
+
         await updateDoc(conversationRef, {
             messages: messages,
             conversationTopics: topics,
             lastMessageTime: serverTimestamp(), // This is OK, it's not in an array
             updatedAt: serverTimestamp() // This is OK, it's not in an array
         });
-        
+
         return true;
     } catch (error) {
         console.error("Error adding message to conversation:", error);
@@ -108,16 +128,16 @@ function extractTopics(text, existingTopics = []) {
         'grief': 'grief',
         'loss': 'grief'
     };
-    
+
     const lowerText = text.toLowerCase();
     const topicsSet = new Set(existingTopics);
-    
+
     for (const [keyword, topic] of Object.entries(keywordMap)) {
         if (lowerText.includes(keyword)) {
             topicsSet.add(topic);
         }
     }
-    
+
     return Array.from(topicsSet);
 }
 
@@ -145,29 +165,29 @@ export async function recommendTherapist(conversationId) {
     try {
         const conversationRef = doc(db, CONVERSATIONS_COLLECTION, conversationId);
         const conversationSnap = await getDoc(conversationRef);
-        
+
         if (!conversationSnap.exists()) {
             console.error("Conversation not found:", conversationId);
             return null;
         }
-        
+
         const conversation = conversationSnap.data();
         const topics = conversation.conversationTopics || [];
         const messages = conversation.messages || [];
-        
+
         // Combine all user messages for analysis
         const userMessages = messages
             .filter(m => m.role === 'user')
             .map(m => m.text)
             .join(' ')
             .toLowerCase();
-        
+
         // Get therapists from Firestore (or use static data)
         const therapists = await getTherapists();
-        
+
         // Match therapist based on topics and conversation content
         const recommended = matchTherapist(topics, userMessages, therapists);
-        
+
         if (recommended) {
             // Mark conversation as having recommended therapist
             await updateDoc(conversationRef, {
@@ -176,10 +196,10 @@ export async function recommendTherapist(conversationId) {
                 recommendedAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             });
-            
+
             return recommended;
         }
-        
+
         return null;
     } catch (error) {
         console.error("Error recommending therapist:", error);
@@ -196,14 +216,14 @@ async function getTherapists() {
         const therapistsRef = collection(db, THERAPISTS_COLLECTION);
         const q = query(therapistsRef, where('verified', '==', true), limit(20));
         const snapshot = await getDocs(q);
-        
+
         if (!snapshot.empty) {
             return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         }
     } catch (error) {
         console.log("Therapists collection not found, using static data. This is okay - using fallback.", error);
     }
-    
+
     // Fallback to static therapist data (from psychologists.html)
     return [
         {
@@ -274,47 +294,47 @@ async function getTherapists() {
  */
 function matchTherapist(topics, userMessages, therapists) {
     if (!therapists || therapists.length === 0) return null;
-    
+
     // Score each therapist based on topic matches
     const scoredTherapists = therapists.map(therapist => {
         let score = 0;
         const therapistTags = (therapist.tags || []).map(t => t.toLowerCase());
         const therapistSpecialties = (therapist.specialties || []).map(s => s.toLowerCase());
         const allTherapistKeywords = [...therapistTags, ...therapistSpecialties];
-        
+
         // Match topics
         topics.forEach(topic => {
             if (allTherapistKeywords.includes(topic.toLowerCase())) {
                 score += 10;
             }
         });
-        
+
         // Match keywords in messages
         allTherapistKeywords.forEach(keyword => {
             if (userMessages.includes(keyword)) {
                 score += 5;
             }
         });
-        
+
         // Prefer verified and online therapists
         if (therapist.verified) score += 5;
         if (therapist.online) score += 3;
-        
+
         // Prefer higher rated therapists
         if (therapist.rating) score += therapist.rating;
-        
+
         return { therapist, score };
     });
-    
+
     // Sort by score and return top match
     scoredTherapists.sort((a, b) => b.score - a.score);
     const topMatch = scoredTherapists[0];
-    
+
     // Only recommend if there's a reasonable match (score > 0)
     if (topMatch && topMatch.score > 0) {
         return topMatch.therapist;
     }
-    
+
     // Default: return first verified therapist
     const verifiedTherapist = therapists.find(t => t.verified);
     return verifiedTherapist || therapists[0];
@@ -327,7 +347,7 @@ export async function getConversation(conversationId) {
     try {
         const conversationRef = doc(db, CONVERSATIONS_COLLECTION, conversationId);
         const conversationSnap = await getDoc(conversationRef);
-        
+
         if (conversationSnap.exists()) {
             return { id: conversationSnap.id, ...conversationSnap.data() };
         }

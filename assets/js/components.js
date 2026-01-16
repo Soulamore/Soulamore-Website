@@ -682,6 +682,15 @@ function getRootPath() {
 // --- 4. INJECTION LOGIC ---
 
 function injectHeader() {
+    // ABORT if inside an iframe (Tool Popups)
+    if (window.self !== window.top) return;
+
+    // ABORT if on a Dashboard or Internal Portal Page (they have their own Sidebar)
+    if (location.pathname.includes('dashboard') ||
+        location.pathname.includes('messaging') ||
+        location.pathname.includes('journal') ||
+        location.pathname.includes('settings')) return;
+
     let headerElement = document.querySelector('header');
 
     // 1. Auto-Create Header if Missing (Robustness)
@@ -736,6 +745,9 @@ function injectHeader() {
 }
 
 function injectFooter() {
+    // ABORT if inside an iframe (Tool Popups)
+    if (window.self !== window.top) return;
+
     const footerElement = document.querySelector('footer');
     if (footerElement) {
         footerElement.innerHTML = getFooterHTML(getRootPath());
@@ -927,6 +939,14 @@ function injectSoulBotWidget() {
     // 2. Hide on SoulBot Page (it has its own full UI)
     if (window.location.pathname.includes('soulbot.html')) return;
 
+    // 3. ABORT if on a Dashboard/Portal Page (Use Tools Drawer instead)
+    if (location.pathname.includes('dashboard') ||
+        location.pathname.includes('portal') ||
+        location.pathname.includes('messaging')) {
+        injectToolsDrawer(); // Call the new drawer instead
+        return;
+    }
+
     // Fix: Create the widget element
     const widget = document.createElement('div');
     widget.id = 'soulbot-widget';
@@ -1094,9 +1114,188 @@ function injectSoulBotWidget() {
     }
 }
 
+// --- 5. TOOLS DRAWER (Dashboard Only) ---
+function injectToolsDrawer() {
+    if (document.getElementById('tools-drawer-overlay')) return;
+
+    // Use root path logic similar to header
+    const rootPath = getRootPath();
+
+    const drawerHTML = `
+        <style>
+            .td-overlay {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5); z-index: 9998;
+                opacity: 0; pointer-events: none; transition: opacity 0.3s;
+                backdrop-filter: blur(4px);
+            }
+            .td-overlay.open { opacity: 1; pointer-events: auto; }
+
+            .td-drawer {
+                position: fixed; top: 0; right: 0; width: 320px; height: 100%;
+                background: var(--bg-surface, #1e293b);
+                border-left: 1px solid var(--border-soft, rgba(255,255,255,0.1));
+                box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+                z-index: 9999;
+                transform: translateX(100%);
+                transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                display: flex; flex-direction: column;
+                padding-top: 20px;
+            }
+            .td-drawer.open { transform: translateX(0); }
+
+            .td-fab {
+                position: fixed; top: 50%; right: -25px;
+                transform: translateY(-50%);
+                width: 55px; height: 55px;
+                background: var(--accent-secondary, #F49F75);
+                color: #0f172a;
+                border-radius: 50% 0 0 50%; /* Semi-circleish look initially */
+                border-radius: 50%; /* Full circle but offset */
+                display: flex; align-items: center; justify-content: flex-start;
+                padding-left: 14px;
+                font-size: 1.3rem;
+                cursor: pointer;
+                box-shadow: -2px 5px 20px rgba(0,0,0,0.2);
+                z-index: 9997;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                border: 2px solid rgba(255,255,255,0.2);
+                opacity: 0.8;
+            }
+            .td-fab:hover { 
+                right: 20px; 
+                opacity: 1;
+                transform: translateY(-50%) rotate(-10deg) scale(1.1);
+            }
+
+            .td-header { padding: 0 25px 20px; border-bottom: 1px solid var(--border-soft, rgba(255,255,255,0.05)); display:flex; justify-content:space-between; align-items:center;}
+            .td-body { flex: 1; padding: 25px; overflow-y: auto; display:flex; flex-direction:column; gap:15px; }
+            
+            .td-item {
+                display: flex; align-items: center; gap: 15px;
+                padding: 15px;
+                background: var(--bg-primary, rgba(0,0,0,0.2));
+                border: 1px solid var(--border-soft, rgba(255,255,255,0.05));
+                border-radius: 12px;
+                color: var(--text-primary, #f1f5f9);
+                text-decoration: none;
+                transition: 0.2s;
+            }
+            .td-item:hover {
+                transform: translateX(-5px);
+                border-color: var(--accent-primary, #4ECDC4);
+                background: var(--bg-elevated, rgba(255,255,255,0.05));
+            }
+            .td-icon { width: 35px; height: 35px; background: rgba(255,255,255,0.05); border-radius: 50%; display:flex; align-items:center; justify-content:center; }
+        </style>
+
+        <div class="td-overlay" id="tools-drawer-overlay" onclick="toggleToolsDrawer()"></div>
+        
+        <div class="td-drawer" id="tools-drawer">
+            <div class="td-header">
+                <h3 style="margin:0; font-family:'Outfit'; font-size:1.4rem;">Daily Tools</h3>
+                <button onclick="toggleToolsDrawer()" style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="td-body">
+                <a href="${rootPath}tools/vent-box.html" target="_blank" class="td-item">
+                    <div class="td-icon" style="color:#ef4444;"><i class="fas fa-fire"></i></div>
+                    <div>
+                        <div style="font-weight:600;">The Vent Box</div>
+                        <div style="font-size:0.8rem; opacity:0.6;">Burn your negative thoughts.</div>
+                    </div>
+                </a>
+                <a href="${rootPath}tools/5-step-reset.html" target="_blank" class="td-item">
+                    <div class="td-icon" style="color:#4ECDC4;"><i class="fas fa-leaf"></i></div>
+                    <div>
+                        <div style="font-weight:600;">5-Step Reset</div>
+                        <div style="font-size:0.8rem; opacity:0.6;">Quick grounding exercise.</div>
+                    </div>
+                </a>
+                <a href="${rootPath}tools/confession-box/index.html" target="_blank" class="td-item">
+                    <div class="td-icon" style="color:#F49F75;"><i class="fas fa-ghost"></i></div>
+                    <div>
+                        <div style="font-weight:600;">Confession Box</div>
+                        <div style="font-size:0.8rem; opacity:0.6;">Let go of a secret.</div>
+                    </div>
+                </a>
+                 <a href="${rootPath}tools/playground.html" target="_blank" class="td-item">
+                    <div class="td-icon" style="color:#fbbf24;"><i class="fas fa-gamepad"></i></div>
+                    <div>
+                        <div style="font-weight:600;">Playground</div>
+                        <div style="font-size:0.8rem; opacity:0.6;">Visual relaxation interactives.</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="td-fab" onclick="toggleToolsDrawer()" title="Open Tools">
+            <i class="fas fa-th-large"></i>
+        </div>
+    `;
+
+    const container = document.createElement('div');
+    container.innerHTML = drawerHTML;
+    document.body.appendChild(container);
+
+    window.toggleToolsDrawer = function () {
+        document.getElementById('tools-drawer-overlay').classList.toggle('open');
+        document.getElementById('tools-drawer').classList.toggle('open');
+    }
+}
+
+// --- 8. THEME ENGINE (New V2 Core) ---
+function initThemeEngine() {
+    // 1. Define Defaults
+    const DEFAULT_MODE = 'dark'; // Safe defaults
+    const DEFAULT_THEME = 'calm';
+
+    // 2. Load from Storage with Validation
+    let savedMode = localStorage.getItem('themeMode');
+    let savedTheme = localStorage.getItem('emotionalTheme');
+
+    // Validation: Reset if invalid/missing
+    if (!savedMode || !['light', 'dark'].includes(savedMode)) {
+        console.warn("Invalid Theme Mode detected, resetting to default.");
+        savedMode = DEFAULT_MODE;
+    }
+    if (!savedTheme) savedTheme = DEFAULT_THEME;
+
+    // 3. Apply to Body (The Source of Truth)
+    document.body.setAttribute('data-mode', savedMode);
+    document.body.setAttribute('data-theme', savedTheme);
+
+    console.log(`Soulamore Theme Engine: Applied ${savedMode} mode with ${savedTheme} theme.`);
+}
+
+// Global Setters (Accessible from any page via onclick)
+window.setThemeMode = function (mode) {
+    document.body.setAttribute('data-mode', mode);
+    localStorage.setItem('themeMode', mode);
+
+    // Update local UI if present (Simple class toggle for buttons with matching IDs)
+    // This is generic handling; specific pages may implement more complex logic if needed
+    document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+    const btn = document.getElementById('btn-mode-' + mode);
+    if (btn) btn.classList.add('active');
+};
+
+window.setEmotionalTheme = function (theme) {
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('emotionalTheme', theme);
+
+    // Update local UI
+    document.querySelectorAll('.theme-tag').forEach(btn => btn.classList.remove('active'));
+    const btn = document.getElementById('btn-theme-' + theme);
+    if (btn) btn.classList.add('active');
+};
+
+
 // --- 7. INITIALIZATION (CRITICAL: MUST RUN) ---
 document.addEventListener('DOMContentLoaded', () => {
     // console.log("Soulamore: Initializing...");
+
+    // 0. Init Theme FIRST (Before flicker)
+    try { initThemeEngine(); } catch (e) { console.error("Theme Engine Failed:", e); }
 
     // 1. Inject Components
     try { injectHeader(); } catch (e) { console.error("Header Injection Failed:", e); }
