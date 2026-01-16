@@ -22,15 +22,6 @@ try {
     const style = document.createElement('style');
     style.id = 'header-styles-v2'; // Changed ID to force refresh/avoid conflicts
     style.innerHTML = `
-        /* GLOBAL SAFEGUARD (Dark Mode Default) */
-        html:not(.light-mode), body:not(.light-mode) {
-            background-color: #0f172a !important;
-            color: #f1f5f9;
-            min-height: 100vh;
-            margin: 0;
-            overflow-x: hidden; /* Prevent horizontal scrollbars causing white edges */
-        }
-
         /* DESKTOP (Width > 1150px) */
         @media (min-width: 1151px) {
             header {
