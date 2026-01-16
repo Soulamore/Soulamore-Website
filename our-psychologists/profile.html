@@ -94,6 +94,7 @@
             font-weight: 700;
             margin-bottom: 5px;
             background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -357,22 +358,29 @@
                 document.getElementById('pFormat').innerText = profile.format;
                 document.getElementById('pCrisis').innerText = profile.crisis;
 
-                // Tags
+                // Tags (Safe Rendering)
                 const tagCont = document.getElementById('pTags');
+                tagCont.innerHTML = ''; // Clear existing
                 profile.tags.forEach(t => {
-                    if (t) tagCont.innerHTML += `<span style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; font-size:0.85rem;">${t}</span>`;
+                    if (t) {
+                        const span = document.createElement('span');
+                        span.style.cssText = "background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; font-size:0.85rem;";
+                        span.textContent = t;
+                        tagCont.appendChild(span);
+                    }
                 });
 
-                // Edu
+                // Edu (Safe Rendering)
                 const eduCont = document.getElementById('pEdu');
+                eduCont.innerHTML = ''; // Clear existing
                 profile.edu.forEach(e => {
-                    if (e) eduCont.innerHTML += `
-                        <div class="exp-item">
-                            <div class="exp-icon"><i class="fas fa-graduation-cap"></i></div>
-                            <div>
-                                <div style="font-weight:600; color:var(--text-light); margin-bottom:2px;">${e}</div>
-                            </div>
-                        </div>`;
+                    if (e) {
+                        const item = document.createElement('div');
+                        item.className = 'exp-item';
+                        item.innerHTML = `<div class="exp-icon"><i class="fas fa-graduation-cap"></i></div><div><div class="exp-text" style="font-weight:600; color:var(--text-light); margin-bottom:2px;"></div></div>`;
+                        item.querySelector('.exp-text').textContent = e;
+                        eduCont.appendChild(item);
+                    }
                 });
             }
 
@@ -395,13 +403,26 @@
             const container = document.getElementById('pReviews');
             const stored = localStorage.getItem('peer_reviews');
             let reviews = stored ? JSON.parse(stored) : [];
+            container.innerHTML = ''; // Clear
+
             if (reviews.length > 0) {
-                container.innerHTML = reviews.map(r => `
-                    <div class="review-card">
-                        <p style="margin-bottom:5px;">"${r.text}"</p>
-                        <div style="font-size:0.8rem; opacity:0.6;">— ${r.author}</div>
-                    </div>
-                `).join('');
+                reviews.forEach(r => {
+                    const card = document.createElement('div');
+                    card.className = 'review-card';
+
+                    const p = document.createElement('p');
+                    p.style.marginBottom = '5px';
+                    p.textContent = `"${r.text}"`;
+
+                    const meta = document.createElement('div');
+                    meta.style.fontSize = '0.8rem';
+                    meta.style.opacity = '0.6';
+                    meta.textContent = `— ${r.author}`;
+
+                    card.appendChild(p);
+                    card.appendChild(meta);
+                    container.appendChild(card);
+                });
             }
         }
     </script>

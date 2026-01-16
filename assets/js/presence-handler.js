@@ -9,7 +9,10 @@ const PRESENCE_COLLECTION = "active_souls";
 const HEARTBEAT_INTERVAL = 30000; // 30 seconds
 
 // Generate a session ID for this tab
-const sessionId = 'soul_' + Math.random().toString(36).substr(2, 9);
+// Generate a secure session ID for this tab
+const array = new Uint32Array(1);
+crypto.getRandomValues(array);
+const sessionId = 'soul_' + array[0].toString(36);
 let docRef = null;
 let userCountry = "Unknown";
 
