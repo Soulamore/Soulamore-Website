@@ -20,133 +20,10 @@
     <script src="../assets/js/components.js"></script>
 
     <style>
-        /* --- 1. CORE THEME: DAYBREAK (Light & Airy) --- */
-        :root {
-            --sky-bg: #f8fafc;
-            --paper-note: #ffffff;
-            --ink-text: #334155;
-            --soft-shadow: rgba(0, 0, 0, 0.03);
-            --border-faint: rgba(0, 0, 0, 0.05);
+        /* --- PROBLEM WALL SPECIFIC STYLES --- */
+        /* Relying on global.css for dark theme background */
 
-            /* Accents (Muted) */
-            --gentle-teal: #99f6e4;
-            --warm-peach: #ffedd5;
-            --soft-gold: #fef3c7;
-            --calm-blue: #e0f2fe;
-
-            /* Interaction */
-            --focus-glow: rgba(255, 255, 255, 0.8);
-            --reaction-hover: rgba(0, 0, 0, 0.02);
-
-            /* Logo Green */
-            --logo-green: #10b981;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
-            /* Throttled gradient for performance */
-            background-image:
-                radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(78, 205, 196, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 80% 20%, rgba(244, 159, 117, 0.05) 0%, transparent 50%);
-            color: var(--ink-black);
-            overflow: hidden;
-            /* Infinite canvas handles scroll */
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            /* Infinite Canvas Feeling */
-            position: relative;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(224, 242, 254, 0.4) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(255, 237, 213, 0.4) 0%, transparent 40%);
-        }
-
-        h1,
-        h2,
-        h3 {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 400;
-        }
-
-        /* --- HEADER REFINED (White Glassmorphism) --- */
-        .site-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
-        }
-
-        .logo {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.6rem;
-            color: #1e293b;
-            font-weight: 700;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo i {
-            color: var(--logo-green);
-        }
-
-        .header-stats {
-            position: fixed;
-            /* Fixed to stay under header */
-            top: 75px;
-            left: 40px;
-            font-size: 0.85rem;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            opacity: 0.9;
-            pointer-events: none;
-            z-index: 1000;
-        }
-
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #10b981;
-            animation: pulse-green 2s infinite;
-        }
-
-        @keyframes pulse-green {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-
-            50% {
-                transform: scale(1.2);
-                opacity: 0.7;
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
+        /* Stats Item Styles */
 
         .nav-links {
             display: flex;
@@ -624,18 +501,7 @@
 <body>
 
     <!-- REFINED HEADER -->
-    <header class="site-header">
-        <a href="../index.html" class="logo">
-            <i class="fas fa-leaf"></i> Soulamore
-        </a>
-        <div class="nav-links">
-            <a href="../index.html" class="nav-link">Home</a>
-            <a href="#" class="nav-link" style="color:#1e293b; font-weight:700;">The Wall</a>
-            <!-- Removed Drop It -->
-        </div>
-        <a href="#" class="cta-btn">Get Help</a>
-        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
-    </header>
+    <!-- Header injected by components.js -->
 
     <!-- LIVE COUNTER -->
     <div class="live-activity-bar">
@@ -644,15 +510,7 @@
     </div>
 
     <!-- UI LAYER -->
-    <!-- FORCE LIGHT THEME LOCALLY -->
-    <style>
-        html,
-        body {
-            background-color: #ffffff !important;
-            background: #ffffff !important;
-            color: #0f172a !important;
-        }
-    </style>
+    <!-- Theme Fix: Removed local white background override to match global dark theme -->
     <div class="ui-layer">
 
         <!-- GLOBAL REACTION STATS -->
@@ -898,7 +756,7 @@
                 note.style.background = tints[Math.floor(Math.random() * tints.length)];
 
                 note.innerHTML = `
-                <div class="note-text">${text}</div>
+                <div class="note-text"></div>
                 <div class="note-meta">
                     <span>Shared quietly</span>
                 </div>
@@ -914,6 +772,8 @@
                     </button>
                 </div>
             `;
+                // SAFE: Use textContent to prevent XSS
+                note.querySelector('.note-text').textContent = text;
 
                 canvas.appendChild(note);
             }
