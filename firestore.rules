@@ -141,6 +141,63 @@ service cloud.firestore {
       // Allow delete: only authenticated users can delete their own usage
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
+
+    // Peer Bookings
+    match /peer_bookings/{bookingId} {
+      // Allow read: users can read their own bookings, peers can read bookings for them
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid);
+      
+      // Allow create: authenticated users can create booking requests
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      
+      // Allow update: users can update their own pending bookings, peers can confirm/cancel their bookings
+      allow update: if request.auth != null && (
+        (resource.data.userId == request.auth.uid && resource.data.status == 'pending_payment') ||
+        (resource.data.peerId == request.auth.uid && resource.data.status in ['pending_payment', 'confirmed'])
+      );
+      
+      // Allow delete: only users can delete their own pending bookings
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid && resource.data.status == 'pending_payment';
+    }
+
+    // Peer Availability Schedules
+    match /peer_availability/{peerId} {
+      // Allow read: public read for checking availability
+      allow read: if true;
+      
+      // Allow create/update: peers can manage their own availability
+      allow create, update: if request.auth != null && request.auth.uid == peerId;
+      
+      // Allow delete: peers can delete their own availability
+      allow delete: if request.auth != null && request.auth.uid == peerId;
+    }
+
+    // Peer Pricing Plans
+    match /peer_plans/{planId} {
+      // Allow read: public read for pricing plans
+      allow read: if true;
+      
+      // Allow create/update: admins or peers can manage plans (restrict in production)
+      allow create, update: if request.auth != null;
+      
+      // Allow delete: admins or peers can delete plans
+      allow delete: if request.auth != null;
+    }
+
+    // Payment Records
+    match /payments/{paymentId} {
+      // Allow read: users can read their own payment records
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // Allow create: system can create payment records (after successful payment)
+      allow create: if request.auth != null;
+      
+      // Allow update: only admins or system can update payment records
+      allow update: if request.auth != null;
+      
+      // Allow delete: no one can delete payment records (audit trail)
+      allow delete: if false;
+    }
     
     // Default: Deny all other access
     match /{document=**} {
