@@ -42,7 +42,7 @@ try {
                 height: auto !important;
                 padding: 0 !important;
                 box-shadow: none !important;
-                gap: clamp(2px, 0.5vw, 6px) !important; /* TIGHTER GAP MAX */
+                gap: 15px !important; /* Tightened from 25px for fit */
                 align-items: center !important;
                 visibility: visible !important; /* Ensure visibility */
                 opacity: 1 !important;
@@ -53,22 +53,13 @@ try {
                 gap: 12px !important; /* Slightly reduced gap */
             }
             .main-nav {
-                /* Grid layout defined in global.css */
+                display: flex !important;
+                justify-content: space-between !important;
                 align-items: center !important;
                 padding: 0 !important; /* Let header handle padding */
                 width: 100% !important;
                 max-width: none !important; /* Remove inner max-width constraint */
                 margin: 0 !important;
-            }
-            /* HEADER CONTAINER OVERRIDE - LAYOUT PHYSICS FIX */
-            html body header.island-nav {
-                left: 0 !important;
-                right: 0 !important;
-                margin: 0 auto !important;
-                transform: none !important; /* CRITICAL: No transform clipping */
-                width: calc(100% - 40px) !important;
-                max-width: 1300px !important; /* EXPANDED for final fit */
-                padding: 6px 25px !important;
             }
             .nav-links i {
                 color: #F49F75 !important; /* Force Peach Glow for Icons */
@@ -85,48 +76,44 @@ try {
                 flex-shrink: 0 !important; /* Critical: Prevent logo img shrinking */
                 object-fit: contain;
             }
-            /* Button Consistency - FIXED COLORS */
+            /* Button Consistency */
             .nav-btn, .lifeline-btn {
-                background: linear-gradient(135deg, #4ECDC4, #2a9d8f) !important; /* BRAND GRADIENT */
-                border: 1px solid rgba(78, 205, 196, 0.3) !important;
+                background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)) !important;
+                border: 1px solid rgba(255,255,255,0.2) !important;
                 border-radius: 50px !important;
-                color: #0f172a !important; /* Dark text on bright background */
-                font-weight: 600 !important;
+                color: white !important;
+                font-weight: 500 !important;
                 transition: all 0.3s ease !important;
                 text-decoration: none !important;
-                white-space: nowrap !important;
+                white-space: nowrap !important; /* Prevent text wrapping */
                 display: flex !important;
                 align-items: center !important;
                 gap: 8px !important;
                 box-sizing: border-box !important;
-                box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2) !important;
             }
             .nav-btn {
-                 padding: 0 14px !important;
+                 padding: 0 20px !important; /* Generous padding for Log In */
                  height: 42px !important;
-                 font-size: 0.9rem !important;
-                 flex-shrink: 0 !important;
-                 overflow: hidden !important;
+                 font-size: 0.95rem !important;
+                 flex-shrink: 0 !important; /* NEVER SHRINK */
             }
             .nav-btn:hover, .lifeline-btn:hover {
-                background: linear-gradient(135deg, #5eddd4, #3aad9f) !important; /* Brighter on hover */
+                background: white !important;
                 color: #0f172a !important;
                 transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4) !important;
             }
             /* Specific override for Get Help to distinguish slightly if needed, or keep uniform */
             .lifeline-btn {
-                border-color: rgba(239, 68, 68, 0.5) !important;
+                border-color: rgba(239, 68, 68, 0.5) !important; /* Red tint border */
                 background: rgba(239, 68, 68, 0.1) !important;
-                padding: 0 8px !important;
-                height: 42px !important;
-                font-size: 0.8rem !important;
+                padding: 0 8px !important; /* SUPER COMPACT PADDING */
+                height: 42px !important; /* UNIFIED HEIGHT (Matches Log In) */
+                font-size: 0.8rem !important; /* COMPACT FONT */
                 justify-content: center !important;
                 flex-shrink: 0 !important;
-                width: fit-content !important;
-                min-width: 0 !important;
-                flex-grow: 0 !important;
-                overflow: hidden !important; /* Isolate shimmer */
+                width: fit-content !important; /* FORCE COMPACT WIDTH */
+                min-width: 0 !important; /* PREVENT MIN-WIDTH DEFAULTS */
+                flex-grow: 0 !important; /* PREVENT GROWING */
             }
             .lifeline-btn:hover {
                 background: #ef4444 !important;
@@ -156,39 +143,12 @@ try {
             border-top: 1px solid rgba(255,255,255,0.1); /* Full Width Separator */
         }
         
-        /* ADAPTIVE ICON MODE: 1151px - 1380px (Targeted Laptop Range) */
-        /* Hides text labels ONLY when necessary on smaller screens */
-        @media (min-width: 1151px) and (max-width: 1380px) {
-            header .nav-links > a, 
-            header .nav-links > .dropdown > a {
-                font-size: 0 !important; /* Hide Text */
-                gap: 0 !important;
-                padding: 0 12px !important;
-            }
-            header .nav-links i {
-                font-size: 1.3rem !important; /* Bigger Icons */
-                margin: 0 !important;
-            }
-            /* Hide Chevron */
-            header .nav-links .fa-chevron-down { display: none !important; }
-        }
-
-        /* FULL TEXT MODE: > 1380px (Standard Desktop) */
-        /* Now possible because we unlocked max-width to 99.5vw */
-        @media (min-width: 1381px) {
-            header a, footer a {
-                font-size: 0.85rem !important; /* Slightly Smaller for Fit */
-                letter-spacing: normal !important;
-                padding: 6px 5px !important; /* Tighter Padding */
-                color: #e2e8f0 !important;
-                text-decoration: none !important;
-                transition: color 0.3s ease;
-            }
-        }
-        
-        /* FOOTER ALWAYS TEXT */
-        footer a {
-             font-size: 0.9rem !important;
+        /* AGGRESSIVE LINK COLOR OVERRIDES */
+        /* Targets all header links and footer links */
+        header a, footer a {
+            color: #e2e8f0 !important;
+            text-decoration: none !important;
+            transition: color 0.3s ease;
         }
         header a:visited, footer a:visited {
             color: #e2e8f0 !important;
@@ -371,62 +331,62 @@ const NAV_DATA = [
         type: 'link',
     },
     {
-        id: 'nav-spaces',
-        label: 'Find Your Space',
-        icon: 'fas fa-layer-group',
-        href: '#',
-        type: 'dropdown',
-        children: [
-            { id: 'nav-students', label: 'For Students', href: 'spaces/campus/index.html' },
-            { id: 'nav-workplaces', label: 'For Workplaces', href: 'spaces/soulamore-workplace/index.html' },
-            { id: 'nav-global', label: 'For Global/Expats', href: 'spaces/soulamore-away/index.html' }
-        ]
-    },
-    {
-        id: 'nav-support',
-        label: 'Get Support',
-        icon: 'fas fa-heart',
-        href: '#',
-        type: 'dropdown',
-        children: [
-            {
-                id: 'nav-peer-group',
-                label: 'Talk to a Peer',
-                href: '#',
-                type: 'submenu',
-                children: [
-                    { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'New Pages/Peer Landing.html' },
-                    { id: 'nav-meet-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
-                    { id: 'nav-join-peer', label: 'Join as Peer', href: 'join-us/peer.html' }
-                ]
-            },
-            {
-                id: 'nav-psych-group',
-                label: 'Talk to a Psychologist',
-                href: '#',
-                type: 'submenu',
-                children: [
-                    { id: 'nav-what-psych', label: 'What is Therapy?', href: 'New Pages/Psychologists Landing.html' },
-                    { id: 'nav-meet-psych', label: 'Meet Our Psychologists', href: 'our-psychologists/psychologists.html' },
-                    { id: 'nav-join-psych', label: 'Join as Psychologist', href: 'join-us/psychologist.html' }
-                ]
-            },
-            { id: 'nav-soulbot', label: 'SoulBot AI (Beta)', href: 'tools/soulbot.html', style: 'color:#F49F75;' },
-            { id: 'nav-problem', label: 'The Problem Wall', href: 'pages/problem-wall.html' }
-        ]
-    },
-    {
         id: 'nav-tools',
-        label: 'Self-Care Tools',
+        label: 'Tools',
         icon: 'fas fa-toolbox',
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
-            { id: 'nav-playground', label: 'Mental Playground', href: 'tools/playground.html' },
-            { id: 'nav-confession', label: 'Confession Box', href: 'tools/confession-box/index.html' },
+            { id: 'nav-problemwall', label: 'The Problem Wall', href: 'pages/problem-wall.html', style: 'color:var(--ink-black); font-weight:600;' },
+            { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html', style: 'color:var(--ember-orange);' },
             { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
-            { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html', style: 'color:var(--ember-orange);' }
+            { id: 'nav-soulrider', label: 'Soul Rider (Beta)', href: 'tools/soul-rider.html', style: 'color:#F49F75;' },
+            { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
+            { id: 'nav-play', label: 'Mental Playground', href: 'tools/playground.html' },
+            { id: 'nav-soulbot', label: 'SoulBot AI', href: 'tools/soulbot.html' },
+            { id: 'nav-confession', label: 'Confession Box', href: 'tools/confession-box/index.html' }
+        ]
+    },
+    {
+        id: 'nav-spaces',
+        label: 'Spaces',
+        icon: 'fas fa-layer-group',
+        href: '#',
+        type: 'dropdown',
+        children: [
+            {
+                id: 'nav-campus',
+                label: 'Soulamore Campus',
+                // HREF FIXED: Pointing to the correct index file
+                href: 'spaces/campus/index.html',
+                type: 'submenu',
+                children: [
+                    { id: 'nav-schools', label: 'Schools', href: 'spaces/campus/schools.html' },
+                    { id: 'nav-institutions', label: 'Institutions', href: 'spaces/campus/institutions.html' },
+                    { id: 'nav-campus-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
+                    { label: 'Student Resources', href: 'spaces/campus/student-resources.html' }
+                ]
+            },
+            {
+                id: 'nav-workplace',
+                label: 'Soulamore Workplace',
+                href: 'spaces/soulamore-workplace/index.html',
+                type: 'submenu',
+                icon: 'fas fa-briefcase',
+                children: [
+                    { label: 'Plans & Pricing', href: 'spaces/soulamore-workplace/index.html#plans' },
+                    { label: 'Guidelines', href: 'spaces/soulamore-workplace/index.html#guidelines' }
+                ]
+            },
+            {
+                id: 'nav-away',
+                label: 'Soulamore Away',
+                href: 'spaces/soulamore-away/index.html',
+                type: 'submenu',
+                children: [
+                    { label: 'Away Resources', href: 'spaces/soulamore-away/resources.html' }
+                ]
+            }
         ]
     },
     {
@@ -436,19 +396,33 @@ const NAV_DATA = [
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
+            { id: 'nav-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
+            { id: 'nav-psych', label: 'Our Psychologists', href: 'our-psychologists/psychologists.html' },
+            { id: 'nav-support', label: 'Support Groups', href: 'community/support-groups.html' },
             { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
-            { id: 'nav-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' }
+            { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
+            { id: 'nav-calendar', label: 'Community Calendar', href: 'community/community-calendar.html' }
         ]
     },
     {
-        id: 'nav-about',
-        label: 'About',
-        icon: 'fas fa-info-circle',
+        id: 'nav-join',
+        label: 'Join Us',
+        icon: 'fas fa-hand-holding-heart',
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-story', label: 'Our Story', href: 'company/about.html' },
+            { id: 'nav-join-peer', label: 'Apply as Peer', href: 'join-us/peer.html' },
+            { id: 'nav-join-psych', label: 'Apply as Psychologist', href: 'join-us/psychologist.html' }
+        ]
+    },
+    {
+        id: 'nav-company',
+        label: 'About',
+        icon: 'fas fa-building',
+        href: '#',
+        type: 'dropdown',
+        children: [
+            { id: 'nav-about', label: 'Our Story', href: 'company/about.html' },
             { id: 'nav-contact', label: 'Contact Us', href: 'company/contact.html' },
             { id: 'nav-legal', label: 'Legal & Privacy', href: 'company/legal.html' }
         ]
@@ -634,7 +608,6 @@ function getRootPath() {
         location.pathname.includes('/community/') ||
         location.pathname.includes('/company/') ||
         location.pathname.includes('/auth/') ||
-        location.pathname.includes('/New Pages/') || /* ADDED: Support for New Pages directory */
         location.pathname.includes('/pages/')) {
         return "../";
     }
@@ -843,15 +816,10 @@ function initializeHeaderLogic() {
                     parent.classList.add('active');
                 }
 
-                // Icon rotation
-                const iconDown = toggle.querySelector('.fa-chevron-down');
-                const iconRight = toggle.querySelector('.fa-chevron-right');
-
-                if (iconDown) {
-                    iconDown.style.transform = parent.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
-                }
-                if (iconRight) {
-                    iconRight.style.transform = parent.classList.contains('active') ? 'rotate(90deg)' : 'rotate(0deg)';
+                // Icon rotation (if exists)
+                const icon = toggle.querySelector('.fa-chevron-down');
+                if (icon) {
+                    icon.style.transform = parent.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
                 }
             }
         });

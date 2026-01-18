@@ -4,6 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Content Security Policy: Prevent XSS and injection attacks -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
+                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com; 
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; 
+                 font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; 
+                 img-src 'self' data: https: https://lh3.googleusercontent.com; 
+                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://accounts.google.com; 
+                 frame-src 'self' https://accounts.google.com https://soulamore-f0a64.firebaseapp.com; 
+                 frame-ancestors 'self';">
+    <meta name="referrer" content="no-referrer-when-downgrade">
     <meta name="description"
         content="Log in to your Soulamore space. Choose your role to access your personalized wellness dashboard.">
     <title>Login | Soulamore</title>
@@ -396,7 +406,7 @@
     <header></header>
     <div id="particles"></div>
 
-    <main class="page-wrapper">
+    <main class="page-wrapper custom-spacing">
         <div class="login-card fade-in">
             <a href="../index.html" class="login-logo">
                 <img src="../assets/images/logo.png" alt="Soulamore" style="height: 60px; margin-bottom: 5px;">
@@ -435,31 +445,46 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" id="passInput" class="form-input" placeholder="••••••••">
+                    <div style="position: relative;">
+                        <input type="password" id="passInput" class="form-input" placeholder="••••••••">
+                        <button type="button" id="togglePassword" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); 
+                                       background: none; border: none; color: var(--starlight); opacity: 0.6; 
+                                       cursor: pointer; font-size: 1rem; transition: opacity 0.2s;"
+                            onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
+        </div>
 
-                <button type="submit" class="submit-btn">Log In</button>
+        <!-- Remember Me & Forgot Password -->
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 15px;">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" id="rememberMe" style="cursor: pointer;">
+                <span>Remember me</span>
+            </label>
+            <a href="forgot-password.html" style="font-size:0.85rem; opacity:0.6; text-decoration:none;">Forgot
+                Password?</a>
+        </div>
 
-                <div style="text-align:right; margin-top:10px;">
-                    <a href="forgot-password.html" style="font-size:0.85rem; opacity:0.6; text-decoration:none;">Forgot
-                        Password?</a>
-                </div>
-            </form>
+        <button type="submit" class="submit-btn">Log In</button>
+        </form>
 
-            <div class="divider"><span>OR</span></div>
+        <div class="divider"><span>OR</span></div>
 
-            <button class="social-btn" id="googleSignInBtn"><i class="fab fa-google"></i> Continue with Google</button>
+        <button class="social-btn" id="googleSignInBtn"><i class="fab fa-google"></i> Continue with Google</button>
 
-            <!-- DEV BYPASS BUTTON -->
-            <button onclick="handleDevBypass()"
-                style="background:transparent; border:none; color:rgba(255,255,255,0.3); font-size:0.75rem; width:100%; margin:10px 0; cursor:pointer; text-decoration:underline;">
-                <i class="fas fa-code"></i> Developer Preview (Skip Login)
-            </button>
+        <!-- DEV BYPASS BUTTON -->
+        <button onclick="handleDevBypass()"
+            style="background:transparent; border:none; color:rgba(255,255,255,0.3); font-size:0.75rem; width:100%; margin:10px 0; cursor:pointer; text-decoration:underline;">
+            <i class="fas fa-code"></i> Developer Preview (Skip Login)
+        </button>
 
-            <div style="font-size:0.9rem; margin-top:20px; opacity:0.7;">
-                New here? <a href="signup.html" style="color:var(--peach-glow); text-decoration:underline;">Create an
-                    account</a>
-            </div>
+        <div style="font-size:0.9rem; margin-top:20px; opacity:0.7;">
+            New here? <a href="signup.html" style="color:var(--peach-glow); text-decoration:underline;">Create an
+                account</a>
+        </div>
 
         </div>
     </main>
@@ -469,11 +494,91 @@
     <!-- SCRIPTS -->
     <script src="../assets/js/components.js"></script>
 
+    <!-- Check if user is already logged in -->
+    <script type="module">
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+        // Initialize Firebase for auth check
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+            authDomain: "soulamore-f0a64.firebaseapp.com",
+            projectId: "soulamore-f0a64"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Redirect if already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const role = sessionStorage.getItem('userRole') || 'user';
+                let dashboard = 'user-dashboard.html';
+                if (role === 'peer') dashboard = 'peer-dashboard.html';
+                if (role === 'psychologist') dashboard = 'psych-dashboard.html';
+                window.location.href = dashboard;
+            }
+        });
+    </script>
+
     <!-- AUTH LOGIC (Modules) -->
     <!-- AUTH LOGIC (Modules) -->
     <script type="module">
         import { loginWithGoogle, loginWithEmail } from "../assets/js/auth-service.js";
         import { handleRoleRouting } from "../assets/js/auth-context.js";
+        import { GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // --- PHASE 4: Deep Link Preservation ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnUrl = urlParams.get('returnUrl');
+        if (returnUrl) {
+            sessionStorage.setItem('returnUrl', returnUrl);
+        }
+
+        // --- PHASE 4: Browser Compatibility Check ---
+        function checkBrowserCompatibility() {
+            const isModernBrowser = 'fetch' in window && 'Promise' in window && 'assign' in Object;
+            if (!isModernBrowser) {
+                alert('⚠️ Your browser is outdated and may not support all features. Please update to the latest version of Chrome, Firefox, Safari, or Edge.');
+            }
+        }
+        checkBrowserCompatibility();
+
+        // --- PHASE 4: Google Multi-Account Selector ---
+        const googleProvider = new GoogleAuthProvider();
+        googleProvider.setCustomParameters({
+            prompt: 'select_account'  // Forces account picker every time
+        });
+
+        // --- PHASE 4: Mobile Keyboard Optimization ---
+        if ('visualViewport' in window) {
+            const viewport = window.visualViewport;
+            viewport.addEventListener('resize', () => {
+                // Adjust page when keyboard appears
+                document.body.style.height = `${viewport.height}px`;
+            });
+        }
+
+        // Friendly error message mapping
+        function getFriendlyErrorMessage(errorCode) {
+            const errorMap = {
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/user-disabled': 'This account has been disabled. Please contact support.',
+                'auth/user-not-found': 'No account found with this email. Please sign up first.',
+                'auth/wrong-password': 'Incorrect password. Please try again or reset your password.',
+                'auth/email-already-in-use': 'An account with this email already exists. Please log in instead.',
+                'auth/weak-password': 'Password should be at least 6 characters long.',
+                'auth/operation-not-allowed': 'This sign-in method is not enabled. Please contact support.',
+                'auth/too-many-requests': 'Too many failed attempts. Please wait a few minutes and try again.',
+                'auth/network-request-failed': 'Network error. Please check your internet connection and try again.',
+                'auth/popup-closed-by-user': 'Sign-in cancelled. Please try again if this was a mistake.',
+                'auth/popup-blocked': 'Popup blocked by your browser. Please allow popups for this site.',
+                'auth/unauthorized-domain': 'This domain is not authorized for authentication. Please contact support.',
+                'auth/invalid-credential': 'Invalid credentials. Please check your information and try again.',
+                'auth/account-exists-with-different-credential': 'An account already exists with this email but different sign-in method.',
+                'auth/cancelled-popup-request': 'Another sign-in popup is already open'
+            };
+            return errorMap[errorCode] || 'An unexpected error occurred. Please try again.';
+        }
 
         // --- GOOGLE ---
         const gBtn = document.getElementById('googleSignInBtn');
@@ -481,6 +586,9 @@
             gBtn.addEventListener('click', async () => {
                 const intent = sessionStorage.getItem('loginIntent') || 'user';
                 try {
+                    gBtn.disabled = true; // Prevent double-click
+                    gBtn.style.opacity = '0.6';
+                    gBtn.style.cursor = 'not-allowed';
                     gBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
 
                     const result = await loginWithGoogle();
@@ -491,8 +599,12 @@
                         throw new Error(result.error);
                     }
                 } catch (e) {
-                    console.error("Login Failed", e);
-                    alert("Sign In Error: " + e.message);
+                    const friendlyMsg = getFriendlyErrorMessage(e.code || e.message);
+                    alert(friendlyMsg);
+                    // Re-enable button on error
+                    gBtn.disabled = false;
+                    gBtn.style.opacity = '1';
+                    gBtn.style.cursor = 'pointer';
                     gBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
                 }
             });
@@ -502,26 +614,101 @@
         window.handleEmailLogin = async function () {
             const intent = sessionStorage.getItem('loginIntent') || 'user';
             const email = document.getElementById('emailInput').value;
-            const pass = document.getElementById('passInput').value; // Assuming valid password input exists
+            const pass = document.getElementById('passInput').value;
+            const submitBtn = document.querySelector('.submit-btn');
+            const rememberMe = document.getElementById('rememberMe').checked;
 
             if (!email || !pass) { alert("Please enter email and password"); return; }
 
             try {
+                // Disable submit button
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.6';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
                 const result = await loginWithEmail(email, pass);
                 if (result.success) {
-                    await handleRoleRouting(result.user, intent);
+                    // Remember me functionality
+                    if (rememberMe) {
+                        localStorage.setItem('rememberedEmail', email);
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                    }
+
+                    // Check for returnUrl
+                    const returnUrl = sessionStorage.getItem('returnUrl');
+                    if (returnUrl) {
+                        sessionStorage.removeItem('returnUrl');
+                        window.location.href = returnUrl;
+                    } else {
+                        await handleRoleRouting(result.user, intent);
+                    }
                 } else {
-                    alert("Login Failed: " + result.error);
+                    const friendlyMsg = getFriendlyErrorMessage(result.error);
+                    alert(friendlyMsg);
                 }
             } catch (e) {
-                console.error(e);
-                alert("Login Error: " + e.message);
+                const friendlyMsg = getFriendlyErrorMessage(e.code || e.message);
+                alert(friendlyMsg);
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.innerHTML = 'Log In';
             }
         }
     </script>
 
     <!-- SLIDER UI & BYPASS LOGIC (Global) -->
     <script>
+        // --- 0. PASSWORD VISIBILITY TOGGLE ---
+        const togglePassword = document.getElementById('togglePassword');
+        const passInput = document.getElementById('passInput');
+        if (togglePassword && passInput) {
+            togglePassword.addEventListener('click', function () {
+                const type = passInput.type === 'password' ? 'text' : 'password';
+                passInput.type = type;
+                const icon = this.querySelector('i');
+                icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+            });
+        }
+
+        // --- 0.5 CAPS LOCK WARNING ---
+        if (passInput) {
+            passInput.addEventListener('keyup', function (event) {
+                const capsWarning = document.getElementById('capsWarning') || (() => {
+                    const warning = document.createElement('div');
+                    warning.id = 'capsWarning';
+                    warning.style.cssText = 'color: #F49F75; font-size: 0.85rem; margin-top: 5px; display: none;';
+                    warning.innerHTML = '<i class="fas fa-exclamation-triangle"></i> CAPS LOCK is ON';
+                    this.parentElement.appendChild(warning);
+                    return warning;
+                })();
+
+                const isCapsOn = event.getModifierState && event.getModifierState('CapsLock');
+                capsWarning.style.display = isCapsOn ? 'block' : 'none';
+            });
+        }
+
+        // ---  0.6 NETWORK STATUS CHECK ---
+        window.addEventListener('offline', () => {
+            alert('⚠️ You are offline. Please check your internet connection.');
+        });
+
+        if (!navigator.onLine) {
+            console.log('No internet connection detected on page load');
+        }
+
+        // --- PHASE 4: Auto-fill Remembered Email ---
+        const rememberedEmail = localStorage.getItem('rememberedEmail');
+        if (rememberedEmail) {
+            const emailInput = document.getElementById('emailInput');
+            if (emailInput) {
+                emailInput.value = rememberedEmail;
+                document.getElementById('rememberMe').checked = true;
+            }
+        }
+
         // --- 1. SLIDER LOGIC ---
         const thumb = document.getElementById('roleThumb');
         const riTitle = document.getElementById('riTitle');
