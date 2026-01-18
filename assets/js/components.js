@@ -274,11 +274,11 @@ try {
             .dropdown-content .dropdown-content::before {
                 content: "";
                 position: absolute;
-                top: 0 !important;
-                left: -20px !important; /* WIDER BRIDGE back to parent */
-                width: 25px !important; /* Fill the 10px gap + extra overlap */
-                height: 100% !important;
-                background: transparent !important;
+                top: -20px !important; /* Taller catch area top */
+                left: -40px !important; /* WIDER BRIDGE back to parent */
+                width: 60px !important; /* Fill gap + overlap parent significantly */
+                height: 140% !important; /* Taller catch area bottom */
+                background: rgba(0,0,0,0.001) !important; /* Force hit-test */
                 z-index: 1001 !important;
             }
 
@@ -397,7 +397,7 @@ const NAV_DATA = [
         children: [
             {
                 id: 'nav-peer-group',
-                label: 'Talk to a Peer <i class="fas fa-fire" style="color:var(--ember-orange); text-shadow:0 0 8px var(--ember-orange); margin-left:4px; font-size:0.8em;"></i>',
+                label: 'Talk to a Peer <i class="fas fa-fire" style="color:var(--ember-orange); text-shadow:0 0 12px var(--ember-orange); margin-left:4px; font-size:0.8em;"></i>',
                 href: '#',
                 type: 'submenu',
                 children: [
@@ -408,7 +408,7 @@ const NAV_DATA = [
             },
             {
                 id: 'nav-psych-group',
-                label: 'Talk to a Psychologist <i class="fas fa-fire" style="color:var(--teal-glow); text-shadow:0 0 8px var(--teal-glow); margin-left:4px; font-size:0.8em;"></i>',
+                label: 'Talk to a Psychologist <i class="fas fa-fire" style="color:var(--teal-glow); text-shadow:0 0 12px var(--teal-glow); margin-left:4px; font-size:0.8em;"></i>',
                 href: '#',
                 type: 'submenu',
                 children: [
