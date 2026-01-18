@@ -20,192 +20,304 @@
     <script src="../assets/js/components.js"></script>
 
     <style>
-        /* --- PROBLEM WALL SPECIFIC STYLES --- */
-        /* Relying on global.css for dark theme background */
+        /* --- 1. CORE THEME: DAYBREAK (Light & Airy) --- */
+        :root {
+            --paper-white: #fffefb;
+            --ink-black: #1e293b;
+            --soft-sky: #f0f9ff;
+            --mist-gray: #e2e8f0;
+            --highlight-blue: #38bdf8;
+            --peach: #F49F75;
+            --teal: #4ECDC4;
+            --warm-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 
-        /* Stats Item Styles */
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
+            /* Performance: Reduce variable usage in heavy animations */
+            --mouse-x: 50%;
+            --mouse-y: 50%;
         }
 
-        .nav-link {
-            text-decoration: none;
-            color: #334155;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: 0.3s;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .nav-link:hover {
-            color: #0f172a;
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            /* Throttled gradient for performance */
+            background-image:
+                radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(78, 205, 196, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(244, 159, 117, 0.05) 0%, transparent 50%);
+            color: var(--ink-black);
+            overflow: hidden;
+            /* Infinite canvas handles scroll */
+            height: 100vh;
+            width: 100vw;
+            will-change: background-image;
+            /* HW Acceleration hint */
         }
 
-        .cta-btn {
-            background: #334155;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: 0.3s;
+        /* --- 2. HEADER OVERRIDE (Daybreak Theme) --- */
+        /* We use specific selectors to override global.css styles injected by components.js */
+
+        /* Force Light Theme on the Island Nav */
+        header.island-nav {
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
         }
 
-        .cta-btn:hover {
-            background: #0f172a;
+        /* Light Theme Links */
+        header.island-nav .nav-links a {
+            color: #475569 !important;
+            /* Slate-600 */
+        }
+
+        header.island-nav .nav-links a:hover {
+            color: #4ECDC4 !important;
+            /* Teal */
+        }
+
+        header.island-nav .nav-links i {
+            color: #94a3b8 !important;
+            /* Slate-400 */
+        }
+
+        header.island-nav .nav-links a:hover i {
+            color: #4ECDC4 !important;
+        }
+
+        /* Logo Text Dark */
+        header.island-nav .nav-logo {
+            filter: invert(1) !important;
+            opacity: 0.8 !important;
+        }
+
+        /* Dropdown Menus (Light Mode) */
+        header.island-nav .dropdown-content {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        header.island-nav .dropdown-content a {
+            color: #475569 !important;
+        }
+
+        /* Header Buttons Override (Force Visibility) */
+        header.island-nav .nav-btn,
+        header.island-nav .lifeline-btn {
+            background: #0f172a !important;
+            /* Dark Slate */
+            border: 1px solid #0f172a !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        header.island-nav .nav-btn:hover,
+        header.island-nav .lifeline-btn:hover {
+            background: #4ECDC4 !important;
+            /* Teal Highlight */
+            border-color: #4ECDC4 !important;
+            color: white !important;
             transform: translateY(-2px);
         }
 
-        /* Mobile Menu Button */
-        .menu-toggle {
-            display: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #334155;
+        header.island-nav .nav-btn {
+            background: white !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
         }
 
-        @media(max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .menu-toggle {
-                display: flex;
-            }
-
-            .site-header {
-                padding: 15px 20px;
-            }
-
-            .header-stats {
-                left: 20px;
-                top: 70px;
-                font-size: 0.75rem;
-            }
+        header.island-nav .nav-btn:hover {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
         }
 
-        /* --- GLOBAL STATS WIDGET (Right Side) --- */
-        .global-stats {
+        /* Header Glow States (Interactive) */
+        header.island-nav.glow-red {
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.3) !important;
+            border-color: rgba(239, 68, 68, 0.4) !important;
+            transition: 0.3s ease;
+        }
+
+        header.island-nav.glow-yellow {
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.3) !important;
+            border-color: rgba(251, 191, 36, 0.4) !important;
+            transition: 0.3s ease;
+        }
+
+        header.island-nav.glow-orange {
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.3) !important;
+            border-color: rgba(249, 115, 22, 0.4) !important;
+            transition: 0.3s ease;
+        }
+
+        /* --- 3. LIVE ACTIVITY BAR --- */
+        .live-activity-bar {
             position: fixed;
-            top: 120px;
-            right: 40px;
-            background: white;
-            padding: 20px;
+            top: 100px;
+            /* Below header */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #64748b;
+            z-index: 900;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 5px 15px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 200;
-            pointer-events: auto;
-            width: 200px;
             border: 1px solid rgba(0, 0, 0, 0.05);
+            pointer-events: none;
+            /* Let clicks pass */
         }
 
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.9rem;
-            color: #475569;
-        }
-
-        .stat-icon {
-            width: 36px;
-            height: 36px;
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulseDot 2s infinite;
         }
 
-        .stat-val {
-            font-weight: 700;
-            color: #1e293b;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            opacity: 0.7;
-        }
-
-        @media(max-width: 768px) {
-            .global-stats {
-                top: auto;
-                bottom: 100px;
-                right: 20px;
-                width: auto;
-                padding: 12px;
-                flex-direction: row;
-                gap: 15px;
-                transform: scale(0.9);
-                transform-origin: bottom right;
-                background: rgba(255, 255, 255, 0.9);
-                backdrop-filter: blur(5px);
+        @keyframes pulseDot {
+            0% {
+                opacity: 0.5;
+                transform: scale(1);
             }
 
-            .stat-label {
-                display: none;
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+
+            100% {
+                opacity: 0.5;
+                transform: scale(1);
             }
         }
 
-        /* --- THE CANVAS CONTAINER --- */
-        #canvas-wrapper {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        /* --- 4. INFINITE CANVAS & NOTES --- */
+        #viewport {
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
             cursor: grab;
+            position: relative;
+            touch-action: none;
+        }
+
+        #viewport:active {
+            cursor: grabbing;
         }
 
         #infinite-canvas {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            transform-origin: 0 0;
-            /* Important for Matrix transforms */
-            transition: transform 0.1s ease-out;
+            width: 5000px;
+            /* Large canvas */
+            height: 5000px;
+            /* Centering initially */
+            transform-origin: center center;
+            /* Dot Grid Pattern */
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 30px 30px;
+            /* Hardware Acceleration */
+            will-change: transform;
+            /* Smoother transition/interp */
         }
 
-        /* --- THE NOTES --- */
+        /* HERO TEXT ON CANVAS */
+        .wall-hero {
+            position: absolute;
+            top: 2450px;
+            /* Center of 5000px canvas */
+            left: 2500px;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            /* Let clicks pass through to canvas */
+            z-index: 0;
+        }
+
+        .wall-hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 4rem;
+            color: #1e293b;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .wall-hero p {
+            font-size: 1.2rem;
+            color: #64748b;
+        }
+
+        /* NOTE CARD STYLING */
         .note {
             position: absolute;
-            width: 300px;
-            background: var(--paper-note);
-            padding: 30px 25px;
-            border-radius: 4px;
-            box-shadow: 0 4px 20px var(--soft-shadow), 0 1px 3px var(--border-faint);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            backface-visibility: hidden;
+            width: 280px;
+            background: var(--paper-white);
+            padding: 25px;
+            border-radius: 2px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            /* Reduced initial shadow for perf */
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #334155;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            /* Faster transition */
+            cursor: default;
+            user-select: none;
+            overflow: hidden;
+            /* Promote to own layer for perf */
+            will-change: transform;
         }
 
         .note:hover {
-            transform: scale(1.05) translateY(-5px) !important;
-            /* Override inline rotation slightly */
-            z-index: 100;
+            transform: scale(1.02) rotate(0deg) !important;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-            border-color: rgba(0, 0, 0, 0.08);
+            z-index: 10;
         }
 
-        .note-text {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #1e293b;
-            margin-bottom: 25px;
-            font-weight: 400;
+        /* Glow States (Simplified box-shadows for perf) */
+        .note.glow-red {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4) !important;
+            border-color: rgba(239, 68, 68, 0.4) !important;
+        }
+
+        .note.glow-yellow {
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4) !important;
+            border-color: rgba(251, 191, 36, 0.4) !important;
+        }
+
+        .note.glow-orange {
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.4) !important;
+            border-color: rgba(249, 115, 22, 0.4) !important;
+        }
+
+        /* Tape effect */
+        .note::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 40px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .note-meta {
@@ -260,36 +372,20 @@
             background: #ffedd5;
         }
 
-        /* Hero / Title - Drifts on Canvas Level visually but fixed for now */
-        .wall-hero {
-            position: absolute;
-            top: 120px;
-            /* Below Header */
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            pointer-events: auto;
+        /* Animation Classes */
+        .pop-active {
+            animation: pop 0.3s;
         }
 
-        .wall-title {
-            font-size: 2.5rem;
-            color: var(--ink-text);
-            font-weight: 300;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(5px);
-            padding: 10px 30px;
-            border-radius: 50px;
+        @keyframes pop {
+            50% {
+                transform: scale(1.3);
+            }
         }
 
-        .wall-sub {
-            font-size: 1rem;
-            color: #64748b;
-        }
-
-        /* Add Note FAB */
-        .fab-wrapper {
-            position: absolute;
+        /* --- 5. UI OVERLAYS (FAB STACK) --- */
+        .fab-stack-container {
+            position: fixed;
             bottom: 40px;
             right: 30px;
             display: flex;
@@ -498,10 +594,14 @@
     </style>
 </head>
 
-<body data-page="problem-wall" data-header-theme="light">
+<body data-header-theme="light">
 
-    <!-- REFINED HEADER -->
-    <!-- Header injected by components.js -->
+    <!-- --- HEADER (INJECTED BY COMPONENTS.JS) --- -->
+    <header class="island-nav" id="main-header"></header>
+    <script>
+        // Force header injection if it hasn't happened yet
+        if (typeof injectHeader === 'function') injectHeader();
+    </script>
 
     <!-- LIVE COUNTER -->
     <div class="live-activity-bar">
@@ -509,427 +609,515 @@
         <span id="userCount">142</span> people here right now
     </div>
 
-    <!-- UI LAYER -->
-    <!-- Theme Fix: Removed local white background override to match global dark theme -->
-    <div class="ui-layer">
-
-        <!-- GLOBAL REACTION STATS -->
-        <div class="global-stats">
-            <div class="stat-item">
-                <div class="stat-icon" style="background:#fce7f3; color:#ec4899;">
-                    <i class="fas fa-heart"></i>
-                </div>
-                <div>
-                    <span class="stat-val" id="totalHearts">2,405</span>
-                    <span class="stat-label">Hearts given</span>
-                </div>
+    <!-- GLOBAL STATS (SIDEBAR) -->
+    <div class="global-stats">
+        <div class="stat-item">
+            <div class="stat-icon-box" style="background: #ffe4e6; color: #ef4444;">
+                <i class="fas fa-heart"></i>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon" style="background:#fef3c7; color:#f59e0b;">
-                    <i class="fas fa-spa"></i>
-                </div>
-                <div>
-                    <span class="stat-val" id="totalFlowers">892</span>
-                    <span class="stat-label">Flowers offered</span>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon" style="background:#ffedd5; color:#f97316;">
-                    <i class="fas fa-fire-alt"></i>
-                </div>
-                <div>
-                    <span class="stat-val" id="totalCandles">1,204</span>
-                    <span class="stat-label">Candles lit</span>
-                </div>
+            <div class="stat-text">
+                <h4 id="totalHearts">0</h4>
+                <span>Hearts given</span>
             </div>
         </div>
-
-        <!-- INFINITE CANVAS WRAPPER -->
-        <div id="viewport">
-            <div id="infinite-canvas">
-
-                <!-- HERO TEXT (Part of Canvas) -->
-                <div class="wall-hero">
-                    <h1>The Problem Wall</h1>
-                    <p>A place where pain is seen, not solved.</p>
-                </div>
-
-                <!-- DYNAMIC NOTES CONTAINER -->
-                <div id="notes-container"></div>
-
+        <div class="stat-item">
+            <div class="stat-icon-box" style="background: #fef9c3; color: #eab308;">
+                <i class="fas fa-spa"></i>
+            </div>
+            <div class="stat-text">
+                <h4 id="totalFlowers">0</h4>
+                <span>Flowers offered</span>
             </div>
         </div>
-
-        <!-- CANVAS WRAPPER (For Panning) -->
-        <div id="canvas-wrapper">
-            <div id="infinite-canvas">
-                <!-- Notes injected here -->
+        <div class="stat-item">
+            <div class="stat-icon-box" style="background: #ffedd5; color: #f97316;">
+                <i class="fas fa-fire-alt"></i>
             </div>
-
-            <!-- 3. Write (Bottom - Main) -->
-            <div class="fab-btn fab-write" onclick="openWriter()" title="Share a Burden">
-                <i class="fas fa-plus"></i>
-            </div>
-
-        </div>
-
-        <!-- WRITING MODAL -->
-        <div class="modal-overlay" id="writeModal">
-            <div class="writer-card">
-                <button class="close-modal" onclick="closeWriter()"><i class="fas fa-times"></i></button>
-                <h3 style="font-family:'Outfit'; margin-bottom:20px; font-size:1.5rem;">Leave a burden.</h3>
-                <textarea class="writer-textarea" id="noteInput" placeholder="I feel..."></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:0.8rem; color:#94a3b8;"><i class="fas fa-shield-alt"></i> Anonymous &
-                        Filtered</span>
-                    <button class="post-btn" onclick="postNote()">Post It</button>
-                </div>
+            <div class="stat-text">
+                <h4 id="totalCandles">0</h4>
+                <span>Candles lit</span>
             </div>
         </div>
+    </div>
 
-        <!-- TOAST -->
-        <div class="toast" id="toast">
-            <i class="fas fa-check-circle" style="color:#10b981;"></i>
-            <span>This was shared anonymously.</span>
+    <!-- INFINITE CANVAS WRAPPER -->
+    <div id="viewport">
+        <div id="infinite-canvas">
+
+            <!-- HERO TEXT (Part of Canvas) -->
+            <div class="wall-hero">
+                <h1>The Problem Wall</h1>
+                <p>A place where pain is seen, not solved.</p>
+            </div>
+
+            <!-- DYNAMIC NOTES CONTAINER -->
+            <div id="notes-container"></div>
+
+        </div>
+    </div>
+
+    <!-- FAB STACK (Bottom Right) -->
+    <div class="fab-stack-container">
+
+        <!-- 2. Center/Reset (Middle) -->
+        <div class="fab-btn fab-center" onclick="resetView()" title="Center View">
+            <i class="fas fa-compress-arrows-alt"></i>
         </div>
 
-        <script>
-            // --- CONTENT SAFETY: PROFANITY FILTER ---
-            const OBSCENE_WORDS = ["damn", "hell", "badword1", "badword2", "hate", "kill", "die", "ugly", "stupid", "idiot"];
-            // Note: Real deployment should use a comprehensive list or API. This is a client-side placeholder.
+        <!-- 3. Write (Bottom - Main) -->
+        <div class="fab-btn fab-write" onclick="openWriter()" title="Share a Burden">
+            <i class="fas fa-plus"></i>
+        </div>
 
-            // --- STORAGE HELPERS (PHASE 1: LocalStorage) ---
-            function getStoredNotes() {
-                try {
-                    return JSON.parse(localStorage.getItem('problemWallNotes')) || [];
-                } catch (e) {
-                    return [];
-                }
+    </div>
+
+    <!-- WRITING MODAL -->
+    <div class="modal-overlay" id="writeModal">
+        <div class="writer-card">
+            <button class="close-modal" onclick="closeWriter()"><i class="fas fa-times"></i></button>
+            <h3 style="font-family:'Outfit'; margin-bottom:20px; font-size:1.5rem;">Leave a burden.</h3>
+            <textarea class="writer-textarea" id="noteInput" placeholder="I feel..."></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.8rem; color:#94a3b8;"><i class="fas fa-shield-alt"></i> Anonymous &
+                    Filtered</span>
+                <button class="post-btn" onclick="postNote()">Post It</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CONFIG & STATE ---
+        const CONFIG = {
+            width: 5000,
+            height: 5000,
+            initialNotes: 25, /* Increased count */
+            spawnRadius: 800 /* Restrict initial spawn to center area */
+        };
+
+        const STATE = {
+            scale: 1,
+            panning: false,
+            pointX: 0,
+            pointY: 0,
+            startX: 0,
+            startY: 0,
+            animationFrame: null
+        };
+
+        const OBSCENE_WORDS = ["fuck", "shit", "bitch", "asshole", "cunt", "dick", "pussy", "whore", "slut", "bastard"];
+
+        // --- 2. INITIALIZATION ---
+        const canvas = document.getElementById('infinite-canvas');
+        const viewport = document.getElementById('viewport');
+        const notesContainer = document.getElementById('notes-container');
+
+        // Center the canvas on load
+        window.onload = () => {
+            // Force header injection again to be safe
+            if (window.injectHeader) window.injectHeader();
+
+            // Calculate center position: (Viewport Width - Canvas Width) / 2
+            STATE.pointX = (window.innerWidth - CONFIG.width) / 2;
+            STATE.pointY = (window.innerHeight - CONFIG.height) / 2;
+
+            updateTransform(); // Apply initial transform
+            generateRandomNotes();
+            startFakeLiveActivity();
+        };
+
+        // --- 3. CANVAS LOGIC (PAN & ZOOM) - OPTIMIZED ---
+        viewport.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.note') || e.target.closest('.wall-hero')) return;
+            STATE.panning = true;
+            STATE.startX = e.clientX - STATE.pointX;
+            STATE.startY = e.clientY - STATE.pointY;
+            viewport.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mouseup', () => {
+            STATE.panning = false;
+            viewport.style.cursor = 'grab';
+        });
+
+        // Throttled Mouse Move
+        let lastFrame = 0;
+        window.addEventListener('mousemove', (e) => {
+            const now = Date.now();
+            if (now - lastFrame < 16) return; // Cap at ~60fps
+            lastFrame = now;
+
+            // A. Pan Logic
+            if (STATE.panning) {
+                e.preventDefault();
+                STATE.pointX = e.clientX - STATE.startX;
+                STATE.pointY = e.clientY - STATE.startY;
+                requestAnimationFrame(updateTransform); // Synced with repaint
             }
 
-            function saveNote(note) {
-                const notes = getStoredNotes();
-                notes.push(note);
-                saveAllNotes(notes);
+            // B. Background Gradient Logic (Only update every 3rd frame loosely)
+            if (Math.random() > 0.6) {
+                const xPercent = (e.clientX / window.innerWidth) * 100 + '%';
+                const yPercent = (e.clientY / window.innerHeight) * 100 + '%';
+                document.body.style.setProperty('--mouse-x', xPercent);
+                document.body.style.setProperty('--mouse-y', yPercent);
             }
+        });
 
-            function saveAllNotes(notes) {
-                localStorage.setItem('problemWallNotes', JSON.stringify(notes));
-            }
+        // Zoom (Wheel)
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const xs = (e.clientX - STATE.pointX) / STATE.scale;
+            const ys = (e.clientY - STATE.pointY) / STATE.scale;
+            const delta = -e.deltaY;
 
+            (delta > 0) ? (STATE.scale *= 1.1) : (STATE.scale /= 1.1);
 
+            // Limit Zoom limits
+            STATE.scale = Math.min(Math.max(0.4, STATE.scale), 2.5);
 
-            // --- GLOBAL STATS FAKE LOGIC ---
-            // Slowly increment counts to simulate activity
-            function incrementStat(id, interval) {
-                const el = document.getElementById(id);
-                if (!el) return;
+            STATE.pointX = e.clientX - xs * STATE.scale;
+            STATE.pointY = e.clientY - ys * STATE.scale;
 
-                // Initial parse
-                let val = parseInt(el.innerText.replace(/,/g, ''));
+            requestAnimationFrame(updateTransform);
+        }, { passive: false });
 
-                setInterval(() => {
-                    // Occasional update
-                    if (Math.random() > 0.3) {
-                        val++;
-                        el.innerText = val.toLocaleString();
+        function updateTransform() {
+            // Using 3D transform for GPU acceleration
+            canvas.style.transform = `translate3d(${STATE.pointX}px, ${STATE.pointY}px, 0) scale(${STATE.scale})`;
+        }
 
-                        // Little flash
-                        el.style.color = "#10b981";
-                        setTimeout(() => el.style.color = "#1e293b", 500);
+        function resetView(focusX = null, focusY = null) {
+            // Default to center of canvas
+            const canvasCenterX = CONFIG.width / 2;
+            const canvasCenterY = CONFIG.height / 2;
 
-                        // Save to local storage for "persistence" feeling? No, simple is fine.
+            const targetPointX = focusX !== null ? focusX : canvasCenterX;
+            const targetPointY = focusY !== null ? focusY : canvasCenterY;
+
+            // Calculate translation to put targetPoint at viewport center
+            // Formula: Translation = (Viewport/2) - (TargetPoint * Scale)
+            // Assuming Scale = 1 for reset
+            const targetX = (window.innerWidth / 2) - targetPointX;
+            const targetY = (window.innerHeight / 2) - targetPointY;
+            const targetScale = 1;
+
+            canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
+
+            STATE.pointX = targetX;
+            STATE.pointY = targetY;
+            STATE.scale = targetScale;
+            updateTransform();
+
+            // Disable transition after animation to prevent drag lag
+            setTimeout(() => {
+                canvas.style.transition = "";
+            }, 1200);
+        }
+
+        // --- 4. NOTE GENERATION (FIXED) ---
+        // --- 4. NOTE GENERATION (SMARTER) ---
+        const sampleTexts = [
+            "I feel so behind everyone else.",
+            "I'm afraid I'll never be good enough.",
+            "I miss who I used to be.",
+            "Everything feels too loud today.",
+            "I just need a hug.",
+            "University is overwhelming.",
+            "I pretend I'm okay.",
+            "Is it okay to not have a plan?",
+            "I feel lonely even with friends.",
+            "I'm tired of the noise.",
+            "Does anyone else feel this lost?",
+            "I wish I could pause time.",
+            "My anxiety is winning today.",
+            "Smiling is exhausting.",
+            "I want to be heard.",
+            "Just getting by is hard enough.",
+            "I miss my childhood.",
+            "The future scares me."
+        ];
+
+        // Track placed notes for collision detection
+        const placedNotes = [];
+        // Global Logic to Track real stats
+        let globalStats = { heart: 0, flower: 0, candle: 0 };
+
+        function generateRandomNotes() {
+            const centerX = CONFIG.width / 2;
+            const centerY = CONFIG.height / 2;
+            const timeOffsets = ["2m ago", "5m ago", "12m ago", "1h ago", "2h ago", "1d ago"];
+
+            // Shuffle method to pick unique texts
+            const textPool = [...sampleTexts].sort(() => 0.5 - Math.random());
+
+            let count = 0;
+            let attempts = 0;
+
+            // Reset Global Stats on Regen
+            globalStats = { heart: 0, flower: 0, candle: 0 };
+
+            while (count < CONFIG.initialNotes && attempts < 2000) {
+                attempts++;
+
+                // Random position within radius
+                const offsetX = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
+                const offsetY = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
+
+                // 1. EXPANDED EXCLUSION ZONE (Center Text)
+                // Expanded STRICTLY for "The Problem Wall" text overlap prevention
+                // Must correspond to text width (~1200px) and height (~400px)
+                if (Math.abs(offsetX) < 650 && Math.abs(offsetY) < 350) continue;
+
+                // 2. COLLISION CHECK (Simple distance)
+                let collision = false;
+                for (let note of placedNotes) {
+                    const dx = note.x - offsetX;
+                    const dy = note.y - offsetY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 340) { // Slight increase in buffer
+                        collision = true;
+                        break;
                     }
-                }, interval);
-            }
-
-            // Start Fake Stats - Slow Paced
-            incrementStat('userCount', 180000); // 3 mins per user roughly
-            incrementStat('totalHearts', 45000); // 45s
-            incrementStat('totalFlowers', 120000); // 2 mins
-            incrementStat('totalCandles', 90000); // 1.5 mins
-
-            // --- SEED DATA ---
-            const seedNotes = [
-                { text: "I feel like I'm failing everyone.", heart: 12, flower: 5, candle: 2 },
-                { text: "I miss someone who hurt me.", heart: 34, flower: 10, candle: 8 },
-                { text: "The silence in my apartment is too loud today.", heart: 5, flower: 2, candle: 0 },
-                { text: "I am tired of pretending I'm okay at work.", heart: 18, flower: 6, candle: 3 },
-                { text: "I don't know who I am anymore.", heart: 42, flower: 15, candle: 12 },
-                { text: "Everyone else seems to have it figured out.", heart: 8, flower: 1, candle: 1 },
-                { text: "I'm scared I'll never feel happy again.", heart: 25, flower: 8, candle: 4 },
-                { text: "I wish I could just pause time for a week.", heart: 50, flower: 20, candle: 10 }
-            ];
-
-            // --- CANVAS STATE ---
-            const wrapper = document.getElementById('canvas-wrapper');
-            const canvas = document.getElementById('infinite-canvas');
-
-            let scale = 1;
-            let panX = 0;
-            let panY = 0;
-            let isDragging = false;
-            let startX, startY;
-
-            function updateTransform() {
-                canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-            }
-
-            // --- PANNING ---
-            wrapper.addEventListener('mousedown', (e) => {
-                if (e.target.closest('.note') || e.target.closest('.modal-overlay')) return;
-                isDragging = true;
-                startX = e.clientX - panX;
-                startY = e.clientY - panY;
-                wrapper.style.cursor = 'grabbing';
-            });
-
-            window.addEventListener('mouseup', () => {
-                isDragging = false;
-                wrapper.style.cursor = 'grab';
-            });
-
-            window.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                e.preventDefault();
-                panX = e.clientX - startX;
-                panY = e.clientY - startY;
-                updateTransform();
-            });
-
-            // Touch Panning
-            wrapper.addEventListener('touchstart', (e) => {
-                if (e.target.closest('.note')) return;
-                isDragging = true;
-                startX = e.touches[0].clientX - panX;
-                startY = e.touches[0].clientY - panY;
-            });
-
-            wrapper.addEventListener('touchmove', (e) => {
-                if (!isDragging) return;
-                e.preventDefault(); // Prevent standard scroll
-                panX = e.touches[0].clientX - startX;
-                panY = e.touches[0].clientY - startY;
-                updateTransform();
-            });
-
-            // --- ZOOMING ---
-            function zoomCanvas(delta) {
-                scale += delta;
-                // Clamp Zoom
-                scale = Math.min(Math.max(0.5, scale), 2);
-                updateTransform();
-            }
-
-            // Mouse Wheel Zoom
-            wrapper.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                const delta = e.deltaY > 0 ? -0.1 : 0.1;
-                zoomCanvas(delta);
-            }, { passive: false });
-
-
-            // --- NOTE CREATION ---
-            // --- NOTE CREATION & RENDERING ---
-            function initCanvas() {
-                // Center Canvas Initially (Approx view center)
-                panX = window.innerWidth / 2;
-                panY = window.innerHeight / 2;
-                updateTransform();
-
-                const storedNotes = getStoredNotes();
-
-                if (storedNotes.length > 0) {
-                    storedNotes.forEach(renderNote);
-                } else {
-                    // SEED DATA IF EMPTY
-                    seedNotes.forEach(data => {
-                        const pos = getRandomPos();
-                        const seed = {
-                            id: crypto.randomUUID(),
-                            text: data.text,
-                            x: pos.x,
-                            y: pos.y,
-                            rotation: (Math.random() - 0.5) * 6,
-                            hearts: data.heart,
-                            flowers: data.flower,
-                            candles: data.candle,
-                            createdAt: new Date().toISOString()
-                        };
-                        saveNote(seed);
-                        renderNote(seed);
-                    });
                 }
+                if (collision) continue;
+
+                // Success - Place Note
+                const reactions = {
+                    heart: Math.floor(Math.random() * 12),
+                    flower: Math.floor(Math.random() * 8),
+                    candle: Math.floor(Math.random() * 5)
+                };
+
+                // Add to Global Stats
+                globalStats.heart += reactions.heart;
+                globalStats.flower += reactions.flower;
+                globalStats.candle += reactions.candle;
+
+                const time = timeOffsets[Math.floor(Math.random() * timeOffsets.length)];
+
+                // Pick text from shuffled pool (clone pool if exhausted)
+                if (count >= textPool.length) {
+                    textPool.sort(() => 0.5 - Math.random());
+                }
+                const text = textPool[count % textPool.length];
+
+                createNoteElement(
+                    text,
+                    centerX + offsetX,
+                    centerY + offsetY,
+                    time,
+                    reactions
+                );
+
+                placedNotes.push({ x: offsetX, y: offsetY });
+                count++;
             }
 
-            function getRandomPos() {
-                // Random scatter relative to center (0,0 is center of infinite canvas logic)
-                // Use a spread of +/- 800px
-                const spread = 800;
-                const x = (Math.random() - 0.5) * spread * 2;
-                const y = (Math.random() - 0.5) * spread * 1.5;
-                return { x, y };
-            }
+            // SET INITIAL STATDOM
+            updateStatDisplay();
+        }
 
-            function renderNote(data) {
-                const note = document.createElement('div');
-                note.className = 'note';
-                note.dataset.id = data.id;
+        function updateStatDisplay() {
+            const h = document.getElementById('totalHearts');
+            const f = document.getElementById('totalFlowers');
+            const c = document.getElementById('totalCandles');
 
-                note.style.left = data.x + 'px';
-                note.style.top = data.y + 'px';
-                note.style.transform = `rotate(${data.rotation}deg)`;
+            if (h) h.innerText = globalStats.heart.toLocaleString();
+            if (f) f.innerText = globalStats.flower.toLocaleString();
+            if (c) c.innerText = globalStats.candle.toLocaleString();
+        }
 
-                const tints = ['#ffffff', '#fdfbf7', '#fefce8', '#f0f9ff'];
-                // Use a deterministic tint based on ID or random if not stored? 
-                // For now, random is fine on render as tint isn't in data model explicitly, 
-                // but better to add it or just pick one. Keeping random for variety on refresh is okay for Phase 1 demo feel,
-                // but user asked for persistence. Let's stick to the user's snippet which used random in renderNote.
-                note.style.background = tints[Math.floor(Math.random() * tints.length)];
+        function createNoteElement(text, x, y, timeLabel, reactionCounts = { heart: 0, flower: 0, candle: 0 }) {
+            const el = document.createElement('div');
+            el.className = 'note';
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            // Random slight rotation
+            el.style.transform = `rotate(${Math.random() * 6 - 3}deg)`;
 
-                note.innerHTML = `
-                <div class="note-text"></div>
+            el.innerHTML = `
+                ${text}
                 <div class="note-meta">
-                    <span>Shared quietly</span>
+                    <span style="opacity:0.6;">Anonymous</span>
+                    <span style="font-size:0.75rem;">${timeLabel}</span>
                 </div>
-                <div class="reaction-row">
-                    <button class="react-btn" onclick="react(this, 'heart')">
-                        <i class="far fa-heart"></i> <span class="count">${data.hearts || data.heart || 0}</span>
+                <!-- REACTION BAR -->
+                <div class="note-actions">
+                    <button class="action-btn heart-btn" onclick="react(this, 'heart')">
+                        <i class="fas fa-heart"></i> <span class="count">${reactionCounts.heart}</span>
                     </button>
-                    <button class="react-btn flower" onclick="react(this, 'flower')">
-                        <i class="fas fa-spa"></i> <span class="count">${data.flowers || data.flower || 0}</span>
+                    <button class="action-btn flower-btn" onclick="react(this, 'flower')">
+                        <i class="fas fa-spa"></i> <span class="count">${reactionCounts.flower}</span>
                     </button>
-                    <button class="react-btn candle" onclick="react(this, 'candle')">
-                        <i class="fas fa-fire-alt"></i> <span class="count">${data.candles || data.candle || 0}</span>
+                    <button class="action-btn candle-btn" onclick="react(this, 'candle')">
+                        <i class="fas fa-fire-alt"></i> <span class="count">${reactionCounts.candle}</span>
                     </button>
                 </div>
             `;
-                note.querySelector('.note-text').textContent = data.text;
-                canvas.appendChild(note);
-            }
 
-            // Replaces old createNoteElement
-            function createNoteElement(text, pos, counts) {
-                // Legacy shim if something calls this, but initCanvas uses renderNote now.
-            }
+            notesContainer.appendChild(el);
+        }
 
-            function postNote() {
-                let txt = document.getElementById('noteInput').value;
-                if (!txt.trim()) return;
+        // --- 5. INTERACTION LOGIC ---
+        function react(btn, type) {
+            // 1. Visual Pop
+            btn.classList.add('pop-active');
+            setTimeout(() => btn.classList.remove('pop-active'), 300);
 
-                txt = sanitizeText(txt);
+            // 2. Increment Note Count
+            const countSpan = btn.querySelector('.count');
+            let val = parseInt(countSpan.innerText);
+            countSpan.innerText = val + 1;
 
-                const targetX = -panX / scale + (window.innerWidth / 2 / scale); // Center of screen relative to canvas
-                const targetY = -panY / scale + (window.innerHeight / 2 / scale);
+            // 3. Header & Global Stat Glow/Increment
+            const header = document.querySelector('header.island-nav');
+            const note = btn.closest('.note');
 
-                const noteData = {
-                    id: crypto.randomUUID(),
-                    text: txt,
-                    x: targetX + (Math.random() * 40 - 20),
-                    y: targetY + (Math.random() * 40 - 20),
-                    rotation: (Math.random() - 0.5) * 6,
-                    hearts: 0,
-                    flowers: 0,
-                    candles: 0,
-                    createdAt: new Date().toISOString()
-                };
-
-                saveNote(noteData);
-                renderNote(noteData);
-
-                document.getElementById('noteInput').value = "";
-                closeWriter();
-
-                // Show toast
-                const toast = document.getElementById('toast');
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3000);
-            }
-
-            // --- REACTION LOGIC ---
-            // --- REACTION LOGIC ---
-            function react(btn, type) {
-                event.stopPropagation();
-
-                const noteEl = btn.closest('.note');
-                const noteId = noteEl.dataset.id;
-
-                const notes = getStoredNotes();
-                const note = notes.find(n => n.id === noteId);
-                if (!note) return;
-
-                const countSpan = btn.querySelector('.count');
-                let count = parseInt(countSpan.innerText);
-
-                if (!btn.classList.contains('active')) {
-                    btn.classList.add('active');
-                    count++;
-
-                    if (type === 'heart') { note.hearts = (note.hearts || 0) + 1; btn.querySelector('i').className = "fas fa-heart"; }
-                    if (type === 'flower') { note.flowers = (note.flowers || 0) + 1; }
-                    if (type === 'candle') { note.candles = (note.candles || 0) + 1; }
-
-                    // Pulse Anim
-                    btn.style.transform = "scale(1.4)";
-                    setTimeout(() => btn.style.transform = "scale(1)", 200);
+            // --- HEADER GLOW ---
+            if (header) {
+                if (type === 'heart') {
+                    header.classList.add('glow-red');
+                    setTimeout(() => header.classList.remove('glow-red'), 400);
+                } else if (type === 'flower') {
+                    header.classList.add('glow-yellow');
+                    setTimeout(() => header.classList.remove('glow-yellow'), 400);
+                } else if (type === 'candle') {
+                    header.classList.add('glow-orange');
+                    setTimeout(() => header.classList.remove('glow-orange'), 400);
                 }
-
-                countSpan.innerText = count;
-                saveAllNotes(notes);
             }
 
-            // --- MODAL & WRITING ---
-            function openWriter() {
-                document.getElementById('writeModal').style.display = 'flex';
-                setTimeout(() => document.getElementById('writeModal').classList.add('active'), 10);
+            // --- NOTE GLOW (FULL CARD) ---
+            if (note) {
+                // Clear previous glows to allow switching
+                note.classList.remove('glow-red', 'glow-yellow', 'glow-orange');
+
+                // Add strong glow class to the whole card
+                if (type === 'heart') {
+                    note.classList.add('glow-red');
+                    setTimeout(() => note.classList.remove('glow-red'), 1000); // 1s Duration
+                } else if (type === 'flower') {
+                    note.classList.add('glow-yellow');
+                    setTimeout(() => note.classList.remove('glow-yellow'), 1000);
+                } else if (type === 'candle') {
+                    note.classList.add('glow-orange');
+                    setTimeout(() => note.classList.remove('glow-orange'), 1000);
+                }
             }
 
-            function closeWriter() {
-                document.getElementById('writeModal').classList.remove('active');
-                setTimeout(() => document.getElementById('writeModal').style.display = 'none', 500);
+            // 4. Update Global Count in Sidebar (Fake Sync)
+            let globalId = '';
+            if (type === 'heart') globalId = 'totalHearts';
+            if (type === 'flower') globalId = 'totalFlowers';
+            if (type === 'candle') globalId = 'totalCandles';
+
+            const globalEl = document.getElementById(globalId);
+            if (globalEl) {
+                // Parse commas
+                let gVal = parseInt(globalEl.innerText.replace(/,/g, ''));
+                globalEl.innerText = (gVal + 1).toLocaleString();
             }
+        }
 
-            function toggleOption(el) {
-                document.querySelectorAll('.option-pill').forEach(p => p.classList.remove('selected'));
-                el.classList.add('selected');
-            }
+        function openWriter() {
+            document.getElementById('writeModal').classList.add('active');
+        }
 
-            function autoResize(el) {
-                el.style.height = 'auto';
-                el.style.height = el.scrollHeight + 'px';
-            }
+        function closeWriter() {
+            document.getElementById('writeModal').classList.remove('active');
+        }
 
-            function postNote() {
-                let txt = document.getElementById('noteInput').value;
-                if (!txt.trim()) return;
+        function sanitizeText(text) {
+            let clean = text;
+            OBSCENE_WORDS.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                clean = clean.replace(regex, '***');
+            });
+            return clean;
+        }
 
-                // SAFETY FILTER
-                txt = sanitizeText(txt);
+        function resetView(focusX = null, focusY = null) {
+            // Default to center if no focus provided
+            const finalX = focusX ?? (CONFIG.width / 2);
+            const finalY = focusY ?? (CONFIG.height / 2);
 
-                // Post at center of CURRENT view (inverted active pan)
-                // Center Canvas (0,0) + Pan Offset
-                // We want it to appear "in front" of user.
-                // Current center = -panX / scale
+            // Calculate Viewport Offset to center the point
+            const targetX = (window.innerWidth / 2) - finalX;
+            const targetY = (window.innerHeight / 2) - finalY;
+            const targetScale = 1;
 
-                const targetX = -panX / scale;
-                const targetY = -panY / scale;
+            // Simple transition logic
+            canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
 
-                createNoteElement(txt, { x: targetX + (Math.random() * 40 - 20), y: targetY + (Math.random() * 40 - 20) });
+            STATE.pointX = targetX;
+            STATE.pointY = targetY;
+            STATE.scale = targetScale;
+            updateTransform();
 
-                // Clear
-                document.getElementById('noteInput').value = "";
-                closeWriter();
+            setTimeout(() => {
+                canvas.style.transition = "";
+            }, 1200);
+        }
 
-                // Toast
-                const toast = document.getElementById('toast');
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3000);
-            }
+        // --- 4. NOTE GENERATION (FIXED) ---
+        // ... (existing code for generating random notes) ...
 
-            // Init
-            initCanvas();
+        function postNote() {
+            const input = document.getElementById('noteInput');
+            const text = input.value.trim();
+            if (!text) return;
 
-        </script>
+            const cleanText = sanitizeText(text);
+
+            const centerX = CONFIG.width / 2;
+            const centerY = CONFIG.height / 2;
+
+            // Randomly choose a safe spot outside the exclusion zone
+            // Exclusion is roughly 650x350 from center
+            // We'll pick a spot either well above or well below
+
+            const side = Math.random() > 0.5 ? 1 : -1;
+            const safeOffsetY = (350 + 100 + Math.random() * 200) * side; // +/- 450 to 650px vertical offset
+            const safeOffsetX = (Math.random() * 800) - 400; // Spread horizontally
+
+            const noteX = centerX + safeOffsetX;
+            const noteY = centerY + safeOffsetY;
+
+            // Create Note
+            createNoteElement(cleanText, noteX, noteY, "Just now", { heart: 0, flower: 0, candle: 0 });
+
+            // Focus View on New Note
+            resetView(noteX, noteY);
+
+            closeWriter();
+            input.value = '';
+        }
+
+        // --- 6. FAKE LIVE COUNTERS ---
+        function startFakeLiveActivity() {
+            setInterval(() => {
+                const count = document.getElementById('userCount');
+                let val = parseInt(count.innerText);
+                val += Math.floor(Math.random() * 3) - 1; // +1, 0, or -1
+                if (val < 120) val = 120;
+                count.innerText = val;
+            }, 5000);
+
+            // Random gloal updates
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const types = ['totalHearts', 'totalFlowers', 'totalCandles'];
+                    const id = types[Math.floor(Math.random() * types.length)];
+                    const el = document.getElementById(id);
+                    if (el) {
+                        let gVal = parseInt(el.innerText.replace(/,/g, ''));
+                        el.innerText = (gVal + 1).toLocaleString();
+                    }
+                }
+            }, 2000);
+        }
+
+    </script>
 </body>
 
 </html>
