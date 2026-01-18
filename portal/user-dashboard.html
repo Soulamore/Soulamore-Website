@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- AUTH GUARD: Protects this page -->
+    <script src="../assets/js/auth-guard.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Space | Soulamore</title>
     <link
@@ -450,14 +452,17 @@
                         <div
                             style="font-size:0.8rem; opacity:0.6; text-transform:uppercase; margin-bottom:10px; font-weight:700;">
                             Recent</div>
-                        <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:5px;">
-                            <div
-                                style="padding:10px; background:var(--bg-elevated); border-radius:6px; font-size:0.9rem; cursor:pointer;">
-                                Morning Thoughts <br><span style="font-size:0.7em; opacity:0.5;">Today</span></div>
-                            <div
-                                style="padding:10px; border-radius:6px; font-size:0.9rem; cursor:pointer; opacity:0.7;">
-                                Weekly Reflection <br><span style="font-size:0.7em; opacity:0.5;">3 days ago</span>
-                            </div>
+
+                        <!-- DYNAMIC LIST CONTAINER -->
+                        <div id="journal-list"
+                            style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:5px;">
+                            <!-- Injected via JS -->
+                        </div>
+
+                        <!-- EMPTY STATE -->
+                        <div id="journal-empty" style="text-align:center; padding:20px; opacity:0.6; display:none;">
+                            <i class="fas fa-pen-fancy" style="margin-bottom:10px;"></i>
+                            <div style="font-size:0.8rem;">No entries yet.</div>
                         </div>
                     </div>
 
@@ -594,7 +599,40 @@
             } else {
                 switchView('home');
             }
+
+            // --- JOURNAL LOGIC (Added for Empty State Demo) ---
+            renderJournalSidebar();
         });
+
+        function renderJournalSidebar() {
+            const list = document.getElementById('journal-list');
+            const empty = document.getElementById('journal-empty');
+            // Mock Data or LocalStorage
+            const stored = localStorage.getItem('my_journal_entries');
+            // Default demo data if nothing stored, to show UI
+            const entries = stored ? JSON.parse(stored) : [
+                { title: "Morning Thoughts", date: "Today" },
+                { title: "Weekly Reflection", date: "3 days ago" }
+            ];
+
+            // To test empty state, uncomment:
+            // const entries = [];
+
+            if (!entries || entries.length === 0) {
+                list.style.display = 'none';
+                empty.style.display = 'block';
+            } else {
+                list.style.display = 'flex';
+                empty.style.display = 'none';
+                list.innerHTML = '';
+                entries.forEach(e => {
+                    const div = document.createElement('div');
+                    div.style.cssText = "padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; font-size:0.9rem; cursor:pointer; margin-bottom:5px;";
+                    div.innerHTML = `${e.title} <br><span style="font-size:0.7em; opacity:0.5;">${e.date}</span>`;
+                    list.appendChild(div);
+                });
+            }
+        }
     </script>
     <script type="module">
         import { createConversation, addMessageToConversation, subscribeToConversation } from "../assets/js/soulbot-handler.js";

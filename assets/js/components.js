@@ -272,10 +272,14 @@ try {
 
             /* HOVER BRIDGE FOR SIDE FLYOUT */
             .dropdown-content .dropdown-content::before {
+                content: "";
+                position: absolute;
                 top: 0 !important;
-                left: -15px !important; /* Bridge back to parent */
-                width: 15px !important;
+                left: -20px !important; /* WIDER BRIDGE back to parent */
+                width: 25px !important; /* Fill the 10px gap + extra overlap */
                 height: 100% !important;
+                background: transparent !important;
+                z-index: 1001 !important;
             }
 
             /* Level 3: Deep Nested */
@@ -393,7 +397,7 @@ const NAV_DATA = [
         children: [
             {
                 id: 'nav-peer-group',
-                label: 'Talk to a Peer',
+                label: 'Talk to a Peer <i class="fas fa-fire" style="color:var(--ember-orange); text-shadow:0 0 8px var(--ember-orange); margin-left:4px; font-size:0.8em;"></i>',
                 href: '#',
                 type: 'submenu',
                 children: [
@@ -404,7 +408,7 @@ const NAV_DATA = [
             },
             {
                 id: 'nav-psych-group',
-                label: 'Talk to a Psychologist',
+                label: 'Talk to a Psychologist <i class="fas fa-fire" style="color:var(--teal-glow); text-shadow:0 0 8px var(--teal-glow); margin-left:4px; font-size:0.8em;"></i>',
                 href: '#',
                 type: 'submenu',
                 children: [
@@ -440,7 +444,8 @@ const NAV_DATA = [
         children: [
             { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
             { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
-            { id: 'nav-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' }
+            { id: 'nav-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
+            { id: 'nav-for-parents', label: 'For Families', href: 'company/for-parents.html' }
         ]
     },
     {
@@ -451,6 +456,7 @@ const NAV_DATA = [
         type: 'dropdown',
         children: [
             { id: 'nav-story', label: 'Our Story', href: 'company/about.html' },
+            { id: 'nav-manifesto', label: 'Our Manifesto', href: 'company/why-soulamore-exists.html' },
             { id: 'nav-contact', label: 'Contact Us', href: 'company/contact.html' },
             { id: 'nav-legal', label: 'Legal & Privacy', href: 'company/legal.html' }
         ]
@@ -526,7 +532,7 @@ const getHeaderHTML = (rootPath) => `
             <div class="mp-info">
                 <span class="mp-name">Welcome, Friend</span>
                 <span class="mp-status">Guest</span>
-                <a href="${rootPath}login.html" class="mp-btn">Log In</a>
+                <a href="${rootPath}portal/login.html" class="mp-btn">Log In</a>
             </div>
         </div>
 
@@ -539,7 +545,7 @@ const getHeaderHTML = (rootPath) => `
     <div class="auth-box">
             <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
             <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
-            <a href="${rootPath}auth/login.html" class="nav-btn">Log In / Sign Up</a>
+            <a href="${rootPath}portal/login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
     
     <button class="mobile-toggle" aria-label="Toggle Navigation">
@@ -586,6 +592,7 @@ const getFooterHTML = (rootPath) => `
                 <li><a href="${rootPath}spaces/campus/campus-ambassadors.html">Campus Ambassadors</a></li>
                 <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
                 <li><a href="${rootPath}community/forum.html">Discussion Forum</a></li>
+                <li><a href="${rootPath}company/for-parents.html">For Family (Comfort)</a></li>
                 <li><a href="${rootPath}join-us/index.html">Join the Team</a></li>
             </ul>
         </div>
@@ -596,6 +603,7 @@ const getFooterHTML = (rootPath) => `
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
                 <li><a href="${rootPath}tools/index.html">Tools</a></li>
                 <li><a href="${rootPath}newsletter.html">Newsletter</a></li>
+                <li><a href="${rootPath}company/why-soulamore-exists.html">Why Soulamore Exists</a></li>
                 <li><a href="${rootPath}company/contact.html">Contact</a></li>
                 <li><a href="${rootPath}company/legal.html">Privacy & Legal</a></li>
                 <li><a href="${rootPath}get-help-now.html" style="color:var(--ember-red); font-weight:600;">Crisis Resources</a></li>

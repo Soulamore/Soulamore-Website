@@ -319,9 +319,10 @@
             width: 100%;
             padding: 12px 15px;
             border-radius: 8px;
-            border: 1px solid var(--border-glass);
-            background: rgba(15, 23, 42, 0.6);
-            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #1e293b;
+            /* Solid dark blue-grey for better contrast */
+            color: #f1f5f9;
             font-family: inherit;
             transition: 0.3s;
         }
@@ -515,6 +516,7 @@
                 let dashboard = 'user-dashboard.html';
                 if (role === 'peer') dashboard = 'peer-dashboard.html';
                 if (role === 'psychologist') dashboard = 'psych-dashboard.html';
+                if (role === 'admin') dashboard = 'admin-dashboard.html';
                 window.location.href = dashboard;
             }
         });
@@ -636,11 +638,15 @@
                     }
 
                     // Check for returnUrl
+                    // Check for returnUrl
                     const returnUrl = sessionStorage.getItem('returnUrl');
-                    if (returnUrl) {
+                    if (returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//')) {
+                        // Secure: Only allow relative paths
                         sessionStorage.removeItem('returnUrl');
                         window.location.href = returnUrl;
                     } else {
+                        // Default flow if url is suspicious or missing
+                        sessionStorage.removeItem('returnUrl');
                         await handleRoleRouting(result.user, intent);
                     }
                 } else {
