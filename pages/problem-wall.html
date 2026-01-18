@@ -939,8 +939,10 @@
             // Random slight rotation
             el.style.transform = `rotate(${Math.random() * 6 - 3}deg)`;
 
-            el.innerHTML = `
-                ${text}
+            // SAFE RENDERING: Use textContent for user input, then append UI
+            el.textContent = text;
+
+            const uiHTML = `
                 <div class="note-meta">
                     <span style="opacity:0.6;">Anonymous</span>
                     <span style="font-size:0.75rem;">${timeLabel}</span>
@@ -958,6 +960,8 @@
                     </button>
                 </div>
             `;
+
+            el.insertAdjacentHTML('beforeend', uiHTML);
 
             notesContainer.appendChild(el);
         }

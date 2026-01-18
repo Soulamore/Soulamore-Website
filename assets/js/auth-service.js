@@ -55,7 +55,9 @@ export async function loginWithGoogle() {
 export async function logoutUser() {
     try {
         await signOut(auth);
-        localStorage.removeItem('user_role'); // Clear legacy mock data
+        // localStorage.removeItem('user_role'); // Legacy
+        localStorage.removeItem('soulamore_session'); // Core Session
+        sessionStorage.clear(); // Clear all temp data
         return { success: true };
     } catch (error) {
         console.error("Logout Error:", error);
