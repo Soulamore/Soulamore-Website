@@ -678,20 +678,22 @@
     <div id="particles"></div>
     <!-- SUB-NAVIGATION (PILL BUTTONS) -->
     <div class="sub-nav-container">
-        <div class="workplace-btn active" onclick="navTo('main')"><i class="fas fa-home"></i><span>Overview</span></div>
-        <div class="workplace-btn" onclick="navTo('plans')"><i class="fas fa-tags"></i><span>Plans & Pricing</span>
-        </div>
-        <div class="workplace-btn" onclick="navTo('guidelines')"><i
+        <div class="workplace-btn active" data-page="main" onclick="navTo('main')"><i
+                class="fas fa-home"></i><span>Overview</span></div>
+        <div class="workplace-btn" data-page="plans" onclick="navTo('plans')"><i class="fas fa-tags"></i><span>Plans &
+                Pricing</span></div>
+        <div class="workplace-btn" data-page="guidelines" onclick="navTo('guidelines')"><i
                 class="fas fa-book-reader"></i><span>Guidelines</span></div>
-        <div class="workplace-btn" onclick="navTo('programs')"><i class="fas fa-layer-group"></i><span>Programs</span>
-        </div>
-        <div class="workplace-btn" onclick="navTo('employees')"><i class="fas fa-user-shield"></i><span>Employees</span>
-        </div>
-        <div class="workplace-btn" onclick="navTo('financial')"><i class="fas fa-coins"></i><span>Financial Peer</span>
-        </div>
-        <div class="workplace-btn" onclick="navTo('hr')"><i class="fas fa-building"></i><span>For HR</span></div>
-        <div class="workplace-btn" onclick="navTo('policy')"><i class="fas fa-file-contract"></i><span>Policy</span>
-        </div>
+        <div class="workplace-btn" data-page="programs" onclick="navTo('programs')"><i
+                class="fas fa-layer-group"></i><span>Programs</span></div>
+        <div class="workplace-btn" data-page="employees" onclick="navTo('employees')"><i
+                class="fas fa-user-shield"></i><span>Employees</span></div>
+        <div class="workplace-btn" data-page="financial" onclick="navTo('financial')"><i
+                class="fas fa-coins"></i><span>Financial Peer</span></div>
+        <div class="workplace-btn" data-page="hr" onclick="navTo('hr')"><i class="fas fa-building"></i><span>For
+                HR</span></div>
+        <div class="workplace-btn" data-page="policy" onclick="navTo('policy')"><i
+                class="fas fa-file-contract"></i><span>Policy</span></div>
     </div>
     <!-- CONTENT CONTAINER -->
     <div id="main-content" style="min-height: 80vh; transition: min-height 0.3s ease;">
@@ -1279,55 +1281,52 @@
         <!-- COMPONENTS SCIPT -->
         <script src="../../assets/js/components.js"></script>
         <script>
-            // --- GLOBAL NAV LOGIC (Defined immediately) ---
+            // --- GLOBAL NAV LOGIC ---
+            // 1. Global Observer Reference
+            window.fadeObserver = null;
+
+            // 2. Navigation Function (State-Pure)
             window.navTo = function (pageId) {
                 console.log("Navigating to:", pageId);
 
-                // A. Hide All Pages (Force Inline Style)
+                // A. Hide All Pages (CSS Class Only)
                 const pages = document.querySelectorAll('.page-view');
                 pages.forEach(p => {
                     p.classList.remove('active');
-                    p.style.display = 'none'; // Brute force hide
-                    p.style.opacity = '0';
+                    // CLEANUP: Clean any inline styles left by previous hacks
+                    p.style.display = '';
+                    p.style.opacity = '';
                 });
 
                 // B. Show Target Page
                 const targetPage = document.getElementById(pageId);
                 if (targetPage) {
-                    targetPage.style.display = 'block'; // Brute force show
-                    // Tiny delay to allow display:block to render before opacity transition
-                    setTimeout(() => {
-                        targetPage.classList.add('active');
-                        targetPage.style.opacity = '1';
+                    targetPage.classList.add('active');
 
-                        // Force Children
+                    // Update URL Hash (if not already there)
+                    if (window.location.hash !== '#' + pageId) {
+                        history.pushState({ page: pageId }, '', `#${pageId}`);
+                    }
+
+                    // Re-observe animations
+                    if (window.fadeObserver) {
                         targetPage.querySelectorAll('.fade-in').forEach(el => {
-                            el.style.opacity = '1';
-                            el.style.transform = 'translateY(0)';
+                            // Reset state so observer triggers again
+                            el.style.opacity = '';
+                            el.style.transform = '';
+                            el.classList.remove('visible'); // If you use a class for state
+                            window.fadeObserver.observe(el);
                         });
-                    }, 10);
+                    }
                 } else {
-                    console.error("Target missing:", pageId);
+                    console.error("Target page not found:", pageId);
                 }
 
-                // C. Update Buttons
+                // C. Update Buttons (Data Attribute Based)
                 document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
-
-                const mapping = {
-                    'main': 0,
-                    'plans': 1,
-                    'guidelines': 2,
-                    'programs': 3,
-                    'employees': 4,
-                    'financial': 5,
-                    'hr': 6,
-                    'policy': 7
-                };
-
-                const index = mapping[pageId];
-                const buttons = document.querySelectorAll('.sub-nav-container .workplace-btn');
-                if (index !== undefined && buttons[index]) {
-                    buttons[index].classList.add('active');
+                const activeBtn = document.querySelector(`.workplace-btn[data-page="${pageId}"]`);
+                if (activeBtn) {
+                    activeBtn.classList.add('active');
                 }
             };
 
@@ -1338,25 +1337,38 @@
                     if (typeof injectFooter === 'function') injectFooter();
                 } catch (e) { console.error("Injection Error:", e); }
 
-                // 1. IntersectionObserver
-                const observer = new IntersectionObserver((entries) => {
+                // 1. IntersectionObserver Setup
+                window.fadeObserver = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             entry.target.style.opacity = '1';
                             entry.target.style.transform = "translateY(0)";
-                            observer.unobserve(entry.target);
+                            // We do NOT unobserve here to allow re-triggering if needed, 
+                            // OR we unobserve but rely on navTo to re-observe.
+                            // User instruction: "Re-observe on tab activation" implies we unobserve after trigger.
+                            window.fadeObserver.unobserve(entry.target);
                         }
                     });
                 });
-                document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+                document.querySelectorAll('.fade-in').forEach(el => window.fadeObserver.observe(el));
 
-                // 2. Handle URL Hash
-                const hash = window.location.hash.substring(1);
-                const validIds = ['main', 'plans', 'guidelines', 'programs', 'employees', 'financial', 'hr', 'policy'];
+                // 2. Handle Initial Load & Popstate
+                const handleHash = () => {
+                    const hash = window.location.hash.substring(1) || 'main';
+                    // Validate hash
+                    const validIds = ['main', 'plans', 'guidelines', 'programs', 'employees', 'financial', 'hr', 'policy'];
+                    if (validIds.includes(hash)) {
+                        navTo(hash);
+                    } else {
+                        navTo('main');
+                    }
+                };
 
-                if (hash && validIds.includes(hash)) {
-                    navTo(hash);
-                }
+                // Initial check
+                handleHash();
+
+                // Back/Forward check
+                window.addEventListener('popstate', handleHash);
 
                 // 3. Particles
                 const pContainer = document.getElementById('particles');
