@@ -235,6 +235,7 @@
             border-radius: 6px;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -250,62 +251,11 @@
         </div>
     </div>
 
-    <!-- BLOG EDITOR OVERLAY (Full Screen) -->
-    <div id="blogEditor" class="editor-layout" style="display:none;">
-        <div class="editor-header">
-            <div style="display:flex; align-items:center; gap:20px;">
-                <button onclick="closeEditor()"
-                    style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer;"><i
-                        class="fas fa-arrow-left"></i></button>
-                <div style="font-family:'Outfit'; font-size:1.2rem; font-weight:700;">Write Story</div>
-                <span id="saveStatus" style="font-size:0.8rem; opacity:0.5; margin-left:10px;">Unsaved</span>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="togglePaperMode()"
-                    style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:white; padding:8px 15px; border-radius:30px; cursor:pointer;"><i
-                        class="fas fa-adjust"></i> Theme</button>
-                <button onclick="saveDraft()"
-                    style="background:transparent; border:1px solid var(--teal-glow); color:var(--teal-glow); padding:8px 20px; border-radius:30px; cursor:pointer;">Save
-                    Draft</button>
-                <button
-                    style="background:var(--teal-glow); border:none; color:#0f172a; padding:8px 20px; border-radius:30px; font-weight:700; cursor:pointer;">Publish</button>
-            </div>
-        </div>
-
-        <div class="editor-workspace">
-            <div class="paper-container">
-                <div class="paper-sheet" id="paperSheet">
-                    <!-- Quill Toolbar & Editor -->
-                    <div id="editor-container"></div>
-                </div>
-            </div>
-
-            <div class="editor-sidebar">
-                <h3 style="margin-bottom:20px;">Settings</h3>
-                <div class="input-group">
-                    <label>Title</label>
-                    <input type="text" class="input-dark" id="blogTitle" placeholder="My Thoughtful Article...">
-                </div>
-                <div class="input-group">
-                    <label>Excerpt / Summary</label>
-                    <textarea class="input-dark" rows="4" placeholder="Brief description for the feed..."></textarea>
-                </div>
-                <div class="input-group">
-                    <label>Tags</label>
-                    <input type="text" class="input-dark" placeholder="anxiety, tips, sleep...">
-                </div>
-                <div class="input-group">
-                    <label>Cover Image URL</label>
-                    <input type="text" class="input-dark" placeholder="https://...">
-                </div>
-            </div>
-        </div>
-    </div>
-
-
     <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
 
     <div class="dashboard-layout">
+        <!-- ... sidebar and main content ... -->
+
 
         <!-- SIDEBAR -->
         <nav class="sidebar" id="sidebar">
@@ -420,6 +370,13 @@
 
                     <!-- RIGHT -->
                     <div style="display:flex; flex-direction:column; gap:25px;">
+
+                        <!-- ANALYTICS CHART -->
+                        <div class="dash-card">
+                            <h4 style="margin-bottom:15px; opacity:0.8;">Content Performance</h4>
+                            <canvas id="perfChart" style="width:100%; height:200px;"></canvas>
+                        </div>
+
                         <div class="dash-card glow" style="text-align:center;">
                             <h4 style="margin-bottom:10px; opacity:0.8;">Active Clients</h4>
                             <div style="font-size:3rem; font-weight:700; font-family:'Outfit'; color:var(--teal-glow);">
@@ -641,41 +598,38 @@
         }
 
         /* --- BLOG EDITOR --- */
-        var quill;
         function openEditor() {
-            document.getElementById('blogEditor').style.display = 'flex';
-            if (!quill) {
-                quill = new Quill('#editor-container', {
-                    theme: 'snow',
-                    placeholder: 'Start writing your story...',
-                    modules: {
-                        toolbar: [
-                            [{ 'header': [1, 2, 3, false] }],
-                            ['bold', 'italic', 'underline', 'strike'],
-                            ['blockquote', 'code-block'],
-                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                            ['link', 'image']
-                        ]
-                    }
-                });
+            window.location.href = 'blog-editor.html';
+        }
+
+        // Editor logic moved to blog-editor.html
+
+        // --- CHART JS ---
+        const ctx = document.getElementById('perfChart').getContext('2d');
+        const perfChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Article Views',
+                    data: [12, 19, 3, 5, 2, 30, 45],
+                    borderColor: '#4ECDC4',
+                    backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: 'rgba(255,255,255,0.5)' }, grid: { display: false } },
+                    y: { ticks: { color: 'rgba(255,255,255,0.5)' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
             }
-        }
-
-        function closeEditor() {
-            if (confirm('Close editor? Unsaved changes may be lost.')) {
-                document.getElementById('blogEditor').style.display = 'none';
-            }
-        }
-
-        function saveDraft() {
-            document.getElementById('saveStatus').innerText = 'Saved just now';
-            // Here we would save quill.root.innerHTML to Firebase
-            alert('Draft saved! (Simulated)');
-        }
-
-        function togglePaperMode() {
-            document.getElementById('paperSheet').classList.toggle('dark-mode');
-        }
+        });
     </script>
 </body>
 

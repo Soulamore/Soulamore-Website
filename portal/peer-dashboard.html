@@ -52,6 +52,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -91,6 +92,8 @@
                     <span>Sessions</span></a>
                 <a href="#" class="side-link" onclick="switchView('journals', this)"><i class="fas fa-book-open"></i>
                     <span>Shared Journals</span></a>
+                <a href="#" class="side-link" onclick="switchView('stories', this)"><i class="fas fa-pen-nib"></i>
+                    <span>My Stories</span></a>
                 <a href="#" class="side-link" onclick="switchView('availability', this)"><i
                         class="fas fa-calendar-check"></i> <span>Availability</span></a>
 
@@ -117,7 +120,9 @@
 
         <!-- MAIN CONTENT -->
         <main class="main-content fade-in">
+            <!-- ... existing header ... -->
 
+            <!-- (Kept existing header) -->
             <div class="peer-header"
                 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:20px;">
                 <div class="ph-title">
@@ -138,142 +143,55 @@
 
             <!-- VIEW: OVERVIEW -->
             <div id="view-overview" class="view-section">
-                <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
-                    <!-- LEFT -->
-                    <div style="display:flex; flex-direction:column; gap:25px;">
-                        <!-- SESSIONS SNAPSHOT -->
-                        <div class="dash-card">
-                            <div class="dc-header"
-                                style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                                <div style="font-family:'Outfit'; font-size:1.2rem; font-weight:700;">Today's Sessions
-                                </div>
-                                <button onclick="switchView('sessions')"
-                                    style="background:transparent; color:var(--peach-glow); border:none; cursor:pointer;">View
-                                    All</button>
-                            </div>
-                            <div class="session-item"
-                                style="background:rgba(255,255,255,0.03); border-radius:12px; padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                                <div>
-                                    <div style="font-weight:700; color:var(--peach-glow);">14:00 - 14:45</div>
-                                    <div>Chat with <strong>Anonymous (User #429)</strong></div>
-                                </div>
-                                <button
-                                    style="background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2); padding:6px 12px; border-radius:6px; font-weight:600;">Prepare</button>
-                            </div>
-                            <div style="text-align:center; padding:20px; opacity:0.5; font-size:0.9rem;">No other
-                                sessions widely booked.</div>
-                        </div>
-
-                        <!-- JOURNAL OF PEER -->
-                        <div class="dash-card">
-                            <h3 style="margin-bottom:10px;">Your Reflections</h3>
-                            <p style="opacity:0.7; font-size:0.9rem; margin-bottom:15px;">Being a listener is hard. Take
-                                time to process your own feelings.</p>
-                            <button onclick="openTool('../tools/journal.html', 'My Private Journal')"
-                                style="width:100%; padding:12px; background:transparent; border:1px solid var(--peach-glow); color:var(--peach-glow); border-radius:8px; display:flex; align-items:center; justify-content:center; gap:10px;">
-                                <i class="fas fa-pen-nib"></i> Write in Private Journal
-                            </button>
-                        </div>
+                <div class="dashboard-grid">
+                    <!-- ANALYTICS CHART -->
+                    <div class="dash-card">
+                        <h4 style="margin-bottom:15px; opacity:0.8;">My Impact</h4>
+                        <canvas id="impactChart" style="width:100%; height:200px;"></canvas>
                     </div>
 
-                    <!-- RIGHT -->
-                    <div style="display:flex; flex-direction:column; gap:25px;">
+                    <div style="display:flex; flex-direction:column; gap:20px;">
                         <div class="dash-card glow" style="text-align:center;">
+                            <h4 style="margin-bottom:10px; opacity:0.8;">People Helped</h4>
                             <div
-                                style="font-size:2.5rem; font-weight:700; font-family:'Outfit'; color:var(--peach-glow);">
-                                4.9</div>
-                            <div style="opacity:0.6;">Average Rating</div>
-                            <div style="color:#fbbf24; margin-top:5px;">★★★★★</div>
+                                style="font-size:3rem; font-weight:700; font-family:'Outfit'; color:var(--peach-glow);">
+                                34</div>
+                            <div style="color:#22c55e; font-size:0.85rem; margin-top:5px;">+5 this week</div>
                         </div>
-
                         <div class="dash-card">
-                            <h4 style="margin-bottom:15px;">Quick Tools</h4>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                                <div class="tool-btn" onclick="openTool('../tools/vent-box.html', 'Vent Box')">Vent
-                                </div>
-                                <div class="tool-btn" onclick="openTool('../tools/5-step-reset.html', 'Reset')">Reset
-                                </div>
+                            <h4 style="margin-bottom:10px; opacity:0.8;">Peer Rating</h4>
+                            <div style="font-size:1.5rem; font-weight:700; color:#fbbf24;">
+                                <i class="fas fa-star"></i> 4.9/5.0
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- ... -->
 
-            <!-- VIEW: SESSIONS -->
-            <div id="view-sessions" class="view-section" style="display:none;">
-                <h2 style="margin-bottom:20px; font-family:'Outfit';">Manage Sessions</h2>
-                <div class="dash-card">
-                    <div style="margin-bottom:20px; display:flex; gap:10px;">
-                        <button
-                            style="padding:8px 15px; background:var(--peach-glow); color:#0f172a; border:none; border-radius:20px; font-weight:700;">Upcoming</button>
-                        <button
-                            style="padding:8px 15px; background:rgba(255,255,255,0.05); color:white; border:none; border-radius:20px;">Past
-                            History</button>
+            <!-- VIEW: MY STORIES (NEW) -->
+            <div id="view-stories" class="view-section" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                    <div>
+                        <h1 style="font-family:'Outfit'; font-size:2rem; color:var(--peach-glow);">My Stories</h1>
+                        <p style="opacity:0.7;">Share your recovery journey to inspire others.</p>
                     </div>
-
-                    <table style="width:100%; border-collapse:collapse; text-align:left;">
-                        <tr style="border-bottom:1px solid rgba(255,255,255,0.1); opacity:0.6;">
-                            <th style="padding:15px;">Time</th>
-                            <th style="padding:15px;">User</th>
-                            <th style="padding:15px;">Topic (If Shared)</th>
-                            <th style="padding:15px;">Action</th>
-                        </tr>
-                        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                            <td style="padding:15px;">Today, 14:00</td>
-                            <td style="padding:15px;">StartDust_99</td>
-                            <td style="padding:15px;">Anxiety</td>
-                            <td style="padding:15px;">
-                                <button
-                                    style="background:#22c55e; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Join
-                                    Room</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding:15px;">Tomorrow, 10:00</td>
-                            <td style="padding:15px;">BlueSky</td>
-                            <td style="padding:15px;">Loneliness</td>
-                            <td style="padding:15px;">
-                                <button
-                                    style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; border:none; color:white;">Reschedule</button>
-                            </td>
-                        </tr>
-                    </table>
+                    <button onclick="openEditor()"
+                        style="background:var(--peach-glow); color:#0f172a; padding:12px 25px; border-radius:30px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
+                        <i class="fas fa-plus"></i> Write New
+                    </button>
                 </div>
-            </div>
 
-            <!-- VIEW: SHARED JOURNALS -->
-            <div id="view-journals" class="view-section" style="display:none;">
-                <h2 style="font-family:'Outfit'; margin-bottom:20px;">Shared with You</h2>
                 <div class="dash-card">
-                    <p style="opacity:0.7; margin-bottom:20px;">Users have shared these entries for context. Please read
-                        with empathy.</p>
-                    <div style="display:grid; gap:15px;">
-                        <!-- Item -->
-                        <div
-                            style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; border-left:3px solid var(--peach-glow); cursor:pointer;">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                                <span style="font-weight:700;">Anonymous (User #882)</span>
-                                <span style="font-size:0.8rem; opacity:0.6;">Shared 2 hrs ago</span>
-                            </div>
-                            <div style="font-style:italic; opacity:0.8;">"I just feel like everyone is moving forward
-                                except me..."</div>
-                            <button
-                                style="margin-top:15px; background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 15px; border-radius:4px; font-size:0.8rem;">Read
-                                Full Entry</button>
-                        </div>
-                        <!-- Item -->
-                        <div
-                            style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; border-left:3px solid #fbbf24; cursor:pointer;">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                                <span style="font-weight:700;">StarWalker</span>
-                                <span style="font-size:0.8rem; opacity:0.6;">Shared Yesterday</span>
-                            </div>
-                            <div style="font-style:italic; opacity:0.8;">"I finally stood up for myself today. It was
-                                terrifying but..."</div>
-                            <button
-                                style="margin-top:15px; background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 15px; border-radius:4px; font-size:0.8rem;">Read
-                                Full Entry</button>
-                        </div>
+                    <div style="text-align:center; padding:40px; opacity:0.6;">
+                        <i class="fas fa-book-open"
+                            style="font-size:3rem; margin-bottom:20px; color:var(--peach-glow);"></i>
+                        <h3 style="color:white; margin-bottom:10px;">Your Voice Matters</h3>
+                        <p style="max-width:400px; margin:0 auto;">You haven't published any stories yet. Sharing your
+                            experience can help others feel less alone.</p>
+                        <button onclick="openEditor()"
+                            style="margin-top:20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; padding:10px 20px; border-radius:30px; cursor:pointer;">Start
+                            Writing</button>
                     </div>
                 </div>
             </div>
@@ -332,6 +250,7 @@
                 </div>
             </div>
 
+
         </main>
     </div>
 
@@ -370,6 +289,10 @@
             setTimeout(() => { document.getElementById('toolFrame').src = ''; }, 300);
         }
 
+        function openEditor() {
+            window.location.href = 'blog-editor.html';
+        }
+
         // --- VIEW SWITCHING ---
         function switchView(viewName, clickedLink) {
             document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
@@ -387,7 +310,8 @@
                 if (viewName === 'overview') nav[0].classList.add('active');
                 if (viewName === 'sessions') nav[1].classList.add('active');
                 if (viewName === 'journals') nav[2].classList.add('active');
-                if (viewName === 'availability') nav[3].classList.add('active');
+                if (viewName === 'stories') nav[3].classList.add('active');
+                if (viewName === 'availability') nav[4].classList.add('active');
             }
         }
 
@@ -396,6 +320,31 @@
             slot.addEventListener('click', function () {
                 this.classList.toggle('available');
             });
+        });
+
+        // --- CHART JS ---
+        const ctx = document.getElementById('impactChart').getContext('2d');
+        const impactChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Engagement',
+                    data: [5, 8, 12, 4, 6, 15, 20],
+                    backgroundColor: 'rgba(244, 159, 117, 0.5)',
+                    borderRadius: 5,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: 'rgba(255,255,255,0.5)' }, grid: { display: false } },
+                    y: { ticks: { color: 'rgba(255,255,255,0.5)' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            }
         });
     </script>
 </body>
