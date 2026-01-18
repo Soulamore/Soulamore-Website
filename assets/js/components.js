@@ -368,98 +368,98 @@ function setupFavicon(rootPath) {
 
 // --- 1. DATA CONFIGURATION ---
 
-const NAV_DATA = [
-    {
-        id: 'nav-home',
+{
+    id: 'nav-home',
         label: 'Home',
-        icon: 'fas fa-home',
-        href: 'index.html',
-        type: 'link',
+            icon: 'fas fa-home',
+                href: 'index.html',
+                    type: 'link',
     },
-    {
-        id: 'nav-spaces',
+{
+    id: 'nav-spaces',
         label: 'Find Your Space',
-        icon: 'fas fa-layer-group',
-        href: '#',
-        type: 'dropdown',
-        children: [
-            { id: 'nav-students', label: 'For Students', href: 'spaces/campus/index.html' },
-            { id: 'nav-workplaces', label: 'For Workplaces', href: 'spaces/soulamore-workplace/index.html' },
-            { id: 'nav-global', label: 'For Global/Expats', href: 'spaces/soulamore-away/index.html' }
-        ]
-    },
-    {
-        id: 'nav-support',
+            icon: 'fas fa-layer-group',
+                href: '#',
+                    type: 'dropdown',
+                        children: [
+                            { id: 'nav-students', label: 'For Students', href: 'spaces/campus/index.html' },
+                            { id: 'nav-workplaces', label: 'For Workplaces', href: 'spaces/soulamore-workplace/index.html' },
+                            { id: 'nav-global', label: 'For Global/Expats', href: 'spaces/soulamore-away/index.html' }
+                        ]
+},
+{
+    id: 'nav-support',
         label: 'Get Support',
-        icon: 'fas fa-heart',
-        href: '#',
-        type: 'dropdown',
-        children: [
-            {
-                id: 'nav-peer-group',
-                label: 'Talk to a Peer <i class="fas fa-fire" style="color:var(--ember-orange); text-shadow:0 0 8px var(--ember-orange); margin-left:4px; font-size:0.8em;"></i>',
+            icon: 'fas fa-heart',
                 href: '#',
-                type: 'submenu',
-                children: [
-                    { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'New Pages/Peer Landing.html' },
-                    { id: 'nav-meet-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
-                    { id: 'nav-join-peer', label: 'Join as Peer', href: 'join-us/index.html' }
-                ]
-            },
-            {
-                id: 'nav-psych-group',
-                label: 'Talk to a Psychologist <i class="fas fa-fire" style="color:var(--teal-glow); text-shadow:0 0 8px var(--teal-glow); margin-left:4px; font-size:0.8em;"></i>',
-                href: '#',
-                type: 'submenu',
-                children: [
-                    { id: 'nav-what-psych', label: 'What is Therapy?', href: 'New Pages/Psychologists Landing.html' },
-                    { id: 'nav-meet-psych', label: 'Meet Our Psychologists', href: 'our-psychologists/psychologists.html' },
-                    { id: 'nav-join-psych', label: 'Join as Psychologist', href: 'join-us/index.html' }
-                ]
-            },
-            { id: 'nav-soulbot', label: 'SoulBot AI (Beta)', href: 'tools/soulbot.html', style: 'color:#F49F75;' },
-            { id: 'nav-problem', label: 'The Problem Wall', href: 'pages/problem-wall.html' }
-        ]
-    },
-    {
-        id: 'nav-tools',
+                    type: 'dropdown',
+                        children: [
+                            {
+                                id: 'nav-peer-group',
+                                label: 'Talk to a Peer <i class="fas fa-fire" style="color:var(--ember-orange); text-shadow:0 0 8px var(--ember-orange); margin-left:4px; font-size:0.8em;"></i>',
+                                href: '#',
+                                type: 'submenu',
+                                children: [
+                                    { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'New Pages/Peer Landing.html' },
+                                    { id: 'nav-meet-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
+                                    { id: 'nav-join-peer', label: 'Join as Peer', href: 'join-us/index.html' }
+                                ]
+                            },
+                            {
+                                id: 'nav-psych-group',
+                                label: 'Talk to a Psychologist <i class="fas fa-fire" style="color:var(--teal-glow); text-shadow:0 0 8px var(--teal-glow); margin-left:4px; font-size:0.8em;"></i>',
+                                href: '#',
+                                type: 'submenu',
+                                children: [
+                                    { id: 'nav-what-psych', label: 'What is Therapy?', href: 'New Pages/Psychologists Landing.html' },
+                                    { id: 'nav-meet-psych', label: 'Meet Our Psychologists', href: 'our-psychologists/psychologists.html' },
+                                    { id: 'nav-join-psych', label: 'Join as Psychologist', href: 'join-us/index.html' }
+                                ]
+                            },
+                            { id: 'nav-soulbot', label: 'SoulBot AI (Beta)', href: 'tools/soulbot.html', style: 'color:#F49F75;' },
+                            { id: 'nav-problem', label: 'The Problem Wall', href: 'pages/problem-wall.html' }
+                        ]
+},
+{
+    id: 'nav-tools',
         label: 'Self-Care Tools',
-        icon: 'fas fa-toolbox',
-        href: '#',
-        type: 'dropdown',
-        children: [
-            { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
-            { id: 'nav-playground', label: 'Mental Playground', href: 'tools/playground.html' },
-            { id: 'nav-confession', label: 'Confession Box', href: 'tools/confession-box/index.html' },
-            { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
-            { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html', style: 'color:var(--ember-orange);' }
-        ]
-    },
-    {
-        id: 'nav-community',
+            icon: 'fas fa-toolbox',
+                href: '#',
+                    type: 'dropdown',
+                        children: [
+                            { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
+                            { id: 'nav-playground', label: 'Mental Playground', href: 'tools/playground.html' },
+                            { id: 'nav-confession', label: 'Confession Box', href: 'tools/confession-box/index.html' },
+                            { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
+                            { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html', style: 'color:var(--ember-orange);' }
+                        ]
+},
+{
+    id: 'nav-community',
         label: 'Community',
-        icon: 'fas fa-users',
-        href: '#',
-        type: 'dropdown',
-        children: [
-            { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
-            { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
-            { id: 'nav-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' }
-        ]
-    },
-    {
-        id: 'nav-about',
+            icon: 'fas fa-users',
+                href: '#',
+                    type: 'dropdown',
+                        children: [
+                            { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
+                            { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
+                            { id: 'nav-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
+                            { id: 'nav-for-parents', label: 'For Families', href: 'company/for-parents.html' }
+                        ]
+},
+{
+    id: 'nav-about',
         label: 'About',
-        icon: 'fas fa-info-circle',
-        href: '#',
-        type: 'dropdown',
-        children: [
-            { id: 'nav-story', label: 'Our Story', href: 'company/about.html' },
-            { id: 'nav-contact', label: 'Contact Us', href: 'company/contact.html' },
-            { id: 'nav-legal', label: 'Legal & Privacy', href: 'company/legal.html' }
-        ]
-    }
-];
+            icon: 'fas fa-info-circle',
+                href: '#',
+                    type: 'dropdown',
+                        children: [
+                            { id: 'nav-story', label: 'Our Story', href: 'company/about.html' },
+                            { id: 'nav-manifesto', label: 'Our Manifesto', href: 'company/why-soulamore-exists.html' },
+                            { id: 'nav-contact', label: 'Contact Us', href: 'company/contact.html' },
+                            { id: 'nav-legal', label: 'Legal & Privacy', href: 'company/legal.html' }
+                        ]
+}
 
 // --- 2. HTML GENERATOR ---
 
