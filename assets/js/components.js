@@ -268,6 +268,7 @@ try {
                 background: rgba(15, 23, 42, 0.98) !important; /* Solid bg */
                 padding-left: 0 !important; /* Reset padding */
                 min-width: 200px !important;
+                z-index: 2000 !important; /* Verify visibility on top */
             }
 
             /* HOVER BRIDGE FOR SIDE FLYOUT */

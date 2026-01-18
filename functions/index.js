@@ -6,7 +6,32 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const Razorpay = require('razorpay');
-const cors = require('cors')({ origin: true });
+
+// CodeQL Fix: Permissive CORS configuration
+// Restrict to specific allowed origins instead of true (wildcard)
+const allowedOrigins = [
+  'https://soulamore-f0a64.web.app',
+  'https://soulamore-f0a64.firebaseapp.com',
+  'https://www.soulamore.com', // Assuming custom domain
+  'http://localhost:5000',     // Local testing
+  'http://127.0.0.1:5500'      // VS Code Live Server
+];
+
+const cors = require('cors')({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      // Optional: For now, during development, you might want to log this but allow it to avoid breakage,
+      // but the CodeQL fix requires blocking.
+      console.warn(`Blocked CORS for origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+});
 
 admin.initializeApp();
 
@@ -65,10 +90,10 @@ exports.verifyPayment = functions.https.onRequest((req, res) => {
 
       // Check if booking is already confirmed
       if (bookingData.status === 'confirmed') {
-        return res.status(200).json({ 
-          success: true, 
+        return res.status(200).json({
+          success: true,
           message: 'Booking already confirmed',
-          bookingId: bookingId 
+          bookingId: bookingId
         });
       }
 

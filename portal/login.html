@@ -640,8 +640,13 @@
                     // Check for returnUrl
                     // Check for returnUrl
                     const returnUrl = sessionStorage.getItem('returnUrl');
-                    if (returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//')) {
-                        // Secure: Only allow relative paths
+
+                    // CodeQL Fix: Client-side URL redirect
+                    // Ensure it is a relative path (starts with /) and NOT a protocol-relative URL (doesn't start with //)
+                    // Also filter out 'javascript:' or 'data:' schemes just in case
+                    if (returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//') && !returnUrl.includes(':')) {
+                        // Double-check against a regex for allowed characters if strictly needed, 
+                        // but avoiding // and : is the standard mitigation for open redirects here.
                         sessionStorage.removeItem('returnUrl');
                         window.location.href = returnUrl;
                     } else {
