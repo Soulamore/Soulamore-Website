@@ -29,13 +29,13 @@ export async function handleRoleRouting(user, intent) {
     if (intent === 'admin') {
         // In a real app, verify admin claim here. For MVP, we trust the intent or check specific email
         // const isAdmin = user.email.endsWith('@soulamore.com'); // Example constraint
-        finalizeSession('admin', 'admin-dashboard.html');
+        finalizeSession('admin', 'portal/admin-dashboard.html');
         return;
     }
 
     // 2. USER (Default)
     if (intent === 'user') {
-        finalizeSession('user', 'user-dashboard.html');
+        finalizeSession('user', 'portal/user-dashboard.html');
         return;
     }
 
@@ -48,10 +48,10 @@ export async function handleRoleRouting(user, intent) {
         if (intent === 'peer') {
             const isVerifiedPeer = roleDoc.exists() && roleDoc.data().peer === true;
             if (isVerifiedPeer) {
-                finalizeSession('peer', 'peer-dashboard.html');
+                finalizeSession('peer', 'portal/peer-dashboard.html');
             } else {
                 alert("Status: Application Pending. You are not yet verified as a Peer. Redirecting to User Dashboard.");
-                finalizeSession('user', 'user-dashboard.html');
+                finalizeSession('user', 'portal/user-dashboard.html');
             }
             return;
         }
@@ -59,10 +59,10 @@ export async function handleRoleRouting(user, intent) {
         if (intent === 'psychologist') {
             const isVerifiedPsych = roleDoc.exists() && roleDoc.data().psychologist === true;
             if (isVerifiedPsych) {
-                finalizeSession('psychologist', 'psych-dashboard.html');
+                finalizeSession('psychologist', 'portal/psych-dashboard.html');
             } else {
                 alert("Status: Not Verified. Professional access restricted. Redirecting to User Dashboard.");
-                finalizeSession('user', 'user-dashboard.html');
+                finalizeSession('user', 'portal/user-dashboard.html');
             }
             return;
         }
