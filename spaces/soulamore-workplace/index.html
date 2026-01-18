@@ -98,7 +98,7 @@
             /* Scroll if too small */
             gap: 10px;
             position: relative;
-            z-index: 10;
+            z-index: 500;
         }
 
         /* Hide scrollbar for clean UI */
@@ -1279,56 +1279,7 @@
         <!-- COMPONENTS SCIPT -->
         <script src="../../assets/js/components.js"></script>
         <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                // 0. Safety Check for Global Injections
-                try {
-                    if (typeof injectHeader === 'function') injectHeader();
-                    if (typeof injectFooter === 'function') injectFooter();
-                } catch (e) {
-                    console.error("Soulamore: Injection error", e);
-                }
-
-                // 1. Setup IntersectionObserver for inner content fade-ins
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.style.opacity = '1';
-                            entry.target.style.transform = "translateY(0)";
-                            observer.unobserve(entry.target); // Trigger only once
-                        }
-                    });
-                });
-                document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-                // 2. Handle URL Hash for Deep Linking
-                const hash = window.location.hash.substring(1);
-                const validIds = ['main', 'programs', 'employees', 'financial', 'hr', 'policy'];
-
-                setTimeout(() => {
-                    if (hash && validIds.includes(hash)) {
-                        navTo(hash);
-                    } else {
-                        navTo('main'); // Default
-                    }
-                }, 100);
-
-                // 3. Particles Effect (Safe Limit)
-                const pContainer = document.getElementById('particles');
-                if (pContainer) {
-                    for (let i = 0; i < 30; i++) {
-                        let p = document.createElement('div');
-                        p.classList.add('particle');
-                        p.style.left = Math.random() * 100 + 'vw';
-                        p.style.width = Math.random() * 4 + 'px';
-                        p.style.height = p.style.width;
-                        p.style.animationDuration = Math.random() * 20 + 10 + 's';
-                        p.style.opacity = Math.random() * 0.3;
-                        pContainer.appendChild(p);
-                    }
-                }
-            });
-
-            // --- GLOBAL NAV LOGIC ---
+            // --- GLOBAL NAV LOGIC (Defined immediately to ensure availability) ---
             window.navTo = function (pageId) {
                 console.log("Navigating to:", pageId);
 
@@ -1341,33 +1292,31 @@
                 // B. Show Target Page
                 const targetPage = document.getElementById(pageId);
                 if (targetPage) {
-                    targetPage.classList.add('active'); // set display:block
+                    targetPage.classList.add('active');
 
-                    // Trigger fade-in after slight delay to allow rendering
+                    // Trigger fade-in
                     setTimeout(() => {
-                        targetPage.classList.add('fade-in-active'); // set opacity:1
-
-                        // FORCE SHOW CHILDREN: Manually set opacity for inner fade-in elements
-                        // This bypasses the IntersectionObserver which might not trigger for newly visible tabs
-                        targetPage.querySelectorAll('.fade-in').forEach(el => {
+                        targetPage.classList.add('fade-in-active');
+                        // Force opacity on children
+                        const children = targetPage.querySelectorAll('.fade-in');
+                        children.forEach(el => {
                             el.style.opacity = '1';
                             el.style.transform = 'translateY(0)';
-                            el.style.animation = 'none'; // Stop CSS animation interference
                         });
-
                     }, 50);
-                } else {
-                    console.error("Target page not found:", pageId);
+
+                    // Scroll to top of content if needed, but smooth
+                    // window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
 
                 // C. Update Buttons
                 document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
 
-                // Fixed Mapping to match HTML structure
+                // Fixed Mapping
                 const mapping = {
                     'main': 0,
-                    'plans': 1, // Link (won't stay active on this page usually, but mapped for correct index)
-                    'guidelines': 2, // Link
+                    'plans': 1,
+                    'guidelines': 2,
                     'programs': 3,
                     'employees': 4,
                     'financial': 5,
@@ -1382,6 +1331,49 @@
                     buttons[index].classList.add('active');
                 }
             };
+
+            document.addEventListener("DOMContentLoaded", () => {
+                // 0. Safety Check
+                try {
+                    if (typeof injectHeader === 'function') injectHeader();
+                    if (typeof injectFooter === 'function') injectFooter();
+                } catch (e) { console.error("Injection Error:", e); }
+
+                // 1. IntersectionObserver
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = "translateY(0)";
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                });
+                document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+                // 2. Handle URL Hash
+                const hash = window.location.hash.substring(1);
+                const validIds = ['main', 'plans', 'guidelines', 'programs', 'employees', 'financial', 'hr', 'policy'];
+
+                if (hash && validIds.includes(hash)) {
+                    navTo(hash);
+                }
+
+                // 3. Particles
+                const pContainer = document.getElementById('particles');
+                if (pContainer) {
+                    for (let i = 0; i < 30; i++) {
+                        let p = document.createElement('div');
+                        p.classList.add('particle');
+                        p.style.left = Math.random() * 100 + 'vw';
+                        p.style.width = Math.random() * 4 + 'px';
+                        p.style.height = p.style.width;
+                        p.style.animationDuration = Math.random() * 20 + 10 + 's';
+                        p.style.opacity = Math.random() * 0.3;
+                        pContainer.appendChild(p);
+                    }
+                }
+            });
         </script>
 </body>
 
