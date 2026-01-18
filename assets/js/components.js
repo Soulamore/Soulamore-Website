@@ -708,7 +708,8 @@ function injectHeader() {
         document.body.prepend(headerElement);
     } else {
         // Ensure it's the first element if it exists but is misplaced
-        if (headerElement.parentElement !== document.body) {
+        // CRITICAL FIX: Do NOT move it if it's already inside #shell-fixed logic
+        if (headerElement.parentElement !== document.body && headerElement.parentElement.id !== 'shell-fixed') {
             document.body.prepend(headerElement);
         }
     }
@@ -793,6 +794,67 @@ function injectFavicon() {
         link.href = `data:image/svg+xml,${iconSVG}`;
     }
 }
+
+// --- 4b. SUB-NAV INJECTION (Layout Shell Binding) ---
+function injectSubnav() {
+    // Only proceed if the page has defined a shell intention
+    if (!window.ShellSubnav) {
+        // console.log("Soulamore: No ShellSubnav config found.");
+        return;
+    }
+
+    const navContainer = document.getElementById('shell-subnav');
+    if (!navContainer) {
+        console.error('Soulamore: ShellSubnav defined but #shell-subnav container missing in DOM.');
+        return;
+    }
+
+    // Clean container
+    navContainer.innerHTML = '';
+
+    // Create Wrapper for spacing/layout
+    const wrapper = document.createElement('div');
+    wrapper.className = 'sub-nav-container';
+    // We reuse the existing CSS class for visual style, but now it lives inside the Shell
+    wrapper.style.margin = '0 auto'; // Override margin for shell context (Handled by padding now)
+    wrapper.style.pointerEvents = 'auto'; // Re-enable clicks
+
+    window.ShellSubnav.tabs.forEach(tab => {
+        const btn = document.createElement('div');
+        btn.className = `workplace-btn ${tab.id === window.ShellSubnav.active ? 'active' : ''} ${tab.extraClass || ''}`;
+        btn.setAttribute('data-page', tab.id);
+
+        // Icon + Label
+        btn.innerHTML = `<i class="fas ${tab.icon}"></i><span>${tab.label}</span>`;
+
+        // Click Handler (Global navTo or custom)
+        btn.onclick = () => {
+            // 1. Priority: Direct Link navigation
+            if (tab.href && tab.href !== '#' && tab.href !== '') {
+                window.location.href = tab.href;
+                return;
+            }
+
+            // 2. Fallback: Legacy navTo (SPA behavior)
+            if (window.navTo) {
+                window.navTo(tab.id);
+                // Update active state visually immediately
+                document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // Update internal state
+                window.ShellSubnav.active = tab.id;
+            }
+        };
+
+        wrapper.appendChild(btn);
+    });
+
+    navContainer.appendChild(wrapper);
+    // console.log("Soulamore: Shell Sub-nav injected.");
+}
+
+// Auto-run subnav injection on load
+document.addEventListener('DOMContentLoaded', injectSubnav);
 
 // --- 5. ACTIVE STATE LOGIC ---
 
@@ -1098,13 +1160,13 @@ function injectSoulBotWidget() {
     }
 }
 
-// --- 7. INITIALIZATION (CRITICAL: MUST RUN) ---
-document.addEventListener('DOMContentLoaded', () => {
-    // console.log("Soulamore: Initializing...");
+// --- GLOBAL INIT ---
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof injectHeader === 'function') injectHeader();
+    if (typeof injectFooter === 'function') injectFooter();
+    initParticles(); // Auto-init particles if container exists
 
-    // 1. Inject Components
-    try { injectHeader(); } catch (e) { console.error("Header Injection Failed:", e); }
-    try { injectFooter(); } catch (e) { console.error("Footer Injection Failed:", e); }
+    // Original Initialization steps (retained)
     try { injectSoulBotWidget(); } catch (e) { console.error("SoulBot Widget Failed:", e); }
     try { injectFavicon(); } catch (e) { console.error("Favicon Injection Failed:", e); }
 
@@ -1116,4 +1178,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("Soulamore: Initialization Complete.");
 });
+
+// --- PARTICLES ENGINE ---
+function initParticles() {
+    const pContainer = document.getElementById('particles');
+    // Only run if container exists and is empty
+    if (pContainer && pContainer.childElementCount === 0) {
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 5 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            pContainer.appendChild(p);
+        }
+    }
+}
 

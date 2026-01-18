@@ -19,6 +19,104 @@
     --teal-glow: #4ECDC4;
     --ember-orange: #ff7043;
     /* Added for Fire Icons */
+
+    /* --- LAYOUT SHELL SYSTEM (Standardized Vertical Rhythm) --- */
+    --shell-header-height: 130px;
+    --shell-subnav-height: 80px;
+}
+
+/* --- LAYOUT SHELL SYSTEM (FINAL CONTRACT) --- */
+#app-shell {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* Rule 1: Fixed shell defines space, not visuals */
+#shell-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    /* Subnav and Header live here */
+    display: flex;
+    flex-direction: column;
+}
+
+#shell-fixed>*,
+#shell-fixed header,
+#shell-fixed #main-header {
+    pointer-events: auto;
+    /* Restore clicks */
+    position: relative !important;
+    /* Force children into flow */
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    /* Disable island-nav transform if present */
+    width: 100% !important;
+}
+
+/* Rule 2: Content starts AFTER fixed shell, always */
+#shell-content {
+    /* Offset by the exact height of shell-fixed (JS calculated) */
+    padding-top: var(--shell-fixed-height, 220px);
+
+    position: relative;
+    min-height: calc(100vh - var(--shell-fixed-height, 220px));
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Rule 4: Constrain Particles */
+#particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Rule 2b: Page Stack Container */
+#page-stack {
+    position: relative;
+    min-height: 100%;
+    z-index: 1;
+    flex: 1;
+    /* Ensure it takes available space */
+}
+
+/* Rule 3: Page Views (Opacity Switching) */
+.page-view {
+    position: absolute;
+    /* Inactive tabs are removed from flow but kept locally */
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    width: 100%;
+}
+
+.page-view.active {
+    position: relative;
+    /* Active tab re-enters flow */
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Footer always last in flow */
+#main-footer {
+    position: relative;
+    z-index: 1;
+}
+
+/* Sub-Nav Anchor */
+#shell-subnav {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    z-index: 999;
 }
 
 * {
@@ -1636,4 +1734,47 @@ body[data-header-theme="light"] .lifeline-btn {
 body[data-page="problem-wall"] header.island-nav {
     backdrop-filter: blur(6px);
     padding: 10px 26px !important;
+}
+
+/* --- CRITICAL LAYOUT FIX (FINAL OVERRIDE) --- */
+#app-shell #shell-fixed header,
+#app-shell #shell-fixed header.island-nav,
+#app-shell #shell-fixed #main-header {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    margin: 0 auto !important;
+    /* We allow width/style to remain, but position is non-negotiable */
+    z-index: 1001 !important;
+}
+
+/* --- GLOBAL PARTICLES --- */
+#particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.particle {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: float linear infinite;
+}
+
+@keyframes float {
+    from {
+        transform: translateY(100vh);
+    }
+
+    to {
+        transform: translateY(-10vh);
+    }
 }

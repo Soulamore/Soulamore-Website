@@ -115,6 +115,53 @@
                 .newsletter-input-group { flex-direction: column; }
                 #popupEmail, #btnPopupEmail { width: 100%; padding: 12px !important; }
             }
+
+            /* RIGHT VISUAL */
+            .popup-visual { 
+                background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(0,0,0,0) 50%); 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                position: relative; 
+                overflow: hidden; 
+                /* Padding to ensure phone doesn't touch edges */
+                padding: 20px;
+            }
+
+            .phone-frame { 
+                width: 260px; 
+                height: 520px; 
+                border: 8px solid #1e293b; 
+                border-radius: 30px; 
+                background: #000; 
+                position: relative; 
+                box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
+                overflow: hidden; 
+                transform: none; 
+            }
+
+            .notch { position: absolute; top:0; left:50%; transform:translateX(-50%); width:90px; height:18px; background:#1e293b; border-bottom-left-radius:10px; border-bottom-right-radius:10px; z-index:10; }
+            
+            .screen-content { 
+                width: 100%; 
+                height: 100%; 
+                background: #0f172a; 
+                /* Fix Scroll: Allow scrolling inside the phone screen */
+                overflow-y: auto; 
+                /* Hide scrollbar for cleaner look */
+                scrollbar-width: none; 
+                -ms-overflow-style: none;
+            }
+            .screen-content::-webkit-scrollbar { display: none; }
+
+            .site-iframe { 
+                width: 100%; 
+                height: 100%; 
+                border: none; 
+                opacity: 1; 
+                transition: opacity 0.5s ease; 
+                display: block;
+            }
         </style>
 
         <div class="popup-card">
@@ -163,54 +210,15 @@
                 </div>
             </div>
 
-            /* RIGHT VISUAL */
-            .popup-visual { 
-                background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(0,0,0,0) 50%); 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                position: relative; 
-                overflow: hidden; 
-                /* Padding to ensure phone doesn't touch edges */
-                padding: 20px;
-            }
-
-            .phone-frame { 
-                width: 260px; 
-                height: 520px; 
-                border: 8px solid #1e293b; 
-                border-radius: 30px; 
-                background: #000; 
-                position: relative; 
-                box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
-                overflow: hidden; 
-                /* Removed unnecessary translateY that pushed it down */
-                transform: none; 
-            }
-
-            .notch { position: absolute; top:0; left:50%; transform:translateX(-50%); width:90px; height:18px; background:#1e293b; border-bottom-left-radius:10px; border-bottom-right-radius:10px; z-index:10; }
-            
-            .screen-content { 
-                width: 100%; 
-                height: 100%; 
-                background: #0f172a; 
-                /* Fix Scroll: Allow scrolling inside the phone screen */
-                overflow-y: auto; 
-                /* Hide scrollbar for cleaner look */
-                scrollbar-width: none; 
-                -ms-overflow-style: none;
-            }
-            .screen-content::-webkit-scrollbar { display: none; }
-
-            .site-iframe { 
-                width: 100%; 
-                height: 100%; 
-                border: none; 
-                opacity: 1; 
-                transition: opacity 0.5s ease; 
-                /* Build scroll into the iframe itself */
-                display: block;
-            }
+            <!-- RIGHT VISUAL (Restored) -->
+            <div class="popup-visual">
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <div class="screen-content">
+                        ${iframeHTML}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <style>@keyframes scrollApp { 0% { transform: translateY(0); } 20% { transform: translateY(-20%); } 50% { transform: translateY(-20%); } 70% { transform: translateY(-5%); } 100% { transform: translateY(0); } }</style>
