@@ -688,6 +688,7 @@ function getRootPath() {
         location.pathname.includes('/community/') ||
         location.pathname.includes('/company/') ||
         location.pathname.includes('/auth/') ||
+        location.pathname.includes('/portal/') || /* ADDED: Critical for Dashboards/Login */
         location.pathname.includes('/New Pages/') || /* ADDED: Support for New Pages directory */
         location.pathname.includes('/pages/')) {
         return "../";
