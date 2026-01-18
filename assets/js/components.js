@@ -116,17 +116,19 @@ try {
             }
             /* Specific override for Get Help to distinguish slightly if needed, or keep uniform */
             .lifeline-btn {
-                border-color: rgba(239, 68, 68, 0.5) !important;
-                background: rgba(239, 68, 68, 0.1) !important;
-                padding: 0 8px !important;
+                border-color: #ef4444 !important; /* Solid Red Border */
+                background: rgba(239, 68, 68, 0.15) !important;
+                color: #fca5a5 !important; /* Light Red Text for Contrast */
+                padding: 0 15px !important;
                 height: 42px !important;
-                font-size: 0.8rem !important;
+                font-size: 0.9rem !important;
                 justify-content: center !important;
                 flex-shrink: 0 !important;
                 width: fit-content !important;
                 min-width: 0 !important;
                 flex-grow: 0 !important;
                 overflow: hidden !important; /* Isolate shimmer */
+                box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important;
             }
             .lifeline-btn:hover {
                 background: #ef4444 !important;
