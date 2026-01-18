@@ -399,7 +399,7 @@ const NAV_DATA = [
                 children: [
                     { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'New Pages/Peer Landing.html' },
                     { id: 'nav-meet-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
-                    { id: 'nav-join-peer', label: 'Join as Peer', href: 'join-us/peer.html' }
+                    { id: 'nav-join-peer', label: 'Join as Peer', href: 'join-us/index.html' }
                 ]
             },
             {
@@ -410,7 +410,7 @@ const NAV_DATA = [
                 children: [
                     { id: 'nav-what-psych', label: 'What is Therapy?', href: 'New Pages/Psychologists Landing.html' },
                     { id: 'nav-meet-psych', label: 'Meet Our Psychologists', href: 'our-psychologists/psychologists.html' },
-                    { id: 'nav-join-psych', label: 'Join as Psychologist', href: 'join-us/psychologist.html' }
+                    { id: 'nav-join-psych', label: 'Join as Psychologist', href: 'join-us/index.html' }
                 ]
             },
             { id: 'nav-soulbot', label: 'SoulBot AI (Beta)', href: 'tools/soulbot.html', style: 'color:#F49F75;' },
@@ -586,6 +586,7 @@ const getFooterHTML = (rootPath) => `
                 <li><a href="${rootPath}spaces/campus/campus-ambassadors.html">Campus Ambassadors</a></li>
                 <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
                 <li><a href="${rootPath}community/forum.html">Discussion Forum</a></li>
+                <li><a href="${rootPath}company/for-parents.html">For Family (Comfort)</a></li>
                 <li><a href="${rootPath}join-us/index.html">Join the Team</a></li>
             </ul>
         </div>
@@ -596,6 +597,7 @@ const getFooterHTML = (rootPath) => `
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
                 <li><a href="${rootPath}tools/index.html">Tools</a></li>
                 <li><a href="${rootPath}newsletter.html">Newsletter</a></li>
+                <li><a href="${rootPath}company/why-soulamore-exists.html">Why Soulamore Exists</a></li>
                 <li><a href="${rootPath}company/contact.html">Contact</a></li>
                 <li><a href="${rootPath}company/legal.html">Privacy & Legal</a></li>
                 <li><a href="${rootPath}get-help-now.html" style="color:var(--ember-red); font-weight:600;">Crisis Resources</a></li>
