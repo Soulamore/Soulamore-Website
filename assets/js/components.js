@@ -526,7 +526,7 @@ const getHeaderHTML = (rootPath) => `
             <div class="mp-info">
                 <span class="mp-name">Welcome, Friend</span>
                 <span class="mp-status">Guest</span>
-                <a href="${rootPath}login.html" class="mp-btn">Log In</a>
+                <a href="${rootPath}portal/login.html" class="mp-btn">Log In</a>
             </div>
         </div>
 
@@ -539,7 +539,7 @@ const getHeaderHTML = (rootPath) => `
     <div class="auth-box">
             <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
             <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
-            <a href="${rootPath}auth/login.html" class="nav-btn">Log In / Sign Up</a>
+            <a href="${rootPath}portal/login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
     
     <button class="mobile-toggle" aria-label="Toggle Navigation">
