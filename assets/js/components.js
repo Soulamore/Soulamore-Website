@@ -384,9 +384,46 @@ const NAV_DATA = [
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-students', label: 'For Students', href: 'spaces/campus/index.html' },
-            { id: 'nav-workplaces', label: 'For Workplaces', href: 'spaces/soulamore-workplace/index.html' },
-            { id: 'nav-global', label: 'For Global/Expats', href: 'spaces/soulamore-away/index.html' }
+            {
+                id: 'nav-students',
+                label: 'For Students',
+                href: 'spaces/campus/index.html',
+                type: 'submenu',
+                children: [
+                    { label: 'Campus Home', href: 'spaces/campus/index.html' },
+                    { label: 'What is Campus?', href: 'spaces/campus/what-is-campus.html' },
+                    { label: 'Anxiety & Overthinking', href: 'spaces/campus/anxiety-and-overthinking.html' },
+                    { label: 'Exam Pressure', href: 'spaces/campus/exam-pressure.html' },
+                    { label: 'Feeling Low', href: 'spaces/campus/feeling-low.html' },
+                    { label: 'Loneliness', href: 'spaces/campus/loneliness.html' },
+                    { label: 'Safety & Boundaries', href: 'spaces/campus/safety-boundaries.html' },
+                    { label: 'Student Resources', href: 'spaces/campus/student-resources.html' },
+                    { label: 'Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
+                    { label: 'For Institutions', href: 'spaces/campus/institutions.html' }
+                ]
+            },
+            {
+                id: 'nav-workplaces',
+                label: 'For Workplaces',
+                href: 'spaces/soulamore-workplace/index.html',
+                type: 'submenu',
+                children: [
+                    { label: 'Workplace Home', href: 'spaces/soulamore-workplace/index.html' },
+                    { label: 'Our Plans', href: 'spaces/soulamore-workplace/plans.html' },
+                    { label: 'Guidelines', href: 'spaces/soulamore-workplace/guidelines.html' }
+                ]
+            },
+            {
+                id: 'nav-global',
+                label: 'For Global/Expats',
+                href: 'spaces/soulamore-away/index.html',
+                type: 'submenu',
+                children: [
+                    { label: 'Soulamore Away Home', href: 'spaces/soulamore-away/index.html' },
+                    { label: 'Who is this for?', href: 'spaces/soulamore-away/who-its-for.html' },
+                    { label: 'Resources', href: 'spaces/soulamore-away/resources.html' }
+                ]
+            }
         ]
     },
     {
