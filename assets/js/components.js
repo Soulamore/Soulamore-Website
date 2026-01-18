@@ -872,6 +872,10 @@ function initializeHeaderLogic() {
                 header.style.setProperty('box-shadow', 'none', 'important');
                 header.style.setProperty('backdrop-filter', 'none', 'important');
             } else {
+                // ADDED CHECK: Respect Light Context Mode (Problem Wall)
+                const headerTheme = document.body.getAttribute('data-header-theme');
+                if (headerTheme === 'light') return;
+
                 // Standard Behavior
                 if (window.scrollY > 50) {
                     header.style.background = 'rgba(15, 23, 42, 0.95)';

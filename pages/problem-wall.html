@@ -498,7 +498,7 @@
     </style>
 </head>
 
-<body>
+<body data-page="problem-wall" data-header-theme="light">
 
     <!-- REFINED HEADER -->
     <!-- Header injected by components.js -->
@@ -598,14 +598,26 @@
             const OBSCENE_WORDS = ["damn", "hell", "badword1", "badword2", "hate", "kill", "die", "ugly", "stupid", "idiot"];
             // Note: Real deployment should use a comprehensive list or API. This is a client-side placeholder.
 
-            function sanitizeText(text) {
-                let clean = text;
-                OBSCENE_WORDS.forEach(word => {
-                    const regex = new RegExp(`\\b${word}\\b`, 'gi');
-                    clean = clean.replace(regex, '****');
-                });
-                return clean;
+            // --- STORAGE HELPERS (PHASE 1: LocalStorage) ---
+            function getStoredNotes() {
+                try {
+                    return JSON.parse(localStorage.getItem('problemWallNotes')) || [];
+                } catch (e) {
+                    return [];
+                }
             }
+
+            function saveNote(note) {
+                const notes = getStoredNotes();
+                notes.push(note);
+                saveAllNotes(notes);
+            }
+
+            function saveAllNotes(notes) {
+                localStorage.setItem('problemWallNotes', JSON.stringify(notes));
+            }
+
+
 
             // --- GLOBAL STATS FAKE LOGIC ---
             // Slowly increment counts to simulate activity
@@ -718,17 +730,36 @@
 
 
             // --- NOTE CREATION ---
+            // --- NOTE CREATION & RENDERING ---
             function initCanvas() {
                 // Center Canvas Initially (Approx view center)
                 panX = window.innerWidth / 2;
                 panY = window.innerHeight / 2;
                 updateTransform();
 
-                // Spawn Seed Notes around the center
-                seedNotes.forEach(data => {
-                    const pos = getRandomPos();
-                    createNoteElement(data.text, pos, data);
-                });
+                const storedNotes = getStoredNotes();
+
+                if (storedNotes.length > 0) {
+                    storedNotes.forEach(renderNote);
+                } else {
+                    // SEED DATA IF EMPTY
+                    seedNotes.forEach(data => {
+                        const pos = getRandomPos();
+                        const seed = {
+                            id: crypto.randomUUID(),
+                            text: data.text,
+                            x: pos.x,
+                            y: pos.y,
+                            rotation: (Math.random() - 0.5) * 6,
+                            hearts: data.heart,
+                            flowers: data.flower,
+                            candles: data.candle,
+                            createdAt: new Date().toISOString()
+                        };
+                        saveNote(seed);
+                        renderNote(seed);
+                    });
+                }
             }
 
             function getRandomPos() {
@@ -740,19 +771,20 @@
                 return { x, y };
             }
 
-            function createNoteElement(text, pos, counts = { heart: 0, flower: 0, candle: 0 }) {
+            function renderNote(data) {
                 const note = document.createElement('div');
                 note.className = 'note';
+                note.dataset.id = data.id;
 
-                // Random Rotation
-                const rot = (Math.random() - 0.5) * 6;
+                note.style.left = data.x + 'px';
+                note.style.top = data.y + 'px';
+                note.style.transform = `rotate(${data.rotation}deg)`;
 
-                note.style.left = pos.x + 'px';
-                note.style.top = pos.y + 'px';
-                note.style.transform = `rotate(${rot}deg)`;
-
-                // Random Tint
                 const tints = ['#ffffff', '#fdfbf7', '#fefce8', '#f0f9ff'];
+                // Use a deterministic tint based on ID or random if not stored? 
+                // For now, random is fine on render as tint isn't in data model explicitly, 
+                // but better to add it or just pick one. Keeping random for variety on refresh is okay for Phase 1 demo feel,
+                // but user asked for persistence. Let's stick to the user's snippet which used random in renderNote.
                 note.style.background = tints[Math.floor(Math.random() * tints.length)];
 
                 note.innerHTML = `
@@ -762,28 +794,70 @@
                 </div>
                 <div class="reaction-row">
                     <button class="react-btn" onclick="react(this, 'heart')">
-                        <i class="far fa-heart"></i> <span class="count">${counts.heart}</span>
+                        <i class="far fa-heart"></i> <span class="count">${data.hearts || data.heart || 0}</span>
                     </button>
                     <button class="react-btn flower" onclick="react(this, 'flower')">
-                        <i class="fas fa-spa"></i> <span class="count">${counts.flower}</span>
+                        <i class="fas fa-spa"></i> <span class="count">${data.flowers || data.flower || 0}</span>
                     </button>
                     <button class="react-btn candle" onclick="react(this, 'candle')">
-                        <i class="fas fa-fire-alt"></i> <span class="count">${counts.candle}</span>
+                        <i class="fas fa-fire-alt"></i> <span class="count">${data.candles || data.candle || 0}</span>
                     </button>
                 </div>
             `;
-                // SAFE: Use textContent to prevent XSS
-                note.querySelector('.note-text').textContent = text;
-
+                note.querySelector('.note-text').textContent = data.text;
                 canvas.appendChild(note);
             }
 
+            // Replaces old createNoteElement
+            function createNoteElement(text, pos, counts) {
+                // Legacy shim if something calls this, but initCanvas uses renderNote now.
+            }
+
+            function postNote() {
+                let txt = document.getElementById('noteInput').value;
+                if (!txt.trim()) return;
+
+                txt = sanitizeText(txt);
+
+                const targetX = -panX / scale + (window.innerWidth / 2 / scale); // Center of screen relative to canvas
+                const targetY = -panY / scale + (window.innerHeight / 2 / scale);
+
+                const noteData = {
+                    id: crypto.randomUUID(),
+                    text: txt,
+                    x: targetX + (Math.random() * 40 - 20),
+                    y: targetY + (Math.random() * 40 - 20),
+                    rotation: (Math.random() - 0.5) * 6,
+                    hearts: 0,
+                    flowers: 0,
+                    candles: 0,
+                    createdAt: new Date().toISOString()
+                };
+
+                saveNote(noteData);
+                renderNote(noteData);
+
+                document.getElementById('noteInput').value = "";
+                closeWriter();
+
+                // Show toast
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            }
+
+            // --- REACTION LOGIC ---
             // --- REACTION LOGIC ---
             function react(btn, type) {
                 event.stopPropagation();
 
-                // Toggle Active state locally
-                const icon = btn.querySelector('i');
+                const noteEl = btn.closest('.note');
+                const noteId = noteEl.dataset.id;
+
+                const notes = getStoredNotes();
+                const note = notes.find(n => n.id === noteId);
+                if (!note) return;
+
                 const countSpan = btn.querySelector('.count');
                 let count = parseInt(countSpan.innerText);
 
@@ -791,23 +865,17 @@
                     btn.classList.add('active');
                     count++;
 
-                    // Icon Change for Heart
-                    if (type === 'heart') icon.className = "fas fa-heart";
+                    if (type === 'heart') { note.hearts = (note.hearts || 0) + 1; btn.querySelector('i').className = "fas fa-heart"; }
+                    if (type === 'flower') { note.flowers = (note.flowers || 0) + 1; }
+                    if (type === 'candle') { note.candles = (note.candles || 0) + 1; }
 
                     // Pulse Anim
                     btn.style.transform = "scale(1.4)";
                     setTimeout(() => btn.style.transform = "scale(1)", 200);
-
-                } else {
-                    // Prevent removing care? Usually standard social apps allow un-liking.
-                    // For Soulamore, maybe "care" implies permanence? 
-                    // Let's allow toggle for now.
-                    btn.classList.remove('active');
-                    count--;
-                    if (type === 'heart') icon.className = "far fa-heart";
                 }
 
                 countSpan.innerText = count;
+                saveAllNotes(notes);
             }
 
             // --- MODAL & WRITING ---
