@@ -1278,114 +1278,115 @@
         <!-- LOGIC -->
         <!-- STANDARD FOOTER INJECTION POINT -->
         <footer id="main-footer"></footer>
-        <!-- COMPONENTS SCIPT -->
-        <script src="../../assets/js/components.js"></script>
-        <script>
-            // --- GLOBAL NAV LOGIC ---
-            // 1. Global Observer Reference
-            window.fadeObserver = null;
+        </main> <!-- End shell-content -->
+    </div> <!-- End app-shell -->
+    <!-- COMPONENTS SCIPT -->
+    <script src="../../assets/js/components.js"></script>
+    <script>
+        // --- GLOBAL NAV LOGIC ---
+        // 1. Global Observer Reference
+        window.fadeObserver = null;
 
-            // 2. Navigation Function (State-Pure)
-            window.navTo = function (pageId) {
-                console.log("Navigating to:", pageId);
+        // 2. Navigation Function (State-Pure)
+        window.navTo = function (pageId) {
+            console.log("Navigating to:", pageId);
 
-                // A. Hide All Pages (CSS Class Only)
-                const pages = document.querySelectorAll('.page-view');
-                pages.forEach(p => {
-                    p.classList.remove('active');
-                    // CLEANUP: Clean any inline styles left by previous hacks
-                    p.style.display = '';
-                    p.style.opacity = '';
-                });
+            // A. Hide All Pages (CSS Class Only)
+            const pages = document.querySelectorAll('.page-view');
+            pages.forEach(p => {
+                p.classList.remove('active');
+                // CLEANUP: Ensure no inline styles block CSS
+                p.style.display = '';
+                p.style.opacity = '';
+            });
 
-                // B. Show Target Page
-                const targetPage = document.getElementById(pageId);
-                if (targetPage) {
-                    targetPage.classList.add('active');
+            // B. Show Target Page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
 
-                    // Update URL Hash (if not already there)
-                    if (window.location.hash !== '#' + pageId) {
-                        history.pushState({ page: pageId }, '', `#${pageId}`);
-                    }
-
-                    // Re-observe animations
-                    if (window.fadeObserver) {
-                        targetPage.querySelectorAll('.fade-in').forEach(el => {
-                            // Reset state so observer triggers again
-                            el.style.opacity = '';
-                            el.style.transform = '';
-                            el.classList.remove('visible'); // If you use a class for state
-                            window.fadeObserver.observe(el);
-                        });
-                    }
-                } else {
-                    console.error("Target page not found:", pageId);
+                // Update URL Hash
+                if (window.location.hash !== '#' + pageId) {
+                    history.replaceState(null, '', `#${pageId}`);
                 }
 
-                // C. Update Buttons (Data Attribute Based)
-                document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
-                const activeBtn = document.querySelector(`.workplace-btn[data-page="${pageId}"]`);
-                if (activeBtn) {
-                    activeBtn.classList.add('active');
+                // IMPORTANT: Scroll Reset
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // Re-observe animations
+                if (window.fadeObserver) {
+                    targetPage.querySelectorAll('.fade-in').forEach(el => {
+                        el.style.opacity = '';
+                        el.style.transform = '';
+                        el.classList.remove('visible');
+                        window.fadeObserver.observe(el);
+                    });
+                }
+            } else {
+                console.error("Target pages not found:", pageId);
+            }
+
+            // C. Update Buttons (Data Attribute Based)
+            document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.querySelector(`.workplace-btn[data-page="${pageId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // 0. Safety Check
+            try {
+                if (typeof injectHeader === 'function') injectHeader();
+                if (typeof injectFooter === 'function') injectFooter();
+            } catch (e) { console.error("Injection Error:", e); }
+
+            // 1. IntersectionObserver Setup
+            window.fadeObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = "translateY(0)";
+                        window.fadeObserver.unobserve(entry.target);
+                    }
+                });
+            });
+            document.querySelectorAll('.fade-in').forEach(el => window.fadeObserver.observe(el));
+
+            // 2. Handle Initial Load & Popstate
+            const handleHash = () => {
+                const hash = window.location.hash.substring(1) || 'main';
+                const validIds = ['main', 'plans', 'guidelines', 'programs', 'employees', 'financial', 'hr', 'policy'];
+                if (validIds.includes(hash)) {
+                    navTo(hash);
+                } else {
+                    navTo('main');
                 }
             };
 
-            document.addEventListener("DOMContentLoaded", () => {
-                // 0. Safety Check
-                try {
-                    if (typeof injectHeader === 'function') injectHeader();
-                    if (typeof injectFooter === 'function') injectFooter();
-                } catch (e) { console.error("Injection Error:", e); }
+            // Initial check
+            // Use small delay to ensure shell is ready? No, logic is synchronous styling.
+            handleHash();
 
-                // 1. IntersectionObserver Setup
-                window.fadeObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.style.opacity = '1';
-                            entry.target.style.transform = "translateY(0)";
-                            // We do NOT unobserve here to allow re-triggering if needed, 
-                            // OR we unobserve but rely on navTo to re-observe.
-                            // User instruction: "Re-observe on tab activation" implies we unobserve after trigger.
-                            window.fadeObserver.unobserve(entry.target);
-                        }
-                    });
-                });
-                document.querySelectorAll('.fade-in').forEach(el => window.fadeObserver.observe(el));
+            // Back/Forward check
+            window.addEventListener('popstate', handleHash);
 
-                // 2. Handle Initial Load & Popstate
-                const handleHash = () => {
-                    const hash = window.location.hash.substring(1) || 'main';
-                    // Validate hash
-                    const validIds = ['main', 'plans', 'guidelines', 'programs', 'employees', 'financial', 'hr', 'policy'];
-                    if (validIds.includes(hash)) {
-                        navTo(hash);
-                    } else {
-                        navTo('main');
-                    }
-                };
-
-                // Initial check
-                handleHash();
-
-                // Back/Forward check
-                window.addEventListener('popstate', handleHash);
-
-                // 3. Particles
-                const pContainer = document.getElementById('particles');
-                if (pContainer) {
-                    for (let i = 0; i < 30; i++) {
-                        let p = document.createElement('div');
-                        p.classList.add('particle');
-                        p.style.left = Math.random() * 100 + 'vw';
-                        p.style.width = Math.random() * 4 + 'px';
-                        p.style.height = p.style.width;
-                        p.style.animationDuration = Math.random() * 20 + 10 + 's';
-                        p.style.opacity = Math.random() * 0.3;
-                        pContainer.appendChild(p);
-                    }
+            // 3. Particles
+            const pContainer = document.getElementById('particles');
+            if (pContainer) {
+                for (let i = 0; i < 30; i++) {
+                    let p = document.createElement('div');
+                    p.classList.add('particle');
+                    p.style.left = Math.random() * 100 + 'vw';
+                    p.style.width = Math.random() * 4 + 'px';
+                    p.style.height = p.style.width;
+                    p.style.animationDuration = Math.random() * 20 + 10 + 's';
+                    p.style.opacity = Math.random() * 0.3;
+                    pContainer.appendChild(p);
                 }
-            });
-        </script>
+            }
+        });
+    </script>
 </body>
 
 </html>
