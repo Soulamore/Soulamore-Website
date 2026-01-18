@@ -1279,40 +1279,40 @@
         <!-- COMPONENTS SCIPT -->
         <script src="../../assets/js/components.js"></script>
         <script>
-            // --- GLOBAL NAV LOGIC (Defined immediately to ensure availability) ---
+            // --- GLOBAL NAV LOGIC (Defined immediately) ---
             window.navTo = function (pageId) {
                 console.log("Navigating to:", pageId);
 
-                // A. Hide All Pages
-                document.querySelectorAll('.page-view').forEach(p => {
+                // A. Hide All Pages (Force Inline Style)
+                const pages = document.querySelectorAll('.page-view');
+                pages.forEach(p => {
                     p.classList.remove('active');
-                    p.classList.remove('fade-in-active');
+                    p.style.display = 'none'; // Brute force hide
+                    p.style.opacity = '0';
                 });
 
                 // B. Show Target Page
                 const targetPage = document.getElementById(pageId);
                 if (targetPage) {
-                    targetPage.classList.add('active');
-
-                    // Trigger fade-in
+                    targetPage.style.display = 'block'; // Brute force show
+                    // Tiny delay to allow display:block to render before opacity transition
                     setTimeout(() => {
-                        targetPage.classList.add('fade-in-active');
-                        // Force opacity on children
-                        const children = targetPage.querySelectorAll('.fade-in');
-                        children.forEach(el => {
+                        targetPage.classList.add('active');
+                        targetPage.style.opacity = '1';
+
+                        // Force Children
+                        targetPage.querySelectorAll('.fade-in').forEach(el => {
                             el.style.opacity = '1';
                             el.style.transform = 'translateY(0)';
                         });
-                    }, 50);
-
-                    // Scroll to top of content if needed, but smooth
-                    // window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 10);
+                } else {
+                    console.error("Target missing:", pageId);
                 }
 
                 // C. Update Buttons
                 document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
 
-                // Fixed Mapping
                 const mapping = {
                     'main': 0,
                     'plans': 1,
@@ -1326,7 +1326,6 @@
 
                 const index = mapping[pageId];
                 const buttons = document.querySelectorAll('.sub-nav-container .workplace-btn');
-
                 if (index !== undefined && buttons[index]) {
                     buttons[index].classList.add('active');
                 }
