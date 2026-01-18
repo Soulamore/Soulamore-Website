@@ -397,7 +397,7 @@ const NAV_DATA = [
         children: [
             {
                 id: 'nav-peer-group',
-                label: 'Talk to a Peer <i class="fas fa-fire" style="color:var(--ember-orange); text-shadow:0 0 8px var(--ember-orange); margin-left:4px; font-size:0.8em;"></i>',
+                label: 'Talk to a Peer <i class="fas fa-fire" style="color:var(--ember-orange); text-shadow:0 0 12px var(--ember-orange); margin-left:4px; font-size:0.8em;"></i>',
                 href: '#',
                 type: 'submenu',
                 children: [
@@ -408,7 +408,7 @@ const NAV_DATA = [
             },
             {
                 id: 'nav-psych-group',
-                label: 'Talk to a Psychologist <i class="fas fa-fire" style="color:var(--teal-glow); text-shadow:0 0 8px var(--teal-glow); margin-left:4px; font-size:0.8em;"></i>',
+                label: 'Talk to a Psychologist <i class="fas fa-fire" style="color:var(--teal-glow); text-shadow:0 0 12px var(--teal-glow); margin-left:4px; font-size:0.8em;"></i>',
                 href: '#',
                 type: 'submenu',
                 children: [
