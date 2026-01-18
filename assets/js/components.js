@@ -274,11 +274,11 @@ try {
             .dropdown-content .dropdown-content::before {
                 content: "";
                 position: absolute;
-                top: 0 !important;
-                left: -20px !important; /* WIDER BRIDGE back to parent */
-                width: 25px !important; /* Fill the 10px gap + extra overlap */
-                height: 100% !important;
-                background: transparent !important;
+                top: -20px !important; /* Taller catch area top */
+                left: -40px !important; /* WIDER BRIDGE back to parent */
+                width: 60px !important; /* Fill gap + overlap parent significantly */
+                height: 140% !important; /* Taller catch area bottom */
+                background: rgba(0,0,0,0.001) !important; /* Force hit-test */
                 z-index: 1001 !important;
             }
 
