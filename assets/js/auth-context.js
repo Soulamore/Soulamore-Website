@@ -70,6 +70,6 @@ export async function handleRoleRouting(user, intent) {
     } catch (error) {
         console.error('[AuthContext] Role verification error:', error);
         alert("Unable to verify professional status. Redirecting to User Dashboard.");
-        finalizeSession('user', 'user-dashboard.html');
+        finalizeSession('user', 'portal/user-dashboard.html');
     }
 }
