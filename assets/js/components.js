@@ -392,12 +392,18 @@ const NAV_DATA = [
                 children: [
                     { label: 'Campus Home', href: 'spaces/campus/index.html' },
                     { label: 'What is Campus?', href: 'spaces/campus/what-is-campus.html' },
-                    { label: 'Anxiety & Overthinking', href: 'spaces/campus/anxiety-and-overthinking.html' },
-                    { label: 'Exam Pressure', href: 'spaces/campus/exam-pressure.html' },
-                    { label: 'Feeling Low', href: 'spaces/campus/feeling-low.html' },
-                    { label: 'Loneliness', href: 'spaces/campus/loneliness.html' },
-                    { label: 'Safety & Boundaries', href: 'spaces/campus/safety-boundaries.html' },
-                    { label: 'Student Resources', href: 'spaces/campus/student-resources.html' },
+                    {
+                        label: 'Student Resources',
+                        href: 'spaces/campus/student-resources.html',
+                        type: 'submenu',
+                        children: [
+                            { label: 'Anxiety & Overthinking', href: 'spaces/campus/anxiety-and-overthinking.html' },
+                            { label: 'Exam Pressure', href: 'spaces/campus/exam-pressure.html' },
+                            { label: 'Feeling Low', href: 'spaces/campus/feeling-low.html' },
+                            { label: 'Loneliness', href: 'spaces/campus/loneliness.html' },
+                            { label: 'Safety & Boundaries', href: 'spaces/campus/safety-boundaries.html' }
+                        ]
+                    },
                     { label: 'Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
                     { label: 'For Institutions', href: 'spaces/campus/institutions.html' }
                 ]
