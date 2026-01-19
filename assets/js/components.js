@@ -689,7 +689,7 @@ function getRootPath() {
         location.pathname.includes('/company/') ||
         location.pathname.includes('/auth/') ||
         location.pathname.includes('/portal/') || /* ADDED: Critical for Dashboards/Login */
-        location.pathname.includes('/New Pages/') || /* ADDED: Support for New Pages directory */
+        location.pathname.includes('/New Pages/') || location.pathname.includes('/New%20Pages/') || /* FIXED: Support URL encoded space */
         location.pathname.includes('/pages/')) {
         return "../";
     }
@@ -1163,6 +1163,7 @@ function injectSoulBotWidget() {
 // --- GLOBAL INIT ---
 document.addEventListener("DOMContentLoaded", () => {
     if (typeof injectHeader === 'function') injectHeader();
+    // Guard Footer Injection: Do not inject on Auth pages (Viewport Scenes)
     if (typeof injectFooter === 'function') injectFooter();
     initParticles(); // Auto-init particles if container exists
 

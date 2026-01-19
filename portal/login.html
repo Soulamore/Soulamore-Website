@@ -45,12 +45,214 @@
             flex-direction: column;
         }
 
-        .page-wrapper {
-            flex: 1;
+        /* === AUTH VIEWPORT SCENE ARCHITECTURE (TRUE GRID) === */
+
+        /* 1. Viewport Contract: Locked Height, No Scroll */
+        body.auth {
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            margin: 0;
+            display: flex;
+            /* Flex column for Footer support */
+            flex-direction: column;
+        }
+
+        /* 2. Header Overlay (Floats ABOVE, does not push) */
+        body.auth header {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: auto;
+            z-index: 100;
+            background: transparent !important;
+            pointer-events: none;
+            opacity: 0.85;
+            backdrop-filter: blur(6px);
+        }
+
+        /* Optional: Scale down header actions to de-emphasize */
+        body.auth header .nav-btn,
+        body.auth header .lifeline-btn {
+            transform: scale(0.95);
+        }
+
+        /* Allow interaction with header contents */
+        body.auth header * {
+            pointer-events: auto;
+        }
+
+        /* 3. The Scene Grid (Horizontal split, full height) */
+        .auth-shell {
+            height: 100vh;
+            width: 100%;
+            max-width: 1100px;
+            /* Constrain width to reduce center gap */
+            margin: 0 auto;
+            /* Center the shell */
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            /* True 50/50 split */
+            box-sizing: border-box;
+        }
+
+        /* Left Context Section (Centered Content) */
+        .auth-left {
             display: flex;
             align-items: center;
+            /* Center text vertically */
             justify-content: center;
-            padding: 60px 20px 40px;
+            padding: 60px;
+            padding-bottom: 120px;
+            /* Push center UP slightly */
+            position: relative;
+        }
+
+        /* Ambient Glow (Pseudo-element for boundless effect) */
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140%;
+            /* Oversized to bleed seamlessly */
+            height: 140%;
+            background: radial-gradient(circle closest-side, rgba(78, 205, 196, 0.15) 0%, transparent 100%);
+            filter: blur(40px);
+            /* Massive blur for ambient feel */
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .auth-context {
+            max-width: 420px;
+            /* Reduced width */
+            opacity: 0.75;
+            /* Reduced visual weight */
+            position: relative;
+            z-index: 2;
+        }
+
+        .auth-context h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            /* Hero Size */
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            /* Premium Gradient Text */
+            background: linear-gradient(135deg, #fff 0%, #a5f3fc 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(78, 205, 196, 0.2));
+        }
+
+        .auth-context p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+
+        .auth-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .auth-features li {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 500;
+        }
+
+        .auth-features i {
+            color: var(--teal-glow);
+            width: 24px;
+        }
+
+        /* Right Login Section (Anchored Top) */
+        .auth-right {
+            display: flex;
+            align-items: center;
+            /* Center vertically */
+            justify-content: center;
+            padding-top: 60px;
+            padding-bottom: 100px;
+            /* Push center UP slightly */
+            padding-left: 40px;
+            padding-right: 40px;
+            background: rgba(15, 23, 42, 0.3);
+            position: relative;
+        }
+
+        /* Card Self-Containment */
+        .login-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            /* Strict width limit */
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px);
+            position: relative;
+            z-index: 5;
+            animation: floatCard 6s ease-in-out infinite;
+            /* Floating Effect */
+        }
+
+        @keyframes floatCard {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* === MOBILE RESPONSIVE (Collapse to Single Column) === */
+        @media (max-width: 900px) {
+            body.auth {
+                overflow-y: auto;
+                /* Allow scroll on mobile */
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .auth-shell {
+                grid-template-columns: 1fr;
+                /* Single column */
+                height: auto;
+                display: block;
+                /* Stack vertically on mobile */
+                padding-top: 80px;
+                /* Clear fixed header on mobile */
+            }
+
+            .auth-left {
+                display: none;
+                /* Hide context, focus on task */
+            }
+
+            .auth-right {
+                padding: 20px;
+                min-height: calc(100vh - 80px);
+            }
         }
 
         h1,
@@ -100,15 +302,16 @@
             }
         }
 
-        /* --- LOGIN CARD --- */
+        /* === LOGIN CARD (Compact) === */
         .login-card {
             background: var(--navy-glass);
             border: 1px solid var(--border-glass);
-            padding: 35px;
-            border-radius: 24px;
+            padding: 28px;
+            /* Compact (was 35px) */
+            border-radius: 20px;
             width: 100%;
-            max-width: 550px;
-            /* Slightly wider for slider */
+            max-width: 420px;
+            /* Slimmer */
             text-align: center;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(15px);
@@ -117,10 +320,12 @@
         }
 
         .login-logo {
-            font-size: 2rem;
+            font-size: 1.6rem;
+            /* Compact */
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            /* Tight */
             display: block;
             color: white;
             text-decoration: none;
@@ -130,201 +335,81 @@
             color: var(--teal-glow);
         }
 
-        /* SLIDER CSS (Added from New Logic) */
-        .role-selector-container {
-            margin: 30px 0;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .role-slider-wrapper {
-            position: relative;
-            width: 100%;
-            height: 60px;
+        /* === HORIZONTAL ROLE PILLS === */
+        .role-selector-pills {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin: 16px 0;
+            /* Compact spacing */
         }
 
-        .role-track {
-            position: absolute;
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+        .role-pill {
+            flex: 1;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 5px;
-            /* Alignment fix */
-        }
-
-        .role-stop {
-            width: 32px;
-            /* Bigger touch target core */
-            height: 32px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            z-index: 2;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        /* EXPANDED HITBOX */
-        .role-stop::after {
-            content: '';
-            position: absolute;
-            top: -30px;
-            bottom: -50px;
-            left: -40px;
-            right: -40px;
-            z-index: 10;
-        }
-
-        .role-stop.active {
-            background: white;
-            color: var(--deep-space);
-            transform: scale(1.1);
-        }
-
-        .role-stop i {
-            font-size: 0.8rem;
-            opacity: 0.5;
-            transition: 0.3s;
-        }
-
-        .role-thumb {
-            position: absolute;
-            top: 50%;
-            left: 0%;
-            /* Dynamic */
-            transform: translate(-50%, -50%);
-            width: 48px;
-            height: 48px;
-            background: var(--peach-glow);
-            border-radius: 50%;
-            box-shadow: 0 0 20px var(--peach-glow);
-            z-index: 5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: #0f172a;
-            transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s, box-shadow 0.3s;
-            pointer-events: none;
-            /* Let clicks pass to track */
-        }
-
-        .pulse-thumb {
-            animation: thumbPulse 2s infinite;
-        }
-
-        @keyframes thumbPulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(244, 159, 117, 0.7);
-            }
-
-            70% {
-                box-shadow: 0 0 0 10px rgba(244, 159, 117, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(244, 159, 117, 0);
-            }
-        }
-
-        /* LABELS */
-        .role-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-top: -15px;
-            margin-bottom: 20px;
-            padding: 0 10px;
-        }
-
-        .rl-item {
-            font-size: 0.75rem;
-            font-weight: 700;
-            opacity: 0.5;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            position: relative;
-            z-index: 11;
-        }
-
-        /* Dynamic Text */
-        .role-info-display {
-            margin-top: 20px;
-            min-height: 80px;
-        }
-
-        .ri-title {
-            font-family: 'Outfit';
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-            transition: color 0.3s;
-        }
-
-        .ri-desc {
-            font-size: 0.9rem;
-            opacity: 0.7;
-            max-width: 90%;
-            margin: 0 auto 10px;
-            min-height: 40px;
-            transition: opacity 0.3s;
-        }
-
-        .ri-badge {
-            display: inline-flex;
+            flex-direction: column;
             align-items: center;
             gap: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 20px;
-            opacity: 0;
-            transform: translateY(5px);
+            padding: 12px 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .role-pill i {
+            font-size: 1.2rem;
+            opacity: 0.6;
             transition: 0.3s;
         }
 
-        .ri-badge.visible {
-            opacity: 1;
-            transform: translateY(0);
+        .role-pill:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* FORM STYLES (from Backup) */
+        .role-pill.active {
+            /* Background and Border color set dynamically via JS for Role Theme */
+            color: var(--deep-space);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            /* Fallback */
+            background: var(--peach-glow);
+            border-color: var(--peach-glow);
+        }
+
+        .role-pill.active i {
+            opacity: 1;
+        }
+
+        /* FORM STYLES (Compact) */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
+            /* Tighter spacing */
             text-align: left;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             opacity: 0.8;
         }
 
         .form-input {
             width: 100%;
-            padding: 12px 15px;
-            border-radius: 8px;
+            padding: 10px 12px;
+            /* Smaller inputs */
+            border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             background: #1e293b;
-            /* Solid dark blue-grey for better contrast */
             color: #f1f5f9;
             font-family: inherit;
             transition: 0.3s;
+            font-size: 0.95rem;
         }
 
         .form-input:focus {
@@ -336,15 +421,15 @@
         .submit-btn {
             background: var(--gradient-primary);
             color: var(--deep-space);
-            padding: 15px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 6px;
             font-weight: 700;
             border: none;
             cursor: pointer;
             width: 100%;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: 0.3s;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         .submit-btn:hover {
@@ -354,9 +439,9 @@
 
         .social-btn {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid var(--border-glass);
-            border-radius: 8px;
+            border-radius: 6px;
             background: rgba(255, 255, 255, 0.05);
             color: white;
             font-weight: 500;
@@ -364,9 +449,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             transition: 0.3s;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
         }
 
         .social-btn:hover {
@@ -374,122 +460,154 @@
         }
 
         .divider {
-            margin: 30px 0;
+            margin: 20px 0;
+            /* Smaller divider spacing */
             border-top: 1px solid var(--border-glass);
             position: relative;
         }
 
         .divider span {
             background: #151e2e;
-            /* Matches approximate bg behind card */
-            padding: 0 10px;
+            padding: 0 8px;
             position: absolute;
-            top: -12px;
+            top: -10px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             opacity: 0.6;
         }
 
-        /* MOBILE FIXES */
-        @media (max-width: 600px) {
+        /* === MOBILE RESPONSIVE (Collapse to Single Column) === */
+        @media (max-width: 900px) {
+            body.auth {
+                overflow-y: auto;
+                /* Allow scroll on mobile */
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .auth-shell {
+                grid-template-columns: 1fr;
+                /* Single column */
+                height: auto;
+                display: block;
+                /* Stack vertically on mobile */
+                padding-top: 80px;
+                /* Clear fixed header on mobile */
+            }
+
+            .auth-left {
+                display: none;
+                /* Hide context, focus on task */
+            }
+
+            .auth-right {
+                padding: 20px;
+                min-height: calc(100vh - 80px);
+            }
+
             .login-card {
-                width: 90% !important;
-                margin: 0 auto;
-                padding: 25px !important;
+                max-width: 100%;
+                padding: 24px !important;
             }
         }
     </style>
 </head>
 
-<body>
+<body class="auth">
 
     <header></header>
     <div id="particles"></div>
 
-    <main class="page-wrapper custom-spacing">
-        <div class="login-card fade-in">
-            <a href="../index.html" class="login-logo">
-                <img src="../assets/images/logo.png" alt="Soulamore" style="height: 60px; margin-bottom: 5px;">
-            </a>
-            <p style="opacity:0.7; margin-bottom:20px;">Welcome back to your space.</p>
-
-            <!-- MERGED: SLIDER COMPONENT -->
-            <div class="role-selector-container">
-                <div class="role-slider-wrapper">
-                    <div class="role-track">
-                        <div class="role-stop" onclick="setRole(0)"><i class="fas fa-user-astronaut"></i></div>
-                        <div class="role-stop" onclick="setRole(1)"><i class="fas fa-hands-helping"></i></div>
-                        <div class="role-stop" onclick="setRole(2)"><i class="fas fa-user-md"></i></div>
-                    </div>
-                    <div class="role-thumb pulse-thumb" id="roleThumb"><i class="fas fa-user-astronaut"></i></div>
-                </div>
-
-                <div class="role-labels">
-                    <span class="rl-item" onclick="setRole(0)">User</span>
-                    <span class="rl-item" onclick="setRole(1)">Peer</span>
-                    <span class="rl-item" onclick="setRole(2)">Pro</span>
-                </div>
-
-                <div class="role-info-display">
-                    <div class="ri-title" id="riTitle">I’m Here to Talk</div>
-                    <div class="ri-desc" id="riDesc">For personal reflection, peer support, and conversations.</div>
-                    <div class="ri-badge" id="riBadge"><i class="fas fa-check-circle"></i> Verified</div>
-                </div>
+    <main class="auth-shell">
+        <!-- Left Context Section -->
+        <section class="auth-left">
+            <div class="auth-context">
+                <div class="hero-subhead-premium" style="margin-bottom: 10px;">Welcome Home</div>
+                <h1 class="hero-title-premium" style="text-align: left; font-size: 3rem;">Your partner in<br>mental
+                    wellness</h1>
+                <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 30px; font-weight: 300;">A
+                    safe space for reflection, support, and growth.</p>
+                <ul class="auth-features">
+                    <li><i class="fas fa-shield-alt"></i> Secure & Private</li>
+                    <li><i class="fas fa-user-friends"></i> Trained Peers & Verified Psychologists</li>
+                    <li><i class="fas fa-clock"></i> 24/7 Support</li>
+                </ul>
             </div>
+        </section>
 
-            <!-- EMAIL FORM -->
-            <form onsubmit="event.preventDefault(); window.handleEmailLogin();">
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" id="emailInput" class="form-input" placeholder="you@example.com">
+        <!-- Right Login Section -->
+        <section class="auth-right">
+            <div class="login-card fade-in">
+                <!-- LOGO -->
+                <div class="login-logo">
+                    <img src="../assets/images/logo.png" alt="Soulamore" style="height: 60px; margin-bottom: 5px;">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <div style="position: relative;">
-                        <input type="password" id="passInput" class="form-input" placeholder="••••••••">
-                        <button type="button" id="togglePassword" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); 
-                                       background: none; border: none; color: var(--starlight); opacity: 0.6; 
-                                       cursor: pointer; font-size: 1rem; transition: opacity 0.2s;"
-                            onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
-                            <i class="fas fa-eye"></i>
-                        </button>
+                <p style="opacity:0.7; margin-bottom:20px;">Welcome back to your space.</p>
+
+                <!-- HORIZONTAL ROLE SELECTOR -->
+                <div class="role-selector-pills">
+                    <div class="role-pill active" onclick="setRole(0)">
+                        <i class="fas fa-user"></i> User
+                    </div>
+                    <div class="role-pill" onclick="setRole(1)">
+                        <i class="fas fa-hands-helping"></i> Peer
+                    </div>
+                    <div class="role-pill" onclick="setRole(2)">
+                        <i class="fas fa-user-md"></i> Pro
                     </div>
                 </div>
 
+                <!-- LOGIN FORM -->
+                <!-- LOGIN FORM -->
+                <form id="loginForm" onsubmit="event.preventDefault(); window.handleEmailLogin()">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" id="emailInput" placeholder="you@example.com" required>
+                    </div>
 
-                <!-- Remember Me & Forgot Password -->
-                <div
-                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 15px;">
-                    <label style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; cursor: pointer;">
-                        <input type="checkbox" id="rememberMe" style="cursor: pointer;">
-                        <span>Remember me</span>
-                    </label>
-                    <a href="forgot-password.html" style="font-size:0.85rem; opacity:0.6; text-decoration:none;">Forgot
-                        Password?</a>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <div style="position:relative;">
+                            <input type="password" class="form-input" id="passInput" placeholder="••••••••" required>
+                            <i class="fas fa-eye show-password-toggle" id="togglePassword"
+                                style="position:absolute; right:12px; top:12px; opacity:0.5; cursor:pointer;"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-row"
+                        style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:0.85rem;">
+                        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                            <input type="checkbox" id="rememberMe"> Remember me
+                        </label>
+                        <a href="#" style="color:var(--teal-glow); text-decoration:none;">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="submit-btn" style="position: relative; z-index: 10;">Log In</button>
+                </form>
+
+                <div class="divider"><span>OR</span></div>
+
+                <button type="button" class="social-btn" id="googleSignInBtn">
+                    <i class="fab fa-google"></i> Continue with Google
+                </button>
+
+                <button type="button" onclick="handleDevBypass()"
+                    style="background:transparent; border:none; color:rgba(255,255,255,0.4); font-size:0.85rem; width:100%; margin:15px 0 0; cursor:pointer; text-decoration:underline;">
+                    &lt;/&gt; Developer Preview (Skip Login)
+                </button>
+
+                <div style="margin-top:20px; font-size:0.9rem;">
+                    New here? <a href="#" style="color:var(--teal-glow); text-decoration:none; font-weight:600;">Create
+                        an account</a>
                 </div>
-
-                <button type="submit" class="submit-btn">Log In</button>
-            </form>
-
-            <div class="divider"><span>OR</span></div>
-
-            <button class="social-btn" id="googleSignInBtn"><i class="fab fa-google"></i> Continue with Google</button>
-
-            <!-- DEV BYPASS BUTTON -->
-            <button onclick="handleDevBypass()"
-                style="background:transparent; border:none; color:rgba(255,255,255,0.3); font-size:0.75rem; width:100%; margin:10px 0; cursor:pointer; text-decoration:underline;">
-                <i class="fas fa-code"></i> Developer Preview (Skip Login)
-            </button>
-
-            <div style="font-size:0.9rem; margin-top:20px; opacity:0.7;">
-                New here? <a href="signup.html" style="color:var(--peach-glow); text-decoration:underline;">Create an
-                    account</a>
             </div>
-
+        </section>
         </div>
+        </section>
     </main>
 
+    <!-- Footer Restored -->
     <footer></footer>
 
     <!-- SCRIPTS -->
@@ -642,13 +760,21 @@
                     const returnUrl = sessionStorage.getItem('returnUrl');
 
                     // CodeQL Fix: Client-side URL redirect
-                    // Ensure it is a relative path (starts with /) and NOT a protocol-relative URL (doesn't start with //)
-                    // Also filter out 'javascript:' or 'data:' schemes just in case
-                    if (returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//') && !returnUrl.includes(':')) {
-                        // Double-check against a regex for allowed characters if strictly needed, 
-                        // but avoiding // and : is the standard mitigation for open redirects here.
-                        sessionStorage.removeItem('returnUrl');
-                        window.location.href = returnUrl;
+                    // Robust check using URL API to verify origin matches
+                    if (returnUrl) {
+                        try {
+                            const validUrl = new URL(returnUrl, window.location.origin);
+                            if (validUrl.origin === window.location.origin) {
+                                sessionStorage.removeItem('returnUrl');
+                                window.location.href = validUrl.href;
+                            } else {
+                                throw new Error("Invalid Redirect Origin");
+                            }
+                        } catch (e) {
+                            console.warn("Blocked potentially unsafe redirect:", returnUrl);
+                            sessionStorage.removeItem('returnUrl');
+                            await handleRoleRouting(result.user, intent);
+                        }
                     } else {
                         // Default flow if url is suspicious or missing
                         sessionStorage.removeItem('returnUrl');
@@ -720,44 +846,54 @@
             }
         }
 
-        // --- 1. SLIDER LOGIC ---
-        const thumb = document.getElementById('roleThumb');
-        const riTitle = document.getElementById('riTitle');
-        const riDesc = document.getElementById('riDesc');
-        const riBadge = document.getElementById('riBadge');
-
+        // --- 1. HORIZONTAL PILL ROLE SELECTOR LOGIC ---
         const roles = [
-            { t: "I’m Here to Talk", d: "Personal reflection, support, and journaling.", c: "#F49F75", i: "fas fa-user-astronaut", v: false, code: "user" },
-            { t: "I’m a Peer", d: "Supporting others through lived experience.", c: "#F49F75", i: "fas fa-hands-helping", v: true, code: "peer" },
-            { t: "I’m a Psychologist", d: "Professional support and clinical guidance.", c: "#4ECDC4", i: "fas fa-user-md", v: true, code: "psychologist" }
+            // User: Peach (Neutral), No Glow, Astronaut Icon
+            { t: "I'm Here to Talk", d: "Personal reflection, support, and journaling.", c: "#F49F75", i: "fas fa-user-astronaut", v: false, code: "user", glow: false },
+            // Peer: Peach Glow + Hands Icon
+            { t: "I'm a Peer", d: "Supporting others through lived experience.", c: "#F49F75", i: "fas fa-hands-helping", v: true, code: "peer", glow: true },
+            // Pro: Teal Glow + Doctor Icon
+            { t: "I'm a Psychologist", d: "Professional support and clinical guidance.", c: "#4ECDC4", i: "fas fa-user-md", v: true, code: "psychologist", glow: true }
         ];
 
         function setRole(index) {
             const r = roles[index];
-            const pct = index * 50;
 
-            thumb.style.left = pct + '%';
-            thumb.style.background = r.c;
-            thumb.style.boxShadow = `0 0 20px ${r.c}`;
-            thumb.innerHTML = `<i class="${r.i}"></i>`;
+            // Update pill active states with dynamic theme colors
+            const pills = document.querySelectorAll('.role-pill');
+            pills.forEach((pill, i) => {
+                // Update Icon based on role config
+                const icon = pill.querySelector('i');
+                if (icon) icon.className = roles[i].i;
 
-            riTitle.style.color = r.c;
-            riTitle.innerText = r.t;
-            riDesc.innerText = r.d;
+                if (i === index) {
+                    pill.classList.add('active');
+                    // Dynamic Theme: Apply Role Color to Background & Border
+                    pill.style.background = roles[i].glow ? roles[i].c : 'rgba(255, 255, 255, 0.15)'; // Default highlight for User
+                    pill.style.borderColor = roles[i].glow ? roles[i].c : 'rgba(255, 255, 255, 0.3)';
+                    pill.style.color = roles[i].glow ? '#0f172a' : '#fff'; // Dark text for colored buttons, White for User
 
-            if (r.v) {
-                riBadge.classList.add('visible');
-                riBadge.style.color = r.c;
-                riBadge.style.background = (r.code === 'psychologist') ? 'rgba(78, 205, 196, 0.2)' : 'rgba(244, 159, 117, 0.2)';
-                riBadge.style.border = `1px solid ${r.c}`;
-            } else {
-                riBadge.classList.remove('visible');
-            }
+                    // Add glow effect ONLY if enabled (Peer/Pro)
+                    if (roles[i].glow) {
+                        pill.style.boxShadow = `0 0 15px ${roles[i].c}66`;
+                    } else {
+                        pill.style.boxShadow = 'none';
+                    }
+                } else {
+                    pill.classList.remove('active');
+                    // Reset inline styles
+                    pill.style.background = '';
+                    pill.style.borderColor = '';
+                    pill.style.color = '';
+                    pill.style.boxShadow = '';
+                }
+            });
 
+            // Save role to session
             sessionStorage.setItem('loginIntent', r.code);
         }
 
-        // Init
+        // Init - select first pill
         setRole(0);
 
         // --- 2. DEV BYPASS ---
