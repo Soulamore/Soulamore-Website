@@ -186,10 +186,10 @@
 
                     <div style="margin-bottom: 15px; font-size:0.75rem; opacity:0.8; font-weight:600; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-family: 'Plus Jakarta Sans', sans-serif;">WHILE YOU WAIT:</div>
                     <div class="tool-links" style="display: flex; gap: 8px; margin-bottom: 25px; flex-wrap: wrap;">
-                        <a href="/get-help-now.html" class="tool-btn btn-crisis"><i class="fas fa-life-ring"></i> Get Help</a>
-                        <a href="/playground.html" class="tool-btn"><i class="fas fa-shapes"></i> Playground</a>
-                        <a href="/5-step-reset.html" class="tool-btn"><i class="fas fa-wind"></i> 5-Step Reset</a>
-                        <a href="/soulbot.html" class="tool-btn"><i class="fas fa-robot"></i> Soulbot</a>
+                        <a href="get-help-now.html" class="tool-btn btn-crisis"><i class="fas fa-life-ring"></i> Get Help</a>
+                        <a href="playground.html" class="tool-btn"><i class="fas fa-shapes"></i> Playground</a>
+                        <a href="5-step-reset.html" class="tool-btn"><i class="fas fa-wind"></i> 5-Step Reset</a>
+                        <a href="soulbot.html" class="tool-btn"><i class="fas fa-robot"></i> Soulbot</a>
                         <a href="https://www.instagram.com/soulamore_/" target="_blank" class="tool-btn"><i class="fab fa-instagram"></i> Instagram</a>
                     </div>
                 </div>
