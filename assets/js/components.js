@@ -1197,3 +1197,36 @@ function initParticles() {
     }
 }
 
+// --- SMART COUNTERS (SOCIAL PROOF) ---
+function initSmartCounters() {
+    const startDate = new Date('2024-01-01'); // Fixed Anchor
+    const today = new Date();
+    const timeDiff = today - startDate;
+    const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+    // Growth Logic
+    const baseTrusted = 450;
+    const trustedCount = baseTrusted + (dayDiff * 2); // ~+2 per day
+
+    const baseJoined = 22120; // 14k was static, lets bump base to match "Legacy" but grow slowly
+    // wait user said "3 digits" for "early stage".
+    // User Request: "make these numbers smaller somewhere in 3 digits"
+    // So 450 and 125 based on previous plan.
+
+    // Revised Logic based on User Request
+    const realTrusted = 450 + (dayDiff * 2);
+    const realJoined = 125 + (dayDiff * 1);
+
+    // Format
+    const fmt = (n) => n.toLocaleString();
+
+    const elTrusted = document.getElementById('counter-trusted');
+    if (elTrusted) elTrusted.innerText = fmt(realTrusted) + "+";
+
+    const elJoined = document.getElementById('counter-joined');
+    // deeply support legacy id 'soulCount' too if needed, but we will update HTML
+    if (elJoined) elJoined.innerText = fmt(realJoined);
+}
+
+// Auto-Run
+document.addEventListener('DOMContentLoaded', initSmartCounters);
