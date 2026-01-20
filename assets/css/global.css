@@ -25,49 +25,68 @@
     --shell-subnav-height: 80px;
 }
 
-/* --- LAYOUT SHELL SYSTEM (FINAL CONTRACT) --- */
+/* --- LAYOUT SHELL SYSTEM (CONSTITUTION) --- */
 #app-shell {
-    position: relative;
-    width: 100%;
     min-height: 100vh;
-}
-
-/* Rule 1: Fixed shell defines space, not visuals */
-#shell-fixed {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    /* Subnav and Header live here */
     display: flex;
     flex-direction: column;
 }
 
-#shell-fixed>*,
-#shell-fixed header,
-#shell-fixed #main-header {
-    pointer-events: auto;
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    transform: none !important;
+/* HEADER ZONE */
+#shell-fixed {
+    position: sticky;
+    top: 20px;
+    /* True floats-off-top gap */
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    /* Let clicks pass through empty areas */
+}
 
-    /* --- RESTORE ISLAND FLOAT --- */
-    width: 95% !important;
-    max-width: 1260px !important;
-    margin: 15px auto 0 !important;
-    /* The 15px gap from top */
-    border-radius: 50px !important;
+#shell-fixed header {
+    pointer-events: auto;
+    margin-top: 0;
+    /* Gap is now handled by parent top */
+    /* Ensure it doesn't stretch */
+    width: fit-content;
+    max-width: 1600px;
+}
+
+/* Force specific styling for the header when inside shell to ensure it matches index */
+#shell-fixed .island-nav {
+    /* Visuals Only - Positioning handled by #shell-fixed parent */
+    border-radius: 50px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding: 12px 30px;
+    /* Ensure it doesn't overflow */
+    box-sizing: border-box;
+
+    /* CALM BREATHE EFFECT REMOVED FOR VISIBILITY FIX */
+    /* animation: calmBreathe 6s infinite ease-in-out; */
+    transition: all 0.5s ease;
+}
+
+/* HOVER: THE EMBRACE (Steady Warmth) */
+#shell-fixed .island-nav:hover {
+    border-color: rgba(244, 159, 117, 0.4);
+    /* Peach Glow */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(244, 159, 117, 0.15);
+    transform: translateY(-2px);
+    /* Slight lift */
 }
 
 /* Rule 2: Content starts AFTER fixed shell, always */
+/* CONTENT ZONE */
 #shell-content {
-    /* Offset by the exact height of shell-fixed (JS calculated) */
-    padding-top: var(--shell-fixed-height, 220px);
-
+    /* island header height + air */
+    padding-top: 120px;
+    flex: 1;
+    /* Pushes footer down */
     position: relative;
-    min-height: calc(100vh - var(--shell-fixed-height, 220px));
     z-index: 1;
     display: flex;
     flex-direction: column;
@@ -109,7 +128,9 @@
 }
 
 /* Footer always last in flow */
+/* FOOTER */
 #main-footer {
+    margin-top: auto;
     position: relative;
     z-index: 1;
 }
@@ -132,7 +153,7 @@ html,
 body {
     margin: 0;
     padding: 0;
-    overflow-x: hidden !important;
+    overflow-x: hidden;
     /* GLOBAL SCROLL KILLER */
     width: 100%;
     position: relative;
@@ -165,7 +186,7 @@ body {
 /* STANDARDIZED: All pages now use 110px after batch fix */
 main:not(.custom-spacing),
 .page-wrapper:not(.custom-spacing) {
-    padding-top: 110px !important;
+    padding-top: 110px;
 }
 
 /* Hero sections and containers manage their own spacing */
@@ -273,6 +294,7 @@ ul {
     line-height: 1.1;
     margin-bottom: 20px;
     background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 60%, #A5F3FC 100%);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 30px rgba(78, 205, 196, 0.3));
@@ -327,55 +349,18 @@ ul {
 }
 
 /* --- GLOBAL HEADER --- */
+/* Base header styles managed by shell-fixed now */
 header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1020;
-    /* INCREASED: Must be higher than Bottom Nav (1001) for menu to cover it */
-    padding: 15px 0;
     transition: background 0.3s ease, backdrop-filter 0.3s ease, transform 0.2s ease-out;
     backdrop-filter: blur(12px);
     background: rgba(15, 23, 42, 0.85);
-    /* Default Dark */
     border-bottom: 1px solid var(--border-glass);
     will-change: transform;
-    /* GPU acceleration hint */
 }
 
 /* --- ISLAND NAVIGATION (Creative) --- */
+/* --- ISLAND NAVIGATION (Visuals) --- */
 header.island-nav {
-    position: fixed !important;
-    /* Force override */
-    top: 20px !important;
-    /* Consistent top gap */
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 auto !important;
-    /* FIXED: Margin centering instead of transform */
-    transform: none !important;
-    /* Remove transform clipping */
-    width: calc(100% - 40px) !important;
-    /* Account for margins */
-    max-width: 1300px !important;
-    /* EXPANDED: 1260px → 1300px for final fit */
-    background: rgba(15, 23, 42, 0.85) !important;
-    /* Darker for visibility */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    /* More visible border */
-    border-radius: 50px !important;
-    padding: 12px 30px !important;
-    /* Restored thicker padding */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-    z-index: 99999 !important;
-    /* Always on top */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
     /* ANTI-FOUC: Smooth appearance */
     opacity: 0;
     animation: headerFadeIn 0.3s ease-out 0.1s forwards;
@@ -417,15 +402,19 @@ header.island-nav {
 
 .main-nav {
     /* GRID-BASED ARCHITECTURE (Industry Standard) */
-    display: grid !important;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    /* [logo] [nav-elastic] [auth-fixed] */
+    /* GRID-BASED ARCHITECTURE (Industry Standard) */
+    display: flex !important;
+    justify-content: space-between;
+    /* INCREASED GAP to 40px */
+    /* Force 3 specific columns */
+    gap: 15px;
+    /* STRICTLY REDUCED to prevent overlap */
+    /* ADDED: Global gap between Logo, Links, and Auth */
     align-items: center;
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
     padding: 0 !important;
-    /* FIXED: Remove padding duplication (header already has 30px) */
     position: relative;
     /* REQUIRED for absolute centering of children */
 }
@@ -436,8 +425,10 @@ header.island-nav {
     display: flex;
     align-items: center;
     padding: 5px 0;
-    margin-right: 15px;
-    /* REDUCED from 20px */
+    margin-right: 0;
+    /* Gap handled by grid now */
+    min-width: 160px;
+    /* Ensure logo area has space */
 }
 
 .nav-logo img {
@@ -466,7 +457,7 @@ header.island-nav {
 }
 
 .nav-links a {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     /* REDUCED: 0.9rem → 0.85rem */
     font-weight: 500;
     color: var(--starlight);
@@ -476,7 +467,7 @@ header.island-nav {
     align-items: center;
     gap: 5px;
     white-space: nowrap;
-    padding: 6px 8px;
+    padding: 6px 4px;
     /* ADDED: Explicit compact padding */
 }
 
@@ -527,20 +518,27 @@ header.island-nav {
 .auth-box {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 15px;
     /* REDUCED: 10px → 8px */
     white-space: nowrap;
     /* Natural width, never shrinks */
 }
 
 .user-icon-btn {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    /* Wrapper Size */
     color: var(--starlight);
     opacity: 0.8;
     transition: 0.3s;
     display: flex;
     align-items: center;
 }
+
+.user-icon-btn i {
+    font-size: 2rem !important;
+    /* FORCED ICON SIZE - User Req */
+}
+
 
 .user-icon-btn:hover {
     color: var(--peach-glow);

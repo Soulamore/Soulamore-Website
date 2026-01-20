@@ -48,36 +48,56 @@
         /* === AUTH VIEWPORT SCENE ARCHITECTURE (TRUE GRID) === */
 
         /* 1. Viewport Contract: Locked Height, No Scroll */
-        /* 1. Viewport Contract: Fluid Height, Scroll Allowed */
         body.auth {
+            height: 100vh;
+            overflow: hidden;
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--deep-space);
             color: var(--starlight);
             line-height: 1.6;
             margin: 0;
             display: flex;
+            /* Flex column for Footer support */
             flex-direction: column;
-            min-height: 100vh;
         }
 
-        /* 2. Header Overlay: Handled by #shell-fixed globally now */
+        /* 2. Header Overlay (Floats ABOVE, does not push) */
+        body.auth header {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: auto;
+            z-index: 100;
+            background: transparent !important;
+            pointer-events: none;
+            opacity: 0.85;
+            backdrop-filter: blur(6px);
+        }
 
-        /* 3. The Scene Grid (Horizontal split, full height minus header) */
-        /* 3. The Scene Grid (Horizontal split, full height minus header) */
-        #shell-content.auth-shell {
-            min-height: calc(100vh - 85px);
-            /* Adjusted for header height */
+        /* Optional: Scale down header actions to de-emphasize */
+        body.auth header .nav-btn,
+        body.auth header .lifeline-btn {
+            transform: scale(0.95);
+        }
+
+        /* Allow interaction with header contents */
+        body.auth header * {
+            pointer-events: auto;
+        }
+
+        /* 3. The Scene Grid (Horizontal split, full height) */
+        .auth-shell {
+            height: 100vh;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1100px;
+            /* Constrain width to reduce center gap */
             margin: 0 auto;
+            /* Center the shell */
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 40px;
+            /* True 50/50 split */
             box-sizing: border-box;
-            padding-top: 10px;
-            /* Minimal padding */
-            align-items: center;
-            /* Vertically Center Content */
         }
 
         /* Left Context Section (Centered Content) */
@@ -86,8 +106,9 @@
             align-items: center;
             /* Center text vertically */
             justify-content: center;
-            padding: 40px;
-            /* Reduced padding */
+            padding: 60px;
+            padding-bottom: 120px;
+            /* Push center UP slightly */
             position: relative;
         }
 
@@ -163,8 +184,11 @@
             align-items: center;
             /* Center vertically */
             justify-content: center;
-            padding: 20px;
-            /* Minimal padding */
+            padding-top: 60px;
+            padding-bottom: 100px;
+            /* Push center UP slightly */
+            padding-left: 40px;
+            padding-right: 40px;
             background: rgba(15, 23, 42, 0.3);
             position: relative;
         }
@@ -210,7 +234,7 @@
                 min-height: 100vh;
             }
 
-            #shell-content.auth-shell {
+            .auth-shell {
                 grid-template-columns: 1fr;
                 /* Single column */
                 height: auto;
@@ -462,7 +486,7 @@
                 min-height: 100vh;
             }
 
-            #shell-content.auth-shell {
+            .auth-shell {
                 grid-template-columns: 1fr;
                 /* Single column */
                 height: auto;
@@ -492,103 +516,99 @@
 
 <body class="auth">
 
-    <div id="app-shell">
-        <div id="shell-fixed">
-            <header></header>
+    <header></header>
+    <div id="particles"></div>
+
+    <main class="auth-shell">
+        <!-- Left Context Section -->
+        <section class="auth-left">
+            <div class="auth-context">
+                <div class="hero-subhead-premium" style="margin-bottom: 10px;">Welcome Home</div>
+                <h1 class="hero-title-premium" style="text-align: left; font-size: 3rem;">Your partner in<br>mental
+                    wellness</h1>
+                <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 30px; font-weight: 300;">A
+                    safe space for reflection, support, and growth.</p>
+                <ul class="auth-features">
+                    <li><i class="fas fa-shield-alt"></i> Secure & Private</li>
+                    <li><i class="fas fa-user-friends"></i> Trained Peers & Verified Psychologists</li>
+                    <li><i class="fas fa-clock"></i> 24/7 Support</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Right Login Section -->
+        <section class="auth-right">
+            <div class="login-card fade-in">
+                <!-- LOGO -->
+                <div class="login-logo">
+                    <img src="../assets/images/logo.png" alt="Soulamore" style="height: 60px; margin-bottom: 5px;">
+                </div>
+                <p style="opacity:0.7; margin-bottom:20px;">Welcome back to your space.</p>
+
+                <!-- HORIZONTAL ROLE SELECTOR -->
+                <div class="role-selector-pills">
+                    <div class="role-pill active" onclick="setRole(0)">
+                        <i class="fas fa-user"></i> User
+                    </div>
+                    <div class="role-pill" onclick="setRole(1)">
+                        <i class="fas fa-hands-helping"></i> Peer
+                    </div>
+                    <div class="role-pill" onclick="setRole(2)">
+                        <i class="fas fa-user-md"></i> Pro
+                    </div>
+                </div>
+
+                <!-- LOGIN FORM -->
+                <!-- LOGIN FORM -->
+                <form id="loginForm" onsubmit="event.preventDefault(); window.handleEmailLogin()">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" id="emailInput" placeholder="you@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <div style="position:relative;">
+                            <input type="password" class="form-input" id="passInput" placeholder="••••••••" required>
+                            <i class="fas fa-eye show-password-toggle" id="togglePassword"
+                                style="position:absolute; right:12px; top:12px; opacity:0.5; cursor:pointer;"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-row"
+                        style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:0.85rem;">
+                        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                            <input type="checkbox" id="rememberMe"> Remember me
+                        </label>
+                        <a href="#" style="color:var(--teal-glow); text-decoration:none;">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="submit-btn" style="position: relative; z-index: 10;">Log In</button>
+                </form>
+
+                <div class="divider"><span>OR</span></div>
+
+                <button type="button" class="social-btn" id="googleSignInBtn">
+                    <i class="fab fa-google"></i> Continue with Google
+                </button>
+
+                <button type="button" onclick="handleDevBypass()"
+                    style="background:transparent; border:none; color:rgba(255,255,255,0.4); font-size:0.85rem; width:100%; margin:15px 0 0; cursor:pointer; text-decoration:underline;">
+                    &lt;/&gt; Developer Preview (Skip Login)
+                </button>
+
+                <div style="margin-top:20px; font-size:0.9rem;">
+                    New here? <a href="#" style="color:var(--teal-glow); text-decoration:none; font-weight:600;">Create
+                        an account</a>
+                </div>
+            </div>
+        </section>
         </div>
-        <div id="particles"></div> <!-- Moved particles inside shell for z-index safety -->
+        </section>
+    </main>
 
-        <main id="shell-content" class="auth-shell">
-            <!-- Left Context Section -->
-            <section class="auth-left">
-                <div class="auth-context">
-                    <div class="hero-subhead-premium" style="margin-bottom: 10px;">Welcome Home</div>
-                    <h1 class="hero-title-premium" style="text-align: left; font-size: 3rem;">Your partner in<br>mental
-                        wellness</h1>
-                    <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 30px; font-weight: 300;">A
-                        safe space for reflection, support, and growth.</p>
-                    <ul class="auth-features">
-                        <li><i class="fas fa-shield-alt"></i> Secure & Private</li>
-                        <li><i class="fas fa-user-friends"></i> Trained Peers & Verified Psychologists</li>
-                        <li><i class="fas fa-clock"></i> 24/7 Support</li>
-                    </ul>
-                </div>
-            </section>
-
-            <!-- Right Login Section -->
-            <section class="auth-right">
-                <div class="login-card fade-in">
-                    <!-- LOGO -->
-                    <div class="login-logo">
-                        <img src="../assets/images/logo.png" alt="Soulamore" style="height: 60px; margin-bottom: 5px;">
-                    </div>
-                    <p style="opacity:0.7; margin-bottom:20px;">Welcome back to your space.</p>
-
-                    <!-- HORIZONTAL ROLE SELECTOR -->
-                    <div class="role-selector-pills">
-                        <div class="role-pill active" onclick="setRole(0)">
-                            <i class="fas fa-user"></i> User
-                        </div>
-                        <div class="role-pill" onclick="setRole(1)">
-                            <i class="fas fa-hands-helping"></i> Peer
-                        </div>
-                        <div class="role-pill" onclick="setRole(2)">
-                            <i class="fas fa-user-md"></i> Pro
-                        </div>
-                    </div>
-
-                    <!-- LOGIN FORM -->
-                    <!-- LOGIN FORM -->
-                    <form id="loginForm" onsubmit="event.preventDefault(); window.handleEmailLogin()">
-                        <div class="form-group">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" class="form-input" id="emailInput" placeholder="you@example.com"
-                                required>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Password</label>
-                            <div style="position:relative;">
-                                <input type="password" class="form-input" id="passInput" placeholder="••••••••"
-                                    required>
-                                <i class="fas fa-eye show-password-toggle" id="togglePassword"
-                                    style="position:absolute; right:12px; top:12px; opacity:0.5; cursor:pointer;"></i>
-                            </div>
-                        </div>
-
-                        <div class="form-row"
-                            style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:0.85rem;">
-                            <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
-                                <input type="checkbox" id="rememberMe"> Remember me
-                            </label>
-                            <a href="#" style="color:var(--teal-glow); text-decoration:none;">Forgot Password?</a>
-                        </div>
-
-                        <button type="submit" class="submit-btn" style="position: relative; z-index: 10;">Log
-                            In</button>
-                    </form>
-
-                    <div class="divider"><span>OR</span></div>
-
-                    <button type="button" class="social-btn" id="googleSignInBtn">
-                        <i class="fab fa-google"></i> Continue with Google
-                    </button>
-
-                    <button type="button" onclick="handleDevBypass()"
-                        style="background:transparent; border:none; color:rgba(255,255,255,0.4); font-size:0.85rem; width:100%; margin:15px 0 0; cursor:pointer; text-decoration:underline;">
-                        &lt;/&gt; Developer Preview (Skip Login)
-                    </button>
-
-                    <div style="margin-top:20px; font-size:0.9rem;">
-                        New here? <a href="#"
-                            style="color:var(--teal-glow); text-decoration:none; font-weight:600;">Create
-                            an account</a>
-                    </div>
-                </div>
-            </section>
-        </main>
-        <footer></footer>
-    </div>
+    <!-- Footer Restored -->
+    <footer></footer>
 
     <!-- SCRIPTS -->
     <script src="../assets/js/components.js"></script>

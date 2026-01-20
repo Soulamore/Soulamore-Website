@@ -22,8 +22,8 @@ try {
     const style = document.createElement('style');
     style.id = 'header-styles-v2'; // Changed ID to force refresh/avoid conflicts
     style.innerHTML = `
-        /* DESKTOP (Width > 1150px) */
-        @media (min-width: 1151px) {
+        /* DESKTOP (Width > 1024px) */
+        @media (min-width: 1025px) {
             header {
                 /* Let global.css island-nav handle positioning if present */
                 z-index: 9999 !important;
@@ -46,7 +46,12 @@ try {
                 align-items: center !important;
                 visibility: visible !important; /* Ensure visibility */
                 opacity: 1 !important;
+                opacity: 1 !important;
+                overflow: visible !important; /* FIX SCROLLBAR */
+                border: none !important;
             }
+            .nav-links > a, .nav-logo { border: none !important; } /* GLOBAL: Remove any vertical borders */
+            .nav-links::-webkit-scrollbar { display: none !important; }
             .auth-box {
                 display: flex !important; /* Force Auth Box Visible */
                 align-items: center !important;
@@ -62,13 +67,13 @@ try {
             }
             /* HEADER CONTAINER OVERRIDE - LAYOUT PHYSICS FIX */
             html body header.island-nav {
-                left: 0 !important;
-                right: 0 !important;
-                margin: 0 auto !important;
-                transform: none !important; /* CRITICAL: No transform clipping */
-                width: calc(100% - 40px) !important;
-                max-width: 1300px !important; /* EXPANDED for final fit */
-                padding: 6px 25px !important;
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
+                margin: 0 !important;
+                width: fit-content !important;
+                max-width: 1600px !important;
+                padding: 6px 30px !important; /* Slightly more dynamic padding */
             }
             .nav-links i {
                 color: #F49F75 !important; /* Force Peach Glow for Icons */
@@ -135,9 +140,16 @@ try {
                 color: white !important;
                 border-color: #ef4444 !important;
             }
+            .user-icon-btn i {
+                font-size: 2.2rem !important; /* FORCE LARGE SIZE */
+                display: block !important;
+                width: auto !important;
+                height: auto !important;
+                line-height: 1 !important;
+            }
         }
-        /* MOBILE (Width <= 1150px) */
-        @media (max-width: 1150px) {
+        /* MOBILE (Width <= 1024px) */
+        @media (max-width: 1024px) {
             .auth-box { display: none !important; }
             .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
             .main-nav {
@@ -158,26 +170,57 @@ try {
             border-top: 1px solid rgba(255,255,255,0.1); /* Full Width Separator */
         }
         
-        /* ADAPTIVE ICON MODE: 1151px - 1380px (Targeted Laptop Range) */
+        /* NUCLEAR OVERRIDE: TARGET NEW ID to bypass global.css conflicts */
+        #mobile-crisis-link-v3 { display: none !important; }
+        
+        @media (max-width: 1024px) {
+            #mobile-crisis-link-v3 { display: flex !important; }
+        }
+        
+        /* ADAPTIVE ICON MODE: 1025px - 1420px (Targeted Laptop Range) */
         /* Hides text labels ONLY when necessary on smaller screens */
-        @media (min-width: 1151px) and (max-width: 1380px) {
+        @media (min-width: 1025px) and (max-width: 1420px) {
             header .nav-links > a, 
             header .nav-links > .dropdown > a {
                 font-size: 0 !important; /* Hide Text */
                 gap: 0 !important;
                 padding: 0 12px !important;
+                border: none !important; /* Remove separators */
             }
+            header .nav-links > a::after { content: none !important; } /* Kill pseudo-elements */
+            
             header .nav-links i {
                 font-size: 1.3rem !important; /* Bigger Icons */
                 margin: 0 !important;
             }
             /* Hide Chevron */
             header .nav-links .fa-chevron-down { display: none !important; }
+            
+            /* COMPACT GET HELP BTN - PERFECT CENTER FIX */
+            .lifeline-btn {
+                font-size: 0 !important;
+                padding: 0 !important;
+                width: 42px !important; /* Circle Width */
+                height: 42px !important; /* Circle Height */
+                justify-content: center !important;
+                align-items: center !important;
+                display: flex !important;
+                border-radius: 50% !important;
+            }
+            .lifeline-btn i {
+                font-size: 1.4rem !important; /* Slightly larger icon */
+                margin: 0 !important;
+                line-height: 1 !important; /* Reset line height */
+                display: block !important;
+            }
+            
+            /* Ensure NO Duplicate Mobile Button */
+            #mobile-crisis-link-v3 { display: none !important; }
         }
 
-        /* FULL TEXT MODE: > 1380px (Standard Desktop) */
+        /* FULL TEXT MODE: > 1420px (Standard Desktop) */
         /* Now possible because we unlocked max-width to 99.5vw */
-        @media (min-width: 1381px) {
+        @media (min-width: 1421px) {
             header a, footer a {
                 font-size: 0.85rem !important; /* Slightly Smaller for Fit */
                 letter-spacing: normal !important;
@@ -200,7 +243,7 @@ try {
         }
         
         /* SPECIAL EXCEPTION: Mobile Menu & Dropdowns (Dark Theme Restoration) */
-        @media (max-width: 1150px) {
+        @media (max-width: 1024px) {
             .nav-links.open {
                 background: rgba(15, 23, 42, 0.98) !important; /* Dark Mobile Menu */
             }
@@ -209,7 +252,7 @@ try {
             }
         }
         /* Dropdowns on Desktop */
-        @media (min-width: 1151px) {
+        @media (min-width: 1025px) {
             /* Level 1: Outer Dropdown (Lightest Border) */
             .dropdown {
                 position: relative !important; /* CRITICAL: Fix absolute positioning context */
@@ -531,8 +574,8 @@ function generateNavHTML(rootPath) {
         }
     });
 
-    // Mobile-Only Help Link (Appended at the end of nav-links)
-    html += `<a href="${rootPath}get-help-now.html" id="mobile-destruct-trigger" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Get Help Now</a>`;
+    // Mobile-Only Help Link MOVED to getHeaderHTML to prevent logic conflicts
+    // html += `<a href="${rootPath}get-help-now.html" id="mobile-destruct-trigger" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Get Help Now</a>`;
 
     return html;
 }
@@ -570,7 +613,7 @@ const getHeaderHTML = (rootPath) => `
 
     <nav class="nav-links">
         
-        <!-- MOBILE PROFILE CARD (Visible < 1150px) -->
+        <!-- MOBILE PROFILE CARD (Visible < 1025px) -->
         <div class="mobile-profile-card" style="display: none;">
             <div class="mp-avatar"><i class="fas fa-ghost"></i></div>
             <div class="mp-info">
@@ -583,12 +626,17 @@ const getHeaderHTML = (rootPath) => `
         <!-- GENERATED NAVIGATION ITEMS -->
         ${generateNavHTML(rootPath)}
 
+        <!-- MOBILE SPECIFIC HELP BUTTON (Parsed out of loop for safety) -->
+        <a href="${rootPath}get-help-now.html" id="mobile-crisis-link-v3" class="mobile-only-help" style="display:none; margin-top:10px;">
+            <i class="fas fa-life-ring"></i> Get Help Now
+        </a>
+
     </nav>
 
     <!-- Auth Group -->
     <div class="auth-box">
-            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
-            <a href="#" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
+            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help Now</a>
+            <a href="${rootPath}portal/user-dashboard.html" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
             <a href="${rootPath}portal/login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
     
@@ -645,7 +693,7 @@ const getFooterHTML = (rootPath) => `
         <div class="footer-col">
             <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Company</h4>
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
-                <li><a href="${rootPath}tools/index.html">Tools</a></li>
+                <!-- <li><a href="${rootPath}tools/index.html">Tools</a></li> Removed: Dead Link -->
                 <li><a href="${rootPath}newsletter.html">Newsletter</a></li>
                 <li><a href="${rootPath}company/why-soulamore-exists.html">Why Soulamore Exists</a></li>
                 <li><a href="${rootPath}company/contact.html">Contact</a></li>
@@ -699,6 +747,14 @@ function getRootPath() {
 // --- 4. INJECTION LOGIC ---
 
 function injectHeader() {
+    // 0. Safety Guard: Do not inject on Admin/Portal Dashboards that have their own sidebar
+    const isAuthPage = ['login.html', 'signup.html', 'forgot-password.html', 'signup-success.html', 'logout.html'].some(page => window.location.pathname.includes(page));
+
+    if (window.location.pathname.includes('/portal/') && !isAuthPage) {
+        // Allow Auth pages to have headers, but not main dashboards
+        return;
+    }
+
     let headerElement = document.querySelector('header');
 
     // 1. Auto-Create Header if Missing (Robustness)
@@ -708,8 +764,9 @@ function injectHeader() {
         document.body.prepend(headerElement);
     } else {
         // Ensure it's the first element if it exists but is misplaced
-        // CRITICAL FIX: Do NOT move it if it's already inside #shell-fixed logic
-        if (headerElement.parentElement !== document.body && headerElement.parentElement.id !== 'shell-fixed') {
+        // CRITICAL FIX: Respect #shell-fixed container
+        const parentId = headerElement.parentElement.id;
+        if (headerElement.parentElement !== document.body && parentId !== 'shell-fixed') {
             document.body.prepend(headerElement);
         }
     }
@@ -736,14 +793,14 @@ function injectHeader() {
             const style = document.createElement('style');
             style.id = 'header-responsive-style';
             style.innerHTML = `
-                @media (min-width: 1151px) {
+                @media (min-width: 1025px) {
                     .mobile-profile-card, 
                     .mobile-toggle,
                     .mobile-only-help { 
                         display: none !important; 
                     }
                 }
-                @media (max-width: 1150px) {
+                @media (max-width: 1024px) {
                     .auth-box { display: none !important; }
                     .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
                 }
@@ -943,9 +1000,9 @@ function initializeHeaderLogic() {
     dropdownToggles.forEach(toggle => {
         toggle.addEventListener('click', (e) => {
             // Only hijacking if in mobile view OR if it's a null link (#)
-            if (window.innerWidth <= 1150 || toggle.getAttribute('href') === '#' || toggle.getAttribute('href').endsWith('#')) {
+            if (window.innerWidth <= 1400 || toggle.getAttribute('href') === '#' || toggle.getAttribute('href').endsWith('#')) {
                 // Prevent default navigation
-                if (toggle.getAttribute('href') === '#' || window.innerWidth <= 1150) {
+                if (toggle.getAttribute('href') === '#' || window.innerWidth <= 1400) {
                     e.preventDefault();
                     e.stopPropagation();
                 }

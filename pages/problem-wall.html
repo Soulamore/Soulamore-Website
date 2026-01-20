@@ -59,15 +59,20 @@
         }
 
         /* --- 2. HEADER OVERRIDE (Daybreak Theme) --- */
-        /* We use specific selectors to override global.css styles injected by components.js */
-
-        /* Force Light Theme on the Island Nav */
-        header.island-nav {
+        /* Target the shell-fixed context to ensure overrides apply */
+        #shell-fixed header.island-nav {
             background: rgba(255, 255, 255, 0.85) !important;
             backdrop-filter: blur(16px) !important;
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(0, 0, 0, 0.08) !important;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Ensure header buttons are visible */
+        #shell-fixed header.island-nav .nav-btn,
+        #shell-fixed header.island-nav .lifeline-btn {
+            opacity: 1 !important;
+            visibility: visible !important;
         }
 
         /* Light Theme Links */
@@ -600,65 +605,73 @@
 
 <body data-header-theme="light">
 
-    <!-- --- HEADER (INJECTED BY COMPONENTS.JS) --- -->
-    <header class="island-nav" id="main-header"></header>
-    <script>
-        // Force header injection if it hasn't happened yet
-        if (typeof injectHeader === 'function') injectHeader();
-    </script>
-
-    <!-- LIVE COUNTER -->
-    <div class="live-activity-bar">
-        <div class="live-dot"></div>
-        <span id="userCount">142</span> people here right now
-    </div>
-
-    <!-- GLOBAL STATS (SIDEBAR) -->
-    <div class="global-stats">
-        <div class="stat-item">
-            <div class="stat-icon-box" style="background: #ffe4e6; color: #ef4444;">
-                <i class="fas fa-heart"></i>
-            </div>
-            <div class="stat-text">
-                <h4 id="totalHearts">0</h4>
-                <span>Hearts given</span>
-            </div>
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header class="island-nav" id="main-header"></header>
         </div>
-        <div class="stat-item">
-            <div class="stat-icon-box" style="background: #fef9c3; color: #eab308;">
-                <i class="fas fa-spa"></i>
-            </div>
-            <div class="stat-text">
-                <h4 id="totalFlowers">0</h4>
-                <span>Flowers offered</span>
-            </div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-icon-box" style="background: #ffedd5; color: #f97316;">
-                <i class="fas fa-fire-alt"></i>
-            </div>
-            <div class="stat-text">
-                <h4 id="totalCandles">0</h4>
-                <span>Candles lit</span>
-            </div>
-        </div>
-    </div>
 
-    <!-- INFINITE CANVAS WRAPPER -->
-    <div id="viewport">
-        <div id="infinite-canvas">
+        <script>
+            // Force header injection if it hasn't happened yet
+            if (typeof injectHeader === 'function') injectHeader();
+        </script>
 
-            <!-- HERO TEXT (Part of Canvas) -->
-            <div class="wall-hero">
-                <h1>The Problem Wall</h1>
-                <p>A place where pain is seen, not solved.</p>
+        <main id="shell-content" class="custom-spacing" style="padding-top: 0 !important;">
+            <!-- Custom spacing override because this is a full-screen canvas app -->
+
+            <!-- LIVE COUNTER -->
+            <div class="live-activity-bar">
+                <div class="live-dot"></div>
+                <span id="userCount">142</span> people here right now
             </div>
 
-            <!-- DYNAMIC NOTES CONTAINER -->
-            <div id="notes-container"></div>
+            <!-- GLOBAL STATS (SIDEBAR) -->
+            <div class="global-stats">
+                <div class="stat-item">
+                    <div class="stat-icon-box" style="background: #ffe4e6; color: #ef4444;">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stat-text">
+                        <h4 id="totalHearts">0</h4>
+                        <span>Hearts given</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon-box" style="background: #fef9c3; color: #eab308;">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <div class="stat-text">
+                        <h4 id="totalFlowers">0</h4>
+                        <span>Flowers offered</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon-box" style="background: #ffedd5; color: #f97316;">
+                        <i class="fas fa-fire-alt"></i>
+                    </div>
+                    <div class="stat-text">
+                        <h4 id="totalCandles">0</h4>
+                        <span>Candles lit</span>
+                    </div>
+                </div>
+            </div>
 
-        </div>
-    </div>
+            <!-- INFINITE CANVAS WRAPPER -->
+            <div id="viewport">
+                <div id="infinite-canvas">
+
+                    <!-- HERO TEXT (Part of Canvas) -->
+                    <div class="wall-hero">
+                        <h1>The Problem Wall</h1>
+                        <p>A place where pain is seen, not solved.</p>
+                    </div>
+
+                    <!-- DYNAMIC NOTES CONTAINER -->
+                    <div id="notes-container"></div>
+
+                </div>
+        </main>
+        <footer></footer>
+    </div> <!-- End App Shell -->
 
     <!-- FAB STACK (Bottom Right) -->
     <div class="fab-stack-container">

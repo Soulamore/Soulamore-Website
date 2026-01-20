@@ -100,7 +100,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: top 0.15s ease-out, left 0.15s ease-out;
+            /* transition handled by JS lerp for smoothness */
         }
 
         #rocket::after {
@@ -183,8 +183,9 @@
             border-radius: 24px;
             backdrop-filter: blur(12px);
             transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-            opacity: 0;
-            transform: translateY(30px);
+            opacity: 1;
+            /* SAFETY: Visible by default */
+            transform: none;
         }
 
         .content-box.visible {
@@ -306,10 +307,9 @@
             <header id="main-header"></header>
         </div>
 
-        <main id="shell-content" style="position:relative;">
+        <main id="shell-content">
 
-            <div id="path-container"
-                style="position: absolute; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;">
+            <div id="path-container">
                 <svg width="100%" height="100%" id="svg-el" style="overflow: visible;">
                     <path id="motion-path" d="" fill="none" stroke="var(--path-color)" stroke-width="2"
                         stroke-dasharray="10,10" />
@@ -434,21 +434,35 @@
         let pathLength = 0;
 
         function updatePath() {
-            // Use shell content height
-            const scrollHeight = document.getElementById('shell-content').scrollHeight;
+            // Robust height calculation
+            const body = document.body;
+            const html = document.documentElement;
+            const scrollHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+
+            // Set container height to match document
             pathContainer.style.height = scrollHeight + 'px';
 
             const points = document.querySelectorAll('.step-point');
+            if (points.length === 0) return;
+
             let d = "";
             let screenWidth = window.innerWidth;
 
             let prevX = screenWidth / 2;
-            let prevY = 0;
+            let prevY = 250; // Requested Start Position (Static)
+
+            // Start Path
             d += `M ${prevX} ${prevY} `;
 
             points.forEach((point, index) => {
+                // Determine Alignment
                 const align = point.getAttribute('data-align');
-                const y = point.offsetTop + (point.offsetHeight / 2);
+                // Calculate Target Y (Middle of element)
+                const rect = point.getBoundingClientRect();
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const top = rect.top + scrollTop;
+                const y = top + (rect.height / 2); // Center of element independent of offsetParent
+
                 let x = screenWidth / 2;
 
                 if (screenWidth > 768) {
@@ -456,6 +470,7 @@
                     if (align === 'right') x = (screenWidth / 2) - 200;
                 }
 
+                // Bezier Control Point
                 const cpY = (prevY + y) / 2;
                 d += `C ${prevX} ${cpY}, ${x} ${cpY}, ${x} ${y} `;
 
@@ -463,36 +478,78 @@
                 prevY = y;
             });
 
+            // End Line straight down
             d += `L ${screenWidth / 2} ${scrollHeight}`;
+
+            // Apply Path
             svgPath.setAttribute('d', d);
-            pathLength = svgPath.getTotalLength();
+
+            // Recalculate Length
+            pathLength = svgPath.getTotalLength() || 0;
+
+            // Safety: Ensure Orb is placed at start if at top
+            if (window.scrollY === 0 && pathLength > 0) {
+                rocket.style.transform = `translate3d(${screenWidth / 2 - 20}px, ${250 - 20}px, 0)`;
+            }
         }
 
-        function moveRocket() {
-            const scrollTop = window.scrollY;
-            const viewHeight = window.innerHeight;
-            const docHeight = document.body.scrollHeight;
+        /* moveRocket replaced by physics loop */
 
+        /* resizeObserver definition moved below */
+
+        // PHYSICS BASED ANIMATION (LERP)
+        let targetScroll = 0;
+        let currentScroll = 0;
+        const ease = 0.08; // Adjust for "heaviness" (0.05 = heavy, 0.1 = snappy)
+
+        scrollContainer.addEventListener('scroll', () => {
+            targetScroll = window.scrollY;
+        });
+
+        function animate() {
+            // Linear Interpolation: Move current towards target
+            currentScroll += (targetScroll - currentScroll) * ease;
+
+            // Calculate progress
+            const docHeight = document.body.scrollHeight;
+            const viewHeight = window.innerHeight;
             const maxScroll = docHeight - viewHeight;
-            let scrollPercent = scrollTop / maxScroll;
+
+            // Safety check
+            if (maxScroll <= 0) {
+                requestAnimationFrame(animate);
+                return;
+            }
+
+            let scrollPercent = currentScroll / maxScroll;
             scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
             const point = svgPath.getPointAtLength(scrollPercent * pathLength);
 
             if (point) {
-                rocket.style.top = (point.y - 20) + 'px';
-                rocket.style.left = (point.x - 20) + 'px';
+                // Use transform for better performance (GPU acceleration)
+                rocket.style.transform = `translate3d(${point.x - 20}px, ${point.y - 20}px, 0)`;
+                // Reset top/left since we use transform now
+                rocket.style.top = '0';
+                rocket.style.left = '0';
             }
+
+            requestAnimationFrame(animate);
         }
 
+        // Initial Path Setup
+        updatePath();
+
+        // Start Loop
+        animate();
+
+        /* resizeObserver logic moved to physics block */
         const resizeObserver = new ResizeObserver(() => {
             updatePath();
-            moveRocket();
         });
         resizeObserver.observe(contentContainer);
 
-        scrollContainer.addEventListener('scroll', moveRocket);
-        window.addEventListener('resize', () => { updatePath(); moveRocket(); });
+        window.addEventListener('resize', () => { updatePath(); });
 
         const fadeObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
