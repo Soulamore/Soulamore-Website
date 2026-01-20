@@ -72,9 +72,7 @@
 
         /* HERO SECTION LAYOUT */
         .hero {
-            padding-top: 140px;
-            /* Reduced to fit viewport */
-            /* Clear fixed header */
+            /* padding-top: 140px;  <-- Handled by shell-content (120px) + minimal adjustment if needed */
             text-align: center;
             position: relative;
             z-index: 2;
@@ -851,185 +849,191 @@
 </head>
 
 <body>
-
-    <!-- AUDIO & VISUALIZER -->
-    <audio id="ambientAudio" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
-    </audio>
-    <div class="audio-control" onclick="toggleAudio()">
-        <div class="audio-bars" id="audioVisualizer">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header class="island-nav"></header>
         </div>
-        <span id="audioText">Play Audio</span>
-    </div>
 
-    <div id="particles"></div>
-    <div id="atmosphere"></div>
-    <div id="scroll-progress"></div>
+        <main id="shell-content">
+            <!-- AUDIO & VISUALIZER -->
+            <audio id="ambientAudio" loop>
+                <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+            </audio>
+            <div class="audio-control" onclick="toggleAudio()">
+                <div class="audio-bars" id="audioVisualizer">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+                <span id="audioText">Play Audio</span>
+            </div>
 
-    <!-- AURORA BACKGROUND -->
-    <div class="aurora-container">
-        <div class="aurora-blob blob-1"></div>
-        <div class="aurora-blob blob-2"></div>
-        <div class="aurora-blob blob-3"></div>
-    </div>
+            <div id="particles"></div>
+            <div id="atmosphere"></div>
+            <div id="scroll-progress"></div>
 
-    <script>
-        window.onscroll = function () {
-            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            var scrolled = (winScroll / height) * 100;
-            document.getElementById("scroll-progress").style.width = scrolled + "%";
-        };
-    </script>
+            <!-- AURORA BACKGROUND -->
+            <div class="aurora-container">
+                <div class="aurora-blob blob-1"></div>
+                <div class="aurora-blob blob-2"></div>
+                <div class="aurora-blob blob-3"></div>
+            </div>
 
+            <script>
+                window.onscroll = function () {
+                    var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                    var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    var scrolled = (winScroll / height) * 100;
+                    document.getElementById("scroll-progress").style.width = scrolled + "%";
+                };
+            </script>
 
-    <div class="container">
-        <!-- HEADER INJECTION -->
-        <header id="main-header"></header>
+            <div class="container">
+                <!-- HEADER MOVED TO SHELL-FIXED -->
 
-        <!-- 1. HERO SECTION: SoulBot First -->
-        <div class="hero fade-in">
-            <div class="hero-subhead-premium">Built for Campuses, Workplaces, and You.</div>
-            <h1 class="hero-title-premium">Mental wellness,<br>made human.</h1>
-            <p>
-                Soulamore connects you to the right kind of support — instant tools, trained peers,
-                or professional help
-                — starting with a simple chat.
-            </p>
+                <!-- 1. HERO SECTION: SoulBot First -->
+                <div class="hero fade-in">
+                    <div class="hero-subhead-premium">Built for Campuses, Workplaces, and You.</div>
+                    <h1 class="hero-title-premium">Mental wellness,<br>made human.</h1>
+                    <p>
+                        Soulamore connects you to the right kind of support — instant tools, trained peers,
+                        or professional help
+                        — starting with a simple chat.
+                    </p>
 
-            <!-- SoulBot Interactive Preview -->
-            <div class="soulbot-preview">
-                <div class="sb-header">
-                    <div class="sb-avatar"><i class="fas fa-robot"></i></div>
-                    <div>
-                        <div style="font-weight:700; font-size:1.1rem;">SoulBot AI</div>
-                        <div style="font-size:0.8rem; opacity:0.6;">Always here to listen</div>
+                    <!-- SoulBot Interactive Preview -->
+                    <div class="soulbot-preview">
+                        <div class="sb-header">
+                            <div class="sb-avatar"><i class="fas fa-robot"></i></div>
+                            <div>
+                                <div style="font-weight:700; font-size:1.1rem;">SoulBot AI</div>
+                                <div style="font-size:0.8rem; opacity:0.6;">Always here to listen</div>
+                            </div>
+                            <div
+                                style="margin-left:auto; font-size:0.8rem; background:rgba(78, 205, 196, 0.2); color:var(--teal-glow); padding:4px 10px; border-radius:12px;">
+                                Beta</div>
+                        </div>
+
+                        <div class="sb-bubble">
+                            Hi there. I'm SoulBot. Things can get heavy sometimes, but you don't have to
+                            carry it all alone.
+                            <br><br>
+                            <strong>How are you feeling right now?</strong>
+                        </div>
+
+                        <a href="portal/login.html" class="hero-cta-btn">
+                            <i class="fas fa-comment-dots"></i> Start with SoulBot
+                        </a>
+                    </div>
+
+                    <!-- Social Proof -->
+                    <div class="social-proof-tag">
+                        <i class="fas fa-user-friends" style="color:var(--teal-glow);"></i> Trusted by
+                        <span id="counter-trusted">...</span> users
+                    </div>
+
+                    <!-- HIDDEN GEMS BAR -->
+                    <div class="hidden-gems-bar fade-in" style="animation-delay: 0.5s;">
+                        <a href="company/for-parents.html" class="gem-link"><i class="fas fa-home"></i> For
+                            Families</a>
+                        <a href="company/why-soulamore-exists.html" class="gem-link"><i class="fas fa-book"></i> Our
+                            Manifesto</a>
+                        <a href="spaces/campus/safety-boundaries.html" class="gem-link"><i
+                                class="fas fa-shield-alt"></i> Safety
+                            & Trust</a>
+                        <a href="company/anonymous-voices.html" class="gem-link"><i class="fas fa-mask"></i>
+                            Anonymous
+                            Voices</a>
+                    </div>
+                </div>
+
+                <!-- 2. WIRING STICKER (Mobile Section / Desktop Banner) -->
+                <style>
+                    @keyframes stickerFloat {
+
+                        0%,
+                        100% {
+                            transform: translateY(0) rotate(-2deg);
+                        }
+
+                        50% {
+                            transform: translateY(-8px) rotate(-1deg);
+                        }
+                    }
+
+                    .wiring-sticker {
+                        position: fixed;
+                        top: 180px;
+                        left: 12%;
+                        z-index: 999;
+                        background: rgba(15, 23, 42, 0.85);
+                        backdrop-filter: blur(16px);
+                        -webkit-backdrop-filter: blur(16px);
+                        border: 1px solid rgba(78, 205, 196, 0.2);
+                        border-radius: 16px;
+                        padding: 20px 25px;
+                        width: 260px;
+                        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+                        font-family: 'Outfit';
+                        animation: stickerFloat 5s ease-in-out infinite;
+                        cursor: pointer;
+                        transition: transform 0.3s;
+                    }
+
+                    .wiring-sticker::before {
+                        /* TAPE EFFECT */
+                        content: '';
+                        position: absolute;
+                        top: -15px;
+                        left: 50%;
+                        transform: translateX(-50%) rotate(-1deg);
+                        width: 60px;
+                        height: 25px;
+                        background: rgba(78, 205, 196, 0.6);
+                        backdrop-filter: blur(5px);
+                        border-radius: 2px;
+                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                        z-index: 1000;
+                    }
+
+                    @media (max-width: 1650px) {
+                        .wiring-sticker {
+                            position: relative;
+                            top: auto;
+                            left: auto;
+                            transform: none !important;
+                            animation: none !important;
+                            width: calc(100% - 40px);
+                            max-width: 400px;
+                            margin: 40px auto;
+                            /* Reduced spacing to bring it closer */
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            /* Center content horizontally */
+                            text-align: center;
+                            /* Center text */
+                            z-index: 10;
+                        }
+
+                        .wiring-sticker::before {
+                            display: none;
+                            /* Hide tape in static section mode for cleaner look */
+                        }
+                    }
+                </style>
+                <div class="wiring-sticker" onclick="window.location.href='tools/drop-it.html'">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <i class="fas fa-bolt" style="color: var(--teal-glow); font-size: 1.1rem;"></i>
+                        <span
+                            style="font-weight: 700; color: var(--teal-glow); font-size: 1rem; letter-spacing: 0.5px;">Wiring
+                            Backend...</span>
                     </div>
                     <div
-                        style="margin-left:auto; font-size:0.8rem; background:rgba(78, 205, 196, 0.2); color:var(--teal-glow); padding:4px 10px; border-radius:12px;">
-                        Beta</div>
-                </div>
-
-                <div class="sb-bubble">
-                    Hi there. I'm SoulBot. Things can get heavy sometimes, but you don't have to
-                    carry it all alone.
-                    <br><br>
-                    <strong>How are you feeling right now?</strong>
-                </div>
-
-                <a href="portal/login.html" class="hero-cta-btn">
-                    <i class="fas fa-comment-dots"></i> Start with SoulBot
-                </a>
-            </div>
-
-            <!-- Social Proof -->
-            <div class="social-proof-tag">
-                <i class="fas fa-user-friends" style="color:var(--teal-glow);"></i> Trusted by
-                <span id="counter-trusted">...</span> users
-            </div>
-
-            <!-- HIDDEN GEMS BAR -->
-            <div class="hidden-gems-bar fade-in" style="animation-delay: 0.5s;">
-                <a href="company/for-parents.html" class="gem-link"><i class="fas fa-home"></i> For
-                    Families</a>
-                <a href="company/why-soulamore-exists.html" class="gem-link"><i class="fas fa-book"></i> Our
-                    Manifesto</a>
-                <a href="spaces/campus/safety-boundaries.html" class="gem-link"><i class="fas fa-shield-alt"></i> Safety
-                    & Trust</a>
-                <a href="company/anonymous-voices.html" class="gem-link"><i class="fas fa-mask"></i>
-                    Anonymous
-                    Voices</a>
-            </div>
-        </div>
-
-        <!-- 2. WIRING STICKER (Mobile Section / Desktop Banner) -->
-        <style>
-            @keyframes stickerFloat {
-
-                0%,
-                100% {
-                    transform: translateY(0) rotate(-2deg);
-                }
-
-                50% {
-                    transform: translateY(-8px) rotate(-1deg);
-                }
-            }
-
-            .wiring-sticker {
-                position: fixed;
-                top: 180px;
-                left: 12%;
-                z-index: 999;
-                background: rgba(15, 23, 42, 0.85);
-                backdrop-filter: blur(16px);
-                -webkit-backdrop-filter: blur(16px);
-                border: 1px solid rgba(78, 205, 196, 0.2);
-                border-radius: 16px;
-                padding: 20px 25px;
-                width: 260px;
-                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-                font-family: 'Outfit';
-                animation: stickerFloat 5s ease-in-out infinite;
-                cursor: pointer;
-                transition: transform 0.3s;
-            }
-
-            .wiring-sticker::before {
-                /* TAPE EFFECT */
-                content: '';
-                position: absolute;
-                top: -15px;
-                left: 50%;
-                transform: translateX(-50%) rotate(-1deg);
-                width: 60px;
-                height: 25px;
-                background: rgba(78, 205, 196, 0.6);
-                backdrop-filter: blur(5px);
-                border-radius: 2px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                z-index: 1000;
-            }
-
-            @media (max-width: 1650px) {
-                .wiring-sticker {
-                    position: relative;
-                    top: auto;
-                    left: auto;
-                    transform: none !important;
-                    animation: none !important;
-                    width: calc(100% - 40px);
-                    max-width: 400px;
-                    margin: 40px auto;
-                    /* Reduced spacing to bring it closer */
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    /* Center content horizontally */
-                    text-align: center;
-                    /* Center text */
-                    z-index: 10;
-                }
-
-                .wiring-sticker::before {
-                    display: none;
-                    /* Hide tape in static section mode for cleaner look */
-                }
-            }
-        </style>
-        <div class="wiring-sticker" onclick="window.location.href='tools/drop-it.html'">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                <i class="fas fa-bolt" style="color: var(--teal-glow); font-size: 1.1rem;"></i>
-                <span style="font-weight: 700; color: var(--teal-glow); font-size: 1rem; letter-spacing: 0.5px;">Wiring
-                    Backend...</span>
-            </div>
-            <div style="font-size: 0.85rem; opacity: 0.7; color: #e2e8f0; line-height: 1.5; margin-bottom: 15px;">
-                We're connecting the Soul-Engine. While you wait...
-            </div>
-            <div style="
+                        style="font-size: 0.85rem; opacity: 0.7; color: #e2e8f0; line-height: 1.5; margin-bottom: 15px;">
+                        We're connecting the Soul-Engine. While you wait...
+                    </div>
+                    <div style="
                 background: rgba(255,255,255,0.08); 
                 border: 1px solid rgba(255,255,255,0.1); 
                 border-radius: 50px; 
@@ -1040,252 +1044,261 @@
                 color: white;
                 transition: 0.3s;
             " onmouseover="this.style.background='rgba(255,255,255,0.15)'"
-                onmouseout="this.style.background='rgba(255,255,255,0.08)'">
-                Play "Drop It" 🚀
-            </div>
-        </div>
-
-        <!-- 2. PHILOSOPHY: "The Messy Stuff" -->
-        <section class="fade-in" style="margin-top: 0; margin-bottom: 120px;">
-            <div
-                style="background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px; border-radius: 30px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
-                <div
-                    style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, var(--teal-glow), var(--peach-glow));">
+                        onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+                        Play "Drop It" 🚀
+                    </div>
                 </div>
-                <h2 style="font-size: 2.2rem; margin-bottom: 20px;">We make space for the <span
-                        style="color: var(--peach-glow);">messy stuff.</span></h2>
-                <p style="font-size: 1.1rem; opacity: 0.8; max-width: 800px; margin: 0 auto 30px; line-height: 1.8;">
-                    Soulamore came from the realization that everything looks fine from the outside,
-                    but something often
-                    feels heavy inside.
-                    We live in a world where conversations are fast, curated, and filtered. Yet, the
-                    emotions we
-                    struggle with — loneliness, self-doubt, pressure — are slow and messy.
-                    Soulamore exists to make space for those conversations again.
-                </p>
-                <i class="fas fa-quote-right" style="font-size: 2rem; opacity: 0.1;"></i>
-            </div>
-        </section>
 
-        <!-- 2.5 FIND YOUR SPACE (Restored CTA Section) -->
-        <div class="section-header fade-in">
-            <h2>Find Your Space</h2>
-            <p style="opacity:0.6;">Specialized support for every part of your journey.</p>
-        </div>
-        <div class="compass-grid fade-in"
-            style="display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 20px !important; margin-bottom: 100px;">
-
-            <!-- Campus -->
-            <a href="spaces/campus/index.html" class="pillar-card"
-                style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(56, 189, 248, 0.3);">
-                <div class="pillar-icon"><i class="fas fa-graduation-cap" style="color:#38bdf8;"></i></div>
-                <div class="pillar-title" style="color:#38bdf8;">For Students</div>
-                <div class="pillar-desc">Navigate campus life, exam stress, and finding your tribe.
-                </div>
-            </a>
-
-            <!-- Workplace -->
-            <a href="spaces/soulamore-workplace/index.html" class="pillar-card"
-                style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(251, 191, 36, 0.3);">
-                <div class="pillar-icon"><i class="fas fa-building" style="color:#fbbf24;"></i>
-                </div>
-                <div class="pillar-title" style="color:#fbbf24;">For Workplaces</div>
-                <div class="pillar-desc">Emotionally safe teams, burnout prevention, and leadership
-                    support.</div>
-            </a>
-
-            <!-- Soulamore Away -->
-            <a href="spaces/soulamore-away/index.html" class="pillar-card"
-                style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(167, 139, 250, 0.3);">
-                <div class="pillar-icon"><i class="fas fa-plane-departure" style="color:#a78bfa;"></i></div>
-                <div class="pillar-title" style="color:#a78bfa;">Soulamore Away</div>
-                <div class="pillar-desc">Support for expats, digital nomads, and those far from
-                    home.</div>
-            </a>
-        </div>
-
-        <!-- 3. STRATEGIC PILLARS (B2B Focus) -->
-        <!-- 3. WELLNESS COMPASS (STEP 3) -->
-        <div class="section-header fade-in" style="margin-top:100px;">
-            <span
-                style="display:inline-block; margin-bottom:15px; background:rgba(251, 191, 36, 0.15); color:var(--gold-glow); padding:4px 12px; border-radius:12px; font-size:0.75rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;">Step
-                3 of 3: Talk to a Peer</span>
-            <h2>You Don't Have to Carry It Alone</h2>
-            <p style="opacity:0.6;">Connect with trained peers who understand.</p>
-        </div>
-        <div class="compass-grid fade-in"
-            style="display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 20px !important; margin-top: 40px !important;">
-            <a href="our-peers/index.html" class="pillar-card"
-                style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(45, 212, 191, 0.3);">
-                <div class="pillar-icon"><i class="fas fa-brain" style="color:#2dd4bf;"></i></div>
-                <div class="pillar-title" style="color:#2dd4bf;">Mental Wellness</div>
-                <div class="pillar-desc">Safe spaces to discuss anxiety, stress, and emotional
-                    resilience.</div>
-            </a>
-            <a href="our-peers/physical-wellness/renu-dogra.html" class="pillar-card"
-                style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(244, 114, 182, 0.3);">
-                <div class="pillar-icon"><i class="fas fa-running" style="color:#f472b6;"></i></div>
-                <div class="pillar-title" style="color:#f472b6;">Physical Wellness</div>
-                <div class="pillar-desc">Body positivity, health habits, and vitality discussions.
-                </div>
-            </a>
-            <a href="spaces/soulamore-workplace/index.html" class="pillar-card"
-                style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(217, 119, 6, 0.3);">
-                <div class="pillar-icon"><i class="fas fa-wallet" style="color:#d97706;"></i></div>
-                <div class="pillar-title" style="color:#d97706;">Financial Wellness</div>
-                <div class="pillar-desc">Money stress affects mental health. Talk to a peer who
-                    understands.</div>
-            </a>
-            <a href="spaces/soulamore-campus.html" class="pillar-card"
-                style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(56, 189, 248, 0.3);">
-                <div class="pillar-icon"><i class="fas fa-book-open" style="color:#38bdf8;"></i>
-                </div>
-                <div class="pillar-title" style="color:#38bdf8;">Academic Wellness</div>
-                <div class="pillar-desc">Study pressure, career guidance, and learning support.
-                </div>
-            </a>
-        </div>
-
-        <!-- 4. "WHAT WOULD HELP RIGHT NOW?" (Engaging B2C Tools) -->
-        <section id="relief-coping" class="fade-in" style="margin: 120px auto;">
-            <div class="section-header">
-                <h2>What Would Help Right Now?</h2>
-                <p>Different moments need different kinds of support. Choose what feels easiest.</p>
-            </div>
-
-            <div
-                style="display: flex !important; flex-wrap: wrap !important; flex-direction: row !important; justify-content: center !important; gap: 30px !important; width: 100% !important;">
-                <!-- 5-Step Reset -->
-                <div class="glass-card hover-cyan" style="flex:1; min-width:300px; padding:40px; border-radius:30px;">
+                <!-- 2. PHILOSOPHY: "The Messy Stuff" -->
+                <section class="fade-in" style="margin-top: 0; margin-bottom: 120px;">
                     <div
-                        style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#4ECDC4; margin-bottom:15px; border:1px solid #4ECDC4; padding:5px 10px; display:inline-block; border-radius:12px;">
-                        Reset</div>
-                    <div style="margin-top:5px;"><i class="fas fa-wind"
-                            style="font-size:3rem; color:#4ECDC4; margin-bottom:20px;"></i></div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 15px; color:white;">5-Step Reset
-                    </h3>
-                    <p style="opacity: 0.9; margin-bottom: 30px; line-height: 1.6;">Anxiety
-                        spiraling? Follow this
-                        simple, guided linear flow to reground yourself in just 2 minutes.</p>
-                    <a href="tools/5-step-reset.html" class="nav-btn"
-                        style="display:inline-block; text-align:center; color:white;">Start Reset <i
-                            class="fas fa-arrow-right"></i></a>
+                        style="background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px; border-radius: 30px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+                        <div
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, var(--teal-glow), var(--peach-glow));">
+                        </div>
+                        <h2 style="font-size: 2.2rem; margin-bottom: 20px;">We make space for the <span
+                                style="color: var(--peach-glow);">messy stuff.</span></h2>
+                        <p
+                            style="font-size: 1.1rem; opacity: 0.8; max-width: 800px; margin: 0 auto 30px; line-height: 1.8;">
+                            Soulamore came from the realization that everything looks fine from the outside,
+                            but something often
+                            feels heavy inside.
+                            We live in a world where conversations are fast, curated, and filtered. Yet, the
+                            emotions we
+                            struggle with — loneliness, self-doubt, pressure — are slow and messy.
+                            Soulamore exists to make space for those conversations again.
+                        </p>
+                        <i class="fas fa-quote-right" style="font-size: 2rem; opacity: 0.1;"></i>
+                    </div>
+                </section>
+
+                <!-- 2.5 FIND YOUR SPACE (Restored CTA Section) -->
+                <div class="section-header fade-in">
+                    <h2>Find Your Space</h2>
+                    <p style="opacity:0.6;">Specialized support for every part of your journey.</p>
+                </div>
+                <div class="compass-grid fade-in"
+                    style="display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 20px !important; margin-bottom: 100px;">
+
+                    <!-- Campus -->
+                    <a href="spaces/campus/index.html" class="pillar-card"
+                        style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(56, 189, 248, 0.3);">
+                        <div class="pillar-icon"><i class="fas fa-graduation-cap" style="color:#38bdf8;"></i></div>
+                        <div class="pillar-title" style="color:#38bdf8;">For Students</div>
+                        <div class="pillar-desc">Navigate campus life, exam stress, and finding your tribe.
+                        </div>
+                    </a>
+
+                    <!-- Workplace -->
+                    <a href="spaces/soulamore-workplace/index.html" class="pillar-card"
+                        style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(251, 191, 36, 0.3);">
+                        <div class="pillar-icon"><i class="fas fa-building" style="color:#fbbf24;"></i>
+                        </div>
+                        <div class="pillar-title" style="color:#fbbf24;">For Workplaces</div>
+                        <div class="pillar-desc">Emotionally safe teams, burnout prevention, and leadership
+                            support.</div>
+                    </a>
+
+                    <!-- Soulamore Away -->
+                    <a href="spaces/soulamore-away/index.html" class="pillar-card"
+                        style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(167, 139, 250, 0.3);">
+                        <div class="pillar-icon"><i class="fas fa-plane-departure" style="color:#a78bfa;"></i></div>
+                        <div class="pillar-title" style="color:#a78bfa;">Soulamore Away</div>
+                        <div class="pillar-desc">Support for expats, digital nomads, and those far from
+                            home.</div>
+                    </a>
                 </div>
 
-                <!-- Mental Playground -->
-                <div class="glass-card hover-purple" style="flex:1; min-width:300px; padding:40px; border-radius:30px;">
+                <!-- 3. STRATEGIC PILLARS (B2B Focus) -->
+                <!-- 3. WELLNESS COMPASS (STEP 3) -->
+                <div class="section-header fade-in" style="margin-top:100px;">
+                    <span
+                        style="display:inline-block; margin-bottom:15px; background:rgba(251, 191, 36, 0.15); color:var(--gold-glow); padding:4px 12px; border-radius:12px; font-size:0.75rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;">Step
+                        3 of 3: Talk to a Peer</span>
+                    <h2>You Don't Have to Carry It Alone</h2>
+                    <p style="opacity:0.6;">Connect with trained peers who understand.</p>
+                </div>
+                <div class="compass-grid fade-in"
+                    style="display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 20px !important; margin-top: 40px !important;">
+                    <a href="our-peers/index.html" class="pillar-card"
+                        style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(45, 212, 191, 0.3);">
+                        <div class="pillar-icon"><i class="fas fa-brain" style="color:#2dd4bf;"></i></div>
+                        <div class="pillar-title" style="color:#2dd4bf;">Mental Wellness</div>
+                        <div class="pillar-desc">Safe spaces to discuss anxiety, stress, and emotional
+                            resilience.</div>
+                    </a>
+                    <a href="our-peers/physical-wellness/renu-dogra.html" class="pillar-card"
+                        style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(244, 114, 182, 0.3);">
+                        <div class="pillar-icon"><i class="fas fa-running" style="color:#f472b6;"></i></div>
+                        <div class="pillar-title" style="color:#f472b6;">Physical Wellness</div>
+                        <div class="pillar-desc">Body positivity, health habits, and vitality discussions.
+                        </div>
+                    </a>
+                    <a href="spaces/soulamore-workplace/index.html" class="pillar-card"
+                        style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(217, 119, 6, 0.3);">
+                        <div class="pillar-icon"><i class="fas fa-wallet" style="color:#d97706;"></i></div>
+                        <div class="pillar-title" style="color:#d97706;">Financial Wellness</div>
+                        <div class="pillar-desc">Money stress affects mental health. Talk to a peer who
+                            understands.</div>
+                    </a>
+                    <a href="spaces/campus/index.html" class="pillar-card"
+                        style="text-decoration:none; color:inherit; display:flex; flex-direction:column; border-color:rgba(56, 189, 248, 0.3);">
+                        <div class="pillar-icon"><i class="fas fa-book-open" style="color:#38bdf8;"></i>
+                        </div>
+                        <div class="pillar-title" style="color:#38bdf8;">Academic Wellness</div>
+                        <div class="pillar-desc">Study pressure, career guidance, and learning support.
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 4. "WHAT WOULD HELP RIGHT NOW?" (Engaging B2C Tools) -->
+                <section id="relief-coping" class="fade-in" style="margin: 120px auto;">
+                    <div class="section-header">
+                        <h2>What Would Help Right Now?</h2>
+                        <p>Different moments need different kinds of support. Choose what feels easiest.</p>
+                    </div>
+
                     <div
-                        style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#a78bfa; margin-bottom:15px; border:1px solid #a78bfa; padding:5px 10px; display:inline-block; border-radius:12px;">
-                        Play</div>
-                    <div style="margin-top:5px;"><i class="fas fa-gamepad"
-                            style="font-size:3rem; color:#a78bfa; margin-bottom:20px;"></i></div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 15px; color:white;">Mental
-                        Playground</h3>
-                    <p style="opacity: 0.9; margin-bottom: 30px; line-height: 1.6;">Interactive toys
-                        for your mind.
-                        Shred worries, pop thought bubbles, or listen to a sound bath.</p>
-                    <a href="tools/drop-it.html" class="nav-btn"
-                        style="display:inline-block; text-align:center; background:transparent; border:1px solid #a78bfa; color:#a78bfa; padding: 10px 20px; border-radius: 50px;">Enter
-                        Playground</a>
-                </div>
+                        style="display: flex !important; flex-wrap: wrap !important; flex-direction: row !important; justify-content: center !important; gap: 30px !important; width: 100% !important;">
+                        <!-- 5-Step Reset -->
+                        <div class="glass-card hover-cyan"
+                            style="flex:1; min-width:300px; padding:40px; border-radius:30px;">
+                            <div
+                                style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#4ECDC4; margin-bottom:15px; border:1px solid #4ECDC4; padding:5px 10px; display:inline-block; border-radius:12px;">
+                                Reset</div>
+                            <div style="margin-top:5px;"><i class="fas fa-wind"
+                                    style="font-size:3rem; color:#4ECDC4; margin-bottom:20px;"></i></div>
+                            <h3 style="font-size: 1.5rem; margin-bottom: 15px; color:white;">5-Step Reset
+                            </h3>
+                            <p style="opacity: 0.9; margin-bottom: 30px; line-height: 1.6;">Anxiety
+                                spiraling? Follow this
+                                simple, guided linear flow to reground yourself in just 2 minutes.</p>
+                            <a href="tools/5-step-reset.html" class="nav-btn"
+                                style="display:inline-block; text-align:center; color:white;">Start Reset <i
+                                    class="fas fa-arrow-right"></i></a>
+                        </div>
 
-                <!-- SoulBot / Talk -->
-                <div class="glass-card hover-orange" style="flex:1; min-width:300px; padding:40px; border-radius:30px;">
-                    <div
-                        style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#F49F75; margin-bottom:15px; border:1px solid #F49F75; padding:5px 10px; display:inline-block; border-radius:12px;">
-                        Talk</div>
-                    <div style="margin-top:5px;"><i class="fas fa-robot"
-                            style="font-size:3rem; color:#F49F75; margin-bottom:20px;"></i></div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 15px; color:white;">Meet SoulBot
-                    </h3>
-                    <p style="opacity: 0.9; margin-bottom: 30px; line-height: 1.6;">A calm AI
-                        companion that listens
-                        without judgement. Perfect for late nights or tangled thoughts.</p>
-                    <a href="tools/soulbot.html" class="nav-btn"
-                        style="display:inline-block; text-align:center; background:linear-gradient(135deg, #F49F75, #fbbf24); color:#0f172a; border:none; padding: 10px 20px; border-radius: 50px;">Talk
-                        to SoulBot</a>
-                </div>
-            </div>
-        </section>
+                        <!-- Mental Playground -->
+                        <div class="glass-card hover-purple"
+                            style="flex:1; min-width:300px; padding:40px; border-radius:30px;">
+                            <div
+                                style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#a78bfa; margin-bottom:15px; border:1px solid #a78bfa; padding:5px 10px; display:inline-block; border-radius:12px;">
+                                Play</div>
+                            <div style="margin-top:5px;"><i class="fas fa-gamepad"
+                                    style="font-size:3rem; color:#a78bfa; margin-bottom:20px;"></i></div>
+                            <h3 style="font-size: 1.5rem; margin-bottom: 15px; color:white;">Mental
+                                Playground</h3>
+                            <p style="opacity: 0.9; margin-bottom: 30px; line-height: 1.6;">Interactive toys
+                                for your mind.
+                                Shred worries, pop thought bubbles, or listen to a sound bath.</p>
+                            <a href="tools/playground.html" class="nav-btn"
+                                style="display:inline-block; text-align:center; background:transparent; border:1px solid #a78bfa; color:#a78bfa; padding: 10px 20px; border-radius: 50px;">Enter
+                                Playground</a>
+                        </div>
 
-        <!-- 5. PEER PROFILES -->
-        <section class="fade-in" style="margin: 120px auto;">
-            <div class="section-header">
-                <h2>You Don't Have to Figure This Out Alone</h2>
-                <p>Sometimes tools help. Sometimes it helps more to talk to someone who's been
-                    there.</p>
-            </div>
-
-            <div class="peer-grid">
-                <!-- Peer 1: Aditya -->
-                <div class="pillar-card" style="padding: 30px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <h3 style="margin:0; font-size:1.4rem;">Aditya</h3>
-                        <span
-                            style="border:1px solid #4ECDC4; color:#4ECDC4; padding:2px 8px; font-size:0.7rem; border-radius:20px;">ONLINE</span>
+                        <!-- SoulBot / Talk -->
+                        <div class="glass-card hover-orange"
+                            style="flex:1; min-width:300px; padding:40px; border-radius:30px;">
+                            <div
+                                style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#F49F75; margin-bottom:15px; border:1px solid #F49F75; padding:5px 10px; display:inline-block; border-radius:12px;">
+                                Talk</div>
+                            <div style="margin-top:5px;"><i class="fas fa-robot"
+                                    style="font-size:3rem; color:#F49F75; margin-bottom:20px;"></i></div>
+                            <h3 style="font-size: 1.5rem; margin-bottom: 15px; color:white;">Meet SoulBot
+                            </h3>
+                            <p style="opacity: 0.9; margin-bottom: 30px; line-height: 1.6;">A calm AI
+                                companion that listens
+                                without judgement. Perfect for late nights or tangled thoughts.</p>
+                            <a href="tools/soulbot.html" class="nav-btn"
+                                style="display:inline-block; text-align:center; background:linear-gradient(135deg, #F49F75, #fbbf24); color:#0f172a; border:none; padding: 10px 20px; border-radius: 50px;">Talk
+                                to SoulBot</a>
+                        </div>
                     </div>
-                    <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
-                        Here to help you
-                        navigate academic pressure and self-discovery.</p>
-                    <a href="our-peers/profile.html?id=aditya" class="nav-btn"
-                        style="width:100%; text-align:center;">Talk to a Peer</a>
-                </div>
+                </section>
 
-                <!-- Peer 2: Lakshit -->
-                <div class="pillar-card" style="padding: 30px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <h3 style="margin:0; font-size:1.4rem;">Lakshit</h3>
-                        <span
-                            style="border:1px solid #F49F75; color:#F49F75; padding:2px 8px; font-size:0.7rem; border-radius:20px;">AWAY</span>
+                <!-- 5. PEER PROFILES -->
+                <section class="fade-in" style="margin: 120px auto;">
+                    <div class="section-header">
+                        <h2>You Don't Have to Figure This Out Alone</h2>
+                        <p>Sometimes tools help. Sometimes it helps more to talk to someone who's been
+                            there.</p>
                     </div>
-                    <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
-                        Ready to listen
-                        about relationships, stress, and finding balance.</p>
-                    <a href="our-peers/profile.html?id=lakshit" class="nav-btn"
-                        style="width:100%; text-align:center;">Talk to a Peer</a>
-                </div>
 
-                <!-- Peer 3: Aarti -->
-                <div class="pillar-card" style="padding: 30px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <h3 style="margin:0; font-size:1.4rem;">Aarti</h3>
-                        <span
-                            style="border:1px solid #4ECDC4; color:#4ECDC4; padding:2px 8px; font-size:0.7rem; border-radius:20px;">ONLINE</span>
+                    <div class="peer-grid">
+                        <!-- Peer 1: Aditya -->
+                        <div class="pillar-card" style="padding: 30px;">
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <h3 style="margin:0; font-size:1.4rem;">Aditya</h3>
+                                <span
+                                    style="border:1px solid #4ECDC4; color:#4ECDC4; padding:2px 8px; font-size:0.7rem; border-radius:20px;">ONLINE</span>
+                            </div>
+                            <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
+                                Here to help you
+                                navigate academic pressure and self-discovery.</p>
+                            <a href="our-peers/profile.html?id=aditya" class="nav-btn"
+                                style="width:100%; text-align:center;">Talk to a Peer</a>
+                        </div>
+
+                        <!-- Peer 2: Lakshit -->
+                        <div class="pillar-card" style="padding: 30px;">
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <h3 style="margin:0; font-size:1.4rem;">Lakshit</h3>
+                                <span
+                                    style="border:1px solid #F49F75; color:#F49F75; padding:2px 8px; font-size:0.7rem; border-radius:20px;">AWAY</span>
+                            </div>
+                            <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
+                                Ready to listen
+                                about relationships, stress, and finding balance.</p>
+                            <a href="our-peers/profile.html?id=lakshit" class="nav-btn"
+                                style="width:100%; text-align:center;">Talk to a Peer</a>
+                        </div>
+
+                        <!-- Peer 3: Aarti -->
+                        <div class="pillar-card" style="padding: 30px;">
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <h3 style="margin:0; font-size:1.4rem;">Aarti</h3>
+                                <span
+                                    style="border:1px solid #4ECDC4; color:#4ECDC4; padding:2px 8px; font-size:0.7rem; border-radius:20px;">ONLINE</span>
+                            </div>
+                            <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
+                                Available to chat
+                                about anxiety, emotional wellness, or just venting.</p>
+                            <a href="our-peers/profile.html?id=aarti" class="nav-btn"
+                                style="width:100%; text-align:center;">Talk to a Peer</a>
+                        </div>
+
+                        <!-- Specialist: Renu -->
+                        <div class="pillar-card" style="padding: 30px; border-color:var(--peach-glow);">
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <h3 style="margin:0; font-size:1.4rem;">Renu</h3>
+                                <span
+                                    style="background:rgba(244, 159, 117, 0.2); color:#F49F75; padding:2px 8px; font-size:0.7rem; border-radius:20px;">SESSIONS</span>
+                            </div>
+                            <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
+                                Certified Yoga
+                                Teacher helping you reconnect with physical calmness.</p>
+                            <a href="our-peers/physical-wellness/renu-dogra.html" class="nav-btn"
+                                style="width:100%; text-align:center;">Book
+                                Session</a>
+                        </div>
                     </div>
-                    <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
-                        Available to chat
-                        about anxiety, emotional wellness, or just venting.</p>
-                    <a href="our-peers/profile.html?id=aarti" class="nav-btn"
-                        style="width:100%; text-align:center;">Talk to a Peer</a>
-                </div>
+                </section>
 
-                <!-- Specialist: Renu -->
-                <div class="pillar-card" style="padding: 30px; border-color:var(--peach-glow);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <h3 style="margin:0; font-size:1.4rem;">Renu</h3>
-                        <span
-                            style="background:rgba(244, 159, 117, 0.2); color:#F49F75; padding:2px 8px; font-size:0.7rem; border-radius:20px;">SESSIONS</span>
-                    </div>
-                    <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
-                        Certified Yoga
-                        Teacher helping you reconnect with physical calmness.</p>
-                    <a href="#" class="nav-btn" style="width:100%; text-align:center;">Book
-                        Session</a>
-                </div>
-            </div>
-        </section>
+                <!-- 6. NEED A SIGN? (Oracle Interaction) -->
+                <!-- 6. NEED A SIGN? (Oracle Interaction) -->
+                <section class="section-gap fade-in">
+                    <div class="unified-card">
+                        <i class="fas fa-hand-sparkles section-icon" style="color:var(--teal-glow);"></i>
+                        <h2 style="font-size: 2.2rem; margin-bottom: 10px;">Need a Sign?</h2>
+                        <p style="opacity: 0.7; margin-bottom: 40px; font-size: 1.1rem;">Tap below for a
+                            message from the
+                            universe.</p>
 
-        <!-- 6. NEED A SIGN? (Oracle Interaction) -->
-        <!-- 6. NEED A SIGN? (Oracle Interaction) -->
-        <section class="section-gap fade-in">
-            <div class="unified-card">
-                <i class="fas fa-hand-sparkles section-icon" style="color:var(--teal-glow);"></i>
-                <h2 style="font-size: 2.2rem; margin-bottom: 10px;">Need a Sign?</h2>
-                <p style="opacity: 0.7; margin-bottom: 40px; font-size: 1.1rem;">Tap below for a
-                    message from the
-                    universe.</p>
-
-                <div id="oracleCard" onclick="flipOracle(this)" style="
+                        <div id="oracleCard" onclick="flipOracle(this)" style="
                     width: 100%;
                     max-width: 350px; 
                     height: 200px; 
@@ -1300,13 +1313,13 @@
                     transform-style: preserve-3d;
                     box-shadow: 0 10px 30px rgba(45, 212, 191, 0.3);
                 ">
-                    <div id="oracleFront"
-                        style="color: #0f172a; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                        <i class="fas fa-magic" style="font-size: 2.5rem; color: white;"></i>
-                        <span style="color:white; margin-top:5px; font-size:1.1rem;">Click to
-                            Reveal</span>
-                    </div>
-                    <div id="oracleText" style="
+                            <div id="oracleFront"
+                                style="color: #0f172a; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                <i class="fas fa-magic" style="font-size: 2.5rem; color: white;"></i>
+                                <span style="color:white; margin-top:5px; font-size:1.1rem;">Click to
+                                    Reveal</span>
+                            </div>
+                            <div id="oracleText" style="
                         position: absolute; 
                         width: 100%; 
                         height: 100%; 
@@ -1320,101 +1333,104 @@
                         font-size: 1.3rem; 
                         color: #0f172a;
                     "></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 7. HUMAN CONNECTION FORM -->
-        <!-- 7. HUMAN CONNECTION FORM -->
-        <section class="section-gap fade-in">
-            <div class="unified-card">
-                <i class="fas fa-phone-alt section-icon" style="color:var(--peach-glow);"></i>
-                <h2 style="font-size: 2.2rem; margin-bottom: 10px;">Need Human Connection?</h2>
-                <p
-                    style="opacity: 0.7; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto; font-size: 1.1rem;">
-                    Technology is great, but sometimes you just need a person. Fill this out, and
-                    our care team will
-                    reach out.
-                </p>
-
-                <form onsubmit="submitLifeline(event)"
-                    style="display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 500px;">
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <input type="text" id="lifeName" class="lifeline-input" placeholder="Your Name" required
-                            style="flex: 1; min-width: 200px;">
-                        <input type="email" id="lifeEmail" class="lifeline-input" placeholder="Your Email" required
-                            style="flex: 1; min-width: 200px;">
+                        </div>
                     </div>
-                    <select id="lifeType" class="lifeline-input" style="color: rgba(255,255,255,0.7);">
-                        <option value="General Support">I want to talk to a...</option>
-                        <option value="Peer">Peer Listener</option>
-                        <option value="Psychologist">Psychologist</option>
-                        <option value="Just Vent">Just someone to vent to</option>
-                    </select>
-                    <button type="submit" id="btnLife" class="lifeline-submit-btn">Request
-                        Support</button>
-                </form>
+                </section>
+
+                <!-- 7. HUMAN CONNECTION FORM -->
+                <!-- 7. HUMAN CONNECTION FORM -->
+                <section class="section-gap fade-in">
+                    <div class="unified-card">
+                        <i class="fas fa-phone-alt section-icon" style="color:var(--peach-glow);"></i>
+                        <h2 style="font-size: 2.2rem; margin-bottom: 10px;">Need Human Connection?</h2>
+                        <p
+                            style="opacity: 0.7; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto; font-size: 1.1rem;">
+                            Technology is great, but sometimes you just need a person. Fill this out, and
+                            our care team will
+                            reach out.
+                        </p>
+
+                        <form onsubmit="submitLifeline(event)"
+                            style="display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 500px;">
+                            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                                <input type="text" id="lifeName" class="lifeline-input" placeholder="Your Name" required
+                                    style="flex: 1; min-width: 200px;">
+                                <input type="email" id="lifeEmail" class="lifeline-input" placeholder="Your Email"
+                                    required style="flex: 1; min-width: 200px;">
+                            </div>
+                            <select id="lifeType" class="lifeline-input" style="color: rgba(255,255,255,0.7);">
+                                <option value="General Support">I want to talk to a...</option>
+                                <option value="Peer">Peer Listener</option>
+                                <option value="Psychologist">Psychologist</option>
+                                <option value="Just Vent">Just someone to vent to</option>
+                            </select>
+                            <button type="submit" id="btnLife" class="lifeline-submit-btn">Request
+                                Support</button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- 8. TRUST ARCHITECTURE -->
+                <section class="fade-in" style="margin: 120px auto; text-align:center;">
+                    <div
+                        style="opacity:0.5; font-size:0.9rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:20px;">
+                        Safe. Secure. Private.</div>
+
+                    <div class="trust-strip">
+                        <div class="trust-item">
+                            <i class="fas fa-user-shield" style="font-size:2rem; color:var(--teal-glow);"></i>
+                            <span>100% Anonymous</span>
+                        </div>
+                        <div class="trust-item">
+                            <i class="fas fa-lock" style="font-size:2rem; color:var(--teal-glow);"></i>
+                            <span>Private Data</span>
+                        </div>
+                        <div class="trust-item">
+                            <i class="fas fa-check-circle" style="font-size:2rem; color:var(--teal-glow);"></i>
+                            <span>Vetted Peers</span>
+                        </div>
+                        <div class="trust-item">
+                            <i class="fas fa-heart" style="font-size:2rem; color:var(--teal-glow);"></i>
+                            <span>Judgment Free</span>
+                        </div>
+                    </div>
+                </section>
+
             </div>
-        </section>
 
-        <!-- 8. TRUST ARCHITECTURE -->
-        <section class="fade-in" style="margin: 120px auto; text-align:center;">
-            <div
-                style="opacity:0.5; font-size:0.9rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:20px;">
-                Safe. Secure. Private.</div>
+            <!-- 9. STAY CONNECTED (NEWSLETTER + TICKER) -->
+            <div class="newsletter-section" style="padding: 60px 0; position: relative; z-index: 5;">
+                <div class="unified-card fade-in">
+                    <i class="fas fa-paper-plane section-icon" style="color: #38bdf8;"></i>
+                    <h2 style="font-size: 2.2rem; margin-bottom: 10px;">Stay Connected</h2>
+                    <p
+                        style="opacity: 0.8; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto; font-size: 1.1rem;">
+                        We are building Soulamore to be a sanctuary for everyone. <br>
+                        Join our community to receive gentle updates, wellness tips, and early access to new
+                        features.
+                    </p>
+                    <div style="font-style: italic; opacity: 0.6; font-size: 0.9rem; margin-bottom: 25px;">
+                        No spam. Just soul.
+                    </div>
 
-            <div class="trust-strip">
-                <div class="trust-item">
-                    <i class="fas fa-user-shield" style="font-size:2rem; color:var(--teal-glow);"></i>
-                    <span>100% Anonymous</span>
-                </div>
-                <div class="trust-item">
-                    <i class="fas fa-lock" style="font-size:2rem; color:var(--teal-glow);"></i>
-                    <span>Private Data</span>
-                </div>
-                <div class="trust-item">
-                    <i class="fas fa-check-circle" style="font-size:2rem; color:var(--teal-glow);"></i>
-                    <span>Vetted Peers</span>
-                </div>
-                <div class="trust-item">
-                    <i class="fas fa-heart" style="font-size:2rem; color:var(--teal-glow);"></i>
-                    <span>Judgment Free</span>
+                    <form onsubmit="submitNewsletterIndex(event)"
+                        style="width: 100%; max-width: 500px; margin: 0 auto;">
+                        <!-- Centered Form -->
+                        <input type="email" id="newsEmailIndex" class="lifeline-input" placeholder="Your email address"
+                            required style="margin-bottom: 15px;">
+                        <button type="submit" id="btnNewsIndex" class="lifeline-btn">Subscribe</button>
+                    </form>
+
+                    <div class="ticker">
+                        Based on your interest • <span style="color:var(--teal-glow);">Joined by <span
+                                id="counter-joined">...</span> souls</span>
+                    </div>
                 </div>
             </div>
-        </section>
 
-    </div>
-
-    <!-- 9. STAY CONNECTED (NEWSLETTER + TICKER) -->
-    <div class="newsletter-section" style="padding: 60px 0; position: relative; z-index: 5;">
-        <div class="unified-card fade-in">
-            <i class="fas fa-paper-plane section-icon" style="color: #38bdf8;"></i>
-            <h2 style="font-size: 2.2rem; margin-bottom: 10px;">Stay Connected</h2>
-            <p
-                style="opacity: 0.8; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto; font-size: 1.1rem;">
-                We are building Soulamore to be a sanctuary for everyone. <br>
-                Join our community to receive gentle updates, wellness tips, and early access to new
-                features.
-            </p>
-            <div style="font-style: italic; opacity: 0.6; font-size: 0.9rem; margin-bottom: 25px;">
-                No spam. Just soul.
-            </div>
-
-            <form onsubmit="submitNewsletterIndex(event)" style="width: 100%; max-width: 500px; margin: 0 auto;">
-                <!-- Centered Form -->
-                <input type="email" id="newsEmailIndex" class="lifeline-input" placeholder="Your email address" required
-                    style="margin-bottom: 15px;">
-                <button type="submit" id="btnNewsIndex" class="lifeline-btn">Subscribe</button>
-            </form>
-
-            <div class="ticker">
-                Based on your interest • <span style="color:var(--teal-glow);">Joined by <span
-                        id="counter-joined">...</span> souls</span>
-            </div>
-        </div>
-    </div>
-
-    <footer></footer>
+        </main>
+        <footer id="main-footer"></footer>
+    </div> <!-- End App Shell -->
 
     <!-- SCRIPTS -->
     <script src="assets/js/components.js?v=2.7"></script>
@@ -1557,29 +1573,13 @@
         }
     </script>
 
-    <!-- APP SHELL CLOSURE -->
-    </main> <!-- End shell-content -->
-    </div> <!-- End app-shell -->
+    <!-- APP SHELL CLOSURE REMOVED (Not using shell) -->
 
     <!-- MODULE: Components -->
     <script src="assets/js/components.js"></script>
     <script>
         // --- SHELL CONFIGURATION ---
-        window.ShellSubnav = {
-            active: 'main',
-            tabs: [
-                { id: 'main', label: 'Overview', icon: 'fa-home', href: '#' },
-                { id: 'programs', label: 'Programs', icon: 'fa-layer-group', href: 'index.html#programs' },
-                { id: 'employees', label: 'Employees', icon: 'fa-user-shield', href: 'index.html#employees' },
-                { id: 'plans', label: 'Plans & Pricing', icon: 'fa-tags', href: 'spaces/soulamore-workplace/plans.html' },
-                { id: 'guidelines', label: 'Guidelines', icon: 'fa-book-reader', href: 'spaces/soulamore-workplace/guidelines.html' }
-            ]
-        };
-
-        // Ensure Layout Calculation Runs
-        window.addEventListener('load', () => {
-            if (window.updateShellHeight) window.updateShellHeight();
-        });
+        // Removed unused ShellSubnav config for Landing Page
     </script>
 
     <!-- MODULE: Backend -->

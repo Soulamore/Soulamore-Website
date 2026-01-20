@@ -306,239 +306,248 @@
 </head>
 
 <body>
-    <header></header> <!-- Injected by components.js -->
-
-    <!-- BACKGROUND LAYERS -->
+    <!-- BACKGROUND LAYERS (Fixed - Outside Shell) -->
     <div id="particles"></div>
     <canvas id="fire-canvas"></canvas>
 
-    <!-- MAIN STAGE -->
-    <div class="container" id="writeStage" style="padding-top: 150px;">
+    <!-- APP SHELL START -->
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header class="island-nav"></header>
+        </div>
 
-        <div class="intro-text">
-            <div class="flame-icon"><i class="fas fa-fire"></i></div>
-            <h1>The Vent Box</h1>
-            <div class="privacy-pill"><i class="fas fa-eye-slash"></i> Nothing is Saved. Ever.</div>
-            <div class="subtitle fade-in">
-                Write it down. Burn it. Let it go.<br>
-                <span id="daily-vent-count"
-                    style="font-size:0.9rem; color:var(--peach-glow); opacity:0.9; margin-top:5px; display:inline-block;">Loading
-                    stats...</span>
+        <main id="shell-content">
+            <!-- MAIN STAGE -->
+            <div class="container" id="writeStage" style="padding-top: 150px;">
+
+                <div class="intro-text">
+                    <div class="flame-icon"><i class="fas fa-fire"></i></div>
+                    <h1>The Vent Box</h1>
+                    <div class="privacy-pill"><i class="fas fa-eye-slash"></i> Nothing is Saved. Ever.</div>
+                    <div class="subtitle fade-in">
+                        Write it down. Burn it. Let it go.<br>
+                        <span id="daily-vent-count"
+                            style="font-size:0.9rem; color:var(--peach-glow); opacity:0.9; margin-top:5px; display:inline-block;">Loading
+                            stats...</span>
+                    </div>
+                    <p style="opacity:0.7;">No judgment. No history.</p>
+                </div>
+
+                <div class="write-area-wrapper">
+                    <div class="ghost-text" id="ghostText">I’m angry about…</div>
+                    <textarea class="vent-input" id="ventInput" oninput="handleInput()" spellcheck="false"></textarea>
+                </div>
+
+                <button class="burn-btn" id="burnBtn" onclick="burnIt()">
+                    BURN IT <i class="fas fa-fire-alt"></i>
+                </button>
+
             </div>
-            <p style="opacity:0.7;">No judgment. No history.</p>
-        </div>
 
-        <div class="write-area-wrapper">
-            <div class="ghost-text" id="ghostText">I’m angry about…</div>
-            <textarea class="vent-input" id="ventInput" oninput="handleInput()" spellcheck="false"></textarea>
-        </div>
+            <!-- AFTERCARE STAGE -->
+            <div class="aftercare-container" id="afterStage">
+                <h2 style="font-size:2.5rem; margin-bottom:10px; color:var(--smoke-white);">It’s gone.</h2>
+                <p style="opacity:0.7;">You don’t have to carry it anymore.</p>
 
-        <button class="burn-btn" id="burnBtn" onclick="burnIt()">
-            BURN IT <i class="fas fa-fire-alt"></i>
-        </button>
+                <div class="option-grid">
+                    <div class="care-card" onclick="sitQuietly()">
+                        <i class="fas fa-chair" style="font-size:2rem; margin-bottom:15px; color:#a78bfa;"></i>
+                        <h3>Sit Quietly</h3>
+                        <p style="font-size:0.9rem; opacity:0.6; margin-top:5px;">Just stay on this blank screen. No
+                            prompts.
+                        </p>
+                    </div>
+                    <div class="care-card" onclick="window.location.href='confession-box/index.html'">
+                        <i class="fas fa-paper-plane"
+                            style="font-size:2rem; margin-bottom:15px; color:var(--ember-orange);"></i>
+                        <h3>Confession Box</h3>
+                        <p style="font-size:0.9rem; opacity:0.6; margin-top:5px;">Share anonymously if you want support.
+                        </p>
+                    </div>
+                </div>
 
-    </div>
+                <div class="body-check">
+                    <p style="margin-bottom:15px; font-size:0.9rem;">How does your body feel right now?</p>
+                    <div>
+                        <button class="feel-btn">Lighter</button>
+                        <button class="feel-btn">Same</button>
+                        <button class="feel-btn">Heavy</button>
+                    </div>
+                    <p style="font-size:0.75rem; opacity:0.4; margin-top:10px;">(Just noticing. Not recording.)</p>
+                </div>
 
-    <!-- AFTERCARE STAGE -->
-    <div class="aftercare-container" id="afterStage">
-        <h2 style="font-size:2.5rem; margin-bottom:10px; color:var(--smoke-white);">It’s gone.</h2>
-        <p style="opacity:0.7;">You don’t have to carry it anymore.</p>
-
-        <div class="option-grid">
-            <div class="care-card" onclick="sitQuietly()">
-                <i class="fas fa-chair" style="font-size:2rem; margin-bottom:15px; color:#a78bfa;"></i>
-                <h3>Sit Quietly</h3>
-                <p style="font-size:0.9rem; opacity:0.6; margin-top:5px;">Just stay on this blank screen. No prompts.
-                </p>
+                <div class="final-note">
+                    "You’re allowed to feel. You’re allowed to release.<br>And you’re allowed to walk away lighter."
+                </div>
             </div>
-            <div class="care-card" onclick="window.location.href='confession-box/index.html'">
-                <i class="fas fa-paper-plane"
-                    style="font-size:2rem; margin-bottom:15px; color:var(--ember-orange);"></i>
-                <h3>Confession Box</h3>
-                <p style="font-size:0.9rem; opacity:0.6; margin-top:5px;">Share anonymously if you want support.</p>
-            </div>
-        </div>
 
-        <div class="body-check">
-            <p style="margin-bottom:15px; font-size:0.9rem;">How does your body feel right now?</p>
-            <div>
-                <button class="feel-btn">Lighter</button>
-                <button class="feel-btn">Same</button>
-                <button class="feel-btn">Heavy</button>
-            </div>
-            <p style="font-size:0.75rem; opacity:0.4; margin-top:10px;">(Just noticing. Not recording.)</p>
-        </div>
+            <script>
+                // --- GHOST TEXT CYCLER ---
+                const placeholders = [
+                    "I’m angry about…",
+                    "I’m tired of…",
+                    "I wish I could say…",
+                    "I am afraid that…",
+                    "Why did they…"
+                ];
+                let pIndex = 0;
+                const ghost = document.getElementById('ghostText');
+                const input = document.getElementById('ventInput');
 
-        <div class="final-note">
-            "You’re allowed to feel. You’re allowed to release.<br>And you’re allowed to walk away lighter."
-        </div>
-    </div>
+                // Cycle text until user types
+                const textCycle = setInterval(() => {
+                    if (input.value.length === 0) {
+                        ghost.style.opacity = 0;
+                        setTimeout(() => {
+                            pIndex = (pIndex + 1) % placeholders.length;
+                            ghost.innerText = placeholders[pIndex];
+                            ghost.style.opacity = 1;
+                        }, 1000);
+                    }
+                }, 3000);
 
-    <script>
-        // --- GHOST TEXT CYCLER ---
-        const placeholders = [
-            "I’m angry about…",
-            "I’m tired of…",
-            "I wish I could say…",
-            "I am afraid that…",
-            "Why did they…"
-        ];
-        let pIndex = 0;
-        const ghost = document.getElementById('ghostText');
-        const input = document.getElementById('ventInput');
-
-        // Cycle text until user types
-        const textCycle = setInterval(() => {
-            if (input.value.length === 0) {
-                ghost.style.opacity = 0;
-                setTimeout(() => {
-                    pIndex = (pIndex + 1) % placeholders.length;
-                    ghost.innerText = placeholders[pIndex];
-                    ghost.style.opacity = 1;
-                }, 1000);
-            }
-        }, 3000);
-
-        function handleInput() {
-            if (input.value.length > 0) {
-                ghost.style.display = 'none';
-            } else {
-                ghost.style.display = 'flex';
-            }
-        }
-
-        // --- FIRE PARTICLE SYSTEM ---
-        const canvas = document.getElementById('fire-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let embers = [];
-
-        function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        class Ember {
-            constructor(x, y, isAmbient = false) {
-                this.x = x;
-                this.y = y;
-                this.isAmbient = isAmbient;
-                this.size = Math.random() * (isAmbient ? 2 : 4) + 1;
-                this.speedY = Math.random() * (isAmbient ? 1.5 : 3) + (isAmbient ? 0.5 : 2); // Move up
-                this.speedX = (Math.random() - 0.5) * (isAmbient ? 1 : 2); // Drift
-                this.color = Math.random() > 0.5 ? '#f97316' : '#ef4444'; // Orange or Red
-                this.opacity = isAmbient ? (Math.random() * 0.5 + 0.1) : 1;
-                this.decay = Math.random() * 0.02 + 0.01;
-            }
-            update() {
-                this.y -= this.speedY;
-                this.x += this.speedX;
-                this.opacity -= this.decay;
-                this.size *= 0.95; // Shrink
-            }
-            draw() {
-                ctx.globalAlpha = Math.max(0, this.opacity);
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            }
-        }
-
-        function spawnExplosion() {
-            const centerX = width / 2;
-            const centerY = height / 2;
-            for (let i = 0; i < 300; i++) {
-                embers.push(new Ember(centerX + (Math.random() - 0.5) * 300, centerY + (Math.random() - 0.5) * 100));
-            }
-        }
-
-        function spawnAmbientFire() {
-            // Spawn random embers from bottom
-            if (Math.random() < 0.3) { // Density control
-                embers.push(new Ember(Math.random() * width, height + 10, true));
-            }
-        }
-
-        function animateFire() {
-            ctx.clearRect(0, 0, width, height);
-
-            // Add subtle glow at bottom
-            const gradient = ctx.createLinearGradient(0, height, 0, height - 200);
-            gradient.addColorStop(0, 'rgba(239, 68, 68, 0.1)');
-            gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, height - 200, width, 200);
-
-            spawnAmbientFire();
-
-            for (let i = 0; i < embers.length; i++) {
-                embers[i].update();
-                embers[i].draw();
-                if (embers[i].opacity <= 0) {
-                    embers.splice(i, 1);
-                    i--;
+                function handleInput() {
+                    if (input.value.length > 0) {
+                        ghost.style.display = 'none';
+                    } else {
+                        ghost.style.display = 'flex';
+                    }
                 }
-            }
-            requestAnimationFrame(animateFire);
-        }
-        animateFire();
 
-        // --- BURN LOGIC ---
-        function burnIt() {
-            const inputVal = input.value;
-            if (!inputVal.trim()) return;
+                // --- FIRE PARTICLE SYSTEM ---
+                const canvas = document.getElementById('fire-canvas');
+                const ctx = canvas.getContext('2d');
+                let width, height;
+                let embers = [];
 
-            // 0. Save to Backend (Fire & Forget)
-            if (window.SoulBackend && window.SoulBackend.submitVent) {
-                window.SoulBackend.submitVent(inputVal, 'burn');
-            }
+                function resize() {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    canvas.width = width;
+                    canvas.height = height;
+                }
+                window.addEventListener('resize', resize);
+                resize();
 
-            // 1. Lock UI
-            input.setAttribute('readonly', true);
-            document.getElementById('burnBtn').style.display = 'none';
-            // document.getElementById('topBar').style.opacity = 0; // Removed as ID doesn't exist
+                class Ember {
+                    constructor(x, y, isAmbient = false) {
+                        this.x = x;
+                        this.y = y;
+                        this.isAmbient = isAmbient;
+                        this.size = Math.random() * (isAmbient ? 2 : 4) + 1;
+                        this.speedY = Math.random() * (isAmbient ? 1.5 : 3) + (isAmbient ? 0.5 : 2); // Move up
+                        this.speedX = (Math.random() - 0.5) * (isAmbient ? 1 : 2); // Drift
+                        this.color = Math.random() > 0.5 ? '#f97316' : '#ef4444'; // Orange or Red
+                        this.opacity = isAmbient ? (Math.random() * 0.5 + 0.1) : 1;
+                        this.decay = Math.random() * 0.02 + 0.01;
+                    }
+                    update() {
+                        this.y -= this.speedY;
+                        this.x += this.speedX;
+                        this.opacity -= this.decay;
+                        this.size *= 0.95; // Shrink
+                    }
+                    draw() {
+                        ctx.globalAlpha = Math.max(0, this.opacity);
+                        ctx.fillStyle = this.color;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.globalAlpha = 1;
+                    }
+                }
 
-            // 2. Trigger Text Crack Effect
-            input.classList.add('cracking');
+                function spawnExplosion() {
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    for (let i = 0; i < 300; i++) {
+                        embers.push(new Ember(centerX + (Math.random() - 0.5) * 300, centerY + (Math.random() - 0.5) * 100));
+                    }
+                }
 
-            // 3. Trigger Particle Explosion
-            setTimeout(spawnExplosion, 500);
-            setTimeout(spawnExplosion, 800);
+                function spawnAmbientFire() {
+                    // Spawn random embers from bottom
+                    if (Math.random() < 0.3) { // Density control
+                        embers.push(new Ember(Math.random() * width, height + 10, true));
+                    }
+                }
 
-            // 4. Fade Out Stage
-            setTimeout(() => {
-                document.getElementById('writeStage').style.opacity = 0;
-            }, 1200);
+                function animateFire() {
+                    ctx.clearRect(0, 0, width, height);
 
-            // 5. Show Aftercare
-            setTimeout(() => {
-                document.getElementById('writeStage').style.display = 'none';
-                input.value = "";
-                document.getElementById('afterStage').classList.add('visible');
-                // document.getElementById('topBar').style.opacity = 1;
-            }, 2500);
-        }
+                    // Add subtle glow at bottom
+                    const gradient = ctx.createLinearGradient(0, height, 0, height - 200);
+                    gradient.addColorStop(0, 'rgba(239, 68, 68, 0.1)');
+                    gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, height - 200, width, 200);
 
-        // --- SIT QUIETLY ---
-        function sitQuietly() {
-            document.getElementById('afterStage').style.opacity = 0;
-            setTimeout(() => {
-                document.getElementById('afterStage').style.display = 'none';
-            }, 1000);
-        }
+                    spawnAmbientFire();
 
-        // --- AMBIENT PARTICLES (Standard - Reduced for clarity with fire) ---
-        // Removed standard particles to focus on fire
-    </script>
+                    for (let i = 0; i < embers.length; i++) {
+                        embers[i].update();
+                        embers[i].draw();
+                        if (embers[i].opacity <= 0) {
+                            embers.splice(i, 1);
+                            i--;
+                        }
+                    }
+                    requestAnimationFrame(animateFire);
+                }
+                animateFire();
+
+                // --- BURN LOGIC ---
+                function burnIt() {
+                    const inputVal = input.value;
+                    if (!inputVal.trim()) return;
+
+                    // 0. Save to Backend (Fire & Forget)
+                    if (window.SoulBackend && window.SoulBackend.submitVent) {
+                        window.SoulBackend.submitVent(inputVal, 'burn');
+                    }
+
+                    // 1. Lock UI
+                    input.setAttribute('readonly', true);
+                    document.getElementById('burnBtn').style.display = 'none';
+                    // document.getElementById('topBar').style.opacity = 0; // Removed as ID doesn't exist
+
+                    // 2. Trigger Text Crack Effect
+                    input.classList.add('cracking');
+
+                    // 3. Trigger Particle Explosion
+                    setTimeout(spawnExplosion, 500);
+                    setTimeout(spawnExplosion, 800);
+
+                    // 4. Fade Out Stage
+                    setTimeout(() => {
+                        document.getElementById('writeStage').style.opacity = 0;
+                    }, 1200);
+
+                    // 5. Show Aftercare
+                    setTimeout(() => {
+                        document.getElementById('writeStage').style.display = 'none';
+                        input.value = "";
+                        document.getElementById('afterStage').classList.add('visible');
+                        // document.getElementById('topBar').style.opacity = 1;
+                    }, 2500);
+                }
+
+                // --- SIT QUIETLY ---
+                function sitQuietly() {
+                    document.getElementById('afterStage').style.opacity = 0;
+                    setTimeout(() => {
+                        document.getElementById('afterStage').style.display = 'none';
+                    }, 1000);
+                }
+
+                // --- AMBIENT PARTICLES (Standard - Reduced for clarity with fire) ---
+                // Removed standard particles to focus on fire
+            </script>
 
 
-    <footer style="width: 100%;"></footer>
+            <footer style="width: 100%;"></footer>
+        </main>
+    </div> <!-- End app-shell -->
 
 
     <script src="../assets/js/components.js" data-header-color="#0b0d12"></script>
