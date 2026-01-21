@@ -12,7 +12,7 @@ export async function createOrUpdateUserProfile(user) {
     try {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
-        
+
         const profileData = {
             uid: user.uid,
             displayName: user.displayName || '',
@@ -33,7 +33,9 @@ export async function createOrUpdateUserProfile(user) {
                 theme: 'dark'
             }
         };
-        
+
+        let isNewUser = false;
+
         if (userSnap.exists()) {
             // Update existing profile
             await updateDoc(userRef, {
@@ -46,10 +48,11 @@ export async function createOrUpdateUserProfile(user) {
         } else {
             // Create new profile
             await setDoc(userRef, profileData);
-            console.log('User profile created:', user.uid);
+            console.log('User profile created (First Time):', user.uid);
+            isNewUser = true;
         }
-        
-        return true;
+
+        return { success: true, isNewUser };
     } catch (error) {
         console.error('Error creating/updating user profile:', error);
         return false;
@@ -63,7 +66,7 @@ export async function getUserProfile(uid) {
     try {
         const userRef = doc(db, "users", uid);
         const userSnap = await getDoc(userRef);
-        
+
         if (userSnap.exists()) {
             return userSnap.data();
         } else {

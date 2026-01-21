@@ -641,6 +641,7 @@
     <script type="module">
         import { loginWithGoogle, loginWithEmail } from "../assets/js/auth-service.js";
         import { handleRoleRouting } from "../assets/js/auth-context.js";
+        import { createOrUpdateUserProfile } from "../assets/js/profile-handler.js"; // New Import
         import { GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         // --- PHASE 4: Deep Link Preservation ---
@@ -710,7 +711,11 @@
                     const result = await loginWithGoogle();
 
                     if (result.success) {
-                        await handleRoleRouting(result.user, intent);
+                        // Check profile status
+                        const profileResult = await createOrUpdateUserProfile(result.user);
+                        const isNewUser = profileResult && profileResult.isNewUser;
+
+                        await handleRoleRouting(result.user, intent, isNewUser);
                     } else {
                         throw new Error(result.error);
                     }
