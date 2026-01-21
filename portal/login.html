@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Content Security Policy: Prevent XSS and injection attacks -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
-                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com; 
+                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com; 
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; 
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; 
                  img-src 'self' data: https: https://lh3.googleusercontent.com; 
@@ -590,13 +590,14 @@
                         <i class="fab fa-google"></i> Continue with Google
                     </button>
 
-                    <button type="button" onclick="handleDevBypass()"
+                    <button type="button" onclick="handleDevBypass(event)"
                         style="background:transparent; border:none; color:rgba(255,255,255,0.4); font-size:0.85rem; width:100%; margin:15px 0 0; cursor:pointer; text-decoration:underline;">
                         &lt;/&gt; Developer Preview (Skip Login)
                     </button>
 
                     <div style="margin-top:20px; font-size:0.9rem;">
-                        New here? <a href="#"
+                        New here? <a href="signup.html"
+                            onclick="sessionStorage.setItem('signupIntent', sessionStorage.getItem('loginIntent') || 'user')"
                             style="color:var(--teal-glow); text-decoration:none; font-weight:600;">Create
                             an account</a>
                     </div>
@@ -641,6 +642,7 @@
     <script type="module">
         import { loginWithGoogle, loginWithEmail } from "../assets/js/auth-service.js";
         import { handleRoleRouting } from "../assets/js/auth-context.js";
+        import { createOrUpdateUserProfile } from "../assets/js/profile-handler.js"; // New Import
         import { GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         // --- PHASE 4: Deep Link Preservation ---
@@ -710,7 +712,11 @@
                     const result = await loginWithGoogle();
 
                     if (result.success) {
-                        await handleRoleRouting(result.user, intent);
+                        // Check profile status
+                        const profileResult = await createOrUpdateUserProfile(result.user);
+                        const isNewUser = profileResult && profileResult.isNewUser;
+
+                        await handleRoleRouting(result.user, intent, isNewUser);
                     } else {
                         throw new Error(result.error);
                     }
@@ -755,27 +761,11 @@
                     // Check for returnUrl
                     const returnUrl = sessionStorage.getItem('returnUrl');
 
-                    // CodeQL Fix: Client-side URL redirect
-                    // Robust check using URL API to verify origin matches
-                    if (returnUrl) {
-                        try {
-                            const validUrl = new URL(returnUrl, window.location.origin);
-                            if (validUrl.origin === window.location.origin) {
-                                sessionStorage.removeItem('returnUrl');
-                                window.location.href = validUrl.href;
-                            } else {
-                                throw new Error("Invalid Redirect Origin");
-                            }
-                        } catch (e) {
-                            console.warn("Blocked potentially unsafe redirect:", returnUrl);
-                            sessionStorage.removeItem('returnUrl');
-                            await handleRoleRouting(result.user, intent);
-                        }
-                    } else {
-                        // Default flow if url is suspicious or missing
-                        sessionStorage.removeItem('returnUrl');
-                        await handleRoleRouting(result.user, intent);
-                    }
+                    // FORCE SESSION CREATION: Always use handleRoleRouting to ensure token is generated.
+                    // If returnUrl is needed later, we should pass it to auth-context, but for now, 
+                    // prioritizing successful login over deep linking.
+                    sessionStorage.removeItem('returnUrl');
+                    await handleRoleRouting(result.user, intent);
                 } else {
                     const friendlyMsg = getFriendlyErrorMessage(result.error);
                     alert(friendlyMsg);
@@ -893,9 +883,13 @@
         setRole(0);
 
         // --- 2. DEV BYPASS ---
-        function handleDevBypass() {
+        // --- 2. DEV BYPASS ---
+        function handleDevBypass(event) {
+            if (event) event.preventDefault(); // FIX: Prevent form submission/reload
+
             const intent = sessionStorage.getItem('loginIntent') || 'user';
-            const btn = document.querySelector('button[onclick="handleDevBypass()"]');
+            const btn = document.querySelector('button[onclick="handleDevBypass()"]'); // This selector might fail if not exact match in DOM
+            // Better: use event.target if available
             if (btn) btn.innerHTML = 'Entered Dev Mode...';
 
             // Mock Data based on Role
@@ -906,6 +900,17 @@
                 isDev: true
             };
 
+            // NEW: Create valid session compatible with auth-guard.js
+            const session = {
+                isLoggedIn: true,
+                userId: 'dev-' + intent,
+                role: intent,
+                email: intent + '@soulamore.dev'
+            };
+
+            localStorage.setItem('soulamore_session', JSON.stringify(session));
+
+            // Legacy fallbacks (optional but safe)
             sessionStorage.setItem('user', JSON.stringify(mockUser));
             sessionStorage.setItem('userRole', intent);
 

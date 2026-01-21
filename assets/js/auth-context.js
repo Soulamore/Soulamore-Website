@@ -6,7 +6,7 @@
 
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-export async function handleRoleRouting(user, intent) {
+export async function handleRoleRouting(user, intent, isNewUser = false) {
     // Role routing after successful authentication
 
     // --- NEW: Persistent Session Logic (Admin Request Jan 18) ---
@@ -39,6 +39,22 @@ export async function handleRoleRouting(user, intent) {
         console.log(`✅ Session Created for [${role}]. Redirecting to ${finalPath}...`);
         window.location.href = finalPath;
     };
+
+    // 0. NEW USER ONBOARDING (First time login)
+    if (isNewUser && intent === 'user') {
+        const confirmMsg = "Welcome to Soulamore! Would you like to complete your profile now?";
+        if (confirm(confirmMsg)) {
+            // Redirect to Profile for completion
+            // Assuming profile.html handles it, or pass a query param ?mode=edit
+            // Using same path logic as finalizeSession but different target
+            let profilePath = 'portal/user-dashboard.html?showProfile=true'; // Sending to dashboard but triggering profile view
+            if (window.location.pathname.includes('/portal/')) {
+                profilePath = 'user-dashboard.html?showProfile=true';
+            }
+            finalizeSession('user', profilePath);
+            return;
+        }
+    }
 
     // 1. ADMIN (Simple Check for MVP)
     if (intent === 'admin') {
