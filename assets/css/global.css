@@ -33,15 +33,20 @@
 }
 
 /* HEADER ZONE */
+/* HEADER ZONE */
 #shell-fixed {
-    position: sticky;
+    position: fixed;
     top: 20px;
-    /* True floats-off-top gap */
-    z-index: 100;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    z-index: 1000;
     display: flex;
     justify-content: center;
     pointer-events: none;
-    /* Let clicks pass through empty areas */
+    /* Container is pass-through */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 #shell-fixed header {
@@ -54,8 +59,10 @@
 }
 
 /* Force specific styling for the header when inside shell to ensure it matches index */
+/* Force specific styling for the header - supports both shell and body injection */
+.island-nav,
 #shell-fixed .island-nav {
-    /* Visuals Only - Positioning handled by #shell-fixed parent */
+    /* Visuals Only */
     border-radius: 50px;
     background: rgba(15, 23, 42, 0.85);
     backdrop-filter: blur(12px);
@@ -65,17 +72,29 @@
     /* Ensure it doesn't overflow */
     box-sizing: border-box;
 
+    /* Positioning for Body-Direct Header */
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92%;
+    max-width: 1600px;
+    z-index: 9999;
+
     /* CALM BREATHE EFFECT REMOVED FOR VISIBILITY FIX */
     /* animation: calmBreathe 6s infinite ease-in-out; */
     transition: all 0.5s ease;
 }
 
 /* HOVER: THE EMBRACE (Steady Warmth) */
+/* HOVER: THE EMBRACE (Steady Warmth) */
+.island-nav:hover,
 #shell-fixed .island-nav:hover {
     border-color: rgba(244, 159, 117, 0.4);
     /* Peach Glow */
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(244, 159, 117, 0.15);
-    transform: translateY(-2px);
+    transform: translateX(-50%) translateY(-2px);
+    /* Maintain Center */
     /* Slight lift */
 }
 
@@ -154,7 +173,7 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    /* GLOBAL SCROLL KILLER */
+    /* RESTORED: Essential for background animations */
     width: 100%;
     position: relative;
     font-family: var(--font-body);
@@ -414,7 +433,8 @@ header.island-nav {
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
-    padding: 0 !important;
+    padding: 0 40px !important;
+    /* FIX: Prevent edge touching on desktop */
     position: relative;
     /* REQUIRED for absolute centering of children */
 }
@@ -1862,5 +1882,29 @@ body[data-page="problem-wall"] header.island-nav {
 
     to {
         transform: translateY(-10vh);
+    }
+}
+
+/* --- LAYOUT CONTRACT: MOBILE SAFE AREA --- */
+@media (max-width: 1024px) {
+
+    /* FIX: Extended to include Tablets */
+    body {
+        padding-bottom: 90px !important;
+        /* Reserve space for fixed bottom bar */
+    }
+}
+
+/* --- ADDED: Responsive Grids for Index --- */
+.compass-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+    .compass-grid {
+        grid-template-columns: 1fr !important;
     }
 }
