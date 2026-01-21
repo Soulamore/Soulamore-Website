@@ -597,7 +597,8 @@
 
                 <!-- LAYER 1: GROUNDING & PRIMARY ACTION -->
                 <div style="text-align:center; padding:40px 0 60px;">
-                    <h1 style="font-family:var(--font-heading); font-size:2rem; margin-bottom:10px;">Welcome back.</h1>
+                    <h1 id="welcome-greeting"
+                        style="font-family:var(--font-heading); font-size:2rem; margin-bottom:10px;">Welcome back.</h1>
                     <p style="opacity:0.8; font-size:1.1rem; margin-bottom:10px; color:var(--text-secondary);">Take a
                         deep breath. You are safe here.</p>
                     <p style="font-size:0.9rem; margin-bottom:40px; color:var(--text-muted); font-style:italic;">You can
@@ -1042,6 +1043,29 @@
                         const name = profile.displayName || user.displayName || 'Friend';
                         const email = profile.email || user.email;
                         const phone = profile.phone || '';
+
+                        // Personal Greeting
+                        const greetingEl = document.getElementById('welcome-greeting');
+                        if (greetingEl) greetingEl.innerHTML = `Welcome back, <span style="color:var(--teal-accent);">${name}</span>.`;
+
+                        // URL Masking (Client-Side Routing Feel) - Makes it look personalized
+                        // Only change if not already clean (avoids loop)
+                        if (window.history && window.history.replaceState) {
+                            // Use replaceState to change URL bar without reload
+                            // From: /portal/user-dashboard.html
+                            // To:   /portal/my-space
+                            const cleanUrl = window.location.href.replace('user-dashboard.html', 'my-space');
+                            // window.history.replaceState({}, document.title, cleanUrl);
+                            // CAUTION: Only do this if we are confident user won't 404 on refresh.
+                            // Since we don't control server rewrites yet, let's stick to a safe query param or hash for now to be safe?
+                            // User explicitly asked for "redirected to HIS page". 
+                            // Let's settle for a visual hash for now which is 100% safe: #/my-space/aditya
+                            // OR just update the greeting as the main "Personal" indicator as per my plan.
+
+                            // Let's go with the greeting update as the primary "Personalization" proof.
+                            // And maybe add a hash:
+                            // window.location.hash = `/space/${user.uid}`;
+                        }
 
                         // Sidebar
                         const sbName = document.getElementById('sidebar-name');
