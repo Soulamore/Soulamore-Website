@@ -14,57 +14,354 @@
     <link rel="stylesheet" href="../assets/css/global.css">
     <link rel="stylesheet" href="../assets/css/dashboard-sidebar.css">
     <style>
-        /* --- VISUAL ENHANCEMENTS (Glows & Depth) --- */
-        .dash-card.active-glow {
-            border: 1px solid rgba(78, 205, 196, 0.3);
-            box-shadow: none;
-            background: rgba(78, 205, 196, 0.02);
+        /* --- DASHBOARD V3 RETRO-FIT --- */
+        :root {
+            /* Palette from Screenshots */
+            --bg-deep: #0f172a;
+            /* Main Background */
+            --bg-card: #1e293b;
+            /* Card Background */
+            --bg-sidebar: #0f172a;
+            /* Sidebar matches body */
+            --teal-accent: #2dd4bf;
+            /* The "SoulBot" Teal */
+            --teal-dim: rgba(45, 212, 191, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --font-head: 'Outfit', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
         }
 
-        .dash-card.peach-glow {
-            border: 1px solid rgba(244, 159, 117, 0.3);
-            box-shadow: none;
-            background: rgba(244, 159, 117, 0.02);
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            /* Prevent horizontal scroll */
         }
 
-        .tool-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--starlight);
-            padding: 15px;
+        /* --- LAYOUT --- */
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- SIDEBAR (Updated to match image) --- */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+
+        .user-avatar-lg {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .user-info-text .name {
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 1rem;
+            line-height: 1.2;
+        }
+
+        .user-info-text .role {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+
+        .side-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
             border-radius: 12px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .side-link i {
+            width: 20px;
             text-align: center;
+        }
+
+        .side-link:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .side-link.active {
+            background: rgba(45, 212, 191, 0.15);
+            /* Teal Tint */
+            color: var(--teal-accent);
+            font-weight: 600;
+            position: relative;
+        }
+
+        /* Active Indicator Line (Optional, simplified to pill for now) */
+
+        .logout-section {
+            padding-top: 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        main {
+            flex: 1;
+            margin-left: 260px;
+            /* Sidebar Width */
+            padding: 40px 60px;
+            max-width: 1400px;
+            /* No Center constraint, let grid handle it */
+        }
+
+        /* --- CARDS & PANELS --- */
+        .dash-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            /* Matches screenshot roundedness */
+            padding: 30px;
+            margin-bottom: 25px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .dash-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- TYPOGRAPHY UPDATES --- */
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: var(--font-head);
+            color: var(--text-main);
+        }
+
+        /* --- BUTTONS (The TEAL!) --- */
+        .btn-dash-primary {
+            background: var(--teal-accent);
+            color: #0f172a;
+            /* Dark Text on Teal */
+            font-weight: 700;
+            font-family: var(--font-head);
+            padding: 14px 32px;
+            border-radius: 50px;
+            /* Pill Shape */
+            border: none;
             cursor: pointer;
-            transition: 0.3s;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
+            text-transform: none;
+        }
+
+        .btn-dash-primary:hover {
+            background: #20b2aa;
+            /* Slightly darker teal */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 212, 191, 0.4);
+        }
+
+        .btn-dash-secondary {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font-body);
+        }
+
+        .btn-dash-secondary:hover {
+            border-color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- SPECIFIC VIEWS (Home Hero) --- */
+        #view-home h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* SoulBot Hero Card specific overrides to match image */
+        .soulbot-hero {
+            text-align: center;
+            padding: 60px 40px !important;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
         }
 
-        .tool-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            border-color: rgba(255, 255, 255, 0.3);
+        .soulbot-hero i {
+            font-size: 4rem !important;
+            color: var(--teal-accent) !important;
+            margin-bottom: 25px !important;
+            filter: drop-shadow(0 0 15px rgba(45, 212, 191, 0.4));
         }
 
-        /* MOBILE OPTIMIZATIONS */
-        @media (max-width: 900px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr !important;
+        /* --- CHAT BUBBLES --- */
+        .chat-bubble {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .chat-bubble.bot {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-bubble.user {
+            background: var(--teal-accent);
+            color: #0f172a;
+            align-self: flex-end;
+            /* Needs flex col parent */
+            border-bottom-right-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                /* Hidden by default */
             }
 
-            .dash-card {
-                padding: 20px !important;
+            .sidebar.open {
+                transform: translateX(0);
             }
 
-            /* Table Scroll */
-            .dash-card table {
+            main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .mobile-toggle {
                 display: block;
-                overflow-x: auto;
-                white-space: nowrap;
+                /* Ensure visible */
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                background: var(--bg-card);
+                border: 1px solid var(--border-subtle);
+                color: var(--text-main);
+                padding: 10px;
+                border-radius: 8px;
             }
+        }
+
+        /* --- FINAL POLISH (Footer & Inputs) --- */
+        .sidebar-footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 20px;
+        }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            /* Red for logout */
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Settings Pills */
+        .theme-btn,
+        .theme-tag {
+            background: var(--bg-deep);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .theme-btn.active,
+        .theme-tag.active {
+            background: var(--teal-accent);
+            color: #0f172a;
+            border-color: var(--teal-accent);
+            font-weight: 700;
+        }
+
+        /* Form Inputs */
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        textarea {
+            background: var(--bg-deep) !important;
+            border: 1px solid var(--border-subtle) !important;
+            color: var(--text-main) !important;
+            border-radius: 12px !important;
+            padding: 12px 15px !important;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--teal-accent) !important;
         }
     </style>
 </head>
@@ -307,16 +604,11 @@
                         move at your own pace.</p>
 
                     <!-- Primary Anchor: SoulBot -->
-                    <div
-                        style="max-width:600px; margin:0 auto; background: var(--bg-surface); border:1px solid var(--border-soft); border-radius:24px; padding:40px; text-align:center; box-shadow:var(--shadow-soft);">
-                        <i class="fas fa-robot"
-                            style="font-size:3rem; color:var(--accent-primary); margin-bottom:20px; opacity:0.9;"></i>
-                        <h2 style="font-family:var(--font-heading); font-size:1.5rem; margin-bottom:10px;">SoulBot is
-                            here with
-                            you.</h2>
-                        <p style="opacity:0.8; margin-bottom:30px; color:var(--text-secondary);">Start where you are.
-                            We'll figure out the rest
-                            together.</p>
+                    <div class="dash-card soulbot-hero">
+                        <i class="fas fa-robot"></i>
+                        <h2 style="font-size:1.5rem; margin-bottom:10px;">SoulBot is here with you.</h2>
+                        <p style="opacity:0.8; margin-bottom:30px; color:var(--text-muted); max-width: 400px;">Start
+                            where you are. We'll figure out the rest together.</p>
                         <button onclick="switchView('soulbot', null)" class="btn-dash-primary">
                             Continue with SoulBot
                         </button>
@@ -324,12 +616,13 @@
                 </div>
 
                 <!-- LAYER 2: REFLECTION (Secondary) -->
-                <div style="max-width:600px; margin:0 auto 40px;">
+                <div style="max-width:700px; margin:0 auto 40px;">
                     <div class="dash-card link-hover"
-                        style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); padding: 25px; cursor:default;">
+                        style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <h3 style="font-size:1.1rem; margin-bottom:5px;">Your Journal</h3>
-                            <p style="font-size:0.9rem; opacity:0.6;">Write or continue your reflection.</p>
+                            <h3 style="font-size:1.2rem; margin-bottom:5px;">Your Journal</h3>
+                            <p style="font-size:0.95rem; opacity:0.6; color:var(--text-muted);">Write or continue your
+                                reflection.</p>
                         </div>
                         <button onclick="switchView('journal', null)" class="btn-dash-secondary">
                             Open Journal
@@ -347,9 +640,9 @@
                         <!-- Peer -->
                         <div class="dash-card link-hover card-peer"
                             onclick="window.location.href='../our-peers/about.html'"
-                            style="text-align:center; padding:25px; background:rgba(244, 159, 117, 0.05); border-color:rgba(244, 159, 117, 0.1); cursor:pointer;">
+                            style="text-align:center; cursor:pointer; display:flex; flex-direction:column; align-items:center;">
                             <i class="fas fa-hands-helping"
-                                style="font-size:1.5rem; color:var(--peach-glow); margin-bottom:15px;"></i>
+                                style="font-size:2rem; color:var(--peach-glow); margin-bottom:15px;"></i>
                             <h4 style="margin-bottom:5px;">Talk to a Peer</h4>
                             <p style="font-size:0.8rem; opacity:0.6;">Someone who gets it.</p>
                         </div>
@@ -357,9 +650,9 @@
                         <!-- Pro -->
                         <div class="dash-card link-hover card-pro"
                             onclick="window.location.href='../our-psychologists/about.html'"
-                            style="text-align:center; padding:25px; background:rgba(78, 205, 196, 0.05); border-color:rgba(78, 205, 196, 0.1); cursor:pointer;">
+                            style="text-align:center; cursor:pointer; display:flex; flex-direction:column; align-items:center;">
                             <i class="fas fa-user-md"
-                                style="font-size:1.5rem; color:var(--teal-glow); margin-bottom:15px;"></i>
+                                style="font-size:2rem; color:var(--teal-accent); margin-bottom:15px;"></i>
                             <h4 style="margin-bottom:5px;">Professional Help</h4>
                             <p style="font-size:0.8rem; opacity:0.6;">Guidance & Therapy.</p>
                         </div>
