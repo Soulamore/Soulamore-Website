@@ -1301,7 +1301,7 @@ function injectMobileBottomNav() {
             <span>Chat</span>
         </a>
         <a href="${pathPrefix}get-help-now.html" class="nav-item ${location.pathname.includes('get-help-now') ? 'active' : ''}">
-            <i class="fas fa-phone-alt"></i>
+            <i class="fas fa-heart-pulse"></i>
             <span>Crisis</span>
         </a>
         <div class="nav-item" onclick="toggleMobileMenu()">
