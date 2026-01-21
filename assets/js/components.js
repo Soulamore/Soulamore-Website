@@ -322,10 +322,17 @@ try {
                 left: -40px !important; /* WIDER BRIDGE back to parent */
                 width: 60px !important; /* Fill gap + overlap parent significantly */
                 height: 140% !important; /* Taller catch area bottom */
-                background: rgba(0,0,0,0.001) !important; /* Force hit-test */
+                background: rgba(0,0,0,0.001) !important; /* Ensure Toggle is ALWAYS on top */
                 z-index: 1001 !important;
             }
-
+.mobile-toggle {
+    z-index: 2147483647 !important; /* NUCLEAR Z-INDEX */
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    /* Above nuclear menu */
+    /* Must be above the menu (2050) */
+    /* Highest priority */
+}
             /* Level 3: Deep Nested */
             .dropdown-content .dropdown-content .dropdown-content {
                 left: 100% !important;
@@ -1232,7 +1239,11 @@ document.addEventListener("DOMContentLoaded", () => {
     try { setActiveState(); } catch (e) { console.warn("Active State Error:", e); }
 
     // 3. Initialize Interactions
+    // 3. Initialize Interactions
     try { initializeHeaderLogic(); } catch (e) { console.warn("Header Logic Error:", e); }
+
+    // 4. Inject Bottom Nav (Global)
+    try { injectMobileBottomNav(); } catch (e) { console.warn("Bottom Nav Error:", e); }
 
     console.log("Soulamore: Initialization Complete.");
 });
