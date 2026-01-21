@@ -96,8 +96,8 @@
                     <i class="fas fa-user-astronaut"></i>
                 </div>
                 <div class="user-info-text">
-                    <div class="name">My Space</div>
-                    <div class="role">Free Member</div>
+                    <div class="name" id="sidebar-name">Loading...</div>
+                    <div class="role" id="sidebar-role">Member</div>
                 </div>
             </div>
 
@@ -184,13 +184,13 @@
                             <div>
                                 <label style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:8px;">Full
                                     Name</label>
-                                <input type="text" value="Aditya Harsh"
+                                <input type="text" id="profile-name" value="Loading..."
                                     style="width:100%; padding:12px; background:var(--bg-primary); border:1px solid var(--border-soft); border-radius:10px; color:var(--text-primary); outline:none;">
                             </div>
                             <div>
                                 <label style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:8px;">Phone
                                     Number</label>
-                                <input type="tel" value="+1 (555) 000-0000"
+                                <input type="tel" id="profile-phone" value="" placeholder="Add phone number"
                                     style="width:100%; padding:12px; background:var(--bg-primary); border:1px solid var(--border-soft); border-radius:10px; color:var(--text-primary); outline:none;">
                             </div>
                         </div>
@@ -202,9 +202,9 @@
                             <div
                                 style="display:flex; align-items:center; gap:10px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-soft); border-radius:10px;">
                                 <i class="fab fa-google" style="color:var(--text-secondary);"></i>
-                                <span
-                                    style="flex:1; color:var(--text-secondary); opacity:0.8;">aditya.harsh@example.com</span>
-                                <span
+                                <span id="profile-email"
+                                    style="flex:1; color:var(--text-secondary); opacity:0.8;">loading...</span>
+                                <span id="profile-verified"
                                     style="font-size:0.8rem; padding:2px 8px; background:var(--bg-elevated); border-radius:4px; opacity:0.6;">Verified</span>
                             </div>
                         </div>
@@ -724,6 +724,55 @@
 
         // Start
         initSoulBotChat();
+    </script>
+
+    <!-- DASHBOARD HYDRATION SCRIPT -->
+    <script type="module">
+        import { onAuthChange } from "../assets/js/auth-service.js";
+        import { getUserProfile, createOrUpdateUserProfile } from "../assets/js/profile-handler.js";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            onAuthChange(async (user) => {
+                if (user) {
+                    // 1. Get Profile
+                    let profile = await getUserProfile(user.uid);
+
+                    // 2. If no profile, try to create one (recovery)
+                    if (!profile) {
+                        console.info("Profile missing in dashboard, attempting recovery...");
+                        await createOrUpdateUserProfile(user);
+                        profile = await getUserProfile(user.uid);
+                    }
+
+                    if (profile) {
+                        // 3. Update UI
+                        const name = profile.displayName || user.displayName || 'Friend';
+                        const email = profile.email || user.email;
+                        const phone = profile.phone || '';
+
+                        // Sidebar
+                        const sbName = document.getElementById('sidebar-name');
+                        if (sbName) sbName.innerText = name;
+
+                        const sbRole = document.getElementById('sidebar-role');
+                        if (sbRole) sbRole.innerText = (profile.role || 'Member');
+
+                        // Settings inputs
+                        const inName = document.getElementById('profile-name');
+                        if (inName) inName.value = name;
+
+                        const inPhone = document.getElementById('profile-phone');
+                        if (inPhone) inPhone.value = phone;
+
+                        const elEmail = document.getElementById('profile-email');
+                        if (elEmail) elEmail.innerText = email;
+
+                    }
+                } else {
+                    console.log("No user found in dashboard.");
+                }
+            });
+        });
     </script>
 </body>
 

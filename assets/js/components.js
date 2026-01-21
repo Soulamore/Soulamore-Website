@@ -1304,10 +1304,10 @@ function injectMobileBottomNav() {
             <i class="fas fa-heart-pulse" style="color:#ef4444;"></i>
             <span>Crisis</span>
         </a>
-        <div class="nav-item" id="mobile-menu-trigger">
+        <button class="nav-item" id="mobile-menu-trigger" type="button">
             <i class="fas fa-bars"></i>
             <span>Menu</span>
-        </div>
+        </button>
     `;
 
     // 4. Create and Append Container
@@ -1381,6 +1381,12 @@ function injectMobileBottomNav() {
             gap: 4px;
             transition: all 0.2s;
             cursor: pointer;
+            /* Button Reset */
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            font-family: inherit;
         }
 
         .nav-item i {
