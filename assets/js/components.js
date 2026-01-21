@@ -986,6 +986,11 @@ function initializeHeaderLogic() {
             }
         });
 
+        // GLOBAL HELPER for Bottom Nav
+        window.toggleMobileMenu = function () {
+            newBtn.click();
+        };
+
         // Close on Link Click (except dropdowns)
         navLinks.querySelectorAll('a').forEach(link => {
             // If it has a next sibling that is a dropdown-content, it's a toggle, not a direct link
@@ -1224,7 +1229,120 @@ function injectSoulBotWidget() {
     }
 }
 
-// --- GLOBAL INIT ---
+// --- MOBILE BOTTOM NAVIGATION INJECTOR ---
+function injectMobileBottomNav() {
+    // 1. Check if already exists
+    if (document.querySelector('.mobile-bottom-nav')) return;
+
+    // 2. Determine Depth for Links
+    // Logic: Count how many levels deep we are from root (assuming index.html is at root)
+    // Heuristic: If we are in 'spaces/campus/index.html', back 2 levels.
+    // However, robust way is to use root-relative paths if hosted at domain root, 
+    // BUT user is likely opening files or using preview.
+    // Let's use the same logic as header 'getRootPath()' if available, or derive it.
+
+    let pathPrefix = './';
+    const depth = (location.pathname.match(/\//g) || []).length;
+    // Base depth adjustment - this depends on where 'components.js' is relative to the page. 
+    // Actually, simpler: check if getRootPath is defined (it is used in header).
+
+    if (typeof getRootPath === 'function') {
+        pathPrefix = getRootPath();
+    } else {
+        // Fallback: Crude depth calculation
+        // Assuming components.js is in assets/js, so 1 level up from assets is root.
+        // If we are at root/index.html, prefix is ./
+        // If we in root/spaces/campus/index.html, prefix is ../../
+    }
+
+    // 3. Create Navigation HTML
+    const navHTML = `
+        <a href="${pathPrefix}index.html" class="nav-item ${location.pathname.endsWith('index.html') && depth < 2 ? 'active' : ''}">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="${pathPrefix}tools/soulbot.html" class="nav-item ${location.pathname.includes('soulbot') ? 'active' : ''}">
+            <i class="fas fa-robot"></i>
+            <span>Chat</span>
+        </a>
+        <a href="${pathPrefix}get-help-now.html" class="nav-item ${location.pathname.includes('get-help-now') ? 'active' : ''}">
+            <i class="fas fa-phone-alt"></i>
+            <span>Crisis</span>
+        </a>
+        <div class="nav-item" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </div>
+    `;
+
+    // 4. Create and Append Container
+    const navContainer = document.createElement('div');
+    navContainer.className = 'mobile-bottom-nav';
+    navContainer.innerHTML = navHTML;
+
+    // Ensure it's not hidden by global styles if we need to override
+    navContainer.style.display = 'flex';
+    navContainer.style.zIndex = '999999'; // Nuclear Z-Index
+
+    document.body.appendChild(navContainer);
+
+    // 5. Inject Styles (Self-Contained for safety)
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 20px;
+            z-index: 2147483647; /* Nuclear */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-bottom-nav.hidden {
+            transform: translate(-50%, 150%);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            gap: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            color: #2dd4bf; /* Teal Glow */
+            transform: translateY(-2px);
+        }
+
+        /* HIDE ON DESKTOP */
+        @media (min-width: 1025px) {
+            .mobile-bottom-nav { display: none !important; }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     if (typeof injectHeader === 'function') injectHeader();
     // Guard Footer Injection: Do not inject on Auth pages (Viewport Scenes)
