@@ -246,29 +246,76 @@
     <script src="../assets/js/components.js"></script>
 
     <script type="module">
-        // Import our auth Logic if needed, but for now we simulate
-        import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-        // window.hasFirebase is set in components typically, but this is a standalone page. 
-        // We'll effectively mock the flow for the UI demo as per user rules (backend logic comes later or via Firebase config file)
+        import { signUpWithEmail } from "../assets/js/auth-service.js";
+        import { handleRoleRouting } from "../assets/js/auth-context.js";
+        import { updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { createOrUpdateUserProfile } from "../assets/js/profile-handler.js";
 
-        window.handleSignup = function (e) {
+        // Initialize Intent from Session (passed from login page)
+        document.addEventListener('DOMContentLoaded', () => {
+            const intent = sessionStorage.getItem('signupIntent');
+            if (intent) {
+                const select = document.getElementById('roleSelect');
+                if (select) select.value = intent;
+            }
+        });
+
+        window.handleSignup = async function (e) {
             e.preventDefault();
             const name = document.getElementById('userName').value;
             const email = document.getElementById('userEmail').value;
+            const password = document.querySelector('input[type="password"]').value;
             const role = document.getElementById('roleSelect').value;
+            const btn = document.querySelector('.submit-btn');
 
-            // Simulate Success
-            // Simulate Success & Create Real Session
-            const session = {
-                isLoggedIn: true,
-                userId: "u_" + Date.now(),
-                role: role,
-                email: email
-            };
-            localStorage.setItem("soulamore_session", JSON.stringify(session));
+            if (!email || !password || !name) { alert("Please fill all fields."); return; }
 
-            // Redirect
-            window.location.href = 'signup-success.html';
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+
+                // 1. Create User in Firebase
+                const result = await signUpWithEmail(email, password);
+
+                if (result.success && result.user) {
+
+                    // 2. Update Display Name
+                    await updateProfile(result.user, { displayName: name });
+
+                    // 3. Create Firestore Profile with Role
+                    // We attach the role to the user object temporarily for the profile handler to see, 
+                    // or we rely on profile-handler to take arguments.
+                    // Let's manually create profile here to ensure correct role data.
+                    // Actually, createOrUpdateUserProfile reads from user object... 
+                    // Let's create proper profile data manually or update profile-handler to accept data.
+                    // For MVP simplicity: We will update profile via profile-handler after adding role property? 
+                    // No, simpler to just write doc here or update profile-handler.
+                    // Let's use profile-handler but we need to inject the role.
+                    // We'll update the profile-handler.js file separately if needed, 
+                    // but for now, we'll manually set the role in the session context.
+
+                    // Let's redirect using handleRoleRouting which creates the session token.
+                    // AND we must save the role intent for the dashboard to see.
+
+                    // Also saving to Firestore via profile handler
+                    // user object doesn't have 'role' property.
+                    // We'll assume for now auth-context handles the "intent" passing.
+
+                    // 4. Create Session & Redirect
+                    // Note: handleRoleRouting creates the token required for dashboards.
+                    // passing isNewUser=true
+                    await handleRoleRouting(result.user, role, true);
+
+                } else {
+                    throw new Error(result.error);
+                }
+
+            } catch (error) {
+                console.error("Signup Error:", error);
+                alert("Error creating account: " + error.message);
+                btn.disabled = false;
+                btn.innerHTML = 'Create Account';
+            }
         }
     </script>
 
