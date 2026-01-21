@@ -453,6 +453,22 @@
             opacity: 0.6;
         }
 
+        /* === DESKTOP AUTH SHELL (Vertically Centered) === */
+        #shell-content.auth-shell {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            align-items: center;
+            /* FIX: Center Vertically */
+            padding-top: 100px;
+            /* FIX: Clear Header */
+            padding-bottom: 40px;
+        }
+
         /* === MOBILE RESPONSIVE (Collapse to Single Column) === */
         @media (max-width: 900px) {
             body.auth {
@@ -882,19 +898,27 @@
             const btn = document.querySelector('button[onclick="handleDevBypass()"]');
             if (btn) btn.innerHTML = 'Entered Dev Mode...';
 
-            const layoutUser = {
-                uid: 'dev-preview', displayName: 'Developer Preview', email: 'dev@soulamore.com', isDev: true
+            // Mock Data based on Role
+            const mockUser = {
+                uid: 'dev-' + intent,
+                displayName: 'Dev ' + intent.charAt(0).toUpperCase() + intent.slice(1),
+                email: intent + '@soulamore.dev',
+                isDev: true
             };
-            sessionStorage.setItem('user', JSON.stringify(layoutUser));
+
+            sessionStorage.setItem('user', JSON.stringify(mockUser));
             sessionStorage.setItem('userRole', intent);
 
+            console.log(`Bypassing login as [${intent}]...`);
             setTimeout(() => { manualRedirect(intent); }, 500);
         }
 
         function manualRedirect(intent) {
             let target = 'user-dashboard.html';
             if (intent === 'peer') target = 'peer-dashboard.html';
-            if (intent === 'psychologist') target = 'psych-dashboard.html';
+            if (intent === 'psychologist' || intent === 'pro') target = 'psych-dashboard.html'; // Handle 'pro' alias
+
+            console.log(`Redirecting to: ${target}`);
             window.location.href = target;
         }
         window.manualRedirect = manualRedirect;

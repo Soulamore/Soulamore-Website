@@ -18,17 +18,30 @@ export async function handleRoleRouting(user, intent) {
     };
 
     // Helper to commit session and redirect
-    const finalizeSession = (role, dashboard) => {
+    const finalizeSession = (role, dashboardFile) => {
         session.role = role;
         localStorage.setItem("soulamore_session", JSON.stringify(session));
-        console.log(`✅ Session Created for [${role}]. Redirecting to ${dashboard}...`);
-        window.location.href = dashboard;
+
+        // FIX: Handle Relative Paths (Root vs Portal)
+        let finalPath = dashboardFile;
+        const isInPortal = window.location.pathname.includes('/portal/');
+
+        if (isInPortal) {
+            // If already in portal, remove 'portal/' prefix if present
+            finalPath = dashboardFile.replace('portal/', '');
+        } else {
+            // If at root, ensure 'portal/' prefix is present
+            if (!finalPath.startsWith('portal/')) {
+                finalPath = 'portal/' + finalPath;
+            }
+        }
+
+        console.log(`✅ Session Created for [${role}]. Redirecting to ${finalPath}...`);
+        window.location.href = finalPath;
     };
 
     // 1. ADMIN (Simple Check for MVP)
     if (intent === 'admin') {
-        // In a real app, verify admin claim here. For MVP, we trust the intent or check specific email
-        // const isAdmin = user.email.endsWith('@soulamore.com'); // Example constraint
         finalizeSession('admin', 'portal/admin-dashboard.html');
         return;
     }

@@ -1454,3 +1454,15 @@ function initSmartCounters() {
 
 // Auto-Run
 document.addEventListener('DOMContentLoaded', initSmartCounters);
+
+
+// --- GLOBAL EXPORTS ---
+// Fix: Expose toggleMobileMenu for bottom nav usage
+window.toggleMobileMenu = function() {
+    const toggle = document.querySelector('.mobile-toggle');
+    if (toggle) {
+        toggle.click(); // Trigger the header's hamburger
+    } else {
+        console.warn('Soulamore: Mobile toggle not found in header.');
+    }
+};
