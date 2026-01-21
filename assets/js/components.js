@@ -1231,8 +1231,12 @@ function injectSoulBotWidget() {
 
 // --- MOBILE BOTTOM NAVIGATION INJECTOR ---
 function injectMobileBottomNav() {
+    console.log("Attempting to Inject Mobile Bottom Nav...");
     // 1. Check if already exists
-    if (document.querySelector('.mobile-bottom-nav')) return;
+    if (document.querySelector('.mobile-bottom-nav')) {
+        console.log("Mobile Nav already exists.");
+        return;
+    }
 
     // 2. Determine Depth for Links
     // Logic: Count how many levels deep we are from root (assuming index.html is at root)
