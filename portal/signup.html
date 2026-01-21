@@ -45,12 +45,12 @@
             grid-template-columns: 1fr 1fr;
             gap: 40px;
             box-sizing: border-box;
-            padding-top: 150px;
-            /* FIX: Clear the 130px header + Extra Space */
-            padding-bottom: 60px;
-            /* Ensure footer space */
-            align-items: flex-start;
-            /* FIX: Prevent center alignment pushing content behind header */
+            /* FIX: Centering without overlap */
+            padding-top: 100px;
+            /* Just enough to clear header visual */
+            padding-bottom: 20px;
+            align-items: center;
+            /* RESTORE CENTER ALIGNMENT */
         }
 
         /* Left Context Section */
@@ -268,43 +268,31 @@
                             style="height: 60px; width: auto; margin: 0 auto 20px auto;">
                     </a>
                     <h2 style="font-family:'Outfit'; margin-bottom:5px;">Create Account</h2>
-                    <p style="opacity:0.7; margin-bottom:30px; font-size:0.95rem;">It only takes a moment.</p>
+                    <!-- ROLE SELECTOR REMOVED: Signup is user-only -->
+                    <!-- Compact Spacing -->
 
-                    <form onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" id="userName" placeholder="Your Name" required>
+                    </div>
 
-                        <!-- ROLE SELECTOR -->
-                        <div class="form-group">
-                            <label class="form-label">I am joining as a...</label>
-                            <select class="role-select" id="roleSelect">
-                                <option value="user">Student / Member</option>
-                                <option value="peer">Peer Listener (Apply)</option>
-                                <option value="psychologist">Psychologist (Apply)</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" id="userEmail" placeholder="you@university.edu" required>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" class="form-input" id="userName" placeholder="Your Name" required>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" placeholder="••••••••" required>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" class="form-input" id="userEmail" placeholder="you@university.edu"
-                                required>
-                        </div>
+                    <div
+                        style="text-align:left; font-size:0.85rem; opacity:0.8; margin-bottom:20px; display:flex; gap:10px; align-items:start;">
+                        <input type="checkbox" required style="margin-top:3px;">
+                        <span>I accept the Terms & Privacy Policy.</span>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-input" placeholder="••••••••" required>
-                        </div>
-
-                        <div
-                            style="text-align:left; font-size:0.85rem; opacity:0.8; margin-bottom:20px; display:flex; gap:10px; align-items:start;">
-                            <input type="checkbox" required style="margin-top:3px;">
-                            <span>I accept the Terms & Privacy Policy.</span>
-                        </div>
-
-                        <button type="submit" class="submit-btn">Create Account</button>
+                    <button type="submit" class="submit-btn">Create Account</button>
                     </form>
 
                     <div
@@ -342,7 +330,8 @@
             const name = document.getElementById('userName').value;
             const email = document.getElementById('userEmail').value;
             const password = document.querySelector('input[type="password"]').value;
-            const role = document.getElementById('roleSelect').value;
+            // FIXED: Role is always user for self-signup
+            const role = 'user';
             const btn = document.querySelector('.submit-btn');
 
             if (!email || !password || !name) { alert("Please fill all fields."); return; }
