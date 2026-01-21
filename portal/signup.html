@@ -11,52 +11,136 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/global.css">
+
     <style>
-        /* Specific Signup Styles Override */
-        /* Specific Signup Styles Override */
-        .signup-container {
-            flex: 1;
-            /* Automatically fill remaining shell space */
+        /* --- THEME FROM LOGIN.HTML --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+        }
+
+        body.auth {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 3. The Scene Grid */
+        #shell-content.auth-shell {
+            min-height: calc(100vh - 85px);
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            box-sizing: border-box;
+            padding-top: 10px;
+            align-items: center;
+        }
+
+        /* Left Context Section */
+        .auth-left {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px 40px;
-            /* Reduced top padding as shell provides 120px */
+            padding: 40px;
+            position: relative;
         }
 
+        /* Ambient Glow */
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140%;
+            height: 140%;
+            background: radial-gradient(circle closest-side, rgba(78, 205, 196, 0.15) 0%, transparent 100%);
+            filter: blur(40px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .auth-context {
+            max-width: 420px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .auth-context h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #fff 0%, #a5f3fc 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(78, 205, 196, 0.2));
+        }
+
+        .auth-context p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+
+        .auth-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .auth-features li {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 500;
+        }
+
+        .auth-features i {
+            color: var(--teal-glow);
+            width: 24px;
+        }
+
+        /* Right Login Section */
+        .auth-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Card Self-Containment */
         .login-card {
-            background: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 35px;
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
             border-radius: 24px;
             width: 100%;
-            max-width: 550px;
+            max-width: 450px;
+            /* SLightly wider for signup form */
             text-align: center;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px);
             position: relative;
-            z-index: 10;
+            z-index: 5;
             animation: fadeIn 0.8s ease-out;
-            margin: 20px;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .logo-img {
-            height: 50px;
-            width: auto;
-            display: block;
-            margin: 0 auto 20px auto;
         }
 
         .form-group {
@@ -76,8 +160,7 @@
         .role-select {
             width: 100%;
             padding: 12px 15px;
-            background: #1e293b;
-            /* Solid dark blue-grey */
+            background: #0f172a;
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
             color: #f1f5f9;
@@ -92,16 +175,6 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        .role-select {
-            cursor: pointer;
-        }
-
-        /* Fix for dark select options */
-        .role-select option {
-            background: #0f172a;
-            color: white;
-        }
-
         .submit-btn {
             width: 100%;
             padding: 12px;
@@ -114,131 +187,129 @@
             cursor: pointer;
             transition: 0.3s;
             margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
         }
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.5);
         }
 
-        .divider {
-            margin: 25px 0;
-            position: relative;
-            opacity: 0.5;
-        }
+        @media (max-width: 900px) {
+            #shell-content.auth-shell {
+                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
+                padding-top: 100px;
+            }
 
-        .divider::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: white;
-        }
+            .auth-left {
+                display: none;
+            }
 
-        .divider span {
-            background: #1e293b;
-            padding: 0 10px;
-            position: relative;
-            font-size: 0.8rem;
-        }
+            .auth-right {
+                width: 100%;
+                padding: 20px;
+            }
 
-        /* Match bg roughly */
-
-        .alt-link {
-            display: block;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        .alt-link a {
-            color: var(--teal-glow);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        #particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* MOBILE FIXES */
-        @media (max-width: 600px) {
             .login-card {
-                width: 90% !important;
-                margin: 0 auto;
-                padding: 25px !important;
+                max-width: 100%;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
     </style>
 </head>
 
-<body>
+<body class="auth">
 
     <div id="app-shell">
         <div id="shell-fixed">
+            <!-- Header Injected -->
             <header></header>
         </div>
         <div id="particles"></div>
 
-        <main id="shell-content" class="signup-container">
-            <div class="login-card">
-                <a href="../index.html">
-                    <img src="../assets/images/logo.png" alt="Soulamore" class="logo-img"
-                        style="height: 60px; width: auto; margin: 0 auto 10px auto;">
-                </a>
-                <h2 style="font-family:'Outfit'; margin-bottom:5px;">Create Account</h2>
-                <p style="opacity:0.7; margin-bottom:30px; font-size:0.95rem;">Join space for your mind.</p>
+        <main id="shell-content" class="auth-shell">
 
-                <form onsubmit="handleSignup(event)">
+            <!-- LEFT COLUMN: CONTEXT -->
+            <section class="auth-left">
+                <div class="auth-context">
+                    <h1>Start Your Journey</h1>
+                    <p>Join a community where you don't have to carry it all alone.</p>
 
-                    <!-- ROLE SELECTOR -->
-                    <div class="form-group">
-                        <label class="form-label">I am joining as a...</label>
-                        <select class="role-select" id="roleSelect">
-                            <option value="user">Student / Member</option>
-                            <option value="peer">Peer Listener (Apply)</option>
-                            <option value="psychologist">Psychologist (Apply)</option>
-                        </select>
-                    </div>
+                    <ul class="auth-features">
+                        <li><i class="fas fa-heart"></i> Safe, anonymous space</li>
+                        <li><i class="fas fa-users"></i> Connect with peers</li>
+                        <li><i class="fas fa-robot"></i> 24/7 AI Support</li>
+                    </ul>
+                </div>
+            </section>
 
-                    <div class="form-group">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" class="form-input" id="userName" placeholder="Your Name" required>
-                    </div>
+            <!-- RIGHT COLUMN: SIGNUP CARD -->
+            <section class="auth-right">
+                <div class="login-card">
+                    <a href="../index.html">
+                        <img src="../assets/images/logo.png" alt="Soulamore" class="logo-img"
+                            style="height: 60px; width: auto; margin: 0 auto 20px auto;">
+                    </a>
+                    <h2 style="font-family:'Outfit'; margin-bottom:5px;">Create Account</h2>
+                    <p style="opacity:0.7; margin-bottom:30px; font-size:0.95rem;">It only takes a moment.</p>
 
-                    <div class="form-group">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" class="form-input" id="userEmail" placeholder="you@university.edu" required>
-                    </div>
+                    <form onsubmit="handleSignup(event)">
 
-                    <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-input" placeholder="••••••••" required>
-                    </div>
+                        <!-- ROLE SELECTOR -->
+                        <div class="form-group">
+                            <label class="form-label">I am joining as a...</label>
+                            <select class="role-select" id="roleSelect">
+                                <option value="user">Student / Member</option>
+                                <option value="peer">Peer Listener (Apply)</option>
+                                <option value="psychologist">Psychologist (Apply)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" id="userName" placeholder="Your Name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" id="userEmail" placeholder="you@university.edu"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" placeholder="••••••••" required>
+                        </div>
+
+                        <div
+                            style="text-align:left; font-size:0.85rem; opacity:0.8; margin-bottom:20px; display:flex; gap:10px; align-items:start;">
+                            <input type="checkbox" required style="margin-top:3px;">
+                            <span>I accept the Terms & Privacy Policy.</span>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Create Account</button>
+                    </form>
 
                     <div
-                        style="text-align:left; font-size:0.85rem; opacity:0.8; margin-bottom:20px; display:flex; gap:10px; align-items:start;">
-                        <input type="checkbox" required style="margin-top:3px;">
-                        <span>I accept the Terms of Service & Privacy Policy. I understand this is a safe space.</span>
+                        style="margin-top:25px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); font-size:0.9rem;">
+                        Already have an account? <a href="login.html"
+                            style="color:var(--teal-glow); text-decoration:none; font-weight:600;">Log In</a>
                     </div>
-
-                    <button type="submit" class="submit-btn">Create Account</button>
-                </form>
-
-                <div class="divider"><span>OR</span></div>
-
-                <div class="alt-link">
-                    Already have an account? <a href="login.html">Log In</a>
                 </div>
-            </div>
+            </section>
         </main>
     </div>
 
@@ -249,7 +320,6 @@
         import { signUpWithEmail } from "../assets/js/auth-service.js";
         import { handleRoleRouting } from "../assets/js/auth-context.js";
         import { updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { createOrUpdateUserProfile } from "../assets/js/profile-handler.js";
 
         // Initialize Intent from Session (passed from login page)
         document.addEventListener('DOMContentLoaded', () => {
@@ -282,28 +352,7 @@
                     // 2. Update Display Name
                     await updateProfile(result.user, { displayName: name });
 
-                    // 3. Create Firestore Profile with Role
-                    // We attach the role to the user object temporarily for the profile handler to see, 
-                    // or we rely on profile-handler to take arguments.
-                    // Let's manually create profile here to ensure correct role data.
-                    // Actually, createOrUpdateUserProfile reads from user object... 
-                    // Let's create proper profile data manually or update profile-handler to accept data.
-                    // For MVP simplicity: We will update profile via profile-handler after adding role property? 
-                    // No, simpler to just write doc here or update profile-handler.
-                    // Let's use profile-handler but we need to inject the role.
-                    // We'll update the profile-handler.js file separately if needed, 
-                    // but for now, we'll manually set the role in the session context.
-
-                    // Let's redirect using handleRoleRouting which creates the session token.
-                    // AND we must save the role intent for the dashboard to see.
-
-                    // Also saving to Firestore via profile handler
-                    // user object doesn't have 'role' property.
-                    // We'll assume for now auth-context handles the "intent" passing.
-
-                    // 4. Create Session & Redirect
-                    // Note: handleRoleRouting creates the token required for dashboards.
-                    // passing isNewUser=true
+                    // 3. Routing (Handles session creation)
                     await handleRoleRouting(result.user, role, true);
 
                 } else {
@@ -339,7 +388,6 @@
         style.innerHTML = `@keyframes float { 0% {transform:translateY(0);} 100% {transform:translateY(-100vh);} }`;
         document.head.appendChild(style);
     </script>
-
 </body>
 
 </html>
