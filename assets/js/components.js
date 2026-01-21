@@ -1317,7 +1317,7 @@ function injectMobileBottomNav() {
 
     // Ensure it's not hidden by global styles if we need to override
     navContainer.style.display = 'flex';
-    navContainer.style.zIndex = '999999'; // Nuclear Z-Index
+    navContainer.style.zIndex = '8000'; // High but below Modal/Menu (9999)
 
     document.body.appendChild(navContainer);
 
@@ -1339,9 +1339,16 @@ function injectMobileBottomNav() {
             justify-content: space-around;
             align-items: center;
             padding: 12px 20px;
-            z-index: 2147483647; /* Nuclear */
+            z-index: 8000; /* Fixed: Lower than Mobile Menu (9999) */
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             transition: transform 0.3s ease;
+        }
+
+       /* HIDE NAV WHEN MOBILE MENU IS OPEN */
+        body.no-scroll .mobile-bottom-nav {
+             z-index: 100 !important; /* Push way back or hide */
+             opacity: 0;
+             pointer-events: none;
         }
 
         .mobile-bottom-nav.hidden {
@@ -1458,11 +1465,35 @@ document.addEventListener('DOMContentLoaded', initSmartCounters);
 
 // --- GLOBAL EXPORTS ---
 // Fix: Expose toggleMobileMenu for bottom nav usage
-window.toggleMobileMenu = function() {
+window.toggleMobileMenu = function () {
+    // 1. Try Standard Header Toggle First
     const toggle = document.querySelector('.mobile-toggle');
-    if (toggle) {
-        toggle.click(); // Trigger the header's hamburger
+    const navLinks = document.querySelector('.nav-links');
+
+    if (navLinks) {
+        // MANUAL TOGGLE FORCE
+        const isOpen = navLinks.classList.contains('open');
+
+        if (isOpen) {
+            navLinks.classList.remove('open');
+            document.body.classList.remove('no-scroll');
+            // Sync Icon
+            if (toggle) {
+                toggle.classList.remove('active');
+                const i = toggle.querySelector('i');
+                if (i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); }
+            }
+        } else {
+            navLinks.classList.add('open');
+            document.body.classList.add('no-scroll');
+            // Sync Icon
+            if (toggle) {
+                toggle.classList.add('active');
+                const i = toggle.querySelector('i');
+                if (i) { i.classList.remove('fa-bars'); i.classList.add('fa-times'); }
+            }
+        }
     } else {
-        console.warn('Soulamore: Mobile toggle not found in header.');
+        console.warn('Soulamore: Nav links not found.');
     }
 };

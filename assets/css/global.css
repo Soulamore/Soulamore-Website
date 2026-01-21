@@ -172,12 +172,18 @@ html,
 body {
     margin: 0;
     padding: 0;
-    overflow-x: hidden;
-    /* RESTORED: Essential for background animations */
+    overflow-x: hidden !important;
+    /* STRICT: No horizontal scroll */
     width: 100%;
+    max-width: 100%;
+    /* Ensure constraints */
     position: relative;
     font-family: var(--font-body);
     line-height: 1.6;
+    touch-action: pan-y;
+    /* FIX: Prevent horizontal scroll jerking on mobile */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scroll for iOS */
 }
 
 /* --- CUSTOM SCROLLBAR (Site-wide Premium Design) --- */
@@ -1478,10 +1484,18 @@ body.no-scroll {
         justify-content: space-around;
         align-items: center;
         padding: 10px 20px;
-        z-index: 2147483648 !important;
-        /* Ensure it stays on top of footer but below toggle? No, above everything. */
+        z-index: 8000 !important;
+        /* Ensure it stays on top of footer but below menu overlay */
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* HIDE when Main Menu is open */
+    body.no-scroll .mobile-bottom-nav {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translate(-50%, 20px) !important;
+        z-index: -1 !important;
     }
 }
 
