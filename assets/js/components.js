@@ -954,44 +954,72 @@ function setActiveState() {
 
 // --- 6. INTERACTION LOGIC ---
 
+// --- 6. INTERACTION LOGIC ---
+
+function bindMobileToggle() {
+    // FIX 3: Event Delegation for Hamburger
+    // Handles toggling even if header is injected late
+    document.addEventListener('click', (e) => {
+        // 1. Toggle Click
+        const toggle = e.target.closest('.mobile-toggle');
+        if (toggle) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const navLinks = document.querySelector('.nav-links');
+            if (!navLinks) return;
+
+            // Toggle State
+            navLinks.classList.toggle('open');
+            document.body.classList.toggle('no-scroll');
+            toggle.classList.toggle('active');
+
+            // Icon Swap
+            const icon = toggle.querySelector('i');
+            if (icon) {
+                if (navLinks.classList.contains('open')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            }
+            return;
+        }
+
+        // 2. Outside Click / Link Click (Close Menu)
+        const navLinks = document.querySelector('.nav-links');
+        if (navLinks && navLinks.classList.contains('open')) {
+            // If clicking inside nav-links (but not a toggle), ignore unless it's a link
+            if (e.target.closest('.nav-links') && !e.target.closest('a')) return;
+
+            // If clicking a dropdown toggle, ignore (handled by separate logic)
+            if (e.target.closest('.dropdown > a') || e.target.closest('.dropdown-submenu > a')) return;
+
+            // Otherwise (Outside click OR non-dropdown link click) -> Close
+            navLinks.classList.remove('open');
+            document.body.classList.remove('no-scroll');
+
+            // Reset Toggles
+            document.querySelectorAll('.mobile-toggle').forEach(btn => {
+                btn.classList.remove('active');
+                const i = btn.querySelector('i');
+                if (i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); }
+            });
+        }
+    });
+}
+
 function initializeHeaderLogic() {
-    const toggleBtn = document.querySelector('.mobile-toggle');
+    // 1. Define Variables
     const navLinks = document.querySelector('.nav-links');
     const header = document.querySelector('header');
 
-    // A. Mobile Sidebar Toggle
-    if (toggleBtn && navLinks) {
-        // Remove old listeners to prevent duplicates if re-initialized
-        const newBtn = toggleBtn.cloneNode(true);
-        toggleBtn.parentNode.replaceChild(newBtn, toggleBtn);
+    // Note: Mobile Toggle logic is now handled by Global `bindMobileToggle` (Event Delegation).
 
-        newBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent immediate bubbling
-            const isOpen = navLinks.classList.contains('open');
-
-            if (isOpen) {
-                // CLOSE
-                navLinks.classList.remove('open');
-                document.body.classList.remove('no-scroll');
-                newBtn.classList.remove('active');
-                const icon = newBtn.querySelector('i');
-                if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
-            } else {
-                // OPEN
-                navLinks.classList.add('open');
-                document.body.classList.add('no-scroll');
-                newBtn.classList.add('active');
-                const icon = newBtn.querySelector('i');
-                if (icon) { icon.classList.remove('fa-bars'); icon.classList.add('fa-times'); }
-            }
-        });
-
-        // GLOBAL HELPER for Bottom Nav
-        window.toggleMobileMenu = function () {
-            newBtn.click();
-        };
-
-        // Close on Link Click (except dropdowns)
+    // 2. Close on Link Click (except dropdowns)
+    if (navLinks) {
         navLinks.querySelectorAll('a').forEach(link => {
             // If it has a next sibling that is a dropdown-content, it's a toggle, not a direct link
             if (link.nextElementSibling && link.nextElementSibling.classList.contains('dropdown-content')) return;
@@ -999,15 +1027,18 @@ function initializeHeaderLogic() {
             link.addEventListener('click', () => {
                 navLinks.classList.remove('open');
                 document.body.classList.remove('no-scroll');
-                // Reset Icon
-                const icon = newBtn.querySelector('i');
-                if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
-                newBtn.classList.remove('active');
+
+                // Reset Icons Globally
+                document.querySelectorAll('.mobile-toggle').forEach(btn => {
+                    btn.classList.remove('active');
+                    const i = btn.querySelector('i');
+                    if (i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); }
+                });
             });
         });
     }
 
-    // B. Mobile Accordion Logic (Dropdowns)
+    // 3. Mobile Accordion Logic (Dropdowns)
     const dropdownToggles = document.querySelectorAll('.dropdown > a, .dropdown-submenu > a');
     dropdownToggles.forEach(toggle => {
         toggle.addEventListener('click', (e) => {
@@ -1043,7 +1074,7 @@ function initializeHeaderLogic() {
         });
     });
 
-    // C. Scroll Glass Effect
+    // 4. Scroll Glass Effect
     if (header) {
         const handleScroll = () => {
             // Check if custom color override exists
@@ -1361,8 +1392,10 @@ document.addEventListener("DOMContentLoaded", () => {
     try { setActiveState(); } catch (e) { console.warn("Active State Error:", e); }
 
     // 3. Initialize Interactions
-    // 3. Initialize Interactions
-    try { initializeHeaderLogic(); } catch (e) { console.warn("Header Logic Error:", e); }
+    try {
+        bindMobileToggle();
+        initializeHeaderLogic();
+    } catch (e) { console.warn("Header Logic Error:", e); }
 
     // 4. Inject Bottom Nav (Global)
     try { injectMobileBottomNav(); } catch (e) { console.warn("Bottom Nav Error:", e); }

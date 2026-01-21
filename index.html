@@ -849,47 +849,44 @@
 </head>
 
 <body>
-    <div id="app-shell">
-        <div id="shell-fixed">
-            <header class="island-nav"></header>
+
+    <!-- AUDIO & VISUALIZER -->
+    <audio id="ambientAudio" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+    </audio>
+    <div class="audio-control" onclick="toggleAudio()">
+        <div class="audio-bars" id="audioVisualizer">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
         </div>
+        <span id="audioText">Play Audio</span>
+    </div>
 
+    <div id="particles"></div>
+    <div id="atmosphere"></div>
+    <div id="scroll-progress"></div>
+
+    <!-- AURORA BACKGROUND -->
+    <div class="aurora-container">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+    </div>
+
+    <script>
+        window.onscroll = function () {
+            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+        };
+    </script>
+
+    <div id="app-shell">
         <main id="shell-content">
-            <!-- AUDIO & VISUALIZER -->
-            <audio id="ambientAudio" loop>
-                <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
-            </audio>
-            <div class="audio-control" onclick="toggleAudio()">
-                <div class="audio-bars" id="audioVisualizer">
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                </div>
-                <span id="audioText">Play Audio</span>
-            </div>
-
-            <div id="particles"></div>
-            <div id="atmosphere"></div>
-            <div id="scroll-progress"></div>
-
-            <!-- AURORA BACKGROUND -->
-            <div class="aurora-container">
-                <div class="aurora-blob blob-1"></div>
-                <div class="aurora-blob blob-2"></div>
-                <div class="aurora-blob blob-3"></div>
-            </div>
-
-            <script>
-                window.onscroll = function () {
-                    var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-                    var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-                    var scrolled = (winScroll / height) * 100;
-                    document.getElementById("scroll-progress").style.width = scrolled + "%";
-                };
-            </script>
-
             <div class="container">
-                <!-- HEADER MOVED TO SHELL-FIXED -->
+                <!-- HEADER MOVED TO BODY (Injected) -->
 
                 <!-- 1. HERO SECTION: SoulBot First -->
                 <div class="hero fade-in">
@@ -1570,6 +1567,10 @@
             }, 800);
         }
     </script>
+
+    </main>
+    </div>
+    <!-- APP SHELL END -->
 
     <!-- APP SHELL CLOSURE REMOVED (Not using shell) -->
 
