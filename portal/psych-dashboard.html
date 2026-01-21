@@ -18,28 +18,21 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
     <style>
-        /* --- DASHBOARD V3 LIGHT (CLINICAL) --- */
+        /* --- DASHBOARD V3 DARK (PSYCH) --- */
         :root {
-            /* Professional Light Palette */
-            --bg-deep: #f1f5f9;
-            /* Light Gray Background */
-            --bg-card: #ffffff;
-            /* White Cards */
-            --bg-sidebar: #ffffff;
-            /* White Sidebar */
-
-            /* Psych Accent: Clinical Teal */
-            --accent-primary: #0d9488;
-            /* Teal 600 */
-            --accent-dim: rgba(13, 148, 136, 0.1);
-
-            --text-main: #1e293b;
-            /* Slate 800 */
-            --text-muted: #64748b;
-            /* Slate 500 */
-            --border-subtle: #e2e8f0;
-            /* Light Border */
-
+            /* Palette from Screenshots */
+            --bg-deep: #0f172a;
+            /* Main Background */
+            --bg-card: #1e293b;
+            /* Card Background */
+            --bg-sidebar: #0f172a;
+            /* Sidebar matches body */
+            --teal-accent: #a855f7;
+            /* Purple for Psych to distinguish */
+            --teal-dim: rgba(168, 85, 247, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-subtle: rgba(255, 255, 255, 0.08);
             --font-head: 'Outfit', sans-serif;
             --font-body: 'Plus Jakarta Sans', sans-serif;
         }
@@ -69,7 +62,6 @@
             height: 100vh;
             z-index: 100;
             transition: transform 0.3s ease;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
         }
 
         .sidebar-header {
@@ -83,14 +75,14 @@
         .user-avatar-lg {
             width: 48px;
             height: 48px;
-            background: var(--accent-dim);
+            background: var(--bg-card);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--accent-primary);
+            color: var(--text-main);
             font-size: 1.2rem;
-            border: 1px solid var(--accent-dim);
+            border: 1px solid var(--border-subtle);
         }
 
         .user-info-text .name {
@@ -98,7 +90,6 @@
             font-weight: 700;
             font-size: 1rem;
             line-height: 1.2;
-            color: var(--text-main);
         }
 
         .user-info-text .role {
@@ -129,15 +120,15 @@
         }
 
         .side-link:hover {
-            background: var(--accent-dim);
-            color: var(--accent-primary);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
         }
 
         .side-link.active {
-            background: var(--accent-primary);
-            color: #ffffff;
+            background: var(--teal-accent);
+            color: #0f172a;
             font-weight: 600;
-            box-shadow: 0 4px 12px var(--accent-dim);
+            box-shadow: 0 4px 12px var(--teal-dim);
         }
 
         .side-link i {
@@ -168,8 +159,7 @@
         }
 
         .logout-btn:hover {
-            background: #fee2e2;
-            border-color: #fecaca;
+            background: rgba(239, 68, 68, 0.2);
         }
 
         /* --- MAIN CONTENT --- */
@@ -197,12 +187,11 @@
             transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         .dash-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         /* --- TYPOGRAPHY --- */
@@ -221,23 +210,22 @@
 
         /* --- BUTTONS --- */
         .btn-dash-primary {
-            background: var(--accent-primary);
-            color: #ffffff;
+            background: var(--teal-accent);
+            color: #0f172a;
             padding: 12px 24px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 700;
             display: inline-block;
-            box-shadow: 0 4px 12px var(--accent-dim);
+            box-shadow: 0 0 15px var(--teal-dim);
             transition: 0.2s;
             border: none;
             cursor: pointer;
         }
 
         .btn-dash-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 15px var(--accent-dim);
-            opacity: 0.95;
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--teal-dim);
         }
 
         /* --- TABLES --- */
@@ -274,7 +262,6 @@
             border-radius: 8px;
             cursor: pointer;
             display: none;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         @media (max-width: 1024px) {
@@ -310,13 +297,11 @@
             padding: 25px;
             cursor: pointer;
             transition: 0.3s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .blog-card:hover {
-            border-color: var(--accent-primary);
+            border-color: var(--teal-accent);
             transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -326,11 +311,10 @@
 
     <!-- TOOL MODAL CONTAINER -->
     <div id="toolModal" class="tool-modal-overlay">
-        <div class="tool-modal-content" style="background:white; color:#1e293b;">
-            <div class="tool-modal-header" style="border-bottom:1px solid #e2e8f0;">
-                <div class="tool-modal-title" id="modalTitle" style="color:#1e293b;">Tool</div>
-                <button class="tool-close-btn" onclick="closeTool()" style="color:#64748b;"><i
-                        class="fas fa-times"></i></button>
+        <div class="tool-modal-content">
+            <div class="tool-modal-header">
+                <div class="tool-modal-title" id="modalTitle">Tool</div>
+                <button class="tool-close-btn" onclick="closeTool()"><i class="fas fa-times"></i></button>
             </div>
             <iframe id="toolFrame" class="tool-frame" src=""></iframe>
         </div>
@@ -343,8 +327,8 @@
         <!-- SIDEBAR -->
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="user-avatar-lg" style="background: var(--accent-dim); border-color:var(--accent-primary);">
-                    <i class="fas fa-user-md" style="color:var(--accent-primary);"></i>
+                <div class="user-avatar-lg" style="background: var(--bg-card); border-color:var(--teal-accent);">
+                    <i class="fas fa-user-md" style="color:var(--teal-accent);"></i>
                 </div>
                 <div class="user-info-text">
                     <div class="name" id="sidebar-name">Dr. Strange</div>
@@ -364,7 +348,7 @@
 
                 <div style="height:1px; background:var(--border-subtle); margin:10px 0;"></div>
                 <div
-                    style="padding:10px 20px; font-size:0.75rem; opacity:0.6; text-transform:uppercase; font-weight:700; color:var(--text-muted);">
+                    style="padding:10px 20px; font-size:0.75rem; opacity:0.5; text-transform:uppercase; font-weight:700;">
                     Personal</div>
 
                 <a href="#" onclick="openTool('../tools/journal.html', 'My Journal')" class="side-link"><i
@@ -426,7 +410,7 @@
                                     </td>
                                     <td>Initial Consultation</td>
                                     <td><span
-                                            style="background:rgba(34, 197, 94, 0.2); color:#15803d; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:600;">Confirmed</span>
+                                            style="background:rgba(34, 197, 94, 0.2); color:#22c55e; padding:2px 8px; border-radius:4px; font-size:0.8rem;">Confirmed</span>
                                     </td>
                                 </tr>
                             </table>
@@ -439,17 +423,15 @@
                                 practice.</p>
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                                 <div class="dash-card"
-                                    style="padding:15px; text-align:center; cursor:pointer; border:2px solid var(--accent-dim); box-shadow:none;"
+                                    style="padding:15px; text-align:center; cursor:pointer; border-color:var(--teal-accent);"
                                     onclick="openTool('../tools/5-step-reset.html', '5-Step Reset')">
-                                    <i class="fas fa-leaf"
-                                        style="color:var(--accent-primary); margin-bottom:5px;"></i><br> 5-Step Reset
+                                    <i class="fas fa-leaf" style="color:var(--teal-accent); margin-bottom:5px;"></i><br>
+                                    5-Step Reset
                                 </div>
-                                <div class="dash-card"
-                                    style="padding:15px; text-align:center; cursor:pointer; border:1px solid var(--border-subtle); box-shadow:none;"
+                                <div class="dash-card" style="padding:15px; text-align:center; cursor:pointer;"
                                     onclick="openTool('../tools/journal.html', 'Clinical Journal')">
-                                    <i class="fas fa-book"
-                                        style="color:var(--accent-primary); margin-bottom:5px;"></i><br> Reflective
-                                    Journal
+                                    <i class="fas fa-book" style="color:var(--teal-accent); margin-bottom:5px;"></i><br>
+                                    Reflective Journal
                                 </div>
                             </div>
                         </div>
@@ -464,13 +446,12 @@
                             <canvas id="perfChart" style="width:100%; height:200px;"></canvas>
                         </div>
 
-                        <div class="dash-card" style="text-align:center; border:1px solid var(--accent-primary);">
+                        <div class="dash-card" style="text-align:center;">
                             <h4 style="margin-bottom:10px; opacity:0.8;">Active Clients</h4>
                             <div
-                                style="font-size:3rem; font-weight:700; font-family:'Outfit'; color:var(--accent-primary);">
+                                style="font-size:3rem; font-weight:700; font-family:'Outfit'; color:var(--teal-accent);">
                                 12</div>
-                            <div style="color:#15803d; font-size:0.85rem; margin-top:5px; font-weight:600;">+2 this week
-                            </div>
+                            <div style="color:#22c55e; font-size:0.85rem; margin-top:5px;">+2 this week</div>
                         </div>
 
                         <div class="dash-card">
@@ -502,7 +483,7 @@
                 <div class="blog-list">
                     <div class="blog-card" onclick="openEditor()">
                         <div
-                            style="color:#b45309; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; font-weight:700;">
+                            style="color:#fbbf24; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">
                             Draft</div>
                         <h3 style="margin-bottom:10px;">Understanding High-Functioning Anxiety</h3>
                         <p style="font-size:0.9rem; margin-bottom:15px;">Anxiety often masquerades as...</p>
@@ -511,7 +492,7 @@
 
                     <div class="blog-card">
                         <div
-                            style="color:#15803d; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; font-weight:700;">
+                            style="color:#22c55e; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">
                             Published</div>
                         <h3 style="margin-bottom:10px;">5 Grounding Techniques</h3>
                         <p style="font-size:0.9rem; margin-bottom:15px;">A guide to quick relief...</p>
@@ -526,7 +507,7 @@
                 <div class="dash-card">
                     <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
                         <input type="text" placeholder="Search patients..."
-                            style="padding:12px; background:white; border:1px solid var(--border-subtle); border-radius:30px; color:var(--text-main); width:300px;">
+                            style="padding:12px; background:rgba(0,0,0,0.2); border:1px solid var(--border-subtle); border-radius:30px; color:white; width:300px;">
                         <button class="btn-dash-primary" style="padding:8px 20px;">+ New Patient</button>
                     </div>
 
@@ -544,11 +525,11 @@
                                     JD</div> John Doe
                             </td>
                             <td><span
-                                    style="color:#15803d; background:rgba(34, 197, 94, 0.1); padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:600;">Active</span>
+                                    style="color:#22c55e; background:rgba(34, 197, 94, 0.1); padding:2px 8px; border-radius:4px; font-size:0.8rem;">Active</span>
                             </td>
                             <td>Today, 3:00 PM</td>
                             <td><button
-                                    style="background:transparent; border:1px solid var(--border-subtle); color:var(--text-main); padding:5px 15px; border-radius:6px; cursor:pointer;">Profile</button>
+                                    style="background:transparent; border:1px solid var(--border-subtle); color:white; padding:5px 15px; border-radius:6px; cursor:pointer;">Profile</button>
                             </td>
                         </tr>
                     </table>
@@ -595,8 +576,8 @@
                 datasets: [{
                     label: 'Article Views',
                     data: [12, 19, 3, 5, 2, 30, 45],
-                    borderColor: '#0d9488',
-                    backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                    borderColor: '#a855f7',
+                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
                     borderWidth: 2,
                     tension: 0.4,
                     fill: true
@@ -607,8 +588,8 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { ticks: { color: '#64748b' }, grid: { display: false } },
-                    y: { ticks: { color: '#64748b' }, grid: { color: '#e2e8f0' } }
+                    x: { ticks: { color: 'rgba(255,255,255,0.5)' }, grid: { display: false } },
+                    y: { ticks: { color: 'rgba(255,255,255,0.5)' }, grid: { color: 'rgba(255,255,255,0.05)' } }
                 }
             }
         });
