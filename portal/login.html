@@ -760,27 +760,11 @@
                     // Check for returnUrl
                     const returnUrl = sessionStorage.getItem('returnUrl');
 
-                    // CodeQL Fix: Client-side URL redirect
-                    // Robust check using URL API to verify origin matches
-                    if (returnUrl) {
-                        try {
-                            const validUrl = new URL(returnUrl, window.location.origin);
-                            if (validUrl.origin === window.location.origin) {
-                                sessionStorage.removeItem('returnUrl');
-                                window.location.href = validUrl.href;
-                            } else {
-                                throw new Error("Invalid Redirect Origin");
-                            }
-                        } catch (e) {
-                            console.warn("Blocked potentially unsafe redirect:", returnUrl);
-                            sessionStorage.removeItem('returnUrl');
-                            await handleRoleRouting(result.user, intent);
-                        }
-                    } else {
-                        // Default flow if url is suspicious or missing
-                        sessionStorage.removeItem('returnUrl');
-                        await handleRoleRouting(result.user, intent);
-                    }
+                    // FORCE SESSION CREATION: Always use handleRoleRouting to ensure token is generated.
+                    // If returnUrl is needed later, we should pass it to auth-context, but for now, 
+                    // prioritizing successful login over deep linking.
+                    sessionStorage.removeItem('returnUrl');
+                    await handleRoleRouting(result.user, intent);
                 } else {
                     const friendlyMsg = getFriendlyErrorMessage(result.error);
                     alert(friendlyMsg);
@@ -915,6 +899,17 @@
                 isDev: true
             };
 
+            // NEW: Create valid session compatible with auth-guard.js
+            const session = {
+                isLoggedIn: true,
+                userId: 'dev-' + intent,
+                role: intent,
+                email: intent + '@soulamore.dev'
+            };
+
+            localStorage.setItem('soulamore_session', JSON.stringify(session));
+
+            // Legacy fallbacks (optional but safe)
             sessionStorage.setItem('user', JSON.stringify(mockUser));
             sessionStorage.setItem('userRole', intent);
 
