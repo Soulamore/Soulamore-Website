@@ -1329,7 +1329,7 @@ function injectMobileBottomNav() {
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 90%;
+            width: 92%;
             max-width: 400px;
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(16px);
