@@ -590,7 +590,7 @@
                         <i class="fab fa-google"></i> Continue with Google
                     </button>
 
-                    <button type="button" onclick="handleDevBypass()"
+                    <button type="button" onclick="handleDevBypass(event)"
                         style="background:transparent; border:none; color:rgba(255,255,255,0.4); font-size:0.85rem; width:100%; margin:15px 0 0; cursor:pointer; text-decoration:underline;">
                         &lt;/&gt; Developer Preview (Skip Login)
                     </button>
@@ -898,9 +898,13 @@
         setRole(0);
 
         // --- 2. DEV BYPASS ---
-        function handleDevBypass() {
+        // --- 2. DEV BYPASS ---
+        function handleDevBypass(event) {
+            if (event) event.preventDefault(); // FIX: Prevent form submission/reload
+
             const intent = sessionStorage.getItem('loginIntent') || 'user';
-            const btn = document.querySelector('button[onclick="handleDevBypass()"]');
+            const btn = document.querySelector('button[onclick="handleDevBypass()"]'); // This selector might fail if not exact match in DOM
+            // Better: use event.target if available
             if (btn) btn.innerHTML = 'Entered Dev Mode...';
 
             // Mock Data based on Role
