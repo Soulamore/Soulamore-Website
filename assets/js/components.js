@@ -1297,11 +1297,11 @@ function injectMobileBottomNav() {
             <span>Home</span>
         </a>
         <a href="${pathPrefix}tools/soulbot.html" class="nav-item ${location.pathname.includes('soulbot') ? 'active' : ''}">
-            <i class="fas fa-robot"></i>
+            <i class="fas fa-robot" style="color:#4ECDC4;"></i>
             <span>Chat</span>
         </a>
         <a href="${pathPrefix}get-help-now.html" class="nav-item ${location.pathname.includes('get-help-now') ? 'active' : ''}">
-            <i class="fas fa-heart-pulse"></i>
+            <i class="fas fa-heart-pulse" style="color:#ef4444;"></i>
             <span>Crisis</span>
         </a>
         <div class="nav-item" onclick="toggleMobileMenu()">
