@@ -1304,7 +1304,7 @@ function injectMobileBottomNav() {
             <i class="fas fa-heart-pulse" style="color:#ef4444;"></i>
             <span>Crisis</span>
         </a>
-        <div class="nav-item" onclick="toggleMobileMenu()">
+        <div class="nav-item" id="mobile-menu-trigger">
             <i class="fas fa-bars"></i>
             <span>Menu</span>
         </div>
@@ -1320,6 +1320,22 @@ function injectMobileBottomNav() {
     navContainer.style.zIndex = '8000'; // High but below Modal/Menu (9999)
 
     document.body.appendChild(navContainer);
+
+    // BIND CLICK EVENT DIRECTLY (Fixes inline onclick scope issues)
+    setTimeout(() => {
+        const trigger = document.getElementById('mobile-menu-trigger');
+        if (trigger) {
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (window.toggleMobileMenu) {
+                    window.toggleMobileMenu();
+                } else {
+                    console.error("toggleMobileMenu function missing!");
+                }
+            });
+        }
+    }, 100);
 
     // 5. Inject Styles (Self-Contained for safety)
     const style = document.createElement('style');
