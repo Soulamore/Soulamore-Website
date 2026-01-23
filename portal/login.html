@@ -586,7 +586,7 @@
 
                     <div class="divider"><span>OR</span></div>
 
-                    <button type="button" class="social-btn" id="googleSignInBtn">
+                    <button type="button" class="social-btn" id="googleSignInBtn" onclick="handleGoogleLogin()">
                         <i class="fab fa-google"></i> Continue with Google
                     </button>
 
@@ -698,39 +698,42 @@
             return errorMap[errorCode] || 'An unexpected error occurred. Please try again.';
         }
 
-        // --- GOOGLE ---
-        const gBtn = document.getElementById('googleSignInBtn');
-        if (gBtn) {
-            gBtn.addEventListener('click', async () => {
-                const intent = sessionStorage.getItem('loginIntent') || 'user';
-                try {
+        // --- GOOGLE (Exported like Signup) ---
+        window.handleGoogleLogin = async function () {
+            const gBtn = document.getElementById('googleSignInBtn');
+            const intent = sessionStorage.getItem('loginIntent') || 'user';
+
+            try {
+                if (gBtn) {
                     gBtn.disabled = true; // Prevent double-click
                     gBtn.style.opacity = '0.6';
                     gBtn.style.cursor = 'not-allowed';
                     gBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+                }
 
-                    const result = await loginWithGoogle();
+                const result = await loginWithGoogle();
 
-                    if (result.success) {
-                        // Check profile status
-                        const profileResult = await createOrUpdateUserProfile(result.user);
-                        const isNewUser = profileResult && profileResult.isNewUser;
+                if (result.success) {
+                    // Check profile status
+                    const profileResult = await createOrUpdateUserProfile(result.user);
+                    const isNewUser = profileResult && profileResult.isNewUser;
 
-                        await handleRoleRouting(result.user, intent, isNewUser);
-                    } else {
-                        throw new Error(result.error);
-                    }
-                } catch (e) {
-                    const friendlyMsg = getFriendlyErrorMessage(e.code || e.message);
-                    alert(friendlyMsg);
-                    // Re-enable button on error
+                    await handleRoleRouting(result.user, intent, isNewUser);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (e) {
+                const friendlyMsg = getFriendlyErrorMessage(e.code || e.message);
+                alert(friendlyMsg);
+                // Re-enable button on error
+                if (gBtn) {
                     gBtn.disabled = false;
                     gBtn.style.opacity = '1';
                     gBtn.style.cursor = 'pointer';
                     gBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
                 }
-            });
-        }
+            }
+        };
 
         // --- EMAIL LOGIN (Exported to Window) ---
         window.handleEmailLogin = async function () {

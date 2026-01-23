@@ -47,6 +47,14 @@
     // Check against rules
     for (const [key, requiredRole] of Object.entries(rules)) {
         if (currentPath.includes(key)) {
+            // RELAXED RULE: 'user-dashboard' is accessible by ALL authenticated roles (since they are also users)
+            if (requiredRole === 'user') {
+                // If logged in (already checked above), allow access. 
+                // Any valid role (peer, psychologist, admin, user) can view the user dashboard.
+                continue;
+            }
+
+            // For other dashboards, enforce strict role match
             if (session.role !== requiredRole) {
                 console.warn(`⛔ Unauthorized Access. Required: ${requiredRole}, Found: ${session.role}`);
                 // Redirect to their correct dashboard to be helpful, or login if confused
