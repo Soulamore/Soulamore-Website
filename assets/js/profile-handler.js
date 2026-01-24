@@ -20,11 +20,15 @@ export async function createOrUpdateUserProfile(user) {
             photoURL: user.photoURL || '',
             createdAt: userSnap.exists() ? userSnap.data().createdAt : serverTimestamp(),
             updatedAt: serverTimestamp(),
+            authProviders: userSnap.exists() ?
+                (userSnap.data().authProviders ? [...new Set([...userSnap.data().authProviders, ...(user.providerData.map(p => p.providerId))])] : ['email'])
+                : (user.providerData.map(p => p.providerId)),
+
             // --- PROFESSIONAL PROFILE FIELDS ---
             // Identity
             bio: userSnap.exists() ? userSnap.data().bio || '' : '',
-            role: userSnap.exists() ? userSnap.data().role || 'Psychologist' : 'Psychologist',
-            phone: userSnap.exists() ? userSnap.data().phone || '' : '',
+            role: userSnap.exists() ? userSnap.data().role || 'Member' : 'Member', // Default to Member
+            phone: userSnap.exists() ? userSnap.data().phone || (user.phoneNumber || '') : (user.phoneNumber || ''),
             location: userSnap.exists() ? userSnap.data().location || '' : '',
 
             // Professional Details
@@ -48,7 +52,7 @@ export async function createOrUpdateUserProfile(user) {
             preferences: userSnap.exists() ? userSnap.data().preferences || {} : {
                 notifications: true,
                 emailUpdates: true,
-                theme: 'dark'
+                theme: 'dark' // Default calm dark mode
             }
         };
 
@@ -58,9 +62,10 @@ export async function createOrUpdateUserProfile(user) {
             // Update existing profile (Merge deep if needed, but for now specific fields)
             // We rely on updateUserProfile for specific updates usually, but this ensures auth sync
             await updateDoc(userRef, {
-                displayName: profileData.displayName,
-                email: profileData.email,
-                photoURL: profileData.photoURL,
+                displayName: user.displayName || userSnap.data().displayName, // Don't overwrite if null
+                email: user.email || userSnap.data().email,
+                photoURL: user.photoURL || userSnap.data().photoURL,
+                authProviders: profileData.authProviders,
                 updatedAt: serverTimestamp()
             });
             console.log('User profile synced on auth:', user.uid);
