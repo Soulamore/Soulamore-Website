@@ -676,13 +676,40 @@
         const auth = getAuth(app);
 
         // Redirect if already logged in
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const role = sessionStorage.getItem('userRole') || 'user';
+                // LOOP PREVENTION: Check if we just came from a dashboard (meaning auth failed there)
+                const fromDashboard = document.referrer && document.referrer.includes('dashboard');
+                if (fromDashboard) {
+                    console.warn("⚠️ Redirect loop detected. Staying on login page to allow re-authentication.");
+                    // Optional: Sign out Firebase to clear the conflicting state
+                    // await auth.signOut(); 
+                    return;
+                }
+
+                // SESSION RESTORATION: Ensure localStorage has the session needed by auth-guard.js
+                const currentSession = localStorage.getItem("soulamore_session");
+                if (!currentSession) {
+                    console.log("Restoring missing session from Firebase auth...");
+                    const userRole = sessionStorage.getItem('userRole') || 'user'; // Fallback
+                    const sessionData = {
+                        isLoggedIn: true,
+                        userId: user.uid,
+                        email: user.email,
+                        role: userRole,
+                        name: user.displayName || "User",
+                        photoURL: user.photoURL || "../assets/images/default-avatar.png"
+                    };
+                    localStorage.setItem("soulamore_session", JSON.stringify(sessionData));
+                }
+
+                const role = sessionStorage.getItem('userRole') || (JSON.parse(localStorage.getItem("soulamore_session") || '{}').role) || 'user';
                 let dashboard = 'user-dashboard.html';
                 if (role === 'peer') dashboard = 'peer-dashboard.html';
                 if (role === 'psychologist') dashboard = 'psych-dashboard.html';
                 if (role === 'admin') dashboard = 'admin-dashboard.html';
+
+                console.log(`Auto-redirecting to ${dashboard}...`);
                 window.location.href = dashboard;
             }
         });
@@ -725,59 +752,99 @@
         // --- EXPOSE AUTH FUNCTIONS (Module Loaded Successfully) ---
         window.handlePhoneAction = async () => {
             const phoneBtn = document.getElementById('phone-action-btn');
-            const phoneInput = document.getElementById('params-phone').value;
+            const phoneInput = document.getElementById('params-phone');
             const otpInput = document.getElementById('params-otp');
             const otpGroup = document.getElementById('otp-group');
 
-            // ... (Rest of logic remains same, just ensuring this overrides the safe placeholder)
             try {
                 if (otpGroup.style.display === 'none') {
-                    // SEND OTP
-                    if (!phoneInput) return alert("Enter valid phone");
-                    phoneBtn.innerText = "Sending...";
-                    const res = await startPhoneLogin(phoneInput, recaptchaVerifier);
+                    // STEP 1: SEND OTP
+                    const phoneNumber = phoneInput.value.trim();
+                    if (!phoneNumber || !phoneNumber.startsWith('+')) {
+                        alert("Please enter phone number with country code (e.g., +919855520392)");
+                        return;
+                    }
+
+                    phoneBtn.innerText = "Sending OTP...";
+                    phoneBtn.disabled = true;
+
+                    // Initialize reCAPTCHA if not already done
+                    if (!recaptchaVerifier) {
+                        recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                            'size': 'invisible'
+                        });
+                    }
+
+                    const res = await startPhoneLogin(phoneNumber, recaptchaVerifier);
                     if (res.success) {
                         confirmationResult = res.confirmationResult;
                         otpGroup.style.display = 'block';
                         phoneBtn.innerText = "Verify & Login";
-                        alert("OTP Sent!");
+                        phoneBtn.disabled = false;
+                        alert("✅ OTP Sent to your phone!");
                     } else {
-                        throw new Error(res.error);
+                        throw new Error(res.error || "Failed to send OTP");
                     }
                 } else {
-                    // VERIFY OTP
-                    const code = otpInput.value;
-                    if (!code) return alert("Enter OTP");
+                    // STEP 2: VERIFY OTP
+                    const code = otpInput.value.trim();
+                    if (!code || code.length !== 6) {
+                        alert("Please enter the 6-digit OTP code");
+                        return;
+                    }
+
                     phoneBtn.innerText = "Verifying...";
+                    phoneBtn.disabled = true;
+
                     const res = await completePhoneLogin(confirmationResult, code);
                     if (res.success) {
-                        // Auth Change listener will pick this up
+                        await createOrUpdateUserProfile(res.user);
+                        const intent = sessionStorage.getItem('loginIntent') || 'user';
+                        handleRoleRouting(res.user, intent);
                     } else {
-                        throw new Error(res.error);
+                        throw new Error(res.error || "Invalid OTP code");
                     }
                 }
             } catch (e) {
-                alert(e.message || "Error");
+                console.error('Phone auth error:', e);
+                alert(e.message || "An error occurred. Please try again.");
                 phoneBtn.innerText = otpGroup.style.display === 'none' ? "Send OTP" : "Verify & Login";
-                if (recaptchaVerifier) recaptchaVerifier.clear();
-                recaptchaVerifier = null; // Reset
+                phoneBtn.disabled = false;
+
+                // Reset reCAPTCHA on error
+                if (recaptchaVerifier) {
+                    recaptchaVerifier.clear();
+                    recaptchaVerifier = null;
+                }
             }
         };
 
         window.handleFacebookLogin = async () => {
-            const res = await loginWithFacebook();
-            if (!res.success) alert(res.error);
+            try {
+                const res = await loginWithFacebook();
+                if (!res.success) {
+                    alert(res.error || "Facebook login failed");
+                }
+            } catch (e) {
+                alert("Error: " + (e.message || "Facebook login failed"));
+            }
         };
 
         window.handleGoogleLogin = async () => {
-            const res = await loginWithGoogle();
-            if (!res.success) alert(res.error);
+            try {
+                const res = await loginWithGoogle();
+                if (!res.success) {
+                    alert(res.error || "Google login failed");
+                }
+            } catch (e) {
+                alert("Error: " + (e.message || "Google login failed"));
+            }
         };
 
         // --- INIT RECAPTCHA (Called by UI script) ---
         window.initRecaptcha = () => {
             if (!recaptchaVerifier) {
-                recaptchaVerifier = new RecaptchaVerifier(auth, 'phone-action-btn', {
+                recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                     'size': 'invisible'
                 });
             }
