@@ -504,6 +504,7 @@
             }
         }
     </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
 </head>
 
 <body class="auth">
@@ -718,6 +719,24 @@
                     const profileResult = await createOrUpdateUserProfile(result.user);
                     const isNewUser = profileResult && profileResult.isNewUser;
 
+                    // --- PEER ONBOARDING CHECK ---
+                    if (intent === 'peer') {
+                        // Check if setup is complete
+                        // We need to read from Firestore (ideally via a helper, but doing inline for speed)
+                        const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                        const db = getFirestore();
+                        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+                        if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                            window.location.href = 'peer-dashboard.html';
+                            return;
+                        } else {
+                            // If first time login (even with Google if allowed, or if setup not done)
+                            // Ideally peers shouldn't Google Login first time, but if they do, we can still route them
+                            // But for now, let's assume Email login is the primary provisioning method.
+                        }
+                    }
+
                     await handleRoleRouting(result.user, intent, isNewUser);
                 } else {
                     throw new Error(result.error);
@@ -761,13 +780,42 @@
                     }
 
                     // Check for returnUrl
-                    // Check for returnUrl
                     const returnUrl = sessionStorage.getItem('returnUrl');
-
-                    // FORCE SESSION CREATION: Always use handleRoleRouting to ensure token is generated.
-                    // If returnUrl is needed later, we should pass it to auth-context, but for now, 
-                    // prioritizing successful login over deep linking.
                     sessionStorage.removeItem('returnUrl');
+
+                    // --- PEER ONBOARDING CHECK ---
+                    if (intent === 'peer') {
+                        // Check if setup is complete
+                        const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                        const db = getFirestore();
+                        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+                        // IF user doc exists AND isSetupComplete is true, go to dashboard
+                        if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                            window.location.href = 'peer-dashboard.html';
+                            return;
+                        } else {
+                            // IF setup NOT complete, redirect to SETUP
+                            window.location.href = 'peer-setup.html';
+                            return;
+                        }
+                    }
+
+                    // --- PSYCHOLOGIST ONBOARDING CHECK ---
+                    if (intent === 'psychologist') {
+                        const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                        const db = getFirestore();
+                        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+                        if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                            window.location.href = 'psych-dashboard.html';
+                            return;
+                        } else {
+                            window.location.href = 'psych-setup.html';
+                            return;
+                        }
+                    }
+
                     await handleRoleRouting(result.user, intent);
                 } else {
                     const friendlyMsg = getFriendlyErrorMessage(result.error);

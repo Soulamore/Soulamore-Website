@@ -20,13 +20,31 @@ export async function createOrUpdateUserProfile(user) {
             photoURL: user.photoURL || '',
             createdAt: userSnap.exists() ? userSnap.data().createdAt : serverTimestamp(),
             updatedAt: serverTimestamp(),
-            // Additional profile fields
+            // --- PROFESSIONAL PROFILE FIELDS ---
+            // Identity
             bio: userSnap.exists() ? userSnap.data().bio || '' : '',
-            role: userSnap.exists() ? userSnap.data().role || '' : '',
-            interests: userSnap.exists() ? userSnap.data().interests || [] : [],
-            location: userSnap.exists() ? userSnap.data().location || '' : '',
+            role: userSnap.exists() ? userSnap.data().role || 'Psychologist' : 'Psychologist',
             phone: userSnap.exists() ? userSnap.data().phone || '' : '',
-            dateOfBirth: userSnap.exists() ? userSnap.data().dateOfBirth || '' : '',
+            location: userSnap.exists() ? userSnap.data().location || '' : '',
+
+            // Professional Details
+            title: userSnap.exists() ? userSnap.data().title || '' : '', // e.g. "Clinical Psychologist"
+            qualification: userSnap.exists() ? userSnap.data().qualification || '' : '',
+            licenseNumber: userSnap.exists() ? userSnap.data().licenseNumber || '' : '',
+            languages: userSnap.exists() ? userSnap.data().languages || [] : [],
+            sessionFee: userSnap.exists() ? userSnap.data().sessionFee || '' : '',
+
+            // Rich Content
+            experience: userSnap.exists() ? userSnap.data().experience || [] : [], // Array of strings or objects
+            expertise: userSnap.exists() ? userSnap.data().expertise || [] : [], // Tags
+            therapeuticStyle: userSnap.exists() ? userSnap.data().therapeuticStyle || [] : [], // New SWOT Style
+            firstSessionExpectations: userSnap.exists() ? userSnap.data().firstSessionExpectations || '' : '', // New SWOT Expectation
+            values: userSnap.exists() ? userSnap.data().values || [] : [],
+
+            // Peer Specific (Optional overlap)
+            livedExperience: userSnap.exists() ? userSnap.data().livedExperience || [] : [],
+
+            // Settings
             preferences: userSnap.exists() ? userSnap.data().preferences || {} : {
                 notifications: true,
                 emailUpdates: true,
@@ -37,14 +55,15 @@ export async function createOrUpdateUserProfile(user) {
         let isNewUser = false;
 
         if (userSnap.exists()) {
-            // Update existing profile
+            // Update existing profile (Merge deep if needed, but for now specific fields)
+            // We rely on updateUserProfile for specific updates usually, but this ensures auth sync
             await updateDoc(userRef, {
                 displayName: profileData.displayName,
                 email: profileData.email,
                 photoURL: profileData.photoURL,
                 updatedAt: serverTimestamp()
             });
-            console.log('User profile updated:', user.uid);
+            console.log('User profile synced on auth:', user.uid);
         } else {
             // Create new profile
             await setDoc(userRef, profileData);
