@@ -670,10 +670,17 @@
 
             const div = document.createElement('div');
             div.className = 'chat-msg me';
-            div.innerHTML = `
-                <div class="chat-meta">You • Now</div>
-                <div class="chat-bubble me">${text}</div>
-            `;
+
+            const meta = document.createElement('div');
+            meta.className = 'chat-meta';
+            meta.textContent = 'You • Now';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble me';
+            bubble.textContent = text;  // SECURITY: Use textContent instead of innerHTML
+
+            div.appendChild(meta);
+            div.appendChild(bubble);
 
             msgs.appendChild(div);
             msgs.scrollTop = msgs.scrollHeight;

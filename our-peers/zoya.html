@@ -421,19 +421,35 @@
                 btn.innerText = "Published!";
                 btn.style.background = "#22c55e";
 
-                // Add to list
+                // Add to list (SECURITY FIX: Use safe DOM methods instead of innerHTML)
                 const list = document.getElementById('reviewList');
                 const div = document.createElement('div');
                 div.className = 'review-item';
-                div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <strong style="color:var(--text-dark);">${name}</strong>
-                        <span style="color:var(--gold-star); font-size:0.8rem;">
-                            ${Array(currentRating).fill('<i class="fas fa-star"></i>').join('')}
-                        </span>
-                    </div>
-                    <p style="color:var(--text-muted); font-style:italic;">"${msg}"</p>
-                `;
+
+                const header = document.createElement('div');
+                header.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:5px;';
+
+                const nameEl = document.createElement('strong');
+                nameEl.style.color = 'var(--text-dark)';
+                nameEl.textContent = name;  // Safe: textContent
+
+                const starsEl = document.createElement('span');
+                starsEl.style.cssText = 'color:var(--gold-star); font-size:0.8rem;';
+                for (let i = 0; i < currentRating; i++) {
+                    const star = document.createElement('i');
+                    star.className = 'fas fa-star';
+                    starsEl.appendChild(star);
+                }
+
+                header.appendChild(nameEl);
+                header.appendChild(starsEl);
+
+                const msgEl = document.createElement('p');
+                msgEl.style.cssText = 'color:var(--text-muted); font-style:italic;';
+                msgEl.textContent = `"${msg}"`;  // Safe: textContent
+
+                div.appendChild(header);
+                div.appendChild(msgEl);
                 list.insertBefore(div, list.firstChild);
 
                 setTimeout(() => {
