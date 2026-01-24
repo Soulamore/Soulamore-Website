@@ -509,9 +509,16 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Redirect if already logged in
+        // Redirect if already logged in (LOOP PREVENTION: Check if user came from dashboard)
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // SECURITY: Prevent redirect loop - only auto-redirect if NOT coming from auth failure
+                const fromDashboard = document.referrer.includes('dashboard');
+                if (fromDashboard) {
+                    console.warn('Redirect loop detected - staying on login page');
+                    return; // Stay on login, don't redirect back
+                }
+
                 const role = sessionStorage.getItem('userRole') || 'user';
                 let dashboard = 'user-dashboard.html';
                 if (role === 'peer') dashboard = 'peer-dashboard.html';
