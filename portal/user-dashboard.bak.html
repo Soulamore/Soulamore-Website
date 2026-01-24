@@ -377,6 +377,25 @@
             letter-spacing: 0.5px;
         }
 
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+
+        .side-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
         .side-link i {
             width: 20px;
             text-align: center;
@@ -408,19 +427,8 @@
             margin-left: 260px;
             /* Sidebar Width */
             padding: 20px 40px;
-            /* Removed max-width: 1400px to allow centering */
-            width: auto;
-            overflow-y: auto;
-            /* ENABLE SCROLLING */
-        }
-
-        /* --- CENTERED STAGE --- */
-        .view-section {
-            max-width: 1200px;
-            /* Standardize content width */
-            margin: 0 auto;
-            /* Center within the main container */
-            width: 100%;
+            /* Reduced padding from 40px 60px */
+            max-width: 1400px;
         }
 
         /* --- CARDS & PANELS --- */
@@ -739,9 +747,10 @@
             --bg-deep: #f1f5f9;
             --bg-card: #ffffff;
             --bg-sidebar: #ffffff;
-            --text-main: #0f172a;
-            --text-primary: #0f172a;
-            /* FIX: Ensure primary text is dark */
+            --text-main: #334155;
+            /* Changed from #0f172a to Slate 700 for softer dark grey */
+            --text-primary: #334155;
+            /* Changed from #0f172a to Slate 700 */
             --text-muted: #64748b;
             --text-secondary: #475569;
             /* FIX: Ensure secondary text is dark gray */
@@ -859,11 +868,10 @@
                     onclick="switchView('journal', this)" data-view="journal"><i class="fas fa-book"></i><span>My
                         Journal</span></a><a href="#" class="side-link" onclick="switchView('bookings', this)"
                     data-view="bookings"><i class="fas fa-calendar-alt"></i><span>My Sessions</span></a><a href="#"
-                    class="side-link" onclick="switchView('peer-guidelines', this)" data-view="peer-guidelines"><i
-                        class="fas fa-hands-helping"></i><span>Peer Guidelines</span></a><a href="#" class="side-link"
-                    onclick="switchView('soulbot', this)" data-view="soulbot"><i class="fas fa-robot"></i><span>SoulBot
-                        AI</span></a><a href="#" onclick="switchView('messages', this)" data-view="messages"
-                    class="side-link"><i class="fas fa-envelope"></i><span>Messages</span></a><a href="#"
+                    class="side-link" onclick="switchView('soulbot', this)" data-view="soulbot"><i
+                        class="fas fa-robot"></i><span>SoulBot AI</span></a><a href="#"
+                    onclick="switchView('messages', this)" data-view="messages" class="side-link"><i
+                        class="fas fa-envelope"></i><span>Messages</span></a><a href="#"
                     onclick="switchView('saved', this)" class="side-link"><i
                         class="fas fa-bookmark"></i><span>Saved</span></a>
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:10px 0;"><a href="#"
@@ -1071,7 +1079,7 @@
                         style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
                         <!-- Header -->
                         <div
-                            style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2);">
+                            style="padding:20px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; background:transparent;">
                             <div style="display:flex; gap:15px; align-items:center;">
                                 <div
                                     style="width:40px; height:40px; background:var(--teal-glow); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#0f172a; font-size:1.2rem;">
@@ -1102,7 +1110,7 @@
                         </div>
                         <!-- Input -->
                         <div
-                            style="padding:20px; background:rgba(0,0,0,0.2); border-top:1px solid rgba(255,255,255,0.05); display:flex; gap:10px;">
+                            style="padding:20px; background:transparent; border-top:1px solid var(--border-subtle); display:flex; gap:10px;">
                             <input type="text" id="soulbot-input" placeholder="Type your message..."
                                 style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:12px 15px; border-radius:12px; color:white; outline:none;"><button
                                 onclick="sendMessage()"
@@ -1135,473 +1143,350 @@
                     </div>
                 </div>
             </div>
-    </div>
-    <!-- VIEW: PEER GUIDELINES (User Version) -->
-    <div id="view-peer-guidelines" class="view-section" style="display:none;">
-        <div class="dash-card">
-            <!-- Header -->
-            <div style="text-align:center; margin-bottom:40px;">
-                <h1 style="font-family:'Outfit'; font-size:2.5rem; color:var(--teal-accent); margin-bottom:15px;">Peer
-                    Support Guidelines</h1>
-                <p style="opacity:0.8; max-width:800px; margin:0 auto; line-height:1.6;">
-                    Welcome to Soulamore's peer support sessions. A safe, empathetic space to connect, share, and
-                    support one another on your journey.
-                </p>
-            </div>
-
-            <!-- Intro Text -->
-            <div
-                style="background:rgba(45, 212, 191, 0.05); border:1px solid rgba(45, 212, 191, 0.2); border-radius:12px; padding:25px; margin-bottom:40px;">
-                <h3 style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:15px; font-size:1.2rem;">
-                    Ideally for You</h3>
-                <p style="font-size:0.95rem; opacity:0.8; line-height:1.6;">
-                    Our sessions offer understanding, validation, and encouragement. Whether you're navigating stress,
-                    anxiety, or seeking connection, these sessions are designed to provide solace and companionship in a
-                    supportive environment.
-                </p>
-            </div>
-
-            <!-- Guidelines Grid -->
-            <div
-                style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:25px; margin-bottom:40px;">
-
-                <!-- 1. Confidentiality -->
-                <div
-                    style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
-                    <h3 style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
-                        Confidentiality</h3>
-                    <p style="font-size:0.95rem; opacity:0.8; line-height:1.6;">Respect the privacy of others. Refrain
-                        from sharing personal information disclosed during the session with outside parties.</p>
-                </div>
-
-                <!-- 2. Active Participation -->
-                <div
-                    style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
-                    <h3 style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
-                        Active Participation</h3>
-                    <p style="font-size:0.95rem; opacity:0.8; line-height:1.6;">Engage actively by sharing openly. Take
-                        advantage of this safe space to express your emotions.</p>
-                </div>
-
-                <!-- 3. Respectful Communication -->
-                <div
-                    style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
-                    <h3 style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
-                        Respectful Communication</h3>
-                    <p style="font-size:0.95rem; opacity:0.8; line-height:1.6;">Listen attentively. Validate feelings
-                        and offer support without judgment. Practice empathy.</p>
-                </div>
-
-                <!-- 4. Boundaries -->
-                <div
-                    style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
-                    <h3 style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
-                        Boundaries</h3>
-                    <p style="font-size:0.95rem; opacity:0.8; line-height:1.6;">Respect comfort levels. Avoid pressuring
-                        others to share more than they wish. Refrain from unsolicited advice.</p>
-                </div>
-
-                <!-- 5. Non-Judgmental Attitude -->
-                <div
-                    style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
-                    <h3 style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
-                        Non-Judgmental</h3>
-                    <p style="font-size:0.95rem; opacity:0.8; line-height:1.6;">Recognize that everyone's experiences
-                        are valid. Refrain from criticizing or invalidating others.</p>
-                </div>
-
-                <!-- 6. Mutual Support -->
-                <div
-                    style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
-                    <h3 style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
-                        Mutual Support</h3>
-                    <p style="font-size:0.95rem; opacity:0.8; line-height:1.6;">Offer encouragement and validation. Be
-                        receptive to receiving support from others in return.</p>
-                </div>
-
-                <!-- 7. Self-Care -->
-                <div
-                    style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
-                    <h3 style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
-                        Self-Care</h3>
-                    <p style="font-size:0.95rem; opacity:0.8; line-height:1.6;">Prioritize your well-being. Take breaks
-                        if needed. Seek additional support if sessions become challenging.</p>
-                </div>
-
-                <!-- 8. Respect for Diversity -->
-                <div
-                    style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
-                    <h3 style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
-                        Respect for Diversity</h3>
-                    <p style="font-size:0.95rem; opacity:0.8; line-height:1.6;">Embrace differences. Be respectful of
-                        differing perspectives and backgrounds. Create an inclusive environment.</p>
-                </div>
-
-            </div>
-
-            <!-- Closing Quote -->
-            <div
-                style="background:rgba(45, 212, 191, 0.05); border-left:4px solid var(--teal-accent); padding:25px; border-radius:0 8px 8px 0; margin-bottom:40px;">
-                <p
-                    style="font-style:italic; font-size:1.1rem; color:var(--text-main); line-height:1.8; margin-bottom:15px;">
-                    "By following these guidelines, you contribute to a positive environment where everyone feels
-                    valued, respected, and empowered. Thank you for supporting your peers on their journey toward
-                    healing."
-                </p>
-                <div
-                    style="font-weight:700; color:var(--teal-accent); letter-spacing:1px; text-transform:uppercase; font-size:0.9rem;">
-                    — Team Soulamore
-                </div>
-            </div>
-
-            <!-- Actions -->
-            <div style="text-align:center; padding-top:20px; border-top:1px solid var(--border-subtle);">
-                <button class="btn-dash-primary" onclick="window.location.href='../our-peers/profile.html'">Book a
-                    Session</button>
-            </div>
-
-        </div>
-    </div>
-    <!-- VIEW: HOME (Reference Design Replication - NO SCROLL) -->
-    <div id="view-home" class="view-section" style="padding-top:10px;">
-        <!-- Minimized Top Padding -->
-        <!-- LAYER 1: GROUNDING & PRIMARY ACTION -->
-        <div style="text-align:center; padding:10px 0 20px;">
-            <!-- Compact Header -->
-            <h1 id="welcome-greeting"
-                style="font-family:'Outfit'; font-size:2rem; margin-bottom:5px; color:var(--text-main);">
-                <!-- Reduced from 2.5rem -->Welcome back.
-            </h1>
-            <p style="opacity:0.8; font-size:1rem; margin-bottom:5px; color:var(--text-muted);">
-                Take a deep breath. You are safe here.</p>
-            <p style="font-size:0.85rem; margin-bottom:20px; color:var(--text-muted); font-style:italic;">
-                You can move at your own pace.</p>
-            <!-- 1. SOULBOT HERO (Compact) -->
-            <div class="dash-card soulbot-hero"
-                style="background:var(--bg-card); border:1px solid var(--border-subtle); padding:30px 20px !important; text-align:center; max-width:800px; margin:0 auto 20px; min-height:auto;">
-                <i class="fas fa-robot"
-                    style="font-size:3rem; color:var(--teal-accent); margin-bottom:15px; filter:drop-shadow(0 0 15px var(--teal-dim));"></i>
-                <h2
-                    style="font-family:'Outfit'; font-size:1.5rem; letter-spacing:-0.5px; color:var(--text-main); margin-bottom:8px;">
-                    SoulBot is here with you. </h2>
-                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px; opacity:0.8;">
-                    Start where you are. We'll figure out the rest
-                    together.
-                </p><button onclick="switchView('soulbot', this)" class="btn-dash-primary"
-                    style="padding:12px 30px; font-size:0.95rem; box-shadow:0 0 15px var(--teal-dim);">Continue
-                    with SoulBot </button>
-            </div>
-            <!-- 2. YOUR JOURNAL (Compact Strip) -->
-            <div class="dash-card"
-                style="display:flex; justify-content:space-between; align-items:center; padding:20px 30px; max-width:800px; margin:0 auto 20px;">
-                <div style="text-align:left;">
-                    <h3 style="font-size:1.1rem; margin-bottom:4px; color:var(--text-main);">
-                        Your Journal</h3>
-                    <p style="margin:0; color:var(--text-muted); opacity:0.7; font-size:0.85rem;">
-                        Write or continue your reflection.</p>
-                </div><button onclick="switchView('journal', this)"
-                    style="background:transparent; border:1px solid var(--border-subtle); color:var(--text-main); padding:8px 20px; border-radius:50px; cursor:pointer; font-weight:600; font-size:0.9rem; transition:0.2s;">Open
-                    Journal </button>
-            </div>
-            <!-- 3. SUPPORT SECTION (Split - Compact) -->
-            <div
-                style="margin-top:20px; margin-bottom:15px; text-align:center; opacity:0.5; font-size:0.75rem; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">
-                When you want to talk to someone </div>
-            <div class="dashboard-grid"
-                style="grid-template-columns: 1fr 1fr; gap:15px; max-width:800px; margin:0 auto;">
-                <!-- PEER TALK -->
-                <div class="dash-card link-hover" onclick="window.location.href='../our-peers/profile.html'"
-                    style="text-align:center; padding:20px 15px; cursor:pointer; min-height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--peach-bg); border:1px solid var(--peach-border); border-radius:16px; transition:all 0.3s ease;">
-                    <i class="fas fa-hands-helping"
-                        style="font-size:1.6rem; margin-bottom:15px; color:var(--peach-glow);"></i>
-                    <h3 style="font-size:1.1rem; margin-bottom:5px; color:var(--peach-glow); font-weight:600;">
-                        Talk to a Peer</h3>
-                    <p style="font-size:0.85rem; color:var(--text-muted); opacity:0.8; margin:0;">
-                        Someone sitting beside you.</p>
-                </div>
-                <!-- PROFESSIONAL HELP -->
-                <div class="dash-card link-hover" onclick="window.location.href='../our-psychologists/about.html'"
-                    style="text-align:center; padding:20px 15px; cursor:pointer; min-height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--teal-dim); border:1px solid var(--teal-border); border-radius:16px; transition:all 0.3s ease;">
-                    <i class="fas fa-user-md"
-                        style="font-size:1.6rem; margin-bottom:15px; color:var(--teal-accent);"></i>
-                    <h3 style="font-size:1.1rem; margin-bottom:5px; color:var(--teal-accent); font-weight:600;">
-                        Professional Guidance</h3>
-                    <p style="font-size:0.85rem; color:var(--text-muted); opacity:0.8; margin:0;">
-                        Structured care and support.</p>
-                </div>
-            </div>
-        </div>
-        <!-- 4. QUICK RELAXATION TOOLS (New Tab Buttons) -->
-        <div style="margin-top:20px; text-align:center;">
-            <div
-                style="opacity:0.5; font-size:0.75rem; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:15px;">
-                Quick Relief </div>
-            <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
-                <button onclick="window.open('../tools/vent-box.html', '_blank')"
-                    style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#ef4444; padding:8px 16px; border-radius:20px; font-weight:600; cursor:pointer; display:flex; gap:8px; align-items:center;"><i
-                        class="fas fa-fire"></i>Vent </button><button
-                    onclick="window.open('../tools/confession-box/index.html', '_blank')"
-                    style="background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px 16px; border-radius:20px; font-weight:600; cursor:pointer; display:flex; gap:8px; align-items:center;"><i
-                        class="fas fa-ghost"></i>Confess </button><button
-                    onclick="window.open('../tools/drop-it.html', '_blank')"
-                    style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); color:#38bdf8; padding:8px 16px; border-radius:20px; font-weight:600; cursor:pointer; display:flex; gap:8px; align-items:center;"><i
-                        class="fas fa-hand-holding-water"></i>Drop It
-                </button><button onclick="window.open('../tools/playground.html', '_blank')"
-                    style="background:rgba(250, 176, 5, 0.1); border:1px solid rgba(250, 176, 5, 0.3); color:#fab005; padding:8px 16px; border-radius:20px; font-weight:600; cursor:pointer; display:flex; gap:8px; align-items:center;"><i
-                        class="fas fa-shapes"></i>Play </button>
-            </div>
-        </div>
-    </div>
-    <!-- VIEW: BOOKINGS (Enhanced) -->
-    <!-- VIEW: BOOKINGS (Enhanced - Compact) -->
-    <div id="view-bookings" class="view-section" style="display:none; padding-top:0;">
-        <!-- Header matching SoulBot style -->
-        <div
-            style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-            <div
-                style="width:40px; height:40px; background:var(--teal-dim); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--teal-accent);">
-                <i class="fas fa-calendar-alt"></i>
-            </div>
-            <div>
-                <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">My Sessions
-                </h2>
-                <div style="font-size:0.8rem; opacity:0.7;">Manage your appointments</div>
-            </div>
-        </div>
-        <!-- TABS -->
-        <div
-            style="display:flex; gap:20px; border-bottom:1px solid var(--border-soft); margin-bottom:20px; padding-bottom:5px;">
-            <div
-                style="font-weight:700; color:var(--teal-accent); border-bottom:2px solid var(--teal-accent); padding-bottom:5px; cursor:pointer;">
-                Upcoming</div>
-            <div style="opacity:0.6; cursor:pointer;">History</div>
-            <div style="opacity:0.6; cursor:pointer;">Feedback</div>
-        </div>
-        <div class="dashboard-grid" style="gap:20px;">
-            <!-- MAIN LIST -->
-            <div class="dash-card" style="grid-column: span 1; padding:20px;">
-                <h3 style="margin-bottom:15px; font-size:1.2rem;">
-                    Upcoming Sessions</h3>
-                <!-- Empty State Placeholder -->
-                <div
-                    style="text-align:center; padding:20px; background:var(--bg-deep); border-radius:12px; border:1px dashed var(--border-subtle);">
-                    <i class="fas fa-calendar-check" style="font-size:1.5rem; opacity:0.3; margin-bottom:10px;"></i>
-                    <p style="opacity:0.7; font-size:0.9rem; margin-bottom:10px;">
-                        No upcoming sessions scheduled.</p><button
-                        onclick="window.location.href='../our-peers/about.html'" class="btn-dash-primary"
-                        style="font-size:0.85rem; padding:8px 20px;">Book
-                        a Session</button>
-                </div>
-            </div>
-            <!-- SIDEBAR: FIND HELP -->
-            <div style="display:flex; flex-direction:column; gap:15px;">
-                <!-- Book New -->
-                <div class="dash-card" style="padding:20px;">
-                    <h4 style="margin-bottom:10px; font-size:1.1rem;">
-                        Find Support</h4>
-                    <div onclick="openTool('../our-peers/index.html', 'Browse Peers')" class="action-row peach"
-                        style="margin-bottom:10px;">
-                        <div
-                            style="width:30px; height:30px; background:rgba(244, 159, 117, 0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--peach-glow);">
-                            <i class="fas fa-hands-helping" style="font-size:0.9rem;"></i>
-                        </div>
-                        <div style="font-size:0.85rem;">Browse
-                            Peer Listeners</div>
+            <!-- VIEW: HOME (Reference Design Replication - NO SCROLL) -->
+            <div id="view-home" class="view-section" style="padding-top:10px;">
+                <!-- Minimized Top Padding -->
+                <!-- LAYER 1: GROUNDING & PRIMARY ACTION -->
+                <div style="text-align:center; padding:10px 0 20px;">
+                    <!-- Compact Header -->
+                    <h1 id="welcome-greeting"
+                        style="font-family:'Outfit'; font-size:2rem; margin-bottom:5px; color:var(--text-main);">
+                        <!-- Reduced from 2.5rem -->Welcome back.
+                    </h1>
+                    <p style="opacity:0.8; font-size:1rem; margin-bottom:5px; color:var(--text-muted);">
+                        Take a deep breath. You are safe here.</p>
+                    <p style="font-size:0.85rem; margin-bottom:20px; color:var(--text-muted); font-style:italic;">
+                        You can move at your own pace.</p>
+                    <!-- 1. SOULBOT HERO (Compact) -->
+                    <div class="dash-card soulbot-hero"
+                        style="background:var(--bg-card); border:1px solid var(--border-subtle); padding:30px 20px !important; text-align:center; max-width:800px; margin:0 auto 20px; min-height:auto;">
+                        <i class="fas fa-robot"
+                            style="font-size:3rem; color:var(--teal-accent); margin-bottom:15px; filter:drop-shadow(0 0 15px var(--teal-dim));"></i>
+                        <h2
+                            style="font-family:'Outfit'; font-size:1.5rem; letter-spacing:-0.5px; color:var(--text-main); margin-bottom:8px;">
+                            SoulBot is here with you. </h2>
+                        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px; opacity:0.8;">
+                            Start where you are. We'll figure out the rest
+                            together.
+                        </p><button onclick="switchView('soulbot', this)" class="btn-dash-primary"
+                            style="padding:12px 30px; font-size:0.95rem; box-shadow:0 0 15px var(--teal-dim);">Continue
+                            with SoulBot </button>
                     </div>
-                    <div onclick="openTool('../our-psychologists/psychologists.html', 'Browse Psychologists')"
-                        class="action-row" style="margin-bottom:10px;">
-                        <div
-                            style="width:30px; height:30px; background:rgba(78, 205, 196, 0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--teal-accent);">
-                            <i class="fas fa-user-md" style="font-size:0.9rem;"></i>
-                        </div>
-                        <div style="font-size:0.85rem;">Find a
-                            Psychologist</div>
+                    <!-- 2. YOUR JOURNAL (Compact Strip) -->
+                    <div class="dash-card"
+                        style="display:flex; justify-content:space-between; align-items:center; padding:20px 30px; max-width:800px; margin:0 auto 20px;">
+                        <div style="text-align:left;">
+                            <h3 style="font-size:1.1rem; margin-bottom:4px; color:var(--text-main);">
+                                Your Journal</h3>
+                            <p style="margin:0; color:var(--text-muted); opacity:0.7; font-size:0.85rem;">
+                                Write or continue your reflection.</p>
+                        </div><button onclick="switchView('journal', this)"
+                            style="background:transparent; border:1px solid var(--border-subtle); color:var(--text-main); padding:8px 20px; border-radius:50px; cursor:pointer; font-weight:600; font-size:0.9rem; transition:0.2s;">Open
+                            Journal </button>
                     </div>
-                    <div onclick="window.open('https://www.supersaas.com/', '_blank')" class="action-row">
-                        <div
-                            style="width:30px; height:30px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                            <i class="fas fa-calendar-alt" style="font-size:0.9rem;"></i>
-                        </div>
-                        <div style="font-size:0.85rem;">
-                            SuperSaaS Calendar</div>
-                    </div>
-                </div>
-                <!-- Credits -->
-                <div class="dash-card" style="position:relative; overflow:hidden; padding:20px;">
-                    <h4 style="margin-bottom:5px; font-size:1.1rem;">
-                        Wallet</h4>
-                    <div style="font-size:1.8rem; font-weight:700; color:var(--text-main);">
-                        $0.00</div>
-                    <div style="font-size:0.8rem; opacity:0.6; margin-bottom:10px;">
-                        Available Credits</div><button
-                        style="width:100%; padding:8px; background:var(--bg-deep); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; cursor:pointer; font-size:0.9rem;">Add
-                        Funds</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- VIEW: JOURNAL (New - Compact) -->
-    <div id="view-journal" class="view-section" style="display:none; padding-top:0;">
-        <div style="display:grid; grid-template-columns: 240px 1fr; gap:20px; height:calc(100vh - 120px);">
-            <!-- Maximized Height -->
-            <!-- Sidebar -->
-            <div class="dash-card" style="padding:15px; display:flex; flex-direction:column;">
-                <button
-                    style="width:100%; padding:10px; background:var(--teal-accent); color:#0f172a; border:none; border-radius:8px; font-weight:700; cursor:pointer; margin-bottom:15px; font-size:0.9rem;"><i
-                        class="fas fa-plus"></i>New Entry</button>
-                <div
-                    style="font-size:0.75rem; opacity:0.6; text-transform:uppercase; margin-bottom:10px; font-weight:700;">
-                    Recent</div>
-                <!-- DYNAMIC LIST CONTAINER -->
-                <div id="journal-list" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:3px;">
-                    <!-- Injected via JS -->
-                </div>
-                <!-- EMPTY STATE -->
-                <div id="journal-empty" style="text-align:center; padding:20px; opacity:0.6; display:none;">
-                    <i class="fas fa-pen-fancy" style="margin-bottom:10px;"></i>
-                    <div style="font-size:0.8rem;">No
-                        entries yet.</div>
-                </div>
-            </div>
-            <!-- Editor -->
-            <div class="dash-card" style="display:flex; flex-direction:column; padding:25px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <input type="text" value="Morning Thoughts"
-                        style="background:transparent; border:none; font-size:1.4rem; font-family:var(--font-head); color:var(--text-main); flex:1; outline:none;">
-                    <div style="opacity:0.5; font-size:0.85rem; white-space:nowrap; margin-left:15px;">
-                        Saved</div>
-                </div><textarea
-                    style="flex:1; background:transparent; border:none; resize:none; font-family:var(--font-body); font-size:1rem; line-height:1.6; color:var(--text-muted); outline:none;"
-                    placeholder="Start writing..."></textarea>
-            </div>
-        </div>
-    </div>
-    <!-- VIEW: SAVED CONTENT -->
-    <div id="view-saved" class="view-section" style="display:none; padding-top:0;">
-        <!-- Header matching SoulBot style -->
-        <div
-            style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-            <div
-                style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
-                <i class="fas fa-bookmark"></i>
-            </div>
-            <div>
-                <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">Saved for
-                    Later
-                </h2>
-                <div style="font-size:0.8rem; opacity:0.7;">Your bookmarked content</div>
-            </div>
-        </div>
-        <div class="dash-card">
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button
-                    style="padding:8px 15px; background:white; color:#0f172a; border-radius:30px; border:none; font-weight:700;">All</button><button
-                    style="padding:8px 15px; background:rgba(255,255,255,0.05); color:white; border-radius:30px; border:none;">Articles</button><button
-                    style="padding:8px 15px; background:rgba(255,255,255,0.05); color:white; border-radius:30px; border:none;">Forum
-                    Posts</button>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:15px;">
-                <div
-                    style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-weight:700; margin-bottom:5px;">
-                            Understanding Anxiety Triggers</div>
-                        <div style="font-size:0.8rem; opacity:0.6;">
-                            Saved 2 days ago • Blog</div>
-                    </div><button
-                        style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:white; padding:5px 15px; border-radius:4px;">Read</button>
-                </div>
-                <div
-                    style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-weight:700; margin-bottom:5px;">
-                            "How do you handle exam stress?" </div>
-                        <div style="font-size:0.8rem; opacity:0.6;">
-                            Saved 5 hours ago • Forum • 12 new replies
-                        </div>
-                    </div><button
-                        style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:white; padding:5px 15px; border-radius:4px;">View
-                        Thread</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- VIEW: MESSAGES (Integrated) -->
-    <div id="view-messages" class="view-section" style="display:none; height:100%; padding-top:0;">
-        <div style="display:grid; grid-template-columns: 320px 1fr; gap:20px; height:calc(100vh - 120px);">
-            <!-- THREADS -->
-            <div class="dash-card" style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
-                <div
-                    style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; opacity:0.6; font-weight:700;">
-                    Active Threads</div>
-                <div class="thread-item active"
-                    style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); border-left:3px solid var(--teal-accent);">
+                    <!-- 3. SUPPORT SECTION (Split - Compact) -->
                     <div
-                        style="width:40px; height:40px; background:var(--teal-accent); border-radius:50%; color:#0f172a; display:flex; align-items:center; justify-content:center;">
-                        <i class="fas fa-user-md"></i>
-                    </div>
-                    <div style="flex:1;">
-                        <div style="font-weight:600;">Dr. Emily Stone</div>
-                        <div style="font-size:0.8rem; opacity:0.7;">Reflection Task</div>
+                        style="margin-top:20px; margin-bottom:15px; text-align:center; opacity:0.5; font-size:0.75rem; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">
+                        When you want to talk to someone </div>
+                    <div class="dashboard-grid"
+                        style="grid-template-columns: 1fr 1fr; gap:15px; max-width:800px; margin:0 auto;">
+                        <!-- PEER TALK -->
+                        <div class="dash-card link-hover" onclick="window.location.href='../our-peers/profile.html'"
+                            style="text-align:center; padding:20px 15px; cursor:pointer; min-height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--peach-bg); border:1px solid var(--peach-border); border-radius:16px; transition:all 0.3s ease;">
+                            <i class="fas fa-hands-helping"
+                                style="font-size:1.6rem; margin-bottom:15px; color:var(--peach-glow);"></i>
+                            <h3 style="font-size:1.1rem; margin-bottom:5px; color:var(--peach-glow); font-weight:600;">
+                                Talk to a Peer</h3>
+                            <p style="font-size:0.85rem; color:var(--text-muted); opacity:0.8; margin:0;">
+                                Someone sitting beside you.</p>
+                        </div>
+                        <!-- PROFESSIONAL HELP -->
+                        <div class="dash-card link-hover"
+                            onclick="window.location.href='../our-psychologists/about.html'"
+                            style="text-align:center; padding:20px 15px; cursor:pointer; min-height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--teal-dim); border:1px solid var(--teal-border); border-radius:16px; transition:all 0.3s ease;">
+                            <i class="fas fa-user-md"
+                                style="font-size:1.6rem; margin-bottom:15px; color:var(--teal-accent);"></i>
+                            <h3 style="font-size:1.1rem; margin-bottom:5px; color:var(--teal-accent); font-weight:600;">
+                                Professional Guidance</h3>
+                            <p style="font-size:0.85rem; color:var(--text-muted); opacity:0.8; margin:0;">
+                                Structured care and support.</p>
+                        </div>
                     </div>
                 </div>
-                <div class="thread-item"
-                    style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); border-left:3px solid var(--peach-glow); opacity:0.85;">
+                <!-- 4. QUICK RELAXATION TOOLS (New Tab Buttons) -->
+                <div style="margin-top:20px; text-align:center;">
                     <div
-                        style="width:40px; height:40px; background:var(--peach-glow); border-radius:50%; color:#0f172a; display:flex; align-items:center; justify-content:center;">
-                        <i class="fas fa-hands-helping"></i>
-                    </div>
-                    <div style="flex:1;">
-                        <div style="font-weight:600;">Peer Sarah</div>
-                        <div style="font-size:0.8rem; opacity:0.7;">Checking in...</div>
+                        style="opacity:0.5; font-size:0.75rem; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:15px;">
+                        Quick Relief </div>
+                    <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+                        <button onclick="window.open('../tools/vent-box.html', '_blank')"
+                            style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#ef4444; padding:8px 16px; border-radius:20px; font-weight:600; cursor:pointer; display:flex; gap:8px; align-items:center;"><i
+                                class="fas fa-fire"></i>Vent </button><button
+                            onclick="window.open('../tools/confession-box/index.html', '_blank')"
+                            style="background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px 16px; border-radius:20px; font-weight:600; cursor:pointer; display:flex; gap:8px; align-items:center;"><i
+                                class="fas fa-ghost"></i>Confess </button><button
+                            onclick="window.open('../tools/drop-it.html', '_blank')"
+                            style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); color:#38bdf8; padding:8px 16px; border-radius:20px; font-weight:600; cursor:pointer; display:flex; gap:8px; align-items:center;"><i
+                                class="fas fa-hand-holding-water"></i>Drop It
+                        </button><button onclick="window.open('../tools/playground.html', '_blank')"
+                            style="background:rgba(250, 176, 5, 0.1); border:1px solid rgba(250, 176, 5, 0.3); color:#fab005; padding:8px 16px; border-radius:20px; font-weight:600; cursor:pointer; display:flex; gap:8px; align-items:center;"><i
+                                class="fas fa-shapes"></i>Play </button>
                     </div>
                 </div>
             </div>
-            <!-- CHAT AREA -->
-            <div class="dash-card" style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
+            <!-- VIEW: BOOKINGS (Enhanced) -->
+            <!-- VIEW: BOOKINGS (Enhanced - Compact) -->
+            <div id="view-bookings" class="view-section" style="display:none; padding-top:0;">
+                <!-- Header matching SoulBot style -->
                 <div
-                    style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
-                    <div style="display:flex; gap:10px; align-items:center;">
+                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px;">
+                    <div
+                        style="width:40px; height:40px; background:var(--teal-dim); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--teal-accent);">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">My Sessions
+                        </h2>
+                        <div style="font-size:0.8rem; opacity:0.7;">Manage your appointments</div>
+                    </div>
+                </div>
+                <!-- TABS -->
+                <div
+                    style="display:flex; gap:20px; border-bottom:1px solid var(--border-soft); margin-bottom:20px; padding-bottom:5px;">
+                    <div
+                        style="font-weight:700; color:var(--teal-accent); border-bottom:2px solid var(--teal-accent); padding-bottom:5px; cursor:pointer;">
+                        Upcoming</div>
+                    <div style="opacity:0.6; cursor:pointer;">History</div>
+                    <div style="opacity:0.6; cursor:pointer;">Feedback</div>
+                </div>
+                <div class="dashboard-grid" style="gap:20px;">
+                    <!-- MAIN LIST -->
+                    <div class="dash-card" style="grid-column: span 1; padding:20px;">
+                        <h3 style="margin-bottom:15px; font-size:1.2rem;">
+                            Upcoming Sessions</h3>
+                        <!-- Empty State Placeholder -->
                         <div
-                            style="width:35px; height:35px; background:var(--teal-accent); color:#0f172a; border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                            <i class="fas fa-user-md"></i>
+                            style="text-align:center; padding:20px; background:var(--bg-deep); border-radius:12px; border:1px dashed var(--border-subtle);">
+                            <i class="fas fa-calendar-check"
+                                style="font-size:1.5rem; opacity:0.3; margin-bottom:10px;"></i>
+                            <p style="opacity:0.7; font-size:0.9rem; margin-bottom:10px;">
+                                No upcoming sessions scheduled.</p><button
+                                onclick="window.location.href='../our-peers/about.html'" class="btn-dash-primary"
+                                style="font-size:0.85rem; padding:8px 20px;">Book
+                                a Session</button>
                         </div>
-                        <div>
-                            <div style="font-weight:700;">Dr. Emily Stone</div>
-                            <div style="font-size:0.8rem; opacity:0.6;">Clinical Psychologist
+                    </div>
+                    <!-- SIDEBAR: FIND HELP -->
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                        <!-- Book New -->
+                        <div class="dash-card" style="padding:20px;">
+                            <h4 style="margin-bottom:10px; font-size:1.1rem;">
+                                Find Support</h4>
+                            <div onclick="openTool('../our-peers/index.html', 'Browse Peers')" class="action-row peach"
+                                style="margin-bottom:10px;">
+                                <div
+                                    style="width:30px; height:30px; background:rgba(244, 159, 117, 0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--peach-glow);">
+                                    <i class="fas fa-hands-helping" style="font-size:0.9rem;"></i>
+                                </div>
+                                <div style="font-size:0.85rem;">Browse
+                                    Peer Listeners</div>
+                            </div>
+                            <div onclick="openTool('../our-psychologists/psychologists.html', 'Browse Psychologists')"
+                                class="action-row" style="margin-bottom:10px;">
+                                <div
+                                    style="width:30px; height:30px; background:rgba(78, 205, 196, 0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--teal-accent);">
+                                    <i class="fas fa-user-md" style="font-size:0.9rem;"></i>
+                                </div>
+                                <div style="font-size:0.85rem;">Find a
+                                    Psychologist</div>
+                            </div>
+                            <div onclick="window.open('https://www.supersaas.com/', '_blank')" class="action-row">
+                                <div
+                                    style="width:30px; height:30px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fas fa-calendar-alt" style="font-size:0.9rem;"></i>
+                                </div>
+                                <div style="font-size:0.85rem;">
+                                    SuperSaaS Calendar</div>
+                            </div>
+                        </div>
+                        <!-- Credits -->
+                        <div class="dash-card" style="position:relative; overflow:hidden; padding:20px;">
+                            <h4 style="margin-bottom:5px; font-size:1.1rem;">
+                                Wallet</h4>
+                            <div style="font-size:1.8rem; font-weight:700; color:var(--text-main);">
+                                $0.00</div>
+                            <div style="font-size:0.8rem; opacity:0.6; margin-bottom:10px;">
+                                Available Credits</div><button
+                                style="width:100%; padding:8px; background:var(--bg-deep); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; cursor:pointer; font-size:0.9rem;">Add
+                                Funds</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- VIEW: JOURNAL (New - Compact) -->
+            <div id="view-journal" class="view-section" style="display:none; padding-top:0;">
+                <div style="display:grid; grid-template-columns: 240px 1fr; gap:20px; height:calc(100vh - 120px);">
+                    <!-- Maximized Height -->
+                    <!-- Sidebar -->
+                    <div class="dash-card" style="padding:15px; display:flex; flex-direction:column;">
+                        <button
+                            style="width:100%; padding:10px; background:var(--teal-accent); color:#0f172a; border:none; border-radius:8px; font-weight:700; cursor:pointer; margin-bottom:15px; font-size:0.9rem;"><i
+                                class="fas fa-plus"></i>New Entry</button>
+                        <div
+                            style="font-size:0.75rem; opacity:0.6; text-transform:uppercase; margin-bottom:10px; font-weight:700;">
+                            Recent</div>
+                        <!-- DYNAMIC LIST CONTAINER -->
+                        <div id="journal-list"
+                            style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:3px;">
+                            <!-- Injected via JS -->
+                        </div>
+                        <!-- EMPTY STATE -->
+                        <div id="journal-empty" style="text-align:center; padding:20px; opacity:0.6; display:none;">
+                            <i class="fas fa-pen-fancy" style="margin-bottom:10px;"></i>
+                            <div style="font-size:0.8rem;">No
+                                entries yet.</div>
+                        </div>
+                    </div>
+                    <!-- Editor -->
+                    <div class="dash-card" style="display:flex; flex-direction:column; padding:25px;">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                            <input type="text" value="Morning Thoughts"
+                                style="background:transparent; border:none; font-size:1.4rem; font-family:var(--font-head); color:var(--text-main); flex:1; outline:none;">
+                            <div style="opacity:0.5; font-size:0.85rem; white-space:nowrap; margin-left:15px;">
+                                Saved</div>
+                        </div><textarea
+                            style="flex:1; background:transparent; border:none; resize:none; font-family:var(--font-body); font-size:1rem; line-height:1.6; color:var(--text-muted); outline:none;"
+                            placeholder="Start writing..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <!-- VIEW: SAVED CONTENT -->
+            <div id="view-saved" class="view-section" style="display:none; padding-top:0;">
+                <!-- Header matching SoulBot style -->
+                <div
+                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px;">
+                    <div
+                        style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                        <i class="fas fa-bookmark"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">Saved for
+                            Later
+                        </h2>
+                        <div style="font-size:0.8rem; opacity:0.7;">Your bookmarked content</div>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div style="display:flex; gap:10px; margin-bottom:20px;">
+                        <button
+                            style="padding:8px 15px; background:white; color:#0f172a; border-radius:30px; border:none; font-weight:700;">All</button><button
+                            style="padding:8px 15px; background:rgba(255,255,255,0.05); color:white; border-radius:30px; border:none;">Articles</button><button
+                            style="padding:8px 15px; background:rgba(255,255,255,0.05); color:white; border-radius:30px; border:none;">Forum
+                            Posts</button>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                        <div
+                            style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700; margin-bottom:5px;">
+                                    Understanding Anxiety Triggers</div>
+                                <div style="font-size:0.8rem; opacity:0.6;">
+                                    Saved 2 days ago • Blog</div>
+                            </div><button
+                                style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:white; padding:5px 15px; border-radius:4px;">Read</button>
+                        </div>
+                        <div
+                            style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700; margin-bottom:5px;">
+                                    "How do you handle exam stress?" </div>
+                                <div style="font-size:0.8rem; opacity:0.6;">
+                                    Saved 5 hours ago • Forum • 12 new replies
+                                </div>
+                            </div><button
+                                style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:white; padding:5px 15px; border-radius:4px;">View
+                                Thread</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- VIEW: MESSAGES (Integrated) -->
+            <div id="view-messages" class="view-section" style="display:none; height:100%; padding-top:0;">
+                <div style="display:grid; grid-template-columns: 320px 1fr; gap:20px; height:calc(100vh - 120px);">
+                    <!-- THREADS -->
+                    <div class="dash-card" style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
+                        <div
+                            style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; opacity:0.6; font-weight:700;">
+                            Active Threads</div>
+                        <div class="thread-item active"
+                            style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); border-left:3px solid var(--teal-accent);">
+                            <div
+                                style="width:40px; height:40px; background:var(--teal-accent); border-radius:50%; color:#0f172a; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <div style="font-weight:600;">Dr. Emily Stone</div>
+                                <div style="font-size:0.8rem; opacity:0.7;">Reflection Task</div>
+                            </div>
+                        </div>
+                        <div class="thread-item"
+                            style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); border-left:3px solid var(--peach-glow); opacity:0.85;">
+                            <div
+                                style="width:40px; height:40px; background:var(--peach-glow); border-radius:50%; color:#0f172a; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-hands-helping"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <div style="font-weight:600;">Peer Sarah</div>
+                                <div style="font-size:0.8rem; opacity:0.7;">Checking in...</div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div
-                    style="flex:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; min-height:0;">
-                    <div class="chat-bubble received"
-                        style="background:rgba(255,255,255,0.05); align-self:flex-start; max-width:75%; padding:12px; border-radius:12px; border-bottom-left-radius:2px;">
-                        Hi there. Following up on our session yesterday. Here is the reflection
-                        task. <div
-                            style="margin-top:10px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; border:1px solid var(--teal-accent);">
-                            <div style="font-weight:700; color:var(--teal-accent); margin-bottom:5px;">
-                                <i class="fas fa-pen"></i>Task: Anxiety
+                    <!-- CHAT AREA -->
+                    <div class="dash-card" style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
+                        <div
+                            style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <div
+                                    style="width:35px; height:35px; background:var(--teal-accent); color:#0f172a; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight:700;">Dr. Emily Stone</div>
+                                    <div style="font-size:0.8rem; opacity:0.6;">Clinical Psychologist
+                                    </div>
+                                </div>
                             </div>
-                            <p style="font-size:0.85rem; margin-bottom:5px;">List 3 situations
-                                this week.</p>
+                        </div>
+                        <div
+                            style="flex:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; min-height:0;">
+                            <div class="chat-bubble received"
+                                style="background:rgba(255,255,255,0.05); align-self:flex-start; max-width:75%; padding:12px; border-radius:12px; border-bottom-left-radius:2px;">
+                                Hi there. Following up on our session yesterday. Here is the reflection
+                                task. <div
+                                    style="margin-top:10px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; border:1px solid var(--teal-accent);">
+                                    <div style="font-weight:700; color:var(--teal-accent); margin-bottom:5px;">
+                                        <i class="fas fa-pen"></i>Task: Anxiety
+                                    </div>
+                                    <p style="font-size:0.85rem; margin-bottom:5px;">List 3 situations
+                                        this week.</p>
+                                </div>
+                            </div>
+                            <div class="chat-bubble sent"
+                                style="background:var(--teal-dim); border:1px solid var(--teal-accent); color:var(--teal-accent); align-self:flex-end; max-width:75%; padding:12px; border-radius:12px; border-bottom-right-radius:2px;">
+                                Thanks Dr. Stone. I'll work on this tonight.
+                            </div>
+                        </div>
+                        <div style="padding:15px; border-top:1px solid var(--border-subtle); display:flex; gap:10px;">
+                            <input type="text" placeholder="Type a message..."
+                                style="flex:1; background:rgba(0,0,0,0.2); border:1px solid var(--border-subtle); color:white; padding:10px; border-radius:8px;"><button
+                                style="background:var(--teal-accent); color:#0f172a; width:40px; border-radius:8px; border:none; cursor:pointer;"><i
+                                    class="fas fa-paper-plane"></i></button>
                         </div>
                     </div>
-                    <div class="chat-bubble sent"
-                        style="background:var(--teal-dim); border:1px solid var(--teal-accent); color:var(--teal-accent); align-self:flex-end; max-width:75%; padding:12px; border-radius:12px; border-bottom-right-radius:2px;">
-                        Thanks Dr. Stone. I'll work on this tonight.
-                    </div>
-                </div>
-                <div style="padding:15px; border-top:1px solid var(--border-subtle); display:flex; gap:10px;">
-                    <input type="text" placeholder="Type a message..."
-                        style="flex:1; background:rgba(0,0,0,0.2); border:1px solid var(--border-subtle); color:white; padding:10px; border-radius:8px;"><button
-                        style="background:var(--teal-accent); color:#0f172a; width:40px; border-radius:8px; border:none; cursor:pointer;"><i
-                            class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
-        </div>
-    </div>
-    </main>
+        </main>
     </div>
     <!-- SCRIPTS -->
     <script src="../assets/js/components.js?v=3" onerror="console.error('Failed to load components.js')"></script>
@@ -2106,7 +1991,7 @@
             </div>
 
             <!-- Reset Tool -->
-            <div onclick="window.open('../tools/5-step-reset.html', '_blank')" class="tool-item"
+            <div onclick="window.open('../tools/reset.html', '_blank')" class="tool-item"
                 style="padding:15px; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all 0.2s;">
                 <div style="display:flex; align-items:center; gap:12px;">
                     <div

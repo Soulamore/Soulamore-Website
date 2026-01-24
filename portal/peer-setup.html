@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peer Setup | Soulamore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .setup-card {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+            margin: 50px auto;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #334155;
+        }
+
+        .step-dot.active {
+            background: #2dd4bf;
+            box-shadow: 0 0 10px rgba(45, 212, 191, 0.5);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #4ECDC4, #2a9d8f);
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(45, 212, 191, 0.3);
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            color: #333;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+    </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <div class="setup-card">
+        <div style="text-align:center; margin-bottom:30px;">
+            <i class="fas fa-shield-alt" style="font-size:3rem; color:#2dd4bf; margin-bottom:15px;"></i>
+            <h1 style="font-size:2rem; margin-bottom:10px;">Secure Your Account</h1>
+            <p style="opacity:0.7;">Welcome! Let's set up your secure peer access.</p>
+        </div>
+
+        <!-- PROGRESS -->
+        <div style="display:flex; justify-content:center; gap:10px; margin-bottom:30px;">
+            <div class="step-dot active" id="dot-1"></div>
+            <div class="step-dot" id="dot-2"></div>
+            <div class="step-dot" id="dot-3"></div>
+        </div>
+
+        <!-- STEP 1: CHANGE PASSWORD -->
+        <div id="step-1">
+            <h3 style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Step 1:
+                Set Permanent Password</h3>
+            <p style="font-size:0.9rem; opacity:0.6; margin-bottom:20px;">
+                You are currently using a temporary access code. Please choose a strong, permanent password.
+            </p>
+
+            <form onsubmit="handlePasswordUpdate(event)">
+                <label style="display:block; margin-bottom:5px; font-size:0.9rem;">New Password</label>
+                <input type="password" id="newPass" class="form-input" required minlength="6"
+                    placeholder="Min 6 characters">
+
+                <label style="display:block; margin-bottom:5px; font-size:0.9rem;">Confirm Password</label>
+                <input type="password" id="confirmPass" class="form-input" required placeholder="Repeat password">
+
+                <button type="submit" class="btn-primary" id="btn-update-pass">Update Password</button>
+            </form>
+        </div>
+
+        <!-- STEP 2: LINK ACCOUNT (Hidden) -->
+        <div id="step-2" style="display:none;">
+            <h3 style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Step 2:
+                Link Social Account</h3>
+            <p style="font-size:0.9rem; opacity:0.6; margin-bottom:20px;">
+                Link your Google account for easier, one-click login in the future.
+            </p>
+
+            <button onclick="handleLinkGoogle()" class="btn-google">
+                <i class="fab fa-google"></i> Link Google Account
+            </button>
+
+            <button onclick="finishSetup()"
+                style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:white; width:100%; padding:10px; border-radius:8px; cursor:pointer;">
+                Skip for now
+            </button>
+        </div>
+
+        <!-- STEP 3: SUCCESS (Hidden) -->
+        <div id="step-3" style="display:none; text-align:center;">
+            <i class="fas fa-check-circle" style="font-size:4rem; color:#22c55e; margin-bottom:20px;"></i>
+            <h2>All Set!</h2>
+            <p style="opacity:0.7; margin-bottom:30px;">Your account is secured and ready.</p>
+            <button onclick="window.location.href='peer-dashboard.html'" class="btn-primary">
+                Enter Dashboard
+            </button>
+        </div>
+
+    </div>
+
+    <!-- FIREBASE & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { updateUserPassword, linkGoogleAccount } from "../assets/js/auth-service.js";
+
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+            authDomain: "soulamore-f0a64.firebaseapp.com",
+            projectId: "soulamore-f0a64"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State Check
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // 1. Update Password
+        window.handlePasswordUpdate = async function (e) {
+            e.preventDefault();
+            const p1 = document.getElementById('newPass').value;
+            const p2 = document.getElementById('confirmPass').value;
+            const btn = document.getElementById('btn-update-pass');
+
+            if (p1 !== p2) { alert("Passwords do not match!"); return; }
+
+            btn.disabled = true;
+            btn.innerHTML = "Updating...";
+
+            const result = await updateUserPassword(p1);
+            if (result.success) {
+                // Determine user Doc ID
+                const user = auth.currentUser;
+                try {
+                    // Update setup status
+                    await setDoc(doc(db, "users", user.uid), { isSetupComplete: false }, { merge: true });
+                    // Note: We keep isSetupComplete false until step 2/finish. Or set true now if step 2 is optional.
+                    // Let's go to step 2.
+                    document.getElementById('step-1').style.display = 'none';
+                    document.getElementById('step-2').style.display = 'block';
+                    document.getElementById('dot-2').classList.add('active');
+                } catch (err) {
+                    console.error("DB Error", err);
+                    // Proceed anyway if auth success
+                    document.getElementById('step-1').style.display = 'none';
+                    document.getElementById('step-2').style.display = 'block';
+                }
+            } else {
+                alert("Error: " + result.error);
+                btn.disabled = false;
+                btn.innerHTML = "Update Password";
+            }
+        }
+
+        // 2. Link Google
+        window.handleLinkGoogle = async function () {
+            const result = await linkGoogleAccount();
+            if (result.success) {
+                alert("Google Account Linked Authorization Successful!");
+                finishSetup();
+            } else {
+                alert("Link Failed: " + result.error);
+            }
+        }
+
+        // 3. Finish
+        window.finishSetup = async function () {
+            const user = auth.currentUser;
+            await setDoc(doc(db, "users", user.uid), {
+                isSetupComplete: true,
+                role: 'peer' // Ensure role is stamped
+            }, { merge: true });
+
+            document.getElementById('step-2').style.display = 'none';
+            document.getElementById('step-3').style.display = 'block';
+            document.getElementById('dot-3').classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

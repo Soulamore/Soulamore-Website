@@ -2,7 +2,7 @@
  * Auth Service
  * Handles Google Login, Email/Pass Login, and User Session.
  */
-import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "./firebase-config.js";
+import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, linkWithPopup } from "./firebase-config.js";
 
 /**
  * Sign Up with Email/Password
@@ -61,6 +61,38 @@ export async function logoutUser() {
         return { success: true };
     } catch (error) {
         console.error("Logout Error:", error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Update Password
+ */
+export async function updateUserPassword(newPassword) {
+    try {
+        const user = auth.currentUser;
+        if (!user) throw new Error("No user logged in");
+
+        await updatePassword(user, newPassword);
+        return { success: true };
+    } catch (error) {
+        console.error("Update Password Error:", error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Link Google Account
+ */
+export async function linkGoogleAccount() {
+    try {
+        const user = auth.currentUser;
+        if (!user) throw new Error("No user logged in");
+
+        const result = await linkWithPopup(user, googleProvider);
+        return { success: true, user: result.user };
+    } catch (error) {
+        console.error("Link Account Error:", error);
         return { success: false, error: error.message };
     }
 }
