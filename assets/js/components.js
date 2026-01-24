@@ -794,6 +794,37 @@ function injectHeader() {
         }
         headerElement.innerHTML = getHeaderHTML(getRootPath());
 
+        // --- COOKIE CONSENT BANNER (Calm GDPR) ---
+        if (!localStorage.getItem('soulamore_cookie_consent')) {
+            const consentDiv = document.createElement('div');
+            consentDiv.id = 'cookie-consent-banner';
+            consentDiv.innerHTML = `
+                <div style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:90%; max-width:600px; background:rgba(15, 23, 42, 0.95); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(10px); padding:20px; border-radius:16px; box-shadow:0 10px 40px rgba(0,0,0,0.5); z-index:10000; display:flex; align-items:center; justify-content:space-between; gap:20px; animation:floatUp 0.5s ease-out;">
+                    <div style="font-size:0.9rem; color:#e2e8f0; line-height:1.5;">
+                        <strong style="color:#fff; display:block; margin-bottom:4px;">We use cookies for calm.</strong>
+                        To keep you logged in and remember your theme. No tracking ads.
+                    </div>
+                    <div style="display:flex; gap:10px; flex-shrink:0;">
+                         <button onclick="acceptCookies()" style="background:#4ECDC4; color:#0f172a; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer;">Okay</button>
+                    </div>
+                </div>
+                <style>
+                    @keyframes floatUp { from { transform: translate(-50%, 20px); opacity:0; } to { transform: translate(-50%, 0); opacity:1; } }
+                    @media(max-width:500px) { #cookie-consent-banner > div { flex-direction:column; text-align:center; } }
+                </style>
+            `;
+            document.body.appendChild(consentDiv);
+
+            window.acceptCookies = function () {
+                localStorage.setItem('soulamore_cookie_consent', 'true');
+                const banner = document.getElementById('cookie-consent-banner');
+                if (banner) {
+                    banner.style.opacity = '0';
+                    setTimeout(() => banner.remove(), 300);
+                }
+            };
+        }
+
         // --- CRITICAL CSS INJECTION ---
         // We inject this style to ensure consistency without relying on complex external CSS media queries alone
         if (!document.getElementById('header-responsive-style')) {
