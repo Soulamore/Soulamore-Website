@@ -1611,7 +1611,8 @@
 
         function handleLogout() {
             sessionStorage.clear();
-            window.location.href = 'logout.html';
+            localStorage.removeItem('soulamore_session');
+            window.location.href = 'login.html';
         }
 
         // --- VIEW SWITCHING ---
@@ -2160,6 +2161,85 @@
         });
     </script>
 
+    <!-- PHOTO UPLOAD MODAL -->
+    <div id="photo-upload-modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.8); backdrop-filter:blur(8px); z-index:2000; align-items:center; justify-content:center;">
+        <div class="dash-card"
+            style="max-width:550px; width:90%; animation: slideUp 0.3s ease; border:1px solid var(--border-subtle);">
+
+            <div style="text-align:center; margin-bottom:30px;">
+                <h2 style="font-family:'Outfit'; margin-bottom:15px; color:var(--text-main);">Profile Photo</h2>
+                <div
+                    style="font-size:0.95rem; line-height:1.6; color:var(--text-muted); font-style:italic; border-left:3px solid var(--teal-accent); padding-left:20px; text-align:left; margin:0 auto; max-width:400px; padding:20px; background:rgba(255,255,255,0.02); border-radius:0 12px 12px 0;">
+                    <p style="margin-bottom:10px;">Choose a photo where your face is visible and you feel like yourself.
+                    </p>
+                    <p style="margin-bottom:10px;">Natural light is enough.<br>A simple background is enough.<br>A quiet
+                        smile, or even a calm, neutral expression, is enough.</p>
+                    <p style="margin-bottom:10px;">This photo isn’t about looking perfect.<br>It’s about letting someone
+                        see the person behind the name.</p>
+                </div>
+            </div>
+
+            <!-- Drag & Drop Zone -->
+            <div id="drop-zone" onclick="document.getElementById('file-input').click()" ondrop="handleDrop(event)"
+                ondragover="event.preventDefault()"
+                style="border:2px dashed var(--border-subtle); border-radius:12px; padding:40px; text-align:center; cursor:pointer; transition:all 0.2s; background:rgba(255,255,255,0.01);">
+
+                <input type="file" id="file-input" hidden accept="image/*" onchange="previewPhoto(this)">
+
+                <div style="font-size:3rem; color:var(--teal-accent); margin-bottom:15px; opacity:0.8;">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h4 style="margin-bottom:5px; font-family:'Outfit';">Click or Drag & Drop</h4>
+                <p style="font-size:0.9rem; opacity:0.5;">Supports JPG, PNG (Max 5MB)</p>
+            </div>
+
+            <div style="margin-top:25px; text-align:right;">
+                <button class="btn-dash-secondary" onclick="togglePhotoModal(false)"
+                    style="margin-right:10px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI UTILITY SCRIPTS (Restored) -->
+    <script>
+        // --- PHOTO UPLOAD FUNCTIONS ---
+        function triggerPhotoUpload() {
+            togglePhotoModal(true);
+        }
+
+        function togglePhotoModal(show) {
+            const modal = document.getElementById('photo-upload-modal');
+            if (modal) modal.style.display = show ? 'flex' : 'none';
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                previewPhoto({ files: e.dataTransfer.files });
+            }
+        }
+
+        function previewPhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // Update all avatar instances
+                    const avatars = document.querySelectorAll('.profile-avatar-img');
+                    avatars.forEach(img => {
+                        img.src = e.target.result;
+                        img.style.display = 'block';
+                    });
+                    // Hide text avatars
+                    const textAvatars = document.querySelectorAll('.profile-avatar-text');
+                    textAvatars.forEach(el => el.style.display = 'none');
+
+                    togglePhotoModal(false);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 </body>
 
 </html>
