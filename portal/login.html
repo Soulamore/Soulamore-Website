@@ -676,13 +676,40 @@
         const auth = getAuth(app);
 
         // Redirect if already logged in
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const role = sessionStorage.getItem('userRole') || 'user';
+                // LOOP PREVENTION: Check if we just came from a dashboard (meaning auth failed there)
+                const fromDashboard = document.referrer && document.referrer.includes('dashboard');
+                if (fromDashboard) {
+                    console.warn("⚠️ Redirect loop detected. Staying on login page to allow re-authentication.");
+                    // Optional: Sign out Firebase to clear the conflicting state
+                    // await auth.signOut(); 
+                    return;
+                }
+
+                // SESSION RESTORATION: Ensure localStorage has the session needed by auth-guard.js
+                const currentSession = localStorage.getItem("soulamore_session");
+                if (!currentSession) {
+                    console.log("Restoring missing session from Firebase auth...");
+                    const userRole = sessionStorage.getItem('userRole') || 'user'; // Fallback
+                    const sessionData = {
+                        isLoggedIn: true,
+                        userId: user.uid,
+                        email: user.email,
+                        role: userRole,
+                        name: user.displayName || "User",
+                        photoURL: user.photoURL || "../assets/images/default-avatar.png"
+                    };
+                    localStorage.setItem("soulamore_session", JSON.stringify(sessionData));
+                }
+
+                const role = sessionStorage.getItem('userRole') || (JSON.parse(localStorage.getItem("soulamore_session") || '{}').role) || 'user';
                 let dashboard = 'user-dashboard.html';
                 if (role === 'peer') dashboard = 'peer-dashboard.html';
                 if (role === 'psychologist') dashboard = 'psych-dashboard.html';
                 if (role === 'admin') dashboard = 'admin-dashboard.html';
+
+                console.log(`Auto-redirecting to ${dashboard}...`);
                 window.location.href = dashboard;
             }
         });
