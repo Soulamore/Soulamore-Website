@@ -326,7 +326,7 @@ try {
                 z-index: 1001 !important;
             }
 .mobile-toggle {
-    z-index: 2147483647 !important; /* NUCLEAR Z-INDEX */
+    z-index: 99999 !important; /* SAFE HIGH Z-INDEX */
     pointer-events: auto !important;
     cursor: pointer !important;
     /* Above nuclear menu */

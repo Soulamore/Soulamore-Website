@@ -98,17 +98,10 @@
             }
         }
 
-        /* --- NAV STYLES REMOVED FOR GLOBAL HEADER CONSISTENCY --- */
-
-        /* --- REMOVED FORCED SPACING (Handled by Shell) --- */
-        /* .hero { padding: 180px 0 60px; } */
-
         /* --- HERO --- */
         .hero {
             text-align: center;
-            /* padding: 180px 0 60px; <-- Removed */
             padding: 40px 0 60px;
-            /* Reduced for shell flow */
         }
 
 
@@ -173,17 +166,13 @@
             gap: 12px;
             overflow-x: auto;
             padding: 20px;
-            /* Increased to prevents glow clipping */
             scrollbar-width: none;
-            /* Firefox */
             -ms-overflow-style: none;
-            /* IE */
             mask-image: linear-gradient(to right, black 95%, transparent 100%);
         }
 
         .category-rail::-webkit-scrollbar {
             display: none;
-            /* Chrome/Safari */
         }
 
         .category-pill {
@@ -251,7 +240,6 @@
         @media (max-width: 768px) {
             .peer-grid {
                 grid-template-columns: 1fr;
-                /* Force Stack */
             }
 
             .filter-bar {
@@ -318,6 +306,7 @@
             font-weight: 700;
             color: var(--deep-space);
             background: var(--starlight);
+            overflow: hidden;
         }
 
         .peer-name {
@@ -446,10 +435,6 @@
     </div>
     <div id="particles"></div>
 
-    <!-- NAV -->
-    <!-- GLOBAL HEADER -->
-    <!-- GLOBAL HEADER (ISLAND STYLE) -->
-    <!-- APP SHELL START -->
     <!-- APP SHELL START -->
     <div id="app-shell">
         <div id="shell-fixed">
@@ -486,7 +471,6 @@
                         Take your time. There’s no rush.</p>
                 </div>
 
-                <!-- FILTERS -->
                 <!-- FILTERS -->
                 <div class="filter-section fade-in">
                     <!-- 1. Horizontal Rail -->
@@ -552,6 +536,9 @@
                 <!-- PEER GRID -->
                 <div class="peer-grid" id="peerGrid">
                     <!-- Peers Injected via JS -->
+                    <div style="grid-column:1/-1; text-align:center; padding:50px; opacity:0.6;">
+                        <i class="fas fa-circle-notch fa-spin"></i> Loading...
+                    </div>
                 </div>
 
                 <!-- DISCLAIMER -->
@@ -583,18 +570,74 @@
 
             </div>
 
-            <script>
-                // --- PEER DATA (Updated with Markers) ---
-                const peers = [
-                    {
-                        id: 10,
-                        name: "Zoya",
-                        quote: "Here to help you get through tough times.",
-                        tags: ["Work Stress", "Travel", "Relationships"],
-                        markers: { price: "Paid", lang: "English", age: "25-34", gender: "Female", avail: "Online" },
-                        avatarColor: "#fbbf24",
-                        profileUrl: "zoya.html"
-                    },
+        </main>
+    </div> <!-- End app-shell -->
+
+    <!-- STANDARDIZED FOOTER -->
+    <footer></footer>
+
+    <!-- SCRIPTS -->
+    <script src="../assets/js/components.js"></script>
+    <script type="module">
+        import { db, collection, getDocs } from "../assets/js/firebase-config.js";
+
+        // --- FETCH PEERS FROM DYANMIC DB ---
+        let peers = []; // Global store
+
+        async function fetchPeers() {
+            try {
+                // Timeout Promise (2.5 seconds limit - Faster Fallback)
+                const timeout = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error("Request timed out")), 2500)
+                );
+
+                // Data Promise
+                const dataFetch = getDocs(collection(db, "professionals"));
+
+                // Race them
+                const querySnapshot = await Promise.race([dataFetch, timeout]);
+
+                const fetchedPeers = [];
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    // FILTER: Only show Peers
+                    const isPeer = (data.role && data.role.toLowerCase().includes('peer')) ||
+                        (data.title && data.title.toLowerCase().includes('peer'));
+
+                    if (isPeer) {
+                        fetchedPeers.push({
+                            id: doc.id,
+                            name: data.name,
+                            quote: data.quote || "Here to listen.",
+                            tags: data.tags || [],
+                            markers: {
+                                price: data.rate > 0 ? "Paid" : "Free",
+                                lang: data.languages || "English",
+                                age: data.ageRange || "18-24", // Needs field
+                                gender: data.gender || "Any",
+                                avail: data.onlineStatus === 'online' ? "Online" : "Offline"
+                            },
+                            avatarColor: data.avatarColor || "#fbbf24",
+                            photoURL: data.photoURL,
+                            profileUrl: `profile.html?id=${doc.id}`
+                        });
+                    }
+                });
+
+                // FALLBACK: If DB is empty, use Hardcoded Demo Data
+                if (fetchedPeers.length === 0) {
+                    console.warn("No peers found in DB, using fallback demo data.");
+                    throw new Error("Empty DB"); // Trigger catch block for fallback
+                } else {
+                    peers = fetchedPeers;
+                    renderPeers();
+                }
+
+            } catch (error) {
+                console.warn("Using fallback data due to:", error.message);
+                // Fallback Data
+                peers = [
                     {
                         id: 1,
                         name: "Aditya",
@@ -602,186 +645,142 @@
                         tags: ["Mental Wellness", "Anxiety", "Student", "Hindi"],
                         markers: { price: "Free", lang: "Hindi", age: "18-24", gender: "Male", avail: "Online" },
                         avatarColor: "#4ECDC4",
-                        profileUrl: "mental-wellness/profile.html"
+                        profileUrl: "profile.html?id=1"
                     },
                     {
-                        id: 101,
-                        name: "Renu Dogra",
-                        quote: "Yoga is the journey of the self, through the self, to the self.",
-                        tags: ["Physical Wellness", "Yoga", "Breathwork"],
+                        id: 10,
+                        name: "Zoya",
+                        quote: "Here to help you get through tough times.",
+                        tags: ["Work Stress", "Travel", "Relationships"],
                         markers: { price: "Paid", lang: "English", age: "25-34", gender: "Female", avail: "Online" },
                         avatarColor: "#fbbf24",
-                        profileUrl: "physical-wellness/renu-dogra.html"
-                    },
-                    {
-                        id: 102,
-                        name: "Palak Shori",
-                        quote: "Academic success is a mindset, not just a grade.",
-                        tags: ["Academic Wellness", "Study Skills", "Career"],
-                        markers: { price: "Free", lang: "English", age: "18-24", gender: "Female", avail: "Online" },
-                        avatarColor: "#a78bfa",
-                        profileUrl: "../our-psychologists/palak-shori.html"
-                    },
-                    {
-                        id: 2,
-                        name: "Aarti",
-                        quote: "Healing touches the soul when shared.",
-                        tags: ["Low Mood", "Relationships", "Gentle Listener"],
-                        markers: { price: "Free", lang: "Hindi", age: "25-34", gender: "Female", avail: "Offline" },
-                        avatarColor: "#F49F75",
-                        profileUrl: "#"
-                    },
-                    {
-                        id: 3,
-                        name: "Lakshit",
-                        quote: "I know the silence of a new city.",
-                        tags: ["Expat", "Loneliness", "Burnout"],
-                        markers: { price: "Paid", lang: "Hindi", age: "25-34", gender: "Male", avail: "Online" },
-                        avatarColor: "#fbbf24",
-                        profileUrl: "#"
-                    },
-                    {
-                        id: 6,
-                        name: "Meera",
-                        quote: "Your feelings are valid, always.",
-                        tags: ["Relationships", "Anxiety", "Body Image"],
-                        markers: { price: "Paid", lang: "Spanish", age: "35+", gender: "Female", avail: "Online" },
-                        avatarColor: "#2a9d8f",
-                        profileUrl: "#"
+                        profileUrl: "profile.html?id=10" // Fixed URL
                     }
                 ];
+                renderPeers();
+            }
+        }
 
-                // --- DYNAMIC INJECTION FOR DEMO ---
-                // In a real app, this would fetch from backend. Here we check localStorage.
-                const myProfile = JSON.parse(localStorage.getItem('professional_profile'));
-                const myRole = localStorage.getItem('user_role');
+        // Init Fetch
+        fetchPeers();
 
-                if (myProfile && myRole === 'Peer') {
-                    const myCard = {
-                        id: 999,
-                        name: myProfile.name,
-                        role: myProfile.title || "Peer Listener",
-                        category: myProfile.category || "Mental Wellness", // Default fallback
-                        image: myProfile.image,
-                        tags: myProfile.tags || ["New", "Listener"],
-                        rating: 5.0,
-                        reviews: 0,
-                        price: "Free",
-                        lang: myProfile.languages || "English",
-                        online: true,
-                        verified: true
-                    };
+        // --- FILTER STATE ---
+        let currentCategory = 'all';
 
-                    // Add to top
-                    peers.unshift(myCard);
-                }
+        // --- RENDER PEERS ---
+        const grid = document.getElementById('peerGrid');
 
-                // --- FILTER STATE ---
-                let currentCategory = 'all';
+        function renderPeers() {
+            grid.innerHTML = '';
 
-                // --- RENDER PEERS ---
-                const grid = document.getElementById('peerGrid');
+            // Get dropdown values
+            const pVal = document.getElementById('priceFilter').value;
+            const lVal = document.getElementById('langFilter').value;
+            const aVal = document.getElementById('ageFilter').value;
+            const gVal = document.getElementById('genderFilter').value;
+            const avVal = document.getElementById('availFilter').value;
 
-                function renderPeers() {
-                    grid.innerHTML = '';
+            // Filter Logic
+            const filtered = peers.filter(peer => {
+                // 1. Check Category
+                const catMatch = (currentCategory === 'all') || (peer.tags && peer.tags.some(t => t.includes(currentCategory)));
 
-                    // Get dropdown values
-                    const pVal = document.getElementById('priceFilter').value;
-                    const lVal = document.getElementById('langFilter').value;
-                    const aVal = document.getElementById('ageFilter').value;
-                    const gVal = document.getElementById('genderFilter').value;
-                    const avVal = document.getElementById('availFilter').value;
+                // 2. Check Markers
+                const priceMatch = (pVal === 'all') || peer.markers.price === pVal;
+                const langMatch = (lVal === 'all') || peer.markers.lang.includes(lVal) || (lVal === 'English' && true);
+                const ageMatch = (aVal === 'all') || peer.markers.age === aVal;
+                const genderMatch = (gVal === 'all') || peer.markers.gender === gVal;
+                const availMatch = (avVal === 'all') || peer.markers.avail === avVal;
 
-                    // Filter Logic
-                    const filtered = peers.filter(peer => {
-                        // 1. Check Category
-                        const catMatch = (currentCategory === 'all') || peer.tags.some(t => t.includes(currentCategory));
+                return catMatch && priceMatch && langMatch && ageMatch && genderMatch && availMatch;
+            });
 
-                        // 2. Check Markers
-                        const priceMatch = (pVal === 'all') || peer.markers.price === pVal;
-                        const langMatch = (lVal === 'all') || peer.markers.lang === lVal || (lVal === 'English' && true); // Assume all speak English default? Simplified.
-                        const ageMatch = (aVal === 'all') || peer.markers.age === aVal;
-                        const genderMatch = (gVal === 'all') || peer.markers.gender === gVal;
-                        const availMatch = (avVal === 'all') || peer.markers.avail === avVal;
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; opacity:0.5; margin-top:30px;">No peers found matching these filters. Try adjusting your preferences.</p>';
+                return;
+            }
 
-                        return catMatch && priceMatch && langMatch && ageMatch && genderMatch && availMatch;
-                    });
+            filtered.forEach(peer => {
+                const statusClass = (peer.markers.avail === 'Online') ? 'status-online' : 'status-offline';
+                // Show first 3 tags
+                const tagHTML = peer.tags.slice(0, 3).map(t => `<span class="mini-tag">${t}</span>`).join('');
+                const priceBadge = (peer.markers.price === "Paid") ? '<span style="font-size:0.7rem; background:var(--gold-glow); color:black; padding:2px 8px; border-radius:10px; margin-left:5px;">Paid</span>' : '';
 
-                    if (filtered.length === 0) {
-                        grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; opacity:0.5; margin-top:30px;">No peers found matching these filters. Try adjusting your preferences.</p>';
-                        return;
-                    }
-
-                    filtered.forEach(peer => {
-                        const statusClass = (peer.markers.avail === 'Online') ? 'status-online' : 'status-offline';
-                        // Show first 3 tags
-                        const tagHTML = peer.tags.slice(0, 3).map(t => `<span class="mini-tag">${t}</span>`).join('');
-                        const priceBadge = (peer.markers.price === "Paid") ? '<span style="font-size:0.7rem; background:var(--gold-glow); color:black; padding:2px 8px; border-radius:10px; margin-left:5px;">Paid</span>' : '';
-
-                        const card = document.createElement('div');
-                        card.className = 'peer-card fade-in';
-                        card.innerHTML = `
-                    <div class="status-dot ${statusClass}"></div>
-                    <div class="peer-avatar" style="background:${peer.avatarColor}">${peer.name.charAt(0)}</div>
-                    <div class="peer-name">${peer.name} ${priceBadge}</div>
-                    <div class="grounding-line">"${peer.quote}"</div>
-                    <div class="tags-row">${tagHTML}</div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; opacity:0.8; margin-top:15px; border-top:1px solid var(--border-glass); padding-top:10px;">
-                        <span><i class="fas fa-language"></i> ${peer.markers.lang}</span>
-                        <span>${peer.markers.price === "Free" ? "Volunteer" : "₹" + peer.markers.price + "/hr"}</span>
-                    </div>
-
-                    <a href="${peer.profileUrl || 'profile.html?id=' + peer.id}" class="pc-btn" style="text-align:center; text-decoration:none; display:block; margin-top:15px;">View Profile</a>
-                    ${peer.id === 999 ? '<div style="text-align:center; font-size:0.7rem; margin-top:5px; opacity:0.5;">(This is You)</div>' : ''}
-                `;
-                        grid.appendChild(card);
-                    });
-                }
-
-                // --- INTERACTION ---
-                function setCategory(cat) {
-                    currentCategory = cat;
-                    // Update UI pills
-                    document.querySelectorAll('.category-pill').forEach(p => {
-                        p.classList.remove('active');
-                        if ((cat === 'all' && p.innerText === 'All Topics') || p.getAttribute('onclick').includes(cat)) {
-                            p.classList.add('active');
-                        }
-                    });
-                    renderPeers();
-                }
-
-                function applyFilters() {
-                    renderPeers();
-                }
-
-                function resetAll() {
-                    currentCategory = 'all';
-                    document.getElementById('priceFilter').value = 'all';
-                    document.getElementById('langFilter').value = 'all';
-                    document.getElementById('ageFilter').value = 'all';
-                    document.getElementById('genderFilter').value = 'all';
-                    document.getElementById('availFilter').value = 'all';
-
-                    // Reset Active Pill UI
-                    document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
-                    document.querySelector('.category-pill').classList.add('active'); // First one
-
-                    renderPeers();
-                }
-
-                // --- INIT ---
-                // Check for URL params
-                const urlParams = new URLSearchParams(window.location.search);
-                const catParam = urlParams.get('category');
-                if (catParam) {
-                    setCategory(catParam);
+                // Avatar Logic
+                let avatarHTML = '';
+                if (peer.photoURL && !peer.photoURL.includes('via.placeholder')) {
+                    avatarHTML = `<img src="${peer.photoURL}" style="width:100%; height:100%; object-fit:cover;">`;
                 } else {
-                    renderPeers();
+                    avatarHTML = peer.name.charAt(0);
                 }
 
-                // --- PARTICLES ---
-                const pContainer = document.getElementById('particles');
+                const card = document.createElement('div');
+                card.className = 'peer-card fade-in';
+                card.innerHTML = `
+            <div class="status-dot ${statusClass}"></div>
+            <div class="peer-avatar" style="background:${peer.avatarColor}">
+                ${avatarHTML}
+            </div>
+            <div class="peer-name">${peer.name} ${priceBadge}</div>
+            <div class="grounding-line">"${peer.quote}"</div>
+            <div class="tags-row">${tagHTML}</div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; opacity:0.8; margin-top:15px; border-top:1px solid var(--border-glass); padding-top:10px;">
+                <span><i class="fas fa-language"></i> ${peer.markers.lang}</span>
+                <span>${peer.markers.price === "Free" ? "Volunteer" : "Top Rated"}</span>
+            </div>
+
+            <a href="${peer.profileUrl}" class="connect-btn" style="text-align:center; text-decoration:none; display:block; margin-top:15px;">View Profile</a>
+            ${peer.id === 999 ? '<div style="text-align:center; font-size:0.7rem; margin-top:5px; opacity:0.5;">(This is You)</div>' : ''}
+        `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- INTERACTION ---
+        window.setCategory = function (cat) {
+            currentCategory = cat;
+            // Update UI pills
+            document.querySelectorAll('.category-pill').forEach(p => {
+                p.classList.remove('active');
+                if ((cat === 'all' && p.innerText === 'All Topics') || p.getAttribute('onclick').includes(cat)) {
+                    p.classList.add('active');
+                }
+            });
+            renderPeers();
+        }
+
+        window.applyFilters = function () { renderPeers(); }
+
+        window.resetAll = function () {
+            currentCategory = 'all';
+            document.getElementById('priceFilter').value = 'all';
+            document.getElementById('langFilter').value = 'all';
+            document.getElementById('ageFilter').value = 'all';
+            document.getElementById('genderFilter').value = 'all';
+            document.getElementById('availFilter').value = 'all';
+
+            // Reset Active Pill UI
+            document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+            document.querySelector('.category-pill').classList.add('active'); // First one
+
+            renderPeers();
+        }
+
+        // --- INIT ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const catParam = urlParams.get('category');
+        if (catParam) {
+            setCategory(catParam);
+        }
+
+    </script>
+    <script>
+        // --- PARTICLES & AUDIO (Visuals Only) ---
+        // Ensure Layout Calculation Runs
+        window.addEventListener('load', () => {
+            // Particles
+            const pContainer = document.getElementById('particles');
+            if (pContainer) {
                 for (let i = 0; i < 30; i++) {
                     let p = document.createElement('div');
                     p.classList.add('particle');
@@ -792,60 +791,28 @@
                     p.style.opacity = Math.random() * 0.3;
                     pContainer.appendChild(p);
                 }
-
-                // --- AUDIO ---
-                const audio = document.getElementById('bgAudio');
-                let playing = false;
-                function toggleAudio() {
-                    if (playing) {
-                        audio.pause();
-                        document.getElementById('audioText').innerText = "Ambience";
-                    } else {
-                        audio.volume = 0.3;
-                        audio.play();
-                        document.getElementById('audioText').innerText = "Pause";
-                    }
-                    playing = !playing;
-                }
-
-                // --- FADE IN ---
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.style.opacity = 1;
-                            entry.target.style.transform = "translateY(0)";
-                        }
-                    });
-                });
-                // We observe cards after rendering? No, static elements only for now
-                document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-            </script>
-            <!-- GLOBAL FOOTER (HASHLILLY STANDARD) -->
-            <!-- GLOBAL FOOTER -->
-
-
-            <!-- STANDARDIZED FOOTER -->
-    </div> <!-- End container -->
-    </main> <!-- End shell-content -->
-
-    <!-- STANDARDIZED FOOTER -->
-    <footer></footer>
-    </div> <!-- End app-shell -->
-
-    <!-- COMPONENTS -->
-    <script src="../assets/js/components.js"></script>
-    <script>
-        // --- SHELL CONFIGURATION ---
-        window.ShellSubnav = null;
-
-        // Ensure Layout Calculation Runs
-        window.addEventListener('load', () => {
+            }
             if (window.updateShellHeight) window.updateShellHeight();
             if (window.injectHeader) injectHeader();
             if (window.injectFooter) injectFooter();
         });
-    </script>
 
+        const audio = document.getElementById('bgAudio');
+        let playing = false;
+        window.toggleAudio = function () {
+            if (playing) {
+                audio.pause();
+                document.getElementById('audioText').innerText = "Ambience";
+                document.querySelector('.audio-control').style.background = "rgba(255,255,255,0.1)";
+            } else {
+                audio.volume = 0.3;
+                audio.play();
+                document.getElementById('audioText').innerText = "Pause";
+                document.querySelector('.audio-control').style.background = "var(--teal-glow)";
+            }
+            playing = !playing;
+        }
+    </script>
     <script src="../assets/js/soulbot-beta.js"></script>
     <script src="../assets/js/main.js"></script>
 </body>

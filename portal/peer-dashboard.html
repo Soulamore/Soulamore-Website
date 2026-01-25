@@ -1641,11 +1641,119 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                 textAvatars.forEach(el => el.style.display = 'none');
 
                 togglePhotoModal(false);
-                alert('Photo updated beautifully.');
             }
             reader.readAsDataURL(file);
+        }
+    </script>
+
+    <!-- DYNAMIC DASHBOARD LOGIC -->
+    <script type="module">
+        import { db, auth } from "../assets/js/firebase-config.js";
+        import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                initDashboard(user.uid);
+            }
+        });
+
+        async function initDashboard(uid) {
+            // Fetch Professional Profile (for Reviews & Role)
+            const profRef = doc(db, "professionals", uid);
+            onSnapshot(profRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    updateProfileUI(data);
+                    renderDashboardReviews(data.reviews || []);
+                }
+            });
+
+            // Fetch User Profile (for Saved Items)
+            const userRef = doc(db, "users", uid);
+            onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    updateUserStats(userData);
+                }
+            });
+        }
+
+        function updateProfileUI(data) {
+            const nameEl = document.getElementById('sidebar-name');
+            const roleEl = document.getElementById('sidebar-role');
+            if (nameEl) nameEl.innerText = data.name || "Peer Portal";
+            if (roleEl) roleEl.innerText = data.role || "Verified Peer";
+        }
+
+        function updateUserStats(userData) {
+            // Updates stats based on User collection data (e.g. saves)
+            const savedCount = userData.savedProfiles ? userData.savedProfiles.length : 0;
+            const linkHoverCards = document.querySelectorAll('.link-hover');
+            // Assuming the 3rd card is "Saves" based on order
+            if (linkHoverCards.length >= 3) {
+                const savesCard = linkHoverCards[2];
+                const countDiv = savesCard.querySelector('div[style*="font-size:2rem"]');
+                if (countDiv) countDiv.innerText = savedCount;
+
+                const labelDiv = savesCard.querySelector('div[style*="font-size:0.8rem"]');
+                if (labelDiv) labelDiv.innerText = "Saved Profiles";
+            }
+        }
+
+        function renderDashboardReviews(reviews) {
+            const container = document.querySelector('#view-testimonials .dashboard-grid');
+            if (!container) return;
+
+            if (reviews.length === 0) {
+                container.innerHTML = `
+                    <div class="dash-card" style="grid-column:1/-1; text-align:center; padding:50px;">
+                        <i class="fas fa-comment-slash" style="font-size:3rem; opacity:0.2; margin-bottom:20px;"></i>
+                        <p>No testimonials yet.</p>
+                        <p style="font-size:0.85rem; opacity:0.6;">Reviews from users will appear here.</p>
+                    </div>
+                 `;
+                return;
+            }
+
+            const sortedReviews = [...reviews].reverse();
+
+            container.innerHTML = sortedReviews.map((r) => `
+                 <div class="dash-card testimonial-card fade-in" style="position:relative; transition:all 0.3s ease;">
+                        <i class="fas fa-quote-right"
+                            style="position:absolute; top:20px; right:20px; font-size:4rem; color:rgba(255,255,255,0.03); z-index:0;"></i>
+                        <div style="position:relative; z-index:1;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:flex-start;">
+                                <div style="display:flex; gap:12px; align-items:center;">
+                                    <div class="review-avatar"
+                                        style="width:45px; height:45px; background:var(--bg-deep); border:1px solid var(--border-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:0.9rem; font-weight:600; text-transform:uppercase;">
+                                        ${r.author ? r.author.substring(0, 2) : "AN"}
+                                    </div>
+                                    <div>
+                                        <div class="review-author"
+                                            style="font-weight:700; font-size:1rem; color:var(--text-main);">${r.author || "Anonymous"}
+                                        </div>
+                                        <div class="review-date" style="font-size:0.8rem; opacity:0.6;">${r.date || "Recent"}</div>
+                                    </div>
+                                </div>
+                                <div class="review-rating"
+                                    style="background:rgba(251, 191, 36, 0.1); padding:5px 10px; border-radius:20px; border:1px solid rgba(251, 191, 36, 0.2);">
+                                    <div style="color:#fbbf24; font-size:0.85rem; display:flex; gap:2px;">
+                                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="padding:15px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid rgba(255,255,255,0.03);">
+                                <p class="review-text" style="font-size:0.95rem; line-height:1.7; opacity:0.95; margin:0; font-style:italic;">
+                                    "${r.text}"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+            `).join('');
         }
     </script>
 </body>
 
 </html>
+```
