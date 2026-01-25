@@ -17,44 +17,46 @@
             --bg-soft: #f0fdf4;
             /* Very light green mint */
             --card-white: #ffffff;
-            --text-dark: #1e293b;
-            --text-muted: #475569;
+            --text-dark: #0f172a;
+            /* STRICT DARK TEXT */
+            --text-muted: #334155;
+            /* DARKER GRAY for readability */
             --accent-green: #dcfce7;
             --accent-text: #166534;
             --btn-sage: #86efac;
         }
 
         body {
-            background-color: var(--bg-soft);
-            color: var(--text-dark);
+            background-color: var(--bg-soft) !important;
+            color: var(--text-dark) !important;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Override Global Header for Visibility if needed, 
-           but assume global header component handles itself (it's dark). 
-           We just ensure content reads well. */
-
-        .profile-container {
-            max-width: 800px;
-            margin: 0 auto 60px;
-            /* Top padding handled by #shell-content */
-            padding: 20px;
+        /* STRICT TEXT CONTRAST OVERRIDES */
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        li,
+        span,
+        div {
+            color: inherit;
+            /* Inherit from body unless tailored */
         }
 
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 30px;
-            transition: 0.3s;
+        .section-text,
+        .soul-list li,
+        .profile-role {
+            color: var(--text-muted) !important;
         }
 
-        .back-link:hover {
-            color: var(--text-dark);
-            transform: translateX(-5px);
+        .profile-name,
+        .section-title {
+            color: var(--text-dark) !important;
         }
 
         /* --- CARDS --- */
@@ -67,6 +69,8 @@
             /* Soft natural shadow */
             border: 1px solid rgba(0, 0, 0, 0.05);
             animation: slideUp 0.6s ease-out;
+            color: var(--text-dark);
+            /* Ensure card content is dark */
         }
 
         @keyframes slideUp {
@@ -249,11 +253,22 @@
                 <!-- HEADER CARD -->
                 <div class="soul-card" style="padding: 30px;">
                     <div class="profile-header">
-                        <img id="pAvatar" src="" class="profile-avatar" alt="Avatar">
+                        <img id="pAvatar" src="" class="profile-avatar" alt="Avatar"
+                            style="display:none; background:#ccc;">
+                        <div id="pAvatarInitial" class="profile-avatar"
+                            style="display:none; background:#fbbf24; color:white; font-size:3rem; font-weight:700; display:flex; align-items:center; justify-content:center;">
+                            A</div>
+
                         <div>
-                            <h1 id="pName" class="profile-name">Loading...</h1>
-                            <div id="pRole" class="profile-role">Peer Listener</div>
-                            <div class="verified-badge"><i class="fas fa-check-circle"></i> Verified Listener</div>
+                            <h1 id="pName" class="profile-name">Loading Profile...</h1>
+                            <div id="pRole" class="profile-role">...</div>
+                            <div style="display:flex; align-items:center; gap:15px;">
+                                <div class="verified-badge"><i class="fas fa-check-circle"></i> Verified Listener</div>
+                                <button id="bookmarkBtn" onclick="toggleBookmark()" class="btn-action-sm"
+                                    style="background:white; border:1px solid #e2e8f0; padding:5px 12px; border-radius:30px; cursor:pointer; font-size:0.9rem; color:#94a3b8; display:flex; align-items:center; gap:5px; transition:0.3s;">
+                                    <i class="far fa-bookmark"></i> <span>Save</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -262,7 +277,7 @@
                 <div class="soul-card">
                     <h2 class="section-title">A little about me</h2>
                     <p id="pBio" class="section-text">
-                        Loading bio...
+                        ...
                     </p>
                 </div>
 
@@ -304,18 +319,19 @@
                     <h2 class="section-title">Wall of Love</h2>
                     <div id="pReviews">
                         <!-- Reviews injected here -->
-                        <p style="opacity:0.6; font-style:italic;">No notes yet. Be the first to leave one!</p>
+                        <p style="opacity:0.6; font-style:italic; color:var(--text-muted);">No notes yet. Be the first
+                            to leave one!</p>
                     </div>
 
                     <!-- LEAVE REVIEW FORM -->
                     <div style="margin-top:30px; border-top:1px solid rgba(0,0,0,0.05); padding-top:20px;">
                         <h4 style="margin-bottom:10px; color:var(--text-dark);">Leave a note</h4>
                         <textarea id="newReviewMsg" class="form-input" rows="2"
-                            style="width:100%; border:1px solid #e2e8f0; padding:10px; border-radius:10px; font-family:inherit; margin-bottom:10px;"
+                            style="width:100%; border:1px solid #e2e8f0; padding:10px; border-radius:10px; font-family:inherit; margin-bottom:10px; background:white; color:#1e293b;"
                             placeholder="How did this conversation help you?"></textarea>
                         <div style="display:flex; gap:10px;">
                             <input id="newReviewName" type="text"
-                                style="flex:1; border:1px solid #e2e8f0; padding:10px; border-radius:10px; font-family:inherit;"
+                                style="flex:1; border:1px solid #e2e8f0; padding:10px; border-radius:10px; font-family:inherit; background:white; color:#1e293b;"
                                 placeholder="Your Name (Optional)">
                             <button onclick="submitReview()"
                                 style="background:var(--text-dark); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:600;">Send
@@ -335,7 +351,11 @@
 
     <!-- SCRIPTS -->
     <script src="../assets/js/components.js"></script>
-    <script>
+    <script type="module">
+        import { db, auth } from "../assets/js/firebase-config.js";
+        import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
         // --- SHELL CONFIGURATION ---
         window.ShellSubnav = null;
 
@@ -345,161 +365,311 @@
             if (window.injectHeader) injectHeader();
             if (window.injectFooter) injectFooter();
         });
-    </script>
-    <script>
+
         // Load Profile Logic
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
 
+            if (!id) {
+                // REDIRECT or SHOW ERROR if no ID
+                document.querySelector('.profile-container').innerHTML = `<div style='text-align:center; padding:50px;'><h2>Profile Not Found</h2><a href='index.html'>Go Back</a></div>`;
+                return;
+            }
+
             let profile = null;
 
-            // 1. Check if it's the logged-in user (Simulation)
-            if (id === '999') {
-                const stored = localStorage.getItem('professional_profile');
-                if (stored) {
-                    const parsed = JSON.parse(stored);
+            try {
+                // 1. Try Fetching from Firestore
+                const docRef = doc(db, "professionals", id);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
                     profile = {
-                        name: parsed.name,
-                        role: parsed.title || "Peer Listener",
-                        image: parsed.image,
-                        bio: parsed.bio,
-                        tags: parsed.style && parsed.style.length > 0 ? parsed.style : (parsed.tags || []),
-                        convo: parsed.convoIndex || "• We start wherever you are (no agenda).\n• You can talk, type, or take breaks.",
-                        match: parsed.matchIndex || "• You're overthinking small things.\n• You feel emotionally tired.",
-                        bound: parsed.boundaries || "I don't diagnose or treat mental health conditions. I am here to listen."
+                        name: data.name,
+                        role: data.role || "Peer Listener",
+                        image: data.photoURL || "",
+                        bio: data.bio || "No bio available yet.",
+                        tags: data.tags || [],
+                        convo: data.conversationStyle || "• We start wherever you are.\n• No agenda, just listening.",
+                        match: data.bestMatch || "• You need a safe space to vent.\n• You are feeling overwhelmed.",
+                        bound: data.boundaries || "Use specific boundaries set by the peer.",
+                        reviews: data.reviews || []
+                    };
+                } else {
+                    console.warn("Profile not found in DB, checking legacy...");
+                }
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+            }
+
+            // Fallback: HARDCODED DATA (If DB fetch fails or for specific legacy IDs)
+            if (!profile) {
+                if (id === '1') {
+                    profile = {
+                        name: "Aditya (Peer)",
+                        role: "Peer Listener • Senior Student",
+                        image: "https://randomuser.me/api/portraits/men/45.jpg",
+                        bio: "I’m here for conversations that feel tangled, slow, or unfinished. I know what it’s like when thoughts don’t stop looping. I've navigated my own path through academic pressure and burnout.",
+                        tags: ["Slow-paced", "Gentle questions", "Comfortable with silence", "Reflective", "Patient"],
+                        convo: "• We start wherever you are.\n• I won't interrupt or rush you.\n• There's no 'right' outcome expected.",
+                        match: "• You're overthinking small things.\n• You feel emotionally tired but aren't sure why.\n• You aren't ready for therapy, but don't want to be alone.",
+                        bound: "Peers at Soulamore don’t diagnose. If you’re feeling unsafe, I’ll help you find immediate professional support.",
+                        reviews: []
+                    };
+                } else if (id === 'zoya') {
+                    profile = {
+                        name: "Zoya",
+                        role: "Peer Counselor",
+                        image: "", // Use Initial
+                        bio: "I am here for you to cope up with negative emotions and get through the tough times. Navigating the challenges of workplace stress can often feel like walking on a tightrope.",
+                        tags: ["Workplace Stress", "Empathy", "Coping Strategies"],
+                        convo: "• Open and non-judgmental space.\n• Focus on practical coping strategies.",
+                        match: "• You feel stressed at work.\n• You need someone to just listen.",
+                        bound: "I am here to listen and support, but I am not a medical professional.",
+                        reviews: [
+                            { text: "Thanks to Zoya, I now have coping strategies.", author: "Ankita", date: "Recent" },
+                            { text: "Zoya's insights are remarkable.", author: "Ashwin", date: "Recent" }
+                        ]
                     };
                 }
-            } else if (id === '1') {
-                // Hardcoded Demo Profile (Aditya/Peer example)
-                profile = {
-                    name: "Aditya (Peer)",
-                    role: "Peer Listener • Senior Student",
-                    image: "https://randomuser.me/api/portraits/men/45.jpg",
-                    bio: "I’m here for conversations that feel tangled, slow, or unfinished. I know what it’s like when thoughts don’t stop looping. I've navigated my own path through academic pressure and burnout.",
-                    tags: ["Slow-paced", "Gentle questions", "Comfortable with silence", "Reflective", "Patient"],
-                    convo: "• We start wherever you are.\n• I won't interrupt or rush you.\n• There's no 'right' outcome expected.",
-                    match: "• You're overthinking small things.\n• You feel emotionally tired but aren't sure why.\n• You aren't ready for therapy, but don't want to be alone.",
-                    bound: "Peers at Soulamore don’t diagnose. If you’re feeling unsafe, I’ll help you find immediate professional support."
-                };
             }
 
-            // Fallback
-            if (!profile) {
-                profile = {
-                    name: "Unknown Peer",
-                    role: "Listener",
-                    image: "https://via.placeholder.com/150",
-                    bio: "Profile not found.",
-                    tags: [],
-                    convo: "",
-                    match: "",
-                    bound: ""
-                };
+            // Render Function
+            if (profile) {
+                renderProfile(profile);
+            } else {
+                document.querySelector('.profile-container').innerHTML = `<div style='text-align:center; padding:50px;'><h2>User Not Found</h2><p>The profile you are looking for does not exist.</p><a href='index.html'>Back to Peers</a></div>`;
             }
 
-            // Render
-            document.getElementById('pName').innerText = profile.name;
-            document.getElementById('pRole').innerText = profile.role;
-            document.getElementById('pAvatar').src = profile.image;
-            document.getElementById('pBio').innerText = profile.bio;
-            document.getElementById('pBound').innerText = profile.bound;
+            function renderProfile(p) {
+                document.getElementById('pName').innerText = p.name;
+                document.getElementById('pRole').innerText = p.role;
 
-            // Render Tags
-            const tagContainer = document.getElementById('pTags');
-            profile.tags.forEach(tag => {
-                if (tag) {
-                    const span = document.createElement('span');
-                    span.className = 'vibe-tag';
-                    span.innerText = tag;
-                    tagContainer.appendChild(span);
+                // Avatar Logic
+                const avImg = document.getElementById('pAvatar');
+                const avInit = document.getElementById('pAvatarInitial');
+
+                if (p.image) {
+                    avImg.src = p.image;
+                    avImg.style.display = 'block';
+                    avInit.style.display = 'none';
+                } else {
+                    avImg.style.display = 'none';
+                    avInit.style.display = 'flex';
+                    avInit.innerText = p.name.charAt(0);
                 }
-            });
 
-            // Render Lists (Split by newline or bullet)
-            const renderList = (text, elementId) => {
-                const ul = document.getElementById(elementId);
-                const items = text.split(/\n|•/).filter(i => i.trim().length > 0);
-                items.forEach(item => {
-                    const li = document.createElement('li');
-                    li.innerText = item.trim();
-                    ul.appendChild(li);
-                });
-            };
+                document.getElementById('pBio').innerText = p.bio;
+                document.getElementById('pBound').innerText = p.bound;
 
-            renderList(profile.convo, 'pConvo');
-            renderList(profile.match, 'pMatch');
+                // Render Tags
+                const tagContainer = document.getElementById('pTags');
+                tagContainer.innerHTML = ''; // Clear loading
+                if (p.tags) {
+                    p.tags.forEach(tag => {
+                        if (tag) {
+                            const span = document.createElement('span');
+                            span.className = 'vibe-tag';
+                            span.innerText = tag;
+                            tagContainer.appendChild(span);
+                        }
+                    });
+                }
 
-            // Force Header Dark (Theme override)
-            const header = document.querySelector('header');
-            if (header) {
-                header.style.background = '#0f172a'; // Ensure nav is visible against soft background
-            }
 
-            // --- REVIEWS LOGIC ---
-            loadReviews();
+                // Render Lists
+                const renderList = (text, elementId) => {
+                    const ul = document.getElementById(elementId);
+                    ul.innerHTML = '';
+                    if (!text) return;
 
-            window.submitReview = function () {
-                const msg = document.getElementById('newReviewMsg').value;
-                const name = document.getElementById('newReviewName').value || "Anonymous";
-
-                if (!msg.trim()) return alert("Please write a message first.");
-
-                const newReview = {
-                    text: msg,
-                    author: name,
-                    date: new Date().toLocaleDateString()
+                    const items = text.split(/\n|•/).filter(i => i.trim().length > 0);
+                    items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerText = item.trim();
+                        ul.appendChild(li);
+                    });
                 };
 
-                // Get existing
-                let reviews = JSON.parse(localStorage.getItem('peer_reviews') || "[]");
-                reviews.unshift(newReview); // Add to top
-                localStorage.setItem('peer_reviews', JSON.stringify(reviews));
+                renderList(p.convo, 'pConvo');
+                renderList(p.match, 'pMatch');
 
-                // Clear and Reload
-                document.getElementById('newReviewMsg').value = "";
-                loadReviews();
-                alert("Thank you! Your note has been sent.");
-            };
-
-            function loadReviews() {
-                const container = document.getElementById('pReviews');
-                const stored = localStorage.getItem('peer_reviews');
-
-                // Demo Data if empty
-                let reviews = stored ? JSON.parse(stored) : [
-                    { text: "Such a calming presence. Thank you for listening.", author: "Student", date: "Oct 12" },
-                    { text: "I felt heard for the first time in weeks.", author: "Anon", date: "Sep 28" }
-                ];
-
-                if (reviews.length === 0) return;
-
-                container.innerHTML = ''; // Clear
-
-                reviews.forEach(r => {
-                    const revDiv = document.createElement('div');
-                    revDiv.style.cssText = 'background:#f8fafc; padding:15px; border-radius:12px; margin-bottom:10px;';
-
-                    const msgP = document.createElement('p');
-                    msgP.style.cssText = 'margin-bottom:5px; font-size:0.95rem;';
-                    msgP.textContent = `"${r.text}"`;
-
-                    const authorDiv = document.createElement('div');
-                    authorDiv.style.cssText = 'font-size:0.75rem; opacity:0.6; font-weight:600;';
-                    authorDiv.textContent = `— ${r.author} `;
-
-                    const dateSpan = document.createElement('span');
-                    dateSpan.style.cssText = 'font-weight:400; margin-left:5px;';
-                    dateSpan.textContent = r.date;
-
-                    authorDiv.appendChild(dateSpan);
-                    revDiv.appendChild(msgP);
-                    revDiv.appendChild(authorDiv);
-
-                    container.appendChild(revDiv);
-                });
+                // Render Reviews
+                renderReviews(p.reviews || []);
             }
         });
+
+        // --- REVIEWS LOGIC ---
+        function renderReviews(reviews) {
+            const container = document.getElementById('pReviews');
+            if (!container) return;
+
+            if (reviews.length === 0) {
+                container.innerHTML = `<p style="opacity:0.6; font-style:italic; color:var(--text-muted);">No notes yet. Be the first to leave one!</p>`;
+                return;
+            }
+
+            container.innerHTML = ''; // Clear
+
+            reviews.forEach(r => {
+                const revDiv = document.createElement('div');
+                revDiv.style.cssText = 'background:#f8fafc; padding:15px; border-radius:12px; margin-bottom:10px; border:1px solid #e2e8f0;';
+
+                const msgP = document.createElement('p');
+                msgP.style.cssText = 'margin-bottom:5px; font-size:0.95rem; color:var(--text-muted);';
+                msgP.textContent = `"${r.text}"`;
+
+                const authorDiv = document.createElement('div');
+                authorDiv.style.cssText = 'font-size:0.75rem; opacity:0.8; font-weight:600; color:var(--text-dark);';
+                // Handle different review formats (legacy vs new)
+                const author = r.author || "Anonymous";
+                const date = r.date || "";
+                authorDiv.textContent = `— ${author} ${date ? `(${date})` : ''}`;
+
+                revDiv.appendChild(msgP);
+                revDiv.appendChild(authorDiv);
+
+                container.appendChild(revDiv);
+            });
+        }
+
+        // Global Submit function (Attached to window for HTML access)
+        window.submitReview = async function () {
+            const msg = document.getElementById('newReviewMsg').value;
+            const name = document.getElementById('newReviewName').value || "Anonymous";
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+
+            if (!msg.trim()) return alert("Please write a message first.");
+
+            const newReview = {
+                text: msg,
+                author: name,
+                date: new Date().toLocaleDateString()
+            };
+
+            // OPTIMISTIC UPDATE
+            const container = document.getElementById('pReviews');
+            // Check if "No notes yet" exists and remove it
+            if (container.querySelector('p')?.style.fontStyle === 'italic') {
+                container.innerHTML = '';
+            }
+            // Add to List UI
+            const tempReviews = [{ text: msg, author: name, date: "Just now" }];
+            // Simple append for smooth UX
+            // Re-render handled by full function usually, but let's simple append:
+            const revDiv = document.createElement('div');
+            revDiv.style.cssText = 'background:#f0fdf4; padding:15px; border-radius:12px; margin-bottom:10px; border:1px solid #86efac; animation: slideUp 0.3s ease-out;';
+            revDiv.innerHTML = `<p style="margin-bottom:5px; font-size:0.95rem; color:#166534;">"${msg}"</p><div style="font-size:0.75rem; font-weight:600; color:#166534;">— ${name} (Just now)</div>`;
+            container.prepend(revDiv);
+
+            // SAVE TO FIRESTORE (If valid ID)
+            if (id && id !== '1' && id !== 'zoya') {
+                try {
+                    const docRef = doc(db, "professionals", id);
+                    await updateDoc(docRef, {
+                        reviews: arrayUnion(newReview)
+                    });
+                    console.log("Review saved to DB");
+                } catch (e) {
+                    console.error("Error saving review:", e);
+                    alert("Note: Review shown locally but could not be saved to server (you might be offline or using a demo profile).");
+                }
+            } else {
+                console.warn("Demo profile - review not saved to DB.");
+                alert("Thanks! Since this is a demo profile, the review is only visible to you for now.");
+            }
+
+            // Clear Input
+            document.getElementById('newReviewMsg').value = "";
+        };
+
+        // --- BOOKMARK LOGIC ---
+        let isBookmarked = false;
+        let currentUser = null;
+        let currentProfileId = new URLSearchParams(window.location.search).get('id');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                // Check if already saved
+                const userRef = doc(db, "users", user.uid); // Assuming users collection
+                // Or "professionals" if a peer is saving? 
+                // Let's assume standard "users" collection for saving content
+                try {
+                    const snap = await getDoc(userRef);
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        if (data.savedProfiles && data.savedProfiles.includes(currentProfileId)) {
+                            isBookmarked = true;
+                            updateBookmarkUI(true);
+                        }
+                    }
+                } catch (e) { console.log("Error checking bookmark status", e); }
+            }
+        });
+
+        window.toggleBookmark = async function () {
+            if (!currentUser) {
+                alert("Please log in to save profiles.");
+                return;
+            }
+            if (!currentProfileId) return;
+
+            const btn = document.getElementById('bookmarkBtn');
+            const icon = btn.querySelector('i');
+            const span = btn.querySelector('span');
+
+            // UI Optimistic Update
+            isBookmarked = !isBookmarked;
+            updateBookmarkUI(isBookmarked);
+
+            const userRef = doc(db, "users", currentUser.uid);
+
+            try {
+                if (isBookmarked) {
+                    await updateDoc(userRef, {
+                        savedProfiles: arrayUnion(currentProfileId)
+                    });
+                    // Also maybe create if doesn't exist? updateDoc might fail if doc doesn't exist.
+                    // But usually users exist on login.
+                } else {
+                    await updateDoc(userRef, {
+                        savedProfiles: arrayRemove(currentProfileId)
+                    });
+                }
+            } catch (e) {
+                console.error("Error updating bookmark:", e);
+                // Revert UI if failed
+                isBookmarked = !isBookmarked;
+                updateBookmarkUI(isBookmarked);
+                alert("Could not save. Please try again.");
+            }
+        };
+
+        function updateBookmarkUI(active) {
+            const btn = document.getElementById('bookmarkBtn');
+            const icon = btn.querySelector('i');
+            const span = btn.querySelector('span');
+
+            if (active) {
+                btn.style.background = "var(--text-dark)";
+                btn.style.color = "white";
+                btn.style.borderColor = "var(--text-dark)";
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                span.innerText = "Saved";
+            } else {
+                btn.style.background = "white";
+                btn.style.color = "#94a3b8";
+                btn.style.borderColor = "#e2e8f0";
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                span.innerText = "Save";
+            }
+        }
     </script>
 </body>
 

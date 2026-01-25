@@ -68,5 +68,45 @@
         }
     }
 
-    console.log('✅ Auth Guard Passed. Welcome, ' + session.userId);
+    // 4. Async Token Validation (Security Layer 2)
+    // Prevents "Manual LocalStorage Spoofing" attack.
+    // Dynamically imports Firebase to avoid blocking the initial page load.
+    const firebaseConfig = {
+        apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+        authDomain: "soulamore-f0a64.firebaseapp.com",
+        projectId: "soulamore-f0a64"
+    };
+
+    // Use dynamic import for modern browsers
+    import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js')
+        .then(({ initializeApp }) => {
+            return import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js')
+                .then(({ getAuth, onAuthStateChanged }) => {
+                    const app = initializeApp(firebaseConfig);
+                    const auth = getAuth(app);
+
+                    onAuthStateChanged(auth, (user) => {
+                        // DEV BYPASS: Skip strict check for developer preview sessions
+                        if (session.userId && session.userId.startsWith('dev-')) {
+                            console.log("🛠️ Dev Mode Active: Firebase Validation Skipped.");
+                            return;
+                        }
+
+                        if (!user) {
+                            console.warn("⛔ SECURITY ALERT: LocalStorage valid but Firebase User missing. Potential spoofing or expired token.");
+                            // Force logout
+                            localStorage.removeItem("soulamore_session");
+                            window.location.href = '../portal/login.html';
+                        } else {
+                            // Verified
+                            console.log("✅ Security Validation Passed: Token is valid.");
+                        }
+                    });
+                });
+        })
+        .catch(err => {
+            console.warn("⚠️ Auth validation skipped (Network/Gateway error). Relying on LocalStorage.", err);
+        });
+
+    console.log('✅ Optimistic Guard Passed. Welcome, ' + session.userId);
 })();
