@@ -445,6 +445,8 @@
                 }
 
                 const result = await loginWithGoogle();
+                
+                console.log('Google login result:', result);
 
                 if (result.success) {
                     // Check profile status
@@ -481,14 +483,32 @@
                 }
             } catch (e) {
                 console.error('Google login error:', e);
-                let errorMsg = e.message || "Google login failed";
-                if (errorMsg.includes('operation-not-allowed')) {
-                    errorMsg = "Google login is not enabled. Please contact support or use email login.";
+                let errorMsg = e.message || e.code || "Google login failed";
+                
+                // Check for specific Firebase error codes
+                if (e.code) {
+                    if (e.code === 'auth/operation-not-allowed') {
+                        errorMsg = "Google login is not enabled in Firebase Console. Please contact support.";
+                    } else if (e.code === 'auth/popup-blocked') {
+                        errorMsg = "Popup was blocked by your browser. Please allow popups for soulamore.com and try again.";
+                    } else if (e.code === 'auth/popup-closed-by-user') {
+                        errorMsg = "Sign-in was cancelled. Please try again.";
+                    } else if (e.code === 'auth/unauthorized-domain') {
+                        errorMsg = "This domain is not authorized. Please add soulamore.com to Firebase authorized domains.";
+                    } else if (e.code === 'auth/network-request-failed') {
+                        errorMsg = "Network error. Please check your internet connection and try again.";
+                    } else {
+                        errorMsg = `Google login failed: ${e.code} - ${e.message || 'Unknown error'}`;
+                    }
+                } else if (errorMsg.includes('operation-not-allowed')) {
+                    errorMsg = "Google login is not enabled in Firebase Console. Please contact support.";
                 } else if (errorMsg.includes('popup-blocked')) {
                     errorMsg = "Popup was blocked. Please allow popups for this site and try again.";
                 } else if (errorMsg.includes('unauthorized-domain')) {
                     errorMsg = "This domain is not authorized. Please contact support.";
                 }
+                
+                console.error('Final error message:', errorMsg);
                 alert(errorMsg);
                 // Re-enable button on error
                 if (gBtn) {
