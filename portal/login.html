@@ -349,40 +349,155 @@
         };
 
         window.handleFacebookLogin = async () => {
+            const fbBtn = document.querySelector('button[onclick="handleFacebookLogin()"]');
+            const intent = sessionStorage.getItem('loginIntent') || 'user';
+
             try {
-                const res = await loginWithFacebook();
-                if (res.success) {
-                    await createOrUpdateUserProfile(res.user);
-                    const intent = sessionStorage.getItem('loginIntent') || 'user';
-                    handleRoleRouting(res.user, intent);
-                } else {
-                    let errorMsg = res.error || "Facebook login failed";
-                    if (errorMsg.includes('operation-not-allowed')) {
-                        errorMsg = "Facebook login is not enabled. Please contact support or use email login.";
-                    } else if (errorMsg.includes('popup-blocked')) {
-                        errorMsg = "Popup was blocked. Please allow popups for this site and try again.";
-                    } else if (errorMsg.includes('unauthorized-domain')) {
-                        errorMsg = "This domain is not authorized. Please contact support.";
+                if (fbBtn) {
+                    fbBtn.disabled = true;
+                    fbBtn.style.opacity = '0.6';
+                    fbBtn.style.cursor = 'not-allowed';
+                    const originalHTML = fbBtn.innerHTML;
+                    fbBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    
+                    const res = await loginWithFacebook();
+                    
+                    if (res.success) {
+                        await createOrUpdateUserProfile(res.user);
+                        
+                        // --- PEER ONBOARDING CHECK ---
+                        if (intent === 'peer') {
+                            const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                            const db = getFirestore();
+                            const userDoc = await getDoc(doc(db, "users", res.user.uid));
+
+                            if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                                window.location.href = 'peer-dashboard.html';
+                                return;
+                            }
+                        }
+
+                        // --- PSYCHOLOGIST ONBOARDING CHECK ---
+                        if (intent === 'psychologist') {
+                            const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                            const db = getFirestore();
+                            const userDoc = await getDoc(doc(db, "users", res.user.uid));
+
+                            if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                                window.location.href = 'psych-dashboard.html';
+                                return;
+                            }
+                        }
+
+                        await handleRoleRouting(res.user, intent);
+                    } else {
+                        let errorMsg = res.error || "Facebook login failed";
+                        if (errorMsg.includes('operation-not-allowed')) {
+                            errorMsg = "Facebook login is not enabled. Please contact support or use email login.";
+                        } else if (errorMsg.includes('popup-blocked')) {
+                            errorMsg = "Popup was blocked. Please allow popups for this site and try again.";
+                        } else if (errorMsg.includes('unauthorized-domain')) {
+                            errorMsg = "This domain is not authorized. Please contact support.";
+                        }
+                        throw new Error(errorMsg);
                     }
-                    alert(errorMsg);
+                } else {
+                    // Fallback if button not found
+                    const res = await loginWithFacebook();
+                    if (res.success) {
+                        await createOrUpdateUserProfile(res.user);
+                        const intent = sessionStorage.getItem('loginIntent') || 'user';
+                        await handleRoleRouting(res.user, intent);
+                    } else {
+                        throw new Error(res.error || "Facebook login failed");
+                    }
                 }
             } catch (e) {
+                console.error('Facebook login error:', e);
                 let errorMsg = e.message || "Facebook login failed";
                 if (errorMsg.includes('operation-not-allowed')) {
                     errorMsg = "Facebook login is not enabled. Please contact support or use email login.";
+                } else if (errorMsg.includes('popup-blocked')) {
+                    errorMsg = "Popup was blocked. Please allow popups for this site and try again.";
+                } else if (errorMsg.includes('unauthorized-domain')) {
+                    errorMsg = "This domain is not authorized. Please contact support.";
                 }
-                alert("Error: " + errorMsg);
+                alert(errorMsg);
+                // Re-enable button on error
+                if (fbBtn) {
+                    fbBtn.disabled = false;
+                    fbBtn.style.opacity = '1';
+                    fbBtn.style.cursor = 'pointer';
+                    fbBtn.innerHTML = '<i class="fab fa-facebook-f" style="color:#1877F2;"></i>';
+                }
             }
         };
 
         window.handleGoogleLogin = async () => {
+            const gBtn = document.getElementById('googleSignInBtn');
+            const intent = sessionStorage.getItem('loginIntent') || 'user';
+
             try {
-                const res = await loginWithGoogle();
-                if (!res.success) {
-                    alert(res.error || "Google login failed");
+                if (gBtn) {
+                    gBtn.disabled = true;
+                    gBtn.style.opacity = '0.6';
+                    gBtn.style.cursor = 'not-allowed';
+                    gBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+                }
+
+                const result = await loginWithGoogle();
+
+                if (result.success) {
+                    // Check profile status
+                    const profileResult = await createOrUpdateUserProfile(result.user);
+                    const isNewUser = profileResult && profileResult.isNewUser;
+
+                    // --- PEER ONBOARDING CHECK ---
+                    if (intent === 'peer') {
+                        const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                        const db = getFirestore();
+                        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+                        if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                            window.location.href = 'peer-dashboard.html';
+                            return;
+                        }
+                    }
+
+                    // --- PSYCHOLOGIST ONBOARDING CHECK ---
+                    if (intent === 'psychologist') {
+                        const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                        const db = getFirestore();
+                        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+                        if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                            window.location.href = 'psych-dashboard.html';
+                            return;
+                        }
+                    }
+
+                    await handleRoleRouting(result.user, intent, isNewUser);
+                } else {
+                    throw new Error(result.error);
                 }
             } catch (e) {
-                alert("Error: " + (e.message || "Google login failed"));
+                console.error('Google login error:', e);
+                let errorMsg = e.message || "Google login failed";
+                if (errorMsg.includes('operation-not-allowed')) {
+                    errorMsg = "Google login is not enabled. Please contact support or use email login.";
+                } else if (errorMsg.includes('popup-blocked')) {
+                    errorMsg = "Popup was blocked. Please allow popups for this site and try again.";
+                } else if (errorMsg.includes('unauthorized-domain')) {
+                    errorMsg = "This domain is not authorized. Please contact support.";
+                }
+                alert(errorMsg);
+                // Re-enable button on error
+                if (gBtn) {
+                    gBtn.disabled = false;
+                    gBtn.style.opacity = '1';
+                    gBtn.style.cursor = 'pointer';
+                    gBtn.innerHTML = '<i class="fab fa-google" style="color:#EA4335;"></i>';
+                }
             }
         };
 
@@ -427,14 +542,24 @@
         };
 
         // Placeholders to prevent ReferenceError if clicked before module loads
+        // These will be overridden by the module script when it loads
         if (!window.handleGoogleLogin) {
-            window.handleGoogleLogin = () => alert("System loading... or blocked by browser security (file://). Please use a Local Server.");
+            window.handleGoogleLogin = () => {
+                console.warn("Auth modules not loaded yet. Please wait...");
+                alert("System loading... Please wait a moment and try again. If this persists, ensure you're accessing via HTTPS (not file://).");
+            };
         }
         if (!window.handleFacebookLogin) {
-            window.handleFacebookLogin = () => alert("System loading... or blocked by browser security (file://). Please use a Local Server.");
+            window.handleFacebookLogin = () => {
+                console.warn("Auth modules not loaded yet. Please wait...");
+                alert("System loading... Please wait a moment and try again. If this persists, ensure you're accessing via HTTPS (not file://).");
+            };
         }
         if (!window.handlePhoneAction) {
-            window.handlePhoneAction = () => alert("Auth Modules verifying... If this persists, please use a Local Server to enable Real OTPs (CORS restricts file:// protocol).");
+            window.handlePhoneAction = () => {
+                console.warn("Auth modules not loaded yet. Please wait...");
+                alert("System loading... Please wait a moment and try again. Authentication requires HTTPS (not file:// protocol).");
+            };
         }
     </script>
 
@@ -470,61 +595,6 @@
             return errorMap[errorCode] || 'An unexpected error occurred. Please try again.';
         }
 
-        // --- GOOGLE (Exported like Signup) ---
-        window.handleGoogleLogin = async function () {
-            const gBtn = document.getElementById('googleSignInBtn');
-            const intent = sessionStorage.getItem('loginIntent') || 'user';
-
-            try {
-                if (gBtn) {
-                    gBtn.disabled = true; // Prevent double-click
-                    gBtn.style.opacity = '0.6';
-                    gBtn.style.cursor = 'not-allowed';
-                    gBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
-                }
-
-                const result = await loginWithGoogle();
-
-                if (result.success) {
-                    // Check profile status
-                    const profileResult = await createOrUpdateUserProfile(result.user);
-                    const isNewUser = profileResult && profileResult.isNewUser;
-
-                    // --- PEER ONBOARDING CHECK ---
-                    if (intent === 'peer') {
-                        // Check if setup is complete
-                        // We need to read from Firestore (ideally via a helper, but doing inline for speed)
-                        const { getFirestore, doc, getDoc } = await
-                            import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
-                        const db = getFirestore();
-                        const userDoc = await getDoc(doc(db, "users", result.user.uid));
-
-                        if (userDoc.exists() && userDoc.data().isSetupComplete) {
-                            window.location.href = 'peer-dashboard.html';
-                            return;
-                        } else {
-                            // If first time login (even with Google if allowed, or if setup not done)
-                            // Ideally peers shouldn't Google Login first time, but if they do, we can still route them
-                            // But for now, let's assume Email login is the primary provisioning method.
-                        }
-                    }
-
-                    await handleRoleRouting(result.user, intent, isNewUser);
-                } else {
-                    throw new Error(result.error);
-                }
-            } catch (e) {
-                const friendlyMsg = getFriendlyErrorMessage(e.code || e.message);
-                alert(friendlyMsg);
-                // Re-enable button on error
-                if (gBtn) {
-                    gBtn.disabled = false;
-                    gBtn.style.opacity = '1';
-                    gBtn.style.cursor = 'pointer';
-                    gBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
-                }
-            }
-        };
 
         // --- EMAIL LOGIN (Exported to Window) ---
         window.handleEmailLogin = async function () {
