@@ -107,3 +107,4 @@ echo "   4. Verify booking is created in Firestore"
 echo ""
 echo "🎉 All done! Your Razorpay integration is ready to test."
 
+

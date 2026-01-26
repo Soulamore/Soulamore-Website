@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Content Security Policy: Prevent XSS and injection attacks -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
-                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com; 
+                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/; 
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; 
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; 
-                 img-src 'self' data: https: https://lh3.googleusercontent.com; 
-                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://accounts.google.com; 
-                 frame-src 'self' https://accounts.google.com https://soulamore-f0a64.firebaseapp.com; 
+                 img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com; 
+                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com/recaptcha/; 
+                 frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com; 
                  frame-ancestors 'self';">
     <meta name="referrer" content="no-referrer-when-downgrade">
     <meta name="description"
@@ -303,7 +303,16 @@
                         phoneBtn.disabled = false;
                         alert("✅ OTP Sent to your phone!");
                     } else {
-                        throw new Error(res.error || "Failed to send OTP");
+                        // Better error handling
+                        let errorMsg = res.error || "Failed to send OTP";
+                        if (errorMsg.includes('operation-not-allowed')) {
+                            errorMsg = "Phone authentication is not enabled. Please contact support or use email login.";
+                        } else if (errorMsg.includes('invalid-phone-number')) {
+                            errorMsg = "Invalid phone number. Please include country code (e.g., +919501808162)";
+                        } else if (errorMsg.includes('recaptcha')) {
+                            errorMsg = "reCAPTCHA verification failed. Please refresh and try again.";
+                        }
+                        throw new Error(errorMsg);
                     }
                 } else {
                     // STEP 2: VERIFY OTP
@@ -342,11 +351,27 @@
         window.handleFacebookLogin = async () => {
             try {
                 const res = await loginWithFacebook();
-                if (!res.success) {
-                    alert(res.error || "Facebook login failed");
+                if (res.success) {
+                    await createOrUpdateUserProfile(res.user);
+                    const intent = sessionStorage.getItem('loginIntent') || 'user';
+                    handleRoleRouting(res.user, intent);
+                } else {
+                    let errorMsg = res.error || "Facebook login failed";
+                    if (errorMsg.includes('operation-not-allowed')) {
+                        errorMsg = "Facebook login is not enabled. Please contact support or use email login.";
+                    } else if (errorMsg.includes('popup-blocked')) {
+                        errorMsg = "Popup was blocked. Please allow popups for this site and try again.";
+                    } else if (errorMsg.includes('unauthorized-domain')) {
+                        errorMsg = "This domain is not authorized. Please contact support.";
+                    }
+                    alert(errorMsg);
                 }
             } catch (e) {
-                alert("Error: " + (e.message || "Facebook login failed"));
+                let errorMsg = e.message || "Facebook login failed";
+                if (errorMsg.includes('operation-not-allowed')) {
+                    errorMsg = "Facebook login is not enabled. Please contact support or use email login.";
+                }
+                alert("Error: " + errorMsg);
             }
         };
 
@@ -376,16 +401,28 @@
         // UI Logic - Safe to run without Modules
         window.togglePhoneModal = function () {
             const modal = document.getElementById('phone-modal');
-            if (modal.style.display === 'none') {
+            if (modal.style.display === 'none' || modal.style.display === '') {
                 modal.style.display = 'flex';
-                // Try to init auth components IF module loaded
-                if (window.initRecaptcha) {
-                    window.initRecaptcha();
-                } else {
-                    console.warn("Auth Module not loaded yet (CORS/File Protocol issue?)");
-                }
+                // Initialize reCAPTCHA when modal opens
+                setTimeout(() => {
+                    if (window.initRecaptcha) {
+                        window.initRecaptcha();
+                    } else {
+                        console.warn("Auth Module not loaded yet (CORS/File Protocol issue?)");
+                        // Show helpful message
+                        const recaptchaContainer = document.getElementById('recaptcha-container');
+                        if (recaptchaContainer) {
+                            recaptchaContainer.innerHTML = '<p style="color: #f59e0b; font-size: 0.85rem; margin-top: 10px;">⚠️ Please ensure you are accessing this page via HTTPS (not file://). Authentication requires a secure connection.</p>';
+                        }
+                    }
+                }, 100);
             } else {
                 modal.style.display = 'none';
+                // Clean up reCAPTCHA when modal closes
+                const recaptchaContainer = document.getElementById('recaptcha-container');
+                if (recaptchaContainer) {
+                    recaptchaContainer.innerHTML = '';
+                }
             }
         };
 

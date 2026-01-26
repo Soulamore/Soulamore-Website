@@ -65,3 +65,4 @@ We'll add rate limiting in the SoulBot code to prevent abuse.
 
 **Recommended budget**: Start with **$50/month** and adjust based on usage.
 
+
