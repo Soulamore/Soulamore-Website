@@ -27,10 +27,14 @@ export async function signUpWithEmail(email, password, name) {
 export async function loginWithEmail(email, password) {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log("Email login success:", userCredential.user.email);
         return { success: true, user: userCredential.user };
     } catch (error) {
-        console.error("Login Error:", error);
-        return { success: false, error: error.message };
+        console.error("Email Login Error:", error);
+        // Return error code for better debugging
+        const errorCode = error.code || error.message;
+        const errorMessage = error.message || 'Unknown error occurred';
+        return { success: false, error: errorMessage, code: errorCode };
     }
 }
 
