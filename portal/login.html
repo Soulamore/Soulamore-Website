@@ -350,7 +350,7 @@
                     const originalHTML = fbBtn.innerHTML;
                     fbBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                     
-                    const res = await loginWithFacebook();
+                const res = await loginWithFacebook();
                     
                     if (res.success) {
                         await createOrUpdateUserProfile(res.user);
@@ -519,119 +519,6 @@
                 });
             }
         };
-    </script>
-
-    <!-- SAFE FALLBACK SCRIPT (Runs even if Modules are blocked by CORS/File Protocol) -->
-    <script>
-        // UI Logic - Safe to run without Modules
-        window.togglePhoneModal = function () {
-            const modal = document.getElementById('phone-modal');
-            if (modal.style.display === 'none' || modal.style.display === '') {
-                modal.style.display = 'flex';
-                
-                // Check if we're on HTTPS
-                const isHTTPS = window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                
-                // Initialize reCAPTCHA when modal opens
-                const initRecaptchaWithRetry = (attempts = 0) => {
-                    if (window.initRecaptcha && typeof window.initRecaptcha === 'function') {
-                        try {
-                            window.initRecaptcha();
-                            // Clear any warning messages
-                            const recaptchaContainer = document.getElementById('recaptcha-container');
-                            if (recaptchaContainer && recaptchaContainer.querySelector('p')) {
-                                recaptchaContainer.innerHTML = '';
-                            }
-                        } catch (e) {
-                            console.error('Error initializing reCAPTCHA:', e);
-                            const recaptchaContainer = document.getElementById('recaptcha-container');
-                            if (recaptchaContainer) {
-                                recaptchaContainer.innerHTML = '<p style="color: #ef4444; font-size: 0.85rem; margin-top: 10px;">⚠️ Error initializing reCAPTCHA. Please refresh the page.</p>';
-                            }
-                        }
-                    } else if (attempts < 10) {
-                        // Retry up to 10 times (1 second total)
-                        setTimeout(() => initRecaptchaWithRetry(attempts + 1), 100);
-                    } else {
-                        // Modules still not loaded after retries
-                        console.warn("Auth Module not loaded after retries");
-                        const recaptchaContainer = document.getElementById('recaptcha-container');
-                        if (recaptchaContainer) {
-                            if (!isHTTPS) {
-                                recaptchaContainer.innerHTML = '<p style="color: #f59e0b; font-size: 0.85rem; margin-top: 10px;">⚠️ Please ensure you are accessing this page via HTTPS (not file://). Authentication requires a secure connection.</p>';
-                            } else {
-                                recaptchaContainer.innerHTML = '<p style="color: #f59e0b; font-size: 0.85rem; margin-top: 10px;">⚠️ Authentication modules are still loading. Please wait a moment and try again.</p>';
-                            }
-                        }
-                    }
-                };
-                
-                // Start initialization with retry
-                setTimeout(() => initRecaptchaWithRetry(), 100);
-            } else {
-                modal.style.display = 'none';
-                // Clean up reCAPTCHA when modal closes
-                const recaptchaContainer = document.getElementById('recaptcha-container');
-                if (recaptchaContainer) {
-                    recaptchaContainer.innerHTML = '';
-                }
-            }
-        };
-
-        // Placeholders to prevent ReferenceError if clicked before module loads
-        // These will be overridden by the module script when it loads
-        if (!window.handleGoogleLogin) {
-            window.handleGoogleLogin = () => {
-                console.warn("Auth modules not loaded yet. Please wait...");
-                alert("System loading... Please wait a moment and try again. If this persists, ensure you're accessing via HTTPS (not file://).");
-            };
-        }
-        if (!window.handleFacebookLogin) {
-            window.handleFacebookLogin = () => {
-                console.warn("Auth modules not loaded yet. Please wait...");
-                alert("System loading... Please wait a moment and try again. If this persists, ensure you're accessing via HTTPS (not file://).");
-            };
-        }
-        if (!window.handlePhoneAction) {
-            window.handlePhoneAction = () => {
-                console.warn("Auth modules not loaded yet. Please wait...");
-                alert("System loading... Please wait a moment and try again. Authentication requires HTTPS (not file:// protocol).");
-            };
-        }
-    </script>
-
-    <script>
-        // --- PHASE 4: Mobile Keyboard Optimization ---
-        if ('visualViewport' in window) {
-            const viewport = window.visualViewport;
-            viewport.addEventListener('resize', () => {
-                // Adjust page when keyboard appears
-                document.body.style.height = `${viewport.height}px`;
-            });
-        }
-
-        // Friendly error message mapping
-        function getFriendlyErrorMessage(errorCode) {
-            const errorMap = {
-                'auth/invalid-email': 'Please enter a valid email address.',
-                'auth/user-disabled': 'This account has been disabled. Please contact support.',
-                'auth/user-not-found': 'No account found with this email. Please sign up first.',
-                'auth/wrong-password': 'Incorrect password. Please try again or reset your password.',
-                'auth/email-already-in-use': 'An account with this email already exists. Please log in instead.',
-                'auth/weak-password': 'Password should be at least 6 characters long.',
-                'auth/operation-not-allowed': 'This sign-in method is not enabled. Please contact support.',
-                'auth/too-many-requests': 'Too many failed attempts. Please wait a few minutes and try again.',
-                'auth/network-request-failed': 'Network error. Please check your internet connection and try again.',
-                'auth/popup-closed-by-user': 'Sign-in cancelled. Please try again if this was a mistake.',
-                'auth/popup-blocked': 'Popup blocked by your browser. Please allow popups for this site.',
-                'auth/unauthorized-domain': 'This domain is not authorized for authentication. Please contact support.',
-                'auth/invalid-credential': 'Invalid credentials. Please check your information and try again.',
-                'auth/account-exists-with-different-credential': 'An account already exists with this email but different sign-in method.',
-                'auth/cancelled-popup-request': 'Another sign-in popup is already open'
-            };
-            return errorMap[errorCode] || 'An unexpected error occurred. Please try again.';
-        }
-
 
         // --- EMAIL LOGIN (Exported to Window) ---
         window.handleEmailLogin = async function () {
@@ -762,6 +649,118 @@
                 submitBtn.style.opacity = '1';
                 submitBtn.innerHTML = 'Log In';
             }
+        };
+    </script>
+
+    <!-- SAFE FALLBACK SCRIPT (Runs even if Modules are blocked by CORS/File Protocol) -->
+    <script>
+        // UI Logic - Safe to run without Modules
+        window.togglePhoneModal = function () {
+            const modal = document.getElementById('phone-modal');
+            if (modal.style.display === 'none' || modal.style.display === '') {
+                modal.style.display = 'flex';
+                
+                // Check if we're on HTTPS
+                const isHTTPS = window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                
+                // Initialize reCAPTCHA when modal opens
+                const initRecaptchaWithRetry = (attempts = 0) => {
+                    if (window.initRecaptcha && typeof window.initRecaptcha === 'function') {
+                        try {
+                    window.initRecaptcha();
+                            // Clear any warning messages
+                            const recaptchaContainer = document.getElementById('recaptcha-container');
+                            if (recaptchaContainer && recaptchaContainer.querySelector('p')) {
+                                recaptchaContainer.innerHTML = '';
+                            }
+                        } catch (e) {
+                            console.error('Error initializing reCAPTCHA:', e);
+                            const recaptchaContainer = document.getElementById('recaptcha-container');
+                            if (recaptchaContainer) {
+                                recaptchaContainer.innerHTML = '<p style="color: #ef4444; font-size: 0.85rem; margin-top: 10px;">⚠️ Error initializing reCAPTCHA. Please refresh the page.</p>';
+                            }
+                        }
+                    } else if (attempts < 10) {
+                        // Retry up to 10 times (1 second total)
+                        setTimeout(() => initRecaptchaWithRetry(attempts + 1), 100);
+                } else {
+                        // Modules still not loaded after retries
+                        console.warn("Auth Module not loaded after retries");
+                        const recaptchaContainer = document.getElementById('recaptcha-container');
+                        if (recaptchaContainer) {
+                            if (!isHTTPS) {
+                                recaptchaContainer.innerHTML = '<p style="color: #f59e0b; font-size: 0.85rem; margin-top: 10px;">⚠️ Please ensure you are accessing this page via HTTPS (not file://). Authentication requires a secure connection.</p>';
+                            } else {
+                                recaptchaContainer.innerHTML = '<p style="color: #f59e0b; font-size: 0.85rem; margin-top: 10px;">⚠️ Authentication modules are still loading. Please wait a moment and try again.</p>';
+                            }
+                        }
+                    }
+                };
+                
+                // Start initialization with retry
+                setTimeout(() => initRecaptchaWithRetry(), 100);
+            } else {
+                modal.style.display = 'none';
+                // Clean up reCAPTCHA when modal closes
+                const recaptchaContainer = document.getElementById('recaptcha-container');
+                if (recaptchaContainer) {
+                    recaptchaContainer.innerHTML = '';
+                }
+            }
+        };
+
+        // Placeholders to prevent ReferenceError if clicked before module loads
+        // These will be overridden by the module script when it loads
+        if (!window.handleGoogleLogin) {
+            window.handleGoogleLogin = () => {
+                console.warn("Auth modules not loaded yet. Please wait...");
+                alert("System loading... Please wait a moment and try again. If this persists, ensure you're accessing via HTTPS (not file://).");
+            };
+        }
+        if (!window.handleFacebookLogin) {
+            window.handleFacebookLogin = () => {
+                console.warn("Auth modules not loaded yet. Please wait...");
+                alert("System loading... Please wait a moment and try again. If this persists, ensure you're accessing via HTTPS (not file://).");
+            };
+        }
+        if (!window.handlePhoneAction) {
+            window.handlePhoneAction = () => {
+                console.warn("Auth modules not loaded yet. Please wait...");
+                alert("System loading... Please wait a moment and try again. Authentication requires HTTPS (not file:// protocol).");
+            };
+        }
+    </script>
+
+    <script>
+        // --- PHASE 4: Mobile Keyboard Optimization ---
+        if ('visualViewport' in window) {
+            const viewport = window.visualViewport;
+            viewport.addEventListener('resize', () => {
+                // Adjust page when keyboard appears
+                document.body.style.height = `${viewport.height}px`;
+            });
+        }
+
+        // Friendly error message mapping
+        function getFriendlyErrorMessage(errorCode) {
+            const errorMap = {
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/user-disabled': 'This account has been disabled. Please contact support.',
+                'auth/user-not-found': 'No account found with this email. Please sign up first.',
+                'auth/wrong-password': 'Incorrect password. Please try again or reset your password.',
+                'auth/email-already-in-use': 'An account with this email already exists. Please log in instead.',
+                'auth/weak-password': 'Password should be at least 6 characters long.',
+                'auth/operation-not-allowed': 'This sign-in method is not enabled. Please contact support.',
+                'auth/too-many-requests': 'Too many failed attempts. Please wait a few minutes and try again.',
+                'auth/network-request-failed': 'Network error. Please check your internet connection and try again.',
+                'auth/popup-closed-by-user': 'Sign-in cancelled. Please try again if this was a mistake.',
+                'auth/popup-blocked': 'Popup blocked by your browser. Please allow popups for this site.',
+                'auth/unauthorized-domain': 'This domain is not authorized for authentication. Please contact support.',
+                'auth/invalid-credential': 'Invalid credentials. Please check your information and try again.',
+                'auth/account-exists-with-different-credential': 'An account already exists with this email but different sign-in method.',
+                'auth/cancelled-popup-request': 'Another sign-in popup is already open'
+            };
+            return errorMap[errorCode] || 'An unexpected error occurred. Please try again.';
         }
     </script>
     </script>
