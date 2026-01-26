@@ -636,12 +636,22 @@
         // --- EMAIL LOGIN (Exported to Window) ---
         window.handleEmailLogin = async function () {
             const intent = sessionStorage.getItem('loginIntent') || 'user';
-            const email = document.getElementById('emailInput').value;
+            const email = document.getElementById('emailInput').value.trim();
             const pass = document.getElementById('passInput').value;
             const submitBtn = document.querySelector('.submit-btn');
             const rememberMe = document.getElementById('rememberMe').checked;
 
-            if (!email || !pass) { alert("Please enter email and password"); return; }
+            if (!email || !pass) { 
+                alert("Please enter both email and password"); 
+                return; 
+            }
+
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert("Please enter a valid email address");
+                return;
+            }
 
             try {
                 // Disable submit button
@@ -650,7 +660,12 @@
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
 
                 const result = await loginWithEmail(email, pass);
+                console.log('Email login result:', result);
+
                 if (result.success) {
+                    // Create/update user profile
+                    await createOrUpdateUserProfile(result.user);
+
                     // Remember me functionality
                     if (rememberMe) {
                         localStorage.setItem('rememberedEmail', email);
@@ -699,12 +714,48 @@
 
                     await handleRoleRouting(result.user, intent);
                 } else {
-                    const friendlyMsg = getFriendlyErrorMessage(result.error);
-                    alert(friendlyMsg);
+                    // Handle login error with specific Firebase error codes
+                    let errorMsg = result.error || "Login failed";
+                    const errorCode = result.code || result.error;
+
+                    if (errorCode) {
+                        if (errorCode === 'auth/user-not-found') {
+                            errorMsg = "No account found with this email. Please sign up first.";
+                        } else if (errorCode === 'auth/wrong-password') {
+                            errorMsg = "Incorrect password. Please try again or use 'Forgot Password?' to reset it.";
+                        } else if (errorCode === 'auth/invalid-email') {
+                            errorMsg = "Invalid email address. Please check and try again.";
+                        } else if (errorCode === 'auth/user-disabled') {
+                            errorMsg = "This account has been disabled. Please contact support.";
+                        } else if (errorCode === 'auth/too-many-requests') {
+                            errorMsg = "Too many failed login attempts. Please wait a few minutes and try again, or reset your password.";
+                        } else if (errorCode === 'auth/network-request-failed') {
+                            errorMsg = "Network error. Please check your internet connection and try again.";
+                        } else if (errorCode === 'auth/operation-not-allowed') {
+                            errorMsg = "Email/password login is not enabled. Please contact support.";
+                        } else {
+                            errorMsg = `Login failed: ${errorCode} - ${result.error || 'Unknown error'}`;
+                        }
+                    }
+                    
+                    console.error('Email login error:', errorCode, errorMsg);
+                    alert(errorMsg);
                 }
             } catch (e) {
-                const friendlyMsg = getFriendlyErrorMessage(e.code || e.message);
-                alert(friendlyMsg);
+                console.error('Email login exception:', e);
+                let errorMsg = e.message || "An unexpected error occurred. Please try again.";
+                
+                if (e.code) {
+                    if (e.code === 'auth/user-not-found') {
+                        errorMsg = "No account found with this email. Please sign up first.";
+                    } else if (e.code === 'auth/wrong-password') {
+                        errorMsg = "Incorrect password. Please try again.";
+                    } else if (e.code === 'auth/invalid-email') {
+                        errorMsg = "Invalid email address format.";
+                    }
+                }
+                
+                alert(errorMsg);
             } finally {
                 // Re-enable button
                 submitBtn.disabled = false;
