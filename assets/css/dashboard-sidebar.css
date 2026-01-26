@@ -16,6 +16,7 @@ body {
 }
 
 /* SIDEBAR */
+/* SIDEBAR */
 .sidebar {
     width: var(--sidebar-width);
     background: var(--bg-primary);
@@ -30,6 +31,8 @@ body {
     z-index: 100;
     backdrop-filter: blur(10px);
     transition: transform 0.3s ease, background 0.3s;
+    /* FIX: Prevent sidebar itself from shrinking in flex contexts */
+    flex-shrink: 0;
 }
 
 /* Slightly darken sidebar in light mode for separation */
@@ -43,6 +46,8 @@ body {
     align-items: center;
     gap: 15px;
     border-bottom: 1px solid var(--border-soft);
+    /* FIX: Prevent header collapse */
+    flex-shrink: 0;
 }
 
 .user-avatar-lg {
@@ -57,6 +62,7 @@ body {
     font-size: 1.2rem;
     color: var(--text-primary);
     box-shadow: none;
+    flex-shrink: 0;
 }
 
 .user-info-text .name {
@@ -64,6 +70,7 @@ body {
     font-weight: 700;
     font-size: 1.1rem;
     color: var(--text-primary);
+    white-space: nowrap;
 }
 
 .user-info-text .role {
@@ -72,6 +79,7 @@ body {
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 1px;
+    white-space: nowrap;
 }
 
 /* NAVIGATION */
@@ -79,6 +87,8 @@ body {
     flex: 1;
     padding: 30px 20px;
     overflow-y: auto;
+    /* FIX: Smooth scroll */
+    scrollbar-width: thin;
 }
 
 .side-link {
@@ -86,17 +96,24 @@ body {
     align-items: center;
     gap: 15px;
     padding: 14px 20px;
-    color: var(--text-secondary);
+    /* FIX: Force fallback color if var is missing */
+    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
     text-decoration: none;
     border-radius: 12px;
     margin-bottom: 5px;
     transition: 0.2s;
     font-weight: 500;
+    /* FIX: Prevent text wrapping/collapse */
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .side-link:hover {
     background: var(--bg-elevated);
-    color: var(--text-primary);
+    /* FIX: Force bright white on hover */
+    color: #ffffff;
+    color: var(--text-primary, #ffffff);
     transform: translateX(3px);
 }
 
@@ -110,12 +127,14 @@ body {
 .side-link i {
     width: 20px;
     text-align: center;
+    flex-shrink: 0;
 }
 
 /* BOTTOM SECTION */
 .sidebar-footer {
     padding: 20px;
     border-top: 1px solid var(--border-soft);
+    flex-shrink: 0;
 }
 
 .logout-btn {
@@ -131,6 +150,7 @@ body {
     cursor: pointer;
     transition: 0.2s;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .logout-btn:hover {
@@ -144,7 +164,9 @@ body {
     flex: 1;
     margin-left: var(--sidebar-width);
     padding: 40px;
+    /* FIX: Ensure calculation considers fixed sidebar */
     width: calc(100% - var(--sidebar-width));
+    box-sizing: border-box;
 }
 
 /* MOBILE TOGGLE */
