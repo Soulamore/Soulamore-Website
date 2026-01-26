@@ -1,37 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professional Care | Soulamore</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CRITICAL: Global Styles for App Shell & Scrollbar -->
+    <link rel="stylesheet" href="../assets/css/global.css">
 
     <style>
         /* --- THEME: WARM CLINIC (Humanized Midnight) --- */
         :root {
             --deep-space: #0f172a;
-            --navy-glass: rgba(30, 41, 59, 0.85); /* Slightly softer glass */
+            --navy-glass: rgba(30, 41, 59, 0.85);
+            /* Slightly softer glass */
             --starlight: #f1f5f9;
             --peach-glow: #F49F75;
             --teal-glow: #4ECDC4;
             --gold-glow: #fbbf24;
-            --border-glass: rgba(255, 255, 255, 0.08); /* More subtle borders */
+            --border-glass: rgba(255, 255, 255, 0.08);
+            /* More subtle borders */
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--deep-space);
             color: var(--starlight);
-            line-height: 1.7; /* Increased line height for breathability */
-            overflow-x: hidden;
-            height: 100vh;
-            width: 100%;
+            line-height: 1.7;
         }
 
-        h1, h2, h3 { font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; }
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+        }
 
         /* --- SCROLL CONTAINER --- */
         #main-scroll {
@@ -43,216 +56,417 @@
         }
 
         /* --- SOFT PARTICLES (Reduced Density) --- */
-        #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.6; }
-        .particle { position: absolute; background: white; border-radius: 50%; opacity: 0.15; animation: float linear infinite; }
-        @keyframes float { from { transform: translateY(100vh); } to { transform: translateY(-10vh); } }
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.15;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
 
         /* --- ORGANIC DNA PATH --- */
         #dna-container {
-            position: absolute; top: 0; left: 0; width: 100%; z-index: 1; pointer-events: none; opacity: 0.4;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.4;
         }
 
         /* --- CONTENT LAYOUT --- */
         .container {
-            max-width: 1000px; margin: 0 auto; padding: 0 24px;
-            position: relative; z-index: 5; padding-bottom: 200px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 5;
+            padding-bottom: 200px;
         }
 
-        .hero { text-align: center; padding: 140px 0 100px; }
-        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; font-weight: 600; background: linear-gradient(to right, #fff, var(--teal-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { font-size: 1.2rem; opacity: 0.9; max-width: 700px; margin: 0 auto; font-weight: 300; }
+        .hero {
+            text-align: center;
+            padding: 40px 0 100px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            background: linear-gradient(to right, #fff, var(--teal-glow));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
 
         /* --- DUAL PATH CARDS --- */
-        .dual-section { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; margin: 80px 0; align-items: start; }
-        
-        .path-card {
-            background: var(--navy-glass); border: 1px solid var(--border-glass);
-            padding: 40px; border-radius: 24px; transition: 0.4s ease-out; position: relative;
-            transform: translateY(30px); opacity: 0; backdrop-filter: blur(10px);
+        .dual-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin: 80px 0;
+            align-items: start;
         }
-        .path-card.visible { transform: translateY(0); opacity: 1; }
-        .path-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.03); }
 
-        .peer-card { border-top: 4px solid var(--gold-glow); }
-        .psych-card { border-top: 4px solid var(--teal-glow); }
+        .path-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 24px;
+            transition: 0.4s ease-out;
+            position: relative;
+            transform: translateY(30px);
+            opacity: 0;
+            backdrop-filter: blur(10px);
+        }
 
-        .card-icon { font-size: 2rem; margin-bottom: 20px; display: block; }
-        .peer-icon { color: var(--gold-glow); }
-        .psych-icon { color: var(--teal-glow); }
+        .path-card.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
 
-        .trust-note { font-size: 0.85rem; opacity: 0.6; margin-top: 20px; border-top: 1px solid var(--border-glass); padding-top: 15px; font-style: italic; }
+        .path-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .peer-card {
+            border-top: 4px solid var(--gold-glow);
+        }
+
+        .psych-card {
+            border-top: 4px solid var(--teal-glow);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .peer-icon {
+            color: var(--gold-glow);
+        }
+
+        .psych-icon {
+            color: var(--teal-glow);
+        }
+
+        .trust-note {
+            font-size: 0.85rem;
+            opacity: 0.6;
+            margin-top: 20px;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 15px;
+            font-style: italic;
+        }
 
         /* --- INTERACTIVE SLIDER (Assessment) --- */
         .slider-section {
-            background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass);
-            padding: 60px; border-radius: 30px; text-align: center; margin: 100px 0;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-glass);
+            padding: 60px;
+            border-radius: 30px;
+            text-align: center;
+            margin: 100px 0;
         }
+
         .slider-track {
-            width: 80%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px;
-            margin: 50px auto; position: relative;
+            width: 80%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 50px auto;
+            position: relative;
         }
+
         .slider-thumb {
-            width: 24px; height: 24px; background: var(--teal-glow); border-radius: 50%;
-            position: absolute; top: -10px; left: 50%; cursor: grab;
-            box-shadow: 0 0 15px var(--teal-glow); transition: left 0.1s;
+            width: 24px;
+            height: 24px;
+            background: var(--teal-glow);
+            border-radius: 50%;
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            cursor: grab;
+            box-shadow: 0 0 15px var(--teal-glow);
+            transition: left 0.1s;
         }
-        .slider-labels { display: flex; justify-content: space-between; width: 80%; margin: 0 auto; font-size: 0.9rem; opacity: 0.7; }
-        
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 0 auto;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
         .outcome-box {
-            margin-top: 30px; padding: 20px; border: 1px solid var(--border-glass);
-            border-radius: 12px; display: inline-block; min-width: 300px;
-            transition: 0.3s; opacity: 0; transform: translateY(10px); background: rgba(0,0,0,0.2);
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            display: inline-block;
+            min-width: 300px;
+            transition: 0.3s;
+            opacity: 0;
+            transform: translateY(10px);
+            background: rgba(0, 0, 0, 0.2);
         }
-        .outcome-box.show { opacity: 1; transform: translateY(0); }
+
+        .outcome-box.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         /* --- WHY THERAPY MATTERS (Grid) --- */
-        .why-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 40px; }
-        .why-item { display: flex; gap: 15px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; transition: 0.3s; }
-        .why-item:hover { background: rgba(255,255,255,0.04); }
-        .why-item i { color: var(--teal-glow); font-size: 1.2rem; margin-top: 4px; }
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .why-item {
+            display: flex;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 20px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+        .why-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .why-item i {
+            color: var(--teal-glow);
+            font-size: 1.2rem;
+            margin-top: 4px;
+        }
 
         /* --- CTA --- */
         .cta-btn {
             background: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
-            color: var(--deep-space); padding: 18px 50px; border-radius: 50px;
-            font-weight: 700; text-decoration: none; display: inline-block;
-            margin-top: 30px; font-size: 1.1rem; transition: 0.3s;
+            color: var(--deep-space);
+            padding: 18px 50px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 30px;
+            font-size: 1.1rem;
+            transition: 0.3s;
         }
-        .cta-btn:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(78, 205, 196, 0.3); }
+
+        .cta-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(78, 205, 196, 0.3);
+        }
 
         /* --- MOBILE --- */
         @media(max-width: 768px) {
-            .dual-section, .why-grid { grid-template-columns: 1fr; }
-            .hero h1 { font-size: 2.5rem; }
-            #dna-container { opacity: 0.2; }
+
+            .dual-section,
+            .why-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            #dna-container {
+                opacity: 0.2;
+            }
         }
     </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
 </head>
+
 <body>
 
-    <div id="particles"></div>
-
-    <!-- ORGANIC PATH ANIMATION -->
-    <div id="dna-container">
-        <svg width="100%" height="100%" id="svg-dna" style="overflow: visible;">
-            <path id="path-1" fill="none" stroke="var(--gold-glow)" stroke-width="1.5" stroke-opacity="0.3" />
-            <path id="path-2" fill="none" stroke="var(--teal-glow)" stroke-width="1.5" stroke-opacity="0.3" />
-        </svg>
-    </div>
-
-    <!-- SCROLL CONTENT -->
-    <div id="main-scroll">
-        <div class="container">
-            
-            <!-- HERO -->
-            <section class="hero scroll-marker">
-                <p style="color:var(--teal-glow); font-weight:700; letter-spacing:2px; text-transform:uppercase; font-size:0.9rem;">Professional Care</p>
-                <h1>When You Need More Support.</h1>
-                <p>Sometimes, being understood is enough. And sometimes, it’s not. <br>We offer a clear path from Peer Support to Professional Care—without shame.</p>
-            </section>
-
-            <!-- DUAL PATH -->
-            <div class="dual-section scroll-marker">
-                <!-- Peer Card -->
-                <div class="path-card peer-card content-box">
-                    <i class="fas fa-hand-holding-heart card-icon peer-icon"></i>
-                    <h3>Step 1: Start Safe</h3>
-                    <p style="opacity:0.9; margin-bottom:15px; font-weight:300;">Many people begin with Peer Therapy. Talking to someone who has lived a similar experience reduces isolation.</p>
-                    <p style="font-size:0.9rem; font-style:italic; opacity:0.7;">"For some, that’s all they need. For others, it opens the door."</p>
-                </div>
-
-                <!-- Psych Card -->
-                <div class="path-card psych-card content-box">
-                    <i class="fas fa-user-md card-icon psych-icon"></i>
-                    <h3>Step 2: Go Deeper</h3>
-                    <p style="opacity:0.9; margin-bottom:15px; font-weight:300;">When emotions feel repetitive, stuck, or linked to trauma, professional guidance helps you understand <em>why</em>.</p>
-                    <div class="trust-note">
-                        <i class="fas fa-shield-alt"></i> Peers do not replace professional care when clinically needed.
-                    </div>
-                </div>
-            </div>
-
-            <!-- INTERACTIVE SLIDER -->
-            <div class="slider-section scroll-marker content-box">
-                <h2>Where are you right now?</h2>
-                <p style="opacity:0.7; margin-bottom:30px;">Drag the slider to see what support fits best.</p>
-                
-                <div class="slider-labels">
-                    <span>Just Venting</span>
-                    <span>Feeling Stuck</span>
-                    <span>Heavy / Patterns</span>
-                </div>
-                
-                <div class="slider-track" id="track">
-                    <div class="slider-thumb" id="thumb"></div>
-                </div>
-
-                <div class="outcome-box" id="outcome">
-                    <strong>Move the slider to check.</strong>
-                </div>
-            </div>
-
-            <!-- WHY THERAPY MATTERS -->
-            <div class="glass-card scroll-marker content-box" style="padding:60px; border-left:4px solid var(--teal-glow); background:rgba(15, 23, 42, 0.6);">
-                <h2 style="color:var(--teal-glow);">Why Professional Therapy Matters</h2>
-                <div class="why-grid">
-                    <div class="why-item">
-                        <i class="fas fa-search"></i>
-                        <div><strong>Understanding Patterns</strong><br><small style="opacity:0.7;">Why feelings keep returning.</small></div>
-                    </div>
-                    <div class="why-item">
-                        <i class="fas fa-tools"></i>
-                        <div><strong>Clinical Tools</strong><br><small style="opacity:0.7;">Evidence-based techniques.</small></div>
-                    </div>
-                    <div class="why-item">
-                        <i class="fas fa-brain"></i>
-                        <div><strong>Emotional Insight</strong><br><small style="opacity:0.7;">Structure for your thoughts.</small></div>
-                    </div>
-                    <div class="why-item">
-                        <i class="fas fa-road"></i>
-                        <div><strong>Long-term Healing</strong><br><small style="opacity:0.7;">Guided wellness planning.</small></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- HUMAN ANCHOR -->
-            <div class="scroll-marker content-box" style="margin-top:100px; text-align:center; opacity:0.8;">
-                <p style="font-size:1.1rem; font-style:italic;">
-                    "Many of our users start with peers. Some move on. Some come back. All are welcome."
-                </p>
-            </div>
-
-            <!-- FOOTER CTA -->
-            <div style="text-align:center; padding: 100px 0;" class="scroll-marker content-box">
-                <p style="font-size:1.2rem; opacity:0.9; margin-bottom:20px;">
-                    "When talking becomes work instead of relief, it may be time for guided support."
-                </p>
-                <a href="#" class="cta-btn">Meet Our Psychologists</a>
-            </div>
-
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header></header>
         </div>
+
+        <div id="particles"></div>
+
+        <!-- ORGANIC PATH ANIMATION -->
+        <div id="dna-container">
+            <svg width="100%" height="100%" id="svg-dna" style="overflow: visible;">
+                <path id="path-1" fill="none" stroke="var(--gold-glow)" stroke-width="1.5" stroke-opacity="0.3" />
+                <path id="path-2" fill="none" stroke="var(--teal-glow)" stroke-width="1.5" stroke-opacity="0.3" />
+            </svg>
+        </div>
+
+        <!-- SCROLL CONTENT -->
+        <main id="shell-content">
+            <div class="container">
+
+                <!-- HERO -->
+                <section class="hero scroll-marker">
+                    <p
+                        style="color:var(--teal-glow); font-weight:700; letter-spacing:2px; text-transform:uppercase; font-size:0.9rem;">
+                        Professional Care</p>
+                    <h1>When You Need More Support.</h1>
+                    <p>Sometimes, being understood is enough. And sometimes, it’s not. <br>We offer a clear path from
+                        Peer Support to Professional Care—without shame.</p>
+                </section>
+
+                <!-- DUAL PATH -->
+                <div class="dual-section scroll-marker">
+                    <!-- Peer Card -->
+                    <div class="path-card peer-card content-box">
+                        <i class="fas fa-hand-holding-heart card-icon peer-icon"></i>
+                        <h3>Step 1: Start Safe</h3>
+                        <p style="opacity:0.9; margin-bottom:15px; font-weight:300;">Many people begin with Peer
+                            Therapy. Talking to someone who has lived a similar experience reduces isolation.</p>
+                        <p style="font-size:0.9rem; font-style:italic; opacity:0.7;">"For some, that’s all they need.
+                            For others, it opens the door."</p>
+                    </div>
+
+                    <!-- Psych Card -->
+                    <div class="path-card psych-card content-box">
+                        <i class="fas fa-user-md card-icon psych-icon"></i>
+                        <h3>Step 2: Go Deeper</h3>
+                        <p style="opacity:0.9; margin-bottom:15px; font-weight:300;">When emotions feel repetitive,
+                            stuck, or linked to trauma, professional guidance helps you understand <em>why</em>.</p>
+                        <div class="trust-note">
+                            <i class="fas fa-shield-alt"></i> Peers do not replace professional care when clinically
+                            needed.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INTERACTIVE SLIDER -->
+                <div class="slider-section scroll-marker content-box">
+                    <h2>Where are you right now?</h2>
+                    <p style="opacity:0.7; margin-bottom:30px;">Drag the slider to see what support fits best.</p>
+
+                    <div class="slider-labels">
+                        <span>Just Venting</span>
+                        <span>Feeling Stuck</span>
+                        <span>Heavy / Patterns</span>
+                    </div>
+
+                    <div class="slider-track" id="track">
+                        <div class="slider-thumb" id="thumb"></div>
+                    </div>
+
+                    <div class="outcome-box" id="outcome">
+                        <strong>Move the slider to check.</strong>
+                    </div>
+                </div>
+
+                <!-- WHY THERAPY MATTERS -->
+                <div class="glass-card scroll-marker content-box"
+                    style="padding:60px; border-left:4px solid var(--teal-glow); background:rgba(15, 23, 42, 0.6);">
+                    <h2 style="color:var(--teal-glow);">Why Professional Therapy Matters</h2>
+                    <div class="why-grid">
+                        <div class="why-item">
+                            <i class="fas fa-search"></i>
+                            <div><strong>Understanding Patterns</strong><br><small style="opacity:0.7;">Why feelings
+                                    keep returning.</small></div>
+                        </div>
+                        <div class="why-item">
+                            <i class="fas fa-tools"></i>
+                            <div><strong>Clinical Tools</strong><br><small style="opacity:0.7;">Evidence-based
+                                    techniques.</small></div>
+                        </div>
+                        <div class="why-item">
+                            <i class="fas fa-brain"></i>
+                            <div><strong>Emotional Insight</strong><br><small style="opacity:0.7;">Structure for your
+                                    thoughts.</small></div>
+                        </div>
+                        <div class="why-item">
+                            <i class="fas fa-road"></i>
+                            <div><strong>Long-term Healing</strong><br><small style="opacity:0.7;">Guided wellness
+                                    planning.</small></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HUMAN ANCHOR -->
+                <div class="scroll-marker content-box" style="margin-top:100px; text-align:center; opacity:0.8;">
+                    <p style="font-size:1.1rem; font-style:italic;">
+                        "Many of our users start with peers. Some move on. Some come back. All are welcome."
+                    </p>
+                </div>
+
+                <!-- FOOTER CTA -->
+                <div style="text-align:center; padding: 100px 0;" class="scroll-marker content-box">
+                    <p style="font-size:1.2rem; opacity:0.9; margin-bottom:20px;">
+                        "When talking becomes work instead of relief, it may be time for guided support."
+                    </p>
+                    <a href="#" class="cta-btn">Meet Our Psychologists</a>
+                </div>
+
+            </div>
+        </main>
+        <footer></footer>
     </div>
 
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/main.js"></script>
     <script>
         // --- 1. DNA PATH ANIMATION (Slow & Organic) ---
-        const scrollContainer = document.getElementById('main-scroll');
+        // CHANGED: Use window scroll instead of element scroll
+        const scrollContainer = window;
         const path1 = document.getElementById('path-1');
         const path2 = document.getElementById('path-2');
         const dnaContainer = document.getElementById('dna-container');
 
         function updateDNA() {
-            const height = document.querySelector('.container').scrollHeight;
+            // Robust height
+            const body = document.body;
+            const html = document.documentElement;
+            const height = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+
             dnaContainer.style.height = height + 'px';
             const width = window.innerWidth;
             const mid = width / 2;
-            
+
             let d1 = `M ${mid - 40} 0 `;
             let d2 = `M ${mid + 40} 0 `;
-            
+
             // Smoother sine waves
-            for(let y=0; y<height; y+=300) {
-                d1 += `C ${mid + 80} ${y+100}, ${mid - 40} ${y+200}, ${mid - 40} ${y+300} `;
-                d2 += `C ${mid - 120} ${y+100}, ${mid + 40} ${y+200}, ${mid + 40} ${y+300} `;
+            for (let y = 0; y < height; y += 300) {
+                d1 += `C ${mid + 80} ${y + 100}, ${mid - 40} ${y + 200}, ${mid - 40} ${y + 300} `;
+                d2 += `C ${mid - 120} ${y + 100}, ${mid + 40} ${y + 200}, ${mid + 40} ${y + 300} `;
             }
 
             path1.setAttribute('d', d1);
@@ -280,25 +494,28 @@
         function stopDrag() { isDragging = false; }
 
         function drag(e) {
-            if(!isDragging) return;
+            if (!isDragging) return;
+            // Prevent default touch scrolling while dragging
+            // if(e.type === 'touchmove') e.preventDefault(); 
+
             const rect = track.getBoundingClientRect();
             let clientX = e.touches ? e.touches[0].clientX : e.clientX;
             let pos = clientX - rect.left;
-            
-            if(pos < 0) pos = 0;
-            if(pos > rect.width) pos = rect.width;
+
+            if (pos < 0) pos = 0;
+            if (pos > rect.width) pos = rect.width;
 
             thumb.style.left = (pos - 12) + 'px';
-            
+
             // Logic
             const percent = pos / rect.width;
             outcome.classList.add('show');
 
-            if(percent < 0.33) {
+            if (percent < 0.33) {
                 outcome.innerHTML = "<span style='color:var(--gold-glow); font-size:1.1rem; font-weight:700;'>Start with a Peer.</span><br><small style='opacity:0.8;'>Great for shared experiences and venting.</small>";
                 thumb.style.background = "var(--gold-glow)";
                 thumb.style.boxShadow = "0 0 20px var(--gold-glow)";
-            } else if(percent < 0.66) {
+            } else if (percent < 0.66) {
                 outcome.innerHTML = "<span style='color:white; font-size:1.1rem; font-weight:700;'>Try a Support Group.</span><br><small style='opacity:0.8;'>Good for feeling less alone in a specific struggle.</small>";
                 thumb.style.background = "white";
                 thumb.style.boxShadow = "0 0 20px white";
@@ -311,11 +528,11 @@
 
         // --- 3. PARTICLES (Reduced) ---
         const pContainer = document.getElementById('particles');
-        for(let i=0; i<15; i++) { 
-            let p = document.createElement('div'); p.classList.add('particle'); 
-            p.style.left=Math.random()*100+'vw'; p.style.width=Math.random()*3+'px'; 
-            p.style.height=p.style.width; p.style.animationDuration=Math.random()*30+15+'s'; 
-            p.style.opacity=Math.random()*0.2; pContainer.appendChild(p); 
+        for (let i = 0; i < 15; i++) {
+            let p = document.createElement('div'); p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw'; p.style.width = Math.random() * 3 + 'px';
+            p.style.height = p.style.width; p.style.animationDuration = Math.random() * 30 + 15 + 's';
+            p.style.opacity = Math.random() * 0.2; pContainer.appendChild(p);
         }
 
         // --- 4. FADE IN ---
@@ -327,4 +544,5 @@
         document.querySelectorAll('.content-box, .hero').forEach(el => observer.observe(el));
     </script>
 </body>
+
 </html>

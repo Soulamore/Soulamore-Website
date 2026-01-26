@@ -6,7 +6,7 @@
 
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-export async function handleRoleRouting(user, intent) {
+export async function handleRoleRouting(user, intent, isNewUser = false) {
     // Role routing after successful authentication
 
     // --- NEW: Persistent Session Logic (Admin Request Jan 18) ---
@@ -18,17 +18,46 @@ export async function handleRoleRouting(user, intent) {
     };
 
     // Helper to commit session and redirect
-    const finalizeSession = (role, dashboard) => {
+    const finalizeSession = (role, dashboardFile) => {
         session.role = role;
         localStorage.setItem("soulamore_session", JSON.stringify(session));
-        console.log(`✅ Session Created for [${role}]. Redirecting to ${dashboard}...`);
-        window.location.href = dashboard;
+
+        // FIX: Handle Relative Paths (Root vs Portal)
+        let finalPath = dashboardFile;
+        const isInPortal = window.location.pathname.includes('/portal/');
+
+        if (isInPortal) {
+            // If already in portal, remove 'portal/' prefix if present
+            finalPath = dashboardFile.replace('portal/', '');
+        } else {
+            // If at root, ensure 'portal/' prefix is present
+            if (!finalPath.startsWith('portal/')) {
+                finalPath = 'portal/' + finalPath;
+            }
+        }
+
+        console.log(`✅ Session Created for [${role}]. Redirecting to ${finalPath}...`);
+        window.location.href = finalPath;
     };
+
+    // 0. NEW USER ONBOARDING (First time login)
+    if (isNewUser && intent === 'user') {
+        const confirmMsg = "Welcome to Soulamore! Would you like to complete your profile now?";
+        if (confirm(confirmMsg)) {
+            // Redirect to Profile for completion
+            // Assuming profile.html handles it, or pass a query param ?mode=edit
+            // Using same path logic as finalizeSession but different target
+            let profilePath = 'portal/user-dashboard.html?showProfile=true'; // Sending to dashboard but triggering profile view
+            if (window.location.pathname.includes('/portal/')) {
+                profilePath = 'user-dashboard.html?showProfile=true';
+            }
+            finalizeSession('user', profilePath);
+            return;
+        }
+    }
 
     // 1. ADMIN (Simple Check for MVP)
     if (intent === 'admin') {
-        // In a real app, verify admin claim here. For MVP, we trust the intent or check specific email
-        // const isAdmin = user.email.endsWith('@soulamore.com'); // Example constraint
         finalizeSession('admin', 'portal/admin-dashboard.html');
         return;
     }

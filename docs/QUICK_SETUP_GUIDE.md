@@ -146,3 +146,4 @@ Firebase Functions:
 - Check Firestore rules are deployed: `firebase deploy --only firestore:rules`
 - See detailed docs: `docs/FIREBASE_FUNCTIONS_SETUP.md`
 
+

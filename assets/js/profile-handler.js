@@ -12,7 +12,7 @@ export async function createOrUpdateUserProfile(user) {
     try {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
-        
+
         const profileData = {
             uid: user.uid,
             displayName: user.displayName || '',
@@ -20,36 +20,63 @@ export async function createOrUpdateUserProfile(user) {
             photoURL: user.photoURL || '',
             createdAt: userSnap.exists() ? userSnap.data().createdAt : serverTimestamp(),
             updatedAt: serverTimestamp(),
-            // Additional profile fields
+            authProviders: userSnap.exists() ?
+                (userSnap.data().authProviders ? [...new Set([...userSnap.data().authProviders, ...(user.providerData.map(p => p.providerId))])] : ['email'])
+                : (user.providerData.map(p => p.providerId)),
+
+            // --- PROFESSIONAL PROFILE FIELDS ---
+            // Identity
             bio: userSnap.exists() ? userSnap.data().bio || '' : '',
-            role: userSnap.exists() ? userSnap.data().role || '' : '',
-            interests: userSnap.exists() ? userSnap.data().interests || [] : [],
+            role: userSnap.exists() ? userSnap.data().role || 'Member' : 'Member', // Default to Member
+            phone: userSnap.exists() ? userSnap.data().phone || (user.phoneNumber || '') : (user.phoneNumber || ''),
             location: userSnap.exists() ? userSnap.data().location || '' : '',
-            phone: userSnap.exists() ? userSnap.data().phone || '' : '',
-            dateOfBirth: userSnap.exists() ? userSnap.data().dateOfBirth || '' : '',
+
+            // Professional Details
+            title: userSnap.exists() ? userSnap.data().title || '' : '', // e.g. "Clinical Psychologist"
+            qualification: userSnap.exists() ? userSnap.data().qualification || '' : '',
+            licenseNumber: userSnap.exists() ? userSnap.data().licenseNumber || '' : '',
+            languages: userSnap.exists() ? userSnap.data().languages || [] : [],
+            sessionFee: userSnap.exists() ? userSnap.data().sessionFee || '' : '',
+
+            // Rich Content
+            experience: userSnap.exists() ? userSnap.data().experience || [] : [], // Array of strings or objects
+            expertise: userSnap.exists() ? userSnap.data().expertise || [] : [], // Tags
+            therapeuticStyle: userSnap.exists() ? userSnap.data().therapeuticStyle || [] : [], // New SWOT Style
+            firstSessionExpectations: userSnap.exists() ? userSnap.data().firstSessionExpectations || '' : '', // New SWOT Expectation
+            values: userSnap.exists() ? userSnap.data().values || [] : [],
+
+            // Peer Specific (Optional overlap)
+            livedExperience: userSnap.exists() ? userSnap.data().livedExperience || [] : [],
+
+            // Settings
             preferences: userSnap.exists() ? userSnap.data().preferences || {} : {
                 notifications: true,
                 emailUpdates: true,
-                theme: 'dark'
+                theme: 'dark' // Default calm dark mode
             }
         };
-        
+
+        let isNewUser = false;
+
         if (userSnap.exists()) {
-            // Update existing profile
+            // Update existing profile (Merge deep if needed, but for now specific fields)
+            // We rely on updateUserProfile for specific updates usually, but this ensures auth sync
             await updateDoc(userRef, {
-                displayName: profileData.displayName,
-                email: profileData.email,
-                photoURL: profileData.photoURL,
+                displayName: user.displayName || userSnap.data().displayName, // Don't overwrite if null
+                email: user.email || userSnap.data().email,
+                photoURL: user.photoURL || userSnap.data().photoURL,
+                authProviders: profileData.authProviders,
                 updatedAt: serverTimestamp()
             });
-            console.log('User profile updated:', user.uid);
+            console.log('User profile synced on auth:', user.uid);
         } else {
             // Create new profile
             await setDoc(userRef, profileData);
-            console.log('User profile created:', user.uid);
+            console.log('User profile created (First Time):', user.uid);
+            isNewUser = true;
         }
-        
-        return true;
+
+        return { success: true, isNewUser };
     } catch (error) {
         console.error('Error creating/updating user profile:', error);
         return false;
@@ -63,7 +90,7 @@ export async function getUserProfile(uid) {
     try {
         const userRef = doc(db, "users", uid);
         const userSnap = await getDoc(userRef);
-        
+
         if (userSnap.exists()) {
             return userSnap.data();
         } else {

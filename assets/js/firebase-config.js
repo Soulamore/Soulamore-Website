@@ -4,10 +4,10 @@
  */
 
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, linkWithCredential, EmailAuthProvider, updatePassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // TODO: User to provide these keys from Firebase Console > Project Settings
 // Live Configuration (Soulamore)
@@ -21,8 +21,16 @@ const firebaseConfig = {
     measurementId: "G-2K2Z1Q2D1W"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase - check if already initialized to prevent duplicate app error
+let app;
+try {
+    app = getApp(); // Try to get existing app
+    console.log("Using existing Firebase app");
+} catch (e) {
+    // App doesn't exist, initialize it
+    app = initializeApp(firebaseConfig);
+    console.log("Firebase app initialized");
+}
 const analytics = getAnalytics(app);
 // Use default Firestore database (native Firestore, not MongoDB-compatible)
 const db = getFirestore(app);
@@ -84,6 +92,6 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // Export for use in other modules
-export { db, collection, addDoc, serverTimestamp, auth, googleProvider, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged };
+export { db, collection, addDoc, serverTimestamp, auth, googleProvider, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, linkWithCredential, EmailAuthProvider };
 
 console.log("Firebase initialized.");

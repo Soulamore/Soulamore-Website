@@ -341,3 +341,4 @@ await openRazorpayCheckout(
 **Setup Time**: 1-2 hours (Razorpay account + API keys)
 **Maintenance**: Minimal (self-hosted, no third-party dependencies)
 
+

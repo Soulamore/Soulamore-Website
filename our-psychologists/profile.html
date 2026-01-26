@@ -10,420 +10,363 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/global.css">
-
     <style>
-        /* --- CLINICAL DARK THEME --- */
+        /* Reusing styles from bhagyavathi.html for consistency */
         :root {
-            --bg-dark: #0f172a;
-            --card-navy: #1e293b;
-            --text-light: #f8fafc;
-            --text-dim: #94a3b8;
-            --accent-blue: #38bdf8;
-            --accent-teal: #2dd4bf;
-            --danger-red: #ef4444;
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.7);
+            --teal-glow: #4ECDC4;
+            --peach-glow: #F49F75;
+            --border-glass: rgba(255, 255, 255, 0.1);
         }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(45, 212, 191, 0.05) 0%, transparent 20%);
+            background-color: var(--deep-space);
+            color: #f1f5f9;
+            line-height: 1.7;
         }
 
-        .profile-container {
-            max-width: 1000px;
-            margin: 120px auto 60px;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            /* Main, Sidebar */
-            gap: 30px;
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 5;
         }
 
-        .back-link {
-            grid-column: span 2;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-dim);
-            text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 20px;
-            transition: 0.3s;
-        }
-
-        .back-link:hover {
-            color: var(--text-light);
-            transform: translateX(-5px);
-        }
-
-        /* --- CARDS --- */
-        .pro-card {
-            background: var(--card-navy);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-        }
-
-        /* --- HEADER SECTION (Spans Full Width) --- */
-        .profile-header-card {
-            grid-column: span 2;
+        /* HEADER */
+        .profile-header {
             text-align: center;
-            padding: 40px;
-            background: linear-gradient(180deg, rgba(30, 41, 59, 1) 0%, rgba(15, 23, 42, 1) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 60px;
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0) 0%, rgba(30, 41, 59, 0.5) 100%);
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border-glass);
+            border-radius: 0 0 40px 40px;
         }
 
-        .pro-avatar-lg {
-            width: 150px;
-            height: 150px;
+        .avatar-ring {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 25px;
             border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--accent-blue);
-            margin: 0 auto 20px;
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+            padding: 5px;
+            background: linear-gradient(135deg, var(--teal-glow), var(--peach-glow));
         }
 
-        .pro-name {
-            font-family: 'Outfit', sans-serif;
-            font-size: 2.5rem;
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: white;
             font-weight: 700;
-            margin-bottom: 5px;
-            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            overflow: hidden;
         }
 
-        .pro-role {
-            font-size: 1.1rem;
-            color: var(--accent-blue);
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 5px;
+        }
+
+        .profile-role {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--teal-glow);
+            font-size: 0.9rem;
             font-weight: 600;
             margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .pill-row {
+        /* STATS */
+        .stats-row {
             display: flex;
             justify-content: center;
             gap: 15px;
             flex-wrap: wrap;
+            margin-bottom: 30px;
         }
 
-        .info-pill {
+        .stat-pill {
             background: rgba(255, 255, 255, 0.05);
-            padding: 8px 16px;
+            border: 1px solid var(--border-glass);
+            padding: 8px 18px;
             border-radius: 50px;
             font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .info-pill i {
-            color: var(--accent-teal);
+        .stat-pill i {
+            color: var(--peach-glow);
         }
 
-        /* --- CONTENT SECTIONS --- */
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--text-light);
-            margin-bottom: 20px;
-            color: var(--accent-blue);
-        }
-
-        .section-text {
-            line-height: 1.8;
-            color: #cbd5e1;
-            font-size: 1.05rem;
-        }
-
-        /* EXPERIENCE LIST */
-        .exp-item {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .exp-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(56, 189, 248, 0.1);
-            color: var(--accent-blue);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        /* CRISIS CARD - RED styled */
-        .crisis-card {
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            background: rgba(239, 68, 68, 0.05);
-        }
-
-        .crisis-title {
-            color: var(--danger-red);
-        }
-
-        /* REVIEWS */
-        .review-card {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border-left: 3px solid var(--accent-teal);
-        }
-
-        /* CTA BUTTON */
         .book-btn {
-            background: var(--accent-teal);
-            color: #0f172a;
-            padding: 15px 40px;
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            padding: 14px 40px;
             border-radius: 50px;
             font-weight: 700;
             text-decoration: none;
             display: inline-block;
-            margin-top: 30px;
             transition: 0.3s;
-            box-shadow: 0 0 20px rgba(45, 212, 191, 0.4);
         }
 
         .book-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(45, 212, 191, 0.6);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.4);
         }
 
-        @media(max-width: 800px) {
-            .profile-container {
+        /* CONTENT */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .glass-panel {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 24px;
+            margin-bottom: 30px;
+        }
+
+        .panel-title {
+            font-family: 'Outfit';
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            color: var(--teal-glow);
+        }
+
+        .bio-text {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border-glass);
+        }
+
+        .tag.style-tag {
+            border-color: var(--peach-glow);
+            color: var(--peach-glow);
+            background: rgba(244, 159, 117, 0.1);
+        }
+
+        .loader {
+            text-align: center;
+            padding: 100px;
+            font-size: 1.5rem;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .content-grid {
                 grid-template-columns: 1fr;
             }
 
-            .profile-header-card {
-                grid-column: span 1;
+            .profile-name {
+                font-size: 2.2rem;
             }
         }
     </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
 </head>
 
 <body>
 
-    <header></header>
+    <div id="loading" class="loader"><i class="fas fa-spinner fa-spin"></i> Loading Profile...</div>
+    <div id="error-msg" class="loader hidden" style="color:#ef4444;">Profile not found.</div>
 
-    <div class="profile-container">
-        <a href="psychologists.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Psychologists</a>
+    <div id="profile-content" class="container hidden" style="margin-top: 50px;">
+        <!-- NAV -->
+        <nav style="margin-bottom: 20px;">
+            <a href="psychologists.html" style="color:white; text-decoration:none; opacity:0.7;"><i
+                    class="fas fa-arrow-left"></i> Back to Psychologists</a>
+        </nav>
 
         <!-- HEADER -->
-        <div class="profile-header-card pro-card">
-            <img id="pAvatar" src="" class="pro-avatar-lg">
-            <h1 id="pName" class="pro-name">Loading...</h1>
-            <div id="pRole" class="pro-role">CLINICAL PSYCHOLOGIST</div>
+        <div class="profile-header">
+            <div class="avatar-ring">
+                <div class="profile-avatar" id="d-avatar"></div>
+            </div>
+            <h1 class="profile-name" id="d-name">Name</h1>
+            <div class="profile-role" id="d-role">Psychologist</div>
 
-            <div class="pill-row">
-                <div class="info-pill"><i class="fas fa-certificate"></i> Verified</div>
-                <div class="info-pill"><i class="fas fa-language"></i> <span id="pLang">English</span></div>
-                <div class="info-pill"><i class="fas fa-video"></i> <span id="pFormat">Online</span></div>
-                <div class="info-pill"><i class="fas fa-rupee-sign"></i> <span id="pPrice">1500</span> / session</div>
+            <div class="stats-row">
+                <div class="stat-pill" id="d-exp-pill"><i class="fas fa-user-md"></i> <span id="d-title">Title</span>
+                </div>
+                <div class="stat-pill"><i class="fas fa-language"></i> <span id="d-langs">English</span></div>
+                <div class="stat-pill"><i class="fas fa-video"></i> Online</div>
+                <div class="stat-pill"><i class="fas fa-wallet"></i> <span id="d-fee">0</span> / Session</div>
             </div>
 
-            <a href="#" class="book-btn">Book Appointment</a>
+            <a href="#book" class="book-btn">Book Appointment</a>
         </div>
 
-        <!-- MAIN COLUMN -->
-        <div>
-            <div class="pro-card">
-                <h2 class="section-title"><i class="fas fa-user"></i> About Me</h2>
-                <p id="pBio" class="section-text">Loading...</p>
-            </div>
-
-            <div class="pro-card">
-                <h2 class="section-title"><i class="fas fa-briefcase"></i> Professional Experience</h2>
-                <div id="pEdu">
-                    <!-- Dynamic List -->
-                </div>
-            </div>
-
-            <div class="pro-card">
-                <h2 class="section-title"><i class="fas fa-star"></i> Client Reviews</h2>
-                <div id="pReviews">
-                    <p style="opacity:0.6;">No reviews yet.</p>
-                </div>
-                <!-- Add Review btn -->
-                <button onclick="promptReview()"
-                    style="margin-top:15px; background:transparent; border:1px solid var(--text-dim); color:var(--text-dim); padding:8px 16px; border-radius:8px; cursor:pointer;">Write
-                    a Review</button>
-            </div>
-        </div>
-
-        <!-- SIDEBAR COLUMN -->
-        <div>
-            <div class="pro-card">
-                <h2 class="section-title"><i class="fas fa-info-circle"></i> Service Details</h2>
-
-                <h4 style="color:var(--text-dim); font-size:0.9rem; margin-bottom:10px; text-transform:uppercase;">
-                    Specializations</h4>
-                <div id="pTags" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;">
-                    <!-- Tags -->
+        <!-- MAIN LAYOUT -->
+        <div class="content-grid">
+            <div class="left-col">
+                <!-- BIO -->
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-user"></i> About Me</div>
+                    <div class="bio-text" id="d-bio"></div>
                 </div>
 
-                <h4 style="color:var(--text-dim); font-size:0.9rem; margin-bottom:10px; text-transform:uppercase;">
-                    Availability</h4>
-                <div style="color:#4ade80; font-weight:600; display:flex; align-items:center; gap:8px;">
-                    <div
-                        style="width:10px; height:10px; background:#4ade80; border-radius:50%; box-shadow:0 0 10px #4ade80;">
+                <!-- STYLE & EXPECTATIONS (SWOT) -->
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-feather-alt"></i> Therapeutic Style</div>
+                    <p style="opacity:0.7; margin-bottom:15px;">How I work with clients:</p>
+                    <div class="tag-cloud" id="d-style-tags" style="margin-bottom:30px;">
+                        <!-- Injected -->
                     </div>
-                    Accepting New Clients
+
+                    <div class="panel-title" style="font-size:1.2rem;"><i class="fas fa-door-open"></i> First Session
+                    </div>
+                    <p class="bio-text"
+                        style="font-size:1rem; padding: 15px; background:rgba(255,255,255,0.03); border-radius:10px; font-style:italic;"
+                        id="d-first-session">
+                        <!-- Injected -->
+                    </p>
+                </div>
+
+                <!-- EXPERTISE -->
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-brain"></i> Areas of Expertise</div>
+                    <div class="tag-cloud" id="d-expertise-tags">
+                        <!-- Injected -->
+                    </div>
                 </div>
             </div>
 
-            <div class="pro-card crisis-card">
-                <h2 class="section-title crisis-title"><i class="fas fa-exclamation-triangle"></i> Crisis Policy</h2>
-                <p id="pCrisis" style="font-size:0.9rem; opacity:0.9; color:#fca5a5;">
-                    I am not available for 24/7 emergency support. If you are in immediate danger, please contact local
-                    emergency services.
-                </p>
-                <div style="margin-top:15px;">
-                    <a href="#"
-                        style="background:#ef4444; color:white; padding:8px 16px; border-radius:8px; text-decoration:none; font-size:0.9rem; font-weight:600; display:block; text-align:center;">Get
-                        Help Now</a>
+            <!-- SIDEBAR -->
+            <div class="right-col">
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-info-circle"></i> Details</div>
+                    <ul style="list-style:none; padding:0;">
+                        <li
+                            style="margin-bottom:15px; border-bottom:1px solid var(--border-glass); padding-bottom:15px;">
+                            <span
+                                style="display:block; font-size:0.8rem; opacity:0.5; text-transform:uppercase;">License</span>
+                            <span id="d-license">--</span>
+                        </li>
+                        <li
+                            style="margin-bottom:15px; border-bottom:1px solid var(--border-glass); padding-bottom:15px;">
+                            <span
+                                style="display:block; font-size:0.8rem; opacity:0.5; text-transform:uppercase;">Values</span>
+                            <div class="tag-cloud" id="d-values-tags" style="margin-top:5px;"></div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- SIMPLE REVIEW MODAL IMPLEMENTATION (Prompt based for speed) -->
-    <script src="../assets/js/components.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    <!-- LOGIC -->
+    <script type="module">
+        import { getUserProfile } from "../assets/js/profile-handler.js";
+
+        document.addEventListener('DOMContentLoaded', async () => {
             const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
+            const uid = params.get('id');
 
-            let profile = null;
+            if (!uid) {
+                showError();
+                return;
+            }
 
-            if (id === '999') {
-                const stored = localStorage.getItem('professional_profile');
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    profile = {
-                        name: parsed.name,
-                        role: parsed.title || "Clinical Psychologist",
-                        image: parsed.image,
-                        bio: parsed.bio,
-                        lang: parsed.languages,
-                        price: parsed.price,
-                        format: parsed.format || "Online (Zoom)",
-                        // Split multiline string into array
-                        edu: parsed.edu ? parsed.edu.split('\n') : ["Master's in Clinical Psychology", "Certified Consultant"],
-                        tags: parsed.tags,
-                        crisis: parsed.crisis || "Standard Crisis Policy applies."
-                    };
+            try {
+                const p = await getUserProfile(uid);
+                if (p) {
+                    renderProfile(p);
+                } else {
+                    showError();
                 }
-            } else {
-                // Demo Data (Palak Shori example)
-                profile = {
-                    name: "Palak Shori",
-                    role: "Master's in Clinical Psychology • School Counselor",
-                    image: "https://via.placeholder.com/150/FF5733/FFFFFF?text=PS",
-                    bio: "In my practice, I blend traditional therapeutic methods with innovative techniques tailored to individual needs. My approach is holistic—considering physical, emotion, and social factors that contribute to overall well-being.",
-                    lang: "English, Hindi",
-                    price: "1500",
-                    format: "Online (G-Meet)",
-                    edu: ["Master's in Clinical Psychology", "PG Diploma in Counseling Psychology", "Triple Major Bachelor's"],
-                    tags: ["Anxiety", "Depression", "Student Wellness", "Holistic"],
-                    crisis: "I am not available for 24/7 emergency support. If you are in immediate danger, please contact local emergency services."
-                };
+            } catch (e) {
+                console.error(e);
+                showError();
             }
-
-            if (profile) {
-                document.getElementById('pName').innerText = profile.name;
-                document.getElementById('pRole').innerText = profile.role;
-                document.getElementById('pAvatar').src = profile.image;
-                document.getElementById('pBio').innerText = profile.bio;
-                document.getElementById('pLang').innerText = profile.lang;
-                document.getElementById('pPrice').innerText = profile.price;
-                document.getElementById('pFormat').innerText = profile.format;
-                document.getElementById('pCrisis').innerText = profile.crisis;
-
-                // Tags (Safe Rendering)
-                const tagCont = document.getElementById('pTags');
-                tagCont.innerHTML = ''; // Clear existing
-                profile.tags.forEach(t => {
-                    if (t) {
-                        const span = document.createElement('span');
-                        span.style.cssText = "background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; font-size:0.85rem;";
-                        span.textContent = t;
-                        tagCont.appendChild(span);
-                    }
-                });
-
-                // Edu (Safe Rendering)
-                const eduCont = document.getElementById('pEdu');
-                eduCont.innerHTML = ''; // Clear existing
-                profile.edu.forEach(e => {
-                    if (e) {
-                        const item = document.createElement('div');
-                        item.className = 'exp-item';
-                        item.innerHTML = `<div class="exp-icon"><i class="fas fa-graduation-cap"></i></div><div><div class="exp-text" style="font-weight:600; color:var(--text-light); margin-bottom:2px;"></div></div>`;
-                        item.querySelector('.exp-text').textContent = e;
-                        eduCont.appendChild(item);
-                    }
-                });
-            }
-
-            // REVIEWS
-            loadReviews();
         });
 
-        // Simple prompt based review for complex requirement handling
-        function promptReview() {
-            const msg = prompt("Write your review:");
-            if (msg) {
-                const reviews = JSON.parse(localStorage.getItem('peer_reviews') || "[]"); // Shared storage for ease
-                reviews.unshift({ text: msg, author: "Client", date: "Just now" });
-                localStorage.setItem('peer_reviews', JSON.stringify(reviews));
-                loadReviews();
+        function renderProfile(p) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('profile-content').classList.remove('hidden');
+
+            // Header
+            document.getElementById('d-name').innerText = p.displayName || 'Psychologist';
+            document.getElementById('d-role').innerText = p.title || 'Psychologist';
+            document.getElementById('d-title').innerText = p.qualification || 'Certified';
+            document.getElementById('d-langs').innerText = Array.isArray(p.languages) ? p.languages.join(', ') : (p.languages || 'English');
+            document.getElementById('d-fee').innerText = p.sessionFee ? `₹${p.sessionFee}` : 'Contract';
+
+            // Avatar
+            const avatarEl = document.getElementById('d-avatar');
+            if (p.photoURL) {
+                avatarEl.innerHTML = `<img src="${p.photoURL}" alt="${p.displayName}">`;
+            } else {
+                avatarEl.innerText = (p.displayName || 'P').charAt(0).toUpperCase();
             }
+
+            // Main Content
+            document.getElementById('d-bio').innerText = p.bio || 'No bio available.';
+            document.getElementById('d-first-session').innerText = p.firstSessionExpectations || 'We will get to know each other.';
+            document.getElementById('d-license').innerText = p.licenseNumber || 'Verified';
+
+            // Arrays
+            renderTags('d-style-tags', p.therapeuticStyle, 'style-tag');
+            renderTags('d-expertise-tags', p.expertise);
+            renderTags('d-values-tags', p.values);
         }
 
-        function loadReviews() {
-            const container = document.getElementById('pReviews');
-            const stored = localStorage.getItem('peer_reviews');
-            let reviews = stored ? JSON.parse(stored) : [];
-            container.innerHTML = ''; // Clear
-
-            if (reviews.length > 0) {
-                reviews.forEach(r => {
-                    const card = document.createElement('div');
-                    card.className = 'review-card';
-
-                    const p = document.createElement('p');
-                    p.style.marginBottom = '5px';
-                    p.textContent = `"${r.text}"`;
-
-                    const meta = document.createElement('div');
-                    meta.style.fontSize = '0.8rem';
-                    meta.style.opacity = '0.6';
-                    meta.textContent = `— ${r.author}`;
-
-                    card.appendChild(p);
-                    card.appendChild(meta);
-                    container.appendChild(card);
-                });
+        function renderTags(containerId, tags, extraClass = '') {
+            const container = document.getElementById(containerId);
+            if (!tags || tags.length === 0) {
+                container.innerHTML = '<span style="opacity:0.5;">None listed</span>';
+                return;
             }
+            container.innerHTML = tags.map(t => `<span class="tag ${extraClass}">${t}</span>`).join('');
+        }
+
+        function showError() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error-msg').classList.remove('hidden');
         }
     </script>
 </body>

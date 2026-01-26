@@ -308,6 +308,12 @@
             margin-bottom: 80px;
         }
 
+        @media (max-width: 768px) {
+            .migration-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .mig-num {
             font-size: 3.5rem;
             font-weight: 700;
@@ -713,258 +719,281 @@
 <body>
 
     <!-- GLOBAL HEADER (ISLAND STYLE) -->
-    <header></header>
+    <div id="app-shell">
 
-    <!-- AUDIO -->
-    <audio id="ambientAudio" loop>
-        <!-- Using Google Sounds (Reliable Cafe Ambience) -->
-        <source src="https://actions.google.com/sounds/v1/nature/river_small.ogg" type="audio/ogg">
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
-    </audio>
-    <div class="audio-control" onclick="toggleAudio()">
-        <div class="audio-bars" id="audioVisualizer">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
+        <!-- GLOBAL HEADER (ISLAND STYLE) -->
+        <div id="shell-fixed">
+            <header></header>
         </div>
-        <span id="audioText">Play Travel Ambience</span>
+
+        <!-- AUDIO -->
+        <audio id="ambientAudio" loop>
+            <!-- Using Google Sounds (Reliable Cafe Ambience) -->
+            <source src="https://actions.google.com/sounds/v1/nature/river_small.ogg" type="audio/ogg">
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+        </audio>
+        <div class="audio-control" onclick="toggleAudio()">
+            <div class="audio-bars" id="audioVisualizer">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <span id="audioText">Play Travel Ambience</span>
+        </div>
+
+        <!-- PARTICLES & GEO-TAGS -->
+        <div id="particles"></div>
+        <div id="atmosphere"></div>
+
+        <main id="shell-content">
+            <div class="container">
+
+                <!-- HERO -->
+                <section class="hero fade-in">
+                    <div class="globe-icon">🌍</div>
+                    <div class="hero-subhead-premium">From Foreign to Familiar</div>
+                    <h1 class="hero-title-premium">Navigate the Unknown Together</h1>
+                    <p
+                        style="font-size: 1.25rem; opacity: 0.8; max-width: 800px; margin: 0 auto 50px; font-weight: 300;">
+                        Moving to a new country is an adventure filled with excitement, but it can also bring feelings
+                        of
+                        homesickness and loneliness. We're here to offer a compassionate ear and a friendly voice.
+                        <br><br>Let's make living abroad feel a little more like home.
+                    </p>
+
+                    <!-- Quick Nav to Sub-pages -->
+                    <div style="margin-bottom: 50px;">
+                        <a href="soulamore-away/who-its-for.html" class="insta-cta"
+                            style="background: var(--teal-glow); color: var(--deep-space); margin: 10px;">Who Is This
+                            For?</a>
+                        <a href="soulamore-away/resources.html" class="insta-cta"
+                            style="background: transparent; border: 1px solid var(--teal-glow); color: var(--teal-glow); margin: 10px;">Explore
+                            Resources</a>
+                    </div>
+
+                    <!-- POSTCARD INTERACTION -->
+                    <div class="postcard-box" id="postcardContainer">
+                        <div style="font-family:'Courier New'; font-size:0.9rem; margin-bottom:10px; color:#999;">From:
+                            Me
+                            <br>To: The World
+                        </div>
+                        <textarea class="paper-input" id="messageText"
+                            placeholder="What do you miss the most right now? (Type here...)"></textarea>
+                        <button class="send-btn" onclick="sendPostcard()">Send to the Community <i
+                                class="fas fa-paper-plane"></i></button>
+                    </div>
+
+                    <div id="postSuccess" style="display:none; margin-top:30px; text-align:center;">
+                        <h3 style="color:var(--teal-glow);">Message Sent. ✈️</h3>
+                        <p>You are not alone in this feeling.</p>
+                        <button onclick="location.reload()"
+                            style="background:none; border:none; color:#999; text-decoration:underline; cursor:pointer;">Write
+                            another</button>
+                    </div>
+                </section>
+
+                <!-- MIGRATION DATA -->
+                <div class="stats-section fade-in">
+                    <div class="migration-grid">
+                        <div>
+                            <span class="mig-num" id="stat1">0</span>
+                            <div class="mig-label">Students Abroad</div>
+                        </div>
+                        <div>
+                            <span class="mig-num" id="stat2">0</span>
+                            <div class="mig-label">New This Year</div>
+                        </div>
+                        <div>
+                            <span class="mig-num" id="stat3">0</span>
+                            <div class="mig-label">Community Peers</div>
+                        </div>
+                    </div>
+                    <p style="text-align: center; margin-top: 20px; opacity: 0.7; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> Over 6 million students study outside their home country. We
+                        are
+                        a global family.
+                    </p>
+                </div>
+
+                <!-- THE 8 REALITIES (FULL CONTENT INTEGRATION) -->
+                <div class="section-header" style="text-align:center; margin-top:100px;">
+                    <h2>The Realities of Moving Abroad</h2>
+                    <p style="opacity:0.6; max-width: 600px; margin: 0 auto 10px;">Our compassionate community is here
+                        to
+                        guide and support you. You don't have to face these challenges alone.</p>
+                </div>
+                <div class="grid-layout fade-in">
+                    <!-- 1 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-earth-americas"></i></div>
+                        <div class="card-title">Cultural Shock & Isolation</div>
+                        <div class="card-desc">The shift to a new country often comes with cultural differences that may
+                            lead to feelings of isolation. Hearing stories helps you find connection.</div>
+                    </div>
+                    <!-- 2 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-home"></i></div>
+                        <div class="card-title">Homesickness</div>
+                        <div class="card-desc">The longing for familiar faces and places is common. Knowing that others
+                            have
+                            experienced this offers comfort and shared understanding.</div>
+                    </div>
+                    <!-- 3 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-coins"></i></div>
+                        <div class="card-title">Financial Stress</div>
+                        <div class="card-desc">Managing finances in a new country can be stressful. Get practical advice
+                            on
+                            budgeting and navigating financial uncertainties.</div>
+                    </div>
+                    <!-- 4 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-battery-quarter"></i></div>
+                        <div class="card-title">Expat Burnout</div>
+                        <div class="card-desc">The pressure of adapting to a new culture can lead to burnout. Hearing
+                            strategies from others can encourage self-care.</div>
+                    </div>
+                    <!-- 5 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-language"></i></div>
+                        <div class="card-title">Language Barriers</div>
+                        <div class="card-desc">Mastering a new language can be overwhelming. Others who have faced this
+                            can
+                            share tips on overcoming communication barriers.</div>
+                    </div>
+                    <!-- 6 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-briefcase"></i></div>
+                        <div class="card-title">Work Environment</div>
+                        <div class="card-desc">Adapting to professional norms can be daunting. Learn from the
+                            experiences of
+                            those who have successfully integrated.</div>
+                    </div>
+                    <!-- 7 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-hospital-user"></i></div>
+                        <div class="card-title">Healthcare System</div>
+                        <div class="card-desc">Understanding a new healthcare system can be confusing. Peers can provide
+                            valuable insights on accessing proper care.</div>
+                    </div>
+                    <!-- 8 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-compass"></i></div>
+                        <div class="card-title">Uncertainty</div>
+                        <div class="card-desc">From visa processes to adjusting to a new lifestyle. Hearing stories
+                            helps
+                            you offer perspectives on embracing the unknown.</div>
+                    </div>
+                </div>
+
+                <!-- PEER RADAR (Location Finder) -->
+                <div class="radar-section fade-in">
+                    <div class="radar-ring"></div>
+                    <div class="radar-box">
+                        <i class="fas fa-map-marker-alt"
+                            style="font-size: 2.5rem; color: var(--peach-glow); margin-bottom: 15px;"></i>
+                        <h2>Are you alone in your city?</h2>
+                        <p style="opacity:0.8;">Enter your city to check if a Soulamore Peer is nearby.</p>
+                        <div class="location-input-group">
+                            <input type="text" id="cityInput" class="loc-input"
+                                placeholder="e.g. Berlin, London, Toronto...">
+                            <button class="loc-btn" onclick="findPeers()">Scan Area</button>
+                        </div>
+                        <div id="radarResult" class="radar-result"></div>
+                    </div>
+                </div>
+
+                <!-- PEER PROFILES -->
+                <div class="peer-section fade-in">
+                    <div class="section-header" style="text-align:center;">
+                        <h2>Get in Touch</h2>
+                        <p style="opacity:0.6; max-width: 700px; margin: 0 auto;">Remember, you're not alone. Connect
+                            with
+                            experienced peers who have been through similar situations and are ready to provide support.
+                        </p>
+                    </div>
+                    <div class="peer-grid">
+                        <!-- Peer 1 -->
+                        <div class="peer-card">
+                            <div class="status-dot">
+                                <div class="pulse"></div> Online
+                            </div>
+                            <div class="avatar-placeholder">L</div>
+                            <h3>Lakshit</h3>
+                            <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">"Living abroad is a unique
+                                experience, that I've embraced with open arms and, at times, weary hearts."</p>
+                            <button class="book-btn">Read More</button>
+                        </div>
+                        <!-- Peer 2 -->
+                        <div class="peer-card">
+                            <div class="status-dot">
+                                <div class="pulse"></div> Online
+                            </div>
+                            <div class="avatar-placeholder">A</div>
+                            <h3>Aditya</h3>
+                            <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">"Finding Hope in Hard Times:
+                                We're
+                                Here for You."</p>
+                            <button class="book-btn">Read More</button>
+                        </div>
+                        <!-- Peer 3 -->
+                        <div class="peer-card">
+                            <div class="status-dot">
+                                <div class="pulse"></div> Online
+                            </div>
+                            <div class="avatar-placeholder" style="background:var(--peach-glow);">Aa</div>
+                            <h3>Aarti</h3>
+                            <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">"Healing touch to the Soul,
+                                Making
+                                Abroad Feel Like Home."</p>
+                            <button class="book-btn">Read More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INSTAGRAM CAROUSEL -->
+                <div class="insta-section fade-in">
+                    <h2>The Digital Campfire</h2>
+                    <p style="opacity:0.7;">We don't post hacks. We post hope. <br>Follow for community stories and
+                        daily
+                        reminders.</p>
+
+                    <div class="insta-card">
+                        <div class="insta-header">
+                            <div class="insta-user">
+                                <div class="insta-avatar"></div> soulamore_
+                            </div>
+                            <i class="fas fa-ellipsis-h" style="color:#aaa;"></i>
+                        </div>
+
+                        <!-- SLIDER AREA -->
+                        <div class="slider-window">
+                            <button class="slide-btn prev" onclick="changeSlide(-1)"><i
+                                    class="fas fa-chevron-left"></i></button>
+                            <div class="slide-content" id="slideText">
+                                "It's okay if you didn't fall in love with your new city immediately. Give it time." 🧡
+                            </div>
+                            <button class="slide-btn next" onclick="changeSlide(1)"><i
+                                    class="fas fa-chevron-right"></i></button>
+                        </div>
+
+                        <div style="text-align:left; margin-top:15px; font-size:0.85rem; display:flex; gap:15px;">
+                            <i class="far fa-heart" style="font-size:1.2rem;"></i> <i class="far fa-comment"
+                                style="font-size:1.2rem;"></i> <i class="far fa-paper-plane"
+                                style="font-size:1.2rem;"></i>
+                        </div>
+                        <div style="text-align:left; margin-top:10px; font-weight:600; font-size:0.8rem;">342 likes
+                        </div>
+                    </div>
+
+                    <a href="https://www.instagram.com/soulamore_/" target="_blank" class="insta-cta"><i
+                            class="fab fa-instagram"></i> Join
+                        the Circle</a>
+                </div>
+
+            </div>
+        </main>
     </div>
-
-    <!-- PARTICLES & GEO-TAGS -->
-    <div id="particles"></div>
-    <div id="atmosphere"></div>
-
-    <main class="page-wrapper">
-        <div class="container">
-
-            <!-- HERO -->
-            <section class="hero fade-in">
-                <div class="globe-icon">🌍</div>
-                <p style="color:var(--teal-glow); font-weight:600; letter-spacing:1px; text-transform:uppercase;">From
-                    Foreign to Familiar</p>
-                <h1>Navigate the Unknown Together</h1>
-                <p>Moving to a new country is an adventure filled with excitement, but it can also bring feelings of
-                    homesickness and loneliness. We're here to offer a compassionate ear and a friendly voice.
-                    <br><br>Let's make living abroad feel a little more like home.
-                </p>
-
-                <!-- Quick Nav to Sub-pages -->
-                <div style="margin-bottom: 50px;">
-                    <a href="soulamore-away/who-its-for.html" class="insta-cta"
-                        style="background: var(--teal-glow); color: var(--deep-space); margin: 10px;">Who Is This
-                        For?</a>
-                    <a href="soulamore-away/resources.html" class="insta-cta"
-                        style="background: transparent; border: 1px solid var(--teal-glow); color: var(--teal-glow); margin: 10px;">Explore
-                        Resources</a>
-                </div>
-
-                <!-- POSTCARD INTERACTION -->
-                <div class="postcard-box" id="postcardContainer">
-                    <div style="font-family:'Courier New'; font-size:0.9rem; margin-bottom:10px; color:#999;">From: Me
-                        <br>To: The World
-                    </div>
-                    <textarea class="paper-input" id="messageText"
-                        placeholder="What do you miss the most right now? (Type here...)"></textarea>
-                    <button class="send-btn" onclick="sendPostcard()">Send to the Community <i
-                            class="fas fa-paper-plane"></i></button>
-                </div>
-
-                <div id="postSuccess" style="display:none; margin-top:30px; text-align:center;">
-                    <h3 style="color:var(--teal-glow);">Message Sent. ✈️</h3>
-                    <p>You are not alone in this feeling.</p>
-                    <button onclick="location.reload()"
-                        style="background:none; border:none; color:#999; text-decoration:underline; cursor:pointer;">Write
-                        another</button>
-                </div>
-            </section>
-
-            <!-- MIGRATION DATA -->
-            <div class="stats-section fade-in">
-                <div class="migration-grid">
-                    <div>
-                        <span class="mig-num" id="stat1">0</span>
-                        <div class="mig-label">Students Abroad</div>
-                    </div>
-                    <div>
-                        <span class="mig-num" id="stat2">0</span>
-                        <div class="mig-label">New This Year</div>
-                    </div>
-                    <div>
-                        <span class="mig-num" id="stat3">0</span>
-                        <div class="mig-label">Community Peers</div>
-                    </div>
-                </div>
-                <p style="text-align: center; margin-top: 20px; opacity: 0.7; font-size: 0.9rem;">
-                    <i class="fas fa-info-circle"></i> Over 6 million students study outside their home country. We are
-                    a global family.
-                </p>
-            </div>
-
-            <!-- THE 8 REALITIES (FULL CONTENT INTEGRATION) -->
-            <div class="section-header" style="text-align:center; margin-top:100px;">
-                <h2>The Realities of Moving Abroad</h2>
-                <p style="opacity:0.6; max-width: 600px; margin: 0 auto 10px;">Our compassionate community is here to
-                    guide and support you. You don't have to face these challenges alone.</p>
-            </div>
-            <div class="grid-layout fade-in">
-                <!-- 1 -->
-                <div class="challenge-card">
-                    <div class="icon-header"><i class="fas fa-earth-americas"></i></div>
-                    <div class="card-title">Cultural Shock & Isolation</div>
-                    <div class="card-desc">The shift to a new country often comes with cultural differences that may
-                        lead to feelings of isolation. Hearing stories helps you find connection.</div>
-                </div>
-                <!-- 2 -->
-                <div class="challenge-card">
-                    <div class="icon-header"><i class="fas fa-home"></i></div>
-                    <div class="card-title">Homesickness</div>
-                    <div class="card-desc">The longing for familiar faces and places is common. Knowing that others have
-                        experienced this offers comfort and shared understanding.</div>
-                </div>
-                <!-- 3 -->
-                <div class="challenge-card">
-                    <div class="icon-header"><i class="fas fa-coins"></i></div>
-                    <div class="card-title">Financial Stress</div>
-                    <div class="card-desc">Managing finances in a new country can be stressful. Get practical advice on
-                        budgeting and navigating financial uncertainties.</div>
-                </div>
-                <!-- 4 -->
-                <div class="challenge-card">
-                    <div class="icon-header"><i class="fas fa-battery-quarter"></i></div>
-                    <div class="card-title">Expat Burnout</div>
-                    <div class="card-desc">The pressure of adapting to a new culture can lead to burnout. Hearing
-                        strategies from others can encourage self-care.</div>
-                </div>
-                <!-- 5 -->
-                <div class="challenge-card">
-                    <div class="icon-header"><i class="fas fa-language"></i></div>
-                    <div class="card-title">Language Barriers</div>
-                    <div class="card-desc">Mastering a new language can be overwhelming. Others who have faced this can
-                        share tips on overcoming communication barriers.</div>
-                </div>
-                <!-- 6 -->
-                <div class="challenge-card">
-                    <div class="icon-header"><i class="fas fa-briefcase"></i></div>
-                    <div class="card-title">Work Environment</div>
-                    <div class="card-desc">Adapting to professional norms can be daunting. Learn from the experiences of
-                        those who have successfully integrated.</div>
-                </div>
-                <!-- 7 -->
-                <div class="challenge-card">
-                    <div class="icon-header"><i class="fas fa-hospital-user"></i></div>
-                    <div class="card-title">Healthcare System</div>
-                    <div class="card-desc">Understanding a new healthcare system can be confusing. Peers can provide
-                        valuable insights on accessing proper care.</div>
-                </div>
-                <!-- 8 -->
-                <div class="challenge-card">
-                    <div class="icon-header"><i class="fas fa-compass"></i></div>
-                    <div class="card-title">Uncertainty</div>
-                    <div class="card-desc">From visa processes to adjusting to a new lifestyle. Hearing stories helps
-                        you offer perspectives on embracing the unknown.</div>
-                </div>
-            </div>
-
-            <!-- PEER RADAR (Location Finder) -->
-            <div class="radar-section fade-in">
-                <div class="radar-ring"></div>
-                <div class="radar-box">
-                    <i class="fas fa-map-marker-alt"
-                        style="font-size: 2.5rem; color: var(--peach-glow); margin-bottom: 15px;"></i>
-                    <h2>Are you alone in your city?</h2>
-                    <p style="opacity:0.8;">Enter your city to check if a Soulamore Peer is nearby.</p>
-                    <div class="location-input-group">
-                        <input type="text" id="cityInput" class="loc-input"
-                            placeholder="e.g. Berlin, London, Toronto...">
-                        <button class="loc-btn" onclick="findPeers()">Scan Area</button>
-                    </div>
-                    <div id="radarResult" class="radar-result"></div>
-                </div>
-            </div>
-
-            <!-- PEER PROFILES -->
-            <div class="peer-section fade-in">
-                <div class="section-header" style="text-align:center;">
-                    <h2>Get in Touch</h2>
-                    <p style="opacity:0.6; max-width: 700px; margin: 0 auto;">Remember, you're not alone. Connect with
-                        experienced peers who have been through similar situations and are ready to provide support.</p>
-                </div>
-                <div class="peer-grid">
-                    <!-- Peer 1 -->
-                    <div class="peer-card">
-                        <div class="status-dot">
-                            <div class="pulse"></div> Online
-                        </div>
-                        <div class="avatar-placeholder">L</div>
-                        <h3>Lakshit</h3>
-                        <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">"Living abroad is a unique
-                            experience, that I've embraced with open arms and, at times, weary hearts."</p>
-                        <button class="book-btn">Read More</button>
-                    </div>
-                    <!-- Peer 2 -->
-                    <div class="peer-card">
-                        <div class="status-dot">
-                            <div class="pulse"></div> Online
-                        </div>
-                        <div class="avatar-placeholder">A</div>
-                        <h3>Aditya</h3>
-                        <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">"Finding Hope in Hard Times: We're
-                            Here for You."</p>
-                        <button class="book-btn">Read More</button>
-                    </div>
-                    <!-- Peer 3 -->
-                    <div class="peer-card">
-                        <div class="status-dot">
-                            <div class="pulse"></div> Online
-                        </div>
-                        <div class="avatar-placeholder" style="background:var(--peach-glow);">Aa</div>
-                        <h3>Aarti</h3>
-                        <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">"Healing touch to the Soul, Making
-                            Abroad Feel Like Home."</p>
-                        <button class="book-btn">Read More</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- INSTAGRAM CAROUSEL -->
-            <div class="insta-section fade-in">
-                <h2>The Digital Campfire</h2>
-                <p style="opacity:0.7;">We don't post hacks. We post hope. <br>Follow for community stories and daily
-                    reminders.</p>
-
-                <div class="insta-card">
-                    <div class="insta-header">
-                        <div class="insta-user">
-                            <div class="insta-avatar"></div> soulamore_
-                        </div>
-                        <i class="fas fa-ellipsis-h" style="color:#aaa;"></i>
-                    </div>
-
-                    <!-- SLIDER AREA -->
-                    <div class="slider-window">
-                        <button class="slide-btn prev" onclick="changeSlide(-1)"><i
-                                class="fas fa-chevron-left"></i></button>
-                        <div class="slide-content" id="slideText">
-                            "It's okay if you didn't fall in love with your new city immediately. Give it time." 🧡
-                        </div>
-                        <button class="slide-btn next" onclick="changeSlide(1)"><i
-                                class="fas fa-chevron-right"></i></button>
-                    </div>
-
-                    <div style="text-align:left; margin-top:15px; font-size:0.85rem; display:flex; gap:15px;">
-                        <i class="far fa-heart" style="font-size:1.2rem;"></i> <i class="far fa-comment"
-                            style="font-size:1.2rem;"></i> <i class="far fa-paper-plane" style="font-size:1.2rem;"></i>
-                    </div>
-                    <div style="text-align:left; margin-top:10px; font-weight:600; font-size:0.8rem;">342 likes</div>
-                </div>
-
-                <a href="https://www.instagram.com/soulamore_/" target="_blank" class="insta-cta"><i
-                        class="fab fa-instagram"></i> Join
-                    the Circle</a>
-            </div>
-
-        </div>
-    </main>
 
     <!-- GLOBAL FOOTER (HASHLILLY STANDARD) -->
 

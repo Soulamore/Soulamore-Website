@@ -39,6 +39,13 @@
             padding: 120px 24px 60px;
         }
 
+        @media (max-width: 600px) {
+            .page-wrapper {
+                padding: 100px 12px 60px;
+                /* More space for calendar */
+            }
+        }
+
         .booking-header {
             text-align: center;
             margin-bottom: 60px;
@@ -408,7 +415,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Empty States */
@@ -424,6 +433,7 @@
             color: var(--teal-chakra);
         }
     </style>
+    <link rel="icon" href="../../assets/images/favicon_symbol.png" type="image/x-icon">
 </head>
 
 <body>
@@ -462,7 +472,7 @@
             <!-- Calendar Section -->
             <div class="calendar-section">
                 <h2>Select Date & Time</h2>
-                
+
                 <!-- Calendar Navigation -->
                 <div class="calendar-nav">
                     <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
@@ -516,12 +526,12 @@
 
     <script type="module">
         import { auth, onAuthStateChanged, db, doc, getDoc } from "../../../assets/js/firebase-config.js";
-        import { 
-            PEER_PLAN_TYPES, 
-            DEFAULT_PLANS, 
-            getPeerAvailability, 
-            getAvailableSlots, 
-            createBookingRequest 
+        import {
+            PEER_PLAN_TYPES,
+            DEFAULT_PLANS,
+            getPeerAvailability,
+            getAvailableSlots,
+            createBookingRequest
         } from "../../../assets/js/peer-booking-handler.js";
         import { openRazorpayCheckout } from "../../../assets/js/payment-handler.js";
 
@@ -584,7 +594,7 @@
                 planCard.className = 'plan-card';
                 planCard.dataset.planType = planType;
 
-                const savings = planType === PEER_PLAN_TYPES.PER_SESSION ? '' : 
+                const savings = planType === PEER_PLAN_TYPES.PER_SESSION ? '' :
                     `<div class="plan-savings">Save ${Math.round((1 - (plan.price / (DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION].price * plan.sessions))) * 100)}%</div>`;
 
                 planCard.innerHTML = `
@@ -603,7 +613,7 @@
 
         function selectPlan(planType) {
             selectedPlan = planType;
-            
+
             // Update UI
             document.querySelectorAll('.plan-card').forEach(card => {
                 card.classList.remove('selected');
@@ -618,10 +628,10 @@
         function renderCalendar() {
             const calendarGrid = document.getElementById('calendarGrid');
             const currentMonthEl = document.getElementById('currentMonth');
-            
+
             const year = currentMonth.getFullYear();
             const month = currentMonth.getMonth();
-            
+
             currentMonthEl.textContent = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
             // Clear previous calendar
@@ -668,7 +678,7 @@
                     // Check if date has availability
                     const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
                     const daySchedule = availability?.availability?.find(slot => slot.day.toLowerCase() === dayName);
-                    
+
                     if (daySchedule) {
                         dayEl.classList.add('available');
                         dayEl.addEventListener('click', () => selectDate(date));
@@ -778,7 +788,7 @@
 
             if (selectedPlan && selectedDate && selectedTimeSlot) {
                 summarySection.style.display = 'block';
-                
+
                 const plan = DEFAULT_PLANS[selectedPlan];
                 document.getElementById('summaryPlan').textContent = plan.name;
                 document.getElementById('summaryDate').textContent = selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -861,4 +871,3 @@
 </body>
 
 </html>
-

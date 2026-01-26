@@ -24,3 +24,4 @@ echo "2. Deploy functions: firebase deploy --only functions"
 echo "3. Copy the Function URL and update assets/js/payment-handler.js"
 echo ""
 
+

@@ -61,7 +61,8 @@
 
         .hero {
             text-align: center;
-            padding: 180px 0 60px;
+            /* padding: 180px 0 60px; REMOVED FOR SHELL STANDARD */
+            padding-bottom: 60px;
         }
 
         .hero h1 {
@@ -206,195 +207,234 @@
             color: var(--deep-space);
         }
     </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
 </head>
 
 <body>
     <!-- GLOBAL HEADER -->
-    <header></header>
+    <!-- APP SHELL START -->
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header id="main-header"></header>
+        </div>
 
-    <div class="container">
-        <section class="hero fade-in">
-            <div class="badge">Verified Professionals</div>
-            <h1>Clinical Support & Therapy</h1>
-            <p>Connect with licensed psychologists and counselors for anxiety, depression, and personal growth.
-                Evidence-based care in a safe space.</p>
-        </section>
+        <main id="shell-content">
+            <div class="container">
+                <section class="hero fade-in">
+                    <div class="badge">Verified Professionals</div>
+                    <h1 class="hero-title-premium" style="margin-bottom: 20px;">Clinical Support & Therapy</h1>
+                    <p>Connect with licensed psychologists and counselors for anxiety, depression, and personal growth.
+                        Evidence-based care in a safe space.</p>
+                </section>
 
-        <!-- FILTERS -->
-        <div class="filter-section fade-in">
-            <div class="filter-bar">
-                <select class="filter-select" id="specFilter" onchange="filterPsychs()">
-                    <option value="all">Specialization: All</option>
-                    <option value="Anxiety">Anxiety</option>
-                    <option value="Depression">Depression</option>
-                    <option value="Relationships">Relationships</option>
-                    <option value="Trauma">Trauma</option>
-                </select>
-                <select class="filter-select" id="langFilter" onchange="filterPsychs()">
-                    <option value="all">Language: All</option>
-                    <option value="English">English</option>
-                    <option value="Hindi">Hindi</option>
-                </select>
+                <!-- FILTERS -->
+                <div class="filter-section fade-in">
+                    <div class="filter-bar">
+                        <select class="filter-select" id="specFilter" onchange="filterPsychs()">
+                            <option value="all">Specialization: All</option>
+                            <option value="Anxiety">Anxiety</option>
+                            <option value="Depression">Depression</option>
+                            <option value="Relationships">Relationships</option>
+                            <option value="Trauma">Trauma</option>
+                        </select>
+                        <select class="filter-select" id="langFilter" onchange="filterPsychs()">
+                            <option value="all">Language: All</option>
+                            <option value="English">English</option>
+                            <option value="Hindi">Hindi</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- GRID -->
+                <div class="psych-grid" id="psychGrid">
+                    <!-- Injected via JS -->
+                </div>
             </div>
-        </div>
-
-        <!-- GRID -->
-        <div class="psych-grid" id="psychGrid">
-            <!-- Injected via JS -->
-        </div>
+        </main>
     </div>
+    <!-- APP SHELL END -->
 
     <!-- STANDARDIZED FOOTER -->
     <footer></footer>
 
     <script src="../assets/js/components.js"></script>
-    <script>
-        const psychs = [
-            {
-                id: 1,
-                name: "Palak Shori",
-                role: "Clinical Psychologist (Master's)",
-                category: "Mental Wellness",
-                image: "https://via.placeholder.com/150/FF5733/FFFFFF?text=PS",
-                tags: ["Anxiety", "Depression", "Youth Counseling", "English", "Hindi"],
-                rating: 4.9,
-                reviews: 120,
-                price: 1800,
-                exp: "8",
-                lang: "English, Hindi",
-                online: true,
-                verified: true
-            },
-            {
-                id: 2,
-                name: "Dr. Ananya Gupta",
-                role: "Senior Therapist (PhD)",
-                category: "Relationship Counseling",
-                image: "https://via.placeholder.com/150/33FF57/FFFFFF?text=AG",
-                tags: ["Trauma", "Relationships", "Stress", "English"],
-                rating: 4.8,
-                reviews: 95,
-                price: 2500,
-                exp: "15",
-                lang: "English",
-                online: false,
-                verified: true
-            },
-            {
-                id: 3,
-                name: "Rahul Sharma",
-                role: "Counseling Psychologist",
-                category: "Career Guidance",
-                image: "https://via.placeholder.com/150/3357FF/FFFFFF?text=RS",
-                tags: ["Career", "Stress", "Motivation", "English", "Hindi"],
-                rating: 4.7,
-                reviews: 80,
-                price: 1500,
-                exp: "6",
-                lang: "English, Hindi",
-                online: true,
-                verified: false
-            },
-            {
-                id: 4,
-                name: "Priya Singh",
-                role: "Child Psychologist",
-                category: "Child & Adolescent Therapy",
-                image: "https://via.placeholder.com/150/FF33A1/FFFFFF?text=PS",
-                tags: ["Child", "Adolescent", "Parenting", "English"],
-                rating: 5.0,
-                reviews: 150,
-                price: 2000,
-                exp: "10",
-                lang: "English",
-                online: true,
-                verified: true
+    <script type="module">
+        import { db, collection, getDocs } from "../assets/js/firebase-config.js";
+
+        // Global State
+        let psychs = [];
+        let fetchedPsychs = [];
+
+        async function fetchPsychs() {
+            try {
+                // Initial Loading State
+                const grid = document.getElementById('psychGrid');
+                if (grid) grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding: 40px; opacity: 0.7;">Loading professionals...</div>';
+
+                // Timeout Promise (2.5 seconds limit - Faster Fallback)
+                const timeout = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error("Request timed out")), 2500)
+                );
+
+                // Data Promise
+                const dataFetch = getDocs(collection(db, "professionals"));
+
+                // Race them
+                const querySnapshot = await Promise.race([dataFetch, timeout]);
+
+                fetchedPsychs = [];
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+
+                    // Filter Logic:
+                    // Check if role indicates a professional (Psychologist, Therapist, Counselor)
+                    const role = data.role || data.title || "";
+                    const isPsych = role.includes('Psychologist') || role.includes('Therapist') || role.includes('Counselor') || data.isPsych === true;
+
+                    if (isPsych && role !== "Peer Listener") {
+                        fetchedPsychs.push({
+                            id: doc.id,
+                            name: data.name,
+                            role: role || "Clinical Psychologist",
+                            category: data.category || "Mental Wellness",
+                            image: data.photoURL,
+                            avatarColor: data.avatarColor || "#F49F75",
+                            color: data.color || "#fff",
+                            tags: data.tags || [],
+                            rating: data.rating || 5.0,
+                            reviews: data.reviews || 0,
+                            price: data.rate || 1500,
+                            exp: data.experience || "5",
+                            lang: data.languages || "English",
+                            online: data.onlineStatus === 'online',
+                            verified: data.verified !== false,
+                            profileUrl: `../our-peers/profile.html?id=${doc.id}`
+                        });
+                    }
+                });
+
+                // FALLBACK if empty
+                if (fetchedPsychs.length === 0) {
+                    console.warn("No psychologists found in Firestore. Using fallback demo data.");
+                    throw new Error("Empty DB");
+                } else {
+                    psychs = fetchedPsychs;
+                    renderPsychs();
+                }
+
+            } catch (error) {
+                console.warn("Using fallback data due to error:", error);
+
+                // Fallback Data
+                psychs = [
+                    {
+                        id: 5,
+                        name: "Bhagyavathi",
+                        role: "Counseling Psychologist",
+                        category: "Trauma & Abuse",
+                        image: "",
+                        avatarColor: "#F49F75",
+                        color: "#fff",
+                        tags: ["Trauma", "Narcissistic Abuse", "Relationships", "English"],
+                        rating: 4.9,
+                        reviews: 21,
+                        price: 1000,
+                        exp: "4",
+                        lang: "English, Tamil",
+                        online: true,
+                        verified: true,
+                        profileUrl: "../our-peers/profile.html?id=5"
+                    },
+                    {
+                        id: 1,
+                        name: "Palak Shori",
+                        role: "Clinical Psychologist (Master's)",
+                        category: "Mental Wellness",
+                        image: "https://via.placeholder.com/150/FF5733/FFFFFF?text=PS",
+                        tags: ["Anxiety", "Depression", "Youth Counseling", "English", "Hindi"],
+                        rating: 4.9,
+                        reviews: 120,
+                        price: 1800,
+                        exp: "8",
+                        lang: "English, Hindi",
+                        online: true,
+                        verified: true,
+                        profileUrl: "../our-peers/profile.html?id=1"
+                    },
+                    {
+                        id: 2,
+                        name: "Dr. Ananya Gupta",
+                        role: "Senior Therapist (PhD)",
+                        category: "Relationship Counseling",
+                        image: "https://via.placeholder.com/150/33FF57/FFFFFF?text=AG",
+                        tags: ["Trauma", "Relationships", "Stress", "English"],
+                        rating: 4.8,
+                        reviews: 95,
+                        price: 2500,
+                        exp: "15",
+                        lang: "English",
+                        online: false,
+                        verified: true,
+                        profileUrl: "#"
+                    }
+                ];
+                renderPsychs();
             }
-        ];
-
-        // --- DYNAMIC INJECTION FOR DEMO ---
-        const myProfile = JSON.parse(localStorage.getItem('professional_profile'));
-        const myRole = localStorage.getItem('user_role');
-
-        if (myProfile && myRole === 'Psychologist') {
-            const myCard = {
-                id: 999,
-                name: myProfile.name,
-                role: myProfile.title || "Clinical Psychologist",
-                category: myProfile.category || "Mental Wellness",
-                image: myProfile.image,
-                tags: myProfile.tags || ["New", "Therapist"],
-                rating: 5.0,
-                reviews: 0,
-                price: myProfile.price || 1500,
-                exp: myProfile.exp || "5",
-                lang: myProfile.languages || "English",
-                online: true,
-                verified: true
-            };
-
-            psychs.unshift(myCard);
         }
 
+        // --- RENDER FUNCTION ---
         function renderPsychs() {
             const grid = document.getElementById('psychGrid');
             const specVal = document.getElementById('specFilter').value;
             const langVal = document.getElementById('langFilter').value;
 
             const filtered = psychs.filter(p => {
-                const specMatch = specVal === 'all' || p.tags.includes(specVal);
-                const langMatch = langVal === 'all' || p.lang.includes(langVal); // Changed to p.lang for language filtering
-                return specMatch && langMatch;
+                const tagMatch = specVal === 'all' || (p.tags && p.tags.includes(specVal)) || (p.category && p.category.includes(specVal));
+                const langMatch = langVal === 'all' || (p.lang && p.lang.includes(langVal));
+                return tagMatch && langMatch;
             });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; opacity:0.7; margin-top:20px;">No professionals found matching these filters.</p>';
+                return;
+            }
 
             grid.innerHTML = filtered.map(psych => `
                 <div class="psych-card fade-in">
-                    <div class="pc-header">
-                        <div class="pc-avatar">
-                            <img src="${psych.image}" alt="${psych.name}">
-                            ${psych.online ? '<div class="online-dot"></div>' : ''}
-                        </div>
-                        ${psych.verified ? '<div class="verified-badge"><i class="fas fa-check-circle"></i> Verified</div>' : ''}
+                    <div class="avatar" style="background:${psych.avatarColor || '#e2e8f0'}; color:${psych.color || '#334155'};">
+                        ${psych.image && !psych.image.includes('via.placeholder') && !psych.image.includes('assets/images/default') ? `<img src="${psych.image}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" alt="${psych.name}">` : psych.name.charAt(0)}
                     </div>
-                    <div class="pc-body">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div>
-                                <h3 class="pc-name">${psych.name}</h3>
-                                <div class="pc-role">${psych.role}</div>
-                                ${psych.category ? `<div style="font-size:0.75rem; color:var(--clinical-blue); background:rgba(59, 130, 246, 0.1); display:inline-block; padding:2px 8px; border-radius:10px; margin-top:4px;">${psych.category}</div>` : ''}
-                            </div>
-                            <div class="pc-rating">
-                                <div style="font-weight:700; color:var(--clinical-blue); font-size:1.1rem;">${psych.rating}</div>
-                                <div style="font-size:0.7rem; opacity:0.6;">${psych.reviews} Reviews</div>
-                            </div>
-                        </div>
-                        
-                        <div class="pc-tags">
-                            ${psych.tags.map(tag => `<span>${tag}</span>`).join('')}
-                        </div>
+                    ${psych.verified ? '<div class="badge" style="margin-bottom:10px; padding:2px 8px; font-size:0.7rem;"><i class="fas fa-check-circle"></i> Verified</div>' : ''}
+                    
+                    <h3 class="name">${psych.name}</h3>
+                    <div class="title">${psych.role}</div>
+                    
+                    <div class="tags">
+                         ${psych.category ? `<span class="tag" style="background:rgba(14, 165, 233, 0.2); color:var(--clinical-blue);">${psych.category}</span>` : ''}
+                         ${psych.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')} 
+                    </div>
 
-                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; opacity:0.8; margin-top:15px; border-top:1px solid var(--border-glass); padding-top:10px;">
-                            <span><i class="fas fa-briefcase"></i> ${psych.exp}+ Yrs</span>
-                            <span><i class="fas fa-language"></i> ${psych.lang}</span>
-                        </div>
+                     <div style="font-style:italic; opacity:0.7; font-size:0.85rem; margin-bottom:15px;">
+                        <i class="fas fa-star" style="color:var(--gold-glow);"></i> ${psych.rating} (${psych.reviews} reviews) • ${psych.exp}+ Yrs Exp
+                    </div>
 
-                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; opacity:0.8; margin-top:15px; border-top:1px solid var(--border-glass); padding-top:10px;">
-                            <span><i class="fas fa-briefcase"></i> ${psych.exp}+ Yrs</span>
-                            <span><i class="fas fa-language"></i> ${psych.lang}</span>
-                        </div>
+                    <div style="margin-bottom:20px; font-size:0.9rem; opacity:0.8;">
+                       <i class="fas fa-language"></i> ${psych.lang}
+                    </div>
 
-                        <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
-                            <div style="font-weight:700; font-size:1.1rem;">₹${psych.price} <span style="font-size:0.8rem; font-weight:400; opacity:0.6;">/ session</span></div>
-                            <a href="profile.html?id=${psych.id}" class="pc-btn" style="text-decoration:none; margin-left:auto;">View Profile</a>
-                        </div>
-                        ${psych.id === 999 ? '<div style="text-align:center; font-size:0.7rem; margin-top:5px; opacity:0.5;">(This is You)</div>' : ''}
+                    <div style="margin-top:auto; width:100%;">
+                         <div style="font-weight:700; font-size:1.2rem; margin-bottom:15px; color:var(--teal-glow);">₹${psych.price} <span style="font-size:0.8rem; opacity:0.6; color:var(--starlight);">/ session</span></div>
+                        <a href="${psych.profileUrl || '../our-peers/profile.html?id=' + psych.id}" class="view-btn">View Profile</a>
                     </div>
                 </div>
             `).join('');
         }
 
-        renderPsychs();
-        function filterPsychs() { renderPsychs(); }
+        // Expose function for HTML onchange events
+        window.filterPsychs = renderPsychs;
+
+        fetchPsychs();
     </script>
 </body>
 

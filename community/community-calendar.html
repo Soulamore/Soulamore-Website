@@ -55,7 +55,8 @@
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 110px 24px 100px;
+            padding: 40px 24px 100px;
+            /* Reduced from 110px */
             position: relative;
             z-index: 5;
         }
@@ -416,6 +417,12 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            /* Mobile: Reduce horizontal padding */
+            .container {
+                padding-left: 12px !important;
+                padding-right: 12px !important;
+            }
         }
     </style>
     <link rel="icon" href="./assets/images/favicon_symbol.png" type="image/x-icon">
@@ -423,208 +430,216 @@
 
 <body>
 
-    <!-- ORBITAL BACKGROUND -->
-    <div id="orbit-system">
-        <div class="orbit-ring ring-1">
-            <div class="planet"></div>
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header></header>
         </div>
-        <div class="orbit-ring ring-2">
-            <div class="planet"></div>
-        </div>
-        <div class="orbit-ring ring-3">
-            <div class="planet"></div>
-        </div>
-    </div>
 
-    <!-- AUDIO -->
-    <audio id="bgAudio" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
-    </audio>
-    <div class="audio-control" onclick="toggleAudio()"><i class="fas fa-music"></i> <span id="audioText">Ambience</span>
-    </div>
-
-    <!-- NAV -->
-    <!-- NAV -->
-    <!-- GLOBAL HEADER (ISLAND STYLE) -->
-    <header></header>
-
-    <div class="container">
-
-        <!-- HERO -->
-        <section class="hero fade-in">
-            <h1>A place to look forward to.<br>Not keep up with.</h1>
-            <p>Support isn’t something you chase. It’s something you can quietly look forward to. <br>This page isn’t
-                about filling your schedule. It’s about knowing there’s space waiting for you.</p>
-        </section>
-
-        <!-- EVENTS LIST -->
-        <div class="events-list">
-
-            <!-- Event 1 -->
-            <div class="event-card fade-in">
-                <div class="event-icon-box"><i class="fas fa-book-open"></i></div>
-                <div>
-                    <div class="event-title">Quiet Study Hour</div>
-                    <div class="event-meta">
-                        <span><i class="far fa-clock"></i> Thu, 8:00 PM</span>
-                        <span><i class="fas fa-video"></i> Zoom</span>
-                    </div>
-                    <div class="event-desc">
-                        For students who want company without conversation. Cameras optional. Mics off.
-                        No one checks on your progress. No one asks questions.
-                    </div>
-                    <div class="event-feel">"You study, read, or sit. Others do the same."</div>
-                </div>
-                <button class="remind-btn" onclick="toggleRemind(this)"><i class="far fa-bell"></i> Remind me
-                    gently</button>
+        <!-- ORBITAL BACKGROUND -->
+        <div id="orbit-system">
+            <div class="orbit-ring ring-1">
+                <div class="planet"></div>
             </div>
-
-            <!-- Event 2 -->
-            <div class="event-card fade-in">
-                <div class="event-icon-box"><i class="fas fa-water"></i></div>
-                <div>
-                    <div class="event-title">Men’s Support Circle</div>
-                    <div class="event-meta">
-                        <span><i class="far fa-clock"></i> Sat, 6:30 PM</span>
-                        <span><i class="fas fa-users"></i> Small Group</span>
-                    </div>
-                    <div class="event-desc">
-                        For men who carry things silently. A small group. No fixing. No advice unless asked.
-                    </div>
-                    <div class="event-feel">"You can speak, or just listen. Both count."</div>
-                </div>
-                <button class="remind-btn" onclick="toggleRemind(this)"><i class="far fa-bell"></i> Remind me
-                    gently</button>
+            <div class="orbit-ring ring-2">
+                <div class="planet"></div>
             </div>
-
-            <!-- Event 3 -->
-            <div class="event-card fade-in">
-                <div class="event-icon-box"><i class="fas fa-brain"></i></div>
-                <div>
-                    <div class="event-title">Ask a Therapist</div>
-                    <div class="event-meta">
-                        <span><i class="far fa-calendar"></i> Twice a Month</span>
-                        <span><i class="fas fa-question"></i> Q&A</span>
-                    </div>
-                    <div class="event-desc">
-                        For anyone with questions they’ve been holding back. A safe place to ask what you’ve Googled at
-                        2 am.
-                    </div>
-                    <div class="event-feel">"You don’t need the right words. Curiosity is enough."</div>
-                </div>
-                <button class="remind-btn" onclick="toggleRemind(this)"><i class="far fa-bell"></i> Remind me
-                    gently</button>
-            </div>
-
-            <!-- Event 4 (Sleep - Special Style) -->
-            <div class="event-card fade-in sleep">
-                <div class="event-icon-box"><i class="fas fa-moon"></i></div>
-                <div>
-                    <div class="event-title">Sleep Reset Session</div>
-                    <div class="event-meta">
-                        <span><i class="far fa-clock"></i> Sun, 10:00 PM</span>
-                        <span><i class="fas fa-bed"></i> Audio Only</span>
-                    </div>
-                    <div class="event-desc">
-                        For anyone struggling to wind down. Gentle guidance. Slower breathing. Softer thoughts.
-                    </div>
-                    <div class="event-feel">"No lectures. Just permission to rest."</div>
-                </div>
-                <button class="remind-btn" onclick="toggleRemind(this)"><i class="far fa-bell"></i> Remind me
-                    gently</button>
-            </div>
-
-        </div>
-
-        <!-- REMINDER INFO -->
-        <div class="reminder-info fade-in">
-            <h4 style="margin-bottom:10px; color:var(--teal-glow);">About Reminders</h4>
-            <p style="font-size:0.9rem; opacity:0.8;">
-                When you tap "Remind me gently", we’ll do just that. No follow-ups. No pressure. No "You missed it"
-                messages.
-                <br><br>You asked to be reminded. Showing up is always optional.
-            </p>
-        </div>
-
-        <!-- UNTIL THEN -->
-        <div class="fade-in">
-            <h2 style="text-align:center;">Until then...</h2>
-            <p style="text-align:center; opacity:0.7;">You don’t have to wait for an event to be supported.</p>
-
-            <div class="quick-actions">
-                <a href="/our-peers" class="action-card">
-                    <i class="fas fa-hand-holding-heart ac-icon"></i>
-                    <span class="ac-title">Talk to a Peer</span>
-                    <span class="ac-desc">Human conversation, no judgement.</span>
-                </a>
-                <a href="/confession" class="action-card">
-                    <i class="fas fa-feather-alt ac-icon" style="color:var(--teal-glow);"></i>
-                    <span class="ac-title">Write a Confession</span>
-                    <span class="ac-desc">Say what you haven’t said yet.</span>
-                </a>
-                <div class="action-card" onclick="window.open('/', '_top')"> <!-- Assuming SoulBot is on Home -->
-                    <i class="fas fa-robot ac-icon" style="color:var(--gold-glow);"></i>
-                    <span class="ac-title">Sit with SoulBot</span>
-                    <span class="ac-desc">Organise your thoughts.</span>
-                </div>
-                <a href="/resources" class="action-card">
-                    <i class="fas fa-wind ac-icon" style="color:#a78bfa;"></i>
-                    <span class="ac-title">Grounding Tool</span>
-                    <span class="ac-desc">No preparation. Just breathe.</span>
-                </a>
+            <div class="orbit-ring ring-3">
+                <div class="planet"></div>
             </div>
         </div>
 
-        <!-- FOOTER -->
-        <div class="footer-note fade-in">
-            "Support doesn’t always look like a meeting.<br>
-            <span style="color:var(--teal-glow);">Sometimes it looks like staying a little longer.</span>"
+        <!-- AUDIO -->
+        <audio id="bgAudio" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+        </audio>
+        <div class="audio-control" onclick="toggleAudio()"><i class="fas fa-music"></i> <span
+                id="audioText">Ambience</span>
         </div>
 
-    </div>
+        <main id="shell-content">
+            <div class="container">
 
-    <script>
-        // --- BUTTON INTERACTION ---
-        function toggleRemind(btn) {
-            if (btn.classList.contains('subscribed')) {
-                btn.classList.remove('subscribed');
-                btn.innerHTML = '<i class="far fa-bell"></i> Remind me gently';
-            } else {
-                btn.classList.add('subscribed');
-                btn.innerHTML = '<i class="fas fa-check"></i> We\'ll whisper';
-            }
-        }
+                <!-- HERO -->
+                <section class="hero fade-in">
+                    <h1>A place to look forward to.<br>Not keep up with.</h1>
+                    <p>Support isn’t something you chase. It’s something you can quietly look forward to. <br>This page
+                        isn’t
+                        about filling your schedule. It’s about knowing there’s space waiting for you.</p>
+                </section>
 
-        // --- AUDIO ---
-        const audio = document.getElementById('bgAudio');
-        let playing = false;
-        function toggleAudio() {
-            if (playing) {
-                audio.pause();
-                document.getElementById('audioText').innerText = "Ambience";
-            } else {
-                audio.volume = 0.3;
-                audio.play();
-                document.getElementById('audioText').innerText = "Pause";
-            }
-            playing = !playing;
-        }
+                <!-- EVENTS LIST -->
+                <div class="events-list">
 
-        // --- FADE IN ---
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = 1;
-                    entry.target.style.transform = "translateY(0)";
+                    <!-- Event 1 -->
+                    <div class="event-card fade-in">
+                        <div class="event-icon-box"><i class="fas fa-book-open"></i></div>
+                        <div>
+                            <div class="event-title">Quiet Study Hour</div>
+                            <div class="event-meta">
+                                <span><i class="far fa-clock"></i> Thu, 8:00 PM</span>
+                                <span><i class="fas fa-video"></i> Zoom</span>
+                            </div>
+                            <div class="event-desc">
+                                For students who want company without conversation. Cameras optional. Mics off.
+                                No one checks on your progress. No one asks questions.
+                            </div>
+                            <div class="event-feel">"You study, read, or sit. Others do the same."</div>
+                        </div>
+                        <button class="remind-btn" onclick="toggleRemind(this)"><i class="far fa-bell"></i> Remind me
+                            gently</button>
+                    </div>
+
+                    <!-- Event 2 -->
+                    <div class="event-card fade-in">
+                        <div class="event-icon-box"><i class="fas fa-water"></i></div>
+                        <div>
+                            <div class="event-title">Men’s Support Circle</div>
+                            <div class="event-meta">
+                                <span><i class="far fa-clock"></i> Sat, 6:30 PM</span>
+                                <span><i class="fas fa-users"></i> Small Group</span>
+                            </div>
+                            <div class="event-desc">
+                                For men who carry things silently. A small group. No fixing. No advice unless asked.
+                            </div>
+                            <div class="event-feel">"You can speak, or just listen. Both count."</div>
+                        </div>
+                        <button class="remind-btn" onclick="toggleRemind(this)"><i class="far fa-bell"></i> Remind me
+                            gently</button>
+                    </div>
+
+                    <!-- Event 3 -->
+                    <div class="event-card fade-in">
+                        <div class="event-icon-box"><i class="fas fa-brain"></i></div>
+                        <div>
+                            <div class="event-title">Ask a Therapist</div>
+                            <div class="event-meta">
+                                <span><i class="far fa-calendar"></i> Twice a Month</span>
+                                <span><i class="fas fa-question"></i> Q&A</span>
+                            </div>
+                            <div class="event-desc">
+                                For anyone with questions they’ve been holding back. A safe place to ask what you’ve
+                                Googled at
+                                2 am.
+                            </div>
+                            <div class="event-feel">"You don’t need the right words. Curiosity is enough."</div>
+                        </div>
+                        <button class="remind-btn" onclick="toggleRemind(this)"><i class="far fa-bell"></i> Remind me
+                            gently</button>
+                    </div>
+
+                    <!-- Event 4 (Sleep - Special Style) -->
+                    <div class="event-card fade-in sleep">
+                        <div class="event-icon-box"><i class="fas fa-moon"></i></div>
+                        <div>
+                            <div class="event-title">Sleep Reset Session</div>
+                            <div class="event-meta">
+                                <span><i class="far fa-clock"></i> Sun, 10:00 PM</span>
+                                <span><i class="fas fa-bed"></i> Audio Only</span>
+                            </div>
+                            <div class="event-desc">
+                                For anyone struggling to wind down. Gentle guidance. Slower breathing. Softer thoughts.
+                            </div>
+                            <div class="event-feel">"No lectures. Just permission to rest."</div>
+                        </div>
+                        <button class="remind-btn" onclick="toggleRemind(this)"><i class="far fa-bell"></i> Remind me
+                            gently</button>
+                    </div>
+
+                </div>
+
+                <!-- REMINDER INFO -->
+                <div class="reminder-info fade-in">
+                    <h4 style="margin-bottom:10px; color:var(--teal-glow);">About Reminders</h4>
+                    <p style="font-size:0.9rem; opacity:0.8;">
+                        When you tap "Remind me gently", we’ll do just that. No follow-ups. No pressure. No "You missed
+                        it"
+                        messages.
+                        <br><br>You asked to be reminded. Showing up is always optional.
+                    </p>
+                </div>
+
+                <!-- UNTIL THEN -->
+                <div class="fade-in">
+                    <h2 style="text-align:center;">Until then...</h2>
+                    <p style="text-align:center; opacity:0.7;">You don’t have to wait for an event to be supported.</p>
+
+                    <div class="quick-actions">
+                        <a href="../our-peers/index.html" class="action-card">
+                            <i class="fas fa-hand-holding-heart ac-icon"></i>
+                            <span class="ac-title">Talk to a Peer</span>
+                            <span class="ac-desc">Human conversation, no judgement.</span>
+                        </a>
+                        <a href="../tools/confession-box/index.html" class="action-card">
+                            <i class="fas fa-feather-alt ac-icon" style="color:var(--teal-glow);"></i>
+                            <span class="ac-title">Write a Confession</span>
+                            <span class="ac-desc">Say what you haven’t said yet.</span>
+                        </a>
+                        <div class="action-card" onclick="window.open('../index.html', '_top')">
+                            <!-- Assuming SoulBot is on Home -->
+                            <i class="fas fa-robot ac-icon" style="color:var(--gold-glow);"></i>
+                            <span class="ac-title">Sit with SoulBot</span>
+                            <span class="ac-desc">Organise your thoughts.</span>
+                        </div>
+                        <a href="../spaces/campus/student-resources.html" class="action-card">
+                            <i class="fas fa-wind ac-icon" style="color:#a78bfa;"></i>
+                            <span class="ac-title">Grounding Tool</span>
+                            <span class="ac-desc">No preparation. Just breathe.</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="footer-note fade-in">
+                    "Support doesn’t always look like a meeting.<br>
+                    <span style="color:var(--teal-glow);">Sometimes it looks like staying a little longer.</span>"
+                </div>
+
+            </div>
+
+            <script>
+                // --- BUTTON INTERACTION ---
+                function toggleRemind(btn) {
+                    if (btn.classList.contains('subscribed')) {
+                        btn.classList.remove('subscribed');
+                        btn.innerHTML = '<i class="far fa-bell"></i> Remind me gently';
+                    } else {
+                        btn.classList.add('subscribed');
+                        btn.innerHTML = '<i class="fas fa-check"></i> We\'ll whisper';
+                    }
                 }
-            });
-        });
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-    </script>
+
+                // --- AUDIO ---
+                const audio = document.getElementById('bgAudio');
+                let playing = false;
+                function toggleAudio() {
+                    if (playing) {
+                        audio.pause();
+                        document.getElementById('audioText').innerText = "Ambience";
+                    } else {
+                        audio.volume = 0.3;
+                        audio.play();
+                        document.getElementById('audioText').innerText = "Pause";
+                    }
+                    playing = !playing;
+                }
+
+                // --- FADE IN ---
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.opacity = 1;
+                            entry.target.style.transform = "translateY(0)";
+                        }
+                    });
+                });
+                document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+            </script>
 
 
 
-    <footer></footer>
+        </main>
+        <footer></footer>
+    </div>
 
 
 

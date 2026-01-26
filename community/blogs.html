@@ -33,7 +33,8 @@
             /* Aligned with standard container */
             margin: 0 auto;
             /* Dynamic spacing respecting fixed header */
-            padding-top: calc(var(--shell-fixed-height, 100px) + 40px);
+            padding-top: 20px;
+            /* Reduced from calc() because #shell-content adds 140px */
             padding-bottom: 80px;
             padding-left: 20px;
             padding-right: 20px;
@@ -46,11 +47,10 @@
             z-index: 10;
         }
 
-        /* --- SIDEBAR --- */
         .sidebar {
             position: sticky;
             /* Dynamic stickiness below header */
-            top: calc(var(--shell-fixed-height, 100px) + 20px);
+            top: 120px;
             height: fit-content;
             background: rgba(30, 41, 59, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -146,6 +146,7 @@
             font-size: 3rem;
             margin-bottom: 10px;
             background: linear-gradient(to right, #fff, #fbbf24);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -241,6 +242,7 @@
             margin-bottom: 20px;
             display: -webkit-box;
             -webkit-line-clamp: 3;
+            line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -282,72 +284,80 @@
             }
         }
     </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
 </head>
 
 <body>
-    <!-- HEADER -->
-    <header></header>
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header></header>
+        </div>
 
-    <!-- PARTICLES BG -->
-    <div id="particles"
-        style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:-1;"></div>
+        <!-- PARTICLES BG -->
+        <div id="particles"
+            style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:-1;"></div>
 
-    <div class="blog-wrapper">
-        <!-- SIDEBAR -->
-        <aside class="sidebar fade-in">
-            <div class="search-box">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" id="searchInput" placeholder="Search stories...">
-            </div>
+        <main id="shell-content">
+            <div class="blog-wrapper">
+                <!-- SIDEBAR -->
+                <aside class="sidebar fade-in">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search stories...">
+                    </div>
 
-            <div class="filter-section">
-                <h4>Browse By</h4>
-                <button class="filter-opt active" onclick="setFilter('all', this)"><i class="fas fa-globe"></i> All
-                    Stories</button>
-            </div>
+                    <div class="filter-section">
+                        <h4>Browse By</h4>
+                        <button class="filter-opt active" onclick="setFilter('all', this)"><i class="fas fa-globe"></i>
+                            All
+                            Stories</button>
+                    </div>
 
-            <div class="filter-section">
-                <h4>By Author</h4>
-                <button class="filter-opt" onclick="setFilter('Psychologist', this)"><i class="fas fa-user-md"></i>
-                    Experts</button>
-                <button class="filter-opt" onclick="setFilter('Peer', this)"><i class="fas fa-user"></i> Peer
-                    Stories</button>
-            </div>
+                    <div class="filter-section">
+                        <h4>By Author</h4>
+                        <button class="filter-opt" onclick="setFilter('Psychologist', this)"><i
+                                class="fas fa-user-md"></i>
+                            Experts</button>
+                        <button class="filter-opt" onclick="setFilter('Peer', this)"><i class="fas fa-user"></i> Peer
+                            Stories</button>
+                    </div>
 
-            <div class="filter-section">
-                <h4>Topics</h4>
-                <button class="filter-opt" onclick="setFilter('Anxiety', this)"><i class="fas fa-wind"></i>
-                    Anxiety</button>
-                <button class="filter-opt" onclick="setFilter('Student Life', this)"><i
-                        class="fas fa-graduation-cap"></i> Student Life</button>
-                <button class="filter-opt" onclick="setFilter('Family', this)"><i class="fas fa-home"></i> Family
-                    Pressure</button>
-            </div>
-        </aside>
+                    <div class="filter-section">
+                        <h4>Topics</h4>
+                        <button class="filter-opt" onclick="setFilter('Anxiety', this)"><i class="fas fa-wind"></i>
+                            Anxiety</button>
+                        <button class="filter-opt" onclick="setFilter('Student Life', this)"><i
+                                class="fas fa-graduation-cap"></i> Student Life</button>
+                        <button class="filter-opt" onclick="setFilter('Family', this)"><i class="fas fa-home"></i>
+                            Family
+                            Pressure</button>
+                    </div>
+                </aside>
 
-        <!-- MAIN CONTENT -->
-        <main>
-            <div class="page-header fade-in">
-                <div>
-                    <h1>Soulamore Stories</h1>
-                    <p style="color:#94a3b8;">Lived experiences and expert guidance, unfiltered.</p>
-                </div>
-                <div class="sort-control">
-                    <select onchange="sortPosts(this.value)">
-                        <option value="newest">Newest First</option>
-                        <option value="popular">Most Read</option>
-                    </select>
-                </div>
-            </div>
+                <!-- MAIN CONTENT -->
+                <section class="blog-main">
+                    <div class="page-header fade-in">
+                        <div>
+                            <h1>Soulamore Stories</h1>
+                            <p style="color:#94a3b8;">Lived experiences and expert guidance, unfiltered.</p>
+                        </div>
+                        <div class="sort-control">
+                            <select onchange="sortPosts(this.value)">
+                                <option value="newest">Newest First</option>
+                                <option value="popular">Most Read</option>
+                            </select>
+                        </div>
+                    </div>
 
-            <div class="blog-grid" id="blogGrid">
-                <!-- Posts injected by JS -->
+                    <div class="blog-grid" id="blogGrid">
+                        <!-- Posts injected by JS -->
+                    </div>
+                </section>
             </div>
         </main>
-    </div>
 
-    <!-- FOOTER -->
-    <footer></footer>
+        <footer></footer>
+    </div>
 
     <script src="../assets/js/components.js"></script>
     <script type="module">
