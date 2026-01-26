@@ -23,10 +23,10 @@
     // 0.2 Performance: Only load iframe on Desktop
     const isDesktop = window.innerWidth > 900;
     // RESTORED IFRAME for "Live Site" preview
-    // Added pointer-events: none so users can't click inside the preview
+    // Removed pointer-events: none to allow scrolling/interaction inside the preview
     // Added timestamp to force refresh and bypass cache for the sticker fix
     const iframeHTML = isDesktop
-        ? `<iframe src="./index.html?v=${new Date().getTime()}" class="site-iframe" style="pointer-events: none;" title="App Preview"></iframe>`
+        ? `<iframe src="./index.html?v=${new Date().getTime()}" class="site-iframe" title="App Preview"></iframe>`
         : `<!-- Phone View Hidden on Mobile -->`;
 
     // 1. Create the Popup HTML Structure
@@ -115,6 +115,53 @@
                 .newsletter-input-group { flex-direction: column; }
                 #popupEmail, #btnPopupEmail { width: 100%; padding: 12px !important; }
             }
+
+            /* RIGHT VISUAL */
+            .popup-visual { 
+                background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(0,0,0,0) 50%); 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                position: relative; 
+                overflow: hidden; 
+                /* Padding to ensure phone doesn't touch edges */
+                padding: 20px;
+            }
+
+            .phone-frame { 
+                width: 260px; 
+                height: 520px; 
+                border: 8px solid #1e293b; 
+                border-radius: 30px; 
+                background: #000; 
+                position: relative; 
+                box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
+                overflow: hidden; 
+                transform: none; 
+            }
+
+            .notch { position: absolute; top:0; left:50%; transform:translateX(-50%); width:90px; height:18px; background:#1e293b; border-bottom-left-radius:10px; border-bottom-right-radius:10px; z-index:10; }
+            
+            .screen-content { 
+                width: 100%; 
+                height: 100%; 
+                background: #0f172a; 
+                /* Fix Scroll: Allow scrolling inside the phone screen */
+                overflow-y: auto; 
+                /* Hide scrollbar for cleaner look */
+                scrollbar-width: none; 
+                -ms-overflow-style: none;
+            }
+            .screen-content::-webkit-scrollbar { display: none; }
+
+            .site-iframe { 
+                width: 100%; 
+                height: 100%; 
+                border: none; 
+                opacity: 1; 
+                transition: opacity 0.5s ease; 
+                display: block;
+            }
         </style>
 
         <div class="popup-card">
@@ -139,10 +186,10 @@
 
                     <div style="margin-bottom: 15px; font-size:0.75rem; opacity:0.8; font-weight:600; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-family: 'Plus Jakarta Sans', sans-serif;">WHILE YOU WAIT:</div>
                     <div class="tool-links" style="display: flex; gap: 8px; margin-bottom: 25px; flex-wrap: wrap;">
-                        <a href="/get-help-now.html" class="tool-btn btn-crisis"><i class="fas fa-life-ring"></i> Get Help</a>
-                        <a href="/playground.html" class="tool-btn"><i class="fas fa-shapes"></i> Playground</a>
-                        <a href="/5-step-reset.html" class="tool-btn"><i class="fas fa-wind"></i> 5-Step Reset</a>
-                        <a href="/soulbot.html" class="tool-btn"><i class="fas fa-robot"></i> Soulbot</a>
+                        <a href="get-help-now.html" class="tool-btn btn-crisis"><i class="fas fa-life-ring"></i> Get Help</a>
+                        <a href="playground.html" class="tool-btn"><i class="fas fa-shapes"></i> Playground</a>
+                        <a href="5-step-reset.html" class="tool-btn"><i class="fas fa-wind"></i> 5-Step Reset</a>
+                        <a href="soulbot.html" class="tool-btn"><i class="fas fa-robot"></i> Soulbot</a>
                         <a href="https://www.instagram.com/soulamore_/" target="_blank" class="tool-btn"><i class="fab fa-instagram"></i> Instagram</a>
                     </div>
                 </div>
@@ -163,12 +210,12 @@
                 </div>
             </div>
 
-            <!-- RIGHT VISUAL -->
-            <div class="popup-visual" style="background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(0,0,0,0) 50%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-                <div class="phone-frame" style="width: 260px; height: 520px; border: 8px solid #1e293b; border-radius: 30px; background: #000; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.6); overflow: hidden; transform: translateY(10px);">
-                    <div class="notch" style="position: absolute; top:0; left:50%; transform:translateX(-50%); width:90px; height:18px; background:#1e293b; border-bottom-left-radius:10px; border-bottom-right-radius:10px; z-index:10;"></div>
-                    <div class="screen-content" style="width: 100%; height: 100%; overflow: hidden; background: #0f172a;">
-                       ${iframeHTML}
+            <!-- RIGHT VISUAL (Restored) -->
+            <div class="popup-visual">
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <div class="screen-content">
+                        ${iframeHTML}
                     </div>
                 </div>
             </div>

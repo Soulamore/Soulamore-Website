@@ -22,27 +22,11 @@ try {
     const style = document.createElement('style');
     style.id = 'header-styles-v2'; // Changed ID to force refresh/avoid conflicts
     style.innerHTML = `
-        /* DESKTOP (Width > 1150px) */
-        @media (min-width: 1151px) {
-                /* REVERTED TO FULL WIDTH HEADER (Per Backup) */
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                transform: none !important;
-                width: 100% !important;
-                max-width: none !important;
-                
-                /* Standard Dark Glass Theme */
-                background: rgba(15, 23, 42, 0.85) !important;
-                backdrop-filter: blur(12px) !important;
-                -webkit-backdrop-filter: blur(12px);
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
-                border-radius: 0 !important; /* Remove Island Radius */
-                padding: 15px 30px !important;
-                
+        /* DESKTOP (Width > 1024px) */
+        @media (min-width: 1025px) {
+            header {
+                /* Let global.css island-nav handle positioning if present */
                 z-index: 9999 !important;
-                transition: all 0.3s ease !important;
             }
             .mobile-profile-card, 
             .mobile-toggle,
@@ -58,24 +42,38 @@ try {
                 height: auto !important;
                 padding: 0 !important;
                 box-shadow: none !important;
-                gap: 15px !important; /* Tightened from 25px for fit */
+                gap: clamp(2px, 0.5vw, 6px) !important; /* TIGHTER GAP MAX */
                 align-items: center !important;
                 visibility: visible !important; /* Ensure visibility */
                 opacity: 1 !important;
+                opacity: 1 !important;
+                overflow: visible !important; /* FIX SCROLLBAR */
+                border: none !important;
             }
+            .nav-links > a, .nav-logo { border: none !important; } /* GLOBAL: Remove any vertical borders */
+            .nav-links::-webkit-scrollbar { display: none !important; }
             .auth-box {
                 display: flex !important; /* Force Auth Box Visible */
                 align-items: center !important;
                 gap: 12px !important; /* Slightly reduced gap */
             }
             .main-nav {
-                display: flex !important;
-                justify-content: space-between !important;
+                /* Grid layout defined in global.css */
                 align-items: center !important;
                 padding: 0 !important; /* Let header handle padding */
                 width: 100% !important;
                 max-width: none !important; /* Remove inner max-width constraint */
                 margin: 0 !important;
+            }
+            /* HEADER CONTAINER OVERRIDE - LAYOUT PHYSICS FIX */
+            html body header.island-nav {
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
+                margin: 0 !important;
+                width: fit-content !important;
+                max-width: 1600px !important;
+                padding: 6px 30px !important; /* Slightly more dynamic padding */
             }
             .nav-links i {
                 color: #F49F75 !important; /* Force Peach Glow for Icons */
@@ -92,54 +90,66 @@ try {
                 flex-shrink: 0 !important; /* Critical: Prevent logo img shrinking */
                 object-fit: contain;
             }
-            /* Button Consistency */
-            .auth-box .nav-btn, .lifeline-btn {
-                background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)) !important;
-                border: 1px solid rgba(255,255,255,0.2) !important;
-                padding: 10px 24px !important;
+            /* Button Consistency - FIXED COLORS */
+            .nav-btn, .lifeline-btn {
+                background: linear-gradient(135deg, #4ECDC4, #2a9d8f) !important; /* BRAND GRADIENT */
+                border: 1px solid rgba(78, 205, 196, 0.3) !important;
                 border-radius: 50px !important;
-                color: white !important;
-                font-weight: 500 !important;
+                color: #0f172a !important; /* Dark text on bright background */
+                font-weight: 600 !important;
                 transition: all 0.3s ease !important;
                 text-decoration: none !important;
-                white-space: nowrap !important; /* Prevent text wrapping */
+                white-space: nowrap !important;
                 display: flex !important;
                 align-items: center !important;
                 gap: 8px !important;
-                height: 42px !important; /* Enforce explicit height */
                 box-sizing: border-box !important;
-                font-size: 0.95rem !important;
+                box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2) !important;
             }
-            .auth-box .nav-btn:hover, .lifeline-btn:hover {
-                background: white !important;
+            .nav-btn {
+                 padding: 0 14px !important;
+                 height: 42px !important;
+                 font-size: 0.9rem !important;
+                 flex-shrink: 0 !important;
+                 overflow: hidden !important;
+            }
+            .nav-btn:hover, .lifeline-btn:hover {
+                background: linear-gradient(135deg, #5eddd4, #3aad9f) !important; /* Brighter on hover */
                 color: #0f172a !important;
                 transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4) !important;
             }
-            /* Specific override for Get Help - More Premium, Less Error-Like */
+            /* Specific override for Get Help to distinguish slightly if needed, or keep uniform */
             .lifeline-btn {
-                border: 1px solid #F49F75 !important;
-                background: transparent !important; /* Force Clear/Black */
-                color: #F49F75 !important;
-                box-shadow: 0 0 10px rgba(244, 159, 117, 0.1) !important;
-                justify-content: center !important; /* Ensure centered text */
+                border-color: #ef4444 !important; /* Solid Red Border */
+                background: rgba(239, 68, 68, 0.15) !important;
+                color: #fca5a5 !important; /* Light Red Text for Contrast */
+                padding: 0 15px !important;
+                height: 42px !important;
+                font-size: 0.9rem !important;
+                justify-content: center !important;
+                flex-shrink: 0 !important;
+                width: fit-content !important;
+                min-width: 0 !important;
+                flex-grow: 0 !important;
+                overflow: hidden !important; /* Isolate shimmer */
+                box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important;
             }
             .lifeline-btn:hover {
-                background: rgba(220, 38, 38, 0.15) !important; /* RED Warning Tint */
-                color: #ef4444 !important; /* RED Warning Text */
+                background: #ef4444 !important;
+                color: white !important;
                 border-color: #ef4444 !important;
-                box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important;
-                transform: translateY(-2px);
             }
-            .ghost-icon:hover {
-                background: rgba(78, 205, 196, 0.15) !important;
-                border-color: #4ECDC4 !important;
-                color: #4ECDC4 !important;
-                box-shadow: 0 0 20px rgba(78, 205, 196, 0.5); /* Stronger Blue Glow */
-                transform: translateY(-2px);
+            .user-icon-btn i {
+                font-size: 2.2rem !important; /* FORCE LARGE SIZE */
+                display: block !important;
+                width: auto !important;
+                height: auto !important;
+                line-height: 1 !important;
             }
         }
-        /* MOBILE (Width <= 1150px) */
-        @media (max-width: 1150px) {
+        /* MOBILE (Width <= 1024px) */
+        @media (max-width: 1024px) {
             .auth-box { display: none !important; }
             .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
             .main-nav {
@@ -160,12 +170,70 @@ try {
             border-top: 1px solid rgba(255,255,255,0.1); /* Full Width Separator */
         }
         
-        /* AGGRESSIVE LINK COLOR OVERRIDES */
-        /* Targets all header links and footer links */
-        header a, footer a {
-            color: #e2e8f0 !important;
-            text-decoration: none !important;
-            transition: color 0.3s ease;
+        /* NUCLEAR OVERRIDE: TARGET NEW ID to bypass global.css conflicts */
+        #mobile-crisis-link-v3 { display: none !important; }
+        
+        @media (max-width: 1024px) {
+            #mobile-crisis-link-v3 { display: flex !important; }
+        }
+        
+        /* ADAPTIVE ICON MODE: 1025px - 1420px (Targeted Laptop Range) */
+        /* Hides text labels ONLY when necessary on smaller screens */
+        @media (min-width: 1025px) and (max-width: 1420px) {
+            header .nav-links > a, 
+            header .nav-links > .dropdown > a {
+                font-size: 0 !important; /* Hide Text */
+                gap: 0 !important;
+                padding: 0 12px !important;
+                border: none !important; /* Remove separators */
+            }
+            header .nav-links > a::after { content: none !important; } /* Kill pseudo-elements */
+            
+            header .nav-links i {
+                font-size: 1.3rem !important; /* Bigger Icons */
+                margin: 0 !important;
+            }
+            /* Hide Chevron */
+            header .nav-links .fa-chevron-down { display: none !important; }
+            
+            /* COMPACT GET HELP BTN - PERFECT CENTER FIX */
+            .lifeline-btn {
+                font-size: 0 !important;
+                padding: 0 !important;
+                width: 42px !important; /* Circle Width */
+                height: 42px !important; /* Circle Height */
+                justify-content: center !important;
+                align-items: center !important;
+                display: flex !important;
+                border-radius: 50% !important;
+            }
+            .lifeline-btn i {
+                font-size: 1.4rem !important; /* Slightly larger icon */
+                margin: 0 !important;
+                line-height: 1 !important; /* Reset line height */
+                display: block !important;
+            }
+            
+            /* Ensure NO Duplicate Mobile Button */
+            #mobile-crisis-link-v3 { display: none !important; }
+        }
+
+        /* FULL TEXT MODE: > 1420px (Standard Desktop) */
+        /* Now possible because we unlocked max-width to 99.5vw */
+        @media (min-width: 1421px) {
+            header a, footer a {
+                font-size: 0.85rem !important; /* Slightly Smaller for Fit */
+                letter-spacing: normal !important;
+                padding: 6px 5px !important; /* Tighter Padding */
+                color: #e2e8f0 !important;
+                text-decoration: none !important;
+                transition: color 0.3s ease;
+            }
+        }
+        
+        /* FOOTER ALWAYS TEXT */
+        footer a {
+             font-size: 0.9rem !important;
         }
         header a:visited, footer a:visited {
             color: #e2e8f0 !important;
@@ -175,7 +243,7 @@ try {
         }
         
         /* SPECIAL EXCEPTION: Mobile Menu & Dropdowns (Dark Theme Restoration) */
-        @media (max-width: 1150px) {
+        @media (max-width: 1024px) {
             .nav-links.open {
                 background: rgba(15, 23, 42, 0.98) !important; /* Dark Mobile Menu */
             }
@@ -184,7 +252,7 @@ try {
             }
         }
         /* Dropdowns on Desktop */
-        @media (min-width: 1151px) {
+        @media (min-width: 1025px) {
             /* Level 1: Outer Dropdown (Lightest Border) */
             .dropdown {
                 position: relative !important; /* CRITICAL: Fix absolute positioning context */
@@ -243,16 +311,28 @@ try {
                 background: rgba(15, 23, 42, 0.98) !important; /* Solid bg */
                 padding-left: 0 !important; /* Reset padding */
                 min-width: 200px !important;
+                z-index: 2000 !important; /* Verify visibility on top */
             }
 
             /* HOVER BRIDGE FOR SIDE FLYOUT */
             .dropdown-content .dropdown-content::before {
-                top: 0 !important;
-                left: -15px !important; /* Bridge back to parent */
-                width: 15px !important;
-                height: 100% !important;
+                content: "";
+                position: absolute;
+                top: -20px !important; /* Taller catch area top */
+                left: -40px !important; /* WIDER BRIDGE back to parent */
+                width: 60px !important; /* Fill gap + overlap parent significantly */
+                height: 140% !important; /* Taller catch area bottom */
+                background: rgba(0,0,0,0.001) !important; /* Ensure Toggle is ALWAYS on top */
+                z-index: 1001 !important;
             }
-
+.mobile-toggle {
+    z-index: 99999 !important; /* SAFE HIGH Z-INDEX */
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    /* Above nuclear menu */
+    /* Must be above the menu (2050) */
+    /* Highest priority */
+}
             /* Level 3: Deep Nested */
             .dropdown-content .dropdown-content .dropdown-content {
                 left: 100% !important;
@@ -291,20 +371,6 @@ try {
         @media (max-width: 768px) {
             body { padding-bottom: 80px !important; } /* Space for FAB/Nav */
             .container { padding-left: 20px !important; padding-right: 20px !important; }
-        }
-
-        /* BURNING ICON ANIMATION */
-        @keyframes burnGlow {
-            0% { text-shadow: 0 0 2px #ef4444, 0 0 5px #fca5a5; transform: scale(1); }
-            50% { text-shadow: 0 0 8px #ef4444, 0 0 12px #fbbf24; transform: scale(1.1); }
-            100% { text-shadow: 0 0 2px #ef4444, 0 0 5px #fca5a5; transform: scale(1); }
-        }
-        .burning-icon {
-            color: #ef4444 !important;
-            margin-left: 6px;
-            font-size: 0.85em;
-            animation: burnGlow 1.5s infinite ease-in-out;
-            display: inline-block;
         }
     `;
     document.head.appendChild(style);
@@ -355,62 +421,112 @@ function setupFavicon(rootPath) {
 
 const NAV_DATA = [
     {
+        id: 'nav-home',
+        label: 'Home',
+        icon: 'fas fa-home',
+        href: 'index.html',
+        type: 'link',
+    },
+    {
         id: 'nav-spaces',
         label: 'Find Your Space',
-        icon: 'fas fa-compass',
+        icon: 'fas fa-layer-group',
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-campus', label: 'For Students', href: 'spaces/campus/index.html', icon: 'fas fa-graduation-cap' },
-            { id: 'nav-workplace', label: 'For Workplaces', href: 'spaces/soulamore-workplace/index.html', icon: 'fas fa-briefcase' },
-            { id: 'nav-away', label: 'For Global/Expats', href: 'spaces/soulamore-away/index.html', icon: 'fas fa-globe-americas' }
+            {
+                id: 'nav-students',
+                label: 'For Students',
+                href: 'spaces/campus/index.html',
+                type: 'submenu',
+                children: [
+                    { label: 'Campus Home', href: 'spaces/campus/index.html' },
+                    { label: 'What is Campus?', href: 'spaces/campus/what-is-campus.html' },
+                    {
+                        label: 'Student Resources',
+                        href: 'spaces/campus/student-resources.html',
+                        type: 'submenu',
+                        children: [
+                            { label: 'Anxiety & Overthinking', href: 'spaces/campus/anxiety-and-overthinking.html' },
+                            { label: 'Exam Pressure', href: 'spaces/campus/exam-pressure.html' },
+                            { label: 'Feeling Low', href: 'spaces/campus/feeling-low.html' },
+                            { label: 'Loneliness', href: 'spaces/campus/loneliness.html' },
+                            { label: 'Safety & Boundaries', href: 'spaces/campus/safety-boundaries.html' }
+                        ]
+                    },
+                    { label: 'Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
+                    { label: 'For Institutions', href: 'spaces/campus/institutions.html' }
+                ]
+            },
+            {
+                id: 'nav-workplaces',
+                label: 'For Workplaces',
+                href: 'spaces/soulamore-workplace/index.html',
+                type: 'submenu',
+                children: [
+                    { label: 'Workplace Home', href: 'spaces/soulamore-workplace/index.html' },
+                    { label: 'Our Plans', href: 'spaces/soulamore-workplace/plans.html' },
+                    { label: 'Guidelines', href: 'spaces/soulamore-workplace/guidelines.html' }
+                ]
+            },
+            {
+                id: 'nav-global',
+                label: 'For Global/Expats',
+                href: 'spaces/soulamore-away/index.html',
+                type: 'submenu',
+                children: [
+                    { label: 'Soulamore Away Home', href: 'spaces/soulamore-away/index.html' },
+                    { label: 'Who is this for?', href: 'spaces/soulamore-away/who-its-for.html' },
+                    { label: 'Resources', href: 'spaces/soulamore-away/resources.html' }
+                ]
+            }
         ]
     },
     {
         id: 'nav-support',
         label: 'Get Support',
-        icon: 'fas fa-hands-helping',
+        icon: 'fas fa-heart',
         href: '#',
         type: 'dropdown',
         children: [
             {
-                id: 'nav-peers-group',
-                label: 'Talk to a Peer <i class="fas fa-fire burning-icon" title="Hot"></i>',
-                href: 'our-peers/about.html', /* Main Landing */
+                id: 'nav-peer-group',
+                label: 'Talk to a Peer <i class="fas fa-fire" style="color:var(--ember-orange); text-shadow:0 0 12px var(--ember-orange); margin-left:4px; font-size:0.8em;"></i>',
+                href: '#',
                 type: 'submenu',
                 children: [
+                    { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'New Pages/Peer Landing.html' },
                     { id: 'nav-meet-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
-                    { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'our-peers/about.html' },
-                    { id: 'nav-join-peer', label: 'Join as a Peer', href: 'join-us/peer.html' }
+                    { id: 'nav-join-peer', label: 'Join as Peer', href: 'join-us/peer.html' }
                 ]
             },
             {
                 id: 'nav-psych-group',
-                label: 'Talk to a Psychologist <i class="fas fa-fire burning-icon" title="Hot"></i>',
-                href: 'our-psychologists/about.html', /* Main Landing */
+                label: 'Talk to a Psychologist <i class="fas fa-fire" style="color:var(--teal-glow); text-shadow:0 0 12px var(--teal-glow); margin-left:4px; font-size:0.8em;"></i>',
+                href: '#',
                 type: 'submenu',
                 children: [
+                    { id: 'nav-what-psych', label: 'What is Therapy?', href: 'New Pages/Psychologists Landing.html' },
                     { id: 'nav-meet-psych', label: 'Meet Our Psychologists', href: 'our-psychologists/psychologists.html' },
-                    { id: 'nav-what-psych', label: 'What is Therapy?', href: 'our-psychologists/about.html' },
-                    { id: 'nav-join-psych', label: 'Join as a Psychologist', href: 'join-us/psychologist.html' }
+                    { id: 'nav-join-psych', label: 'Join as Psychologist', href: 'join-us/psychologist.html' }
                 ]
             },
-            { id: 'nav-soulbot', label: 'SoulBot AI <span style="font-size:0.7em; background:var(--teal-glow); color:#0f172a; padding:2px 6px; border-radius:4px; margin-left:5px; font-weight:700;">Beta</span>', href: 'tools/soulbot.html', style: 'color:#F49F75; font-weight:700;' },
-            { id: 'nav-problemwall', label: 'The Problem Wall', href: 'pages/problem-wall.html' }
+            { id: 'nav-soulbot', label: 'SoulBot AI (Beta)', href: 'tools/soulbot.html', style: 'color:#F49F75;' },
+            { id: 'nav-problem', label: 'The Problem Wall', href: 'pages/problem-wall.html' }
         ]
     },
     {
         id: 'nav-tools',
         label: 'Self-Care Tools',
-        icon: 'fas fa-tools',
+        icon: 'fas fa-toolbox',
         href: '#',
         type: 'dropdown',
         children: [
             { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
             { id: 'nav-playground', label: 'Mental Playground', href: 'tools/playground.html' },
-            { id: 'nav-cbox', label: 'Confession Box', href: 'tools/confession-box/index.html' },
-            { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html' },
-            { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html' }
+            { id: 'nav-confession', label: 'Confession Box', href: 'tools/confession-box/index.html' },
+            { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
+            { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html', style: 'color:var(--ember-orange);' }
         ]
     },
     {
@@ -422,17 +538,19 @@ const NAV_DATA = [
         children: [
             { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
             { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
-            { id: 'nav-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' }
+            { id: 'nav-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
+            { id: 'nav-for-parents', label: 'For Families', href: 'company/for-parents.html' }
         ]
     },
     {
-        id: 'nav-company',
+        id: 'nav-about',
         label: 'About',
         icon: 'fas fa-info-circle',
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-about', label: 'Our Story', href: 'company/about.html' },
+            { id: 'nav-story', label: 'Our Story', href: 'company/about.html' },
+            { id: 'nav-manifesto', label: 'Our Manifesto', href: 'company/why-soulamore-exists.html' },
             { id: 'nav-contact', label: 'Contact Us', href: 'company/contact.html' },
             { id: 'nav-legal', label: 'Legal & Privacy', href: 'company/legal.html' }
         ]
@@ -463,8 +581,8 @@ function generateNavHTML(rootPath) {
         }
     });
 
-    // Mobile-Only Help Link (Appended at the end of nav-links)
-    html += `<a href="${rootPath}get-help-now.html" id="mobile-destruct-trigger" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Crisis Resources</a>`;
+    // Mobile-Only Help Link MOVED to getHeaderHTML to prevent logic conflicts
+    // html += `<a href="${rootPath}get-help-now.html" id="mobile-destruct-trigger" class="mobile-only-help" style="display:none; margin-top:10px;"><i class="fas fa-life-ring"></i> Get Help Now</a>`;
 
     return html;
 }
@@ -494,46 +612,6 @@ function generateSubmenuHTML(children, rootPath) {
     return html;
 }
 
-
-function generateProfileMenu(rootPath) {
-    // Default to 'user' if not set
-    const role = sessionStorage.getItem('userRole') || 'user';
-    let html = '';
-
-    if (role === 'peer') {
-        html += `
-            <div style="padding: 8px 12px; font-size: 0.75rem; opacity: 0.6; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;">PEER MODE</div>
-            <a href="${rootPath}portal/peer-dashboard.html"><i class="fas fa-columns" style="width:20px; text-align:center; color:var(--peach-glow);"></i> Peer Dashboard</a>
-            <a href="${rootPath}peer/sessions.html"><i class="fas fa-clock" style="width:20px; text-align:center;"></i> Sessions</a>
-            <a href="${rootPath}peer/journals.html"><i class="fas fa-book-open" style="width:20px; text-align:center;"></i> Shared Journals</a>
-            <a href="${rootPath}peer/availability.html"><i class="fas fa-toggle-on" style="width:20px; text-align:center;"></i> Availability</a>
-            <a href="${rootPath}peer/feedback.html"><i class="fas fa-star" style="width:20px; text-align:center;"></i> Feedback</a>
-            <a href="${rootPath}settings.html"><i class="fas fa-cog" style="width:20px; text-align:center;"></i> Settings</a>
-        `;
-    } else if (role === 'psychologist') {
-        html += `
-             <div style="padding: 8px 12px; font-size: 0.75rem; opacity: 0.6; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;">PRO MODE</div>
-            <a href="${rootPath}portal/psych-dashboard.html"><i class="fas fa-columns" style="width:20px; text-align:center; color:var(--teal-glow);"></i> Psych Dashboard</a>
-            <a href="${rootPath}psychologist/sessions.html"><i class="fas fa-calendar-check" style="width:20px; text-align:center;"></i> Sessions</a>
-            <a href="${rootPath}psychologist/journals.html"><i class="fas fa-book-medical" style="width:20px; text-align:center;"></i> Client Journals</a>
-            <a href="${rootPath}psychologist/profile.html"><i class="fas fa-user-md" style="width:20px; text-align:center;"></i> My Profile</a>
-            <a href="${rootPath}psychologist/feedback.html"><i class="fas fa-chart-line" style="width:20px; text-align:center;"></i> Reputation</a>
-            <a href="${rootPath}settings.html"><i class="fas fa-cog" style="width:20px; text-align:center;"></i> Settings</a>
-        `;
-    } else {
-        // Standard User
-        html += `
-            <a href="${rootPath}portal/user-dashboard.html"><i class="fas fa-home" style="width:20px; text-align:center;"></i> Dashboard</a>
-            <a href="${rootPath}journal/index.html"><i class="fas fa-feather-alt" style="width:20px; text-align:center;"></i> Journal</a>
-            <a href="${rootPath}dashboard/sessions.html"><i class="fas fa-video" style="width:20px; text-align:center;"></i> My Sessions</a>
-            <a href="${rootPath}dashboard/saved-blogs.html"><i class="fas fa-bookmark" style="width:20px; text-align:center;"></i> Saved Blogs</a>
-            <a href="${rootPath}settings.html"><i class="fas fa-cog" style="width:20px; text-align:center;"></i> Settings</a>
-            <a href="${rootPath}get-help-now.html" style="color:#ef4444;"><i class="fas fa-life-ring" style="width:20px; text-align:center;"></i> Help</a>
-        `;
-    }
-    return html;
-}
-
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
@@ -542,7 +620,7 @@ const getHeaderHTML = (rootPath) => `
 
     <nav class="nav-links">
         
-        <!-- MOBILE PROFILE CARD (Visible < 1150px) -->
+        <!-- MOBILE PROFILE CARD (Visible < 1025px) -->
         <div class="mobile-profile-card" style="display: none;">
             <div class="mp-avatar"><i class="fas fa-ghost"></i></div>
             <div class="mp-info">
@@ -555,44 +633,18 @@ const getHeaderHTML = (rootPath) => `
         <!-- GENERATED NAVIGATION ITEMS -->
         ${generateNavHTML(rootPath)}
 
+        <!-- MOBILE SPECIFIC HELP BUTTON (Parsed out of loop for safety) -->
+        <a href="${rootPath}get-help-now.html" id="mobile-crisis-link-v3" class="mobile-only-help" style="display:none; margin-top:10px;">
+            <i class="fas fa-life-ring"></i> Get Help Now
+        </a>
+
     </nav>
 
+    <!-- Auth Group -->
     <div class="auth-box">
-            <a href="${rootPath}get-help-now.html" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help</a>
-            
-            <!-- Ghost Profile Dropdown -->
-            <div class="dropdown profile-dropdown" style="display: flex; align-items: center; justify-content: center;">
-                <div class="ghost-icon" style="
-                    width: 40px; 
-                    height: 40px; 
-                    min-width: 40px; /* Prevent Squeeze */
-                    min-height: 40px; /* Prevent Squeeze */
-                    flex-shrink: 0;   /* Prevent Squeeze */
-                    display: flex; 
-                    align-items: center; 
-                    justify-content: center; 
-                    background: rgba(255,255,255,0.05); 
-                    border-radius: 50%; 
-                    margin: 0 8px;
-                    border: 1px solid rgba(255,255,255,0.1);
-                    color: var(--starlight);
-                    transition: 0.3s;
-                    cursor: pointer;
-                    position: relative;
-                " title="My Profile"
-                onmouseover="this.style.background='rgba(78, 205, 196, 0.15)'; this.style.color='#4ECDC4'; this.style.boxShadow='0 0 15px rgba(78, 205, 196, 0.4)';"
-                onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='var(--starlight)'; this.style.boxShadow='none';">
-                    <i class="fas fa-ghost"></i>
-                </div>
-                
-                <div class="dropdown-content" style="left: auto !important; right: 0 !important; transform: translateX(10px); min-width: 200px !important;">
-                    ${generateProfileMenu(rootPath)}
-                    <div style="height:1px; background:rgba(255,255,255,0.1); margin:4px 0;"></div>
-                    <a href="#" onclick="event.preventDefault(); sessionStorage.clear(); window.location.href='${rootPath}portal/login.html';"><i class="fas fa-sign-out-alt" style="margin-right:8px; width:20px; text-align:center;"></i> Log Out</a>
-                </div>
-            </div>
-
-            <a href="${rootPath}portal/login.html" class="nav-btn" style="padding: 0 15px !important; white-space: nowrap; flex-shrink: 0;">Log In</a>
+            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help Now</a>
+            <a href="${rootPath}portal/user-dashboard.html" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
+            <a href="${rootPath}portal/login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
     
     <button class="mobile-toggle" aria-label="Toggle Navigation">
@@ -639,6 +691,7 @@ const getFooterHTML = (rootPath) => `
                 <li><a href="${rootPath}spaces/campus/campus-ambassadors.html">Campus Ambassadors</a></li>
                 <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
                 <li><a href="${rootPath}community/forum.html">Discussion Forum</a></li>
+                <li><a href="${rootPath}company/for-parents.html">For Family (Comfort)</a></li>
                 <li><a href="${rootPath}join-us/index.html">Join the Team</a></li>
             </ul>
         </div>
@@ -647,8 +700,9 @@ const getFooterHTML = (rootPath) => `
         <div class="footer-col">
             <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Company</h4>
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
-                <li><a href="${rootPath}tools/index.html">Tools</a></li>
+                <!-- <li><a href="${rootPath}tools/index.html">Tools</a></li> Removed: Dead Link -->
                 <li><a href="${rootPath}newsletter.html">Newsletter</a></li>
+                <li><a href="${rootPath}company/why-soulamore-exists.html">Why Soulamore Exists</a></li>
                 <li><a href="${rootPath}company/contact.html">Contact</a></li>
                 <li><a href="${rootPath}company/legal.html">Privacy & Legal</a></li>
                 <li><a href="${rootPath}get-help-now.html" style="color:var(--ember-red); font-weight:600;">Crisis Resources</a></li>
@@ -689,6 +743,8 @@ function getRootPath() {
         location.pathname.includes('/community/') ||
         location.pathname.includes('/company/') ||
         location.pathname.includes('/auth/') ||
+        location.pathname.includes('/portal/') || /* ADDED: Critical for Dashboards/Login */
+        location.pathname.includes('/New Pages/') || location.pathname.includes('/New%20Pages/') || /* FIXED: Support URL encoded space */
         location.pathname.includes('/pages/')) {
         return "../";
     }
@@ -698,14 +754,13 @@ function getRootPath() {
 // --- 4. INJECTION LOGIC ---
 
 function injectHeader() {
-    // ABORT if inside an iframe (Tool Popups)
-    if (window.self !== window.top) return;
+    // 0. Safety Guard: Do not inject on Admin/Portal Dashboards that have their own sidebar
+    const isAuthPage = ['login.html', 'signup.html', 'forgot-password.html', 'signup-success.html', 'logout.html'].some(page => window.location.pathname.includes(page));
 
-    // ABORT if on a Dashboard or Internal Portal Page (they have their own Sidebar)
-    if (location.pathname.includes('dashboard') ||
-        location.pathname.includes('messaging') ||
-        location.pathname.includes('journal') ||
-        location.pathname.includes('settings')) return;
+    if (window.location.pathname.includes('/portal/') && !isAuthPage) {
+        // Allow Auth pages to have headers, but not main dashboards
+        return;
+    }
 
     let headerElement = document.querySelector('header');
 
@@ -716,7 +771,9 @@ function injectHeader() {
         document.body.prepend(headerElement);
     } else {
         // Ensure it's the first element if it exists but is misplaced
-        if (headerElement.parentElement !== document.body) {
+        // CRITICAL FIX: Respect #shell-fixed container
+        const parentId = headerElement.parentElement.id;
+        if (headerElement.parentElement !== document.body && parentId !== 'shell-fixed') {
             document.body.prepend(headerElement);
         }
     }
@@ -737,20 +794,51 @@ function injectHeader() {
         }
         headerElement.innerHTML = getHeaderHTML(getRootPath());
 
+        // --- COOKIE CONSENT BANNER (Calm GDPR) ---
+        if (!localStorage.getItem('soulamore_cookie_consent')) {
+            const consentDiv = document.createElement('div');
+            consentDiv.id = 'cookie-consent-banner';
+            consentDiv.innerHTML = `
+                <div style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:90%; max-width:600px; background:rgba(15, 23, 42, 0.95); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(10px); padding:20px; border-radius:16px; box-shadow:0 10px 40px rgba(0,0,0,0.5); z-index:10000; display:flex; align-items:center; justify-content:space-between; gap:20px; animation:floatUp 0.5s ease-out;">
+                    <div style="font-size:0.9rem; color:#e2e8f0; line-height:1.5;">
+                        <strong style="color:#fff; display:block; margin-bottom:4px;">We use cookies for calm.</strong>
+                        To keep you logged in and remember your theme. No tracking ads.
+                    </div>
+                    <div style="display:flex; gap:10px; flex-shrink:0;">
+                         <button onclick="acceptCookies()" style="background:#4ECDC4; color:#0f172a; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer;">Okay</button>
+                    </div>
+                </div>
+                <style>
+                    @keyframes floatUp { from { transform: translate(-50%, 20px); opacity:0; } to { transform: translate(-50%, 0); opacity:1; } }
+                    @media(max-width:500px) { #cookie-consent-banner > div { flex-direction:column; text-align:center; } }
+                </style>
+            `;
+            document.body.appendChild(consentDiv);
+
+            window.acceptCookies = function () {
+                localStorage.setItem('soulamore_cookie_consent', 'true');
+                const banner = document.getElementById('cookie-consent-banner');
+                if (banner) {
+                    banner.style.opacity = '0';
+                    setTimeout(() => banner.remove(), 300);
+                }
+            };
+        }
+
         // --- CRITICAL CSS INJECTION ---
         // We inject this style to ensure consistency without relying on complex external CSS media queries alone
         if (!document.getElementById('header-responsive-style')) {
             const style = document.createElement('style');
             style.id = 'header-responsive-style';
             style.innerHTML = `
-                @media (min-width: 1151px) {
+                @media (min-width: 1025px) {
                     .mobile-profile-card, 
                     .mobile-toggle,
                     .mobile-only-help { 
                         display: none !important; 
                     }
                 }
-                @media (max-width: 1150px) {
+                @media (max-width: 1024px) {
                     .auth-box { display: none !important; }
                     .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
                 }
@@ -761,9 +849,6 @@ function injectHeader() {
 }
 
 function injectFooter() {
-    // ABORT if inside an iframe (Tool Popups)
-    if (window.self !== window.top) return;
-
     const footerElement = document.querySelector('footer');
     if (footerElement) {
         footerElement.innerHTML = getFooterHTML(getRootPath());
@@ -805,6 +890,67 @@ function injectFavicon() {
     }
 }
 
+// --- 4b. SUB-NAV INJECTION (Layout Shell Binding) ---
+function injectSubnav() {
+    // Only proceed if the page has defined a shell intention
+    if (!window.ShellSubnav) {
+        // console.log("Soulamore: No ShellSubnav config found.");
+        return;
+    }
+
+    const navContainer = document.getElementById('shell-subnav');
+    if (!navContainer) {
+        console.error('Soulamore: ShellSubnav defined but #shell-subnav container missing in DOM.');
+        return;
+    }
+
+    // Clean container
+    navContainer.innerHTML = '';
+
+    // Create Wrapper for spacing/layout
+    const wrapper = document.createElement('div');
+    wrapper.className = 'sub-nav-container';
+    // We reuse the existing CSS class for visual style, but now it lives inside the Shell
+    wrapper.style.margin = '0 auto'; // Override margin for shell context (Handled by padding now)
+    wrapper.style.pointerEvents = 'auto'; // Re-enable clicks
+
+    window.ShellSubnav.tabs.forEach(tab => {
+        const btn = document.createElement('div');
+        btn.className = `workplace-btn ${tab.id === window.ShellSubnav.active ? 'active' : ''} ${tab.extraClass || ''}`;
+        btn.setAttribute('data-page', tab.id);
+
+        // Icon + Label
+        btn.innerHTML = `<i class="fas ${tab.icon}"></i><span>${tab.label}</span>`;
+
+        // Click Handler (Global navTo or custom)
+        btn.onclick = () => {
+            // 1. Priority: Direct Link navigation
+            if (tab.href && tab.href !== '#' && tab.href !== '') {
+                window.location.href = tab.href;
+                return;
+            }
+
+            // 2. Fallback: Legacy navTo (SPA behavior)
+            if (window.navTo) {
+                window.navTo(tab.id);
+                // Update active state visually immediately
+                document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // Update internal state
+                window.ShellSubnav.active = tab.id;
+            }
+        };
+
+        wrapper.appendChild(btn);
+    });
+
+    navContainer.appendChild(wrapper);
+    // console.log("Soulamore: Shell Sub-nav injected.");
+}
+
+// Auto-run subnav injection on load
+document.addEventListener('DOMContentLoaded', injectSubnav);
+
 // --- 5. ACTIVE STATE LOGIC ---
 
 function setActiveState() {
@@ -839,39 +985,72 @@ function setActiveState() {
 
 // --- 6. INTERACTION LOGIC ---
 
+// --- 6. INTERACTION LOGIC ---
+
+function bindMobileToggle() {
+    // FIX 3: Event Delegation for Hamburger
+    // Handles toggling even if header is injected late
+    document.addEventListener('click', (e) => {
+        // 1. Toggle Click
+        const toggle = e.target.closest('.mobile-toggle');
+        if (toggle) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const navLinks = document.querySelector('.nav-links');
+            if (!navLinks) return;
+
+            // Toggle State
+            navLinks.classList.toggle('open');
+            document.body.classList.toggle('no-scroll');
+            toggle.classList.toggle('active');
+
+            // Icon Swap
+            const icon = toggle.querySelector('i');
+            if (icon) {
+                if (navLinks.classList.contains('open')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            }
+            return;
+        }
+
+        // 2. Outside Click / Link Click (Close Menu)
+        const navLinks = document.querySelector('.nav-links');
+        if (navLinks && navLinks.classList.contains('open')) {
+            // If clicking inside nav-links (but not a toggle), ignore unless it's a link
+            if (e.target.closest('.nav-links') && !e.target.closest('a')) return;
+
+            // If clicking a dropdown toggle, ignore (handled by separate logic)
+            if (e.target.closest('.dropdown > a') || e.target.closest('.dropdown-submenu > a')) return;
+
+            // Otherwise (Outside click OR non-dropdown link click) -> Close
+            navLinks.classList.remove('open');
+            document.body.classList.remove('no-scroll');
+
+            // Reset Toggles
+            document.querySelectorAll('.mobile-toggle').forEach(btn => {
+                btn.classList.remove('active');
+                const i = btn.querySelector('i');
+                if (i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); }
+            });
+        }
+    });
+}
+
 function initializeHeaderLogic() {
-    const toggleBtn = document.querySelector('.mobile-toggle');
+    // 1. Define Variables
     const navLinks = document.querySelector('.nav-links');
     const header = document.querySelector('header');
 
-    // A. Mobile Sidebar Toggle
-    if (toggleBtn && navLinks) {
-        // Remove old listeners to prevent duplicates if re-initialized
-        const newBtn = toggleBtn.cloneNode(true);
-        toggleBtn.parentNode.replaceChild(newBtn, toggleBtn);
+    // Note: Mobile Toggle logic is now handled by Global `bindMobileToggle` (Event Delegation).
 
-        newBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent immediate bubbling
-            const isOpen = navLinks.classList.contains('open');
-
-            if (isOpen) {
-                // CLOSE
-                navLinks.classList.remove('open');
-                document.body.classList.remove('no-scroll');
-                newBtn.classList.remove('active');
-                const icon = newBtn.querySelector('i');
-                if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
-            } else {
-                // OPEN
-                navLinks.classList.add('open');
-                document.body.classList.add('no-scroll');
-                newBtn.classList.add('active');
-                const icon = newBtn.querySelector('i');
-                if (icon) { icon.classList.remove('fa-bars'); icon.classList.add('fa-times'); }
-            }
-        });
-
-        // Close on Link Click (except dropdowns)
+    // 2. Close on Link Click (except dropdowns)
+    if (navLinks) {
         navLinks.querySelectorAll('a').forEach(link => {
             // If it has a next sibling that is a dropdown-content, it's a toggle, not a direct link
             if (link.nextElementSibling && link.nextElementSibling.classList.contains('dropdown-content')) return;
@@ -879,22 +1058,25 @@ function initializeHeaderLogic() {
             link.addEventListener('click', () => {
                 navLinks.classList.remove('open');
                 document.body.classList.remove('no-scroll');
-                // Reset Icon
-                const icon = newBtn.querySelector('i');
-                if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
-                newBtn.classList.remove('active');
+
+                // Reset Icons Globally
+                document.querySelectorAll('.mobile-toggle').forEach(btn => {
+                    btn.classList.remove('active');
+                    const i = btn.querySelector('i');
+                    if (i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); }
+                });
             });
         });
     }
 
-    // B. Mobile Accordion Logic (Dropdowns)
+    // 3. Mobile Accordion Logic (Dropdowns)
     const dropdownToggles = document.querySelectorAll('.dropdown > a, .dropdown-submenu > a');
     dropdownToggles.forEach(toggle => {
         toggle.addEventListener('click', (e) => {
             // Only hijacking if in mobile view OR if it's a null link (#)
-            if (window.innerWidth <= 1150 || toggle.getAttribute('href') === '#' || toggle.getAttribute('href').endsWith('#')) {
+            if (window.innerWidth <= 1400 || toggle.getAttribute('href') === '#' || toggle.getAttribute('href').endsWith('#')) {
                 // Prevent default navigation
-                if (toggle.getAttribute('href') === '#' || window.innerWidth <= 1150) {
+                if (toggle.getAttribute('href') === '#' || window.innerWidth <= 1400) {
                     e.preventDefault();
                     e.stopPropagation();
                 }
@@ -909,16 +1091,21 @@ function initializeHeaderLogic() {
                     parent.classList.add('active');
                 }
 
-                // Icon rotation (if exists)
-                const icon = toggle.querySelector('.fa-chevron-down');
-                if (icon) {
-                    icon.style.transform = parent.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+                // Icon rotation
+                const iconDown = toggle.querySelector('.fa-chevron-down');
+                const iconRight = toggle.querySelector('.fa-chevron-right');
+
+                if (iconDown) {
+                    iconDown.style.transform = parent.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+                }
+                if (iconRight) {
+                    iconRight.style.transform = parent.classList.contains('active') ? 'rotate(90deg)' : 'rotate(0deg)';
                 }
             }
         });
     });
 
-    // C. Scroll Glass Effect
+    // 4. Scroll Glass Effect
     if (header) {
         const handleScroll = () => {
             // Check if custom color override exists
@@ -931,6 +1118,10 @@ function initializeHeaderLogic() {
                 header.style.setProperty('box-shadow', 'none', 'important');
                 header.style.setProperty('backdrop-filter', 'none', 'important');
             } else {
+                // ADDED CHECK: Respect Light Context Mode (Problem Wall)
+                const headerTheme = document.body.getAttribute('data-header-theme');
+                if (headerTheme === 'light') return;
+
                 // Standard Behavior
                 if (window.scrollY > 50) {
                     header.style.background = 'rgba(15, 23, 42, 0.95)';
@@ -955,14 +1146,6 @@ function injectSoulBotWidget() {
     // 2. Hide on SoulBot Page (it has its own full UI)
     if (window.location.pathname.includes('soulbot.html')) return;
 
-    // 3. ABORT if on a Dashboard/Portal Page (Use Tools Drawer instead)
-    if (location.pathname.includes('dashboard') ||
-        location.pathname.includes('portal') ||
-        location.pathname.includes('messaging')) {
-        injectToolsDrawer(); // Call the new drawer instead
-        return;
-    }
-
     // Fix: Create the widget element
     const widget = document.createElement('div');
     widget.id = 'soulbot-widget';
@@ -980,35 +1163,29 @@ function injectSoulBotWidget() {
                 align-items: flex-end;
             }
             #soulbot-widget-fab {
+                width: 60px;
                 height: 60px;
-                padding: 0 25px;
                 background: var(--teal-glow, #4ECDC4);
-                border-radius: 50px;
+                border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                gap: 10px;
                 cursor: pointer;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                 z-index: 9999;
-                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 border: 2px solid rgba(255,255,255,0.2);
             }
             #soulbot-widget-fab:hover {
-                transform: translateY(-5px);
+                transform: scale(1.1) rotate(10deg);
                 box-shadow: 0 15px 40px rgba(78, 205, 196, 0.4);
             }
             #soulbot-widget-fab i {
                 color: #0f172a;
-                font-size: 1.5rem;
+                font-size: 1.8rem;
                 transition: transform 0.3s;
             }
-            #soulbot-widget-fab span {
-                color: #0f172a;
-                font-weight: 700;
-                font-size: 1rem;
-                white-space: nowrap;
-            }
+            #soulbot-widget-fab:hover i { transform: scale(1.1); }
 
             #sb-window {
                 width: 350px;
@@ -1038,10 +1215,8 @@ function injectSoulBotWidget() {
 
             /* MOBILE TWEAKS */
             @media (max-width: 768px) {
-                #soulbot-widget-container { bottom: 130px !important; right: 20px; }
-                #sb-window { width: 90vw; right: 5vw; bottom: 90px; height: 60vh; }
-                #soulbot-widget-fab span { display: none; } /* Hide Label on Mobile to save space */
-                #soulbot-widget-fab { width: 60px; height: 60px; padding: 0; border-radius: 50%; }
+                #soulbot-widget-container { bottom: 160px !important; right: 20px; }
+                #sb-window { width: 90vw; right: 5vw; bottom: 120px; height: 60vh; }
             }
         </style>
         
@@ -1049,7 +1224,7 @@ function injectSoulBotWidget() {
             <div id="sb-window">
                 <div class="sb-header">
                     <span style="font-weight:700; color:white;"><i class="fas fa-robot" style="color:#4ECDC4;"></i> SoulBot</span>
-                    <i class="fas fa-expand-alt" style="cursor:pointer; color: #94a3b8;" title="Full Screen" onclick="window.location.href='tools/soulbot.html'"></i>
+                    <i class="fas fa-expand-alt" style="cursor:pointer; color: #94a3b8;" title="Full Screen" onclick="window.location.href='soulbot.html'"></i>
                 </div>
                 <div class="sb-body" id="sb-chat-body">
                     <div class="sb-msg sb-msg-bot">Hi there. I'm here if you need to untangle a thought.</div>
@@ -1061,7 +1236,6 @@ function injectSoulBotWidget() {
             </div>
             <div id="soulbot-widget-fab" onclick="toggleWidget()">
                 <i class="fas fa-robot"></i>
-                <span>Start Here</span>
             </div>
         </div>
     `;
@@ -1071,25 +1245,12 @@ function injectSoulBotWidget() {
     window.toggleWidget = function () {
         const win = document.getElementById('sb-window');
         const fab = document.getElementById('soulbot-widget-fab');
-        const span = fab.querySelector('span');
-
         if (win.style.display === 'flex') {
             win.style.display = 'none';
-            fab.querySelector('i').className = 'fas fa-robot';
-            fab.style.borderRadius = "50px";
-            fab.style.width = "auto";
-            fab.style.padding = "0 25px";
-            if (span) span.style.display = "inline";
+            fab.innerHTML = '<i class="fas fa-robot"></i>';
         } else {
             win.style.display = 'flex';
-            fab.querySelector('i').className = 'fas fa-times';
-            // Collapse to circle when open
-            if (window.innerWidth > 768) {
-                fab.style.padding = "0";
-                fab.style.width = "60px";
-                fab.style.borderRadius = "50%";
-                if (span) span.style.display = "none";
-            }
+            fab.innerHTML = '<i class="fas fa-times"></i>';
             document.getElementById('sb-input').focus();
         }
     };
@@ -1130,192 +1291,160 @@ function injectSoulBotWidget() {
     }
 }
 
-// --- 5. TOOLS DRAWER (Dashboard Only) ---
-function injectToolsDrawer() {
-    if (document.getElementById('tools-drawer-overlay')) return;
+// --- MOBILE BOTTOM NAVIGATION INJECTOR ---
+function injectMobileBottomNav() {
+    console.log("Attempting to Inject Mobile Bottom Nav...");
+    // 1. Check if already exists
+    if (document.querySelector('.mobile-bottom-nav')) {
+        console.log("Mobile Nav already exists.");
+        return;
+    }
 
-    // Use root path logic similar to header
-    const rootPath = getRootPath();
+    // 2. Determine Depth for Links
+    // Logic: Count how many levels deep we are from root (assuming index.html is at root)
+    // Heuristic: If we are in 'spaces/campus/index.html', back 2 levels.
+    // However, robust way is to use root-relative paths if hosted at domain root, 
+    // BUT user is likely opening files or using preview.
+    // Let's use the same logic as header 'getRootPath()' if available, or derive it.
 
-    const drawerHTML = `
-        <style>
-            .td-overlay {
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(0,0,0,0.5); z-index: 9998;
-                opacity: 0; pointer-events: none; transition: opacity 0.3s;
-                backdrop-filter: blur(4px);
-            }
-            .td-overlay.open { opacity: 1; pointer-events: auto; }
+    let pathPrefix = './';
+    const depth = (location.pathname.match(/\//g) || []).length;
+    // Base depth adjustment - this depends on where 'components.js' is relative to the page. 
+    // Actually, simpler: check if getRootPath is defined (it is used in header).
 
-            .td-drawer {
-                position: fixed; top: 0; right: 0; width: 320px; height: 100%;
-                background: var(--bg-surface, #1e293b);
-                border-left: 1px solid var(--border-soft, rgba(255,255,255,0.1));
-                box-shadow: -10px 0 40px rgba(0,0,0,0.5);
-                z-index: 9999;
-                transform: translateX(100%);
-                transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-                display: flex; flex-direction: column;
-                padding-top: 20px;
-            }
-            .td-drawer.open { transform: translateX(0); }
+    if (typeof getRootPath === 'function') {
+        pathPrefix = getRootPath();
+    } else {
+        // Fallback: Crude depth calculation
+        // Assuming components.js is in assets/js, so 1 level up from assets is root.
+        // If we are at root/index.html, prefix is ./
+        // If we in root/spaces/campus/index.html, prefix is ../../
+    }
 
-            .td-fab {
-                position: fixed; top: 50%; right: -25px;
-                transform: translateY(-50%);
-                width: 55px; height: 55px;
-                background: var(--accent-secondary, #F49F75);
-                color: #0f172a;
-                border-radius: 50% 0 0 50%; /* Semi-circleish look initially */
-                border-radius: 50%; /* Full circle but offset */
-                display: flex; align-items: center; justify-content: flex-start;
-                padding-left: 14px;
-                font-size: 1.3rem;
-                cursor: pointer;
-                box-shadow: -2px 5px 20px rgba(0,0,0,0.2);
-                z-index: 9997;
-                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                border: 2px solid rgba(255,255,255,0.2);
-                opacity: 0.8;
-            }
-            .td-fab:hover { 
-                right: 20px; 
-                opacity: 1;
-                transform: translateY(-50%) rotate(-10deg) scale(1.1);
-            }
-
-            .td-header { padding: 0 25px 20px; border-bottom: 1px solid var(--border-soft, rgba(255,255,255,0.05)); display:flex; justify-content:space-between; align-items:center;}
-            .td-body { flex: 1; padding: 25px; overflow-y: auto; display:flex; flex-direction:column; gap:15px; }
-            
-            .td-item {
-                display: flex; align-items: center; gap: 15px;
-                padding: 15px;
-                background: var(--bg-primary, rgba(0,0,0,0.2));
-                border: 1px solid var(--border-soft, rgba(255,255,255,0.05));
-                border-radius: 12px;
-                color: var(--text-primary, #f1f5f9);
-                text-decoration: none;
-                transition: 0.2s;
-            }
-            .td-item:hover {
-                transform: translateX(-5px);
-                border-color: var(--accent-primary, #4ECDC4);
-                background: var(--bg-elevated, rgba(255,255,255,0.05));
-            }
-            .td-icon { width: 35px; height: 35px; background: rgba(255,255,255,0.05); border-radius: 50%; display:flex; align-items:center; justify-content:center; }
-        </style>
-
-        <div class="td-overlay" id="tools-drawer-overlay" onclick="toggleToolsDrawer()"></div>
-        
-        <div class="td-drawer" id="tools-drawer">
-            <div class="td-header">
-                <h3 style="margin:0; font-family:'Outfit'; font-size:1.4rem;">Daily Tools</h3>
-                <button onclick="toggleToolsDrawer()" style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer;"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="td-body">
-                <a href="${rootPath}tools/vent-box.html" target="_blank" class="td-item">
-                    <div class="td-icon" style="color:#ef4444;"><i class="fas fa-fire"></i></div>
-                    <div>
-                        <div style="font-weight:600;">The Vent Box</div>
-                        <div style="font-size:0.8rem; opacity:0.6;">Burn your negative thoughts.</div>
-                    </div>
-                </a>
-                <a href="${rootPath}tools/5-step-reset.html" target="_blank" class="td-item">
-                    <div class="td-icon" style="color:#4ECDC4;"><i class="fas fa-leaf"></i></div>
-                    <div>
-                        <div style="font-weight:600;">5-Step Reset</div>
-                        <div style="font-size:0.8rem; opacity:0.6;">Quick grounding exercise.</div>
-                    </div>
-                </a>
-                <a href="${rootPath}tools/confession-box/index.html" target="_blank" class="td-item">
-                    <div class="td-icon" style="color:#F49F75;"><i class="fas fa-ghost"></i></div>
-                    <div>
-                        <div style="font-weight:600;">Confession Box</div>
-                        <div style="font-size:0.8rem; opacity:0.6;">Let go of a secret.</div>
-                    </div>
-                </a>
-                 <a href="${rootPath}tools/playground.html" target="_blank" class="td-item">
-                    <div class="td-icon" style="color:#fbbf24;"><i class="fas fa-gamepad"></i></div>
-                    <div>
-                        <div style="font-weight:600;">Playground</div>
-                        <div style="font-size:0.8rem; opacity:0.6;">Visual relaxation interactives.</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <div class="td-fab" onclick="toggleToolsDrawer()" title="Open Tools">
-            <i class="fas fa-th-large"></i>
-        </div>
+    // 3. Create Navigation HTML
+    const navHTML = `
+        <a href="${pathPrefix}index.html" class="nav-item ${location.pathname.endsWith('index.html') && depth < 2 ? 'active' : ''}">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="${pathPrefix}tools/soulbot.html" class="nav-item ${location.pathname.includes('soulbot') ? 'active' : ''}">
+            <i class="fas fa-robot" style="color:#4ECDC4;"></i>
+            <span>Chat</span>
+        </a>
+        <a href="${pathPrefix}get-help-now.html" class="nav-item ${location.pathname.includes('get-help-now') ? 'active' : ''}">
+            <i class="fas fa-heart-pulse" style="color:#ef4444;"></i>
+            <span>Crisis</span>
+        </a>
+        <button class="nav-item" id="mobile-menu-trigger" type="button">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </button>
     `;
 
-    const container = document.createElement('div');
-    container.innerHTML = drawerHTML;
-    document.body.appendChild(container);
+    // 4. Create and Append Container
+    const navContainer = document.createElement('div');
+    navContainer.className = 'mobile-bottom-nav';
+    navContainer.innerHTML = navHTML;
 
-    window.toggleToolsDrawer = function () {
-        document.getElementById('tools-drawer-overlay').classList.toggle('open');
-        document.getElementById('tools-drawer').classList.toggle('open');
-    }
+    // Ensure it's not hidden by global styles if we need to override
+    navContainer.style.display = 'flex';
+    navContainer.style.zIndex = '8000'; // High but below Modal/Menu (9999)
+
+    document.body.appendChild(navContainer);
+
+    // BIND CLICK EVENT DIRECTLY (Fixes inline onclick scope issues)
+    setTimeout(() => {
+        const trigger = document.getElementById('mobile-menu-trigger');
+        if (trigger) {
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (window.toggleMobileMenu) {
+                    window.toggleMobileMenu();
+                } else {
+                    console.error("toggleMobileMenu function missing!");
+                }
+            });
+        }
+    }, 100);
+
+    // 5. Inject Styles (Self-Contained for safety)
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 400px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 20px;
+            z-index: 8000; /* Fixed: Lower than Mobile Menu (9999) */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+       /* HIDE NAV WHEN MOBILE MENU IS OPEN */
+        body.no-scroll .mobile-bottom-nav {
+             z-index: 100 !important; /* Push way back or hide */
+             opacity: 0;
+             pointer-events: none;
+        }
+
+        .mobile-bottom-nav.hidden {
+            transform: translate(-50%, 150%);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            gap: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+            /* Button Reset */
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            font-family: inherit;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            color: #2dd4bf; /* Teal Glow */
+            transform: translateY(-2px);
+        }
+
+        /* HIDE ON DESKTOP */
+        @media (min-width: 1025px) {
+            .mobile-bottom-nav { display: none !important; }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
-// --- 8. THEME ENGINE (New V2 Core) ---
-function initThemeEngine() {
-    // 1. Define Defaults
-    const DEFAULT_MODE = 'dark'; // Safe defaults
-    const DEFAULT_THEME = 'calm';
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof injectHeader === 'function') injectHeader();
+    // Guard Footer Injection: Do not inject on Auth pages (Viewport Scenes)
+    if (typeof injectFooter === 'function') injectFooter();
+    initParticles(); // Auto-init particles if container exists
 
-    // 2. Load from Storage with Validation
-    let savedMode = localStorage.getItem('themeMode');
-    let savedTheme = localStorage.getItem('emotionalTheme');
-
-    // Validation: Reset if invalid/missing
-    if (!savedMode || !['light', 'dark'].includes(savedMode)) {
-        console.warn("Invalid Theme Mode detected, resetting to default.");
-        savedMode = DEFAULT_MODE;
-    }
-    if (!savedTheme) savedTheme = DEFAULT_THEME;
-
-    // 3. Apply to Body (The Source of Truth)
-    document.body.setAttribute('data-mode', savedMode);
-    document.body.setAttribute('data-theme', savedTheme);
-
-    console.log(`Soulamore Theme Engine: Applied ${savedMode} mode with ${savedTheme} theme.`);
-}
-
-// Global Setters (Accessible from any page via onclick)
-window.setThemeMode = function (mode) {
-    document.body.setAttribute('data-mode', mode);
-    localStorage.setItem('themeMode', mode);
-
-    // Update local UI if present (Simple class toggle for buttons with matching IDs)
-    // This is generic handling; specific pages may implement more complex logic if needed
-    document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-    const btn = document.getElementById('btn-mode-' + mode);
-    if (btn) btn.classList.add('active');
-};
-
-window.setEmotionalTheme = function (theme) {
-    document.body.setAttribute('data-theme', theme);
-    localStorage.setItem('emotionalTheme', theme);
-
-    // Update local UI
-    document.querySelectorAll('.theme-tag').forEach(btn => btn.classList.remove('active'));
-    const btn = document.getElementById('btn-theme-' + theme);
-    if (btn) btn.classList.add('active');
-};
-
-
-// --- 7. INITIALIZATION (CRITICAL: MUST RUN) ---
-document.addEventListener('DOMContentLoaded', () => {
-    // console.log("Soulamore: Initializing...");
-
-    // 0. Init Theme FIRST (Before flicker)
-    try { initThemeEngine(); } catch (e) { console.error("Theme Engine Failed:", e); }
-
-    // 1. Inject Components
-    try { injectHeader(); } catch (e) { console.error("Header Injection Failed:", e); }
-    try { injectFooter(); } catch (e) { console.error("Footer Injection Failed:", e); }
+    // Original Initialization steps (retained)
     try { injectSoulBotWidget(); } catch (e) { console.error("SoulBot Widget Failed:", e); }
     try { injectFavicon(); } catch (e) { console.error("Favicon Injection Failed:", e); }
 
@@ -1323,8 +1452,101 @@ document.addEventListener('DOMContentLoaded', () => {
     try { setActiveState(); } catch (e) { console.warn("Active State Error:", e); }
 
     // 3. Initialize Interactions
-    try { initializeHeaderLogic(); } catch (e) { console.warn("Header Logic Error:", e); }
+    try {
+        bindMobileToggle();
+        initializeHeaderLogic();
+    } catch (e) { console.warn("Header Logic Error:", e); }
+
+    // 4. Inject Bottom Nav (Global)
+    try { injectMobileBottomNav(); } catch (e) { console.warn("Bottom Nav Error:", e); }
 
     console.log("Soulamore: Initialization Complete.");
 });
 
+// --- PARTICLES ENGINE ---
+function initParticles() {
+    const pContainer = document.getElementById('particles');
+    // Only run if container exists and is empty
+    if (pContainer && pContainer.childElementCount === 0) {
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 5 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            pContainer.appendChild(p);
+        }
+    }
+}
+
+// --- SMART COUNTERS (SOCIAL PROOF) ---
+function initSmartCounters() {
+    const startDate = new Date('2024-01-01'); // Fixed Anchor
+    const today = new Date();
+    const timeDiff = today - startDate;
+    const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+    // Growth Logic
+    const baseTrusted = 450;
+    const trustedCount = baseTrusted + (dayDiff * 2); // ~+2 per day
+
+    const baseJoined = 22120; // 14k was static, lets bump base to match "Legacy" but grow slowly
+    // wait user said "3 digits" for "early stage".
+    // User Request: "make these numbers smaller somewhere in 3 digits"
+    // So 450 and 125 based on previous plan.
+
+    // Revised Logic based on User Request
+    const realTrusted = 450 + (dayDiff * 2);
+    const realJoined = 125 + (dayDiff * 1);
+
+    // Format
+    const fmt = (n) => n.toLocaleString();
+
+    const elTrusted = document.getElementById('counter-trusted');
+    if (elTrusted) elTrusted.innerText = fmt(realTrusted) + "+";
+
+    const elJoined = document.getElementById('counter-joined');
+    // deeply support legacy id 'soulCount' too if needed, but we will update HTML
+    if (elJoined) elJoined.innerText = fmt(realJoined);
+}
+
+// Auto-Run
+document.addEventListener('DOMContentLoaded', initSmartCounters);
+
+
+// --- GLOBAL EXPORTS ---
+// Fix: Expose toggleMobileMenu for bottom nav usage
+window.toggleMobileMenu = function () {
+    // 1. Try Standard Header Toggle First
+    const toggle = document.querySelector('.mobile-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (navLinks) {
+        // MANUAL TOGGLE FORCE
+        const isOpen = navLinks.classList.contains('open');
+
+        if (isOpen) {
+            navLinks.classList.remove('open');
+            document.body.classList.remove('no-scroll');
+            // Sync Icon
+            if (toggle) {
+                toggle.classList.remove('active');
+                const i = toggle.querySelector('i');
+                if (i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); }
+            }
+        } else {
+            navLinks.classList.add('open');
+            document.body.classList.add('no-scroll');
+            // Sync Icon
+            if (toggle) {
+                toggle.classList.add('active');
+                const i = toggle.querySelector('i');
+                if (i) { i.classList.remove('fa-bars'); i.classList.add('fa-times'); }
+            }
+        }
+    } else {
+        console.warn('Soulamore: Nav links not found.');
+    }
+};

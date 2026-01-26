@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breathe | Soulamore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .circle-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .breathing-circle {
+            background: linear-gradient(135deg, #2dd4bf, #0f766e);
+            border-radius: 50%;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            z-index: 1;
+            box-shadow: 0 0 50px rgba(45, 212, 191, 0.4);
+            animation: breathe 12s infinite ease-in-out;
+        }
+
+        .text-container {
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #instruction {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: textFade 12s infinite ease-in-out;
+        }
+
+        .sub-text {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            20% {
+                transform: scale(0.6);
+                opacity: 0.8;
+            }
+
+            /* Inhale (4s approx) */
+            20%,
+            35% {
+                transform: scale(0.6);
+                opacity: 0.8;
+            }
+
+            /* Hold (7s -> wait, standard 4-7-8 is different but lets do simple box for visual) */
+            /* Let's do 4-4-4 for visual simplicity or 4-7-8 properly */
+            /* 4s In, 4s Hold, 4s Out usually better for UI visualization */
+            /* 0-33% In, 33-66% Hold, 66-100% Out */
+            0% {
+                transform: scale(0.4);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+
+            /* Inhale */
+            60% {
+                transform: scale(1);
+            }
+
+            /* Hold */
+            100% {
+                transform: scale(0.4);
+            }
+
+            /* Exhale */
+        }
+
+        /* Matching text animation */
+        @keyframes textFade {
+
+            0%,
+            100% {
+                content: "Breathe In";
+                opacity: 1;
+            }
+        }
+
+        .controls {
+            margin-top: 50px;
+            display: flex;
+            gap: 20px;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        button:hover {
+            background: white;
+            color: #0f172a;
+        }
+    </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="circle-container">
+            <div class="breathing-circle" id="circle"></div>
+            <div class="text-container">
+                <div id="instruction">Breathe In</div>
+            </div>
+        </div>
+
+        <p class="sub-text">Follow the rhythm to calm your nervous system</p>
+
+        <div class="controls">
+            <button onclick="window.close()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const instruction = document.getElementById('instruction');
+        const textStates = [
+            { text: "Breathe In", time: 4000 },
+            { text: "Hold", time: 3000 },
+            { text: "Breathe Out", time: 5000 } // 4-3-5 rhythm for loop
+        ];
+
+        // Simpler 4-4-4 for JS sync
+        let step = 0;
+
+        function updateCycle() {
+            // 12s total duration matches CSS
+            // 0-4s: Inhale
+            // 4-8s: Hold
+            // 8-12s: Exhale
+
+            setTimeout(() => { instruction.innerText = "Hold"; }, 4000);
+            setTimeout(() => { instruction.innerText = "Breathe Out"; }, 7000);
+            setTimeout(() => { instruction.innerText = "Breathe In"; }, 12000);
+        }
+
+        updateCycle();
+        setInterval(updateCycle, 12000);
+    </script>
+</body>
+
+</html>

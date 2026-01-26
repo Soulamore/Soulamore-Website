@@ -617,6 +617,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -893,13 +894,13 @@
     <script>
         // These stub functions prevent errors from cached inline handlers
         // They will be replaced by the real functions when the module loads
-        window.autoExpand = function(field) {
+        window.autoExpand = function (field) {
             if (field) {
                 field.style.height = 'auto';
                 field.style.height = field.scrollHeight + 'px';
             }
         };
-        window.handleEnter = function(e) {
+        window.handleEnter = function (e) {
             if (e && e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 if (typeof window.handleSend === 'function') {
@@ -907,7 +908,7 @@
                 }
             }
         };
-        window.handleSend = function() {
+        window.handleSend = function () {
             console.log("Stub handleSend called - checking if module loaded...");
             // Check if the real handleSend exists in module scope (it won't, but we can check window)
             if (window._realHandleSend && typeof window._realHandleSend === 'function') {
@@ -921,7 +922,7 @@
                 alert("SoulBot is still loading. Please check the browser console for errors. The Google Generative AI script may be blocked by Content Security Policy.");
             }
         };
-        window.sendPrompt = function(el) {
+        window.sendPrompt = function (el) {
             if (el && typeof window.handleSend === 'function') {
                 const input = document.getElementById('userInput');
                 if (input) {
@@ -936,13 +937,13 @@
     <!-- LOGIC -->
     <script type="module">
         import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-        
+
         // Import Firestore functions with error handling
         let createConversation, addMessageToConversation, updateConversationDuration, recommendTherapist, getConversation;
         let checkRateLimit, validateMessageLength, getRateLimitInfo;
         let auth = null;
-        let onAuthStateChanged = () => {};
-        
+        let onAuthStateChanged = () => { };
+
         // Try to import Firestore modules, but don't fail if they don't work
         (async () => {
             try {
@@ -955,15 +956,15 @@
                 checkRateLimit = soulbotHandler.checkRateLimit;
                 validateMessageLength = soulbotHandler.validateMessageLength;
                 getRateLimitInfo = soulbotHandler.getRateLimitInfo;
-                
+
                 const firebaseConfig = await import("../assets/js/firebase-config.js");
                 auth = firebaseConfig.auth;
-                
+
                 const firebaseAuth = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
                 onAuthStateChanged = firebaseAuth.onAuthStateChanged;
-                
+
                 console.log("Firestore modules loaded successfully");
-                
+
                 // Now initialize conversation after imports complete
                 if (auth) {
                     onAuthStateChanged(auth, async (user) => {
@@ -973,7 +974,7 @@
                         }
                     });
                 }
-                
+
                 // Initialize conversation (for anonymous users)
                 await initConversation();
             } catch (error) {
@@ -987,7 +988,7 @@
                 checkRateLimit = async () => ({ allowed: true }); // Allow if Firestore unavailable
                 validateMessageLength = (text) => text.length <= 2000;
                 getRateLimitInfo = async () => ({ requestsToday: 0, requestsPerMinute: 0, dailyLimit: 100, minuteLimit: 10 });
-                
+
                 // Initialize anyway (local-only mode)
                 conversationStartTime = Date.now();
             }
@@ -1031,10 +1032,10 @@
                 }
                 conversationStartTime = Date.now();
                 recommendationShown = false;
-                
+
                 // Start timer to check for recommendation after 5-10 minutes
                 startRecommendationTimer();
-                
+
                 console.log("Conversation initialized:", conversationId || "local-only");
             } catch (error) {
                 console.warn("Error creating conversation (chat will still work):", error);
@@ -1047,45 +1048,45 @@
 
         // Ensure functions are available globally even if module fails
         console.log("SoulBot chat script loaded");
-        
+
         // Wait for DOM to be ready, then set up event listeners
         function initChatEventListeners() {
             console.log("Setting up chat event listeners");
-            
+
             // Wait a bit to ensure all variables are defined
             setTimeout(() => {
                 // Verify elements exist
                 const inputEl = document.getElementById('userInput');
                 const btnEl = document.getElementById('sendBtn');
-                
+
                 if (!inputEl || !btnEl) {
                     console.error("Chat elements not found!");
                     return;
                 }
-                
+
                 console.log("Chat elements found, attaching event listeners");
-                
+
                 // Set up input auto-expand
                 inputEl.addEventListener('input', (e) => {
                     autoExpand(e.target);
                 });
-                
+
                 // Set up Enter key handler
                 inputEl.addEventListener('keydown', (e) => {
                     handleEnter(e);
                 });
-                
+
                 // Set up send button click handler
                 btnEl.addEventListener('click', (e) => {
                     e.preventDefault();
                     console.log("Send button clicked");
                     handleSend();
                 });
-                
+
                 console.log("Event listeners attached successfully");
             }, 100);
         }
-        
+
         // Initialize event listeners when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initChatEventListeners);
@@ -1098,42 +1099,42 @@
             if (conversationTimer) {
                 clearTimeout(conversationTimer);
             }
-            
+
             // Random time between 5-10 minutes (300000ms - 600000ms)
             const minTime = 5 * 60 * 1000; // 5 minutes
             const maxTime = 10 * 60 * 1000; // 10 minutes
             const randomTime = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
-            
+
             conversationTimer = setTimeout(async () => {
                 if (!recommendationShown && conversationId) {
                     await checkAndRecommendTherapist();
                 }
             }, randomTime);
-            
+
             console.log(`Recommendation timer set for ${Math.round(randomTime / 1000 / 60)} minutes`);
         }
 
         async function checkAndRecommendTherapist() {
             if (recommendationShown || !conversationId) return;
-            
+
             // Only recommend if there's been meaningful conversation (at least 3 user messages)
             const conversation = await getConversation(conversationId);
             if (!conversation) return;
-            
+
             const userMessages = (conversation.messages || []).filter(m => m.role === 'user');
             if (userMessages.length < 3) {
                 // Not enough conversation yet, check again in 2 minutes
                 conversationTimer = setTimeout(checkAndRecommendTherapist, 2 * 60 * 1000);
                 return;
             }
-            
+
             // Calculate actual duration
             const durationSeconds = Math.floor((Date.now() - conversationStartTime) / 1000);
             await updateConversationDuration(conversationId, durationSeconds);
-            
+
             // Get therapist recommendation
             const therapist = await recommendTherapist(conversationId);
-            
+
             if (therapist) {
                 showTherapistRecommendation(therapist);
                 recommendationShown = true;
@@ -1178,12 +1179,12 @@
                 const inputEl = getUserInput();
                 const btnEl = getSendBtn();
                 const emptyStateEl = getEmptyState();
-                
+
                 if (!inputEl || !btnEl) {
                     console.error("Input or button not found!");
                     return;
                 }
-                
+
                 const text = inputEl.value.trim();
                 if (!text) {
                     console.log("Empty text, returning");
@@ -1223,7 +1224,7 @@
                     }
                 }
 
-            // UI Updates
+                // UI Updates
                 inputEl.value = "";
                 inputEl.style.height = 'auto';
                 if (emptyStateEl) emptyStateEl.classList.add('hidden');
@@ -1237,16 +1238,16 @@
                     });
                 }
 
-            // Add Thinking Placeholder
+                // Add Thinking Placeholder
                 const thinkingId = appendThinking(getMessagesContainer());
                 scrollToBottom(getMessagesContainer());
 
-            // API Logic
-            try {
-                // Safety Check First
-                const crisisKeywords = ['suicide', 'kill myself', 'die', 'end it all'];
-                if (crisisKeywords.some(w => text.toLowerCase().includes(w))) {
-                    removeThinking(thinkingId);
+                // API Logic
+                try {
+                    // Safety Check First
+                    const crisisKeywords = ['suicide', 'kill myself', 'die', 'end it all'];
+                    if (crisisKeywords.some(w => text.toLowerCase().includes(w))) {
+                        removeThinking(thinkingId);
                         appendCrisisCard(getMessagesContainer());
                         if (conversationId) {
                             addMessageToConversation(conversationId, 'bot', 'CRISIS_ALERT', { type: 'crisis' }).catch(err => console.error(err));
@@ -1254,39 +1255,39 @@
                         btnEl.disabled = false;
                         inputEl.disabled = false;
                         inputEl.focus();
-                    return;
-                }
+                        return;
+                    }
 
-                const chat = model.startChat({
-                    history: [
-                        { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
-                        { role: "model", parts: [{ text: "Understood." }] },
-                        ...chatHistory
-                    ]
-                });
+                    const chat = model.startChat({
+                        history: [
+                            { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
+                            { role: "model", parts: [{ text: "Understood." }] },
+                            ...chatHistory
+                        ]
+                    });
 
-                const result = await chat.sendMessage(text);
-                const response = result.response.text();
+                    const result = await chat.sendMessage(text);
+                    const response = result.response.text();
 
-                removeThinking(thinkingId);
+                    removeThinking(thinkingId);
 
-                if (response.includes("CRISIS_ALERT")) {
+                    if (response.includes("CRISIS_ALERT")) {
                         appendCrisisCard(getMessagesContainer());
                         if (conversationId) {
                             addMessageToConversation(conversationId, 'bot', 'CRISIS_ALERT', { type: 'crisis' }).catch(err => console.error(err));
                         }
-                } else {
+                    } else {
                         appendMessage('bot', response, getMessagesContainer());
-                    chatHistory.push({ role: "user", parts: [{ text: text }] });
-                    chatHistory.push({ role: "model", parts: [{ text: response }] });
-                        
+                        chatHistory.push({ role: "user", parts: [{ text: text }] });
+                        chatHistory.push({ role: "model", parts: [{ text: response }] });
+
                         // Save bot message to Firestore (non-blocking)
                         if (conversationId) {
                             addMessageToConversation(conversationId, 'bot', response).catch(err => {
                                 console.error("Failed to save bot message:", err);
                             });
                         }
-                        
+
                         // Check if we should recommend a therapist (after meaningful conversation)
                         // Trigger recommendation after 3-5 user messages if timer hasn't fired yet
                         if (conversationId && !recommendationShown) {
@@ -1294,7 +1295,7 @@
                                 if (conversation && !recommendationShown) {
                                     const userMessages = (conversation.messages || []).filter(m => m.role === 'user');
                                     const durationSeconds = Math.floor((Date.now() - conversationStartTime) / 1000);
-                                    
+
                                     // Recommend if: 5+ minutes AND 5+ messages, OR 10+ messages regardless of time
                                     if ((durationSeconds >= 5 * 60 && userMessages.length >= 5) || userMessages.length >= 10) {
                                         checkAndRecommendTherapist().catch(err => console.error("Failed to recommend therapist:", err));
@@ -1302,10 +1303,10 @@
                                 }
                             }).catch(err => console.error("Failed to get conversation:", err));
                         }
-                }
+                    }
 
-            } catch (err) {
-                removeThinking(thinkingId);
+                } catch (err) {
+                    removeThinking(thinkingId);
                     const errorMsg = "I'm having a little trouble connecting. Please try again in a moment.";
                     appendMessage('bot', errorMsg, getMessagesContainer());
                     if (conversationId) {
@@ -1363,7 +1364,7 @@
                 console.error("Messages container not found");
                 return;
             }
-            
+
             const div = document.createElement('div');
             div.className = 'message-row';
 
@@ -1414,7 +1415,7 @@
                 console.error("Messages container not found");
                 return null;
             }
-            
+
             const id = 'thinking-' + Date.now();
             const div = document.createElement('div');
             div.id = id;
@@ -1444,7 +1445,7 @@
                 console.error("Messages container not found");
                 return;
             }
-            
+
             const div = document.createElement('div');
             div.className = 'message-row';
             div.innerHTML = `
@@ -1464,37 +1465,43 @@
         function scrollToBottom(container = null) {
             const messagesContainer = container || getMessagesContainer();
             if (messagesContainer) {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
         }
 
         function formatText(text) {
-            return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            // 1. Escape HTML first (prevent XSS)
+            const div = document.createElement('div');
+            div.textContent = text;
+            let safeText = div.innerHTML;
+
+            // 2. Apply allowed formatting to the SAFE text
+            return safeText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
         }
 
         // Set up event listeners after all functions are defined
         function setupEventListeners() {
             console.log("Setting up event listeners...");
-            
+
             const inputEl = document.getElementById('userInput');
             const btnEl = document.getElementById('sendBtn');
-            
+
             if (!inputEl || !btnEl) {
                 console.warn("Elements not found yet, retrying...");
                 setTimeout(setupEventListeners, 200); // Retry
                 return;
             }
-            
+
             console.log("Elements found, attaching listeners");
-            
+
             // Remove any existing inline handlers by cloning elements
             const newInput = inputEl.cloneNode(true);
             const newBtn = btnEl.cloneNode(true);
             inputEl.parentNode.replaceChild(newInput, inputEl);
             btnEl.parentNode.replaceChild(newBtn, btnEl);
-            
+
             // Input auto-expand
-            newInput.addEventListener('input', function(e) {
+            newInput.addEventListener('input', function (e) {
                 const func = window.autoExpand || autoExpand;
                 if (typeof func === 'function') {
                     func(this);
@@ -1502,9 +1509,9 @@
                     console.error("autoExpand not available");
                 }
             });
-            
+
             // Enter key handler
-            newInput.addEventListener('keydown', function(e) {
+            newInput.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     const func = window.handleSend || handleSend;
@@ -1515,9 +1522,9 @@
                     }
                 }
             });
-            
+
             // Send button click
-            newBtn.addEventListener('click', function(e) {
+            newBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 console.log("Send button clicked!");
                 const func = window.handleSend || handleSend;
@@ -1528,9 +1535,9 @@
                     console.error("handleSend not available. Type:", typeof func, "window.handleSend:", typeof window.handleSend, "handleSend:", typeof handleSend);
                 }
             });
-            
+
             // Test: Add a direct click handler as backup
-            newBtn.onclick = function(e) {
+            newBtn.onclick = function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log("Direct onclick handler triggered");
@@ -1538,7 +1545,7 @@
                     window.handleSend();
                 }
             };
-            
+
             console.log("Event listeners attached successfully");
             console.log("Button element:", newBtn);
             console.log("Input element:", newInput);
@@ -1547,7 +1554,7 @@
         // Wait for everything to be ready, then set up listeners
         function initAfterLoad() {
             // Check if functions are defined (either in module scope or window)
-            if ((typeof handleSend === 'function' || typeof window.handleSend === 'function') && 
+            if ((typeof handleSend === 'function' || typeof window.handleSend === 'function') &&
                 (typeof autoExpand === 'function' || typeof window.autoExpand === 'function')) {
                 console.log("Functions ready, setting up event listeners");
                 setupEventListeners();
@@ -1572,47 +1579,103 @@
                 console.error("Messages container not found for therapist recommendation");
                 return;
             }
-            
+
             const recommendationDiv = document.createElement('div');
             recommendationDiv.className = 'therapist-recommendation';
-            recommendationDiv.innerHTML = `
-                <div class="therapist-header">
-                    <div class="therapist-avatar">${therapist.name.charAt(0).toUpperCase()}</div>
-                    <div class="therapist-info">
-                        <h3>${therapist.name}</h3>
-                        <p>${therapist.role || 'Therapist'}</p>
-                    </div>
-                </div>
-                <p style="margin-bottom: 15px; opacity: 0.9; line-height: 1.6;">
-                    Based on our conversation, I think ${therapist.name} might be a good match for you. 
-                    They specialize in areas that seem relevant to what you've been sharing.
-                </p>
-                ${therapist.tags && therapist.tags.length > 0 ? `
-                    <div class="therapist-badges">
-                        ${therapist.tags.slice(0, 5).map(tag => `<span class="therapist-badge">${tag}</span>`).join('')}
-                    </div>
-                ` : ''}
-                ${therapist.rating ? `
-                    <div style="margin: 15px 0; display: flex; align-items: center; gap: 10px;">
-                        <span style="color: #fbbf24; font-size: 1.2rem;">★</span>
-                        <span style="font-weight: 600;">${therapist.rating}</span>
-                        <span style="opacity: 0.7; font-size: 0.9rem;">(${therapist.reviews || 0} reviews)</span>
-                        ${therapist.online ? '<span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: auto;">Online</span>' : ''}
-                    </div>
-                ` : ''}
-                <div class="therapist-cta">
-                    <a href="../our-psychologists/psychologists.html?therapist=${therapist.id}" class="therapist-btn therapist-btn-primary">
-                        View Profile <i class="fas fa-arrow-right"></i>
-                    </a>
-                    <button onclick="this.parentElement.parentElement.style.display='none'" class="therapist-btn therapist-btn-secondary">
-                        Maybe Later
-                    </button>
-                </div>
-            `;
-            
+
+            // Header
+            const header = document.createElement('div');
+            header.className = 'therapist-header';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'therapist-avatar';
+            avatar.textContent = therapist.name.charAt(0).toUpperCase();
+
+            const info = document.createElement('div');
+            info.className = 'therapist-info';
+
+            const nameEl = document.createElement('h3');
+            nameEl.textContent = therapist.name;
+
+            const roleEl = document.createElement('p');
+            roleEl.textContent = therapist.role || 'Therapist';
+
+            info.appendChild(nameEl);
+            info.appendChild(roleEl);
+            header.appendChild(avatar);
+            header.appendChild(info);
+
+            // Body
+            const bodyText = document.createElement('p');
+            bodyText.style.cssText = "margin-bottom: 15px; opacity: 0.9; line-height: 1.6;";
+            bodyText.textContent = `Based on our conversation, I think ${therapist.name} might be a good match for you. They specialize in areas that seem relevant to what you've been sharing.`;
+
+            // Badges
+            let badgesContainer = null;
+            if (therapist.tags && therapist.tags.length > 0) {
+                badgesContainer = document.createElement('div');
+                badgesContainer.className = 'therapist-badges';
+                therapist.tags.slice(0, 5).forEach(tag => {
+                    const span = document.createElement('span');
+                    span.className = 'therapist-badge';
+                    span.textContent = tag;
+                    badgesContainer.appendChild(span);
+                });
+            }
+
+            // Rating (Optional)
+            let ratingDiv = null;
+            if (therapist.rating) {
+                ratingDiv = document.createElement('div');
+                ratingDiv.style.cssText = "margin: 15px 0; display: flex; align-items: center; gap: 10px;";
+                ratingDiv.innerHTML = `<span style="color: #fbbf24; font-size: 1.2rem;">★</span>`; // Star is safe static HTML
+
+                const rateVal = document.createElement('span');
+                rateVal.style.fontWeight = '600';
+                rateVal.textContent = therapist.rating;
+
+                const reviewCount = document.createElement('span');
+                reviewCount.style.cssText = "opacity: 0.7; font-size: 0.9rem;";
+                reviewCount.textContent = `(${therapist.reviews || 0} reviews)`;
+
+                ratingDiv.appendChild(rateVal);
+                ratingDiv.appendChild(reviewCount);
+
+                if (therapist.online) {
+                    const onlineBadge = document.createElement('span');
+                    onlineBadge.style.cssText = "background: #10b981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: auto;";
+                    onlineBadge.textContent = "Online";
+                    ratingDiv.appendChild(onlineBadge);
+                }
+            }
+
+            // CTA
+            const ctaDiv = document.createElement('div');
+            ctaDiv.className = 'therapist-cta';
+
+            const viewLink = document.createElement('a');
+            viewLink.href = `../our-psychologists/psychologists.html?therapist=${encodeURIComponent(therapist.id)}`;
+            viewLink.className = 'therapist-btn therapist-btn-primary';
+            viewLink.innerHTML = `View Profile <i class="fas fa-arrow-right"></i>`; // Icon is safe
+
+            const laterBtn = document.createElement('button');
+            laterBtn.className = 'therapist-btn therapist-btn-secondary';
+            laterBtn.textContent = 'Maybe Later';
+            laterBtn.onclick = function () { this.parentElement.parentElement.style.display = 'none'; };
+
+            ctaDiv.appendChild(viewLink);
+            ctaDiv.appendChild(laterBtn);
+
+            // Assemble
+            recommendationDiv.appendChild(header);
+            recommendationDiv.appendChild(bodyText);
+            if (badgesContainer) recommendationDiv.appendChild(badgesContainer);
+            if (ratingDiv) recommendationDiv.appendChild(ratingDiv);
+            recommendationDiv.appendChild(ctaDiv);
+
             messagesContainer.appendChild(recommendationDiv);
             scrollToBottom(messagesContainer);
-            
+
             // Add a bot message introducing the recommendation
             setTimeout(() => {
                 const introDiv = document.createElement('div');

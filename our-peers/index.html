@@ -98,13 +98,12 @@
             }
         }
 
-        /* --- NAV STYLES REMOVED FOR GLOBAL HEADER CONSISTENCY --- */
-
         /* --- HERO --- */
         .hero {
             text-align: center;
-            padding: 180px 0 60px;
+            padding: 40px 0 60px;
         }
+
 
         .hero h1 {
             font-size: 3.5rem;
@@ -167,17 +166,13 @@
             gap: 12px;
             overflow-x: auto;
             padding: 20px;
-            /* Increased to prevents glow clipping */
             scrollbar-width: none;
-            /* Firefox */
             -ms-overflow-style: none;
-            /* IE */
             mask-image: linear-gradient(to right, black 95%, transparent 100%);
         }
 
         .category-rail::-webkit-scrollbar {
             display: none;
-            /* Chrome/Safari */
         }
 
         .category-pill {
@@ -237,9 +232,28 @@
         /* --- PEER GRID --- */
         .peer-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
             margin-bottom: 80px;
+        }
+
+        @media (max-width: 768px) {
+            .peer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
         }
 
         .peer-card {
@@ -292,6 +306,7 @@
             font-weight: 700;
             color: var(--deep-space);
             background: var(--starlight);
+            overflow: hidden;
         }
 
         .peer-name {
@@ -420,212 +435,234 @@
     </div>
     <div id="particles"></div>
 
-    <!-- NAV -->
-    <!-- GLOBAL HEADER -->
-    <!-- GLOBAL HEADER (ISLAND STYLE) -->
-    <header></header>
-
-    <div class="container">
-
-        <!-- HERO -->
-        <section class="hero fade-in">
-            <span class="subtitle">Real people. Trained listeners. Shared ground.</span>
-            <h1>Our Peers</h1>
-
-            <div class="footer-socials">
-                <a href="https://www.instagram.com/soulamore_/" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="https://www.linkedin.com/company/soulamore/" target="_blank"><i
-                        class="fab fa-linkedin"></i></a>
-                <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank"><i
-                        class="fab fa-facebook"></i></a>
-            </div>
-            <p>At Soulamore, peers are not here to fix you. They are here to sit with you, listen without judgement, and
-                help you untangle what feels heavy.</p>
-        </section>
-
-        <!-- EXPLAINER -->
-        <div class="fade-in" style="text-align:center; max-width:600px; margin:0 auto 60px; opacity:0.8;">
-            <p style="font-size:0.95rem;"><i class="fas fa-info-circle"></i> <strong>How to choose:</strong> It’s not
-                about finding the "best" person. It’s about finding someone who feels close enough to your experience.
-                Take your time. There’s no rush.</p>
+    <!-- APP SHELL START -->
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header class="island-nav"></header>
         </div>
 
-        <!-- FILTERS -->
-        <!-- FILTERS -->
-        <div class="filter-section fade-in">
-            <!-- 1. Horizontal Rail -->
-            <div class="category-rail-container">
-                <div class="category-rail">
-                    <div class="category-pill active" onclick="setCategory('all')">All Topics</div>
-                    <div class="category-pill" onclick="setCategory('Physical')">Physical Wellness</div>
-                    <div class="category-pill" onclick="setCategory('Academic')">Academic Wellness</div>
-                    <div class="category-pill" onclick="setCategory('Financial')">Financial Wellness</div>
-                    <div class="category-pill" onclick="setCategory('Anxiety')">Anxiety & Overthinking</div>
-                    <div class="category-pill" onclick="setCategory('Low Mood')">Feeling Low</div>
-                    <div class="category-pill" onclick="setCategory('Loneliness')">Loneliness</div>
-                    <div class="category-pill" onclick="setCategory('Relationships')">Relationships</div>
-                    <div class="category-pill" onclick="setCategory('Body Image')">Body Image</div>
-                    <div class="category-pill" onclick="setCategory('Self-Esteem')">Self-Esteem</div>
-                    <div class="category-pill" onclick="setCategory('ADHD')">ADHD Support</div>
-                    <div class="category-pill" onclick="setCategory('Grief')">Grief & Loss</div>
-                    <div class="category-pill" onclick="setCategory('LGBTQ')">LGBTQ+ Identity</div>
+        <main id="shell-content">
+            <div class="container">
+
+                <!-- HERO -->
+                <section class="hero fade-in">
+                    <span class="hero-subhead-premium">Real people. Trained listeners. Shared ground.</span>
+                    <h1 class="hero-title-premium">Our Peers</h1>
+
+                    <div class="footer-socials">
+                        <a href="https://www.instagram.com/soulamore_/" target="_blank"><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/company/soulamore/" target="_blank"><i
+                                class="fab fa-linkedin"></i></a>
+                        <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank"><i
+                                class="fab fa-facebook"></i></a>
+                    </div>
+                    <p>At Soulamore, peers are not here to fix you. They are here to sit with you, listen without
+                        judgement, and
+                        help you untangle what feels heavy.</p>
+                </section>
+
+                <!-- EXPLAINER -->
+                <div class="fade-in" style="text-align:center; max-width:600px; margin:0 auto 60px; opacity:0.8;">
+                    <p style="font-size:0.95rem;"><i class="fas fa-info-circle"></i> <strong>How to choose:</strong>
+                        It’s not
+                        about finding the "best" person. It’s about finding someone who feels close enough to your
+                        experience.
+                        Take your time. There’s no rush.</p>
                 </div>
+
+                <!-- FILTERS -->
+                <div class="filter-section fade-in">
+                    <!-- 1. Horizontal Rail -->
+                    <div class="category-rail-container">
+                        <div class="category-rail">
+                            <div class="category-pill active" onclick="setCategory('all')">All Topics</div>
+                            <div class="category-pill" onclick="setCategory('Physical')">Physical Wellness</div>
+                            <div class="category-pill" onclick="setCategory('Academic')">Academic Wellness</div>
+                            <div class="category-pill" onclick="setCategory('Financial')">Financial Wellness</div>
+                            <div class="category-pill" onclick="setCategory('Anxiety')">Anxiety & Overthinking</div>
+                            <div class="category-pill" onclick="setCategory('Low Mood')">Feeling Low</div>
+                            <div class="category-pill" onclick="setCategory('Loneliness')">Loneliness</div>
+                            <div class="category-pill" onclick="setCategory('Relationships')">Relationships</div>
+                            <div class="category-pill" onclick="setCategory('Body Image')">Body Image</div>
+                            <div class="category-pill" onclick="setCategory('Self-Esteem')">Self-Esteem</div>
+                            <div class="category-pill" onclick="setCategory('ADHD')">ADHD Support</div>
+                            <div class="category-pill" onclick="setCategory('Grief')">Grief & Loss</div>
+                            <div class="category-pill" onclick="setCategory('LGBTQ')">LGBTQ+ Identity</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Secondary Filter Bar (Markers) -->
+                    <div class="filter-bar">
+                        <select class="filter-select" id="priceFilter" onchange="applyFilters()">
+                            <option value="all">Price: Any</option>
+                            <option value="Free">Free (Volunteer)</option>
+                            <option value="Paid">Paid Session</option>
+                        </select>
+
+                        <select class="filter-select" id="langFilter" onchange="applyFilters()">
+                            <option value="all">Language: Any</option>
+                            <option value="English">English</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Spanish">Spanish</option>
+                        </select>
+
+                        <select class="filter-select" id="ageFilter" onchange="applyFilters()">
+                            <option value="all">Peer Age: Any</option>
+                            <option value="18-24">18 - 24</option>
+                            <option value="25-34">25 - 34</option>
+                            <option value="35+">35+</option>
+                        </select>
+
+                        <select class="filter-select" id="genderFilter" onchange="applyFilters()">
+                            <option value="all">Gender: Any</option>
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Non-binary">Non-binary</option>
+                        </select>
+
+                        <select class="filter-select" id="availFilter" onchange="applyFilters()">
+                            <option value="all">Availability: Any</option>
+                            <option value="Online">Online Now</option>
+                            <option value="Offline">Schedule Later</option>
+                        </select>
+
+                        <button onclick="resetAll()"
+                            style="font-size:0.8rem; background:none; border:none; color:var(--peach-glow); text-decoration:underline; cursor:pointer;">Reset
+                            All</button>
+                    </div>
+                </div>
+
+                <!-- PEER GRID -->
+                <div class="peer-grid" id="peerGrid">
+                    <!-- Peers Injected via JS -->
+                    <div style="grid-column:1/-1; text-align:center; padding:50px; opacity:0.6;">
+                        <i class="fas fa-circle-notch fa-spin"></i> Loading...
+                    </div>
+                </div>
+
+                <!-- DISCLAIMER -->
+                <div class="boundary-box fade-in">
+                    <h3 style="color:var(--alert-red); margin-bottom:10px;"><i class="fas fa-shield-alt"></i> Gentle
+                        Boundary
+                        Note</h3>
+                    <p style="opacity:0.9;">Peers at Soulamore are trained listeners, not clinical therapists. They
+                        don’t
+                        diagnose or treat mental health conditions.</p>
+                    <p style="opacity:0.9; margin-top:10px;">If you need clinical support or deeper intervention, please
+                        connect
+                        with our <a href="psychologists.html"
+                            style="color:var(--alert-red); text-decoration:underline; font-weight:700;">Licensed
+                            Psychologists</a>. You deserve the right kind of support.
+                    </p>
+                </div>
+
+                <!-- CTA -->
+                <div class="alt-cta fade-in">
+                    <h2>Not sure who to choose?</h2>
+                    <p style="opacity:0.8; margin-bottom:20px;">If picking a peer feels overwhelming, that’s okay.</p>
+                    <div>
+                        <a href="../tools/confession-box/index.html" class="alt-btn btn-secondary">Start with Confession
+                            Box</a>
+                        <a href="company/contact.html" class="alt-btn btn-primary">Help me choose</a>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- 2. Secondary Filter Bar (Markers) -->
-            <div class="filter-bar">
-                <select class="filter-select" id="priceFilter" onchange="applyFilters()">
-                    <option value="all">Price: Any</option>
-                    <option value="Free">Free (Volunteer)</option>
-                    <option value="Paid">Paid Session</option>
-                </select>
+        </main>
+    </div> <!-- End app-shell -->
 
-                <select class="filter-select" id="langFilter" onchange="applyFilters()">
-                    <option value="all">Language: Any</option>
-                    <option value="English">English</option>
-                    <option value="Hindi">Hindi</option>
-                    <option value="Spanish">Spanish</option>
-                </select>
+    <!-- STANDARDIZED FOOTER -->
+    <footer></footer>
 
-                <select class="filter-select" id="ageFilter" onchange="applyFilters()">
-                    <option value="all">Peer Age: Any</option>
-                    <option value="18-24">18 - 24</option>
-                    <option value="25-34">25 - 34</option>
-                    <option value="35+">35+</option>
-                </select>
+    <!-- SCRIPTS -->
+    <script src="../assets/js/components.js"></script>
+    <script type="module">
+        import { db, collection, getDocs } from "../assets/js/firebase-config.js";
 
-                <select class="filter-select" id="genderFilter" onchange="applyFilters()">
-                    <option value="all">Gender: Any</option>
-                    <option value="Female">Female</option>
-                    <option value="Male">Male</option>
-                    <option value="Non-binary">Non-binary</option>
-                </select>
+        // --- FETCH PEERS FROM DYANMIC DB ---
+        let peers = []; // Global store
 
-                <select class="filter-select" id="availFilter" onchange="applyFilters()">
-                    <option value="all">Availability: Any</option>
-                    <option value="Online">Online Now</option>
-                    <option value="Offline">Schedule Later</option>
-                </select>
+        async function fetchPeers() {
+            try {
+                // Timeout Promise (2.5 seconds limit - Faster Fallback)
+                const timeout = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error("Request timed out")), 2500)
+                );
 
-                <button onclick="resetAll()"
-                    style="font-size:0.8rem; background:none; border:none; color:var(--peach-glow); text-decoration:underline; cursor:pointer;">Reset
-                    All</button>
-            </div>
-        </div>
+                // Data Promise
+                const dataFetch = getDocs(collection(db, "professionals"));
 
-        <!-- PEER GRID -->
-        <div class="peer-grid" id="peerGrid">
-            <!-- Peers Injected via JS -->
-        </div>
+                // Race them
+                const querySnapshot = await Promise.race([dataFetch, timeout]);
 
-        <!-- DISCLAIMER -->
-        <div class="boundary-box fade-in">
-            <h3 style="color:var(--alert-red); margin-bottom:10px;"><i class="fas fa-shield-alt"></i> Gentle Boundary
-                Note</h3>
-            <p style="opacity:0.9;">Peers at Soulamore are trained listeners, not clinical therapists. They don’t
-                diagnose or treat mental health conditions.</p>
-            <p style="opacity:0.9; margin-top:10px;">If you need clinical support or deeper intervention, please connect
-                with our <a href="psychologists.html"
-                    style="color:var(--alert-red); text-decoration:underline; font-weight:700;">Licensed
-                    Psychologists</a>. You deserve the right kind of support.
-            </p>
-        </div>
+                const fetchedPeers = [];
 
-        <!-- CTA -->
-        <div class="alt-cta fade-in">
-            <h2>Not sure who to choose?</h2>
-            <p style="opacity:0.8; margin-bottom:20px;">If picking a peer feels overwhelming, that’s okay.</p>
-            <div>
-                <a href="../tools/confession-box/index.html" class="alt-btn btn-secondary">Start with Confession Box</a>
-                <a href="/contact" class="alt-btn btn-primary">Help me choose</a>
-            </div>
-        </div>
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    // FILTER: Only show Peers
+                    const isPeer = (data.role && data.role.toLowerCase().includes('peer')) ||
+                        (data.title && data.title.toLowerCase().includes('peer'));
 
-    </div>
+                    if (isPeer) {
+                        fetchedPeers.push({
+                            id: doc.id,
+                            name: data.name,
+                            quote: data.quote || "Here to listen.",
+                            tags: data.tags || [],
+                            markers: {
+                                price: data.rate > 0 ? "Paid" : "Free",
+                                lang: data.languages || "English",
+                                age: data.ageRange || "18-24", // Needs field
+                                gender: data.gender || "Any",
+                                avail: data.onlineStatus === 'online' ? "Online" : "Offline"
+                            },
+                            avatarColor: data.avatarColor || "#fbbf24",
+                            photoURL: data.photoURL,
+                            profileUrl: `profile.html?id=${doc.id}`
+                        });
+                    }
+                });
 
-    <script>
-        // --- PEER DATA (Updated with Markers) ---
-        const peers = [
-            {
-                id: 1,
-                name: "Aditya",
-                quote: "I’m here to listen without rushing your story.",
-                tags: ["Mental Wellness", "Anxiety", "Student", "Hindi"],
-                markers: { price: "Free", lang: "Hindi", age: "18-24", gender: "Male", avail: "Online" },
-                avatarColor: "#4ECDC4",
-                profileUrl: "mental-wellness/profile.html"
-            },
-            {
-                id: 101,
-                name: "Renu Dogra",
-                quote: "Yoga is the journey of the self, through the self, to the self.",
-                tags: ["Physical Wellness", "Yoga", "Breathwork"],
-                markers: { price: "Paid", lang: "English", age: "25-34", gender: "Female", avail: "Online" },
-                avatarColor: "#fbbf24",
-                profileUrl: "physical-wellness/renu-dogra.html"
-            },
-            {
-                id: 102,
-                name: "Palak Shori",
-                quote: "Academic success is a mindset, not just a grade.",
-                tags: ["Academic Wellness", "Study Skills", "Career"],
-                markers: { price: "Free", lang: "English", age: "18-24", gender: "Female", avail: "Online" },
-                avatarColor: "#a78bfa",
-                profileUrl: "../our-psychologists/palak-shori.html"
-            },
-            {
-                id: 2,
-                name: "Aarti",
-                quote: "Healing touches the soul when shared.",
-                tags: ["Low Mood", "Relationships", "Gentle Listener"],
-                markers: { price: "Free", lang: "Hindi", age: "25-34", gender: "Female", avail: "Offline" },
-                avatarColor: "#F49F75",
-                profileUrl: "#"
-            },
-            {
-                id: 3,
-                name: "Lakshit",
-                quote: "I know the silence of a new city.",
-                tags: ["Expat", "Loneliness", "Burnout"],
-                markers: { price: "Paid", lang: "Hindi", age: "25-34", gender: "Male", avail: "Online" },
-                avatarColor: "#fbbf24",
-                profileUrl: "#"
-            },
-            {
-                id: 6,
-                name: "Meera",
-                quote: "Your feelings are valid, always.",
-                tags: ["Relationships", "Anxiety", "Body Image"],
-                markers: { price: "Paid", lang: "Spanish", age: "35+", gender: "Female", avail: "Online" },
-                avatarColor: "#2a9d8f",
-                profileUrl: "#"
+                // FALLBACK: If DB is empty, use Hardcoded Demo Data
+                if (fetchedPeers.length === 0) {
+                    console.warn("No peers found in DB, using fallback demo data.");
+                    throw new Error("Empty DB"); // Trigger catch block for fallback
+                } else {
+                    peers = fetchedPeers;
+                    renderPeers();
+                }
+
+            } catch (error) {
+                console.warn("Using fallback data due to:", error.message);
+                // Fallback Data
+                peers = [
+                    {
+                        id: 1,
+                        name: "Aditya",
+                        quote: "I’m here to listen without rushing your story.",
+                        tags: ["Mental Wellness", "Anxiety", "Student", "Hindi"],
+                        markers: { price: "Free", lang: "Hindi", age: "18-24", gender: "Male", avail: "Online" },
+                        avatarColor: "#4ECDC4",
+                        profileUrl: "profile.html?id=1"
+                    },
+                    {
+                        id: 10,
+                        name: "Zoya",
+                        quote: "Here to help you get through tough times.",
+                        tags: ["Work Stress", "Travel", "Relationships"],
+                        markers: { price: "Paid", lang: "English", age: "25-34", gender: "Female", avail: "Online" },
+                        avatarColor: "#fbbf24",
+                        profileUrl: "profile.html?id=10" // Fixed URL
+                    }
+                ];
+                renderPeers();
             }
-        ];
-
-        // --- DYNAMIC INJECTION FOR DEMO ---
-        // In a real app, this would fetch from backend. Here we check localStorage.
-        const myProfile = JSON.parse(localStorage.getItem('professional_profile'));
-        const myRole = localStorage.getItem('user_role');
-
-        if (myProfile && myRole === 'Peer') {
-            const myCard = {
-                id: 999,
-                name: myProfile.name,
-                role: myProfile.title || "Peer Listener",
-                category: myProfile.category || "Mental Wellness", // Default fallback
-                image: myProfile.image,
-                tags: myProfile.tags || ["New", "Listener"],
-                rating: 5.0,
-                reviews: 0,
-                price: "Free",
-                lang: myProfile.languages || "English",
-                online: true,
-                verified: true
-            };
-
-            // Add to top
-            peers.unshift(myCard);
         }
+
+        // Init Fetch
+        fetchPeers();
 
         // --- FILTER STATE ---
         let currentCategory = 'all';
@@ -646,11 +683,11 @@
             // Filter Logic
             const filtered = peers.filter(peer => {
                 // 1. Check Category
-                const catMatch = (currentCategory === 'all') || peer.tags.some(t => t.includes(currentCategory));
+                const catMatch = (currentCategory === 'all') || (peer.tags && peer.tags.some(t => t.includes(currentCategory)));
 
                 // 2. Check Markers
                 const priceMatch = (pVal === 'all') || peer.markers.price === pVal;
-                const langMatch = (lVal === 'all') || peer.markers.lang === lVal || (lVal === 'English' && true); // Assume all speak English default? Simplified.
+                const langMatch = (lVal === 'all') || peer.markers.lang.includes(lVal) || (lVal === 'English' && true);
                 const ageMatch = (aVal === 'all') || peer.markers.age === aVal;
                 const genderMatch = (gVal === 'all') || peer.markers.gender === gVal;
                 const availMatch = (avVal === 'all') || peer.markers.avail === avVal;
@@ -669,28 +706,38 @@
                 const tagHTML = peer.tags.slice(0, 3).map(t => `<span class="mini-tag">${t}</span>`).join('');
                 const priceBadge = (peer.markers.price === "Paid") ? '<span style="font-size:0.7rem; background:var(--gold-glow); color:black; padding:2px 8px; border-radius:10px; margin-left:5px;">Paid</span>' : '';
 
+                // Avatar Logic
+                let avatarHTML = '';
+                if (peer.photoURL && !peer.photoURL.includes('via.placeholder')) {
+                    avatarHTML = `<img src="${peer.photoURL}" style="width:100%; height:100%; object-fit:cover;">`;
+                } else {
+                    avatarHTML = peer.name.charAt(0);
+                }
+
                 const card = document.createElement('div');
                 card.className = 'peer-card fade-in';
                 card.innerHTML = `
-                    <div class="status-dot ${statusClass}"></div>
-                    <div class="peer-avatar" style="background:${peer.avatarColor}">${peer.name.charAt(0)}</div>
-                    <div class="peer-name">${peer.name} ${priceBadge}</div>
-                    <div class="grounding-line">"${peer.quote}"</div>
-                    <div class="tags-row">${tagHTML}</div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; opacity:0.8; margin-top:15px; border-top:1px solid var(--border-glass); padding-top:10px;">
-                        <span><i class="fas fa-language"></i> ${peer.markers.lang}</span>
-                        <span>${peer.markers.price === "Free" ? "Volunteer" : "₹" + peer.markers.price + "/hr"}</span>
-                    </div>
+            <div class="status-dot ${statusClass}"></div>
+            <div class="peer-avatar" style="background:${peer.avatarColor}">
+                ${avatarHTML}
+            </div>
+            <div class="peer-name">${peer.name} ${priceBadge}</div>
+            <div class="grounding-line">"${peer.quote}"</div>
+            <div class="tags-row">${tagHTML}</div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; opacity:0.8; margin-top:15px; border-top:1px solid var(--border-glass); padding-top:10px;">
+                <span><i class="fas fa-language"></i> ${peer.markers.lang}</span>
+                <span>${peer.markers.price === "Free" ? "Volunteer" : "Top Rated"}</span>
+            </div>
 
-                    <a href="${peer.profileUrl || 'profile.html?id=' + peer.id}" class="pc-btn" style="text-align:center; text-decoration:none; display:block; margin-top:15px;">View Profile</a>
-                    ${peer.id === 999 ? '<div style="text-align:center; font-size:0.7rem; margin-top:5px; opacity:0.5;">(This is You)</div>' : ''}
-                `;
+            <a href="${peer.profileUrl}" class="connect-btn" style="text-align:center; text-decoration:none; display:block; margin-top:15px;">View Profile</a>
+            ${peer.id === 999 ? '<div style="text-align:center; font-size:0.7rem; margin-top:5px; opacity:0.5;">(This is You)</div>' : ''}
+        `;
                 grid.appendChild(card);
             });
         }
 
         // --- INTERACTION ---
-        function setCategory(cat) {
+        window.setCategory = function (cat) {
             currentCategory = cat;
             // Update UI pills
             document.querySelectorAll('.category-pill').forEach(p => {
@@ -702,11 +749,9 @@
             renderPeers();
         }
 
-        function applyFilters() {
-            renderPeers();
-        }
+        window.applyFilters = function () { renderPeers(); }
 
-        function resetAll() {
+        window.resetAll = function () {
             currentCategory = 'all';
             document.getElementById('priceFilter').value = 'all';
             document.getElementById('langFilter').value = 'all';
@@ -722,64 +767,53 @@
         }
 
         // --- INIT ---
-        // Check for URL params
         const urlParams = new URLSearchParams(window.location.search);
         const catParam = urlParams.get('category');
         if (catParam) {
             setCategory(catParam);
-        } else {
-            renderPeers();
         }
 
-        // --- PARTICLES ---
-        const pContainer = document.getElementById('particles');
-        for (let i = 0; i < 30; i++) {
-            let p = document.createElement('div');
-            p.classList.add('particle');
-            p.style.left = Math.random() * 100 + 'vw';
-            p.style.width = Math.random() * 4 + 'px';
-            p.style.height = p.style.width;
-            p.style.animationDuration = Math.random() * 20 + 10 + 's';
-            p.style.opacity = Math.random() * 0.3;
-            pContainer.appendChild(p);
-        }
+    </script>
+    <script>
+        // --- PARTICLES & AUDIO (Visuals Only) ---
+        // Ensure Layout Calculation Runs
+        window.addEventListener('load', () => {
+            // Particles
+            const pContainer = document.getElementById('particles');
+            if (pContainer) {
+                for (let i = 0; i < 30; i++) {
+                    let p = document.createElement('div');
+                    p.classList.add('particle');
+                    p.style.left = Math.random() * 100 + 'vw';
+                    p.style.width = Math.random() * 4 + 'px';
+                    p.style.height = p.style.width;
+                    p.style.animationDuration = Math.random() * 20 + 10 + 's';
+                    p.style.opacity = Math.random() * 0.3;
+                    pContainer.appendChild(p);
+                }
+            }
+            if (window.updateShellHeight) window.updateShellHeight();
+            if (window.injectHeader) injectHeader();
+            if (window.injectFooter) injectFooter();
+        });
 
-        // --- AUDIO ---
         const audio = document.getElementById('bgAudio');
         let playing = false;
-        function toggleAudio() {
+        window.toggleAudio = function () {
             if (playing) {
                 audio.pause();
                 document.getElementById('audioText').innerText = "Ambience";
+                document.querySelector('.audio-control').style.background = "rgba(255,255,255,0.1)";
             } else {
                 audio.volume = 0.3;
                 audio.play();
                 document.getElementById('audioText').innerText = "Pause";
+                document.querySelector('.audio-control').style.background = "var(--teal-glow)";
             }
             playing = !playing;
         }
-
-        // --- FADE IN ---
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = 1;
-                    entry.target.style.transform = "translateY(0)";
-                }
-            });
-        });
-        // We observe cards after rendering? No, static elements only for now
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     </script>
-    <!-- GLOBAL FOOTER (HASHLILLY STANDARD) -->
-    <!-- GLOBAL FOOTER -->
-
-
-    <!-- STANDARDIZED FOOTER -->
-    <footer></footer>
-
     <script src="../assets/js/soulbot-beta.js"></script>
-    <script src="../assets/js/components.js"></script>
     <script src="../assets/js/main.js"></script>
 </body>
 

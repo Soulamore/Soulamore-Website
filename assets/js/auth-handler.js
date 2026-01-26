@@ -14,12 +14,12 @@ let currentUser = null;
 onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     updateAuthUI(user);
-    
+
     // Store user info in sessionStorage and create/update profile
     if (user) {
         // Create or update user profile in Firestore
         await createOrUpdateUserProfile(user);
-        
+
         sessionStorage.setItem('user', JSON.stringify({
             uid: user.uid,
             displayName: user.displayName,
@@ -38,7 +38,7 @@ function updateAuthUI(user) {
         // Update login/signup button
         const loginBtn = document.querySelector('.nav-btn, a[href*="login.html"]');
         const userIconBtn = document.querySelector('.user-icon-btn');
-        
+
         if (user) {
             // User is logged in
             if (loginBtn) {
@@ -49,7 +49,7 @@ function updateAuthUI(user) {
                     showUserMenu(user);
                 };
             }
-            
+
             // Update user icon
             if (userIconBtn) {
                 if (user.photoURL) {
@@ -70,7 +70,7 @@ function updateAuthUI(user) {
                 loginBtn.href = isAuthPage ? 'login.html' : 'auth/login.html';
                 loginBtn.onclick = null;
             }
-            
+
             if (userIconBtn) {
                 userIconBtn.innerHTML = '<i class="fas fa-ghost"></i>';
             }
@@ -86,7 +86,7 @@ function showUserMenu(user) {
         existingMenu.remove();
         return;
     }
-    
+
     // Create menu
     const menu = document.createElement('div');
     menu.id = 'userMenu';
@@ -103,11 +103,11 @@ function showUserMenu(user) {
         z-index: 1000;
         backdrop-filter: blur(10px);
     `;
-    
-        menu.innerHTML = `
+
+    menu.innerHTML = `
         <div style="padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 10px;">
-            <div style="font-weight: 600; color: white;">${user.displayName || 'User'}</div>
-            <div style="font-size: 0.85rem; opacity: 0.7; color: #e2e8f0;">${user.email}</div>
+            <div id="authUserDisplayName" style="font-weight: 600; color: white;"></div>
+            <div id="authUserEmail" style="font-size: 0.85rem; opacity: 0.7; color: #e2e8f0;"></div>
         </div>
         <a href="profile.html" style="
             display: block;
@@ -135,9 +135,13 @@ function showUserMenu(user) {
             transition: 0.2s;
         ">Sign Out</button>
     `;
-    
+
+    // SAFE: Use textContent to populate user data
+    menu.querySelector('#authUserDisplayName').textContent = user.displayName || 'User';
+    menu.querySelector('#authUserEmail').textContent = user.email;
+
     document.body.appendChild(menu);
-    
+
     // Handle logout
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
@@ -149,7 +153,7 @@ function showUserMenu(user) {
             alert('Failed to sign out: ' + error.message);
         }
     });
-    
+
     // Close menu when clicking outside
     setTimeout(() => {
         document.addEventListener('click', function closeMenu(e) {

@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Content Security Policy: Prevent XSS and injection attacks -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
+                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com; 
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; 
+                 font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; 
+                 img-src 'self' data: https: https://lh3.googleusercontent.com; 
+                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://accounts.google.com; 
+                 frame-src 'self' https://accounts.google.com https://soulamore-f0a64.firebaseapp.com; 
+                 frame-ancestors 'self';">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <meta name="description"
+        content="Log in to your Soulamore space. Choose your role to access your personalized wellness dashboard.">
+    <title>Login | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <style>
+        /* --- RESTORED THEME FROM BACKUP --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === AUTH VIEWPORT SCENE ARCHITECTURE (TRUE GRID) === */
+
+        /* 1. Viewport Contract: Locked Height, No Scroll */
+        body.auth {
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            margin: 0;
+            display: flex;
+            /* Flex column for Footer support */
+            flex-direction: column;
+        }
+
+        /* 2. Header Overlay (Floats ABOVE, does not push) */
+        body.auth header {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: auto;
+            z-index: 100;
+            background: transparent !important;
+            pointer-events: none;
+            opacity: 0.85;
+            backdrop-filter: blur(6px);
+        }
+
+        /* Optional: Scale down header actions to de-emphasize */
+        body.auth header .nav-btn,
+        body.auth header .lifeline-btn {
+            transform: scale(0.95);
+        }
+
+        /* Allow interaction with header contents */
+        body.auth header * {
+            pointer-events: auto;
+        }
+
+        /* 3. The Scene Grid (Horizontal split, full height) */
+        .auth-shell {
+            height: 100vh;
+            width: 100%;
+            max-width: 1100px;
+            /* Constrain width to reduce center gap */
+            margin: 0 auto;
+            /* Center the shell */
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            /* True 50/50 split */
+            box-sizing: border-box;
+        }
+
+        /* Left Context Section (Centered Content) */
+        .auth-left {
+            display: flex;
+            align-items: center;
+            /* Center text vertically */
+            justify-content: center;
+            padding: 60px;
+            padding-bottom: 120px;
+            /* Push center UP slightly */
+            position: relative;
+        }
+
+        /* Ambient Glow (Pseudo-element for boundless effect) */
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140%;
+            /* Oversized to bleed seamlessly */
+            height: 140%;
+            background: radial-gradient(circle closest-side, rgba(78, 205, 196, 0.15) 0%, transparent 100%);
+            filter: blur(40px);
+            /* Massive blur for ambient feel */
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .auth-context {
+            max-width: 420px;
+            /* Reduced width */
+            opacity: 0.75;
+            /* Reduced visual weight */
+            position: relative;
+            z-index: 2;
+        }
+
+        .auth-context h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            /* Hero Size */
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            /* Premium Gradient Text */
+            background: linear-gradient(135deg, #fff 0%, #a5f3fc 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(78, 205, 196, 0.2));
+        }
+
+        .auth-context p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+
+        .auth-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .auth-features li {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 500;
+        }
+
+        .auth-features i {
+            color: var(--teal-glow);
+            width: 24px;
+        }
+
+        /* Right Login Section (Anchored Top) */
+        .auth-right {
+            display: flex;
+            align-items: center;
+            /* Center vertically */
+            justify-content: center;
+            padding-top: 60px;
+            padding-bottom: 100px;
+            /* Push center UP slightly */
+            padding-left: 40px;
+            padding-right: 40px;
+            background: rgba(15, 23, 42, 0.3);
+            position: relative;
+        }
+
+        /* Card Self-Containment */
+        .login-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            /* Strict width limit */
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px);
+            position: relative;
+            z-index: 5;
+            animation: floatCard 6s ease-in-out infinite;
+            /* Floating Effect */
+        }
+
+        @keyframes floatCard {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* === MOBILE RESPONSIVE (Collapse to Single Column) === */
+        @media (max-width: 900px) {
+            body.auth {
+                overflow-y: auto;
+                /* Allow scroll on mobile */
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .auth-shell {
+                grid-template-columns: 1fr;
+                /* Single column */
+                height: auto;
+                display: block;
+                /* Stack vertically on mobile */
+                padding-top: 80px;
+                /* Clear fixed header on mobile */
+            }
+
+            .auth-left {
+                display: none;
+                /* Hide context, focus on task */
+            }
+
+            .auth-right {
+                padding: 20px;
+                min-height: calc(100vh - 80px);
+            }
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* === LOGIN CARD (Compact) === */
+        .login-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 28px;
+            /* Compact (was 35px) */
+            border-radius: 20px;
+            width: 100%;
+            max-width: 420px;
+            /* Slimmer */
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px);
+            position: relative;
+            z-index: 5;
+        }
+
+        .login-logo {
+            font-size: 1.6rem;
+            /* Compact */
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            margin-bottom: 4px;
+            /* Tight */
+            display: block;
+            color: white;
+            text-decoration: none;
+        }
+
+        .login-logo i {
+            color: var(--teal-glow);
+        }
+
+        /* === HORIZONTAL ROLE PILLS === */
+        .role-selector-pills {
+            display: flex;
+            gap: 8px;
+            margin: 16px 0;
+            /* Compact spacing */
+        }
+
+        .role-pill {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .role-pill i {
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+
+        .role-pill:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .role-pill.active {
+            /* Background and Border color set dynamically via JS for Role Theme */
+            color: var(--deep-space);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            /* Fallback */
+            background: var(--peach-glow);
+            border-color: var(--peach-glow);
+        }
+
+        .role-pill.active i {
+            opacity: 1;
+        }
+
+        /* FORM STYLES (Compact) */
+        .form-group {
+            margin-bottom: 12px;
+            /* Tighter spacing */
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            /* Smaller inputs */
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #1e293b;
+            color: #f1f5f9;
+            font-family: inherit;
+            transition: 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus {
+            border-color: var(--teal-glow);
+            outline: none;
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .submit-btn {
+            background: var(--gradient-primary);
+            color: var(--deep-space);
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.95rem;
+            transition: 0.3s;
+            margin-top: 5px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.2);
+        }
+
+        .social-btn {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-glass);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider {
+            margin: 20px 0;
+            /* Smaller divider spacing */
+            border-top: 1px solid var(--border-glass);
+            position: relative;
+        }
+
+        .divider span {
+            background: #151e2e;
+            padding: 0 8px;
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+
+        /* === MOBILE RESPONSIVE (Collapse to Single Column) === */
+        @media (max-width: 900px) {
+            body.auth {
+                overflow-y: auto;
+                /* Allow scroll on mobile */
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .auth-shell {
+                grid-template-columns: 1fr;
+                /* Single column */
+                height: auto;
+                display: block;
+                /* Stack vertically on mobile */
+                padding-top: 80px;
+                /* Clear fixed header on mobile */
+            }
+
+            .auth-left {
+                display: none;
+                /* Hide context, focus on task */
+            }
+
+            .auth-right {
+                padding: 20px;
+                min-height: calc(100vh - 80px);
+            }
+
+            .login-card {
+                max-width: 100%;
+                padding: 24px !important;
+            }
+        }
+    </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body class="auth">
+
+    <header></header>
+    <div id="particles"></div>
+
+    <main class="auth-shell">
+        <!-- Left Context Section -->
+        <section class="auth-left">
+            <div class="auth-context">
+                <div class="hero-subhead-premium" style="margin-bottom: 10px;">Welcome Home</div>
+                <h1 class="hero-title-premium" style="text-align: left; font-size: 3rem;">Your partner in<br>mental
+                    wellness</h1>
+                <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 30px; font-weight: 300;">A
+                    safe space for reflection, support, and growth.</p>
+                <ul class="auth-features">
+                    <li><i class="fas fa-shield-alt"></i> Secure & Private</li>
+                    <li><i class="fas fa-user-friends"></i> Trained Peers & Verified Psychologists</li>
+                    <li><i class="fas fa-clock"></i> 24/7 Support</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Right Login Section -->
+        <section class="auth-right">
+            <div class="login-card fade-in">
+                <!-- LOGO -->
+                <div class="login-logo">
+                    <img src="../assets/images/logo.png" alt="Soulamore" style="height: 60px; margin-bottom: 5px;">
+                </div>
+                <p style="opacity:0.7; margin-bottom:20px;">Welcome back to your space.</p>
+
+                <!-- HORIZONTAL ROLE SELECTOR -->
+                <div class="role-selector-pills">
+                    <div class="role-pill active" onclick="setRole(0)">
+                        <i class="fas fa-user"></i> User
+                    </div>
+                    <div class="role-pill" onclick="setRole(1)">
+                        <i class="fas fa-hands-helping"></i> Peer
+                    </div>
+                    <div class="role-pill" onclick="setRole(2)">
+                        <i class="fas fa-user-md"></i> Pro
+                    </div>
+                </div>
+
+                <!-- LOGIN FORM -->
+                <!-- LOGIN FORM -->
+                <form id="loginForm" onsubmit="event.preventDefault(); window.handleEmailLogin()">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" id="emailInput" placeholder="you@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <div style="position:relative;">
+                            <input type="password" class="form-input" id="passInput" placeholder="••••••••" required>
+                            <i class="fas fa-eye show-password-toggle" id="togglePassword"
+                                style="position:absolute; right:12px; top:12px; opacity:0.5; cursor:pointer;"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-row"
+                        style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:0.85rem;">
+                        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                            <input type="checkbox" id="rememberMe"> Remember me
+                        </label>
+                        <a href="#" style="color:var(--teal-glow); text-decoration:none;">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="submit-btn" style="position: relative; z-index: 10;">Log In</button>
+                </form>
+
+                <div class="divider"><span>OR</span></div>
+
+                <button type="button" class="social-btn" id="googleSignInBtn">
+                    <i class="fab fa-google"></i> Continue with Google
+                </button>
+
+                <button type="button" onclick="handleDevBypass()"
+                    style="background:transparent; border:none; color:rgba(255,255,255,0.4); font-size:0.85rem; width:100%; margin:15px 0 0; cursor:pointer; text-decoration:underline;">
+                    &lt;/&gt; Developer Preview (Skip Login)
+                </button>
+
+                <div style="margin-top:20px; font-size:0.9rem;">
+                    New here? <a href="#" style="color:var(--teal-glow); text-decoration:none; font-weight:600;">Create
+                        an account</a>
+                </div>
+            </div>
+        </section>
+        </div>
+        </section>
+    </main>
+
+    <!-- Footer Restored -->
+    <footer></footer>
+
+    <!-- SCRIPTS -->
+    <script src="../assets/js/components.js"></script>
+
+    <!-- Check if user is already logged in -->
+    <script type="module">
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+        // Initialize Firebase for auth check
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+            authDomain: "soulamore-f0a64.firebaseapp.com",
+            projectId: "soulamore-f0a64"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Redirect if already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const role = sessionStorage.getItem('userRole') || 'user';
+                let dashboard = 'user-dashboard.html';
+                if (role === 'peer') dashboard = 'peer-dashboard.html';
+                if (role === 'psychologist') dashboard = 'psych-dashboard.html';
+                if (role === 'admin') dashboard = 'admin-dashboard.html';
+                window.location.href = dashboard;
+            }
+        });
+    </script>
+
+    <!-- AUTH LOGIC (Modules) -->
+    <!-- AUTH LOGIC (Modules) -->
+    <script type="module">
+        import { loginWithGoogle, loginWithEmail } from "../assets/js/auth-service.js";
+        import { handleRoleRouting } from "../assets/js/auth-context.js";
+        import { GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // --- PHASE 4: Deep Link Preservation ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnUrl = urlParams.get('returnUrl');
+        if (returnUrl) {
+            sessionStorage.setItem('returnUrl', returnUrl);
+        }
+
+        // --- PHASE 4: Browser Compatibility Check ---
+        function checkBrowserCompatibility() {
+            const isModernBrowser = 'fetch' in window && 'Promise' in window && 'assign' in Object;
+            if (!isModernBrowser) {
+                alert('⚠️ Your browser is outdated and may not support all features. Please update to the latest version of Chrome, Firefox, Safari, or Edge.');
+            }
+        }
+        checkBrowserCompatibility();
+
+        // --- PHASE 4: Google Multi-Account Selector ---
+        const googleProvider = new GoogleAuthProvider();
+        googleProvider.setCustomParameters({
+            prompt: 'select_account'  // Forces account picker every time
+        });
+
+        // --- PHASE 4: Mobile Keyboard Optimization ---
+        if ('visualViewport' in window) {
+            const viewport = window.visualViewport;
+            viewport.addEventListener('resize', () => {
+                // Adjust page when keyboard appears
+                document.body.style.height = `${viewport.height}px`;
+            });
+        }
+
+        // Friendly error message mapping
+        function getFriendlyErrorMessage(errorCode) {
+            const errorMap = {
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/user-disabled': 'This account has been disabled. Please contact support.',
+                'auth/user-not-found': 'No account found with this email. Please sign up first.',
+                'auth/wrong-password': 'Incorrect password. Please try again or reset your password.',
+                'auth/email-already-in-use': 'An account with this email already exists. Please log in instead.',
+                'auth/weak-password': 'Password should be at least 6 characters long.',
+                'auth/operation-not-allowed': 'This sign-in method is not enabled. Please contact support.',
+                'auth/too-many-requests': 'Too many failed attempts. Please wait a few minutes and try again.',
+                'auth/network-request-failed': 'Network error. Please check your internet connection and try again.',
+                'auth/popup-closed-by-user': 'Sign-in cancelled. Please try again if this was a mistake.',
+                'auth/popup-blocked': 'Popup blocked by your browser. Please allow popups for this site.',
+                'auth/unauthorized-domain': 'This domain is not authorized for authentication. Please contact support.',
+                'auth/invalid-credential': 'Invalid credentials. Please check your information and try again.',
+                'auth/account-exists-with-different-credential': 'An account already exists with this email but different sign-in method.',
+                'auth/cancelled-popup-request': 'Another sign-in popup is already open'
+            };
+            return errorMap[errorCode] || 'An unexpected error occurred. Please try again.';
+        }
+
+        // --- GOOGLE ---
+        const gBtn = document.getElementById('googleSignInBtn');
+        if (gBtn) {
+            gBtn.addEventListener('click', async () => {
+                const intent = sessionStorage.getItem('loginIntent') || 'user';
+                try {
+                    gBtn.disabled = true; // Prevent double-click
+                    gBtn.style.opacity = '0.6';
+                    gBtn.style.cursor = 'not-allowed';
+                    gBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+
+                    const result = await loginWithGoogle();
+
+                    if (result.success) {
+                        await handleRoleRouting(result.user, intent);
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (e) {
+                    const friendlyMsg = getFriendlyErrorMessage(e.code || e.message);
+                    alert(friendlyMsg);
+                    // Re-enable button on error
+                    gBtn.disabled = false;
+                    gBtn.style.opacity = '1';
+                    gBtn.style.cursor = 'pointer';
+                    gBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
+                }
+            });
+        }
+
+        // --- EMAIL LOGIN (Exported to Window) ---
+        window.handleEmailLogin = async function () {
+            const intent = sessionStorage.getItem('loginIntent') || 'user';
+            const email = document.getElementById('emailInput').value;
+            const pass = document.getElementById('passInput').value;
+            const submitBtn = document.querySelector('.submit-btn');
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            if (!email || !pass) { alert("Please enter email and password"); return; }
+
+            try {
+                // Disable submit button
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.6';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+                const result = await loginWithEmail(email, pass);
+                if (result.success) {
+                    // Remember me functionality
+                    if (rememberMe) {
+                        localStorage.setItem('rememberedEmail', email);
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                    }
+
+                    // Check for returnUrl
+                    // Check for returnUrl
+                    const returnUrl = sessionStorage.getItem('returnUrl');
+
+                    // CodeQL Fix: Client-side URL redirect
+                    // Robust check using URL API to verify origin matches
+                    if (returnUrl) {
+                        try {
+                            const validUrl = new URL(returnUrl, window.location.origin);
+                            if (validUrl.origin === window.location.origin) {
+                                sessionStorage.removeItem('returnUrl');
+                                window.location.href = validUrl.href;
+                            } else {
+                                throw new Error("Invalid Redirect Origin");
+                            }
+                        } catch (e) {
+                            console.warn("Blocked potentially unsafe redirect:", returnUrl);
+                            sessionStorage.removeItem('returnUrl');
+                            await handleRoleRouting(result.user, intent);
+                        }
+                    } else {
+                        // Default flow if url is suspicious or missing
+                        sessionStorage.removeItem('returnUrl');
+                        await handleRoleRouting(result.user, intent);
+                    }
+                } else {
+                    const friendlyMsg = getFriendlyErrorMessage(result.error);
+                    alert(friendlyMsg);
+                }
+            } catch (e) {
+                const friendlyMsg = getFriendlyErrorMessage(e.code || e.message);
+                alert(friendlyMsg);
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.innerHTML = 'Log In';
+            }
+        }
+    </script>
+
+    <!-- SLIDER UI & BYPASS LOGIC (Global) -->
+    <script>
+        // --- 0. PASSWORD VISIBILITY TOGGLE ---
+        const togglePassword = document.getElementById('togglePassword');
+        const passInput = document.getElementById('passInput');
+        if (togglePassword && passInput) {
+            togglePassword.addEventListener('click', function () {
+                const type = passInput.type === 'password' ? 'text' : 'password';
+                passInput.type = type;
+                const icon = this.querySelector('i');
+                icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+            });
+        }
+
+        // --- 0.5 CAPS LOCK WARNING ---
+        if (passInput) {
+            passInput.addEventListener('keyup', function (event) {
+                const capsWarning = document.getElementById('capsWarning') || (() => {
+                    const warning = document.createElement('div');
+                    warning.id = 'capsWarning';
+                    warning.style.cssText = 'color: #F49F75; font-size: 0.85rem; margin-top: 5px; display: none;';
+                    warning.innerHTML = '<i class="fas fa-exclamation-triangle"></i> CAPS LOCK is ON';
+                    this.parentElement.appendChild(warning);
+                    return warning;
+                })();
+
+                const isCapsOn = event.getModifierState && event.getModifierState('CapsLock');
+                capsWarning.style.display = isCapsOn ? 'block' : 'none';
+            });
+        }
+
+        // ---  0.6 NETWORK STATUS CHECK ---
+        window.addEventListener('offline', () => {
+            alert('⚠️ You are offline. Please check your internet connection.');
+        });
+
+        if (!navigator.onLine) {
+            console.log('No internet connection detected on page load');
+        }
+
+        // --- PHASE 4: Auto-fill Remembered Email ---
+        const rememberedEmail = localStorage.getItem('rememberedEmail');
+        if (rememberedEmail) {
+            const emailInput = document.getElementById('emailInput');
+            if (emailInput) {
+                emailInput.value = rememberedEmail;
+                document.getElementById('rememberMe').checked = true;
+            }
+        }
+
+        // --- 1. HORIZONTAL PILL ROLE SELECTOR LOGIC ---
+        const roles = [
+            // User: Peach (Neutral), No Glow, Astronaut Icon
+            { t: "I'm Here to Talk", d: "Personal reflection, support, and journaling.", c: "#F49F75", i: "fas fa-user-astronaut", v: false, code: "user", glow: false },
+            // Peer: Peach Glow + Hands Icon
+            { t: "I'm a Peer", d: "Supporting others through lived experience.", c: "#F49F75", i: "fas fa-hands-helping", v: true, code: "peer", glow: true },
+            // Pro: Teal Glow + Doctor Icon
+            { t: "I'm a Psychologist", d: "Professional support and clinical guidance.", c: "#4ECDC4", i: "fas fa-user-md", v: true, code: "psychologist", glow: true }
+        ];
+
+        function setRole(index) {
+            const r = roles[index];
+
+            // Update pill active states with dynamic theme colors
+            const pills = document.querySelectorAll('.role-pill');
+            pills.forEach((pill, i) => {
+                // Update Icon based on role config
+                const icon = pill.querySelector('i');
+                if (icon) icon.className = roles[i].i;
+
+                if (i === index) {
+                    pill.classList.add('active');
+                    // Dynamic Theme: Apply Role Color to Background & Border
+                    pill.style.background = roles[i].glow ? roles[i].c : 'rgba(255, 255, 255, 0.15)'; // Default highlight for User
+                    pill.style.borderColor = roles[i].glow ? roles[i].c : 'rgba(255, 255, 255, 0.3)';
+                    pill.style.color = roles[i].glow ? '#0f172a' : '#fff'; // Dark text for colored buttons, White for User
+
+                    // Add glow effect ONLY if enabled (Peer/Pro)
+                    if (roles[i].glow) {
+                        pill.style.boxShadow = `0 0 15px ${roles[i].c}66`;
+                    } else {
+                        pill.style.boxShadow = 'none';
+                    }
+                } else {
+                    pill.classList.remove('active');
+                    // Reset inline styles
+                    pill.style.background = '';
+                    pill.style.borderColor = '';
+                    pill.style.color = '';
+                    pill.style.boxShadow = '';
+                }
+            });
+
+            // Save role to session
+            sessionStorage.setItem('loginIntent', r.code);
+        }
+
+        // Init - select first pill
+        setRole(0);
+
+        // --- 2. DEV BYPASS ---
+        function handleDevBypass() {
+            const intent = sessionStorage.getItem('loginIntent') || 'user';
+            const btn = document.querySelector('button[onclick="handleDevBypass()"]');
+            if (btn) btn.innerHTML = 'Entered Dev Mode...';
+
+            const layoutUser = {
+                uid: 'dev-preview', displayName: 'Developer Preview', email: 'dev@soulamore.com', isDev: true
+            };
+            sessionStorage.setItem('user', JSON.stringify(layoutUser));
+            sessionStorage.setItem('userRole', intent);
+
+            setTimeout(() => { manualRedirect(intent); }, 500);
+        }
+
+        function manualRedirect(intent) {
+            let target = 'user-dashboard.html';
+            if (intent === 'peer') target = 'peer-dashboard.html';
+            if (intent === 'psychologist') target = 'psych-dashboard.html';
+            window.location.href = target;
+        }
+        window.manualRedirect = manualRedirect;
+
+        // --- 3. PARTICLES ---
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 4 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            particleContainer.appendChild(p);
+        }
+    </script>
+
+</body>
+
+</html>

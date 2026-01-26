@@ -46,7 +46,8 @@
             display: grid;
             grid-template-columns: 260px 1fr 300px;
             flex: 1;
-            padding-top: 150px;
+            padding-top: 20px;
+            /* Reduced from 150px, Shell handles header */
             /* Clear fixed header */
             max-width: 1400px;
             margin: 0 auto;
@@ -61,8 +62,9 @@
             display: flex;
             flex-direction: column;
             position: sticky;
-            top: 140px;
-            height: calc(100vh - 140px);
+            top: 120px;
+            /* Adjusted for Shell Header */
+            height: calc(100vh - 120px);
             overflow-y: auto;
         }
 
@@ -276,8 +278,9 @@
             background: rgba(15, 23, 42, 0.5);
             padding: 20px;
             position: sticky;
-            top: 140px;
-            height: calc(100vh - 140px);
+            top: 120px;
+            /* Adjusted for Shell Header */
+            height: calc(100vh - 120px);
             overflow-y: auto;
         }
 
@@ -500,87 +503,102 @@
 <body>
 
     <!-- GLOBAL HEADER (ISLAND STYLE) -->
-    <header></header>
+    <!-- GLOBAL HEADER (ISLAND STYLE) -->
+    <!-- APP SHELL START -->
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header id="main-header"></header>
+        </div>
 
-    <div class="app-layout">
+        <main id="shell-content">
+            <div class="app-layout">
 
-        <!-- SIDEBAR LEFT -->
-        <nav class="sidebar-left">
-            <div class="category-header">Main Menu</div>
-            <div class="menu-item active"><i class="fas fa-home menu-icon-active"></i> <span class="menu-text">Home
-                    Feed</span></div>
-            <div class="menu-item"><i class="fas fa-fire"></i> <span class="menu-text">Trending</span></div>
-            <div class="menu-item"><i class="fas fa-bookmark"></i> <span class="menu-text">Saved</span></div>
+                <!-- SIDEBAR LEFT -->
+                <nav class="sidebar-left">
+                    <div class="category-header">Main Menu</div>
+                    <div class="menu-item active"><i class="fas fa-home menu-icon-active"></i> <span
+                            class="menu-text">Home
+                            Feed</span></div>
+                    <div class="menu-item"><i class="fas fa-fire"></i> <span class="menu-text">Trending</span></div>
+                    <div class="menu-item"><i class="fas fa-bookmark"></i> <span class="menu-text">Saved</span></div>
 
-            <div class="category-header">Communities</div>
-            <div class="menu-item"><i class="fas fa-graduation-cap"></i> <span class="menu-text">Academic Stress</span>
-            </div>
-            <div class="menu-item"><i class="fas fa-plane"></i> <span class="menu-text">International</span></div>
-            <div class="menu-item"><i class="fas fa-heart-broken"></i> <span class="menu-text">Relationships</span>
-            </div>
-            <div class="menu-item"><i class="fas fa-user-friends"></i> <span class="menu-text">Social Anxiety</span>
-            </div>
-        </nav>
+                    <div class="category-header">Communities</div>
+                    <div class="menu-item"><i class="fas fa-graduation-cap"></i> <span class="menu-text">Academic
+                            Stress</span>
+                    </div>
+                    <div class="menu-item"><i class="fas fa-plane"></i> <span class="menu-text">International</span>
+                    </div>
+                    <div class="menu-item"><i class="fas fa-heart-broken"></i> <span
+                            class="menu-text">Relationships</span>
+                    </div>
+                    <div class="menu-item"><i class="fas fa-user-friends"></i> <span class="menu-text">Social
+                            Anxiety</span>
+                    </div>
+                </nav>
 
-        <!-- CENTER FEED -->
-        <main class="feed-container">
-            <div class="feed-header">
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search topics...">
-                </div>
+                <!-- CENTER FEED -->
+                <main class="feed-container">
+                    <div class="feed-header">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search topics...">
+                        </div>
 
-                <div class="filters">
-                    <div class="filter-pill active" onclick="filterFeed('All', this)">All</div>
-                    <div class="filter-pill" onclick="filterFeed('Support Needed', this)">Support Needed</div>
-                    <div class="filter-pill" onclick="filterFeed('Venting', this)">Venting</div>
-                    <div class="filter-pill" onclick="filterFeed('Success Stories', this)">Success Stories</div>
-                    <div class="filter-pill" onclick="filterFeed('Advice', this)">Advice</div>
-                    <div class="filter-pill" style="border-color: #C13584; color: #C13584;"
-                        onclick="filterFeed('Instagram', this)"><i class="fab fa-instagram"></i> Instagram</div>
-                    <div class="filter-pill" style="border-color: var(--teal-glow); color: var(--teal-glow);"
-                        onclick="filterFeed('Confessions', this)"><i class="fas fa-mask"></i> Confessions</div>
-                </div>
-            </div>
+                        <div class="filters">
+                            <div class="filter-pill active" onclick="filterFeed('All', this)">All</div>
+                            <div class="filter-pill" onclick="filterFeed('Support Needed', this)">Support Needed</div>
+                            <div class="filter-pill" onclick="filterFeed('Venting', this)">Venting</div>
+                            <div class="filter-pill" onclick="filterFeed('Success Stories', this)">Success Stories</div>
+                            <div class="filter-pill" onclick="filterFeed('Advice', this)">Advice</div>
+                            <div class="filter-pill" style="border-color: #C13584; color: #C13584;"
+                                onclick="filterFeed('Instagram', this)"><i class="fab fa-instagram"></i> Instagram</div>
+                            <div class="filter-pill" style="border-color: var(--teal-glow); color: var(--teal-glow);"
+                                onclick="filterFeed('Confessions', this)"><i class="fas fa-mask"></i> Confessions</div>
+                        </div>
+                    </div>
 
-            <div style="padding: 20px;">
-                <!-- MOCK INPUT -->
-                <div class="create-post-trigger" onclick="openModal()">
-                    <div class="user-avatar-sm">Me</div>
-                    <div class="mock-input">What's on your mind today?</div>
-                </div>
+                    <div style="padding: 20px;">
+                        <!-- MOCK INPUT -->
+                        <div class="create-post-trigger" onclick="openModal()">
+                            <div class="user-avatar-sm">Me</div>
+                            <div class="mock-input">What's on your mind today?</div>
+                        </div>
 
-                <!-- POSTS -->
-                <div id="postsFeed">
-                    <!-- Populated by JS -->
-                </div>
+                        <!-- POSTS -->
+                        <div id="postsFeed">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </main>
+
+                <!-- SIDEBAR RIGHT -->
+                <aside class="sidebar-right">
+                    <div class="panel-box">
+                        <div class="panel-title">Forum Rules</div>
+                        <div class="rule-item">Be respectful and kind.</div>
+                        <div class="rule-item">No hate speech or bullying.</div>
+                        <div class="rule-item">Respect anonymity.</div>
+                        <div class="rule-item">Trigger warnings for sensitive topics.</div>
+                    </div>
+
+                    <div class="panel-box">
+                        <div class="panel-title">Online Peers</div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <div class="user-avatar-sm" style="background:#fbbf24; color:black;">A</div>
+                            <div class="user-avatar-sm" style="background:#e879f9;">S</div>
+                            <div class="user-avatar-sm" style="background:#38bdf8;">J</div>
+                            <div style="font-size:0.8rem; color:#94a3b8; display:flex; align-items:center;">+ 124 others
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
             </div>
         </main>
-
-        <!-- SIDEBAR RIGHT -->
-        <aside class="sidebar-right">
-            <div class="panel-box">
-                <div class="panel-title">Forum Rules</div>
-                <div class="rule-item">Be respectful and kind.</div>
-                <div class="rule-item">No hate speech or bullying.</div>
-                <div class="rule-item">Respect anonymity.</div>
-                <div class="rule-item">Trigger warnings for sensitive topics.</div>
-            </div>
-
-            <div class="panel-box">
-                <div class="panel-title">Online Peers</div>
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <div class="user-avatar-sm" style="background:#fbbf24; color:black;">A</div>
-                    <div class="user-avatar-sm" style="background:#e879f9;">S</div>
-                    <div class="user-avatar-sm" style="background:#38bdf8;">J</div>
-                    <div style="font-size:0.8rem; color:#94a3b8; display:flex; align-items:center;">+ 124 others</div>
-                </div>
-            </div>
-        </aside>
-
+        <!-- STANDARDIZED FOOTER -->
+        <footer></footer>
     </div>
-
-    <!-- CREATE POST MODAL -->
+    <!-- APP SHELL END -->
     <div class="modal-overlay" id="createModal">
         <div class="modal-box">
             <div class="modal-header">
@@ -618,8 +636,7 @@
     </div>
 
 
-    <!-- STANDARDIZED FOOTER -->
-    <footer></footer>
+
 
     <script src="../assets/js/api.js"></script>
     <script src="../assets/js/components.js"></script>

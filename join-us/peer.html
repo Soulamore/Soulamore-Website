@@ -32,7 +32,6 @@
             background-color: var(--deep-space);
             color: var(--starlight);
             line-height: 1.6;
-            overflow-x: hidden;
         }
 
         h1,
@@ -40,6 +39,8 @@
         h3 {
             font-family: 'Outfit', sans-serif;
         }
+
+        /* ... existing fade-in ... */
 
         .fade-in {
             animation: fadeIn 0.8s ease-out forwards;
@@ -85,11 +86,18 @@
 
         /* --- SCROLL AREA --- */
         .container {
+            width: 100%;
+            /* FIX: Prevent collapse */
             max-width: 900px;
             margin: 0 auto;
-            padding: 150px 24px 100px;
+            padding: 0 24px 100px;
+            /* Adjusted for global shell padding */
             position: relative;
-            z-index: 5;
+            z-index: 10;
+            /* Ensure above footer */
+            box-sizing: border-box;
+            /* Ensure flex child behaves */
+            flex: 1;
         }
 
         /* --- FORM STYLES --- */
@@ -236,6 +244,8 @@
             margin-top: 30px;
         }
 
+
+
         .action-btn:hover {
             transform: scale(1.03);
             box-shadow: 0 10px 30px rgba(251, 191, 36, 0.2);
@@ -246,132 +256,132 @@
 
 <body>
 
-    <!-- GLOBAL HEADER -->
-    <!-- GLOBAL HEADER (ISLAND STYLE) -->
-    <header></header>
+    <!-- APP SHELL START -->
+    <div id="app-shell">
+        <div id="particles"></div>
 
-    <div id="particles"></div>
-
-    <main class="page-wrapper">
-        <div class="container">
-
-            <!-- STEP 1: INTRO -->
-            <div class="page-view fade-in">
-                <div class="section-header">
-                    <span
-                        style="border:1px solid var(--gold-glow); color:var(--gold-glow); padding:5px 15px; border-radius:20px; font-size:0.8rem; margin-bottom:15px; display:inline-block;">VOLUNTEER
-                        ROLE</span>
-                    <h1>Become a Peer</h1>
-
-                    <div class="footer-socials">
-                        <a href="https://www.instagram.com/soulamore_/" target="_blank"><i
-                                class="fab fa-instagram"></i></a>
-                        <a href="https://www.linkedin.com/company/soulamore/" target="_blank"><i
-                                class="fab fa-linkedin"></i></a>
-                        <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank"><i
-                                class="fab fa-facebook"></i></a>
-                    </div>
-                    <p>Turn your lived experience into someone else's lifeline.</p>
-                </div>
-
-                <form id="peerAppForm" onsubmit="event.preventDefault(); submitPeerApp();">
-                    <div class="form-card">
-                        <h3
-                            style="margin-bottom:20px; border-bottom:1px solid var(--border-glass); padding-bottom:10px;">
-                            01. The Basics</h3>
-
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                            <div class="input-group">
-                                <label class="input-label">Full Name</label>
-                                <input type="text" name="fullName" class="input-box" placeholder="e.g. Aditya Harsh"
-                                    required>
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Email Address</label>
-                                <input type="email" name="email" class="input-box" placeholder="you@university.edu"
-                                    required>
-                            </div>
-                        </div>
-
-                        <div class="input-group">
-                            <label class="input-label">Current Role / Status</label>
-                            <select name="role" class="input-box" style="background:#0f172a;">
-                                <option value="Student">Student</option>
-                                <option value="Working Professional">Working Professional</option>
-                                <option value="Psychology Graduate">Psychology Graduate</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-card">
-                        <h3
-                            style="margin-bottom:20px; border-bottom:1px solid var(--border-glass); padding-bottom:10px;">
-                            02. Your Story</h3>
-
-                        <div class="input-group">
-                            <label class="input-label">Which areas do you have lived experience in?</label>
-                            <p style="font-size:0.8rem; opacity:0.6; margin-bottom:10px;">Select all that apply. This
-                                helps
-                                us match you.</p>
-                            <div class="check-grid">
-                                <div class="tag-item"><input type="checkbox" id="c1"><label for="c1">Academic
-                                        Stress</label></div>
-                                <div class="tag-item"><input type="checkbox" id="c2"><label for="c2">Loneliness</label>
-                                </div>
-                                <div class="tag-item"><input type="checkbox" id="c3"><label for="c3">Relationship
-                                        Issues</label></div>
-                                <div class="tag-item"><input type="checkbox" id="c4"><label for="c4">Grief /
-                                        Loss</label>
-                                </div>
-                                <div class="tag-item"><input type="checkbox" id="c5"><label for="c5">Body
-                                        Image</label>
-                                </div>
-                                <div class="tag-item"><input type="checkbox" id="c6"><label for="c6">Career
-                                        Anxiety</label></div>
-                            </div>
-                        </div>
-
-                        <div class="input-group">
-                            <label class="input-label">Why do you want to be a Peer?</label>
-                            <textarea name="motivation" class="input-box"
-                                placeholder="Tell us briefly about why you want to support others..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-card">
-                        <h3
-                            style="margin-bottom:20px; border-bottom:1px solid var(--border-glass); padding-bottom:10px;">
-                            03. Commitment</h3>
-                        <p style="opacity:0.8; font-size:0.9rem; margin-bottom:20px;">Peers are expected to volunteer at
-                            least 2 hours per week. We provide training and supervision.</p>
-
-                        <div class="check-item" style="margin-top:20px;">
-                            <input type="checkbox" id="terms" required>
-                            <label for="terms" style="background:none; padding:0;">
-                                I understand that this is a volunteer role and not a substitute for professional therapy
-                                training.
-                            </label>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="action-btn" id="fullSubmitBtn">Submit Application</button>
-            </div>
-            </form>
-
+        <div id="shell-fixed">
+            <header id="main-header"></header>
         </div>
-    </main>
 
-    <!-- GLOBAL FOOTER (HASHLILLY STANDARD) -->
-    <!-- GLOBAL FOOTER -->
+        <main id="shell-content">
+            <div class="container">
 
+                <!-- STEP 1: INTRO -->
+                <div class="fade-in">
+                    <div class="section-header">
+                        <span
+                            style="border:1px solid var(--gold-glow); color:var(--gold-glow); padding:5px 15px; border-radius:20px; font-size:0.8rem; margin-bottom:15px; display:inline-block;">VOLUNTEER
+                            ROLE</span>
+                        <h1>Become a Peer</h1>
 
+                        <div class="footer-socials">
+                            <a href="https://www.instagram.com/soulamore_/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.linkedin.com/company/soulamore/" target="_blank"><i
+                                    class="fab fa-linkedin"></i></a>
+                            <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank"><i
+                                    class="fab fa-facebook"></i></a>
+                        </div>
+                        <p>Turn your lived experience into someone else's lifeline.</p>
+                    </div>
 
+                    <form id="peerAppForm" onsubmit="event.preventDefault(); submitPeerApp();">
+                        <div class="form-card">
+                            <h3
+                                style="margin-bottom:20px; border-bottom:1px solid var(--border-glass); padding-bottom:10px;">
+                                01. The Basics</h3>
 
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                                <div class="input-group">
+                                    <label class="input-label">Full Name</label>
+                                    <input type="text" name="fullName" class="input-box" placeholder="e.g. Aditya Harsh"
+                                        required>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Email Address</label>
+                                    <input type="email" name="email" class="input-box" placeholder="you@university.edu"
+                                        required>
+                                </div>
+                            </div>
 
+                            <div class="input-group">
+                                <label class="input-label">Current Role / Status</label>
+                                <select name="role" class="input-box" style="background:#0f172a;">
+                                    <option value="Student">Student</option>
+                                    <option value="Working Professional">Working Professional</option>
+                                    <option value="Psychology Graduate">Psychology Graduate</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
 
-    <!-- STANDARDIZED FOOTER -->
-    <footer></footer>
+                        <div class="form-card">
+                            <h3
+                                style="margin-bottom:20px; border-bottom:1px solid var(--border-glass); padding-bottom:10px;">
+                                02. Your Story</h3>
+
+                            <div class="input-group">
+                                <label class="input-label">Which areas do you have lived experience in?</label>
+                                <p style="font-size:0.8rem; opacity:0.6; margin-bottom:10px;">Select all that apply.
+                                    This
+                                    helps
+                                    us match you.</p>
+                                <div class="check-grid">
+                                    <div class="tag-item"><input type="checkbox" id="c1"><label for="c1">Academic
+                                            Stress</label></div>
+                                    <div class="tag-item"><input type="checkbox" id="c2"><label
+                                            for="c2">Loneliness</label>
+                                    </div>
+                                    <div class="tag-item"><input type="checkbox" id="c3"><label for="c3">Relationship
+                                            Issues</label></div>
+                                    <div class="tag-item"><input type="checkbox" id="c4"><label for="c4">Grief /
+                                            Loss</label>
+                                    </div>
+                                    <div class="tag-item"><input type="checkbox" id="c5"><label for="c5">Body
+                                            Image</label>
+                                    </div>
+                                    <div class="tag-item"><input type="checkbox" id="c6"><label for="c6">Career
+                                            Anxiety</label></div>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="input-label">Why do you want to be a Peer?</label>
+                                <textarea name="motivation" class="input-box"
+                                    placeholder="Tell us briefly about why you want to support others..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-card">
+                            <h3
+                                style="margin-bottom:20px; border-bottom:1px solid var(--border-glass); padding-bottom:10px;">
+                                03. Commitment</h3>
+                            <p style="opacity:0.8; font-size:0.9rem; margin-bottom:20px;">Peers are expected to
+                                volunteer at
+                                least 2 hours per week. We provide training and supervision.</p>
+
+                            <div class="check-item" style="margin-top:20px;">
+                                <input type="checkbox" id="terms" required>
+                                <label for="terms" style="background:none; padding:0;">
+                                    I understand that this is a volunteer role and not a substitute for professional
+                                    therapy
+                                    training.
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="action-btn" id="fullSubmitBtn">Submit Application</button>
+                </div>
+                </form>
+
+            </div>
+        </main>
+
+        <!-- STANDARDIZED FOOTER -->
+        <footer id="main-footer"></footer>
+    </div>
+    <!-- APP SHELL END -->
 
     <script src="../assets/js/components.js"></script>
     <script src="../assets/js/main.js"></script>
