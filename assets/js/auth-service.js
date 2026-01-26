@@ -45,7 +45,10 @@ export async function loginWithGoogle() {
         return { success: true, user: user };
     } catch (error) {
         console.error("Google Login Error:", error);
-        return { success: false, error: error.message };
+        // Return error code for better debugging
+        const errorCode = error.code || error.message;
+        const errorMessage = error.message || 'Unknown error occurred';
+        return { success: false, error: errorMessage, code: errorCode };
     }
 }
 

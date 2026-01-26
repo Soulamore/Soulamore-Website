@@ -445,6 +445,8 @@
                 }
 
                 const result = await loginWithGoogle();
+                
+                console.log('Google login result:', result);
 
                 if (result.success) {
                     // Check profile status
@@ -481,14 +483,32 @@
                 }
             } catch (e) {
                 console.error('Google login error:', e);
-                let errorMsg = e.message || "Google login failed";
-                if (errorMsg.includes('operation-not-allowed')) {
-                    errorMsg = "Google login is not enabled. Please contact support or use email login.";
+                let errorMsg = e.message || e.code || "Google login failed";
+                
+                // Check for specific Firebase error codes
+                if (e.code) {
+                    if (e.code === 'auth/operation-not-allowed') {
+                        errorMsg = "Google login is not enabled in Firebase Console. Please contact support.";
+                    } else if (e.code === 'auth/popup-blocked') {
+                        errorMsg = "Popup was blocked by your browser. Please allow popups for soulamore.com and try again.";
+                    } else if (e.code === 'auth/popup-closed-by-user') {
+                        errorMsg = "Sign-in was cancelled. Please try again.";
+                    } else if (e.code === 'auth/unauthorized-domain') {
+                        errorMsg = "This domain is not authorized. Please add soulamore.com to Firebase authorized domains.";
+                    } else if (e.code === 'auth/network-request-failed') {
+                        errorMsg = "Network error. Please check your internet connection and try again.";
+                    } else {
+                        errorMsg = `Google login failed: ${e.code} - ${e.message || 'Unknown error'}`;
+                    }
+                } else if (errorMsg.includes('operation-not-allowed')) {
+                    errorMsg = "Google login is not enabled in Firebase Console. Please contact support.";
                 } else if (errorMsg.includes('popup-blocked')) {
                     errorMsg = "Popup was blocked. Please allow popups for this site and try again.";
                 } else if (errorMsg.includes('unauthorized-domain')) {
                     errorMsg = "This domain is not authorized. Please contact support.";
                 }
+                
+                console.error('Final error message:', errorMsg);
                 alert(errorMsg);
                 // Re-enable button on error
                 if (gBtn) {
@@ -517,19 +537,46 @@
             const modal = document.getElementById('phone-modal');
             if (modal.style.display === 'none' || modal.style.display === '') {
                 modal.style.display = 'flex';
+                
+                // Check if we're on HTTPS
+                const isHTTPS = window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                
                 // Initialize reCAPTCHA when modal opens
-                setTimeout(() => {
-                    if (window.initRecaptcha) {
-                        window.initRecaptcha();
+                const initRecaptchaWithRetry = (attempts = 0) => {
+                    if (window.initRecaptcha && typeof window.initRecaptcha === 'function') {
+                        try {
+                            window.initRecaptcha();
+                            // Clear any warning messages
+                            const recaptchaContainer = document.getElementById('recaptcha-container');
+                            if (recaptchaContainer && recaptchaContainer.querySelector('p')) {
+                                recaptchaContainer.innerHTML = '';
+                            }
+                        } catch (e) {
+                            console.error('Error initializing reCAPTCHA:', e);
+                            const recaptchaContainer = document.getElementById('recaptcha-container');
+                            if (recaptchaContainer) {
+                                recaptchaContainer.innerHTML = '<p style="color: #ef4444; font-size: 0.85rem; margin-top: 10px;">⚠️ Error initializing reCAPTCHA. Please refresh the page.</p>';
+                            }
+                        }
+                    } else if (attempts < 10) {
+                        // Retry up to 10 times (1 second total)
+                        setTimeout(() => initRecaptchaWithRetry(attempts + 1), 100);
                     } else {
-                        console.warn("Auth Module not loaded yet (CORS/File Protocol issue?)");
-                        // Show helpful message
+                        // Modules still not loaded after retries
+                        console.warn("Auth Module not loaded after retries");
                         const recaptchaContainer = document.getElementById('recaptcha-container');
                         if (recaptchaContainer) {
-                            recaptchaContainer.innerHTML = '<p style="color: #f59e0b; font-size: 0.85rem; margin-top: 10px;">⚠️ Please ensure you are accessing this page via HTTPS (not file://). Authentication requires a secure connection.</p>';
+                            if (!isHTTPS) {
+                                recaptchaContainer.innerHTML = '<p style="color: #f59e0b; font-size: 0.85rem; margin-top: 10px;">⚠️ Please ensure you are accessing this page via HTTPS (not file://). Authentication requires a secure connection.</p>';
+                            } else {
+                                recaptchaContainer.innerHTML = '<p style="color: #f59e0b; font-size: 0.85rem; margin-top: 10px;">⚠️ Authentication modules are still loading. Please wait a moment and try again.</p>';
+                            }
                         }
                     }
-                }, 100);
+                };
+                
+                // Start initialization with retry
+                setTimeout(() => initRecaptchaWithRetry(), 100);
             } else {
                 modal.style.display = 'none';
                 // Clean up reCAPTCHA when modal closes
