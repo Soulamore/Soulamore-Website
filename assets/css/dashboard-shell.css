@@ -1,0 +1,195 @@
+/* ============================================
+   SOULAMORE DASHBOARD - SINGLE APP SHELL
+   Architecture: Fixed Sidebar + Fluid Content Shell
+   ============================================ */
+
+/* 1. ROOT LAYOUT CONTEXT */
+body {
+    overflow: hidden;
+    /* Prevent body scroll, everything lives in #page-stage */
+    background: var(--bg-base);
+    /* Base theme color */
+}
+
+#dashboard-root {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    background: var(--bg-base);
+}
+
+/* 2. SIDEBAR (Fixed Z-Index King) */
+#sidebar {
+    width: 260px;
+    height: 100%;
+    flex-shrink: 0;
+    z-index: 500;
+    /* Sidebar is always above content */
+    position: relative;
+    /* Stays in flow but z-indexed */
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border-subtle);
+}
+
+/* 3. APP SHELL (The Main Content Wrapper) */
+#app-shell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+    /* Prevent flex overflow */
+    position: relative;
+    z-index: 10;
+    /* Below sidebar */
+    background: var(--bg-base);
+}
+
+/* 4. GLOBAL PAGE HEADER (Fixed Height) */
+#page-header {
+    height: var(--header-height, 64px);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    /* Aligned with content padding */
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--bg-base);
+    z-index: 20;
+}
+
+/* 5. PAGE STAGE (The ONLY Scroll Container) */
+#page-stage {
+    flex: 1;
+    overflow-y: auto;
+    /* Vertical scroll only */
+    overflow-x: hidden;
+    padding: 24px 40px;
+    /* Consistent spacing */
+    position: relative;
+    scroll-behavior: smooth;
+    display: block;
+    /* It's a container, not a flex parent for views */
+}
+
+.page-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+    /* Bottom Scroll buffer */
+}
+
+/* 6. VIEWS (Strict Content Only) */
+.view-section {
+    display: none;
+    /* Default hidden */
+    width: 100%;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.view-section.active {
+    display: block;
+    /* Content flow */
+}
+
+/* Special Case: Spatial Layouts (SoulBot, Grid Views) */
+.view-section.spatial-view {
+    height: 100%;
+    display: none;
+}
+
+.view-section.spatial-view.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 7. ANIMATIONS */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 8. COMPONENT UTILITIES (Locked) */
+.page-header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.page-header-icon.system {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+}
+
+.page-header-icon.peer {
+    background: var(--peach-soft);
+    color: var(--peach-base);
+    box-shadow: 0 0 10px rgba(244, 162, 97, 0.2);
+}
+
+.page-header-icon.pro {
+    background: var(--teal-dim);
+    color: var(--teal-accent);
+    box-shadow: 0 0 10px rgba(45, 212, 191, 0.2);
+}
+
+.page-header-content h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+    color: var(--text-main);
+}
+
+.page-header-content p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+    opacity: 0.8;
+}
+
+/* 9. THEME TOKENS (Scoped Variables) */
+:root {
+    /* Color Primitives */
+    --peach-base: #F4A261;
+    --teal-base: #2DD4BF;
+
+    /* PEACH (Peer) Context - Use Sparingly */
+    --peach-glow: var(--peach-base);
+    --peach-soft: rgba(244, 162, 97, 0.12);
+    --peach-border: rgba(244, 162, 97, 0.35);
+
+    /* TEAL (Professional) Context */
+    --teal-accent: var(--teal-base);
+    --teal-dim: rgba(45, 212, 191, 0.12);
+    --teal-border: rgba(45, 212, 191, 0.35);
+}
+
+/* Peer Theme Enforcement */
+.peer-theme {
+    --accent-color: var(--peach-base);
+    --accent-soft: var(--peach-soft);
+    --accent-border: var(--peach-border);
+}
+
+/* Professional Theme Enforcement */
+.pro-theme {
+    --accent-color: var(--teal-base);
+    --accent-soft: var(--teal-dim);
+    --accent-border: var(--teal-border);
+}
