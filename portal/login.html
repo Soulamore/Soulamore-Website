@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Content Security Policy: Prevent XSS and injection attacks -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; 
                  script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/; 
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; 
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; 
@@ -349,12 +350,12 @@
                     fbBtn.style.cursor = 'not-allowed';
                     const originalHTML = fbBtn.innerHTML;
                     fbBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    
-                const res = await loginWithFacebook();
-                    
+
+                    const res = await loginWithFacebook();
+
                     if (res.success) {
                         await createOrUpdateUserProfile(res.user);
-                        
+
                         // --- PEER ONBOARDING CHECK ---
                         if (intent === 'peer') {
                             const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
@@ -436,7 +437,7 @@
                 }
 
                 const result = await loginWithGoogle();
-                
+
                 console.log('Google login result:', result);
 
                 if (result.success) {
@@ -475,7 +476,7 @@
             } catch (e) {
                 console.error('Google login error:', e);
                 let errorMsg = e.message || e.code || "Google login failed";
-                
+
                 // Check for specific Firebase error codes
                 if (e.code) {
                     if (e.code === 'auth/operation-not-allowed') {
@@ -498,7 +499,7 @@
                 } else if (errorMsg.includes('unauthorized-domain')) {
                     errorMsg = "This domain is not authorized. Please contact support.";
                 }
-                
+
                 console.error('Final error message:', errorMsg);
                 alert(errorMsg);
                 // Re-enable button on error
@@ -528,9 +529,9 @@
             const submitBtn = document.querySelector('.submit-btn');
             const rememberMe = document.getElementById('rememberMe').checked;
 
-            if (!email || !pass) { 
-                alert("Please enter both email and password"); 
-                return; 
+            if (!email || !pass) {
+                alert("Please enter both email and password");
+                return;
             }
 
             // Basic email validation
@@ -624,14 +625,14 @@
                             errorMsg = `Login failed: ${errorCode} - ${result.error || 'Unknown error'}`;
                         }
                     }
-                    
+
                     console.error('Email login error:', errorCode, errorMsg);
                     alert(errorMsg);
                 }
             } catch (e) {
                 console.error('Email login exception:', e);
                 let errorMsg = e.message || "An unexpected error occurred. Please try again.";
-                
+
                 if (e.code) {
                     if (e.code === 'auth/user-not-found') {
                         errorMsg = "No account found with this email. Please sign up first.";
@@ -641,7 +642,7 @@
                         errorMsg = "Invalid email address format.";
                     }
                 }
-                
+
                 alert(errorMsg);
             } finally {
                 // Re-enable button
