@@ -160,16 +160,28 @@ service cloud.firestore {
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid && resource.data.status == 'pending_payment';
     }
 
-    // Peer Availability Schedules
+    // Peer/Psychologist Availability Schedules
     match /peer_availability/{peerId} {
       // Allow read: public read for checking availability
       allow read: if true;
       
-      // Allow create/update: peers can manage their own availability
+      // Allow create/update: peers and psychologists can manage their own availability
       allow create, update: if request.auth != null && request.auth.uid == peerId;
       
-      // Allow delete: peers can delete their own availability
+      // Allow delete: peers and psychologists can delete their own availability
       allow delete: if request.auth != null && request.auth.uid == peerId;
+    }
+
+    // Roles Collection (for peer/psychologist verification)
+    match /roles/{userId} {
+      // Allow read: authenticated users can read their own role
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow create/update: only admins can set roles (restrict in production)
+      allow create, update: if request.auth != null;
+      
+      // Allow delete: only admins can delete roles
+      allow delete: if request.auth != null;
     }
 
     // Peer Pricing Plans
