@@ -903,63 +903,15 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                         </div>
 
                         <!-- Days List -->
-                        <div class="schedule-list">
-                            <!-- MONDAY -->
-                            <div class="schedule-row"
-                                style="display:flex; border-bottom:1px solid var(--border-subtle); padding:15px 0; align-items:center;">
-                                <div style="width:100px; font-weight:600;">Mon</div>
-                                <div style="flex:1;">
-                                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                                        <input type="time" value="09:00"
-                                            style="background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;">
-                                        <span>-</span>
-                                        <input type="time" value="17:00"
-                                            style="background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;">
-                                        <button
-                                            style="background:none; border:none; color:var(--text-muted); cursor:pointer;"><i
-                                                class="fas fa-trash"></i></button>
-                                    </div>
-                                </div>
-                                <button
-                                    style="background:none; border:none; color:var(--teal-accent); cursor:pointer;"><i
-                                        class="fas fa-plus"></i></button>
-                            </div>
-
-                            <!-- TUESDAY -->
-                            <div class="schedule-row"
-                                style="display:flex; border-bottom:1px solid var(--border-subtle); padding:15px 0; align-items:center;">
-                                <div style="width:100px; font-weight:600;">Tue</div>
-                                <div style="flex:1;">
-                                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                                        <input type="time" value="10:00"
-                                            style="background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;">
-                                        <span>-</span>
-                                        <input type="time" value="14:00"
-                                            style="background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;">
-                                        <button
-                                            style="background:none; border:none; color:var(--text-muted); cursor:pointer;"><i
-                                                class="fas fa-trash"></i></button>
-                                    </div>
-                                </div>
-                                <button
-                                    style="background:none; border:none; color:var(--teal-accent); cursor:pointer;"><i
-                                        class="fas fa-plus"></i></button>
-                            </div>
-
-                            <!-- WEDNESDAY (Unavailable) -->
-                            <div class="schedule-row"
-                                style="display:flex; border-bottom:1px solid var(--border-subtle); padding:15px 0; align-items:center; opacity:0.5;">
-                                <div style="width:100px; font-weight:600;">Wed</div>
-                                <div style="flex:1; font-style:italic;">Unavailable</div>
-                                <button
-                                    style="background:none; border:none; color:var(--teal-accent); cursor:pointer;"><i
-                                        class="fas fa-plus"></i></button>
-                            </div>
+                        <div class="schedule-list" id="availability-schedule-list">
+                            <!-- Will be populated by JavaScript -->
                         </div>
 
                         <div style="margin-top:25px; text-align:right;">
-                            <button class="btn-dash-primary" onclick="alert('Availability saved!')">Save
-                                Schedule</button>
+                            <button class="btn-dash-primary" id="save-availability-btn" onclick="saveAvailability()">
+                                <i class="fas fa-spinner fa-spin" id="save-availability-spinner" style="display:none;"></i>
+                                <span id="save-availability-text">Save Schedule</span>
+                            </button>
                         </div>
                     </div>
 
@@ -1734,6 +1686,179 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                     </div>
             `).join('');
         }
+    </script>
+
+    <!-- AVAILABILITY MANAGEMENT -->
+    <script type="module">
+        import { setPeerAvailability, getPeerAvailability } from "../assets/js/peer-booking-handler.js";
+        import { auth } from "../assets/js/firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getUserRole, isPeer } from "../assets/js/role-helper.js";
+
+        const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        let currentAvailability = [];
+
+        // Load availability when view is shown
+        const originalSwitchView = window.switchView;
+        window.switchView = function(viewName, clickedLink) {
+            originalSwitchView(viewName, clickedLink);
+            if (viewName === 'availability') {
+                loadAvailability();
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                await loadAvailability();
+            }
+        });
+
+        async function loadAvailability() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            try {
+                // Verify user is a peer
+                const userIsPeer = await isPeer(user.uid);
+                if (!userIsPeer) {
+                    console.warn('User is not a verified peer. Availability may not be accessible.');
+                }
+
+                const availability = await getPeerAvailability(user.uid);
+                if (availability && availability.availability) {
+                    currentAvailability = availability.availability;
+                } else {
+                    // Default: Monday-Friday, 9 AM - 5 PM
+                    currentAvailability = [
+                        { day: 'monday', startTime: '09:00', endTime: '17:00' },
+                        { day: 'tuesday', startTime: '09:00', endTime: '17:00' },
+                        { day: 'wednesday', startTime: '09:00', endTime: '17:00' },
+                        { day: 'thursday', startTime: '09:00', endTime: '17:00' },
+                        { day: 'friday', startTime: '09:00', endTime: '17:00' }
+                    ];
+                }
+                renderAvailability();
+            } catch (error) {
+                console.error('Error loading availability:', error);
+            }
+        }
+
+        function renderAvailability() {
+            const container = document.getElementById('availability-schedule-list');
+            if (!container) return;
+
+            container.innerHTML = DAYS.map((day, index) => {
+                const daySlots = currentAvailability.filter(slot => slot.day.toLowerCase() === day);
+                const dayLabel = DAY_LABELS[index];
+                
+                if (daySlots.length === 0) {
+                    return `
+                        <div class="schedule-row" data-day="${day}"
+                            style="display:flex; border-bottom:1px solid var(--border-subtle); padding:15px 0; align-items:center; opacity:0.5;">
+                            <div style="width:100px; font-weight:600;">${dayLabel}</div>
+                            <div style="flex:1; font-style:italic;">Unavailable</div>
+                            <button onclick="addTimeSlot('${day}')"
+                                style="background:none; border:none; color:var(--teal-accent); cursor:pointer;">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="schedule-row" data-day="${day}"
+                        style="display:flex; border-bottom:1px solid var(--border-subtle); padding:15px 0; align-items:flex-start;">
+                        <div style="width:100px; font-weight:600; padding-top:8px;">${dayLabel}</div>
+                        <div style="flex:1;">
+                            ${daySlots.map((slot, slotIndex) => `
+                                <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                                    <input type="time" value="${slot.startTime}" 
+                                        data-day="${day}" data-slot="${slotIndex}" data-field="startTime"
+                                        style="background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;"
+                                        onchange="updateTimeSlot('${day}', ${slotIndex}, 'startTime', this.value)">
+                                    <span>-</span>
+                                    <input type="time" value="${slot.endTime}"
+                                        data-day="${day}" data-slot="${slotIndex}" data-field="endTime"
+                                        style="background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;"
+                                        onchange="updateTimeSlot('${day}', ${slotIndex}, 'endTime', this.value)">
+                                    <button onclick="removeTimeSlot('${day}', ${slotIndex})"
+                                        style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:5px;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="addTimeSlot('${day}')"
+                            style="background:none; border:none; color:var(--teal-accent); cursor:pointer; padding:5px;">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.addTimeSlot = function(day) {
+            // Add default slot: 9 AM - 5 PM
+            const newSlot = { day: day.toLowerCase(), startTime: '09:00', endTime: '17:00' };
+            currentAvailability.push(newSlot);
+            renderAvailability();
+        };
+
+        window.removeTimeSlot = function(day, slotIndex) {
+            const daySlots = currentAvailability.filter(slot => slot.day.toLowerCase() === day);
+            const slotToRemove = daySlots[slotIndex];
+            if (slotToRemove) {
+                const index = currentAvailability.indexOf(slotToRemove);
+                currentAvailability.splice(index, 1);
+                renderAvailability();
+            }
+        };
+
+        window.updateTimeSlot = function(day, slotIndex, field, value) {
+            const daySlots = currentAvailability.filter(slot => slot.day.toLowerCase() === day);
+            const slot = daySlots[slotIndex];
+            if (slot) {
+                slot[field] = value;
+            }
+        };
+
+        window.saveAvailability = async function() {
+            const user = auth.currentUser;
+            if (!user) {
+                alert('Please log in to save availability');
+                return;
+            }
+
+            const btn = document.getElementById('save-availability-btn');
+            const spinner = document.getElementById('save-availability-spinner');
+            const text = document.getElementById('save-availability-text');
+
+            try {
+                btn.disabled = true;
+                spinner.style.display = 'inline-block';
+                text.textContent = 'Saving...';
+
+                const success = await setPeerAvailability(user.uid, currentAvailability);
+                
+                if (success) {
+                    text.textContent = 'Saved!';
+                    setTimeout(() => {
+                        text.textContent = 'Save Schedule';
+                        spinner.style.display = 'none';
+                        btn.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error('Failed to save availability');
+                }
+            } catch (error) {
+                console.error('Error saving availability:', error);
+                alert('Failed to save availability. Please try again.');
+                text.textContent = 'Save Schedule';
+                spinner.style.display = 'none';
+                btn.disabled = false;
+            }
+        };
     </script>
 </body>
 

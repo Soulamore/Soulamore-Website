@@ -331,6 +331,7 @@
                         Blogs</span></a>
                 <a href="#" class="side-link" onclick="switchView('clients', this)"><i class="fas fa-users"></i>
                     <span>Clients</span></a>
+                <a href="#" class="side-link" onclick="switchView('availability', this)"><i class="fas fa-calendar-check"></i> <span>Availability</span></a>
                 <a href="#" class="side-link"><i class="fas fa-file-medical"></i> <span>Notes</span></a>
                 <a href="#" class="side-link"><i class="fas fa-file-invoice-dollar"></i> <span>Billing</span></a>
 
@@ -524,6 +525,93 @@
                 </div>
             </div>
 
+            <!-- VIEW: AVAILABILITY -->
+            <div id="view-availability" class="view-section" style="display:none;">
+                <!-- Header -->
+                <div style="margin-bottom:30px; border-bottom:1px solid var(--border-subtle); padding-bottom:20px;">
+                    <h1 style="font-family:'Outfit'; color:var(--text-main); margin-bottom:5px; font-size:2rem;">
+                        Availability</h1>
+                    <p style="opacity:0.7;">Manage your time slots and sync with your personal calendar.</p>
+                </div>
+
+                <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; gap:30px;">
+
+                    <!-- COLUMN 1: WEEKLY SCHEDULER -->
+                    <div class="dash-card">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                            <h3 style="color:var(--teal-accent);">Weekly Schedule</h3>
+                            <div
+                                style="font-size:0.8rem; background:rgba(45, 212, 191, 0.1); color:var(--teal-accent); padding:5px 10px; border-radius:20px;">
+                                <i class="fas fa-globe"></i> GMT+05:30 (Your Time)
+                            </div>
+                        </div>
+
+                        <!-- Days List -->
+                        <div class="schedule-list" id="availability-schedule-list-psych">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+
+                        <div style="margin-top:25px; text-align:right;">
+                            <button class="btn-dash-primary" id="save-availability-btn-psych" onclick="saveAvailabilityPsych()">
+                                <i class="fas fa-spinner fa-spin" id="save-availability-spinner-psych" style="display:none;"></i>
+                                <span id="save-availability-text-psych">Save Schedule</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- COLUMN 2: CALENDAR INTEGRATION -->
+                    <div style="display:flex; flex-direction:column; gap:25px;">
+
+                        <!-- Integration Card -->
+                        <div class="dash-card"
+                            style="background:linear-gradient(145deg, rgba(30,41,59,0.7), rgba(15,23,42,0.9)); border:1px solid var(--teal-dim);">
+                            <h3 style="margin-bottom:15px; display:flex; align-items:center; gap:10px;">
+                                <i class="fas fa-sync-alt" style="color:var(--teal-accent);"></i> Sync Calendar
+                            </h3>
+                            <p style="font-size:0.85rem; opacity:0.7; margin-bottom:20px;">
+                                Connect your calendar to automatically block sessions and prevent double-booking.
+                            </p>
+
+                            <!-- Google -->
+                            <button
+                                onclick="this.innerHTML='<i class=\'fas fa-check\'></i> Connected'; this.style.borderColor='var(--success)'; this.style.color='var(--success)';"
+                                style="width:100%; display:flex; align-items:center; gap:12px; padding:12px; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); border-radius:8px; margin-bottom:10px; color:var(--text-main); cursor:pointer; font-weight:500; transition:all 0.2s;">
+                                <i class="fab fa-google" style="color:#EA4335;"></i> Google Calendar
+                            </button>
+
+                            <!-- Outlook -->
+                            <button onclick="alert('Outlook integration requires API setup.')"
+                                style="width:100%; display:flex; align-items:center; gap:12px; padding:12px; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); border-radius:8px; margin-bottom:10px; color:var(--text-main); cursor:pointer; font-weight:500; transition:all 0.2s;">
+                                <i class="fab fa-microsoft" style="color:#0078D4;"></i> Outlook Calendar
+                            </button>
+
+                            <!-- Apple -->
+                            <button onclick="alert('iCal link copied to clipboard!')"
+                                style="width:100%; display:flex; align-items:center; gap:12px; padding:12px; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-main); cursor:pointer; font-weight:500; transition:all 0.2s;">
+                                <i class="fab fa-apple" style="color:#fff;"></i> Apple Calendar
+                            </button>
+                        </div>
+
+                        <!-- Sync Settings -->
+                        <div class="dash-card">
+                            <h4 style="margin-bottom:15px; color:var(--peach-accent);">Sync Settings</h4>
+                            <label
+                                style="display:flex; align-items:center; gap:10px; font-size:0.9rem; margin-bottom:12px; cursor:pointer;">
+                                <input type="checkbox" checked style="accent-color:var(--teal-accent);">
+                                <span style="opacity:0.8;">Add sessions to my calendar</span>
+                            </label>
+                            <label
+                                style="display:flex; align-items:center; gap:10px; font-size:0.9rem; margin-bottom:0; cursor:pointer;">
+                                <input type="checkbox" style="accent-color:var(--teal-accent);">
+                                <span style="opacity:0.8;">Block calendar busy times</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
             <!-- VIEW: SETTINGS -->
             <div id="view-settings" class="view-section" style="display:none;">
                 <h2 style="font-family:'Outfit'; margin-bottom:20px;">Settings</h2>
@@ -540,7 +628,7 @@
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
         function handleLogout() { sessionStorage.clear(); window.location.href = 'logout.html'; }
 
-        function switchView(viewName, clickedLink) {
+        let switchViewOriginal = function(viewName, clickedLink) {
             document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
             let t = document.getElementById('view-' + viewName);
             if (t) t.style.display = 'block';
@@ -549,7 +637,9 @@
                 document.querySelectorAll('.sidebar-nav .side-link').forEach(l => l.classList.remove('active'));
                 clickedLink.classList.add('active');
             }
-        }
+        };
+        
+        window.switchView = switchViewOriginal;
 
         function openEditor() {
             window.location.href = 'blog-editor.html';
@@ -581,6 +671,181 @@
                 }
             }
         });
+    </script>
+
+    <!-- AVAILABILITY MANAGEMENT FOR PSYCHOLOGISTS -->
+    <script type="module">
+        import { setPeerAvailability, getPeerAvailability } from "../assets/js/peer-booking-handler.js";
+        import { auth } from "../assets/js/firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getUserRole, isPsychologist } from "../assets/js/role-helper.js";
+
+        const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        let currentAvailabilityPsych = [];
+
+        // Load availability when view is shown
+        const originalSwitchViewPsych = window.switchView;
+        window.switchView = function(viewName, clickedLink) {
+            if (originalSwitchViewPsych) {
+                originalSwitchViewPsych(viewName, clickedLink);
+            }
+            if (viewName === 'availability') {
+                loadAvailabilityPsych();
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                await loadAvailabilityPsych();
+            }
+        });
+
+        async function loadAvailabilityPsych() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            try {
+                // Verify user is a psychologist
+                const userIsPsych = await isPsychologist(user.uid);
+                if (!userIsPsych) {
+                    console.warn('User is not a verified psychologist. Availability may not be accessible.');
+                }
+
+                const availability = await getPeerAvailability(user.uid);
+                if (availability && availability.availability) {
+                    currentAvailabilityPsych = availability.availability;
+                } else {
+                    // Default: Monday-Friday, 9 AM - 5 PM
+                    currentAvailabilityPsych = [
+                        { day: 'monday', startTime: '09:00', endTime: '17:00' },
+                        { day: 'tuesday', startTime: '09:00', endTime: '17:00' },
+                        { day: 'wednesday', startTime: '09:00', endTime: '17:00' },
+                        { day: 'thursday', startTime: '09:00', endTime: '17:00' },
+                        { day: 'friday', startTime: '09:00', endTime: '17:00' }
+                    ];
+                }
+                renderAvailabilityPsych();
+            } catch (error) {
+                console.error('Error loading availability:', error);
+            }
+        }
+
+        function renderAvailabilityPsych() {
+            const container = document.getElementById('availability-schedule-list-psych');
+            if (!container) return;
+
+            container.innerHTML = DAYS.map((day, index) => {
+                const daySlots = currentAvailabilityPsych.filter(slot => slot.day.toLowerCase() === day);
+                const dayLabel = DAY_LABELS[index];
+                
+                if (daySlots.length === 0) {
+                    return `
+                        <div class="schedule-row" data-day="${day}"
+                            style="display:flex; border-bottom:1px solid var(--border-subtle); padding:15px 0; align-items:center; opacity:0.5;">
+                            <div style="width:100px; font-weight:600;">${dayLabel}</div>
+                            <div style="flex:1; font-style:italic;">Unavailable</div>
+                            <button onclick="addTimeSlotPsych('${day}')"
+                                style="background:none; border:none; color:var(--teal-accent); cursor:pointer;">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="schedule-row" data-day="${day}"
+                        style="display:flex; border-bottom:1px solid var(--border-subtle); padding:15px 0; align-items:flex-start;">
+                        <div style="width:100px; font-weight:600; padding-top:8px;">${dayLabel}</div>
+                        <div style="flex:1;">
+                            ${daySlots.map((slot, slotIndex) => `
+                                <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                                    <input type="time" value="${slot.startTime}" 
+                                        data-day="${day}" data-slot="${slotIndex}" data-field="startTime"
+                                        style="background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;"
+                                        onchange="updateTimeSlotPsych('${day}', ${slotIndex}, 'startTime', this.value)">
+                                    <span>-</span>
+                                    <input type="time" value="${slot.endTime}"
+                                        data-day="${day}" data-slot="${slotIndex}" data-field="endTime"
+                                        style="background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;"
+                                        onchange="updateTimeSlotPsych('${day}', ${slotIndex}, 'endTime', this.value)">
+                                    <button onclick="removeTimeSlotPsych('${day}', ${slotIndex})"
+                                        style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:5px;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="addTimeSlotPsych('${day}')"
+                            style="background:none; border:none; color:var(--teal-accent); cursor:pointer; padding:5px;">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.addTimeSlotPsych = function(day) {
+            // Add default slot: 9 AM - 5 PM
+            const newSlot = { day: day.toLowerCase(), startTime: '09:00', endTime: '17:00' };
+            currentAvailabilityPsych.push(newSlot);
+            renderAvailabilityPsych();
+        };
+
+        window.removeTimeSlotPsych = function(day, slotIndex) {
+            const daySlots = currentAvailabilityPsych.filter(slot => slot.day.toLowerCase() === day);
+            const slotToRemove = daySlots[slotIndex];
+            if (slotToRemove) {
+                const index = currentAvailabilityPsych.indexOf(slotToRemove);
+                currentAvailabilityPsych.splice(index, 1);
+                renderAvailabilityPsych();
+            }
+        };
+
+        window.updateTimeSlotPsych = function(day, slotIndex, field, value) {
+            const daySlots = currentAvailabilityPsych.filter(slot => slot.day.toLowerCase() === day);
+            const slot = daySlots[slotIndex];
+            if (slot) {
+                slot[field] = value;
+            }
+        };
+
+        window.saveAvailabilityPsych = async function() {
+            const user = auth.currentUser;
+            if (!user) {
+                alert('Please log in to save availability');
+                return;
+            }
+
+            const btn = document.getElementById('save-availability-btn-psych');
+            const spinner = document.getElementById('save-availability-spinner-psych');
+            const text = document.getElementById('save-availability-text-psych');
+
+            try {
+                btn.disabled = true;
+                spinner.style.display = 'inline-block';
+                text.textContent = 'Saving...';
+
+                const success = await setPeerAvailability(user.uid, currentAvailabilityPsych);
+                
+                if (success) {
+                    text.textContent = 'Saved!';
+                    setTimeout(() => {
+                        text.textContent = 'Save Schedule';
+                        spinner.style.display = 'none';
+                        btn.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error('Failed to save availability');
+                }
+            } catch (error) {
+                console.error('Error saving availability:', error);
+                alert('Failed to save availability. Please try again.');
+                text.textContent = 'Save Schedule';
+                spinner.style.display = 'none';
+                btn.disabled = false;
+            }
+        };
     </script>
 </body>
 
