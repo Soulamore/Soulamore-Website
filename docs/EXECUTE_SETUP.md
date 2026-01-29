@@ -140,3 +140,4 @@ After successful setup:
   - `docs/FIREBASE_FUNCTIONS_SETUP.md` - Functions setup
 
 
+

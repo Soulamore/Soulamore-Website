@@ -166,3 +166,4 @@ If issues persist:
 2. Check Firebase Console → Authentication → Users for errors
 3. Verify all setup steps in `FIREBASE_AUTH_SETUP.md` are completed
 
+

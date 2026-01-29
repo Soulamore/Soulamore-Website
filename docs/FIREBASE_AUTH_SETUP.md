@@ -159,3 +159,4 @@ After enabling providers:
 3. Set up user profile creation (already implemented in `profile-handler.js`)
 4. Configure email templates (optional) in Firebase Console → Authentication → Templates
 
+
