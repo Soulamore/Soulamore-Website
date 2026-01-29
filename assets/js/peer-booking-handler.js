@@ -1,9 +1,11 @@
 /**
  * Peer Booking Handler
  * Manages peer availability, scheduling, booking, and payment integration
+ * Works for both peers and psychologists
  */
 
 import { db, collection, addDoc, doc, getDoc, setDoc, updateDoc, getDocs, query, where, serverTimestamp, Timestamp } from "./firebase-config.js";
+import { isProfessional, getUserRole } from "./role-helper.js";
 
 const PEER_BOOKINGS_COLLECTION = "peer_bookings";
 const PEER_AVAILABILITY_COLLECTION = "peer_availability";
@@ -55,25 +57,34 @@ export const DEFAULT_PLANS = {
 };
 
 /**
- * Create or update peer availability schedule
- * @param {string} peerId - Peer's user ID
+ * Create or update peer/psychologist availability schedule
+ * @param {string} peerId - Peer's or Psychologist's user ID
  * @param {Array} availability - Array of availability slots { day: 'monday', startTime: '09:00', endTime: '17:00', timezone: 'Asia/Kolkata' }
  * @returns {Promise<boolean>}
  */
 export async function setPeerAvailability(peerId, availability) {
     try {
+        // Verify user is a professional (peer or psychologist)
+        const isProf = await isProfessional(peerId);
+        if (!isProf) {
+            console.warn("User is not a verified peer or psychologist:", peerId);
+            // Still allow setting availability, but log warning
+        }
+        
+        const roleInfo = await getUserRole(peerId);
         const availabilityRef = doc(db, PEER_AVAILABILITY_COLLECTION, peerId);
         await setDoc(availabilityRef, {
             peerId: peerId,
+            role: roleInfo.role, // Store role for reference
             availability: availability,
             timezone: "Asia/Kolkata", // Default timezone
             updatedAt: serverTimestamp()
         }, { merge: true });
         
-        console.log("Peer availability set:", peerId);
+        console.log(`Availability set for ${roleInfo.role}:`, peerId);
         return true;
     } catch (error) {
-        console.error("Error setting peer availability:", error);
+        console.error("Error setting availability:", error);
         return false;
     }
 }
