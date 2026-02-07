@@ -401,7 +401,8 @@
             flex-direction: column;
             gap: 12px;
             align-items: center;
-            z-index: 100;
+            z-index: 999;
+            /* Increased from 100 */
         }
 
         .fab-btn {
@@ -599,6 +600,13 @@
             .wall-hero h1 {
                 font-size: 2.5rem;
             }
+
+            /* FAB Stack: Move above mobile nav bar */
+            .fab-stack-container {
+                bottom: 100px;
+                /* Increased from 40px to clear mobile nav */
+                right: 20px;
+            }
         }
     </style>
     <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
@@ -703,12 +711,16 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // --- FIREBASE IMPORTS ---
+        import { db, collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, query, orderBy, limit, getDocs } from "../assets/js/firebase-config.js";
+        import { increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
         // --- 1. CONFIG & STATE ---
         const CONFIG = {
             width: 5000,
             height: 5000,
-            initialNotes: 25, /* Increased count */
+            initialNotes: 25, /* Placeholder count */
             spawnRadius: 800 /* Restrict initial spawn to center area */
         };
 
@@ -719,7 +731,8 @@
             pointY: 0,
             startX: 0,
             startY: 0,
-            animationFrame: null
+            animationFrame: null,
+            firebaseNotes: new Map() // Track Firebase note IDs to prevent duplicates
         };
 
         const OBSCENE_WORDS = ["fuck", "shit", "bitch", "asshole", "cunt", "dick", "pussy", "whore", "slut", "bastard"];
@@ -739,8 +752,11 @@
             STATE.pointY = (window.innerHeight - CONFIG.height) / 2;
 
             updateTransform(); // Apply initial transform
-            generateRandomNotes();
+            generateRandomNotes(); // Generate placeholder notes
             startFakeLiveActivity();
+
+            // --- FIREBASE: Real-time Note Listener ---
+            subscribeToFirebaseNotes();
         };
 
         // --- 3. CANVAS LOGIC (PAN & ZOOM) - OPTIMIZED ---
@@ -1084,7 +1100,8 @@
         // --- 4. NOTE GENERATION (FIXED) ---
         // ... (existing code for generating random notes) ...
 
-        function postNote() {
+        // --- FIREBASE: Post note to Firestore ---
+        async function postNote() {
             const input = document.getElementById('noteInput');
             const text = input.value.trim();
             if (!text) return;
@@ -1095,24 +1112,39 @@
             const centerY = CONFIG.height / 2;
 
             // Randomly choose a safe spot outside the exclusion zone
-            // Exclusion is roughly 650x350 from center
-            // We'll pick a spot either well above or well below
-
             const side = Math.random() > 0.5 ? 1 : -1;
-            const safeOffsetY = (350 + 100 + Math.random() * 200) * side; // +/- 450 to 650px vertical offset
-            const safeOffsetX = (Math.random() * 800) - 400; // Spread horizontally
+            const safeOffsetY = (350 + 100 + Math.random() * 200) * side;
+            const safeOffsetX = (Math.random() * 800) - 400;
 
             const noteX = centerX + safeOffsetX;
             const noteY = centerY + safeOffsetY;
 
-            // Create Note
-            createNoteElement(cleanText, noteX, noteY, "Just now", { heart: 0, flower: 0, candle: 0 });
-
-            // Focus View on New Note
-            resetView(noteX, noteY);
-
+            // Close modal immediately for UX
             closeWriter();
             input.value = '';
+
+            try {
+                // Save to Firebase - the real-time listener will render it
+                const docRef = await addDoc(collection(db, 'problem-wall-notes'), {
+                    text: cleanText,
+                    x: noteX,
+                    y: noteY,
+                    hearts: 0,
+                    flowers: 0,
+                    candles: 0,
+                    createdAt: serverTimestamp()
+                });
+
+                console.log('Note saved to Firebase:', docRef.id);
+
+                // Focus View on where the new note will appear
+                resetView(noteX, noteY);
+            } catch (error) {
+                console.error('Error saving note:', error);
+                // Fallback: create local note if Firebase fails
+                createNoteElement(cleanText, noteX, noteY, "Just now", { heart: 0, flower: 0, candle: 0 });
+                resetView(noteX, noteY);
+            }
         }
 
         // --- 6. FAKE LIVE COUNTERS ---
@@ -1138,6 +1170,150 @@
                 }
             }, 2000);
         }
+
+        // --- FIREBASE: Subscribe to real-time notes ---
+        function subscribeToFirebaseNotes() {
+            const notesRef = collection(db, 'problem-wall-notes');
+            const notesQuery = query(notesRef, orderBy('createdAt', 'desc'), limit(100));
+
+            // Real-time listener - fires on initial load and any changes
+            onSnapshot(notesQuery, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    const noteData = change.doc.data();
+                    const noteId = change.doc.id;
+
+                    if (change.type === 'added') {
+                        // Don't duplicate if already rendered
+                        if (!STATE.firebaseNotes.has(noteId)) {
+                            createFirebaseNoteElement(noteId, noteData);
+                            STATE.firebaseNotes.set(noteId, true);
+                        }
+                    } else if (change.type === 'modified') {
+                        // Update reaction counts
+                        updateNoteReactions(noteId, noteData);
+                    }
+                });
+            }, (error) => {
+                console.error('Firebase listener error:', error);
+            });
+        }
+
+        // --- FIREBASE: Create note element with Firebase ID ---
+        function createFirebaseNoteElement(noteId, data) {
+            const el = document.createElement('div');
+            el.className = 'note firebase-note';
+            el.dataset.noteId = noteId;
+            el.style.left = data.x + 'px';
+            el.style.top = data.y + 'px';
+            el.style.transform = `rotate(${Math.random() * 6 - 3}deg)`;
+
+            // Calculate time label
+            let timeLabel = 'Just now';
+            if (data.createdAt) {
+                const created = data.createdAt.toDate();
+                const diffMs = Date.now() - created.getTime();
+                const diffMins = Math.floor(diffMs / 60000);
+                if (diffMins < 1) timeLabel = 'Just now';
+                else if (diffMins < 60) timeLabel = `${diffMins}m ago`;
+                else if (diffMins < 1440) timeLabel = `${Math.floor(diffMins / 60)}h ago`;
+                else timeLabel = `${Math.floor(diffMins / 1440)}d ago`;
+            }
+
+            el.textContent = data.text;
+
+            const uiHTML = `
+                <div class="note-meta">
+                    <span style="opacity:0.6;">Anonymous</span>
+                    <span style="font-size:0.75rem;">${timeLabel}</span>
+                </div>
+                <div class="note-actions">
+                    <button class="action-btn heart-btn" onclick="reactFirebase('${noteId}', 'hearts', this)">
+                        <i class="fas fa-heart"></i> <span class="count">${data.hearts || 0}</span>
+                    </button>
+                    <button class="action-btn flower-btn" onclick="reactFirebase('${noteId}', 'flowers', this)">
+                        <i class="fas fa-spa"></i> <span class="count">${data.flowers || 0}</span>
+                    </button>
+                    <button class="action-btn candle-btn" onclick="reactFirebase('${noteId}', 'candles', this)">
+                        <i class="fas fa-fire-alt"></i> <span class="count">${data.candles || 0}</span>
+                    </button>
+                </div>
+            `;
+
+            el.insertAdjacentHTML('beforeend', uiHTML);
+            notesContainer.appendChild(el);
+        }
+
+        // --- FIREBASE: Update note reaction counts (from real-time listener) ---
+        function updateNoteReactions(noteId, data) {
+            const noteEl = document.querySelector(`.note[data-note-id="${noteId}"]`);
+            if (!noteEl) return;
+
+            const heartCount = noteEl.querySelector('.heart-btn .count');
+            const flowerCount = noteEl.querySelector('.flower-btn .count');
+            const candleCount = noteEl.querySelector('.candle-btn .count');
+
+            if (heartCount) heartCount.innerText = data.hearts || 0;
+            if (flowerCount) flowerCount.innerText = data.flowers || 0;
+            if (candleCount) candleCount.innerText = data.candles || 0;
+        }
+
+        // --- FIREBASE: React to a Firebase note ---
+        async function reactFirebase(noteId, reactionType, btn) {
+            // 1. Visual Pop
+            btn.classList.add('pop-active');
+            setTimeout(() => btn.classList.remove('pop-active'), 300);
+
+            // 2. Header & Note Glow
+            const header = document.querySelector('header.island-nav');
+            const note = btn.closest('.note');
+
+            const glowClass = reactionType === 'hearts' ? 'glow-red' :
+                reactionType === 'flowers' ? 'glow-yellow' : 'glow-orange';
+
+            if (header) {
+                header.classList.add(glowClass);
+                setTimeout(() => header.classList.remove(glowClass), 400);
+            }
+
+            if (note) {
+                note.classList.remove('glow-red', 'glow-yellow', 'glow-orange');
+                note.classList.add(glowClass);
+                setTimeout(() => note.classList.remove(glowClass), 1000);
+            }
+
+            // 3. Optimistic UI update
+            const countSpan = btn.querySelector('.count');
+            let val = parseInt(countSpan.innerText);
+            countSpan.innerText = val + 1;
+
+            // 4. Update Firebase atomically
+            try {
+                const noteRef = doc(db, 'problem-wall-notes', noteId);
+                await updateDoc(noteRef, {
+                    [reactionType]: increment(1)
+                });
+            } catch (error) {
+                console.error('Error updating reaction:', error);
+                // Revert on failure
+                countSpan.innerText = val;
+            }
+
+            // 5. Update global stats display
+            const globalMap = { hearts: 'totalHearts', flowers: 'totalFlowers', candles: 'totalCandles' };
+            const globalEl = document.getElementById(globalMap[reactionType]);
+            if (globalEl) {
+                let gVal = parseInt(globalEl.innerText.replace(/,/g, ''));
+                globalEl.innerText = (gVal + 1).toLocaleString();
+            }
+        }
+
+        // --- Expose functions to window for onclick handlers ---
+        window.postNote = postNote;
+        window.openWriter = openWriter;
+        window.closeWriter = closeWriter;
+        window.resetView = resetView;
+        window.react = react;
+        window.reactFirebase = reactFirebase;
 
     </script>
 </body>
