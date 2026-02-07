@@ -713,7 +713,7 @@
 
     <script type="module">
         // --- FIREBASE IMPORTS ---
-        import { db, collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, query, orderBy, limit, getDocs, increment } from "../assets/js/firebase-config.js";
+        import { db, collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, query, orderBy, limit, getDocs, increment, auth, signInAnonymously, onAuthStateChanged } from "../assets/js/firebase-config.js";
 
         // --- 1. CONFIG & STATE ---
         const CONFIG = {
@@ -754,8 +754,23 @@
             generateRandomNotes(); // Generate placeholder notes
             startFakeLiveActivity();
 
-            // --- FIREBASE: Real-time Note Listener ---
-            subscribeToFirebaseNotes();
+            // --- FIREBASE: Auth & Real-time Note Listener ---
+            // Ensure user is signed in (anonymously) before subscribing
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // User is signed in (Anonymously or otherwise)
+                    // console.log("Problem Wall: User signed in", user.uid);
+                    subscribeToFirebaseNotes();
+                } else {
+                    // Try to sign in anonymously
+                    // console.log("Problem Wall: Signing in anonymously...");
+                    signInAnonymously(auth).catch((error) => {
+                        console.warn("Auth failed or disabled. Attempting public subscription...", error);
+                        // Fallback: If Auth is disabled, maybe rules are public? Try subscribing anyway.
+                        subscribeToFirebaseNotes();
+                    });
+                }
+            });
         }
 
         // Module-safe initialization
