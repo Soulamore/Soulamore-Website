@@ -713,8 +713,7 @@
 
     <script type="module">
         // --- FIREBASE IMPORTS ---
-        import { db, collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, query, orderBy, limit, getDocs } from "../assets/js/firebase-config.js";
-        import { increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { db, collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, query, orderBy, limit, getDocs, increment } from "../assets/js/firebase-config.js";
 
         // --- 1. CONFIG & STATE ---
         const CONFIG = {
@@ -743,7 +742,7 @@
         const notesContainer = document.getElementById('notes-container');
 
         // Center the canvas on load
-        window.onload = () => {
+        function initProblemWall() {
             // Force header injection again to be safe
             if (window.injectHeader) window.injectHeader();
 
@@ -757,7 +756,14 @@
 
             // --- FIREBASE: Real-time Note Listener ---
             subscribeToFirebaseNotes();
-        };
+        }
+
+        // Module-safe initialization
+        if (document.readyState === 'complete') {
+            initProblemWall();
+        } else {
+            window.addEventListener('load', initProblemWall);
+        }
 
         // --- 3. CANVAS LOGIC (PAN & ZOOM) - OPTIMIZED ---
         viewport.addEventListener('mousedown', (e) => {
@@ -1074,28 +1080,7 @@
             return clean;
         }
 
-        function resetView(focusX = null, focusY = null) {
-            // Default to center if no focus provided
-            const finalX = focusX ?? (CONFIG.width / 2);
-            const finalY = focusY ?? (CONFIG.height / 2);
 
-            // Calculate Viewport Offset to center the point
-            const targetX = (window.innerWidth / 2) - finalX;
-            const targetY = (window.innerHeight / 2) - finalY;
-            const targetScale = 1;
-
-            // Simple transition logic
-            canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
-
-            STATE.pointX = targetX;
-            STATE.pointY = targetY;
-            STATE.scale = targetScale;
-            updateTransform();
-
-            setTimeout(() => {
-                canvas.style.transition = "";
-            }, 1200);
-        }
 
         // --- 4. NOTE GENERATION (FIXED) ---
         // ... (existing code for generating random notes) ...
