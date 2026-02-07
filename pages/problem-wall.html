@@ -720,7 +720,8 @@
             width: 5000,
             height: 5000,
             initialNotes: 25, /* Placeholder count */
-            spawnRadius: 800 /* Restrict initial spawn to center area */
+            spawnRadius: 1800, /* Increased from 800 to use more canvas */
+            bufferDistance: 380 /* Minimum distance between notes */
         };
 
         const STATE = {
@@ -731,10 +732,14 @@
             startX: 0,
             startY: 0,
             animationFrame: null,
-            firebaseNotes: new Map() // Track Firebase note IDs to prevent duplicates
+            firebaseNotes: new Map()
         };
 
         const OBSCENE_WORDS = ["fuck", "shit", "bitch", "asshole", "cunt", "dick", "pussy", "whore", "slut", "bastard"];
+
+        // STATS TRACKING
+        let baseStats = { hearts: 0, flowers: 0, candles: 0 }; // From placeholders
+        let liveStats = { hearts: 0, flowers: 0, candles: 0 }; // From Firestore
 
         // --- 2. INITIALIZATION ---
         const canvas = document.getElementById('infinite-canvas');
@@ -743,44 +748,36 @@
 
         // Center the canvas on load
         function initProblemWall() {
-            // Force header injection again to be safe
             if (window.injectHeader) window.injectHeader();
 
-            // Calculate center position: (Viewport Width - Canvas Width) / 2
             STATE.pointX = (window.innerWidth - CONFIG.width) / 2;
             STATE.pointY = (window.innerHeight - CONFIG.height) / 2;
 
-            updateTransform(); // Apply initial transform
-            generateRandomNotes(); // Generate placeholder notes
-            startFakeLiveActivity();
+            updateTransform();
+            generateRandomNotes(); // Generates placeholders & calculates baseStats
+
+            // Note: startFakeLiveActivity removed as per user request for realism
 
             // --- FIREBASE: Auth & Real-time Note Listener ---
-            // Ensure user is signed in (anonymously) before subscribing
             onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    // User is signed in (Anonymously or otherwise)
-                    // console.log("Problem Wall: User signed in", user.uid);
                     subscribeToFirebaseNotes();
                 } else {
-                    // Try to sign in anonymously
-                    // console.log("Problem Wall: Signing in anonymously...");
                     signInAnonymously(auth).catch((error) => {
-                        console.warn("Auth failed or disabled. Attempting public subscription...", error);
-                        // Fallback: If Auth is disabled, maybe rules are public? Try subscribing anyway.
+                        console.warn("Auth failed, public fallback...", error);
                         subscribeToFirebaseNotes();
                     });
                 }
             });
         }
 
-        // Module-safe initialization
         if (document.readyState === 'complete') {
             initProblemWall();
         } else {
             window.addEventListener('load', initProblemWall);
         }
 
-        // --- 3. CANVAS LOGIC (PAN & ZOOM) - OPTIMIZED ---
+        // --- 3. CANVAS LOGIC (PAN & ZOOM) ---
         viewport.addEventListener('mousedown', (e) => {
             if (e.target.closest('.note') || e.target.closest('.wall-hero')) return;
             STATE.panning = true;
@@ -794,31 +791,14 @@
             viewport.style.cursor = 'grab';
         });
 
-        // Throttled Mouse Move
         let lastFrame = 0;
         window.addEventListener('mousemove', (e) => {
             const now = Date.now();
-            if (now - lastFrame < 16) return; // Cap at ~60fps
-            lastFrame = now;
-
-            // A. Pan Logic
-            if (STATE.panning) {
-                e.preventDefault();
-                STATE.pointX = e.clientX - STATE.startX;
-                STATE.pointY = e.clientY - STATE.startY;
-                requestAnimationFrame(updateTransform); // Synced with repaint
-            }
-
-            // B. Background Gradient Logic (Only update every 3rd frame loosely)
-            if (Math.random() > 0.6) {
-                const xPercent = (e.clientX / window.innerWidth) * 100 + '%';
-                const yPercent = (e.clientY / window.innerHeight) * 100 + '%';
-                document.body.style.setProperty('--mouse-x', xPercent);
-                document.body.style.setProperty('--mouse-y', yPercent);
+            if (now - lastFrame < 16) return; lastFrame = now; if (STATE.panning) {
+                e.preventDefault(); STATE.pointX = e.clientX -
+                    STATE.startX; STATE.pointY = e.clientY - STATE.startY; requestAnimationFrame(updateTransform);
             }
         });
-
-        // Zoom (Wheel)
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
             const xs = (e.clientX - STATE.pointX) / STATE.scale;
@@ -826,8 +806,6 @@
             const delta = -e.deltaY;
 
             (delta > 0) ? (STATE.scale *= 1.1) : (STATE.scale /= 1.1);
-
-            // Limit Zoom limits
             STATE.scale = Math.min(Math.max(0.4, STATE.scale), 2.5);
 
             STATE.pointX = e.clientX - xs * STATE.scale;
@@ -837,65 +815,38 @@
         }, { passive: false });
 
         function updateTransform() {
-            // Using 3D transform for GPU acceleration
             canvas.style.transform = `translate3d(${STATE.pointX}px, ${STATE.pointY}px, 0) scale(${STATE.scale})`;
         }
 
         function resetView(focusX = null, focusY = null) {
-            // Default to center of canvas
             const canvasCenterX = CONFIG.width / 2;
             const canvasCenterY = CONFIG.height / 2;
-
             const targetPointX = focusX !== null ? focusX : canvasCenterX;
             const targetPointY = focusY !== null ? focusY : canvasCenterY;
 
-            // Calculate translation to put targetPoint at viewport center
-            // Formula: Translation = (Viewport/2) - (TargetPoint * Scale)
-            // Assuming Scale = 1 for reset
             const targetX = (window.innerWidth / 2) - targetPointX;
             const targetY = (window.innerHeight / 2) - targetPointY;
-            const targetScale = 1;
 
             canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
-
             STATE.pointX = targetX;
             STATE.pointY = targetY;
-            STATE.scale = targetScale;
+            STATE.scale = 1;
             updateTransform();
 
-            // Disable transition after animation to prevent drag lag
-            setTimeout(() => {
-                canvas.style.transition = "";
-            }, 1200);
+            setTimeout(() => { canvas.style.transition = ""; }, 1200);
         }
 
-        // --- 4. NOTE GENERATION (FIXED) ---
         // --- 4. NOTE GENERATION (SMARTER) ---
         const sampleTexts = [
-            "I feel so behind everyone else.",
-            "I'm afraid I'll never be good enough.",
-            "I miss who I used to be.",
-            "Everything feels too loud today.",
-            "I just need a hug.",
-            "University is overwhelming.",
-            "I pretend I'm okay.",
-            "Is it okay to not have a plan?",
-            "I feel lonely even with friends.",
-            "I'm tired of the noise.",
-            "Does anyone else feel this lost?",
-            "I wish I could pause time.",
-            "My anxiety is winning today.",
-            "Smiling is exhausting.",
-            "I want to be heard.",
-            "Just getting by is hard enough.",
-            "I miss my childhood.",
-            "The future scares me."
+            "I feel so behind everyone else.", "I'm afraid I'll never be good enough.", "I miss who I used to be.",
+            "Everything feels too loud today.", "I just need a hug.", "University is overwhelming.",
+            "I pretend I'm okay.", "Is it okay to not have a plan?", "I feel lonely even with friends.",
+            "I'm tired of the noise.", "Does anyone else feel this lost?", "I wish I could pause time.",
+            "My anxiety is winning today.", "Smiling is exhausting.", "I want to be heard.",
+            "Just getting by is hard enough.", "I miss my childhood.", "The future scares me."
         ];
 
-        // Track placed notes for collision detection
         const placedNotes = [];
-        // Global Logic to Track real stats
-        let globalStats = { heart: 0, flower: 0, candle: 0 };
 
         function generateRandomNotes() {
             const centerX = CONFIG.width / 2;
@@ -908,35 +859,33 @@
             let count = 0;
             let attempts = 0;
 
-            // Reset Global Stats on Regen
-            globalStats = { heart: 0, flower: 0, candle: 0 };
+            // Reset Base Stats
+            baseStats = { hearts: 0, flowers: 0, candles: 0 };
 
-            while (count < CONFIG.initialNotes && attempts < 2000) {
+            while (count < CONFIG.initialNotes && attempts < 5000) {
                 attempts++;
 
-                // Random position within radius
+                // Larger Spread (Infinite Feel)
                 const offsetX = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
                 const offsetY = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
 
-                // 1. EXPANDED EXCLUSION ZONE (Center Text)
-                // Expanded STRICTLY for "The Problem Wall" text overlap prevention
-                // Must correspond to text width (~1200px) and height (~400px)
-                if (Math.abs(offsetX) < 650 && Math.abs(offsetY) < 350) continue;
+                // Exclusion Zone (Text)
+                if (Math.abs(offsetX) < 700 && Math.abs(offsetY) < 400) continue;
 
-                // 2. COLLISION CHECK (Simple distance)
+                // Collision Check
                 let collision = false;
                 for (let note of placedNotes) {
                     const dx = note.x - offsetX;
                     const dy = note.y - offsetY;
                     const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 340) { // Slight increase in buffer
+                    if (dist < CONFIG.bufferDistance) {
                         collision = true;
                         break;
                     }
                 }
                 if (collision) continue;
 
-                // Success - Place Note
+                // Generate Reactions for Base Stats
                 const reactions = {
                     heart: Math.floor(Math.random() * 12),
                     flower: Math.floor(Math.random() * 8),
@@ -944,9 +893,9 @@
                 };
 
                 // Add to Global Stats
-                globalStats.heart += reactions.heart;
-                globalStats.flower += reactions.flower;
-                globalStats.candle += reactions.candle;
+                baseStats.hearts += reactions.heart;
+                baseStats.flowers += reactions.flower;
+                baseStats.candles += reactions.candle;
 
                 const time = timeOffsets[Math.floor(Math.random() * timeOffsets.length)];
 
@@ -968,123 +917,71 @@
                 count++;
             }
 
-            // SET INITIAL STATDOM
-            updateStatDisplay();
+            // SET INITIAL STATDOM (Base + Live which is 0 initially)
+            updateTotalStats();
         }
 
-        function updateStatDisplay() {
+        function updateTotalStats() {
             const h = document.getElementById('totalHearts');
             const f = document.getElementById('totalFlowers');
             const c = document.getElementById('totalCandles');
 
-            if (h) h.innerText = globalStats.heart.toLocaleString();
-            if (f) f.innerText = globalStats.flower.toLocaleString();
-            if (c) c.innerText = globalStats.candle.toLocaleString();
+            const totalHearts = baseStats.hearts + liveStats.hearts;
+            const totalFlowers = baseStats.flowers + liveStats.flowers;
+            const totalCandles = baseStats.candles + liveStats.candles;
+
+            if (h) h.innerText = totalHearts.toLocaleString();
+            if (f) f.innerText = totalFlowers.toLocaleString();
+            if (c) c.innerText = totalCandles.toLocaleString();
         }
 
-        function createNoteElement(text, x, y, timeLabel, reactionCounts = { heart: 0, flower: 0, candle: 0 }) {
+        function createNoteElement(text, x, y, timeLabel, reactionCounts) {
             const el = document.createElement('div');
             el.className = 'note';
             el.style.left = x + 'px';
             el.style.top = y + 'px';
-            // Random slight rotation
             el.style.transform = `rotate(${Math.random() * 6 - 3}deg)`;
-
-            // SAFE RENDERING: Use textContent for user input, then append UI
             el.textContent = text;
 
             const uiHTML = `
-                <div class="note-meta">
-                    <span style="opacity:0.6;">Anonymous</span>
-                    <span style="font-size:0.75rem;">${timeLabel}</span>
-                </div>
-                <!-- REACTION BAR -->
-                <div class="note-actions">
-                    <button class="action-btn heart-btn" onclick="react(this, 'heart')">
-                        <i class="fas fa-heart"></i> <span class="count">${reactionCounts.heart}</span>
-                    </button>
-                    <button class="action-btn flower-btn" onclick="react(this, 'flower')">
-                        <i class="fas fa-spa"></i> <span class="count">${reactionCounts.flower}</span>
-                    </button>
-                    <button class="action-btn candle-btn" onclick="react(this, 'candle')">
-                        <i class="fas fa-fire-alt"></i> <span class="count">${reactionCounts.candle}</span>
-                    </button>
-                </div>
+            <div class="note-meta">
+                <span style="opacity:0.6;">Anonymous</span>
+                <span style="font-size:0.75rem;">${timeLabel}</span>
+            </div>
+            <div class="note-actions">
+                <button class="action-btn heart-btn" onclick="react(this, 'heart')">
+                    <i class="fas fa-heart"></i> <span class="count">${reactionCounts.heart}</span>
+                </button>
+                <button class="action-btn flower-btn" onclick="react(this, 'flower')">
+                    <i class="fas fa-spa"></i> <span class="count">${reactionCounts.flower}</span>
+                </button>
+                <button class="action-btn candle-btn" onclick="react(this, 'candle')">
+                    <i class="fas fa-fire-alt"></i> <span class="count">${reactionCounts.candle}</span>
+                </button>
+            </div>
             `;
-
             el.insertAdjacentHTML('beforeend', uiHTML);
-
             notesContainer.appendChild(el);
         }
 
         // --- 5. INTERACTION LOGIC ---
         function react(btn, type) {
-            // 1. Visual Pop
             btn.classList.add('pop-active');
             setTimeout(() => btn.classList.remove('pop-active'), 300);
 
-            // 2. Increment Note Count
             const countSpan = btn.querySelector('.count');
             let val = parseInt(countSpan.innerText);
             countSpan.innerText = val + 1;
 
-            // 3. Header & Global Stat Glow/Increment
-            const header = document.querySelector('header.island-nav');
-            const note = btn.closest('.note');
-
-            // --- HEADER GLOW ---
-            if (header) {
-                if (type === 'heart') {
-                    header.classList.add('glow-red');
-                    setTimeout(() => header.classList.remove('glow-red'), 400);
-                } else if (type === 'flower') {
-                    header.classList.add('glow-yellow');
-                    setTimeout(() => header.classList.remove('glow-yellow'), 400);
-                } else if (type === 'candle') {
-                    header.classList.add('glow-orange');
-                    setTimeout(() => header.classList.remove('glow-orange'), 400);
-                }
-            }
-
-            // --- NOTE GLOW (FULL CARD) ---
-            if (note) {
-                // Clear previous glows to allow switching
-                note.classList.remove('glow-red', 'glow-yellow', 'glow-orange');
-
-                // Add strong glow class to the whole card
-                if (type === 'heart') {
-                    note.classList.add('glow-red');
-                    setTimeout(() => note.classList.remove('glow-red'), 1000); // 1s Duration
-                } else if (type === 'flower') {
-                    note.classList.add('glow-yellow');
-                    setTimeout(() => note.classList.remove('glow-yellow'), 1000);
-                } else if (type === 'candle') {
-                    note.classList.add('glow-orange');
-                    setTimeout(() => note.classList.remove('glow-orange'), 1000);
-                }
-            }
-
-            // 4. Update Global Count in Sidebar (Fake Sync)
-            let globalId = '';
-            if (type === 'heart') globalId = 'totalHearts';
-            if (type === 'flower') globalId = 'totalFlowers';
-            if (type === 'candle') globalId = 'totalCandles';
-
-            const globalEl = document.getElementById(globalId);
-            if (globalEl) {
-                // Parse commas
-                let gVal = parseInt(globalEl.innerText.replace(/,/g, ''));
-                globalEl.innerText = (gVal + 1).toLocaleString();
-            }
+            // Update BASE stats locally for placeholders
+            if (type === 'heart') baseStats.hearts++;
+            if (type === 'flower') baseStats.flowers++;
+            if (type === 'candle') baseStats.candles++;
+            updateTotalStats();
         }
 
-        function openWriter() {
-            document.getElementById('writeModal').classList.add('active');
-        }
-
-        function closeWriter() {
-            document.getElementById('writeModal').classList.remove('active');
-        }
+        function openWriter() { document.getElementById('writeModal').classList.add('active'); }
+        function closeWriter() { document.getElementById('writeModal').classList.remove('active'); }
 
         function sanitizeText(text) {
             let clean = text;
@@ -1095,99 +992,78 @@
             return clean;
         }
 
-
-
-        // --- 4. NOTE GENERATION (FIXED) ---
-        // ... (existing code for generating random notes) ...
-
-        // --- FIREBASE: Post note to Firestore ---
+        // --- FIREBASE: Post note ---
         async function postNote() {
             const input = document.getElementById('noteInput');
             const text = input.value.trim();
             if (!text) return;
 
             const cleanText = sanitizeText(text);
-
             const centerX = CONFIG.width / 2;
             const centerY = CONFIG.height / 2;
 
-            // Randomly choose a safe spot outside the exclusion zone
+            // Random Logic for New Notes (Avoid Center)
             const side = Math.random() > 0.5 ? 1 : -1;
-            const safeOffsetY = (350 + 100 + Math.random() * 200) * side;
-            const safeOffsetX = (Math.random() * 800) - 400;
+            const safeOffsetY = (400 + Math.random() * 400) * side;
+            const safeOffsetX = (Math.random() * 1200) - 600;
 
             const noteX = centerX + safeOffsetX;
             const noteY = centerY + safeOffsetY;
 
-            // Close modal immediately for UX
             closeWriter();
             input.value = '';
 
             try {
-                // Save to Firebase - the real-time listener will render it
-                const docRef = await addDoc(collection(db, 'problem-wall-notes'), {
+                await addDoc(collection(db, 'problem-wall-notes'), {
                     text: cleanText,
                     x: noteX,
                     y: noteY,
-                    hearts: 0,
-                    flowers: 0,
-                    candles: 0,
+                    hearts: 0, flowers: 0, candles: 0,
                     createdAt: serverTimestamp()
                 });
-
-                console.log('Note saved to Firebase:', docRef.id);
-
-                // Focus View on where the new note will appear
                 resetView(noteX, noteY);
             } catch (error) {
                 console.error('Error saving note:', error);
-                // Fallback: create local note if Firebase fails
                 createNoteElement(cleanText, noteX, noteY, "Just now", { heart: 0, flower: 0, candle: 0 });
                 resetView(noteX, noteY);
             }
         }
 
-        // --- 6. FAKE LIVE COUNTERS ---
-        function startFakeLiveActivity() {
-            setInterval(() => {
-                const count = document.getElementById('userCount');
-                let val = parseInt(count.innerText);
-                val += Math.floor(Math.random() * 3) - 1; // +1, 0, or -1
-                if (val < 120) val = 120;
-                count.innerText = val;
-            }, 5000);
-
-            // Removed fake global stat increments to ensure realism
-        }
-
-        // --- FIREBASE: Subscribe to real-time notes ---
+        // --- FIREBASE: Subscribe ---
         function subscribeToFirebaseNotes() {
             const notesRef = collection(db, 'problem-wall-notes');
             const notesQuery = query(notesRef, orderBy('createdAt', 'desc'), limit(100));
 
-            // Real-time listener - fires on initial load and any changes
             onSnapshot(notesQuery, (snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    const noteData = change.doc.data();
-                    const noteId = change.doc.id;
+                // Reset Live Stats on each snapshot to avoid double counting if calculating from scratch
+                // Optimization: Incremental updates are better but full recount is safer for consistency
+                let currentLive = { hearts: 0, flowers: 0, candles: 0 };
 
-                    if (change.type === 'added') {
-                        // Don't duplicate if already rendered
-                        if (!STATE.firebaseNotes.has(noteId)) {
-                            createFirebaseNoteElement(noteId, noteData);
-                            STATE.firebaseNotes.set(noteId, true);
-                        }
-                    } else if (change.type === 'modified') {
-                        // Update reaction counts
-                        updateNoteReactions(noteId, noteData);
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    currentLive.hearts += (data.hearts || 0);
+                    currentLive.flowers += (data.flowers || 0);
+                    currentLive.candles += (data.candles || 0);
+
+                    // Render if new
+                    const noteId = doc.id;
+                    if (!STATE.firebaseNotes.has(noteId)) {
+                        createFirebaseNoteElement(noteId, data);
+                        STATE.firebaseNotes.set(noteId, true);
+                    } else {
+                        // Update existing reaction count display
+                        updateNoteReactions(noteId, data);
                     }
                 });
+
+                liveStats = currentLive;
+                updateTotalStats();
+
             }, (error) => {
                 console.error('Firebase listener error:', error);
             });
         }
 
-        // --- FIREBASE: Create note element with Firebase ID ---
         function createFirebaseNoteElement(noteId, data) {
             const el = document.createElement('div');
             el.className = 'note firebase-note';
@@ -1196,24 +1072,17 @@
             el.style.top = data.y + 'px';
             el.style.transform = `rotate(${Math.random() * 6 - 3}deg)`;
 
-            // Calculate time label
             let timeLabel = 'Just now';
             if (data.createdAt) {
                 const created = data.createdAt.toDate();
                 const diffMs = Date.now() - created.getTime();
                 const diffMins = Math.floor(diffMs / 60000);
-                if (diffMins < 1) timeLabel = 'Just now';
-                else if (diffMins < 60) timeLabel = `${diffMins}m ago`;
-                else if (diffMins < 1440) timeLabel = `${Math.floor(diffMins / 60)}h ago`;
-                else timeLabel = `${Math.floor(diffMins / 1440)}d ago`;
-            }
-
-            el.textContent = data.text;
-
-            const uiHTML = `
-                <div class="note-meta">
-                    <span style="opacity:0.6;">Anonymous</span>
-                    <span style="font-size:0.75rem;">${timeLabel}</span>
+                if (diffMins < 60) timeLabel = `${diffMins}m ago`; else if (diffMins < 1440) timeLabel = `${Math.floor(diffMins
+                    / 60)}h ago`; else timeLabel = `${Math.floor(diffMins / 1440)}d ago`;
+            } el.textContent = data.text; const
+                uiHTML = ` <div class="note-meta">
+                <span style="opacity:0.6;">Anonymous</span>
+                <span style="font-size:0.75rem;">${timeLabel}</span>
                 </div>
                 <div class="note-actions">
                     <button class="action-btn heart-btn" onclick="reactFirebase('${noteId}', 'hearts', this)">
@@ -1226,77 +1095,46 @@
                         <i class="fas fa-fire-alt"></i> <span class="count">${data.candles || 0}</span>
                     </button>
                 </div>
-            `;
-
+                `;
             el.insertAdjacentHTML('beforeend', uiHTML);
             notesContainer.appendChild(el);
         }
 
-        // --- FIREBASE: Update note reaction counts (from real-time listener) ---
         function updateNoteReactions(noteId, data) {
             const noteEl = document.querySelector(`.note[data-note-id="${noteId}"]`);
             if (!noteEl) return;
-
-            const heartCount = noteEl.querySelector('.heart-btn .count');
-            const flowerCount = noteEl.querySelector('.flower-btn .count');
-            const candleCount = noteEl.querySelector('.candle-btn .count');
-
-            if (heartCount) heartCount.innerText = data.hearts || 0;
-            if (flowerCount) flowerCount.innerText = data.flowers || 0;
-            if (candleCount) candleCount.innerText = data.candles || 0;
+            // Update individual note counters
+            const h = noteEl.querySelector('.heart-btn .count');
+            if (h) h.innerText = data.hearts || 0;
+            const f = noteEl.querySelector('.flower-btn .count');
+            if (f) f.innerText = data.flowers || 0;
+            const c = noteEl.querySelector('.candle-btn .count');
+            if (c) c.innerText = data.candles || 0;
         }
 
-        // --- FIREBASE: React to a Firebase note ---
         async function reactFirebase(noteId, reactionType, btn) {
-            // 1. Visual Pop
             btn.classList.add('pop-active');
             setTimeout(() => btn.classList.remove('pop-active'), 300);
 
-            // 2. Header & Note Glow
-            const header = document.querySelector('header.island-nav');
-            const note = btn.closest('.note');
-
-            const glowClass = reactionType === 'hearts' ? 'glow-red' :
-                reactionType === 'flowers' ? 'glow-yellow' : 'glow-orange';
-
-            if (header) {
-                header.classList.add(glowClass);
-                setTimeout(() => header.classList.remove(glowClass), 400);
-            }
-
-            if (note) {
-                note.classList.remove('glow-red', 'glow-yellow', 'glow-orange');
-                note.classList.add(glowClass);
-                setTimeout(() => note.classList.remove(glowClass), 1000);
-            }
-
-            // 3. Optimistic UI update
+            // Optimistic Update
             const countSpan = btn.querySelector('.count');
             let val = parseInt(countSpan.innerText);
             countSpan.innerText = val + 1;
 
-            // 4. Update Firebase atomically
+            // Update LIVE stats optimistically
+            if (reactionType === 'hearts') liveStats.hearts++;
+            if (reactionType === 'flowers') liveStats.flowers++;
+            if (reactionType === 'candles') liveStats.candles++;
+            updateTotalStats();
+
             try {
                 const noteRef = doc(db, 'problem-wall-notes', noteId);
-                await updateDoc(noteRef, {
-                    [reactionType]: increment(1)
-                });
+                await updateDoc(noteRef, { [reactionType]: increment(1) });
             } catch (error) {
                 console.error('Error updating reaction:', error);
-                // Revert on failure
-                countSpan.innerText = val;
-            }
-
-            // 5. Update global stats display
-            const globalMap = { hearts: 'totalHearts', flowers: 'totalFlowers', candles: 'totalCandles' };
-            const globalEl = document.getElementById(globalMap[reactionType]);
-            if (globalEl) {
-                let gVal = parseInt(globalEl.innerText.replace(/,/g, ''));
-                globalEl.innerText = (gVal + 1).toLocaleString();
             }
         }
 
-        // --- Expose functions to window for onclick handlers ---
         window.postNote = postNote;
         window.openWriter = openWriter;
         window.closeWriter = closeWriter;
