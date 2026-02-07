@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- AUTH GUARD: Protects this page -->
+    <script src="../assets/js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychologist Dashboard | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/dashboard-sidebar.css">
+    <!-- Quill Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+    <style>
+        /* --- DASHBOARD V3 DARK (TEAL STANDARD) --- */
+        :root {
+            /* Palette from Screenshots */
+            --bg-deep: #0f172a;
+            /* Main Background */
+            --bg-card: #1e293b;
+            /* Card Background */
+            --bg-sidebar: #0f172a;
+            /* Sidebar matches body */
+            --teal-accent: #2dd4bf;
+            /* Teal for Consistency */
+            --teal-dim: rgba(45, 212, 191, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --font-head: 'Outfit', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+        }
+
+        /* --- LAYOUT --- */
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+
+        .user-avatar-lg {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .user-info-text .name {
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 1rem;
+            line-height: 1.2;
+        }
+
+        .user-info-text .role {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+
+        .side-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: 0.2s;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .side-link:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+        }
+
+        .side-link.active {
+            background: var(--teal-accent);
+            color: #0f172a;
+            font-weight: 600;
+            box-shadow: 0 4px 12px var(--teal-dim);
+        }
+
+        .side-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 20px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: #ef4444;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 40px;
+            width: auto;
+            overflow-y: auto;
+        }
+
+        .view-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- CARDS & GRID --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dash-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            padding: 30px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dash-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: var(--font-head);
+            color: var(--text-main);
+        }
+
+        p {
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        /* --- BUTTONS --- */
+        .btn-dash-primary {
+            background: var(--teal-accent);
+            color: #0f172a;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-block;
+            box-shadow: 0 0 15px var(--teal-dim);
+            transition: 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-dash-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--teal-dim);
+        }
+
+        .btn-dash-secondary {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-dash-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-muted);
+        }
+
+        /* --- FORMS --- */
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-family: var(--font-body);
+        }
+
+        .form-input:focus {
+            border-color: var(--teal-accent);
+            outline: none;
+        }
+
+        /* --- TABLES --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        td {
+            padding: 15px;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        /* --- MOBILE TOGGLE --- */
+        .mobile-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+
+        /* --- MESSAGING VIEW CSS --- */
+        .msg-layout {
+            display: flex;
+            height: calc(100vh - 220px);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .msg-sidebar {
+            width: 320px;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .msg-thread {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .msg-thread:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .msg-thread.active {
+            background: rgba(45, 212, 191, 0.05);
+            border-left: 3px solid var(--teal-accent);
+        }
+
+        .msg-list-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            font-weight: 700;
+            opacity: 0.7;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .msg-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .msg-warning-banner {
+            background: #fffbeb;
+            color: #92400e;
+            padding: 10px;
+            font-size: 0.85rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .msg-header {
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+        }
+
+        .chat-area {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+        }
+
+        .chat-bubble.me {
+            align-self: flex-end;
+        }
+
+        .chat-box {
+            background: transparent;
+            padding: 0;
+            color: var(--text-main);
+        }
+
+        .task-card {
+            background: rgba(45, 212, 191, 0.05);
+            border: 1px solid rgba(45, 212, 191, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            max-width: 400px;
+        }
+
+        .task-btn {
+            background: rgba(45, 212, 191, 0.1);
+            color: var(--teal-accent);
+            border: 1px solid var(--teal-accent);
+            padding: 5px 15px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .simple-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            font-family: var(--font-body);
+        }
+
+        /* --- TOOL MODAL --- */
+        .tool-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tool-modal-overlay.active {
+            display: flex;
+        }
+
+        .tool-modal-content {
+            width: 90%;
+            max-width: 1000px;
+            height: 80vh;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .tool-modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .tool-modal-title {
+            font-family: var(--font-head);
+            font-weight: 700;
+            color: var(--teal-accent);
+        }
+
+        .tool-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tool-close-btn:hover {
+            color: #ef4444;
+            transform: rotate(90deg);
+        }
+
+        .tool-frame {
+            flex: 1;
+            border: none;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-deep);
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <!-- TOOL MODAL CONTAINER -->
+    <div id="toolModal" class="tool-modal-overlay">
+        <div class="tool-modal-content">
+            <div class="tool-modal-header">
+                <div class="tool-modal-title" id="modalTitle">Tool</div>
+                <button class="tool-close-btn" onclick="closeTool()"><i class="fas fa-times"></i></button>
+            </div>
+            <iframe id="toolFrame" class="tool-frame" src=""></iframe>
+        </div>
+    </div>
+
+    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <div class="dashboard-layout">
+        <!-- SIDEBAR -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar-lg" style="background: var(--bg-card); border-color:var(--teal-accent);">
+                    <i class="fas fa-user-md" style="color:var(--teal-accent);"></i>
+                </div>
+                <div class="user-info-text">
+                    <div class="name" id="sidebar-name">Dr. Strange</div>
+                    <div class="role">Psychologist</div>
+                </div>
+            </div>
+
+            <div class="sidebar-nav">
+                <a href="#" class="side-link active" onclick="switchView('overview', this)"><i
+                        class="fas fa-hospital-user"></i> <span>Practice</span></a>
+                <a href="#" class="side-link" onclick="switchView('clients', this)"><i class="fas fa-users"></i>
+                    <span>Clients</span></a>
+                <a href="#" class="side-link" onclick="switchView('profile', this)"><i class="fas fa-id-card-alt"></i>
+                    <span>My Profile</span></a>
+                <a href="#" class="side-link" onclick="switchView('availability', this)"><i
+                        class="fas fa-calendar-check"></i> <span>Availability</span></a>
+                <a href="#" class="side-link" onclick="switchView('blogs', this)"><i class="fas fa-pen-nib"></i>
+                    <span>Articles</span></a>
+                <a href="#" class="side-link" onclick="switchView('verification', this)"><i
+                        class="fas fa-certificate"></i> <span>Verification</span></a>
+
+                <div style="height:1px; background:var(--border-subtle); margin:10px 0;"></div>
+                <div
+                    style="padding:10px 20px; font-size:0.75rem; opacity:0.5; text-transform:uppercase; font-weight:700;">
+                    Personal</div>
+
+                <a href="#" onclick="openTool('../tools/journal.html', 'My Journal')" class="side-link"><i
+                        class="fas fa-feather-alt"></i> <span>Journal</span></a>
+                <a href="#" onclick="switchView('messages', this)" class="side-link"><i class="fas fa-envelope"></i>
+                    <span>Messages</span></a>
+
+                <div style="height:1px; background:var(--border-subtle); margin:10px 0;"></div>
+                <a href="#" onclick="switchView('settings', this)" class="side-link"><i class="fas fa-cog"></i>
+                    <span>Settings</span></a>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+            </div>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content fade-in">
+            <!-- OVERVIEW VIEW -->
+            <div id="view-overview" class="view-section">
+                <header
+                    style="margin-bottom:30px; padding-bottom:20px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h1 style="font-family:'Outfit'; font-size:2rem; color:var(--text-main); margin-bottom:5px;">
+                            Clinical Dashboard</h1>
+                        <p style="opacity:0.7;">Practice Overview</p>
+                    </div>
+                </header>
+                <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+                    <!-- LEFT -->
+                    <div style="display:flex; flex-direction:column; gap:25px;">
+                        <!-- APPOINTMENTS -->
+                        <div class="dash-card">
+                            <div class="dc-header"
+                                style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                                <div style="font-weight:700; font-size:1.1rem;">Upcoming Sessions</div>
+                                <button class="btn-dash-primary" style="padding:5px 15px; font-size:0.8rem;">+
+                                    Add</button>
+                            </div>
+                            <table>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Client</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                </tr>
+                                <tr>
+                                    <td>15:00</td>
+                                    <td style="display:flex; gap:10px; align-items:center;">
+                                        <div
+                                            style="width:30px; height:30px; background:var(--bg-deep); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem;">
+                                            JD</div>
+                                        John D.
+                                    </td>
+                                    <td>Initial Consultation</td>
+                                    <td><span
+                                            style="background:rgba(34, 197, 94, 0.2); color:#22c55e; padding:2px 8px; border-radius:4px; font-size:0.8rem;">Confirmed</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+
+                    </div>
+
+                    <!-- RIGHT -->
+                    <div style="display:flex; flex-direction:column; gap:25px;">
+                        <!-- ANALYTICS CHART (FIXED HEIGHT) -->
+                        <div class="dash-card"
+                            style="position:relative; height:350px; display:flex; flex-direction:column;">
+                            <h4 style="margin-bottom:15px; opacity:0.8;">Content Performance</h4>
+                            <div style="position:relative; flex:1; width:100%; min-height:0;">
+                                <canvas id="perfChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="dash-card" style="text-align:center;">
+                            <h4 style="margin-bottom:10px; opacity:0.8;">Active Clients</h4>
+                            <div
+                                style="font-size:3rem; font-weight:700; font-family:'Outfit'; color:var(--teal-accent);">
+                                12</div>
+                            <div style="color:#22c55e; font-size:0.85rem; margin-top:5px;">+2 this week</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: CLIENTS -->
+            <div id="view-clients" class="view-section" style="display:none;">
+                <h2 style="font-family:'Outfit'; margin-bottom:20px;">My Case Load</h2>
+                <div class="dash-card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                        <input type="text" placeholder="Search patients..."
+                            style="padding:12px; background:rgba(0,0,0,0.2); border:1px solid var(--border-subtle); border-radius:30px; color:white; width:300px;">
+                        <button class="btn-dash-primary" style="padding:8px 20px;">+ New Patient</button>
+                    </div>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Next Session</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr>
+                            <td style="display:flex; align-items:center; gap:10px;">
+                                <div
+                                    style="width:32px; height:32px; background:var(--bg-deep); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem;">
+                                    JD</div>
+                                John Doe
+                            </td>
+                            <td><span
+                                    style="color:#22c55e; background:rgba(34, 197, 94, 0.1); padding:2px 8px; border-radius:4px; font-size:0.8rem;">Active</span>
+                            </td>
+                            <td>Today, 3:00 PM</td>
+                            <td style="display:flex; gap:10px;">
+                                <button onclick="alert('Opening secure notes...')"
+                                    style="background:transparent; border:1px solid var(--teal-accent); color:var(--teal-accent); padding:5px 15px; border-radius:6px; cursor:pointer; font-size:0.85rem;">Notes</button>
+                                <button onclick="window.location.href='messaging.html'"
+                                    style="background:transparent; border:1px solid var(--border-subtle); color:var(--text-muted); padding:5px 10px; border-radius:6px; cursor:pointer;"><i
+                                        class="fas fa-envelope"></i></button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+
+
+            <!-- VIEW: PROFILE (PROFESSIONAL) -->
+            <div id="view-profile" class="view-section" style="display:none;">
+                <div class="dash-card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:25px; align-items:center;">
+                        <h2 style="color:var(--teal-accent);">Professional Profile</h2>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-dash-secondary"
+                                onclick="window.open('../meet-psychologists.html?preview=true', '_blank')">
+                                <i class="fas fa-eye"></i> Preview Public
+                            </button>
+                            <button class="btn-dash-primary" onclick="saveProfile()">Save Changes</button>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 250px 1fr; gap:40px;">
+                        <!-- Avatar Column -->
+                        <div style="text-align:center;">
+                            <div style="width:180px; height:180px; border-radius:50%; background:var(--bg-deep); margin:0 auto 20px; border:2px dashed var(--border-subtle); display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; position:relative;"
+                                onclick="triggerPhotoUpload()">
+                                <img id="profile-preview" src=""
+                                    style="width:100%; height:100%; object-fit:cover; display:none;">
+                                <div id="profile-placeholder">
+                                    <i class="fas fa-camera" style="font-size:2rem; opacity:0.5;"></i>
+                                </div>
+                            </div>
+                            <button class="btn-dash-secondary" style="font-size:0.85rem;"
+                                onclick="triggerPhotoUpload()">Upload Headshot</button>
+
+                            <!-- Service Status -->
+                            <div
+                                style="margin-top:30px; text-align:left; background:rgba(255,255,255,0.02); padding:15px; border-radius:12px;">
+                                <label
+                                    style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:10px;">AVAILABILITY</label>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span id="status-text" style="color:#22c55e; font-size:0.9rem;">Accepting New
+                                        Clients</span>
+                                    <label class="switch">
+                                        <input type="checkbox" checked onchange="toggleAvailability(this)">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Column -->
+                        <div style="flex:1; width:100%;">
+
+                            <!-- CARD 1: PROFESSIONAL IDENTITY -->
+                            <div class="dash-card" style="margin-bottom:30px;">
+                                <h3
+                                    style="margin-bottom:20px; color:var(--teal-accent); display:flex; align-items:center; gap:10px;">
+                                    <i class="fas fa-id-card"></i> Professional Identity
+                                </h3>
+
+                                <div
+                                    style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
+                                    <div class="form-group">
+                                        <label class="form-label">Full Name & Title</label>
+                                        <input type="text" class="form-input" id="p-name" value="Dr. Strange"
+                                            placeholder="e.g. Dr. Jane Doe">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Highest Qualification</label>
+                                        <select class="form-input" id="p-qual">
+                                            <option>Ph.D. in Clinical Psychology</option>
+                                            <option>Psy.D.</option>
+                                            <option>M.Phil in Clinical Psychology</option>
+                                            <option>Masters in Counseling</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div
+                                    style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:20px; margin-bottom:20px;">
+                                    <div class="form-group">
+                                        <label class="form-label">License Number</label>
+                                        <input type="text" class="form-input" id="p-license" value="PSY1234567">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Languages (Comma sep)</label>
+                                        <input type="text" class="form-input" id="p-langs" value="English, Hindi">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Session Fee</label>
+                                        <div style="position:relative;">
+                                            <span style="position:absolute; left:15px; top:12px; opacity:0.6;">$</span>
+                                            <input type="number" class="form-input" id="p-rate" value="150"
+                                                style="padding-left:30px;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" style="display:flex; justify-content:space-between;">
+                                        <span>Professional Experience</span>
+                                        <button onclick="addExp()"
+                                            style="background:transparent; border:none; color:var(--teal-accent); font-size:0.8rem; cursor:pointer;">+
+                                            Add</button>
+                                    </label>
+                                    <div id="experience-list">
+                                        <div class="exp-item" style="display:flex; gap:10px; margin-bottom:10px;">
+                                            <i class="fas fa-graduation-cap" style="padding-top:12px; opacity:0.5;"></i>
+                                            <input type="text" class="form-input"
+                                                value="Master's in Clinical Psychology"
+                                                placeholder="Degree / Certification">
+                                            <button onclick="removeExp(this)"
+                                                style="background:transparent; border:none; color:var(--alert-red); cursor:pointer;"><i
+                                                    class="fas fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 2: CLINICAL APPROACH -->
+                            <div class="dash-card" style="margin-bottom:30px;">
+                                <h3
+                                    style="margin-bottom:20px; color:var(--peach-accent); display:flex; align-items:center; gap:10px;">
+                                    <i class="fas fa-feather-alt"></i> Clinical Approach
+                                </h3>
+
+                                <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:30px;">
+                                    <!-- Left: Bio & Expectations -->
+                                    <div>
+                                        <div class="form-group" style="margin-bottom:20px;">
+                                            <label class="form-label">About Me (Public Bio)</label>
+                                            <textarea class="form-input" id="p-bio"
+                                                style="height:140px; line-height:1.6;"
+                                                placeholder="Share your journey..."></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">First Session Expectations</label>
+                                            <textarea class="form-input" id="p-first-session" style="height:100px;"
+                                                placeholder="Help reduce anxiety..."></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Right: Style Tags -->
+                                    <div>
+                                        <label class="form-label">My Therapeutic Style</label>
+                                        <div class="tag-container" id="style-tags" style="margin-bottom:20px;">
+                                            <button class="tag-select" onclick="toggleTag(this)">Good Listener</button>
+                                            <button class="tag-select"
+                                                onclick="toggleTag(this)">Solution-Focused</button>
+                                            <button class="tag-select" onclick="toggleTag(this)">Gentle &
+                                                Patient</button>
+                                            <button class="tag-select" onclick="toggleTag(this)">Direct &
+                                                Honest</button>
+                                            <button class="tag-select"
+                                                onclick="toggleTag(this)">Homework-Oriented</button>
+                                            <button class="tag-select"
+                                                onclick="toggleTag(this)">Skills-Building</button>
+                                            <button class="tag-select" onclick="toggleTag(this)">Reflective</button>
+                                        </div>
+
+                                        <label class="form-label">Why Soulamore?</label>
+                                        <textarea class="form-input" id="p-ref"
+                                            style="height:80px; font-size:0.9rem;">To contribute to a community where mental health is accessible.</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 3: EXPERTISE & VALUES -->
+                            <div class="dash-card" style="margin-bottom:30px;">
+                                <h3 style="margin-bottom:20px; color:var(--text-main); opacity:0.8;">Expertise &
+                                    Alignment</h3>
+
+                                <div class="form-group" style="margin-bottom:25px;">
+                                    <label class="form-label">Areas of Expertise</label>
+                                    <div class="tag-container" id="expertise-tags">
+                                        <button class="tag-select active" onclick="toggleTag(this)">Anxiety</button>
+                                        <button class="tag-select active" onclick="toggleTag(this)">Depression</button>
+                                        <button class="tag-select" onclick="toggleTag(this)">Trauma / PTSD</button>
+                                        <button class="tag-select" onclick="toggleTag(this)">Relationships</button>
+                                        <button class="tag-select" onclick="toggleTag(this)">Student Wellness</button>
+                                        <button class="tag-select" onclick="toggleTag(this)">LGBTQIA+</button>
+                                        <button class="tag-select" onclick="toggleTag(this)">Grief</button>
+                                        <button class="tag-select" onclick="toggleTag(this)">Career</button>
+                                        <button class="tag-select active" onclick="toggleTag(this)">Holistic</button>
+                                        <button class="tag-select" onclick="toggleTag(this)">Parenting</button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Core Values (Select 3)</label>
+                                    <div class="tag-container" id="values-tags">
+                                        <button class="tag-select active"
+                                            onclick="toggleTag(this, 3)">Integrity</button>
+                                        <button class="tag-select active" onclick="toggleTag(this, 3)">Empathy</button>
+                                        <button class="tag-select" onclick="toggleTag(this, 3)">Ethics</button>
+                                        <button class="tag-select" onclick="toggleTag(this, 3)">Depth</button>
+                                        <button class="tag-select active"
+                                            onclick="toggleTag(this, 3)">Community</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Save Action -->
+                            <div
+                                style="text-align:right; margin-top:20px; border-top:1px solid var(--border-subtle); padding-top:20px;">
+                                <button class="btn-dash-primary" onclick="saveProfile()"
+                                    style="padding:12px 30px; font-size:1rem;">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: AVALABILITY (PRO) -->
+            <div id="view-availability" class="view-section" style="display:none;">
+                <h2 style="font-family:'Outfit'; margin-bottom:20px;">Availability & Sync</h2>
+
+                <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap:30px;">
+                    <!-- SYNC -->
+                    <div class="dash-card">
+                        <h3 style="margin-bottom:20px; color:var(--teal-accent);">Calendar Sync</h3>
+                        <p style="font-size:0.9rem; margin-bottom:20px;">Prevent double bookings by syncing
+                            your
+                            external calendars.</p>
+
+                        <div style="display:flex; flex-direction:column; gap:15px;">
+                            <button
+                                style="display:flex; align-items:center; gap:15px; padding:15px; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); border-radius:12px; color:white; cursor:pointer;"
+                                onclick="this.style.borderColor='#22c55e'; this.querySelector('span').innerText='Connected'; this.querySelector('span').style.color='#22c55e';">
+                                <i class="fab fa-google" style="font-size:1.5rem;"></i>
+                                <div style="text-align:left; flex:1;">
+                                    <div style="font-weight:600;">Google Calendar</div>
+                                    <span style="font-size:0.8rem; opacity:0.6;">Click to connect</span>
+                                </div>
+                            </button>
+                            <button
+                                style="display:flex; align-items:center; gap:15px; padding:15px; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); border-radius:12px; color:white; cursor:pointer;">
+                                <i class="fab fa-microsoft" style="font-size:1.5rem;"></i>
+                                <div style="text-align:left; flex:1;">
+                                    <div style="font-weight:600;">Outlook Calendar</div>
+                                    <span style="font-size:0.8rem; opacity:0.6;">Connect</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SESSION TYPES -->
+                    <div class="dash-card">
+                        <h3 style="margin-bottom:10px;">Session Types</h3>
+                        <div
+                            style="margin-bottom:15px; padding:15px; background:rgba(255,255,255,0.03); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700;">Intake Session</div>
+                                <div style="font-size:0.85rem; opacity:0.7;">60 mins • Video</div>
+                            </div>
+                            <i class="fas fa-edit" style="cursor:pointer; opacity:0.5;"></i>
+                        </div>
+                        <div
+                            style="margin-bottom:15px; padding:15px; background:rgba(255,255,255,0.03); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700;">Standard Therapy</div>
+                                <div style="font-size:0.85rem; opacity:0.7;">50 mins • Video/Audio</div>
+                            </div>
+                            <i class="fas fa-edit" style="cursor:pointer; opacity:0.5;"></i>
+                        </div>
+                        <button class="btn-dash-secondary" style="width:100%;">+ Add Session Type</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: VERIFICATION -->
+            <div id="view-verification" class="view-section" style="display:none;">
+                <h2 style="font-family:'Outfit'; margin-bottom:20px;">Credential Verification</h2>
+
+                <div class="dash-card" style="text-align:center; padding:50px;">
+                    <div style="font-size:4rem; color:var(--teal-accent); margin-bottom:20px;">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div
+                        style="display:inline-block; background:rgba(34, 197, 94, 0.2); color:#22c55e; padding:5px 15px; border-radius:20px; font-weight:700; margin-bottom:20px;">
+                        VERIFIED
+                    </div>
+                    <p style="margin-bottom:30px;">Your credentials have been verified. You are authorized
+                        to practice.
+                    </p>
+
+                    <div
+                        style="text-align:left; max-width:600px; margin:0 auto; background:rgba(255,255,255,0.02); padding:20px; border-radius:12px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <span style="opacity:0.6;">Document Type</span>
+                            <span>State License</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <span style="opacity:0.6;">Uploaded On</span>
+                            <span>Jan 15, 2026</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between;">
+                            <span style="opacity:0.6;">Expiry</span>
+                            <span>Dec 31, 2028</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: BLOGS -->
+            <div id="view-blogs" class="view-section" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                    <div>
+                        <h1 style="font-family:'Outfit'; font-size:2rem; color:var(--text-main);">My
+                            Articles</h1>
+                        <p style="opacity:0.7;">Share your expertise.</p>
+                    </div>
+                    <button class="btn-dash-primary" onclick="openEditor()">
+                        <i class="fas fa-plus"></i> Write New
+                    </button>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                    <div class="dash-card" onclick="openEditor()" style="cursor:pointer;">
+                        <div
+                            style="color:#fbbf24; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">
+                            Draft</div>
+                        <h3 style="margin-bottom:10px;">High-Functioning Anxiety</h3>
+                        <p style="font-size:0.9rem; margin-bottom:15px;">Anxiety often masquerades as...</p>
+                        <div style="font-size:0.8rem; opacity:0.5;">Last edited: 2 hours ago</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: MESSAGES (INLINE) -->
+            <div id="view-messages" class="view-section" style="display:none; max-width: 1400px;">
+                <!-- Wider for messages -->
+                <div style="margin-bottom:20px;">
+                    <h1 style="font-family:'Outfit'; font-size:1.8rem;">Follow-up Messages</h1>
+                </div>
+
+                <div class="msg-layout">
+                    <!-- SIDEBAR LIST -->
+                    <div class="msg-sidebar">
+                        <div class="msg-list-header">Active Threads</div>
+
+                        <!-- Thread 1 -->
+                        <div class="msg-thread active">
+                            <div
+                                style="width:40px; height:40px; background:#2dd4bf; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#0f172a; flex-shrink:0;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div style="flex:1; overflow:hidden;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                    <span style="font-weight:700; font-size:0.9rem;">Dr. Emily Stone</span>
+                                    <span style="font-size:0.7rem; opacity:0.5;">2h</span>
+                                </div>
+                                <div
+                                    style="font-size:0.75rem; font-weight:700; color:var(--teal-accent); margin-bottom:2px;">
+                                    <i class="fas fa-tasks"></i> REFLECTION TASK
+                                </div>
+                                <div
+                                    style="font-size:0.8rem; opacity:0.6; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    Please share your thoughts on the...</div>
+                            </div>
+                        </div>
+
+                        <!-- Thread 2 -->
+                        <div class="msg-thread">
+                            <div
+                                style="width:40px; height:40px; background:#f97316; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; flex-shrink:0;">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                    <span style="font-weight:700; font-size:0.9rem;">Peer Sarah</span>
+                                    <span style="font-size:0.7rem; opacity:0.5;">1d</span>
+                                </div>
+                                <div style="font-size:0.75rem; font-weight:700; color:#f97316; margin-bottom:2px;">
+                                    <i class="fas fa-bookmark"></i> POST-SESSION CHECK-IN
+                                </div>
+                                <div style="font-size:0.8rem; opacity:0.6;">Just checking how the week
+                                    felt...</div>
+                            </div>
+                        </div>
+
+                        <div class="msg-list-header" style="margin-top:auto;">Archived</div>
+                        <div class="msg-thread" style="opacity:0.5;">
+                            <div
+                                style="width:40px; height:40px; background:#334155; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#94a3b8;">
+                                <i class="fas fa-archive"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight:600; font-size:0.9rem;">Archived Session</div>
+                                <div style="font-size:0.7rem;">EXPIRED</div>
+                                <div style="font-size:0.8rem;">Chat locked. Book new session...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CHAT AREA -->
+                    <div class="msg-content">
+                        <!-- Warning Banner -->
+                        <div class="msg-warning-banner">
+                            <i class="fas fa-exclamation-circle"></i>
+                            This is a follow-up support space. It is not a substitute for therapy or
+                            emergency care.
+                        </div>
+
+                        <!-- Header -->
+                        <div class="msg-header">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div
+                                    style="width:35px; height:35px; background:#2dd4bf; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#0f172a;">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight:700;">Dr. Emily Stone</div>
+                                    <div style="font-size:0.8rem; opacity:0.6;">Clinical Psychologist</div>
+                                </div>
+                            </div>
+                            <div style="font-size:0.8rem; opacity:0.6;"><i class="fas fa-clock"></i> Closes
+                                in 2
+                                days
+                            </div>
+                        </div>
+
+                        <!-- Bubbles -->
+                        <div class="chat-area">
+                            <div style="text-align:center; font-size:0.8rem; opacity:0.4; margin:10px 0;">
+                                Thread
+                                Started: Post-Session Task</div>
+
+                            <div class="chat-bubble">
+                                <div class="chat-box">
+                                    <p style="margin-bottom:10px;">Hi there. Following up on our session
+                                        yesterday.
+                                        Here
+                                        is the reflection task we discussed.</p>
+
+                                    <!-- TASK CARD -->
+                                    <div class="task-card">
+                                        <div
+                                            style="display:flex; align-items:center; gap:8px; color:var(--teal-accent); font-weight:700; margin-bottom:5px;">
+                                            <i class="fas fa-pen"></i> Task: Anxiety Triggers
+                                        </div>
+                                        <p style="font-size:0.9rem; margin-bottom:10px;">List 3 situations
+                                            this week
+                                            where you felt the 'tightness' we spoke about.</p>
+                                        <button class="task-btn"
+                                            onclick="openTool('../tools/journal.html', 'Journal Task')">Open
+                                            Journal</button>
+                                    </div>
+
+                                    <p style="margin-top:10px;">Thanks Dr. Stone. I'll work on this tonight.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Input -->
+                        <div class="input-area">
+                            <input type="text" class="simple-input" placeholder="Type a message (Follow-up only)...">
+                            <button
+                                style="background:var(--teal-accent); border:none; width:35px; height:35px; border-radius:50%; color:#0f172a; cursor:pointer;"><i
+                                    class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SETTINGS -->
+            <div id="view-settings" class="view-section" style="display:none; padding-top:0;">
+                <style>
+                    .settings-header {
+                        padding: 20px;
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                        background: transparent;
+                        margin-bottom: 20px;
+                        color: var(--text-main);
+                    }
+
+                    body.light-mode .settings-header {
+                        border-bottom: 1px solid var(--border-subtle);
+                    }
+
+                    .theme-btn {
+                        background: rgba(255, 255, 255, 0.05);
+                        border: 1px solid var(--border-subtle);
+                        color: var(--text-muted);
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        transition: all 0.2s;
+                    }
+
+                    .theme-btn:hover {
+                        background: rgba(255, 255, 255, 0.1);
+                        color: var(--text-main);
+                        transform: translateY(-2px);
+                    }
+
+                    .theme-btn.active {
+                        background: rgba(45, 212, 191, 0.1);
+                        border-color: var(--teal-accent);
+                        color: var(--teal-accent);
+                        font-weight: 600;
+                    }
+
+                    /* Light Mode Overrides */
+                    body.light-mode {
+                        background-color: #f8fafc;
+                        color: #0f172a;
+                        --bg-deep: #f8fafc;
+                        /* White for card backgrounds */
+                        --bg-card: #ffffff;
+                        --bg-sidebar: #f1f5f9;
+                        --text-main: #0f172a;
+                        --text-muted: #475569;
+                        /* Darker muted text for contrast */
+                        --border-subtle: #cbd5e1;
+                        /* Higher contrast border */
+                    }
+
+                    /* Specific Light Mode Fixes */
+                    body.light-mode .msg-content {
+                        background: transparent;
+                        /* Remove the grey overlay */
+                    }
+
+                    body.light-mode .msg-sidebar {
+                        background: #ffffff;
+                        border-right: 1px solid var(--border-subtle);
+                    }
+
+                    body.light-mode .msg-header {
+                        background: #ffffff;
+                        border-bottom: 1px solid var(--border-subtle);
+                    }
+
+                    body.light-mode .input-area {
+                        background: #ffffff;
+                        border-top: 1px solid var(--border-subtle);
+                    }
+
+                    body.light-mode .simple-input {
+                        color: var(--text-main);
+                    }
+
+                    body.light-mode .task-card {
+                        background: rgba(45, 212, 191, 0.15);
+                        /* More visible teal in light mode */
+                        border: 1px solid rgba(45, 212, 191, 0.5);
+                    }
+
+                    /* FIX: Reset Dashboard Headers (Remove Global Site Styles) */
+                    .view-section header {
+                        background: transparent !important;
+                        backdrop-filter: none !important;
+                        border-bottom: 1px solid var(--border-subtle) !important;
+                        position: static !important;
+                        width: 100% !important;
+                        box-shadow: none !important;
+                    }
+
+                    /* PROFILE EDITOR STYLES */
+                    .tag-container {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 10px;
+                    }
+
+                    .tag-select {
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        border: 1px solid var(--border-subtle);
+                        background: rgba(255, 255, 255, 0.02);
+                        color: var(--text-muted);
+                        cursor: pointer;
+                        font-size: 0.85rem;
+                        transition: all 0.2s;
+                    }
+
+                    .tag-select:hover {
+                        background: rgba(45, 212, 191, 0.1);
+                        border-color: var(--teal-accent);
+                    }
+
+                    .tag-select.active {
+                        background: var(--teal-accent);
+                        color: #0f172a;
+                        font-weight: 600;
+                        border-color: var(--teal-accent);
+                    }
+
+                    /* Toggle Switch */
+                    .switch {
+                        position: relative;
+                        display: inline-block;
+                        width: 50px;
+                        height: 24px;
+                    }
+
+                    .switch input {
+                        opacity: 0;
+                        width: 0;
+                        height: 0;
+                    }
+
+                    .slider {
+                        position: absolute;
+                        cursor: pointer;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-color: #334155;
+                        transition: .4s;
+                    }
+
+                    .slider:before {
+                        position: absolute;
+                        content: "";
+                        height: 16px;
+                        width: 16px;
+                        left: 4px;
+                        bottom: 4px;
+                        background-color: white;
+                        transition: .4s;
+                    }
+
+                    input:checked+.slider {
+                        background-color: #22c55e;
+                    }
+
+                    input:checked+.slider:before {
+                        transform: translateX(26px);
+                    }
+
+                    .slider.round {
+                        border-radius: 34px;
+                    }
+
+                    .slider.round:before {
+                        border-radius: 50%;
+                    }
+                </style>
+
+                <div class="settings-header">
+                    <div
+                        style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">
+                            Settings</h2>
+                        <div style="font-size:0.8rem; opacity:0.7;">Customize your workspace</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid" style="grid-template-columns: 1fr; gap:25px;">
+                    <!-- APPEARANCE CARD -->
+                    <div class="dash-card">
+                        <h3 style="margin-bottom:20px; color:var(--teal-accent);">Appearance</h3>
+                        <div style="margin-bottom:20px;">
+                            <label style="display:block; margin-bottom:15px; font-weight:600; opacity:0.9;">Interface
+                                Theme</label>
+                            <div style="display:flex; gap:15px;">
+                                <button onclick="setThemeMode('dark')" class="theme-btn active" id="btn-mode-dark">
+                                    <i class="fas fa-moon"></i> Dark
+                                </button>
+                                <button onclick="setThemeMode('light')" class="theme-btn" id="btn-mode-light">
+                                    <i class="fas fa-sun"></i> Light
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PERSONAL INFORMATION -->
+                    <div class="dash-card">
+                        <h3 style="margin-bottom:20px; color:var(--teal-accent);">Personal Information</h3>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
+                            <div>
+                                <label style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:8px;">Full
+                                    Name</label>
+                                <input type="text" value="Dr. Strange"
+                                    style="width:100%; padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; color:var(--text-main); outline:none;">
+                            </div>
+                            <div>
+                                <label
+                                    style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:8px;">Title</label>
+                                <input type="text" value="Clinical Psychologist"
+                                    style="width:100%; padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; color:var(--text-main); outline:none;">
+                            </div>
+                        </div>
+                        <div
+                            style="display:flex; gap:15px; border-top:1px solid var(--border-subtle); padding-top:20px;">
+                            <button class="btn-dash-primary" onclick="alert('Profile Updated!')">Save
+                                Changes</button>
+                            <button class="btn-dash-secondary" onclick="alert('Password reset link sent.')">Change
+                                Password</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SOULBOT VISUALS -->
+    <script src="../assets/js/soulbot-visuals.js"></script>
+
+    <script>
+        // Init Soulbot
+        if (window.SoulbotVisuals) {
+            window.SoulbotVisuals.init();
+        }
+
+        // --- DASHBOARD FUNCTIONS ---
+
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('soulamore_session');
+            window.location.href = 'login.html';
+        }
+
+        function switchView(viewName, clickedLink) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+
+            // Show target view
+            const target = document.getElementById('view-' + viewName);
+            if (target) {
+                target.style.display = 'block';
+            } else {
+                console.error('View not found:', viewName);
+            }
+
+            // Update sidebar active state
+            if (clickedLink) {
+                document.querySelectorAll('.sidebar-nav .side-link').forEach(l => l.classList.remove('active'));
+                clickedLink.classList.add('active');
+            }
+        }
+
+        function openEditor() {
+            window.location.href = 'blog-editor.html';
+        }
+
+        /* --- TOOL MODAL FUNCTIONS --- */
+        function openTool(url, title) {
+            const modal = document.getElementById('toolModal');
+            const frame = document.getElementById('toolFrame');
+            const titleEl = document.getElementById('modalTitle');
+
+            if (modal) {
+                modal.classList.add('active');
+                modal.style.display = 'flex'; // Ensure visibility
+            }
+            if (frame) frame.src = url;
+            if (titleEl) titleEl.innerText = title;
+        }
+
+        function closeTool() {
+            const modal = document.getElementById('toolModal');
+            const frame = document.getElementById('toolFrame');
+
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
+            if (frame) frame.src = '';
+        }
+
+
+        /* --- GLOBAL EVENT LISTENERS --- */
+
+        // 1. Close Modal on clicking outside (Backdrop)
+        window.onclick = function (event) {
+            const modal = document.getElementById('toolModal');
+            if (event.target === modal) {
+                closeTool();
+            }
+
+            // 2. Close Sidebar on mobile when clicking main content
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.mobile-toggle');
+
+            if (window.innerWidth <= 1024 &&
+                sidebar.classList.contains('open') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target)) {
+                toggleSidebar();
+            }
+        }
+
+        // 3. Close Modal on Escape key
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeTool();
+            }
+        });
+
+        /* --- CHART JS --- */
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartCanvas = document.getElementById('perfChart');
+            if (chartCanvas) {
+                const ctx = chartCanvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Article Views',
+                            data: [12, 19, 3, 5, 2, 30, 45],
+                            borderColor: '#2dd4bf',
+                            backgroundColor: 'rgba(45, 212, 191, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: {
+                                ticks: { color: 'rgba(255,255,255,0.5)' },
+                                grid: { display: false }
+                            },
+                            y: {
+                                ticks: { color: 'rgba(255,255,255,0.5)' },
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+    <!-- FLOATING TOOLS BUTTON & MENU -->
+    <button id="tools-fab" onclick="toggleToolsMenu()"
+        style="position:fixed; bottom:30px; right:30px; width:56px; height:56px; border-radius:50%; background:var(--peach-glow); border:none; cursor:pointer; box-shadow:0 4px 12px rgba(244,159,117,0.4); display:flex; align-items:center; justify-content:center; z-index:1000; transition:all 0.3s ease;">
+        <i class="fas fa-toolbox" style="font-size:1.4rem; color:#0f172a;"></i>
+    </button>
+
+    <!-- TOOLS SLIDE-OUT MENU -->
+    <div id="tools-menu"
+        style="position:fixed; top:0; right:-350px; width:350px; height:100vh; background:var(--bg-card); border-left:1px solid var(--border-subtle); z-index:999; transition:right 0.3s ease; display:flex; flex-direction:column; box-shadow:-4px 0 20px rgba(0,0,0,0.3);">
+        <!-- Header -->
+        <div
+            style="padding:20px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2);">
+            <div>
+                <h3 style="margin:0; font-family:'Outfit'; font-size:1.2rem;">Self-Help Tools</h3>
+                <p style="margin:5px 0 0 0; font-size:0.8rem; opacity:0.7;">Quick access to all tools</p>
+            </div>
+            <button onclick="toggleToolsMenu()"
+                style="background:transparent; border:none; color:var(--text-main); cursor:pointer; font-size:1.5rem; opacity:0.7; padding:5px;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Tools List -->
+        <div style="flex:1; overflow-y:auto; padding:15px;">
+            <!-- Breathing Exercise -->
+            <div onclick="window.open('../tools/breathing.html', '_blank')" class="tool-item"
+                style="padding:15px; background:rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.3); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all 0.2s;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div
+                        style="width:40px; height:40px; background:rgba(45,212,191,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                        <i class="fas fa-wind" style="color:var(--teal-accent); font-size:1.1rem;"></i>
+                    </div>
+                    <div style="flex:1;">
+                        <h4 style="margin:0; font-size:1rem; color:var(--teal-accent);">Breathing</h4>
+                        <p style="margin:3px 0 0 0; font-size:0.75rem; opacity:0.7;">Calm your mind</p>
+                    </div>
+                    <i class="fas fa-external-link-alt" style="opacity:0.5; font-size:0.9rem;"></i>
+                </div>
+            </div>
+
+            <!-- Reset Tool -->
+            <div onclick="window.open('../tools/5-step-reset.html', '_blank')" class="tool-item"
+                style="padding:15px; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all 0.2s;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div
+                        style="width:40px; height:40px; background:rgba(255,255,255,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                        <i class="fas fa-redo-alt" style="color:var(--text-main); font-size:1.1rem;"></i>
+                    </div>
+                    <div style="flex:1;">
+                        <h4 style="margin:0; font-size:1rem;">Reset</h4>
+                        <p style="margin:3px 0 0 0; font-size:0.75rem; opacity:0.7;">Start fresh</p>
+                    </div>
+                    <i class="fas fa-external-link-alt" style="opacity:0.5; font-size:0.9rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .tool-item:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        #tools-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(244, 159, 117, 0.6);
+        }
+    </style>
+
+    <script>
+        function toggleToolsMenu() {
+            const menu = document.getElementById('tools-menu');
+            const fab = document.getElementById('tools-fab');
+            const isOpen = menu.style.right === '0px';
+
+            if (isOpen) {
+                menu.style.right = '-350px';
+                fab.style.transform = 'rotate(0deg)';
+            } else {
+                menu.style.right = '0px';
+                fab.style.transform = 'rotate(180deg)';
+            }
+        }
+    </script>
+    <!-- AUTH & PROFILE LOGIC -->
+    <script type="module">
+        import { onAuthChange } from "../assets/js/auth-service.js";
+        import { getUserProfile, updateUserProfile } from "../assets/js/profile-handler.js";
+
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auth Listener
+            onAuthChange(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    // Load Profile Data
+                    const profile = await getUserProfile(user.uid);
+                    if (profile) populateDashboard(profile);
+                } else {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+
+        function populateDashboard(p) {
+            // Basic Info
+            if (p.displayName) document.getElementById('p-name').value = p.displayName;
+            if (p.title) document.getElementById('p-qual').value = p.title; // Using title as the select value
+            if (p.licenseNumber) document.getElementById('p-license').value = p.licenseNumber;
+            if (p.languages) document.getElementById('p-langs').value = Array.isArray(p.languages) ? p.languages.join(', ') : p.languages;
+            if (p.sessionFee) document.getElementById('p-rate').value = p.sessionFee;
+            if (p.bio) document.getElementById('p-bio').value = p.bio;
+            if (p.firstSessionExpectations) document.getElementById('p-first-session').value = p.firstSessionExpectations;
+            if (p.photoURL) {
+                document.getElementById('profile-preview').src = p.photoURL;
+                document.getElementById('profile-preview').style.display = 'block';
+                document.getElementById('profile-placeholder').style.display = 'none';
+            }
+
+            // Restore Tags (Helper)
+            if (p.expertise) activateTags('expertise-tags', p.expertise);
+            if (p.therapeuticStyle) activateTags('style-tags', p.therapeuticStyle);
+            if (p.values) activateTags('values-tags', p.values);
+
+            // Restore Experience (Simplified for MVP: Just text inputs if we stored them, or skipped for now)
+            // Ideally we'd loop through p.experience and create .exp-item divs
+        }
+
+        function activateTags(containerId, activeList) {
+            if (!activeList || !Array.isArray(activeList)) return;
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const btns = container.getElementsByTagName('button');
+            for (let btn of btns) {
+                if (activeList.includes(btn.innerText)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            }
+        }
+
+        // --- SAVE FUNCTION ---
+        window.saveProfile = async function () {
+            if (!currentUser) return;
+
+            const btn = document.querySelector('.btn-dash-primary');
+            const originalText = btn.innerText;
+            btn.innerText = "Saving...";
+            btn.disabled = true;
+
+            try {
+                // Gather Data
+                const updates = {
+                    displayName: document.getElementById('p-name').value,
+                    title: document.getElementById('p-qual').value,
+                    licenseNumber: document.getElementById('p-license').value,
+                    languages: document.getElementById('p-langs').value.split(',').map(s => s.trim()),
+                    sessionFee: document.getElementById('p-rate').value,
+                    bio: document.getElementById('p-bio').value,
+                    firstSessionExpectations: document.getElementById('p-first-session').value,
+
+                    // Arrays
+                    expertise: getActiveTags('expertise-tags'),
+                    therapeuticStyle: getActiveTags('style-tags'),
+                    values: getActiveTags('values-tags'),
+
+                    location: 'Online' // Default
+                };
+
+                const success = await updateUserProfile(currentUser.uid, updates);
+
+                if (success) {
+                    alert('Profile updated successfully! Your public page is live.');
+                } else {
+                    alert('Failed to update profile. Please try again.');
+                }
+
+            } catch (e) {
+                console.error(e);
+                alert('An error occurred.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function getActiveTags(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return [];
+            const activeBtns = container.querySelectorAll('.active');
+            return Array.from(activeBtns).map(b => b.innerText);
+        }
+
+    </script>
+
+    <!-- UI UTILITY SCRIPTS (Global - Restored) -->
+    <script>
+        // --- PHOTO UPLOAD FUNCTIONS ---
+        function triggerPhotoUpload() {
+            togglePhotoModal(true);
+        }
+
+        function togglePhotoModal(show) {
+            const modal = document.getElementById('photo-upload-modal');
+            if (modal) modal.style.display = show ? 'flex' : 'none';
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                previewPhoto({ files: e.dataTransfer.files });
+                togglePhotoModal(false);
+            }
+        }
+
+        function previewPhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.getElementById('profile-preview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('profile-placeholder').style.display = 'none';
+                    togglePhotoModal(false);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // --- DASHBOARD UTILITIES ---
+        function toggleTag(btn, maxLimit = 0) {
+            const container = btn.parentElement;
+            if (maxLimit > 0 && !btn.classList.contains('active')) {
+                const activeCount = container.querySelectorAll('.active').length;
+                if (activeCount >= maxLimit) {
+                    alert(`You can only select ${maxLimit} items.`);
+                    return;
+                }
+            }
+            btn.classList.toggle('active');
+        }
+
+        function toggleAvailability(checkbox) {
+            const text = document.getElementById('status-text');
+            if (checkbox.checked) {
+                text.innerText = "Accepting New Clients";
+                text.style.color = "#22c55e";
+            } else {
+                text.innerText = "Not Accepting Clients";
+                text.style.color = "#ef4444";
+            }
+        }
+
+        function addExp() {
+            const list = document.getElementById('experience-list');
+            const div = document.createElement('div');
+            div.className = 'exp-item';
+            div.style.cssText = 'display:flex; gap:10px; margin-bottom:10px;';
+            div.innerHTML = `
+                <i class="fas fa-graduation-cap" style="padding-top:12px; opacity:0.5;"></i>
+                <input type="text" class="form-input" placeholder="Degree / Certification">
+                <button onclick="removeExp(this)" style="background:transparent; border:none; color:var(--alert-red); cursor:pointer;"><i class="fas fa-trash"></i></button>
+            `;
+            list.appendChild(div);
+        }
+
+        function removeExp(btn) {
+            btn.parentElement.remove();
+        }
+    </script>
+
+    <!-- DASHBOARD CORE SCRIPTS (RESTORED) -->
+    <script>
+        // --- DASHBOARD FUNCTIONS ---
+        function setThemeMode(mode) {
+            const body = document.body;
+            const btnDark = document.getElementById('btn-mode-dark');
+            const btnLight = document.getElementById('btn-mode-light');
+
+            if (mode === 'light') {
+                body.classList.add('light-mode');
+                if (btnLight) btnLight.classList.add('active');
+                if (btnDark) btnDark.classList.remove('active');
+                localStorage.setItem('soul_theme', 'light');
+            } else {
+                body.classList.remove('light-mode');
+                if (btnDark) btnDark.classList.add('active');
+                if (btnLight) btnLight.classList.remove('active');
+                localStorage.setItem('soul_theme', 'dark');
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function handleLogout() {
+            sessionStorage.clear();
+            localStorage.removeItem('soulamore_session');
+            window.location.href = 'login.html';
+        }
+
+        function switchView(viewName, clickedLink) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+
+            // Show target view
+            const target = document.getElementById('view-' + viewName);
+            if (target) {
+                target.style.display = 'block';
+            } else {
+                console.error('View not found:', viewName);
+            }
+
+            // Update sidebar active state
+            if (clickedLink) {
+                document.querySelectorAll('.sidebar-nav .side-link').forEach(l => l.classList.remove('active'));
+                clickedLink.classList.add('active');
+            }
+        }
+
+        function openEditor() {
+            window.location.href = 'blog-editor.html';
+        }
+
+        /* --- TOOL MODAL FUNCTIONS --- */
+        function openTool(url, title) {
+            const modal = document.getElementById('toolModal');
+            const frame = document.getElementById('toolFrame');
+            const titleEl = document.getElementById('modalTitle');
+
+            if (modal) {
+                modal.classList.add('active');
+                modal.style.display = 'flex';
+            }
+            if (frame) frame.src = url;
+            if (titleEl) titleEl.innerText = title;
+        }
+
+        function closeTool() {
+            const modal = document.getElementById('toolModal');
+            const frame = document.getElementById('toolFrame');
+
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
+            if (frame) frame.src = '';
+        }
+
+        /* --- GLOBAL EVENT LISTENERS --- */
+        window.onclick = function (event) {
+            const modal = document.getElementById('toolModal');
+            if (event.target === modal) {
+                closeTool();
+            }
+
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.mobile-toggle');
+
+            if (window.innerWidth <= 1024 &&
+                sidebar.classList.contains('open') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target)) {
+                toggleSidebar();
+            }
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeTool();
+            }
+        });
+
+        /* --- CHART JS --- */
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartCanvas = document.getElementById('perfChart');
+            if (chartCanvas) {
+                const ctx = chartCanvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Article Views',
+                            data: [12, 19, 3, 5, 2, 30, 45],
+                            borderColor: '#2dd4bf',
+                            backgroundColor: 'rgba(45, 212, 191, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: {
+                                ticks: { color: 'rgba(255,255,255,0.5)' },
+                                grid: { display: false }
+                            },
+                            y: {
+                                ticks: { color: 'rgba(255,255,255,0.5)' },
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Set Default View
+            switchView('overview');
+        });
+    </script>
+
+    <!-- PHOTO UPLOAD MODAL -->
+    <div id="photo-upload-modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.8); backdrop-filter:blur(8px); z-index:2000; align-items:center; justify-content:center;">
+        <div class="dash-card"
+            style="max-width:550px; width:90%; animation: slideUp 0.3s ease; border:1px solid var(--border-subtle);">
+
+            <div style="text-align:center; margin-bottom:30px;">
+                <h2 style="font-family:'Outfit'; margin-bottom:15px; color:var(--text-main);">Profile Photo</h2>
+                <div
+                    style="font-size:0.95rem; line-height:1.6; color:var(--text-muted); font-style:italic; border-left:3px solid var(--teal-accent); padding-left:20px; text-align:left; margin:0 auto; max-width:400px; padding:20px; background:rgba(255,255,255,0.02); border-radius:0 12px 12px 0;">
+                    <p style="margin-bottom:10px;">Choose a professional photo where your face is clearly visible.</p>
+                    <p style="margin-bottom:10px;">Good lighting makes a difference.<br>A simple background works
+                        best.<br>A warm, welcoming expression helps clients feel safe.</p>
+                    <p style="margin-bottom:10px;">This isn't just about identification.<br>It's the first connection a
+                        client makes with you.</p>
+                    <p style="margin-bottom:0;">Please avoid group photos or selfies with filters.</p>
+                </div>
+            </div>
+
+            <!-- Drag & Drop Zone -->
+            <div id="drop-zone" onclick="document.getElementById('file-input').click()" ondrop="handleDrop(event)"
+                ondragover="event.preventDefault()"
+                style="border:2px dashed var(--border-subtle); border-radius:12px; padding:40px; text-align:center; cursor:pointer; transition:all 0.2s; background:rgba(255,255,255,0.01);">
+
+                <input type="file" id="file-input" hidden accept="image/*" onchange="previewPhoto(this)">
+
+                <div style="font-size:3rem; color:var(--teal-accent); margin-bottom:15px; opacity:0.8;">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h4 style="margin-bottom:5px; font-family:'Outfit';">Click or Drag & Drop</h4>
+                <p style="font-size:0.9rem; opacity:0.5;">Supports JPG, PNG (Max 5MB)</p>
+            </div>
+
+            <div style="margin-top:25px; text-align:right;">
+                <button class="btn-dash-secondary" onclick="togglePhotoModal(false)"
+                    style="margin-right:10px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* CONTRAST FIX: Select Dropdowns */
+        select option {
+            background-color: var(--bg-card) !important;
+            color: var(--text-main) !important;
+            padding: 10px;
+        }
+
+        /* For Webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-deep);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-subtle);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+    </style>
+
+    <!-- NAVIGATION LOGIC (Restored) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const viewParam = urlParams.get('view');
+            const initialView = viewParam || 'home';
+
+            // Initialize view
+            setTimeout(() => {
+                if (typeof switchView === 'function') {
+                    switchView(initialView);
+                }
+            }, 100);
+        });
+    </script>
+</body>
+
+</html>

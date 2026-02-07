@@ -165,38 +165,46 @@
             }
         }
 
-        /* VIEW SECTION: Absolute Layering */
+        /* VIEW SECTION: Relative Flow */
         .view-section {
-            position: absolute !important;
-            /* Respect parent padding area by using inset or padding on self */
-            top: 110px !important;
-            bottom: 90px !important;
-            left: 40px !important;
-            right: 40px !important;
-
-            display: none !important;
-            /* Hidden by default */
-            flex-direction: column !important;
+            position: relative;
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px;
+            pointer-events: none;
+            /* FIX 4: Prevent phantom clicks */
+            border: none;
             background: transparent;
-            /* or var(--bg-deep) if needed */
-            padding-top: 0 !important;
-            border: none !important;
+        }
+
+        /* CONTAINMENT FIX */
+        .main-content {
+            margin-left: 280px !important;
+            /* FIX 2 */
+            width: calc(100% - 280px) !important;
+            /* FIX 2 */
+            position: relative;
+            z-index: 1;
+            /* FIX 2 */
+            min-height: 100vh;
             height: auto !important;
-            /* Let top/bottom define height */
-        }
-
-        /* ACTIVE VIEW: The only one that exists / scrolls */
-        .view-section.active {
-            display: flex !important;
             overflow-y: auto !important;
-            /* Internal scroll */
-            z-index: 10;
         }
 
-        /* SCROLL FIX: Ensure content is accessible */
+        /* ACTIVE VIEW */
+        .view-section.active {
+            display: flex;
+            z-index: 10;
+            pointer-events: auto;
+            /* FIX 4 */
+        }
+
+        /* SCROLL FIX */
         body {
             overflow: hidden !important;
-            /* No body scroll */
+            /* Keep body fixed, main scrolls */
         }
     </style>
 </head>
@@ -275,7 +283,9 @@
                         AI</span></a><a href="#" onclick="switchView('messages', this)" data-view="messages"
                     class="side-link"><i class="fas fa-envelope"></i><span>Messages</span></a><a href="#"
                     onclick="switchView('saved', this)" class="side-link"><i
-                        class="fas fa-bookmark"></i><span>Saved</span></a>
+                        class="fas fa-bookmark"></i><span>Saved</span></a><a href="#" class="side-link"
+                    onclick="switchView('wallet', this)" data-view="wallet"><i class="fas fa-wallet"></i><span>My
+                        Wallet</span></a>
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:10px 0;"><a href="#"
                     class="side-link" onclick="switchView('profile', this)" data-view="profile"><i
                         class="fas fa-user-circle"></i><span>My Profile</span></a><a href="#" class="side-link"
@@ -289,11 +299,9 @@
         <main class="main-content">
             <!-- VIEW: SETTINGS (Appearance & Preferences) -->
             <!-- VIEW: SETTINGS (Appearance & Preferences) -->
-            <div id="view-settings" class="view-section" style="display:none; padding-top:0;">
-                <!-- Header matching SoulBot style -->
+            <div id="view-settings" class="view-section no-scroll" style="display:none;">
                 <!-- Standardized Header -->
-                <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
+                <div class="workspace-header">
                     <div
                         style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-cog"></i>
@@ -393,10 +401,9 @@
                 </div>
             </div>
             <!-- VIEW: PROFILE -->
-            <div id="view-profile" class="view-section" style="display:none; padding-top:0;">
+            <div id="view-profile" class="view-section no-scroll" style="display:none;">
                 <!-- Standardized Header -->
-                <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
+                <div class="workspace-header">
                     <div
                         style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-user-circle"></i>
@@ -454,10 +461,9 @@
             </div>
 
             <!-- VIEW: SOULBOT CHAT -->
-            <div id="view-soulbot" class="view-section" style="display:none;">
+            <div id="view-soulbot" class="view-section no-scroll" style="display:none;">
                 <!-- Standardized Header -->
-                <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
+                <div class="workspace-header">
                     <div
                         style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-robot"></i>
@@ -469,7 +475,7 @@
                     </div>
                 </div>
                 <div class="soulbot-layout"
-                    style="display:grid; grid-template-columns: 1fr 300px; gap:20px; height:calc(100vh - 250px);">
+                    style="display:grid; grid-template-columns: 1fr 300px; gap:20px; flex:1; min-height:0; padding-bottom:20px;">
                     <!-- CHAT AREA -->
                     <div class="dash-card link-hover"
                         style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
@@ -543,7 +549,7 @@
             <div id="view-peer-guidelines" class="view-section" style="display:none; height:100%;">
                 <!-- Standardized Header (OUTSIDE CARD) -->
                 <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left; flex-shrink: 0;">
+                    style="padding:20px 0; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left; flex-shrink: 0;">
                     <div
                         style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-hands-helping"></i>
@@ -732,8 +738,7 @@
             <!-- VIEW: HOME (Default) -->
             <div id="view-home" class="view-section active">
                 <!-- Standardized Header -->
-                <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left; flex-shrink: 0;">
+                <div class="workspace-header">
                     <div
                         style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-home"></i>
@@ -745,12 +750,12 @@
                 </div>
 
                 <!-- Scrollable Content -->
-                <div style="flex:1; overflow-y:auto; padding-right:10px;">
+                <div style="flex:1; overflow-y:auto; padding-right:10px; padding-bottom: 40px;">
                     <!-- LAYER 1: GROUNDING & PRIMARY ACTION -->
                     <div style="text-align:center; padding:10px 0 20px;">
                         <!-- 1. SOULBOT HERO (Compact) -->
                         <div class="dash-card soulbot-hero"
-                            style="background:var(--bg-card); border:1px solid var(--border-subtle); padding:30px 20px !important; text-align:center; max-width:800px; margin:0 auto 20px; min-height:auto;">
+                            style="background:var(--bg-card); border:1px solid var(--border-subtle); padding:30px 20px !important; text-align:center; margin:0 0 20px 0; min-height:auto;">
                             <i class="fas fa-robot"
                                 style="font-size:3rem; color:var(--teal-accent); margin-bottom:15px; filter:drop-shadow(0 0 15px var(--teal-dim));"></i>
                             <h2
@@ -765,7 +770,7 @@
                         </div>
                         <!-- 2. YOUR JOURNAL (Compact Strip) -->
                         <div class="dash-card"
-                            style="display:flex; justify-content:space-between; align-items:center; padding:20px 30px; max-width:800px; margin:0 auto 20px;">
+                            style="display:flex; justify-content:space-between; align-items:center; padding:20px 30px; margin:0 0 20px 0;">
                             <div style="text-align:left;">
                                 <h3 style="font-size:1.1rem; margin-bottom:4px; color:var(--text-main);">
                                     Your Journal</h3>
@@ -779,8 +784,7 @@
                         <div
                             style="margin-top:20px; margin-bottom:15px; text-align:center; opacity:0.5; font-size:0.75rem; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">
                             When you want to talk to someone </div>
-                        <div class="dashboard-grid"
-                            style="grid-template-columns: 1fr 1fr; gap:15px; max-width:800px; margin:0 auto;">
+                        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap:15px; margin:0 auto;">
                             <!-- PEER TALK -->
                             <div class="dash-card link-hover" onclick="window.location.href='../our-peers/profile.html'"
                                 style="text-align:center; padding:20px 15px; cursor:pointer; min-height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--peach-bg); border:1px solid var(--peach-border); border-radius:16px; transition:all 0.3s ease;">
@@ -899,10 +903,9 @@
                 </div>
             </div>
             <!-- VIEW: JOURNAL (Enhanced) -->
-            <div id="view-journal" class="view-section" style="display:none;">
+            <div id="view-journal" class="view-section no-scroll" style="display:none;">
                 <!-- Standardized Header -->
-                <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
+                <div class="workspace-header">
                     <div
                         style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-book"></i>
@@ -914,7 +917,9 @@
                         <div style="font-size:0.8rem; opacity:0.7;">Your personal space for reflection</div>
                     </div>
                 </div>
-                <div style="display:grid; grid-template-columns: 240px 1fr; gap:20px; height:calc(100vh - 120px);">
+                <!-- Fixed Height Container -->
+                <div
+                    style="display:grid; grid-template-columns: 240px 1fr; gap:20px; flex:1; min-height:0; padding-bottom: 20px;">
                     <!-- Maximized Height -->
                     <!-- Sidebar -->
                     <div class="dash-card" style="padding:15px; display:flex; flex-direction:column;">
@@ -1004,7 +1009,7 @@
             <div id="view-messages" class="view-section" style="display:none; height:100%; padding-top:0;">
                 <!-- Standardized Header -->
                 <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
+                    style="padding:20px 0; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
                     <div
                         style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-envelope"></i>
@@ -1091,6 +1096,44 @@
                     </div>
                 </div>
             </div>
+            <!-- VIEW: WALLET -->
+            <div id="view-wallet" class="view-section" style="display:none; padding-top:0;">
+                <div style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); margin-bottom:20px;">
+                    <h1 style="margin:0; font-size:1.8rem;">My Wallet</h1>
+                    <p style="margin:5px 0 0; opacity:0.6; font-size:0.9rem;">Manage funds and payment methods.</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Balance Card -->
+                    <div class="dash-card"
+                        style="background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(15, 23, 42, 0.8)); border:1px solid var(--teal-accent);">
+                        <h4 style="margin-bottom:10px; opacity:0.8;">Current Balance</h4>
+                        <div style="font-size:3.5rem; font-weight:700; color:var(--teal-accent); font-family:'Outfit';"
+                            id="wallet-balance">$0.00</div>
+                        <div style="margin-top:20px; display:flex; gap:10px;">
+                            <button class="btn-dash-primary" onclick="triggerAddFunds()">+ Add Funds</button>
+                        </div>
+                    </div>
+
+                    <!-- Payment Methods (Placeholder) -->
+                    <div class="dash-card">
+                        <h4 style="margin-bottom:15px; opacity:0.8;">Payment Methods</h4>
+                        <div
+                            style="padding:15px; background:rgba(255,255,255,0.05); border-radius:10px; display:flex; align-items:center; gap:15px; margin-bottom:10px;">
+                            <i class="fab fa-cc-visa" style="font-size:1.5rem; color:#fff;"></i>
+                            <div style="flex:1;">
+                                <div style="font-weight:600;">Visa ending in 4242</div>
+                                <div style="font-size:0.8rem; opacity:0.6;">Expires 12/28</div>
+                            </div>
+                            <span
+                                style="font-size:0.7rem; background:rgba(45,212,191,0.2); color:#2dd4bf; padding:3px 8px; border-radius:4px;">Default</span>
+                        </div>
+                        <button class="btn-action-sm"
+                            style="width:100%; border:1px dashed rgba(255,255,255,0.2); padding:10px;">+ Add Payment
+                            Method</button>
+                    </div>
+                </div>
+            </div>
             <!-- SCRIPTS -->
             <script src="../assets/js/components.js?v=3"
                 onerror="console.error('Failed to load components.js')"></script>
@@ -1105,33 +1148,8 @@
                 }
 
                 // --- VIEW SWITCHING ---
-                function switchView(viewName, clickedLink) {
-                    // Hide all view sections (Class Toggling)
-                    document.querySelectorAll('.view-section').forEach(el => {
-                        el.classList.remove('active');
-                    });
+                // Replaced by Module Import below
 
-                    // Show the target view section
-                    const target = document.getElementById('view-' + viewName);
-                    if (target) {
-                        target.classList.add('active');
-                    } else {
-                        console.error("View not found:", viewName);
-                    }
-
-                    // Update Sidebar Active State
-                    document.querySelectorAll('.sidebar-nav .side-link').forEach(l => l.classList.remove('active'));
-
-                    if (clickedLink) {
-                        clickedLink.classList.add('active');
-                    }
-
-                    else {
-                        // Fallback if clickedLink is not passed (e.g., initial load)
-                        const defaultLink = document.querySelector(`.sidebar-nav .side-link[data-view="${viewName}"]`);
-                        if (defaultLink) defaultLink.classList.add('active');
-                    }
-                }
 
                 // Initial view load function to check URL parameters or default
                 document.addEventListener('DOMContentLoaded', () => {
@@ -1759,6 +1777,58 @@
                     }, 500); // 500ms safety delay
                 });
             </script>
+
+        </main>
+    </div>
+
+    <!-- CORE UTILITIES (Global Script) -->
+    <script src="../assets/js/dashboard-utils.js"></script>
+
+    <script type="module">
+        // No import needed. switchView is global.
+        const baseSwitchView = window.switchView;
+
+        // Global Wrapper
+        window.switchView = function (viewName, clickedLink) {
+            if (baseSwitchView) baseSwitchView(viewName, clickedLink);
+            // Link to Journal/Blog logic depending on view if needed
+        };
+    </script>
+
+    <!-- SCRIPT LOGIC -->
+    <script type="module">
+        import { initWalletListener, addFundsMock } from '../assets/js/billing-logic.js';
+        import { auth } from '../assets/js/firebase-config.js';
+
+        // Initialize Wallet on Auth
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                initWalletListener(user.uid, (data) => {
+                    const el = document.getElementById('wallet-balance');
+                    if (el) el.textContent = '$' + (data.balance || 0).toFixed(2);
+                });
+            }
+        });
+
+        window.triggerAddFunds = async function () {
+            if (confirm("Simulate adding $50 via Stripe?")) {
+                const btn = document.querySelector('#view-wallet .btn-dash-primary');
+                const originalText = btn.textContent;
+                btn.textContent = "Processing...";
+                btn.disabled = true;
+
+                try {
+                    const res = await addFundsMock(50);
+                    if (res.success) alert(res.message);
+                } catch (e) {
+                    alert("Error: " + e.message);
+                } finally {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            }
+        };
+    </script>
 </body>
 
 </html>
