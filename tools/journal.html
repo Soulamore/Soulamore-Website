@@ -4,7 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reflective Journal | Soulamore</title>
+    <title>Reflective Journal: Private Emotional Space | Soulamore</title>
+    <meta name="description"
+        content="Your private, offline-first journal for self-reflection. Write freely with auto-save privacy. No login required.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soulamore.com/tools/journal.html">
+    <meta property="og:title" content="Reflective Journal: Private Emotional Space | Soulamore">
+    <meta property="og:description"
+        content="Your private, offline-first journal for self-reflection. Write freely with auto-save privacy.">
+    <meta property="og:image" content="../assets/images/header-bg-desktop.jpg">
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -86,15 +96,45 @@
 
         <div class="journal-entry">
             <div style="font-size:0.9rem; opacity:0.5; margin-bottom:10px;">New Entry - <span id="date"></span></div>
-            <textarea placeholder="Write your thoughts here..."></textarea>
+            <textarea id="journalEntry"
+                placeholder="Write your thoughts here... (Auto-saved to your browser)"></textarea>
             <div style="text-align:right;">
-                <button onclick="alert('Entry saved (simulation)')">Save Entry</button>
+                <button id="saveBtn" onclick="saveEntry()">Save Entry</button>
             </div>
         </div>
     </div>
 
     <script>
         document.getElementById('date').innerText = new Date().toLocaleDateString();
+
+        const journalEntry = document.getElementById('journalEntry');
+        const saveBtn = document.getElementById('saveBtn');
+
+        // Load saved content
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedContent = localStorage.getItem('soulamore_journal_content');
+            if (savedContent) {
+                journalEntry.value = savedContent;
+            }
+        });
+
+        // Auto-save on input
+        journalEntry.addEventListener('input', () => {
+            localStorage.setItem('soulamore_journal_content', journalEntry.value);
+        });
+
+        // Manual Save with Feedback
+        function saveEntry() {
+            localStorage.setItem('soulamore_journal_content', journalEntry.value);
+            const originalText = saveBtn.innerText;
+            saveBtn.innerText = "Saved!";
+            saveBtn.style.background = "#22c55e"; // Green success color
+
+            setTimeout(() => {
+                saveBtn.innerText = originalText;
+                saveBtn.style.background = ""; // Revert to CSS default
+            }, 2000);
+        }
     </script>
 </body>
 
