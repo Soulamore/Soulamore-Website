@@ -90,7 +90,30 @@ function setupWallListeners(renderCallback, updateUICallback, statsCallback) {
 /**
  * Post a Note
  */
-export async function postNoteToWall(text, position) {
+/**
+ * Post a Note
+ * Supports Optimistic UI Updates
+ */
+export async function postNoteToWall(text, position, optimisticCallback) {
+    // 1. Optimistic Update (Immediate Feedback)
+    const tempId = 'temp-' + Date.now();
+    const noteData = {
+        text: text,
+        x: position.x,
+        y: position.y,
+        hearts: 0,
+        flowers: 0,
+        candles: 0,
+        createdAt: { seconds: Date.now() / 1000 }, // Mock timestamp
+        isSeeded: false,
+        isHidden: false
+    };
+
+    if (optimisticCallback) {
+        optimisticCallback(tempId, noteData);
+    }
+
+    // 2. Background Sync
     try {
         await addDoc(collection(db, WALL_COLLECTION), {
             text: text,
@@ -103,6 +126,10 @@ export async function postNoteToWall(text, position) {
             isSeeded: false,
             isHidden: false
         });
+        // Note: We don't need to manually update the UI here because 
+        // the onSnapshot listener will fire when the data reaches the server
+        // and comes back. The UI should handle deduping if needed, 
+        // or we rely on the snap to replace the temp node.
         return { success: true };
     } catch (error) {
         console.error("Error posting note:", error);
