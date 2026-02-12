@@ -1379,78 +1379,23 @@
 
     </script>
 
-    <!-- FIREBASE LOGIC (Module - May fail on local file://) -->
+    <!-- FIREBASE LOGIC (Handler Module) -->
     <script type="module">
-        import { db, collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, query, orderBy, limit, increment, auth, signInAnonymously, onAuthStateChanged, getDocs } from "../assets/js/firebase-config.js";
+        import { initWall, postNoteToWall, reactToNote, hideNote } from "../assets/js/problem-wall-handler.js";
 
-        // --- SEEDER FUNCTION ---
-        async function seedDatabase() {
-            const notesRef = collection(db, 'problem-wall-notes');
-            const existingSnap = await getDocs(notesRef);
-            const existingTexts = new Set();
-            existingSnap.forEach(doc => existingTexts.add(doc.data().text));
+        // --- UI BINDINGS ---
 
-            console.log("Checking for missing seeded notes...");
-            const notesToSeed = window.seededNotes;
-
-            for (const note of notesToSeed) {
-                if (!existingTexts.has(note.text)) {
-                    const pos = window.getGridPosition();
-                    try {
-                        await addDoc(collection(db, 'problem-wall-notes'), {
-                            text: note.text,
-                            x: pos.x,
-                            y: pos.y,
-                            hearts: note.hearts,
-                            flowers: note.flowers,
-                            candles: note.candles,
-                            createdAt: serverTimestamp(),
-                            isSeeded: true
-                        });
-                    } catch (e) { console.error("Seeding error:", e); }
-                }
-            }
-        }
-
-        // --- SUBSCRIBE ---
-        function subscribeToFirebaseNotes() {
-            const notesRef = collection(db, 'problem-wall-notes');
-            seedDatabase();
-
-            // Modified query to handle visibility if possible, or we filter in-memory
-            const notesQuery = query(notesRef, orderBy('createdAt', 'desc'), limit(150));
-            onSnapshot(notesQuery, (snapshot) => {
-                if (window.fallbackTimer) clearTimeout(window.fallbackTimer);
-                window.totalStats = { hearts: 0, flowers: 0, candles: 0 };
-
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const noteId = doc.id;
-
-                    // Filter hidden notes
-                    if (data.isHidden === true) {
-                        const existing = document.querySelector(`.note[data-note-id="${noteId}"]`);
-                        if (existing) existing.remove();
-                        return;
-                    }
-
-                    window.totalStats.hearts += (data.hearts || 0);
-                    window.totalStats.flowers += (data.flowers || 0);
-                    window.totalStats.candles += (data.candles || 0);
-
-                    if (!window.STATE.firebaseNotes.has(noteId)) {
-                        renderFirebaseNote(noteId, data);
-                        window.STATE.firebaseNotes.set(noteId, true);
-                    } else {
-                        updateNoteUI(noteId, data);
-                    }
-                });
+        // 1. Initialize Wall
+        initWall(
+            (id, data) => renderFirebaseNote(id, data), // Render New
+            (id, data) => updateNoteUI(id, data),       // Update Existing
+            (stats) => {                                // Update Stats
+                window.totalStats = stats;
                 window.updateTotalStats();
-            }, (error) => {
-                console.error('Firebase Error:', error);
-            });
-        }
+            }
+        );
 
+        // 2. Render Functions (Moved from inline to be accessible)
         function renderFirebaseNote(noteId, data) {
             let finalX = data.x, finalY = data.y;
             if (finalX === undefined || finalY === undefined) {
@@ -1473,6 +1418,9 @@
                 time: timeLabel,
                 reactions: { heart: data.hearts || 0, flower: data.flowers || 0, candle: data.candles || 0 }
             }, false);
+
+            // Clear fallback timer if real data arrives
+            if (window.fallbackTimer) clearTimeout(window.fallbackTimer);
         }
 
         function updateNoteUI(noteId, data) {
@@ -1481,44 +1429,33 @@
             const h = noteEl.querySelector('.heart-btn .count'); if (h) h.innerText = data.hearts || 0;
             const f = noteEl.querySelector('.flower-btn .count'); if (f) f.innerText = data.flowers || 0;
             const c = noteEl.querySelector('.candle-btn .count'); if (c) c.innerText = data.candles || 0;
-        };
+        }
 
-        window.firebaseReact = async function (noteId, type) {
-            const map = { heart: 'hearts', flower: 'flowers', candle: 'candles' };
-            const field = map[type];
-            try {
-                const noteRef = doc(db, 'problem-wall-notes', noteId);
-                await updateDoc(noteRef, { [field]: increment(1) });
-            } catch (error) { console.error('Error updating reaction:', error); }
-        };
-
-        window.firebaseHide = async function (noteId) {
-            try {
-                const noteRef = doc(db, 'problem-wall-notes', noteId);
-                await updateDoc(noteRef, { isHidden: true });
-            } catch (error) { console.error('Error hiding note:', error); }
-        };
-
+        // 3. Global Actions (Exposed to window for onclick)
         window.postNote = async function () {
             const input = document.getElementById('noteInput');
             const text = input.value.trim();
             if (!text) return;
 
-            playSound('post');
+            // Play Sound & visual feedback immediately
+            // Note: playSound is defined in the standard script above, assuming it's global or attached to window
+            // The standard script (lines 979-1380) defined playSound in scope but not explicitly window.playSound?
+            // Checking... yes, line 1306 `function playSound` inside script... wait.
+            // Validating global access: The standard script is NOT a module, so `playSound` is global.
+            if (window.playSound) window.playSound('post');
+            else try { new Audio('https://assets.mixkit.co/active_storage/sfx/1992/1992-preview.mp3').play(); } catch (e) { }
+
             const cleanText = window.sanitizeText(text);
             const pos = window.getGridPosition();
             window.closeWriter();
             input.value = '';
-            try {
-                await addDoc(collection(db, 'problem-wall-notes'), {
-                    text: cleanText, x: pos.x, y: pos.y,
-                    hearts: 0, flowers: 0, candles: 0,
-                    createdAt: serverTimestamp()
-                });
+
+            const result = await postNoteToWall(cleanText, pos);
+            if (result.success) {
                 window.resetView(pos.x, pos.y);
-            } catch (error) {
-                console.error('Error saving note:', error);
-                // Render locally as temp fallback
+            } else {
+                alert("Failed to post note. Please try again.");
+                // Fallback render?
                 window.createNoteElement({
                     id: 'temp_' + Date.now(),
                     text: cleanText,
@@ -1529,7 +1466,15 @@
             }
         };
 
-        // --- MODERATOR SECRET ---
+        window.firebaseReact = async function (noteId, type) {
+            await reactToNote(noteId, type);
+        };
+
+        window.firebaseHide = async function (noteId) {
+            await hideNote(noteId);
+        };
+
+        // --- MODERATOR SECRET (Restored) ---
         let clickCount = 0;
         let lastClick = 0;
         document.addEventListener('click', (e) => {
@@ -1553,25 +1498,6 @@
             const isMod = document.body.classList.contains('mod-mode');
             if (isMod) alert("Moderator Mode Active. You can now hide inappropriate notes.");
         }
-
-        window.hideNoteGlobally = async function (id) {
-            if (!confirm("Are you sure you want to hide this note from the wall?")) return;
-
-            // 1. Remove from Local
-            const el = document.querySelector(`.note[data-note-id="${id}"]`);
-            if (el) el.style.opacity = '0.3';
-
-            // 2. Firebase Update
-            if (window.firebaseHide) {
-                await window.firebaseHide(id);
-            }
-        };
-
-        // Init Firebase
-        onAuthStateChanged(auth, (user) => {
-            if (user) subscribeToFirebaseNotes();
-            else signInAnonymously(auth).then(() => subscribeToFirebaseNotes());
-        });
     </script>
 
     <script>

@@ -1,8 +1,8 @@
 /**
  * Problem Wall Handler
- * Manages real-time posts and reactions for the anonymous wall.
+ * Manages real-time posts, reactions, and seeding for the anonymous wall.
  */
-import { db } from "./firebase-config.js";
+import { db, auth, signInAnonymously, onAuthStateChanged } from "./firebase-config.js";
 import {
     collection,
     addDoc,
@@ -13,91 +13,162 @@ import {
     updateDoc,
     doc,
     increment,
-    serverTimestamp
+    serverTimestamp,
+    getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const WALL_COLLECTION = "problem_wall_posts";
+const WALL_COLLECTION = "problem-wall-notes";
 
 /**
- * Subscribe to the Wall
- * Listens for the latest 50 posts.
+ * Initialize Wall Logic
+ * Handles Auth, Seeding, and Subscribing
  */
-export function subscribeToWall(callback) {
+export function initWall(renderCallback, updateUICallback, statsCallback) {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            setupWallListeners(renderCallback, updateUICallback, statsCallback);
+        } else {
+            signInAnonymously(auth).then(() => {
+                setupWallListeners(renderCallback, updateUICallback, statsCallback);
+            }).catch(e => console.error("Auth Failed:", e));
+        }
+    });
+
+    // Check for seeding requirements
+    seedDatabase();
+}
+
+/**
+ * Subscribe to Notes
+ */
+function setupWallListeners(renderCallback, updateUICallback, statsCallback) {
     const q = query(
         collection(db, WALL_COLLECTION),
-        orderBy("timestamp", "desc"),
-        limit(50)
+        orderBy("createdAt", "desc"),
+        limit(150)
     );
 
-    return onSnapshot(q, (snapshot) => {
-        const posts = [];
+    const processedIds = new Set();
+    const stats = { hearts: 0, flowers: 0, candles: 0 };
+
+    onSnapshot(q, (snapshot) => {
+        // Reset stats for recalculation or handle incremental if preferred
+        // For simplicity, we'll re-tally visible snapshot notes + existing totals if needed
+        // But the inline script did a full tally. Let's replicate that safety.
+        stats.hearts = 0; stats.flowers = 0; stats.candles = 0;
+
         snapshot.forEach((doc) => {
-            posts.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            const noteId = doc.id;
+
+            // Update stats
+            stats.hearts += (data.hearts || 0);
+            stats.flowers += (data.flowers || 0);
+            stats.candles += (data.candles || 0);
+
+            if (data.isHidden) {
+                // Handle hiding element if logic exists in UI
+                const el = document.querySelector(`.note[data-note-id="${noteId}"]`);
+                if (el) el.remove();
+                return;
+            }
+
+            if (!processedIds.has(noteId)) {
+                renderCallback(noteId, data);
+                processedIds.add(noteId);
+            } else {
+                updateUICallback(noteId, data);
+            }
         });
-        callback(posts);
+
+        if (statsCallback) statsCallback(stats);
+    }, (error) => {
+        console.error("Firebase Snapshot Error:", error);
     });
 }
 
 /**
- * Post a Problem
- * Adds a new anonymous post to Firestore.
+ * Post a Note
  */
-export async function postProblem(text, isPublic = true) {
+export async function postNoteToWall(text, position) {
     try {
-        // Large Canvas Logic (5000x5000)
-        // Center is 2500, 2500. We want to scatter around the center.
-        // Spread +/- 1000px
-        const centerX = 2500;
-        const centerY = 2500;
-        const spread = 1200;
-
-        // Random offset
-        const x = centerX + (Math.random() * spread * 2) - spread;
-        const y = centerY + (Math.random() * spread * 2) - spread;
-
-        // Random Pastel Color
-        const colors = ['#fffefb', '#fdfbf7', '#fefce8', '#f0f9ff', '#fff1f2'];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-
         await addDoc(collection(db, WALL_COLLECTION), {
             text: text,
-            isPublic: isPublic,
-            timestamp: serverTimestamp(),
-            color: color,
-            position: { x, y }, // Absolute px coordinates now
-            reactions: {
-                heart: 0,
-                flower: 0,
-                candle: 0
-            }
+            x: position.x,
+            y: position.y,
+            hearts: 0,
+            flowers: 0,
+            candles: 0,
+            createdAt: serverTimestamp(),
+            isSeeded: false,
+            isHidden: false
         });
         return { success: true };
     } catch (error) {
-        console.error("Error posting to wall:", error);
-        return { success: false, error: error.message };
+        console.error("Error posting note:", error);
+        return { success: false, error };
     }
 }
 
 /**
  * React to a Post
- * Atomically increments the reaction count.
  */
-export async function reactToPost(postId, reactionType) {
-    if (!['heart', 'flower', 'candle'].includes(reactionType)) return;
-
-    const postRef = doc(db, WALL_COLLECTION, postId);
-
-    // Dynamic field update using template literal syntax for key
-    // Firestore requires "reactions.heart" dot notation for nested fields
-    const fieldPath = `reactions.${reactionType}`;
+export async function reactToNote(noteId, reactionType) {
+    const map = { heart: 'hearts', flower: 'flowers', candle: 'candles' };
+    const field = map[reactionType];
+    if (!field) return;
 
     try {
-        await updateDoc(postRef, {
-            [fieldPath]: increment(1)
-        });
-        return { success: true };
+        const noteRef = doc(db, WALL_COLLECTION, noteId);
+        await updateDoc(noteRef, { [field]: increment(1) });
     } catch (error) {
-        console.error("Error reacting:", error);
-        return { success: false, error: error };
+        console.error("Reaction failed:", error);
+    }
+}
+
+/**
+ * Hide a Note (Mod)
+ */
+export async function hideNote(noteId) {
+    try {
+        const noteRef = doc(db, WALL_COLLECTION, noteId);
+        await updateDoc(noteRef, { isHidden: true });
+    } catch (error) {
+        console.error("Hide failed:", error);
+    }
+}
+
+/**
+ * Seeding Logic
+ */
+async function seedDatabase() {
+    // Only run if we suspect empty or first run. 
+    // Optimization: Check if empty first
+    const q = query(collection(db, WALL_COLLECTION), limit(1));
+    const snap = await getDocs(q);
+    if (!snap.empty) return; // Already has data
+
+    console.log("Seeding Database...");
+    const notesToSeed = window.seededNotes || []; // Expects window.seededNotes from HTML config
+
+    // Safety check for window.getGridPosition or default
+    const getPos = window.getGridPosition || (() => ({ x: Math.random() * 2000, y: Math.random() * 2000 }));
+
+    for (const note of notesToSeed) {
+        const pos = getPos();
+        try {
+            await addDoc(collection(db, WALL_COLLECTION), {
+                text: note.text,
+                x: pos.x,
+                y: pos.y,
+                hearts: note.hearts || 0,
+                flowers: note.flowers || 0,
+                candles: note.candles || 0,
+                createdAt: serverTimestamp(),
+                isSeeded: true
+            });
+        } catch (e) {
+            console.error("Seeding error:", e);
+        }
     }
 }
