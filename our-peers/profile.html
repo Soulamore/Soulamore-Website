@@ -686,7 +686,19 @@
             reviews.forEach(r => {
                 const div = document.createElement('div');
                 div.className = 'review-card';
-                div.innerHTML = `<p style="margin-bottom:5px;">"${r.text}"</p><div style="font-size:0.8rem; font-weight:600; opacity:0.8;">— ${r.author || 'Anon'}</div>`;
+
+                const p = document.createElement('p');
+                p.style.marginBottom = '5px';
+                p.textContent = `"${r.text}"`;
+
+                const metaDiv = document.createElement('div');
+                metaDiv.style.fontSize = '0.8rem';
+                metaDiv.style.fontWeight = '600';
+                metaDiv.style.opacity = '0.8';
+                metaDiv.textContent = `— ${r.author || 'Anon'}`;
+
+                div.appendChild(p);
+                div.appendChild(metaDiv);
                 container.appendChild(div);
             });
         }
@@ -703,12 +715,26 @@
 
             // Optimistic UI
             const container = document.getElementById('pReviews');
-            if (container.querySelector('p')?.style.fontStyle === 'italic') container.innerHTML = '';
+            const emptyMsg = container.querySelector('p');
+            if (emptyMsg && emptyMsg.innerText.includes('No notes yet')) {
+                container.innerHTML = '';
+            }
 
             const div = document.createElement('div');
             div.className = 'review-card';
             div.style.background = '#dbece0'; // Match sage
-            div.innerHTML = `<p style="margin-bottom:5px;">"${msg}"</p><div style="font-size:0.8rem; font-weight:600;">— ${name} (Just now)</div>`;
+
+            const p = document.createElement('p');
+            p.style.marginBottom = '5px';
+            p.textContent = `"${msg}"`;
+
+            const metaDiv = document.createElement('div');
+            metaDiv.style.fontSize = '0.8rem';
+            metaDiv.style.fontWeight = '600';
+            metaDiv.textContent = `— ${name} (Just now)`;
+
+            div.appendChild(p);
+            div.appendChild(metaDiv);
             container.prepend(div);
             document.getElementById('newReviewMsg').value = '';
 
