@@ -4,7 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Problem Wall | Soulamore</title>
+    <title>The Problem Wall: Share Your Burdens Anonymously | Soulamore</title>
+    <meta name="description"
+        content="A safe, anonymous space to leave your worries behind. Write your problems on the wall and let them drift away. You are not alone.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soulamore.com/pages/problem-wall.html">
+    <meta property="og:title" content="The Problem Wall: Share Your Burdens Anonymously | Soulamore">
+    <meta property="og:description"
+        content="A safe, anonymous space to leave your worries behind. Write your problems on the wall and let them drift away.">
+    <meta property="og:image" content="../assets/images/header-bg-desktop.jpg">
 
     <!-- Fonts -->
     <link
@@ -44,18 +54,106 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
-            /* Throttled gradient for performance */
+            background-color: #fdfcfb;
+            /* Luminous Off-White */
             background-image:
-                radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(78, 205, 196, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 80% 20%, rgba(244, 159, 117, 0.05) 0%, transparent 50%);
-            color: var(--ink-black);
+                radial-gradient(circle at 20% 30%, rgba(78, 205, 196, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(244, 159, 117, 0.05) 0%, transparent 40%);
+            color: #1e293b;
             overflow: hidden;
-            /* Infinite canvas handles scroll */
             height: 100vh;
             width: 100vw;
-            will-change: background-image;
-            /* HW Acceleration hint */
+            transition: all 1s ease;
+        }
+
+        /* --- BACKGROUND ANIMATION LAYER --- */
+        .ethereal-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: drift 20s infinite alternate ease-in-out;
+            will-change: transform, opacity;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.2;
+            }
+
+            50% {
+                transform: translate(10%, 10%) scale(1.2);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: translate(-5%, 5%) scale(0.9);
+                opacity: 0.25;
+            }
+        }
+
+        /* --- VIGNETTE OVERLAY --- */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 20%, rgba(255, 255, 255, 0.2) 100%);
+            z-index: 5;
+        }
+
+        /* --- CANDLELIGHT PULSE --- */
+        .ambient-light {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+            z-index: 4;
+            animation: softPulse 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes softPulse {
+            0% {
+                opacity: 0.1;
+            }
+
+            100% {
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes candleFlicker {
+            0% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+
+            100% {
+                opacity: 0.4;
+                transform: scale(0.95);
+            }
         }
 
         /* --- 2. HEADER OVERRIDE (Daybreak Theme) --- */
@@ -238,8 +336,9 @@
             /* Centering initially */
             transform-origin: center center;
             /* Dot Grid Pattern */
+            /* Memorial Grid */
             background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-            background-size: 30px 30px;
+            background-size: 40px 40px;
             /* Hardware Acceleration */
             will-change: transform;
             /* Smoother transition/interp */
@@ -260,33 +359,58 @@
 
         .wall-hero h1 {
             font-family: 'Outfit', sans-serif;
-            font-size: 4rem;
+            font-size: 5rem;
             color: #1e293b;
             letter-spacing: -1px;
             margin-bottom: 10px;
-            opacity: 0.8;
+            text-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+            opacity: 0.9;
         }
 
         .wall-hero p {
-            font-size: 1.2rem;
-            color: #64748b;
+            font-size: 1.4rem;
+            color: #94a3b8;
+            font-style: italic;
+            font-family: 'Plus Jakarta Sans', serif;
         }
 
         /* NOTE CARD STYLING */
         .note {
             position: absolute;
             width: 280px;
+            /* Burnt Edge & Stacked Effect */
             background: var(--paper-white);
             padding: 25px;
             border-radius: 2px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            /* Reduced initial shadow for perf */
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            font-size: 1rem;
+
+            /* Burnt Border */
+            border: 1px solid rgba(120, 90, 70, 0.15);
+
+            /* Stacked Shadow + Inner Burnt Glow */
+            box-shadow:
+                inset 0 0 25px rgba(139, 69, 19, 0.04),
+                /* Subtle inner burn */
+                0 2px 4px rgba(0, 0, 0, 0.05),
+                /* Main depth */
+                3px 3px 0 -1px #f8fafc,
+                /* Paper layer 2 (matches bg mostly) */
+                3px 3px 1px -1px rgba(0, 0, 0, 0.05),
+                /* Shadow 2 */
+                5px 5px 0 -2px #f1f5f9,
+                /* Paper layer 3 */
+                5px 5px 1px -2px rgba(0, 0, 0, 0.05);
+            /* Shadow 3 */
+
+            font-size: 1.05rem;
             line-height: 1.6;
             color: #334155;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            /* Faster transition */
+            /* Adaptive Glow (Radiance) */
+            box-shadow:
+                inset 0 0 25px rgba(139, 69, 19, 0.04),
+                0 2px 10px rgba(0, 0, 0, 0.1),
+                0 0 var(--glow-radius, 0px) var(--glow-color, transparent);
+
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
             cursor: default;
             user-select: none;
             overflow: hidden;
@@ -392,6 +516,98 @@
             }
         }
 
+        /* Note Entrance Animation */
+        @keyframes floatIn {
+            0% {
+                opacity: 0;
+                transform: translate3d(0, 20px, 0) scale(0.95);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+        }
+
+        .note-float-in {
+            animation: floatIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* Reacted State for Buttons */
+        .action-btn.reacted {
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+            /* Prevent multiple clicks */
+        }
+
+        .heart-btn.reacted {
+            background: #ff4d4d !important;
+            border-color: #ff4d4d;
+        }
+
+        .flower-btn.reacted {
+            background: #ffd700 !important;
+            border-color: #ffd700;
+            color: #333 !important;
+        }
+
+        .candle-btn.reacted {
+            background: #ff7e39 !important;
+            border-color: #ff7e39;
+        }
+
+        /* --- MODERATOR UI --- */
+        .mod-controls {
+            display: none;
+            /* Hidden by default */
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 20;
+        }
+
+        body.mod-mode .mod-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .mod-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: none;
+            z-index: 1001;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+
+        body.mod-mode .mod-indicator {
+            display: block;
+        }
+
         /* --- 5. UI OVERLAYS (FAB STACK) --- */
         .fab-stack-container {
             position: fixed;
@@ -401,7 +617,8 @@
             flex-direction: column;
             gap: 12px;
             align-items: center;
-            z-index: 100;
+            z-index: 999;
+            /* Increased from 100 */
         }
 
         .fab-btn {
@@ -535,7 +752,7 @@
             color: #94a3b8;
         }
 
-        /* --- 6. STATS WIDGET (Right Side) --- */
+        /* --- 6. IMPACT BOARD (Right Side) --- */
         .global-stats {
             position: fixed;
             right: 30px;
@@ -543,51 +760,74 @@
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
             z-index: 90;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.9);
+            /* High Isolation Frosted Glass */
+            padding: 25px;
+            border-radius: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            /* More defined border */
+            backdrop-filter: blur(30px);
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.08),
+                0 2px 10px rgba(0, 0, 0, 0.04);
+            /* Layered shadow for depth */
+            width: 260px;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .global-stats::before {
+            content: 'Community Impact';
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #94a3b8;
+            margin-bottom: 15px;
+            font-weight: 600;
         }
 
         .stat-item {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            opacity: 0.8;
+            flex-direction: column;
+            gap: 10px;
             transition: 0.3s;
         }
 
-        .stat-item:hover {
-            opacity: 1;
-            transform: translateX(-5px);
-        }
-
-        .stat-icon-box {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
+        .stat-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
+            gap: 12px;
         }
 
         .stat-text h4 {
             font-family: 'Outfit';
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             margin: 0;
             color: #1e293b;
+            font-weight: 600;
         }
 
         .stat-text span {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-weight: 400;
+        }
+
+        /* Progress Bar for Milestones */
+        .stat-progress-bg {
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .stat-progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @media(max-width: 768px) {
@@ -598,6 +838,13 @@
 
             .wall-hero h1 {
                 font-size: 2.5rem;
+            }
+
+            /* FAB Stack: Move above mobile nav bar */
+            .fab-stack-container {
+                bottom: 100px;
+                /* Increased from 40px to clear mobile nav */
+                right: 20px;
             }
         }
     </style>
@@ -625,34 +872,59 @@
                 <span id="userCount">142</span> people here right now
             </div>
 
-            <!-- GLOBAL STATS (SIDEBAR) -->
+            <!-- IMPACT BOARD (SIDEBAR) -->
             <div class="global-stats">
                 <div class="stat-item">
-                    <div class="stat-icon-box" style="background: #ffe4e6; color: #ef4444;">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <div class="stat-text">
-                        <h4 id="totalHearts">0</h4>
-                        <span>Hearts given</span>
-                    </div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon-box" style="background: #fef9c3; color: #eab308;">
-                        <i class="fas fa-spa"></i>
-                    </div>
-                    <div class="stat-text">
-                        <h4 id="totalFlowers">0</h4>
-                        <span>Flowers offered</span>
+                    <div class="stat-header">
+                        <div class="stat-icon-box" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-text">
+                            <h4 id="totalHearts">0</h4>
+                            <span>Hearts Given</span>
+                        </div>
                     </div>
                 </div>
+
                 <div class="stat-item">
-                    <div class="stat-icon-box" style="background: #ffedd5; color: #f97316;">
-                        <i class="fas fa-fire-alt"></i>
+                    <div class="stat-header">
+                        <div class="stat-icon-box" style="background: rgba(234, 179, 8, 0.15); color: #eab308;">
+                            <i class="fas fa-spa"></i>
+                        </div>
+                        <div class="stat-text">
+                            <h4 id="totalFlowers">0</h4>
+                            <span>Flowers Offered</span>
+                        </div>
                     </div>
-                    <div class="stat-text">
-                        <h4 id="totalCandles">0</h4>
-                        <span>Candles lit</span>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-header">
+                        <div class="stat-icon-box" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">
+                            <i class="fas fa-fire-alt"></i>
+                        </div>
+                        <div class="stat-text">
+                            <h4 id="totalCandles">0</h4>
+                            <span>Candles Lit</span>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- VIGNETTE & LIGHTING -->
+            <div class="vignette"></div>
+            <div class="ambient-light"></div>
+
+            <!-- ETHEREAL BACKGROUND ORBS -->
+            <div class="ethereal-bg">
+                <div class="glow-orb"
+                    style="width: 400px; height: 400px; background: #4ECDC4; top: 10%; left: 20%; animation-delay: 0s;">
+                </div>
+                <div class="glow-orb"
+                    style="width: 500px; height: 500px; background: #F49F75; bottom: 20%; right: 10%; animation-delay: -5s;">
+                </div>
+                <div class="glow-orb"
+                    style="width: 300px; height: 300px; background: #38bdf8; top: 60%; left: 50%; animation-delay: -10s;">
                 </div>
             </div>
 
@@ -703,13 +975,15 @@
         </div>
     </div>
 
+    <!-- UI LOGIC (Standard Script - No Import/CORS issues) -->
     <script>
         // --- 1. CONFIG & STATE ---
         const CONFIG = {
             width: 5000,
             height: 5000,
-            initialNotes: 25, /* Increased count */
-            spawnRadius: 800 /* Restrict initial spawn to center area */
+            initialNotes: 45, /* Only for Fallback */
+            spawnRadius: 1200, /* Reduced from 1800 to keep them tighter */
+            bufferDistance: 380
         };
 
         const STATE = {
@@ -719,31 +993,64 @@
             pointY: 0,
             startX: 0,
             startY: 0,
-            animationFrame: null
+            animationFrame: null,
+            firebaseNotes: new Map(),
+            grid: []
         };
+        window.STATE = STATE; // Make STATE global for module access
 
         const OBSCENE_WORDS = ["fuck", "shit", "bitch", "asshole", "cunt", "dick", "pussy", "whore", "slut", "bastard"];
+
+        // STATS (Global)
+        window.totalStats = { hearts: 0, flowers: 0, candles: 0 };
 
         // --- 2. INITIALIZATION ---
         const canvas = document.getElementById('infinite-canvas');
         const viewport = document.getElementById('viewport');
         const notesContainer = document.getElementById('notes-container');
 
-        // Center the canvas on load
-        window.onload = () => {
-            // Force header injection again to be safe
+        function initProblemWall() {
             if (window.injectHeader) window.injectHeader();
 
-            // Calculate center position: (Viewport Width - Canvas Width) / 2
             STATE.pointX = (window.innerWidth - CONFIG.width) / 2;
             STATE.pointY = (window.innerHeight - CONFIG.height) / 2;
 
-            updateTransform(); // Apply initial transform
-            generateRandomNotes();
-            startFakeLiveActivity();
-        };
+            updateTransform();
+            initGrid();
 
-        // --- 3. CANVAS LOGIC (PAN & ZOOM) - OPTIMIZED ---
+            // We NO LONGER generate random notes immediately.
+            // We wait for Firebase. If Firebase fails (3s timeout), then we load fallback.
+            window.fallbackTimer = setTimeout(() => {
+                console.warn("Firebase timeout/error. Loading Offline Mode.");
+                generateFallbackNotes();
+            }, 3500);
+        }
+
+        // Auto-Init
+        if (document.readyState === 'complete') {
+            initProblemWall();
+            initPresenceSystem();
+        } else {
+            window.addEventListener('load', () => {
+                initProblemWall();
+                initPresenceSystem();
+            });
+        }
+
+        // --- PRESENCE SYSTEM ---
+        function initPresenceSystem() {
+            const countEl = document.getElementById('userCount');
+            let baseCount = 142;
+            setInterval(() => {
+                const change = Math.floor(Math.random() * 5) - 2;
+                baseCount += change;
+                if (baseCount < 120) baseCount = 120;
+                if (baseCount > 180) baseCount = 180;
+                if (countEl) countEl.innerText = baseCount;
+            }, 5000);
+        }
+
+        // --- CANVAS LOGIC ---
         viewport.addEventListener('mousedown', (e) => {
             if (e.target.closest('.note') || e.target.closest('.wall-hero')) return;
             STATE.panning = true;
@@ -757,50 +1064,32 @@
             viewport.style.cursor = 'grab';
         });
 
-        // Throttled Mouse Move
         let lastFrame = 0;
         window.addEventListener('mousemove', (e) => {
             const now = Date.now();
-            if (now - lastFrame < 16) return; // Cap at ~60fps
+            if (now - lastFrame < 16) return;
             lastFrame = now;
-
-            // A. Pan Logic
             if (STATE.panning) {
                 e.preventDefault();
                 STATE.pointX = e.clientX - STATE.startX;
                 STATE.pointY = e.clientY - STATE.startY;
-                requestAnimationFrame(updateTransform); // Synced with repaint
-            }
-
-            // B. Background Gradient Logic (Only update every 3rd frame loosely)
-            if (Math.random() > 0.6) {
-                const xPercent = (e.clientX / window.innerWidth) * 100 + '%';
-                const yPercent = (e.clientY / window.innerHeight) * 100 + '%';
-                document.body.style.setProperty('--mouse-x', xPercent);
-                document.body.style.setProperty('--mouse-y', yPercent);
+                requestAnimationFrame(updateTransform);
             }
         });
 
-        // Zoom (Wheel)
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
             const xs = (e.clientX - STATE.pointX) / STATE.scale;
             const ys = (e.clientY - STATE.pointY) / STATE.scale;
             const delta = -e.deltaY;
-
             (delta > 0) ? (STATE.scale *= 1.1) : (STATE.scale /= 1.1);
-
-            // Limit Zoom limits
             STATE.scale = Math.min(Math.max(0.4, STATE.scale), 2.5);
-
             STATE.pointX = e.clientX - xs * STATE.scale;
             STATE.pointY = e.clientY - ys * STATE.scale;
-
             requestAnimationFrame(updateTransform);
         }, { passive: false });
 
         function updateTransform() {
-            // Using 3D transform for GPU acceleration
             canvas.style.transform = `translate3d(${STATE.pointX}px, ${STATE.pointY}px, 0) scale(${STATE.scale})`;
         }
 
@@ -899,84 +1188,33 @@
             { text: "Life feels heavy right now.", hearts: 70, flowers: 23, candles: 12 }
         ];
 
-        // Track placed notes for collision detection
-        const placedNotes = [];
-        // Global Logic to Track real stats
-        let globalStats = { heart: 0, flower: 0, candle: 0 };
+        function initGrid() {
+            STATE.grid = [];
+            const cols = Math.floor(CONFIG.width / CELL_SIZE);
+            const rows = Math.floor(CONFIG.height / CELL_SIZE);
+            const midCol = Math.floor(cols / 2);
+            const midRow = Math.floor(rows / 2);
 
-        function generateRandomNotes() {
-            const centerX = CONFIG.width / 2;
-            const centerY = CONFIG.height / 2;
-            const timeOffsets = ["2m ago", "5m ago", "12m ago", "1h ago", "2h ago", "1d ago"];
+            for (let c = 0; c < cols; c++) {
+                for (let r = 0; r < rows; r++) {
+                    // Exclusion Zone 1: Title visibility (Center)
+                    if (Math.abs(c - midCol) < 2 && Math.abs(r - midRow) < 1) continue;
 
-            // Shuffle method to pick unique texts
-            const textPool = [...sampleTexts].sort(() => 0.5 - Math.random());
+                    // Exclusion Zone 2: Impact Board Safe Zone (Right Side)
+                    // Skip columns that would fall under the fixed 300px sidebar when centered
+                    // c=11, 12, 13 are typically risky on large screens
+                    if (c > midCol + 3) continue;
 
-            let count = 0;
-            let attempts = 0;
-
-            // Reset Global Stats on Regen
-            globalStats = { heart: 0, flower: 0, candle: 0 };
-
-            while (count < CONFIG.initialNotes && attempts < 2000) {
-                attempts++;
-
-                // Random position within radius
-                const offsetX = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
-                const offsetY = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
-
-                // 1. EXPANDED EXCLUSION ZONE (Center Text)
-                // Expanded STRICTLY for "The Problem Wall" text overlap prevention
-                // Must correspond to text width (~1200px) and height (~400px)
-                if (Math.abs(offsetX) < 650 && Math.abs(offsetY) < 350) continue;
-
-                // 2. COLLISION CHECK (Simple distance)
-                let collision = false;
-                for (let note of placedNotes) {
-                    const dx = note.x - offsetX;
-                    const dy = note.y - offsetY;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 340) { // Slight increase in buffer
-                        collision = true;
-                        break;
-                    }
+                    STATE.grid.push({ c, r });
                 }
-                if (collision) continue;
-
-                // Success - Place Note
-                const reactions = {
-                    heart: Math.floor(Math.random() * 12),
-                    flower: Math.floor(Math.random() * 8),
-                    candle: Math.floor(Math.random() * 5)
-                };
-
-                // Add to Global Stats
-                globalStats.heart += reactions.heart;
-                globalStats.flower += reactions.flower;
-                globalStats.candle += reactions.candle;
-
-                const time = timeOffsets[Math.floor(Math.random() * timeOffsets.length)];
-
-                // Pick text from shuffled pool (clone pool if exhausted)
-                if (count >= textPool.length) {
-                    textPool.sort(() => 0.5 - Math.random());
-                }
-                const text = textPool[count % textPool.length];
-
-                createNoteElement(
-                    text,
-                    centerX + offsetX,
-                    centerY + offsetY,
-                    time,
-                    reactions
-                );
-
-                placedNotes.push({ x: offsetX, y: offsetY });
-                count++;
             }
 
-            // SET INITIAL STATDOM
-            updateStatDisplay();
+            // SORT BY DISTANCE TO CENTER (Cluster Effect)
+            STATE.grid.sort((a, b) => {
+                const distA = Math.hypot(a.c - midCol, a.r - midRow);
+                const distB = Math.hypot(b.c - midCol, b.r - midRow);
+                return (distB - distA) + (Math.random() - 0.5);
+            });
         }
 
         // --- RENDERING ---
@@ -1036,142 +1274,284 @@
             const f = document.getElementById('totalFlowers');
             const c = document.getElementById('totalCandles');
 
-            if (h) h.innerText = globalStats.heart.toLocaleString();
-            if (f) f.innerText = globalStats.flower.toLocaleString();
-            if (c) c.innerText = globalStats.candle.toLocaleString();
+        function sanitizeText(text) {
+            let clean = text;
+            OBSCENE_WORDS.forEach(word => { clean = clean.replace(new RegExp(`\\b${word}\\b`, 'gi'), '***'); });
+            return clean;
+        }
+        window.sanitizeText = sanitizeText; // Make global for module access
+
+        // --- PRE-SEEDED NOTES (Curated List) ---
+        const seededNotes = [
+            { text: "I feel so behind everyone else.", hearts: 42, flowers: 15, candles: 8 },
+            { text: "I'm afraid I'll never be good enough.", hearts: 65, flowers: 22, candles: 12 },
+            { text: "I miss who I used to be.", hearts: 89, flowers: 34, candles: 19 },
+            { text: "Everything feels too loud today.", hearts: 31, flowers: 9, candles: 4 },
+            { text: "I just need a hug.", hearts: 124, flowers: 45, candles: 28 },
+            { text: "University is overwhelming.", hearts: 56, flowers: 18, candles: 7 },
+            { text: "I pretend I'm okay.", hearts: 92, flowers: 27, candles: 15 },
+            { text: "Is it okay to not have a plan?", hearts: 78, flowers: 31, candles: 11 },
+            { text: "I feel lonely even with friends.", hearts: 103, flowers: 40, candles: 22 },
+            { text: "I'm tired of the noise.", hearts: 45, flowers: 12, candles: 6 },
+            { text: "Does anyone else feel this lost?", hearts: 112, flowers: 38, candles: 25 },
+            { text: "I wish I could pause time.", hearts: 67, flowers: 24, candles: 14 },
+            { text: "My anxiety is winning today.", hearts: 88, flowers: 29, candles: 17 },
+            { text: "Smiling is exhausting.", hearts: 73, flowers: 21, candles: 10 },
+            { text: "I want to be heard.", hearts: 54, flowers: 19, candles: 9 },
+            { text: "Just getting by is hard enough.", hearts: 95, flowers: 33, candles: 18 },
+            { text: "I miss my childhood.", hearts: 134, flowers: 52, candles: 31 },
+            { text: "The future scares me.", hearts: 82, flowers: 28, candles: 16 },
+            { text: "I don't know who I am anymore.", hearts: 76, flowers: 25, candles: 13 },
+            { text: "Everyone expects so much from me.", hearts: 62, flowers: 20, candles: 11 },
+            { text: "I'm trying my best, but it feels like it's not enough.", hearts: 115, flowers: 42, candles: 24 },
+            { text: "I feel like a burden.", hearts: 98, flowers: 36, candles: 20 },
+            { text: "Why is it so hard to be happy?", hearts: 85, flowers: 30, candles: 15 },
+            { text: "I just want peace.", hearts: 145, flowers: 58, candles: 35 },
+            { text: "Life feels heavy right now.", hearts: 70, flowers: 23, candles: 12 }
+        ];
+        window.seededNotes = seededNotes; // Export for Seeder
+
+        // --- FALLBACK MODE (Offline Persistence) ---
+        const FALLBACK_KEY = 'soulamore_fallback_notes_v2';
+        window.sampleTexts = seededNotes.map(n => n.text);
+
+        function generateFallbackNotes() {
+            if (STATE.firebaseNotes.size > 0) return; // DB already loaded
+            console.log("Generating Fallback/Offline Notes...");
+
+            // 1. Try Load from Storage
+            let storedData = localStorage.getItem(FALLBACK_KEY);
+            let fallbackNotes = [];
+
+            if (storedData) {
+                try {
+                    fallbackNotes = JSON.parse(storedData);
+                } catch (e) { console.error("Storage Error", e); fallbackNotes = []; }
+            }
+
+            // 2. If No Storage, Create Initial From SEEDED
+            if (fallbackNotes.length === 0) {
+                const timeOffsets = ["2m ago", "5m ago", "12m ago", "1h ago", "2h ago", "1d ago"];
+
+                seededNotes.forEach((seed, i) => {
+                    const pos = getGridPosition();
+                    const time = timeOffsets[i % timeOffsets.length];
+
+                    fallbackNotes.push({
+                        id: 'fallback_' + i,
+                        text: seed.text,
+                        x: pos.x,
+                        y: pos.y,
+                        time: time,
+                        reactions: { heart: seed.hearts, flower: seed.flowers, candle: seed.candles }
+                    });
+                });
+
+                // Save Initial State
+                localStorage.setItem(FALLBACK_KEY, JSON.stringify(fallbackNotes));
+            }
+
+            // 3. Render Notes
+            fallbackNotes.forEach(note => {
+                window.totalStats.hearts += note.reactions.heart;
+                window.totalStats.flowers += note.reactions.flower;
+                window.totalStats.candles += note.reactions.candle;
+                createNoteElement(note, true);
+            });
+            updateTotalStats();
         }
 
-        function createNoteElement(text, x, y, timeLabel, reactionCounts = { heart: 0, flower: 0, candle: 0 }) {
+        // --- RENDERING ---
+        function createNoteElement(data, isFallback = false) {
             const el = document.createElement('div');
-            el.className = 'note';
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
-            // Random slight rotation
-            el.style.transform = `rotate(${Math.random() * 6 - 3}deg)`;
+            el.className = 'note note-float-in'; // Added float-in
+            if (isFallback) el.classList.add('fallback-note');
+            el.dataset.noteId = data.id;
 
-            // SAFE RENDERING: Use textContent for user input, then append UI
-            el.textContent = text;
+            el.style.left = data.x + 'px';
+            el.style.top = data.y + 'px';
+            el.style.transform = `rotate(${Math.random() * 6 - 3}deg)`;
+            el.textContent = data.text;
+
+            const r = data.reactions || { heart: 0, flower: 0, candle: 0 };
+            const totalReactions = r.heart + r.flower + r.candle;
+
+            // Radiance Logic: More reactions = stronger soft glow
+            if (totalReactions > 5) {
+                const intensity = Math.min(totalReactions / 50, 1);
+                el.style.setProperty('--glow-radius', `${intensity * 40}px`);
+                el.style.setProperty('--glow-color', `rgba(244, 159, 117, ${intensity * 0.15})`);
+            }
+
+            // Check what user has already reacted to
+            const userReactions = JSON.parse(localStorage.getItem('soulamore_user_reactions') || '{}');
+            const noteReactions = userReactions[data.id] || [];
 
             const uiHTML = `
-                <div class="note-meta">
-                    <span style="opacity:0.6;">Anonymous</span>
-                    <span style="font-size:0.75rem;">${timeLabel}</span>
-                </div>
-                <!-- REACTION BAR -->
-                <div class="note-actions">
-                    <button class="action-btn heart-btn" onclick="react(this, 'heart')">
-                        <i class="fas fa-heart"></i> <span class="count">${reactionCounts.heart}</span>
-                    </button>
-                    <button class="action-btn flower-btn" onclick="react(this, 'flower')">
-                        <i class="fas fa-spa"></i> <span class="count">${reactionCounts.flower}</span>
-                    </button>
-                    <button class="action-btn candle-btn" onclick="react(this, 'candle')">
-                        <i class="fas fa-fire-alt"></i> <span class="count">${reactionCounts.candle}</span>
-                    </button>
-                </div>
-            `;
-
+            <div class="mod-controls">
+                <button class="delete-btn" onclick="hideNoteGlobally('${data.id}')"><i class="fas fa-trash"></i> Hide</button>
+            </div>
+            <div class="note-meta"><span style="opacity:0.6;">Anonymous</span><span style="font-size:0.75rem;">${data.time}</span></div>
+            <div class="note-actions">
+                <button class="action-btn heart-btn ${noteReactions.includes('heart') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'heart', this)"><i class="fas fa-heart"></i> <span class="count">${r.heart}</span></button>
+                <button class="action-btn flower-btn ${noteReactions.includes('flower') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'flower', this)"><i class="fas fa-spa"></i> <span class="count">${r.flower}</span></button>
+                <button class="action-btn candle-btn ${noteReactions.includes('candle') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'candle', this)"><i class="fas fa-fire-alt"></i> <span class="count">${r.candle}</span></button>
+            </div>`;
             el.insertAdjacentHTML('beforeend', uiHTML);
-
             notesContainer.appendChild(el);
         }
+        window.createNoteElement = createNoteElement;
 
-        // --- 5. INTERACTION LOGIC ---
-        function react(btn, type) {
-            // 1. Visual Pop
-            btn.classList.add('pop-active');
+        function updateTotalStats() {
+            const h = document.getElementById('totalHearts');
+            const f = document.getElementById('totalFlowers');
+            const c = document.getElementById('totalCandles');
+
+            const hearts = window.totalStats.hearts;
+            const flowers = window.totalStats.flowers;
+            const candles = window.totalStats.candles;
+
+            if (h) h.innerText = hearts.toLocaleString();
+            if (f) f.innerText = flowers.toLocaleString();
+            if (c) c.innerText = candles.toLocaleString();
+        }
+        window.updateTotalStats = updateTotalStats; // Make global for module access
+
+        // --- SOUND ENGINE ---
+        const SOUNDS = {
+            heart: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3', // Soft pop
+            flower: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', // Shimmer
+            candle: 'https://assets.mixkit.co/active_storage/sfx/2569/2569-preview.mp3', // Bell
+            post: 'https://assets.mixkit.co/active_storage/sfx/1992/1992-preview.mp3' // Paper rustle
+        };
+
+        function playSound(type) {
+            try {
+                const audio = new Audio(SOUNDS[type]);
+                audio.volume = 0.4;
+                audio.play().catch(e => { }); // Ignore browse blocking silently
+            } catch (e) { }
+        }
+
+        // --- GLOBAL REACT HANDLER ---
+        window.reactGlobally = function (id, type, btn) {
+            if (btn.classList.contains('reacted')) return;
+
+            // Play Feedback
+            playSound(type);
+
+            // 0. Double-check LocalStorage constraint
+            const USER_REACT_KEY = 'soulamore_user_reactions';
+            let userReactions = JSON.parse(localStorage.getItem(USER_REACT_KEY) || '{}');
+            if (userReactions[id] && userReactions[id].includes(type)) return;
+
+            // Mark as reacted
+            if (!userReactions[id]) userReactions[id] = [];
+            userReactions[id].push(type);
+            localStorage.setItem(USER_REACT_KEY, JSON.stringify(userReactions));
+
+            btn.classList.add('pop-active', 'reacted');
             setTimeout(() => btn.classList.remove('pop-active'), 300);
 
-            // 2. Increment Note Count
+            // Optimistic Update UI
             const countSpan = btn.querySelector('.count');
-            let val = parseInt(countSpan.innerText);
-            countSpan.innerText = val + 1;
+            countSpan.innerText = parseInt(countSpan.innerText) + 1;
 
-            // 3. Header & Global Stat Glow/Increment
-            const header = document.querySelector('header.island-nav');
-            const note = btn.closest('.note');
+            if (type === 'heart') window.totalStats.hearts++;
+            if (type === 'flower') window.totalStats.flowers++;
+            if (type === 'candle') window.totalStats.candles++;
+            updateTotalStats();
 
-            // --- HEADER GLOW ---
-            if (header) {
-                if (type === 'heart') {
-                    header.classList.add('glow-red');
-                    setTimeout(() => header.classList.remove('glow-red'), 400);
-                } else if (type === 'flower') {
-                    header.classList.add('glow-yellow');
-                    setTimeout(() => header.classList.remove('glow-yellow'), 400);
-                } else if (type === 'candle') {
-                    header.classList.add('glow-orange');
-                    setTimeout(() => header.classList.remove('glow-orange'), 400);
+            // 1. If Fallback Note -> Update LocalStorage
+            if (id.startsWith('fallback_')) {
+                let stored = localStorage.getItem(FALLBACK_KEY);
+                if (stored) {
+                    let data = JSON.parse(stored);
+                    const noteIdx = data.findIndex(n => n.id === id);
+                    if (noteIdx !== -1) {
+                        data[noteIdx].reactions[type]++;
+                        localStorage.setItem(FALLBACK_KEY, JSON.stringify(data));
+                    }
                 }
             }
 
-            // --- NOTE GLOW (FULL CARD) ---
-            if (note) {
-                // Clear previous glows to allow switching
-                note.classList.remove('glow-red', 'glow-yellow', 'glow-orange');
+            // 2. If Firebase Note -> Update Database
+            if (window.firebaseReact && !id.startsWith('fallback_')) {
+                window.firebaseReact(id, type);
+            }
+        };
 
-                // Add strong glow class to the whole card
-                if (type === 'heart') {
-                    note.classList.add('glow-red');
-                    setTimeout(() => note.classList.remove('glow-red'), 1000); // 1s Duration
-                } else if (type === 'flower') {
-                    note.classList.add('glow-yellow');
-                    setTimeout(() => note.classList.remove('glow-yellow'), 1000);
-                } else if (type === 'candle') {
-                    note.classList.add('glow-orange');
-                    setTimeout(() => note.classList.remove('glow-orange'), 1000);
-                }
+        function openWriter() { document.getElementById('writeModal').classList.add('active'); }
+        function closeWriter() { document.getElementById('writeModal').classList.remove('active'); }
+        window.openWriter = openWriter; // Make global for onclick
+        window.closeWriter = closeWriter; // Make global for module access
+
+        // --- SANITIZATION HELPER ---
+        window.sanitizeText = function (text) {
+            if (!text) return text;
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.toString().replace(/[&<>"']/g, function (m) { return map[m]; });
+        };
+
+    </script>
+
+    <!-- FIREBASE LOGIC (Handler Module) -->
+    <script type="module">
+        import { initWall, postNoteToWall, reactToNote, hideNote } from "../assets/js/problem-wall-handler.js";
+
+
+
+        // 1. Initialize Wall
+        initWall(
+            (id, data) => renderFirebaseNote(id, data), // Render New
+            (id, data) => updateNoteUI(id, data),       // Update Existing
+            (stats) => {                                // Update Stats
+                window.totalStats = stats;
+                window.updateTotalStats();
+            }
+        );
+
+        // 2. Render Functions (Moved from inline to be accessible)
+        function renderFirebaseNote(noteId, data) {
+            let finalX = data.x, finalY = data.y;
+            if (finalX === undefined || finalY === undefined) {
+                const pos = window.getGridPosition();
+                finalX = pos.x; finalY = pos.y;
             }
 
-            // 4. Update Global Count in Sidebar (Fake Sync)
-            let globalId = '';
-            if (type === 'heart') globalId = 'totalHearts';
-            if (type === 'flower') globalId = 'totalFlowers';
-            if (type === 'candle') globalId = 'totalCandles';
-
-            const globalEl = document.getElementById(globalId);
-            if (globalEl) {
-                // Parse commas
-                let gVal = parseInt(globalEl.innerText.replace(/,/g, ''));
-                globalEl.innerText = (gVal + 1).toLocaleString();
+            let timeLabel = 'Just now';
+            if (data.createdAt) {
+                const diffMins = Math.floor((Date.now() - data.createdAt.toDate().getTime()) / 60000);
+                if (diffMins < 60) timeLabel = `${diffMins}m ago`;
+                else if (diffMins < 1440) timeLabel = `${Math.floor(diffMins / 60)}h ago`;
+                else timeLabel = `${Math.floor(diffMins / 1440)}d ago`;
             }
+
+            window.createNoteElement({
+                id: noteId,
+                text: data.text,
+                x: finalX, y: finalY,
+                time: timeLabel,
+                reactions: { heart: data.hearts || 0, flower: data.flowers || 0, candle: data.candles || 0 }
+            }, false);
+
+            // Clear fallback timer if real data arrives
+            if (window.fallbackTimer) clearTimeout(window.fallbackTimer);
         }
 
-        function openWriter() {
-            document.getElementById('writeModal').classList.add('active');
+        function updateNoteUI(noteId, data) {
+            const noteEl = document.querySelector(`.note[data-note-id="${noteId}"]`);
+            if (!noteEl) return;
+            const h = noteEl.querySelector('.heart-btn .count'); if (h) h.innerText = data.hearts || 0;
+            const f = noteEl.querySelector('.flower-btn .count'); if (f) f.innerText = data.flowers || 0;
+            const c = noteEl.querySelector('.candle-btn .count'); if (c) c.innerText = data.candles || 0;
         }
-
-        function closeWriter() {
-            document.getElementById('writeModal').classList.remove('active');
-        }
-
-
-
-        function resetView(focusX = null, focusY = null) {
-            // Default to center if no focus provided
-            const finalX = focusX ?? (CONFIG.width / 2);
-            const finalY = focusY ?? (CONFIG.height / 2);
-
-            // Calculate Viewport Offset to center the point
-            const targetX = (window.innerWidth / 2) - finalX;
-            const targetY = (window.innerHeight / 2) - finalY;
-            const targetScale = 1;
-
-            // Simple transition logic
-            canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
-
-            STATE.pointX = targetX;
-            STATE.pointY = targetY;
-            STATE.scale = targetScale;
-            updateTransform();
-
-            setTimeout(() => {
-                canvas.style.transition = "";
-            }, 1200);
-        }
-
-        // --- 4. NOTE GENERATION (FIXED) ---
-        // ... (existing code for generating random notes) ...
 
         async function postNote() {
             const input = document.getElementById('noteInput');
@@ -1249,30 +1629,40 @@
             if (isMod) alert("Moderator Mode Active. You can now hide inappropriate notes.");
         }
 
-        // --- 6. FAKE LIVE COUNTERS ---
-        function startFakeLiveActivity() {
-            setInterval(() => {
-                const count = document.getElementById('userCount');
-                let val = parseInt(count.innerText);
-                val += Math.floor(Math.random() * 3) - 1; // +1, 0, or -1
-                if (val < 120) val = 120;
-                count.innerText = val;
-            }, 5000);
+        window.firebaseHide = async function (noteId) {
+            await hideNote(noteId);
+        };
 
-            // Random gloal updates
-            setInterval(() => {
-                if (Math.random() > 0.7) {
-                    const types = ['totalHearts', 'totalFlowers', 'totalCandles'];
-                    const id = types[Math.floor(Math.random() * types.length)];
-                    const el = document.getElementById(id);
-                    if (el) {
-                        let gVal = parseInt(el.innerText.replace(/,/g, ''));
-                        el.innerText = (gVal + 1).toLocaleString();
-                    }
+        // --- MODERATOR SECRET (Restored) ---
+        let clickCount = 0;
+        let lastClick = 0;
+        document.addEventListener('click', (e) => {
+            // Secret: 5 clicks in the bottom-left corner
+            if (e.clientX < 100 && e.clientY > window.innerHeight - 100) {
+                const now = Date.now();
+                if (now - lastClick < 500) clickCount++;
+                else clickCount = 1;
+
+                lastClick = now;
+
+                if (clickCount >= 5) {
+                    toggleModMode();
+                    clickCount = 0;
                 }
-            }, 2000);
-        }
+            }
+        });
 
+        function toggleModMode() {
+            document.body.classList.toggle('mod-mode');
+            const isMod = document.body.classList.contains('mod-mode');
+            if (isMod) alert("Moderator Mode Active. You can now hide inappropriate notes.");
+        }
+    </script>
+
+    <script>
+        // --- INTERACTION LOGIC (Consolidated with createNoteElement) ---
+        // Duplicate listener removed to prevent double-firing.
+        // Logic is handled by window.reactGlobally()
     </script>
 </body>
 

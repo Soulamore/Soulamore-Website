@@ -11,7 +11,10 @@ body {
 /* MAIN LAYOUT CONTAINER */
 .dashboard-layout {
     display: flex;
-    min-height: 100vh;
+    height: 100vh;
+    /* Fixed height */
+    overflow: hidden;
+    /* Prevent body scroll */
     background: var(--bg-deep, #131B2E);
 }
 
@@ -24,10 +27,10 @@ body {
     border-right: 1px solid var(--border-soft);
     display: flex;
     flex-direction: column;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
+    position: relative;
+    /* Change from fixed to relative since parent is fixed */
+    height: 100%;
+    /* Full height of parent */
     z-index: 100;
     backdrop-filter: blur(10px);
     transition: transform 0.3s ease, background 0.3s;
@@ -206,11 +209,72 @@ body {
 /* MAIN CONTENT */
 .main-content {
     flex: 1;
-    margin-left: var(--sidebar-width);
+    margin-left: 0;
+    /* Sidebar is now relative in flex */
     padding: 40px;
-    /* FIX: Ensure calculation considers fixed sidebar */
-    width: calc(100% - var(--sidebar-width));
+    width: 100%;
+    height: 100vh;
+    /* Full viewport height */
+    overflow-y: auto;
+    /* SCROLLS HERE */
+    scroll-behavior: smooth;
+    overflow: hidden !important;
+    /* NO PAGE SCROLL */
+}
+
+/* --- MASTER WORKSPACE DIRECTIVE --- */
+:root {
+    --content-max-width: 1000px;
+    /* Breathing Room */
+    --header-height: 109px;
+    /* Matches Sidebar Header 108px + border */
+}
+
+.view-section {
+    width: 100%;
+    /* CENTERED WORKSPACE MODEL */
+    margin: 0 auto !important;
+    max-width: var(--content-max-width) !important;
+    padding-left: 0 !important;
+    /* No rail padding, use container */
+    padding-right: 0 !important;
+
     box-sizing: border-box;
+    position: relative;
+    display: none;
+    flex-direction: column;
+    padding-top: 0;
+    border: none;
+    height: 100%;
+    /* Fill Container for internal scroll */
+    overflow-y: auto;
+    /* FALLBACK: Allow view to scroll if internal content doesn't */
+    pointer-events: none;
+}
+
+/* Specific Views with Internal Scroll (OPT-IN) */
+.view-section.no-scroll {
+    overflow-y: hidden !important;
+}
+
+.view-section.active {
+    display: flex;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+/* HEADER ALIGNMENT UTILITY */
+.workspace-header {
+    height: 109px; /* MATCH SIDEBAR HEADER EXACTLY */
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    /* Match Sidebar Line */
+    margin-bottom: 0 !important;
+    padding: 0 20px !important;
+    /* Internal spacing */
+    flex-shrink: 0;
+    box-sizing: border-box; /* Prevent padding from adding height */
 }
 
 /* MOBILE TOGGLE */
@@ -227,7 +291,7 @@ body {
     color: var(--text-primary);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .sidebar {
         transform: translateX(-100%);
         width: 100%;

@@ -413,8 +413,8 @@ function setupFavicon(rootPath) {
 }
 
 // execute setup
-// setupFavicon(rootPath); // This needs to run after rootPath is defined or just use logical path
-// Moving execution to end of file
+// setupFavicon(rootPath); // MOVED to init function to ensure rootPath is available
+
 
 
 // --- 1. DATA CONFIGURATION ---
@@ -523,6 +523,7 @@ const NAV_DATA = [
         type: 'dropdown',
         children: [
             { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
+            { id: 'nav-journal', label: 'Reflective Journal', href: 'journal/', style: 'color:var(--teal-glow); font-weight:700;' },
             { id: 'nav-playground', label: 'Mental Playground', href: 'tools/playground.html' },
             { id: 'nav-confession', label: 'Confession Box', href: 'tools/confession-box/index.html' },
             { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
@@ -538,7 +539,6 @@ const NAV_DATA = [
         children: [
             { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
             { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
-            { id: 'nav-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
             { id: 'nav-for-parents', label: 'For Families', href: 'company/for-parents.html' }
         ]
     },
@@ -676,6 +676,7 @@ const getFooterHTML = (rootPath) => `
         <div class="footer-col">
             <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Relief Tools</h4>
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}journal/">Reflective Journal</a></li>
                 <li><a href="${rootPath}tools/vent-box.html">The Vent Box</a></li>
                 <li><a href="${rootPath}tools/5-step-reset.html">5-Step Reset</a></li>
                 <li><a href="${rootPath}tools/playground.html">Mental Playground</a></li>
@@ -948,8 +949,73 @@ function injectSubnav() {
     // console.log("Soulamore: Shell Sub-nav injected.");
 }
 
-// Auto-run subnav injection on load
-document.addEventListener('DOMContentLoaded', injectSubnav);
+// --- 11. COOKIE CONSENT ---
+function injectCookieBanner() {
+    // 1. Check if already consented
+    if (localStorage.getItem('cookieConsent') === 'accepted') return;
+
+    // 2. Create Banner
+    const banner = document.createElement('div');
+    banner.id = 'cookie-banner';
+    banner.innerHTML = `
+        <style>
+            #cookie-banner {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                max-width: 400px;
+                background: rgba(15, 23, 42, 0.95);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                color: #f1f5f9;
+                padding: 20px 25px;
+                border-radius: 20px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                z-index: 10000;
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                animation: slideUp 0.5s ease-out;
+            }
+            @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            
+            .cb-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-weight: 600; color: #4ECDC4; }
+            .cb-text { font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px; line-height: 1.5; }
+            .cb-actions { display: flex; gap: 10px; justify-content: flex-end; }
+            
+            .cb-btn { padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; cursor: pointer; border: none; font-weight: 600; transition: 0.3s; }
+            .cb-accept { background: #4ECDC4; color: #0f172a; }
+            .cb-accept:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3); }
+            
+            .cb-info { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.1); }
+            .cb-info:hover { color: white; border-color: white; }
+        </style>
+        <div class="cb-header"><i class="fas fa-cookie-bite"></i> Human, we use cookies.</div>
+        <div class="cb-text">Not the chocolate chip kind (sadly). Just the digital kind to keep you logged in and make sure the site works. No tracking for ads.</div>
+        <div class="cb-actions">
+            <button class="cb-btn cb-info" onclick="window.location.href='/company/privacy-policy.html'">Privacy</button>
+            <button class="cb-btn cb-accept" id="acceptCookies">Got it</button>
+        </div>
+    `;
+
+    document.body.appendChild(banner);
+
+    // 3. Bind Event
+    document.getElementById('acceptCookies').addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'accepted');
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(20px)';
+        setTimeout(() => banner.remove(), 500);
+    });
+}
+
+// Auto-run subnav and other injections on load
+document.addEventListener('DOMContentLoaded', () => {
+    injectSubnav();
+    injectFavicon(); // ADDED: Fix missing favicons
+    initializeHeaderLogic(); // ADDED: Ensure listener binding
+    bindMobileToggle(); // ADDED: Ensure mobile toggle binding
+    injectSoulBotWidget(); // ADDED: Ensure SoulBot widget injection
+    injectCookieBanner(); // ADDED: GDPR Compliance
+});
 
 // --- 5. ACTIVE STATE LOGIC ---
 
@@ -1386,7 +1452,13 @@ function injectMobileBottomNav() {
             justify-content: space-around;
             align-items: center;
             padding: 12px 20px;
-            z-index: 8000; /* Fixed: Lower than Mobile Menu (9999) */
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 20px;
+            z-index: 8000; /* Layer: Below Modal (9999), Above Content */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             transition: transform 0.3s ease;
         }

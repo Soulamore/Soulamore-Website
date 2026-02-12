@@ -6,11 +6,25 @@
 import { db, collection, addDoc, serverTimestamp, query, onSnapshot, orderBy } from "./firebase-config.js";
 
 // --- 1. VENT BOX (Anonymous) ---
+// --- HELPER: INPUT SANITIZATION ---
+function sanitizeInput(text) {
+    if (!text) return text;
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.toString().replace(/[&<>"']/g, function (m) { return map[m]; });
+}
+
 // --- 1. VENT BOX (Anonymous) ---
 export async function handleVentSubmission(text, type = "burn") {
     try {
+        const cleanText = sanitizeInput(text); // ADDED: Sanitization
         await addDoc(collection(db, "vents"), {
-            content: text, // Storing raw text as requested, anonymity is policy-based
+            content: cleanText, // Stored as requested, but sanitized
             action: type, // 'burn', 'shred', 'void'
             timestamp: serverTimestamp(),
             device: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
@@ -26,8 +40,9 @@ export async function handleVentSubmission(text, type = "burn") {
 // --- 1.5 ECHO SPACE (Loneliness) ---
 export async function handleEcho(text) {
     try {
+        const cleanText = sanitizeInput(text); // ADDED: Sanitization
         await addDoc(collection(db, "echoes"), {
-            content: text,
+            content: cleanText,
             timestamp: serverTimestamp(),
             public: true // Flag for potential future display
         });
@@ -42,10 +57,14 @@ export async function handleEcho(text) {
 // --- 2. CONFESSION BOX ---
 export async function handleConfession(text, email = null, phone = null) {
     try {
+        const cleanText = sanitizeInput(text); // ADDED: Sanitization
+        const cleanEmail = sanitizeInput(email);
+        const cleanPhone = sanitizeInput(phone);
+
         await addDoc(collection(db, "confessions"), {
-            content: text, // We assume they want their story told, but strict scrubbing is optional
-            email: email,
-            phone: phone,
+            content: cleanText,
+            email: cleanEmail,
+            phone: cleanPhone,
             status: "pending",
             timestamp: serverTimestamp()
         });
@@ -64,9 +83,16 @@ export async function handleApplication(type, data) {
 
     try {
         console.log(`Attempting to save application to ${collectionName}...`, data);
+
+        // Sanitize Data Object
+        const cleanData = {};
+        for (const [key, value] of Object.entries(data)) {
+            cleanData[key] = sanitizeInput(value);
+        }
+
         const docRef = await addDoc(collection(db, collectionName), {
             type: type, // Keeping type for redundancy check
-            ...data,
+            ...cleanData,
             status: "new",
             timestamp: serverTimestamp()
         });
@@ -94,10 +120,10 @@ export async function handleApplication(type, data) {
 export async function handleContact(name, email, subject, message) {
     try {
         await addDoc(collection(db, "contacts"), {
-            name: name,
-            email: email,
-            subject: subject,
-            message: message,
+            name: sanitizeInput(name),
+            email: sanitizeInput(email),
+            subject: sanitizeInput(subject),
+            message: sanitizeInput(message),
             status: "unread",
             timestamp: serverTimestamp()
         });
@@ -112,11 +138,11 @@ export async function handleContact(name, email, subject, message) {
 export async function handlePostcard(message, city = "Unknown") {
     try {
         // Simple scrub for postcards as they are public
-        const cleanMessage = window.PIIScrubber ? window.PIIScrubber.scrubStrict(message) : message;
+        const cleanMessage = window.PIIScrubber ? window.PIIScrubber.scrubStrict(message) : sanitizeInput(message);
 
         await addDoc(collection(db, "postcards"), {
             message: cleanMessage,
-            originCity: city,
+            originCity: sanitizeInput(city),
             likes: 0,
             timestamp: serverTimestamp()
         });
@@ -226,3 +252,62 @@ export async function getAggregateStats(type) {
         return 0;
     }
 }
+// --- 11. COMMUNITY PULSE STATS ---
+export function updatePulseStats() {
+    const h = document.getElementById('pulseHearts');
+    const f = document.getElementById('pulseFlowers');
+    const c = document.getElementById('pulseCandles');
+
+    // Fallback values
+    const setFallback = () => {
+        if (h && (h.innerText === '...' || h.innerText === '')) h.innerText = '1,280';
+        if (f && (f.innerText === '...' || f.innerText === '')) f.innerText = '850';
+        if (c && (c.innerText === '...' || c.innerText === '')) c.innerText = '430';
+    };
+
+    const fallbackTimeout = setTimeout(setFallback, 2000);
+
+    try {
+        const q = collection(db, "problem-wall-notes");
+        onSnapshot(q, (snapshot) => {
+            clearTimeout(fallbackTimeout);
+            let hearts = 0, flowers = 0, candles = 0;
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.isHidden !== true) {
+                    hearts += (data.hearts || 0);
+                    flowers += (data.flowers || 0);
+                    candles += (data.candles || 0);
+                }
+            });
+
+            if (h) h.innerText = hearts.toLocaleString();
+            if (f) f.innerText = flowers.toLocaleString();
+            if (c) c.innerText = candles.toLocaleString();
+
+            // Sync to any other listeners if needed
+            window.SoulPulseData = { hearts, flowers, candles };
+        }, (error) => {
+            console.error("Pulse Stats Error:", error);
+            setFallback();
+        });
+    } catch (e) {
+        console.error("Firebase Init Error:", e);
+        setFallback();
+    }
+}
+
+// Make globally available for inline HTML onclicks (via a bridge helper if needed)
+window.SoulBackend = {
+    submitVent: handleVentSubmission,
+    submitEcho: handleEcho,
+    submitConfession: handleConfession,
+    submitApp: handleApplication,
+    submitContact: handleContact,
+    submitPostcard: handlePostcard,
+    submitNewsletter: handleNewsletter,
+    getAggregateStats: getAggregateStats,
+    subscribeToShredCount: subscribeToShredCount,
+    subscribeToNewsletterCount: subscribeToNewsletterCount,
+    updatePulseStats: updatePulseStats
+};
