@@ -523,6 +523,7 @@ const NAV_DATA = [
         type: 'dropdown',
         children: [
             { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
+            { id: 'nav-journal', label: 'Reflective Journal', href: 'journal/', style: 'color:var(--teal-glow); font-weight:700;' },
             { id: 'nav-playground', label: 'Mental Playground', href: 'tools/playground.html' },
             { id: 'nav-confession', label: 'Confession Box', href: 'tools/confession-box/index.html' },
             { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
@@ -675,6 +676,7 @@ const getFooterHTML = (rootPath) => `
         <div class="footer-col">
             <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Relief Tools</h4>
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}journal/">Reflective Journal</a></li>
                 <li><a href="${rootPath}tools/vent-box.html">The Vent Box</a></li>
                 <li><a href="${rootPath}tools/5-step-reset.html">5-Step Reset</a></li>
                 <li><a href="${rootPath}tools/playground.html">Mental Playground</a></li>
