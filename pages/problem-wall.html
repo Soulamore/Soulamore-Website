@@ -804,55 +804,99 @@
             canvas.style.transform = `translate3d(${STATE.pointX}px, ${STATE.pointY}px, 0) scale(${STATE.scale})`;
         }
 
-        function resetView(focusX = null, focusY = null) {
-            // Default to center of canvas
-            const canvasCenterX = CONFIG.width / 2;
-            const canvasCenterY = CONFIG.height / 2;
+        // --- GRID & HELPERS ---
+        const CELL_SIZE = 350;
 
-            const targetPointX = focusX !== null ? focusX : canvasCenterX;
-            const targetPointY = focusY !== null ? focusY : canvasCenterY;
+        // --- ORGANIC PLACEMENT (Scattered Papers) ---
+        const NOTE_WIDTH = 340; // 280 + padding + margins
+        const NOTE_HEIGHT = 200; // Approx average height
 
-            // Calculate translation to put targetPoint at viewport center
-            // Formula: Translation = (Viewport/2) - (TargetPoint * Scale)
-            // Assuming Scale = 1 for reset
-            const targetX = (window.innerWidth / 2) - targetPointX;
-            const targetY = (window.innerHeight / 2) - targetPointY;
-            const targetScale = 1;
-
-            canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
-
-            STATE.pointX = targetX;
-            STATE.pointY = targetY;
-            STATE.scale = targetScale;
-            updateTransform();
-
-            // Disable transition after animation to prevent drag lag
-            setTimeout(() => {
-                canvas.style.transition = "";
-            }, 1200);
+        function initGrid() {
+            STATE.placedNotes = []; // Stores {x, y, w, h}
         }
 
-        // --- 4. NOTE GENERATION (FIXED) ---
-        // --- 4. NOTE GENERATION (SMARTER) ---
-        const sampleTexts = [
-            "I feel so behind everyone else.",
-            "I'm afraid I'll never be good enough.",
-            "I miss who I used to be.",
-            "Everything feels too loud today.",
-            "I just need a hug.",
-            "University is overwhelming.",
-            "I pretend I'm okay.",
-            "Is it okay to not have a plan?",
-            "I feel lonely even with friends.",
-            "I'm tired of the noise.",
-            "Does anyone else feel this lost?",
-            "I wish I could pause time.",
-            "My anxiety is winning today.",
-            "Smiling is exhausting.",
-            "I want to be heard.",
-            "Just getting by is hard enough.",
-            "I miss my childhood.",
-            "The future scares me."
+        function getGridPosition() {
+            // Try 50 times to find a spot with minimal overlap
+            const maxTries = 50;
+            const centerW = CONFIG.width; // 5000
+            const centerH = CONFIG.height; // 5000
+
+            // Bias towards center but spread out (Gaussian-ish)
+            // We want notes to cluster around 2500,2500 but spread to ~4000
+
+            for (let i = 0; i < maxTries; i++) {
+                // Random position within a central 3000x3000 area, biased to center
+                // Using a simple random for now, maybe polar coordinates for better scattering?
+                // Let's use simple uniform for the area, but reject if too crowded.
+
+                // Spread factor: increases as more notes are added? 
+                // We don't track count efficiently here, so just randomized range.
+                const range = 1800; // +/- 1800px from center
+                const x = (centerW / 2) - range / 2 + Math.random() * range;
+                const y = (centerH / 2) - range / 2 + Math.random() * range;
+
+                // Exclusion: Don't block the very center (Title)
+                const dist = Math.hypot(x - centerW / 2, y - centerH / 2);
+                if (dist < 400) continue;
+
+                // Collision Check (Allow 5% overlap = shrink checking box by 20%)
+                const hit = STATE.placedNotes.some(note => {
+                    return !(x + NOTE_WIDTH * 0.8 < note.x ||
+                        x > note.x + NOTE_WIDTH * 0.8 ||
+                        y + NOTE_HEIGHT * 0.8 < note.y ||
+                        y > note.y + NOTE_HEIGHT * 0.8);
+                });
+
+                if (!hit) {
+                    STATE.placedNotes.push({ x, y, w: NOTE_WIDTH, h: NOTE_HEIGHT });
+                    return { x, y };
+                }
+            }
+
+            // Fallback: Just place it far out
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 2000 + Math.random() * 500;
+            const x = (centerW / 2) + Math.cos(angle) * radius;
+            const y = (centerH / 2) + Math.sin(angle) * radius;
+            STATE.placedNotes.push({ x, y, w: NOTE_WIDTH, h: NOTE_HEIGHT });
+            return { x, y };
+        }
+        window.getGridPosition = getGridPosition;
+
+        function sanitizeText(text) {
+            let clean = text;
+            OBSCENE_WORDS.forEach(word => { clean = clean.replace(new RegExp(`\\b${word}\\b`, 'gi'), '***'); });
+            return clean;
+        }
+        window.sanitizeText = sanitizeText; // Make global for module access
+
+        // --- PRE-SEEDED NOTES (Curated List) ---
+        const seededNotes = [
+            { text: "I feel so behind everyone else.", hearts: 42, flowers: 15, candles: 8 },
+            { text: "I'm afraid I'll never be good enough.", hearts: 65, flowers: 22, candles: 12 },
+            { text: "I miss who I used to be.", hearts: 89, flowers: 34, candles: 19 },
+            { text: "Everything feels too loud today.", hearts: 31, flowers: 9, candles: 4 },
+            { text: "I just need a hug.", hearts: 124, flowers: 45, candles: 28 },
+            { text: "University is overwhelming.", hearts: 56, flowers: 18, candles: 7 },
+            { text: "I pretend I'm okay.", hearts: 92, flowers: 27, candles: 15 },
+            { text: "Is it okay to not have a plan?", hearts: 78, flowers: 31, candles: 11 },
+            { text: "I feel lonely even with friends.", hearts: 103, flowers: 40, candles: 22 },
+            { text: "I'm tired of the noise.", hearts: 45, flowers: 12, candles: 6 },
+            { text: "Does anyone else feel this lost?", hearts: 112, flowers: 38, candles: 25 },
+            { text: "I wish I could pause time.", hearts: 67, flowers: 24, candles: 14 },
+            { text: "My anxiety is winning today.", hearts: 88, flowers: 29, candles: 17 },
+            { text: "Smiling is exhausting.", hearts: 73, flowers: 21, candles: 10 },
+            { text: "I want to be heard.", hearts: 54, flowers: 19, candles: 9 },
+            { text: "Just getting by is hard enough.", hearts: 95, flowers: 33, candles: 18 },
+            { text: "I miss my childhood.", hearts: 134, flowers: 52, candles: 31 },
+            { text: "The future scares me.", hearts: 82, flowers: 28, candles: 16 },
+            { text: "I don't know who I am anymore.", hearts: 76, flowers: 25, candles: 13 },
+            { text: "Everyone expects so much from me.", hearts: 62, flowers: 20, candles: 11 },
+            { text: "I'm trying my best, but it feels like it's not enough.", hearts: 115, flowers: 42, candles: 24 },
+            { text: "I feel like a burden.", hearts: 98, flowers: 36, candles: 20 },
+            { text: "Why is it so hard to be happy?", hearts: 85, flowers: 30, candles: 15 },
+            { text: "I just want peace.", hearts: 145, flowers: 58, candles: 35 },
+            { text: "Life feels heavy right now.", hearts: 70, flowers: 23, candles: 12 }
         ];
 
         // Track placed notes for collision detection
@@ -935,7 +979,59 @@
             updateStatDisplay();
         }
 
-        function updateStatDisplay() {
+        // --- RENDERING ---
+        function createNoteElement(data, isFallback = false) {
+            const el = document.createElement('div');
+            el.className = 'note note-float-in'; // Added float-in
+            if (isFallback) el.classList.add('fallback-note');
+            el.dataset.noteId = data.id;
+
+            el.style.left = data.x + 'px';
+            el.style.top = data.y + 'px';
+
+            // Random Rotation (More organic: +/- 12 degrees)
+            const rot = (Math.random() * 24) - 12;
+            el.style.transform = `rotate(${rot}deg)`;
+
+            // Register Placement (if coming from server/fallback and not yet in state)
+            // This ensures collision detection works for subsequently loaded notes
+            const exists = STATE.placedNotes.some(n => Math.abs(n.x - data.x) < 1 && Math.abs(n.y - data.y) < 1);
+            if (!exists) {
+                STATE.placedNotes.push({ x: data.x, y: data.y, w: 340, h: 200 });
+            }
+
+            el.textContent = data.text;
+
+            const r = data.reactions || { heart: 0, flower: 0, candle: 0 };
+            const totalReactions = r.heart + r.flower + r.candle;
+
+            // Radiance Logic: More reactions = stronger soft glow
+            if (totalReactions > 5) {
+                const intensity = Math.min(totalReactions / 50, 1);
+                el.style.setProperty('--glow-radius', `${intensity * 40}px`);
+                el.style.setProperty('--glow-color', `rgba(244, 159, 117, ${intensity * 0.15})`);
+            }
+
+            // Check what user has already reacted to
+            const userReactions = JSON.parse(localStorage.getItem('soulamore_user_reactions') || '{}');
+            const noteReactions = userReactions[data.id] || [];
+
+            const uiHTML = `
+            <div class="mod-controls">
+                <button class="delete-btn" onclick="hideNoteGlobally('${data.id}')"><i class="fas fa-trash"></i> Hide</button>
+            </div>
+            <div class="note-meta"><span style="opacity:0.6;">Anonymous</span><span style="font-size:0.75rem;">${data.time}</span></div>
+            <div class="note-actions">
+                <button class="action-btn heart-btn ${noteReactions.includes('heart') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'heart', this)"><i class="fas fa-heart"></i> <span class="count">${r.heart}</span></button>
+                <button class="action-btn flower-btn ${noteReactions.includes('flower') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'flower', this)"><i class="fas fa-spa"></i> <span class="count">${r.flower}</span></button>
+                <button class="action-btn candle-btn ${noteReactions.includes('candle') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'candle', this)"><i class="fas fa-fire-alt"></i> <span class="count">${r.candle}</span></button>
+            </div>`;
+            el.insertAdjacentHTML('beforeend', uiHTML);
+            notesContainer.appendChild(el);
+        }
+        window.createNoteElement = createNoteElement;
+
+        function updateTotalStats() {
             const h = document.getElementById('totalHearts');
             const f = document.getElementById('totalFlowers');
             const c = document.getElementById('totalCandles');
@@ -1049,14 +1145,7 @@
             document.getElementById('writeModal').classList.remove('active');
         }
 
-        function sanitizeText(text) {
-            let clean = text;
-            OBSCENE_WORDS.forEach(word => {
-                const regex = new RegExp(`\\b${word}\\b`, 'gi');
-                clean = clean.replace(regex, '***');
-            });
-            return clean;
-        }
+
 
         function resetView(focusX = null, focusY = null) {
             // Default to center if no focus provided
@@ -1084,35 +1173,80 @@
         // --- 4. NOTE GENERATION (FIXED) ---
         // ... (existing code for generating random notes) ...
 
-        function postNote() {
+        async function postNote() {
             const input = document.getElementById('noteInput');
             const text = input.value.trim();
             if (!text) return;
 
-            const cleanText = sanitizeText(text);
+            // Play Sound
+            if (window.playSound) window.playSound('post');
 
-            const centerX = CONFIG.width / 2;
-            const centerY = CONFIG.height / 2;
-
-            // Randomly choose a safe spot outside the exclusion zone
-            // Exclusion is roughly 650x350 from center
-            // We'll pick a spot either well above or well below
-
-            const side = Math.random() > 0.5 ? 1 : -1;
-            const safeOffsetY = (350 + 100 + Math.random() * 200) * side; // +/- 450 to 650px vertical offset
-            const safeOffsetX = (Math.random() * 800) - 400; // Spread horizontally
-
-            const noteX = centerX + safeOffsetX;
-            const noteY = centerY + safeOffsetY;
-
-            // Create Note
-            createNoteElement(cleanText, noteX, noteY, "Just now", { heart: 0, flower: 0, candle: 0 });
-
-            // Focus View on New Note
-            resetView(noteX, noteY);
-
-            closeWriter();
+            const cleanText = window.sanitizeText(text); // Ensure this exists or use text
+            const pos = window.getGridPosition();
+            window.closeWriter();
             input.value = '';
+
+            // Optimistic Update
+            await postNoteToWall(cleanText, pos, (tempId, data) => {
+                // 1. Immediate Render
+                renderFirebaseNote(tempId, data);
+
+                // 2. Focus on the new note
+                // Since pos is derived from getGridPosition (center of screen), 
+                // the note should already be visible. We just ensure the user feels it.
+                // If they moved, we snap back.
+                if (window.resetView) window.resetView(pos.x, pos.y);
+
+                // 3. Highlight
+                setTimeout(() => {
+                    const el = document.querySelector(`.note[data-note-id="${tempId}"]`);
+                    if (el) {
+                        el.style.transition = "transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s";
+                        el.style.transform = "scale(1.15) rotate(-2deg)";
+                        el.style.zIndex = "1000";
+                        el.style.boxShadow = "0 20px 60px rgba(78, 205, 196, 0.4)"; // Teal glow
+
+                        setTimeout(() => {
+                            el.style.transform = "scale(1) rotate(0deg)";
+                            el.style.zIndex = "";
+                            el.style.boxShadow = "";
+                        }, 1200);
+                    }
+                }, 100);
+            });
+        };
+
+        window.firebaseReact = async function (noteId, type) {
+            await reactToNote(noteId, type);
+        };
+
+        window.firebaseHide = async function (noteId) {
+            await hideNote(noteId);
+        };
+
+        // --- MODERATOR SECRET (Restored) ---
+        let clickCount = 0;
+        let lastClick = 0;
+        document.addEventListener('click', (e) => {
+            // Secret: 5 clicks in the bottom-left corner
+            if (e.clientX < 100 && e.clientY > window.innerHeight - 100) {
+                const now = Date.now();
+                if (now - lastClick < 500) clickCount++;
+                else clickCount = 1;
+
+                lastClick = now;
+
+                if (clickCount >= 5) {
+                    toggleModMode();
+                    clickCount = 0;
+                }
+            }
+        });
+
+        function toggleModMode() {
+            document.body.classList.toggle('mod-mode');
+            const isMod = document.body.classList.contains('mod-mode');
+            if (isMod) alert("Moderator Mode Active. You can now hide inappropriate notes.");
         }
 
         // --- 6. FAKE LIVE COUNTERS ---

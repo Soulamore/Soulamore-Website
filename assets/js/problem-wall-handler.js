@@ -42,39 +42,50 @@ export function subscribeToWall(callback) {
  * Post a Problem
  * Adds a new anonymous post to Firestore.
  */
-export async function postProblem(text, isPublic = true) {
+/**
+ * Post a Note
+ * Supports Optimistic UI Updates
+ */
+export async function postNoteToWall(text, position, optimisticCallback) {
+    // 1. Optimistic Update (Immediate Feedback)
+    const tempId = 'temp-' + Date.now();
+    const noteData = {
+        text: text,
+        x: position.x,
+        y: position.y,
+        hearts: 0,
+        flowers: 0,
+        candles: 0,
+        createdAt: { seconds: Date.now() / 1000 }, // Mock timestamp
+        isSeeded: false,
+        isHidden: false
+    };
+
+    if (optimisticCallback) {
+        optimisticCallback(tempId, noteData);
+    }
+
+    // 2. Background Sync
     try {
-        // Large Canvas Logic (5000x5000)
-        // Center is 2500, 2500. We want to scatter around the center.
-        // Spread +/- 1000px
-        const centerX = 2500;
-        const centerY = 2500;
-        const spread = 1200;
-
-        // Random offset
-        const x = centerX + (Math.random() * spread * 2) - spread;
-        const y = centerY + (Math.random() * spread * 2) - spread;
-
-        // Random Pastel Color
-        const colors = ['#fffefb', '#fdfbf7', '#fefce8', '#f0f9ff', '#fff1f2'];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-
         await addDoc(collection(db, WALL_COLLECTION), {
             text: text,
-            isPublic: isPublic,
-            timestamp: serverTimestamp(),
-            color: color,
-            position: { x, y }, // Absolute px coordinates now
-            reactions: {
-                heart: 0,
-                flower: 0,
-                candle: 0
-            }
+            x: position.x,
+            y: position.y,
+            hearts: 0,
+            flowers: 0,
+            candles: 0,
+            createdAt: serverTimestamp(),
+            isSeeded: false,
+            isHidden: false
         });
+        // Note: We don't need to manually update the UI here because 
+        // the onSnapshot listener will fire when the data reaches the server
+        // and comes back. The UI should handle deduping if needed, 
+        // or we rely on the snap to replace the temp node.
         return { success: true };
     } catch (error) {
-        console.error("Error posting to wall:", error);
-        return { success: false, error: error.message };
+        console.error("Error posting note:", error);
+        return { success: false, error };
     }
 }
 
