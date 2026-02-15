@@ -1201,6 +1201,71 @@
             });
         }
 
+        // --- KEYBOARD NAVIGATION (Arrow Keys) ---
+        window.addEventListener('keydown', (e) => {
+            const step = 50;
+            switch(e.key) {
+                case 'ArrowUp': STATE.pointY += step; break;
+                case 'ArrowDown': STATE.pointY -= step; break;
+                case 'ArrowLeft': STATE.pointX += step; break;
+                case 'ArrowRight': STATE.pointX -= step; break;
+                default: return; // Exit if not arrow key
+            }
+            updateTransform();
+        });
+
+        // --- TOUCH EVENTS (Mobile Pan & Zoom) ---
+        let initialPinchDistance = null;
+        let initialScale = 1;
+
+        viewport.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.note') || e.target.closest('.wall-hero')) return;
+            
+            if (e.touches.length === 1) {
+                // Single touch: Pan
+                STATE.panning = true;
+                STATE.startX = e.touches[0].clientX - STATE.pointX;
+                STATE.startY = e.touches[0].clientY - STATE.pointY;
+            } else if (e.touches.length === 2) {
+                // Double touch: Pinch Zoom
+                STATE.panning = false;
+                initialPinchDistance = getPinchDistance(e);
+                initialScale = STATE.scale;
+            }
+        }, { passive: false });
+
+        viewport.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 1 && STATE.panning) {
+                e.preventDefault(); // Prevent scroll
+                STATE.pointX = e.touches[0].clientX - STATE.startX;
+                STATE.pointY = e.touches[0].clientY - STATE.startY;
+                requestAnimationFrame(updateTransform);
+            } else if (e.touches.length === 2 && initialPinchDistance) {
+                e.preventDefault();
+                const currentDistance = getPinchDistance(e);
+                const ratio = currentDistance / initialPinchDistance;
+                
+                const newScale = initialScale * ratio;
+                STATE.scale = Math.min(Math.max(0.4, newScale), 2.0);
+                
+                // Note: accurate pinch-zoom center is complex, centering on screen for now
+                updateTransform();
+                updateZoomUI();
+            }
+        }, { passive: false });
+
+        viewport.addEventListener('touchend', () => {
+            STATE.panning = false;
+            initialPinchDistance = null;
+        });
+
+        function getPinchDistance(e) {
+            return Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+        }
+
         function updateZoomUI() {
             if (zoomSlider) zoomSlider.value = STATE.scale;
             if (zoomLabel) zoomLabel.innerText = Math.round(STATE.scale * 100) + '%';

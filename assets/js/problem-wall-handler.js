@@ -72,6 +72,7 @@ function setupWallListeners(renderCallback, updateUICallback, statsCallback) {
 
     const processedIds = new Set();
     const stats = { hearts: 0, flowers: 0, candles: 0 };
+    let isFirstSnapshot = true;
 
     log("Attaching onSnapshot listener...");
     onSnapshot(q, (snapshot) => {
@@ -106,11 +107,19 @@ function setupWallListeners(renderCallback, updateUICallback, statsCallback) {
                 // log(`Rendering New Note: ${noteId}`);
                 renderCallback(noteId, data);
                 processedIds.add(noteId);
+
+                // AUDIO: Play sound for NEW REMOTE notes only
+                // 1. !isFirstSnapshot (Don't play on initial load)
+                // 2. !doc.metadata.hasPendingWrites (Don't play for my own local optimistic writes)
+                if (!isFirstSnapshot && !doc.metadata.hasPendingWrites && window.playSound) {
+                    window.playSound('post'); // Paper rustle sound
+                }
             } else {
                 updateUICallback(noteId, data);
             }
         });
 
+        isFirstSnapshot = false;
         if (statsCallback) statsCallback(stats);
     }, (error) => {
         log(`Snapshot ERROR: ${error.message} (${error.code})`);
