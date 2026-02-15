@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Content Security Policy: Prevent XSS and injection attacks -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; 
+                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/; 
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; 
+                 font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; 
+                 img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com; 
+                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/; 
+                 frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <meta name="description"
+        content="Log in to your Soulamore space. Choose your role to access your personalized wellness dashboard.">
+    <title>Login | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <link rel="stylesheet" href="../assets/css/auth.css">
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body class="auth">
+
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header></header>
+        </div>
+        <div id="particles"></div> <!-- Moved particles inside shell for z-index safety -->
+
+        <main id="shell-content" class="auth-shell">
+            <!-- Left Context Section -->
+            <section class="auth-left">
+                <div class="auth-context">
+                    <div class="hero-subhead-premium" style="margin-bottom: 10px;">Welcome Home</div>
+                    <h1 class="hero-title-premium" style="text-align: left; font-size: 3rem;">Your partner in<br>mental
+                        wellness</h1>
+                    <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 30px; font-weight: 300;">A
+                        safe space for reflection, support, and growth.</p>
+                    <ul class="auth-features">
+                        <li><i class="fas fa-shield-alt"></i> Secure & Private</li>
+                        <li><i class="fas fa-user-friends"></i> Trained Peers & Verified Psychologists</li>
+                        <li><i class="fas fa-clock"></i> 24/7 Support</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Right Login Section -->
+            <section class="auth-right">
+                <div class="login-card fade-in">
+                    <!-- LOGO -->
+                    <div class="login-logo">
+                        <img src="../assets/images/logo.png" alt="Soulamore" style="height: 60px; margin-bottom: 5px;">
+                    </div>
+                    <p style="opacity:0.7; margin-bottom:20px;">Welcome back to your space.</p>
+
+                    <!-- HORIZONTAL ROLE SELECTOR -->
+                    <div class="role-selector-pills">
+                        <div class="role-pill active" onclick="setRole(0)">
+                            <i class="fas fa-user"></i> User
+                        </div>
+                        <div class="role-pill" onclick="setRole(1)">
+                            <i class="fas fa-hands-helping"></i> Peer
+                        </div>
+                        <div class="role-pill" onclick="setRole(2)">
+                            <i class="fas fa-user-md"></i> Pro
+                        </div>
+                    </div>
+
+                    <!-- LOGIN FORM -->
+                    <!-- LOGIN FORM -->
+                    <form id="loginForm" onsubmit="event.preventDefault(); window.handleEmailLogin()">
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" id="emailInput" placeholder="you@example.com"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <div style="position:relative;">
+                                <input type="password" class="form-input" id="passInput" placeholder="••••••••"
+                                    required>
+                                <i class="fas fa-eye show-password-toggle" id="togglePassword"
+                                    style="position:absolute; right:12px; top:12px; opacity:0.5; cursor:pointer;"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-row"
+                            style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:0.85rem;">
+                            <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                                <input type="checkbox" id="rememberMe"> Remember me
+                            </label>
+                            <a href="#" style="color:var(--teal-glow); text-decoration:none;">Forgot Password?</a>
+                        </div>
+
+                        <button type="submit" class="submit-btn" style="position: relative; z-index: 10;">Log
+                            In</button>
+                    </form>
+
+                    <div class="divider"><span>OR</span></div>
+
+                    <!-- ADDITIVE V2 FEATURES -->
+                    <!-- COMPACT ADDITIVE FEATURES (Horizontal) -->
+                    <div
+                        style="display:flex; flex-direction:row; gap:10px; justify-content:space-between; margin-bottom:10px;">
+                        <button type="button" class="social-btn" onclick="togglePhoneModal()" title="Phone Login"
+                            style="width:auto; flex:1; justify-content:center; margin:0; padding:12px;">
+                            <i class="fas fa-phone"></i>
+                        </button>
+
+                        <button type="button" class="social-btn" id="googleSignInBtn" onclick="handleGoogleLogin()"
+                            title="Google Login"
+                            style="width:auto; flex:1; justify-content:center; margin:0; padding:12px;">
+                            <i class="fab fa-google" style="color:#EA4335;"></i>
+                        </button>
+
+                        <button type="button" class="social-btn" onclick="handleFacebookLogin()" title="Facebook Login"
+                            style="width:auto; flex:1; justify-content:center; margin:0; padding:12px;">
+                            <i class="fab fa-facebook-f" style="color:#1877F2;"></i>
+                        </button>
+                    </div>
+
+                    <!-- PHONE LOGIN MODAL OVERLAY -->
+                    <div id="phone-modal"
+                        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.8); backdrop-filter:blur(5px); z-index:100; align-items:center; justify-content:center; animation:fadeIn 0.2s ease-out;">
+                        <div
+                            style="background:var(--navy-glass); border:1px solid var(--border-glass); padding:30px; border-radius:20px; width:90%; max-width:350px; text-align:center; position:relative; box-shadow:0 25px 50px rgba(0,0,0,0.5);">
+
+                            <!-- Close Button -->
+                            <button onclick="togglePhoneModal()"
+                                style="position:absolute; top:15px; right:15px; background:none; border:none; color:white; font-size:1.2rem; cursor:pointer; opacity:0.7;">&times;</button>
+
+                            <h3 style="margin-bottom:20px; color:white;">Phone Login</h3>
+
+                            <div class="form-group" style="text-align:left;">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" id="params-phone" class="form-input" placeholder="+91 99999 99999"
+                                    value="+91" onkeydown="if(event.key === 'Enter') handlePhoneAction()">
+                            </div>
+
+                            <div id="otp-group" style="display:none; text-align:left; margin-top:15px;">
+                                <label class="form-label">Enter OTP</label>
+                                <input type="text" id="params-otp" class="form-input" placeholder="123456"
+                                    style="letter-spacing:4px; text-align:center;"
+                                    onkeydown="if(event.key === 'Enter') handlePhoneAction()">
+                            </div>
+
+                            <button type="button" id="phone-action-btn" class="submit-btn" onclick="handlePhoneAction()"
+                                style="margin-top:20px;">Send OTP</button>
+                            <div id="recaptcha-container"></div>
+                        </div>
+                    </div>
+
+
+
+                    <button type="button" onclick="handleDevBypass(event)"
+                        style="background:transparent; border:none; color:rgba(255,255,255,0.4); font-size:0.85rem; width:100%; margin:15px 0 0; cursor:pointer; text-decoration:underline;">
+                        &lt;/&gt; Developer Preview (Skip Login)
+                    </button>
+
+                    <div style="margin-top:20px; font-size:0.9rem;">
+                        New here? <a href="signup.html"
+                            onclick="sessionStorage.setItem('signupIntent', sessionStorage.getItem('loginIntent') || 'user')"
+                            style="color:var(--teal-glow); text-decoration:none; font-weight:600;">Create
+                            an account</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer></footer>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="../assets/js/components.js"></script>
+
+    <!-- Check if user is already logged in -->
+    <script type="module">
+        // Use the centralized Firebase config instead of initializing again
+        import { auth, onAuthStateChanged } from "../assets/js/firebase-config.js";
+
+        // Redirect if already logged in
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // LOOP PREVENTION: Check if we just came from a dashboard (meaning auth failed there)
+                const fromDashboard = document.referrer && document.referrer.includes('dashboard');
+                if (fromDashboard) {
+                    console.warn("⚠️ Redirect loop detected. Staying on login page to allow re-authentication.");
+                    // Optional: Sign out Firebase to clear the conflicting state
+                    // await auth.signOut(); 
+                    return;
+                }
+
+                // SESSION RESTORATION: Ensure localStorage has the session needed by auth-guard.js
+                const currentSession = localStorage.getItem("soulamore_session");
+                if (!currentSession) {
+                    console.log("Restoring missing session from Firebase auth...");
+                    const userRole = sessionStorage.getItem('userRole') || 'user'; // Fallback
+                    const sessionData = {
+                        isLoggedIn: true,
+                        userId: user.uid,
+                        email: user.email,
+                        role: userRole,
+                        name: user.displayName || "User",
+                        photoURL: user.photoURL || "../assets/images/default-avatar.png"
+                    };
+                    localStorage.setItem("soulamore_session", JSON.stringify(sessionData));
+                }
+
+                const role = sessionStorage.getItem('userRole') || (JSON.parse(localStorage.getItem("soulamore_session") || '{}').role) || 'user';
+                let dashboard = 'user-dashboard.html';
+                if (role === 'peer') dashboard = 'peer-dashboard.html';
+                if (role === 'psychologist') dashboard = 'psych-dashboard.html';
+                if (role === 'admin') dashboard = 'admin-dashboard.html';
+
+                console.log(`Auto-redirecting to ${dashboard}...`);
+                window.location.href = dashboard;
+            }
+        });
+    </script>
+
+    <!-- AUTH LOGIC (Modules) -->
+    <script type="module">
+        import { loginWithGoogle, loginWithEmail, loginWithFacebook, startPhoneLogin, completePhoneLogin, onAuthChange } from "../assets/js/auth-service.js"; // Added Facebook/Phone
+        import { handleRoleRouting } from "../assets/js/auth-context.js";
+        import { createOrUpdateUserProfile } from "../assets/js/profile-handler.js";
+        import { GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { RecaptchaVerifier, auth } from "../assets/js/firebase-config.js";
+
+        // --- PHONE STATE ---
+        let confirmationResult = null;
+        let recaptchaVerifier = null;
+
+        // --- PHASE 4: Deep Link Preservation ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnUrl = urlParams.get('returnUrl');
+        if (returnUrl) {
+            sessionStorage.setItem('returnUrl', returnUrl);
+        }
+
+        // --- PHASE 4: Browser Compatibility Check ---
+        function checkBrowserCompatibility() {
+            const isModernBrowser = 'fetch' in window && 'Promise' in window && 'assign' in Object;
+            if (!isModernBrowser) {
+                alert('⚠️ Your browser is outdated and may not support all features. Please update to the latest version of Chrome, Firefox, Safari, or Edge.');
+            }
+        }
+        checkBrowserCompatibility();
+
+        // --- PHASE 4: Google Multi-Account Selector ---
+        const googleProvider = new GoogleAuthProvider();
+        googleProvider.setCustomParameters({
+            prompt: 'select_account'  // Forces account picker every time
+        });
+
+        // --- EXPOSE AUTH FUNCTIONS (Module Loaded Successfully) ---
+        window.handlePhoneAction = async () => {
+            const phoneBtn = document.getElementById('phone-action-btn');
+            const phoneInput = document.getElementById('params-phone');
+            const otpInput = document.getElementById('params-otp');
+            const otpGroup = document.getElementById('otp-group');
+
+            try {
+                if (otpGroup.style.display === 'none') {
+                    // STEP 1: SEND OTP
+                    const phoneNumber = phoneInput.value.trim();
+                    if (!phoneNumber || !phoneNumber.startsWith('+')) {
+                        alert("Please enter phone number with country code (e.g., +919855520392)");
+                        return;
+                    }
+
+                    phoneBtn.innerText = "Sending OTP...";
+                    phoneBtn.disabled = true;
+
+                    // Initialize reCAPTCHA if not already done
+                    if (!recaptchaVerifier) {
+                        recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                            'size': 'invisible'
+                        });
+                    }
+
+                    const res = await startPhoneLogin(phoneNumber, recaptchaVerifier);
+                    if (res.success) {
+                        confirmationResult = res.confirmationResult;
+                        otpGroup.style.display = 'block';
+                        phoneBtn.innerText = "Verify & Login";
+                        phoneBtn.disabled = false;
+                        alert("✅ OTP Sent to your phone!");
+                    } else {
+                        // Better error handling
+                        let errorMsg = res.error || "Failed to send OTP";
+                        if (errorMsg.includes('operation-not-allowed')) {
+                            errorMsg = "Phone authentication is not enabled. Please contact support or use email login.";
+                        } else if (errorMsg.includes('invalid-phone-number')) {
+                            errorMsg = "Invalid phone number. Please include country code (e.g., +919501808162)";
+                        } else if (errorMsg.includes('recaptcha')) {
+                            errorMsg = "reCAPTCHA verification failed. Please refresh and try again.";
+                        }
+                        throw new Error(errorMsg);
+                    }
+                } else {
+                    // STEP 2: VERIFY OTP
+                    const code = otpInput.value.trim();
+                    if (!code || code.length !== 6) {
+                        alert("Please enter the 6-digit OTP code");
+                        return;
+                    }
+
+                    phoneBtn.innerText = "Verifying...";
+                    phoneBtn.disabled = true;
+
+                    const res = await completePhoneLogin(confirmationResult, code);
+                    if (res.success) {
+                        await createOrUpdateUserProfile(res.user);
+                        const intent = sessionStorage.getItem('loginIntent') || 'user';
+                        handleRoleRouting(res.user, intent);
+                    } else {
+                        throw new Error(res.error || "Invalid OTP code");
+                    }
+                }
+            } catch (e) {
+                console.error('Phone auth error:', e);
+                alert(e.message || "An error occurred. Please try again.");
+                phoneBtn.innerText = otpGroup.style.display === 'none' ? "Send OTP" : "Verify & Login";
+                phoneBtn.disabled = false;
+
+                // Reset reCAPTCHA on error
+                if (recaptchaVerifier) {
+                    recaptchaVerifier.clear();
+                    recaptchaVerifier = null;
+                }
+            }
+        };
+
+        window.handleFacebookLogin = async () => {
+            const fbBtn = document.querySelector('button[onclick="handleFacebookLogin()"]');
+            const intent = sessionStorage.getItem('loginIntent') || 'user';
+
+            try {
+                if (fbBtn) {
+                    fbBtn.disabled = true;
+                    fbBtn.style.opacity = '0.6';
+                    fbBtn.style.cursor = 'not-allowed';
+                    const originalHTML = fbBtn.innerHTML;
+                    fbBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                    const res = await loginWithFacebook();
+
+                    if (res.success) {
+                        await createOrUpdateUserProfile(res.user);
+
+                        // --- PEER ONBOARDING CHECK ---
+                        if (intent === 'peer') {
+                            const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                            const db = getFirestore();
+                            const userDoc = await getDoc(doc(db, "users", res.user.uid));
+
+                            if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                                window.location.href = 'peer-dashboard.html';
+                                return;
+                            }
+                        }
+
+                        // --- PSYCHOLOGIST ONBOARDING CHECK ---
+                        if (intent === 'psychologist') {
+                            const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                            const db = getFirestore();
+                            const userDoc = await getDoc(doc(db, "users", res.user.uid));
+
+                            if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                                window.location.href = 'psych-dashboard.html';
+                                return;
+                            }
+                        }
+
+                        await handleRoleRouting(res.user, intent);
+                    } else {
+                        let errorMsg = res.error || "Facebook login failed";
+                        if (errorMsg.includes('operation-not-allowed')) {
+                            errorMsg = "Facebook login is not enabled. Please contact support or use email login.";
+                        } else if (errorMsg.includes('popup-blocked')) {
+                            errorMsg = "Popup was blocked. Please allow popups for this site and try again.";
+                        } else if (errorMsg.includes('unauthorized-domain')) {
+                            errorMsg = "This domain is not authorized. Please contact support.";
+                        }
+                        throw new Error(errorMsg);
+                    }
+                } else {
+                    // Fallback if button not found
+                    const res = await loginWithFacebook();
+                    if (res.success) {
+                        await createOrUpdateUserProfile(res.user);
+                        const intent = sessionStorage.getItem('loginIntent') || 'user';
+                        await handleRoleRouting(res.user, intent);
+                    } else {
+                        throw new Error(res.error || "Facebook login failed");
+                    }
+                }
+            } catch (e) {
+                console.error('Facebook login error:', e);
+                let errorMsg = e.message || "Facebook login failed";
+                if (errorMsg.includes('operation-not-allowed')) {
+                    errorMsg = "Facebook login is not enabled. Please contact support or use email login.";
+                } else if (errorMsg.includes('popup-blocked')) {
+                    errorMsg = "Popup was blocked. Please allow popups for this site and try again.";
+                } else if (errorMsg.includes('unauthorized-domain')) {
+                    errorMsg = "This domain is not authorized. Please contact support.";
+                }
+                alert(errorMsg);
+                // Re-enable button on error
+                if (fbBtn) {
+                    fbBtn.disabled = false;
+                    fbBtn.style.opacity = '1';
+                    fbBtn.style.cursor = 'pointer';
+                    fbBtn.innerHTML = '<i class="fab fa-facebook-f" style="color:#1877F2;"></i>';
+                }
+            }
+        };
+
+        window.handleGoogleLogin = async () => {
+            const gBtn = document.getElementById('googleSignInBtn');
+            const intent = sessionStorage.getItem('loginIntent') || 'user';
+
+            try {
+                if (gBtn) {
+                    gBtn.disabled = true;
+                    gBtn.style.opacity = '0.6';
+                    gBtn.style.cursor = 'not-allowed';
+                    gBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+                }
+
+                const result = await loginWithGoogle();
+
+                console.log('Google login result:', result);
+
+                if (result.success) {
+                    // Check profile status
+                    const profileResult = await createOrUpdateUserProfile(result.user);
+                    const isNewUser = profileResult && profileResult.isNewUser;
+
+                    // --- PEER ONBOARDING CHECK ---
+                    if (intent === 'peer') {
+                        const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                        const db = getFirestore();
+                        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+                        if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                            window.location.href = 'peer-dashboard.html';
+                            return;
+                        }
+                    }
+
+                    // --- PSYCHOLOGIST ONBOARDING CHECK ---
+                    if (intent === 'psychologist') {
+                        const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                        const db = getFirestore();
+                        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+                        if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                            window.location.href = 'psych-dashboard.html';
+                            return;
+                        }
+                    }
+
+                    await handleRoleRouting(result.user, intent, isNewUser);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (e) {
+                console.error('Google login error:', e);
+                let errorMsg = e.message || e.code || "Google login failed";
+
+                // Check for specific Firebase error codes
+                if (e.code) {
+                    if (e.code === 'auth/operation-not-allowed') {
+                        errorMsg = "Google login is not enabled in Firebase Console. Please contact support.";
+                    } else if (e.code === 'auth/popup-blocked') {
+                        errorMsg = "Popup was blocked by your browser. Please allow popups for soulamore.com and try again.";
+                    } else if (e.code === 'auth/popup-closed-by-user') {
+                        errorMsg = "Sign-in was cancelled. Please try again.";
+                    } else if (e.code === 'auth/unauthorized-domain') {
+                        errorMsg = "This domain is not authorized. Please add soulamore.com to Firebase authorized domains.";
+                    } else if (e.code === 'auth/network-request-failed') {
+                        errorMsg = "Network error. Please check your internet connection and try again.";
+                    } else {
+                        errorMsg = `Google login failed: ${e.code} - ${e.message || 'Unknown error'}`;
+                    }
+                } else if (errorMsg.includes('operation-not-allowed')) {
+                    errorMsg = "Google login is not enabled in Firebase Console. Please contact support.";
+                } else if (errorMsg.includes('popup-blocked')) {
+                    errorMsg = "Popup was blocked. Please allow popups for this site and try again.";
+                } else if (errorMsg.includes('unauthorized-domain')) {
+                    errorMsg = "This domain is not authorized. Please contact support.";
+                }
+
+                console.error('Final error message:', errorMsg);
+                alert(errorMsg);
+                // Re-enable button on error
+                if (gBtn) {
+                    gBtn.disabled = false;
+                    gBtn.style.opacity = '1';
+                    gBtn.style.cursor = 'pointer';
+                    gBtn.innerHTML = '<i class="fab fa-google" style="color:#EA4335;"></i>';
+                }
+            }
+        };
+
+        // --- INIT RECAPTCHA (Called by UI script) ---
+        window.initRecaptcha = () => {
+            if (!recaptchaVerifier) {
+                recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    'size': 'invisible'
+                });
+            }
+        };
+
+        // --- EMAIL LOGIN (Exported to Window) ---
+        window.handleEmailLogin = async function () {
+            const intent = sessionStorage.getItem('loginIntent') || 'user';
+            const email = document.getElementById('emailInput').value.trim();
+            const pass = document.getElementById('passInput').value;
+            const submitBtn = document.querySelector('.submit-btn');
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            if (!email || !pass) {
+                alert("Please enter both email and password");
+                return;
+            }
+
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert("Please enter a valid email address");
+                return;
+            }
+
+            try {
+                // Disable submit button
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.6';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+                const result = await loginWithEmail(email, pass);
+                console.log('Email login result:', result);
+
+                if (result.success) {
+                    // Create/update user profile
+                    await createOrUpdateUserProfile(result.user);
+
+                    // Remember me functionality
+                    if (rememberMe) {
+                        localStorage.setItem('rememberedEmail', email);
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                    }
+
+                    // Check for returnUrl
+                    const returnUrl = sessionStorage.getItem('returnUrl');
+                    sessionStorage.removeItem('returnUrl');
+
+                    // --- PEER ONBOARDING CHECK ---
+                    if (intent === 'peer') {
+                        // Check if setup is complete
+                        const { getFirestore, doc, getDoc } = await
+                            import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                        const db = getFirestore();
+                        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+                        // IF user doc exists AND isSetupComplete is true, go to dashboard
+                        if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                            window.location.href = 'peer-dashboard.html';
+                            return;
+                        } else {
+                            // IF setup NOT complete, redirect to SETUP
+                            window.location.href = 'peer-setup.html';
+                            return;
+                        }
+                    }
+
+                    // --- PSYCHOLOGIST ONBOARDING CHECK ---
+                    if (intent === 'psychologist') {
+                        const { getFirestore, doc, getDoc } = await
+                            import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                        const db = getFirestore();
+                        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+                        if (userDoc.exists() && userDoc.data().isSetupComplete) {
+                            window.location.href = 'psych-dashboard.html';
+                            return;
+                        } else {
+                            window.location.href = 'psych-setup.html';
+                            return;
+                        }
+                    }
+
+                    await handleRoleRouting(result.user, intent);
+                } else {
+                    // Handle login error with specific Firebase error codes
+                    let errorMsg = result.error || "Login failed";
+                    const errorCode = result.code || result.error;
+
+                    if (errorCode) {
+                        if (errorCode === 'auth/user-not-found') {
+                            errorMsg = "No account found with this email. Please sign up first.";
+                        } else if (errorCode === 'auth/wrong-password') {
+                            errorMsg = "Incorrect password. Please try again or use 'Forgot Password?' to reset it.";
+                        } else if (errorCode === 'auth/invalid-email') {
+                            errorMsg = "Invalid email address. Please check and try again.";
+                        } else if (errorCode === 'auth/user-disabled') {
+                            errorMsg = "This account has been disabled. Please contact support.";
+                        } else if (errorCode === 'auth/too-many-requests') {
+                            errorMsg = "Too many failed login attempts. Please wait a few minutes and try again, or reset your password.";
+                        } else if (errorCode === 'auth/network-request-failed') {
+                            errorMsg = "Network error. Please check your internet connection and try again.";
+                        } else if (errorCode === 'auth/operation-not-allowed') {
+                            errorMsg = "Email/password login is not enabled. Please contact support.";
+                        } else {
+                            errorMsg = `Login failed: ${errorCode} - ${result.error || 'Unknown error'}`;
+                        }
+                    }
+
+                    console.error('Email login error:', errorCode, errorMsg);
+                    alert(errorMsg);
+                }
+            } catch (e) {
+                console.error('Email login exception:', e);
+                let errorMsg = e.message || "An unexpected error occurred. Please try again.";
+
+                if (e.code) {
+                    if (e.code === 'auth/user-not-found') {
+                        errorMsg = "No account found with this email. Please sign up first.";
+                    } else if (e.code === 'auth/wrong-password') {
+                        errorMsg = "Incorrect password. Please try again.";
+                    } else if (e.code === 'auth/invalid-email') {
+                        errorMsg = "Invalid email address format.";
+                    }
+                }
+
+                alert(errorMsg);
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.innerHTML = 'Log In';
+            }
+        };
+    </script>
+
+    <!-- SAFE FALLBACK SCRIPT (Runs even if Modules are blocked by CORS/File Protocol) -->
+    <script>
+        // UI Logic - Safe to run without Modules
+        window.togglePhoneModal = function () {
+            const modal = document.getElementById('phone-modal');
+            if (modal.style.display === 'none' || modal.style.display === '') {
+                modal.style.display = 'flex';
+                
+                // Check if we're on HTTPS
+                const isHTTPS = window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                
+                // Initialize reCAPTCHA when modal opens
+                const initRecaptchaWithRetry = (attempts = 0) => {
+                    if (window.initRecaptcha && typeof window.initRecaptcha === 'function') {
+                        try {
+                    window.initRecaptcha();
+                            // Clear any warning messages
+                            const recaptchaContainer = document.getElementById('recaptcha-container');
+                            if (recaptchaContainer && recaptchaContainer.querySelector('p')) {
+                                recaptchaContainer.innerHTML = '';
+                            }
+                        } catch (e) {
+                            console.error('Error initializing reCAPTCHA:', e);
+                            const recaptchaContainer = document.getElementById('recaptcha-container');
+                            if (recaptchaContainer) {
+                                recaptchaContainer.innerHTML = '<p style="color: #ef4444; font-size: 0.85rem; margin-top: 10px;">⚠️ Error initializing reCAPTCHA. Please refresh the page.</p>';
+                            }
+                        }
+                    } else if (attempts < 10) {
+                        // Retry up to 10 times (1 second total)
+                        setTimeout(() => initRecaptchaWithRetry(attempts + 1), 100);
+                } else {
+                        // Modules still not loaded after retries
+                        console.warn("Auth Module not loaded after retries");
+                        const recaptchaContainer = document.getElementById('recaptcha-container');
+                        if (recaptchaContainer) {
+                            if (!isHTTPS) {
+                                recaptchaContainer.innerHTML = '<p style="color: #f59e0b; font-size: 0.85rem; margin-top: 10px;">⚠️ Please ensure you are accessing this page via HTTPS (not file://). Authentication requires a secure connection.</p>';
+                            } else {
+                                recaptchaContainer.innerHTML = '<p style="color: #f59e0b; font-size: 0.85rem; margin-top: 10px;">⚠️ Authentication modules are still loading. Please wait a moment and try again.</p>';
+                            }
+                        }
+                    }
+                };
+                
+                // Start initialization with retry
+                setTimeout(() => initRecaptchaWithRetry(), 100);
+            } else {
+                modal.style.display = 'none';
+                // Clean up reCAPTCHA when modal closes
+                const recaptchaContainer = document.getElementById('recaptcha-container');
+                if (recaptchaContainer) {
+                    recaptchaContainer.innerHTML = '';
+                }
+            }
+        };
+
+        // Placeholders to prevent ReferenceError if clicked before module loads
+        // These will be overridden by the module script when it loads
+        if (!window.handleGoogleLogin) {
+            window.handleGoogleLogin = () => {
+                console.warn("Auth modules not loaded yet. Please wait...");
+                alert("System loading... Please wait a moment and try again. If this persists, ensure you're accessing via HTTPS (not file://).");
+            };
+        }
+        if (!window.handleFacebookLogin) {
+            window.handleFacebookLogin = () => {
+                console.warn("Auth modules not loaded yet. Please wait...");
+                alert("System loading... Please wait a moment and try again. If this persists, ensure you're accessing via HTTPS (not file://).");
+            };
+        }
+        if (!window.handlePhoneAction) {
+            window.handlePhoneAction = () => {
+                console.warn("Auth modules not loaded yet. Please wait...");
+                alert("System loading... Please wait a moment and try again. Authentication requires HTTPS (not file:// protocol).");
+            };
+        }
+    </script>
+
+    <script>
+        // --- PHASE 4: Mobile Keyboard Optimization ---
+        if ('visualViewport' in window) {
+            const viewport = window.visualViewport;
+            viewport.addEventListener('resize', () => {
+                // Adjust page when keyboard appears
+                document.body.style.height = `${viewport.height}px`;
+            });
+        }
+
+        // Friendly error message mapping
+        function getFriendlyErrorMessage(errorCode) {
+            const errorMap = {
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/user-disabled': 'This account has been disabled. Please contact support.',
+                'auth/user-not-found': 'No account found with this email. Please sign up first.',
+                'auth/wrong-password': 'Incorrect password. Please try again or reset your password.',
+                'auth/email-already-in-use': 'An account with this email already exists. Please log in instead.',
+                'auth/weak-password': 'Password should be at least 6 characters long.',
+                'auth/operation-not-allowed': 'This sign-in method is not enabled. Please contact support.',
+                'auth/too-many-requests': 'Too many failed attempts. Please wait a few minutes and try again.',
+                'auth/network-request-failed': 'Network error. Please check your internet connection and try again.',
+                'auth/popup-closed-by-user': 'Sign-in cancelled. Please try again if this was a mistake.',
+                'auth/popup-blocked': 'Popup blocked by your browser. Please allow popups for this site.',
+                'auth/unauthorized-domain': 'This domain is not authorized for authentication. Please contact support.',
+                'auth/invalid-credential': 'Invalid credentials. Please check your information and try again.',
+                'auth/account-exists-with-different-credential': 'An account already exists with this email but different sign-in method.',
+                'auth/cancelled-popup-request': 'Another sign-in popup is already open'
+            };
+            return errorMap[errorCode] || 'An unexpected error occurred. Please try again.';
+        }
+    </script>
+    </script>
+
+    <!-- SLIDER UI & BYPASS LOGIC (Global) -->
+    <script>
+        // --- 0. PASSWORD VISIBILITY TOGGLE ---
+        const togglePassword = document.getElementById('togglePassword');
+        const passInput = document.getElementById('passInput');
+        if (togglePassword && passInput) {
+            togglePassword.addEventListener('click', function () {
+                const type = passInput.type === 'password' ? 'text' : 'password';
+                passInput.type = type;
+                const icon = this.querySelector('i');
+                icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+            });
+        }
+
+        // --- 0.5 CAPS LOCK WARNING ---
+        if (passInput) {
+            passInput.addEventListener('keyup', function (event) {
+                const capsWarning = document.getElementById('capsWarning') || (() => {
+                    const warning = document.createElement('div');
+                    warning.id = 'capsWarning';
+                    warning.style.cssText = 'color: #F49F75; font-size: 0.85rem; margin-top: 5px; display: none;';
+                    warning.innerHTML = '<i class="fas fa-exclamation-triangle"></i> CAPS LOCK is ON';
+                    this.parentElement.appendChild(warning);
+                    return warning;
+                })();
+
+                const isCapsOn = event.getModifierState && event.getModifierState('CapsLock');
+                capsWarning.style.display = isCapsOn ? 'block' : 'none';
+            });
+        }
+
+        // ---  0.6 NETWORK STATUS CHECK ---
+        window.addEventListener('offline', () => {
+            alert('⚠️ You are offline. Please check your internet connection.');
+        });
+
+        if (!navigator.onLine) {
+            console.log('No internet connection detected on page load');
+        }
+
+        // --- PHASE 4: Auto-fill Remembered Email ---
+        const rememberedEmail = localStorage.getItem('rememberedEmail');
+        if (rememberedEmail) {
+            const emailInput = document.getElementById('emailInput');
+            if (emailInput) {
+                emailInput.value = rememberedEmail;
+                document.getElementById('rememberMe').checked = true;
+            }
+        }
+
+        // --- 1. HORIZONTAL PILL ROLE SELECTOR LOGIC ---
+        const roles = [
+            // User: Peach (Neutral), No Glow, Astronaut Icon
+            { t: "I'm Here to Talk", d: "Personal reflection, support, and journaling.", c: "#F49F75", i: "fas fa-user-astronaut", v: false, code: "user", glow: false },
+            // Peer: Peach Glow + Hands Icon
+            { t: "I'm a Peer", d: "Supporting others through lived experience.", c: "#F49F75", i: "fas fa-hands-helping", v: true, code: "peer", glow: true },
+            // Pro: Teal Glow + Doctor Icon
+            { t: "I'm a Psychologist", d: "Professional support and clinical guidance.", c: "#4ECDC4", i: "fas fa-user-md", v: true, code: "psychologist", glow: true }
+        ];
+
+        function setRole(index) {
+            const r = roles[index];
+
+            // Update pill active states with dynamic theme colors
+            const pills = document.querySelectorAll('.role-pill');
+            pills.forEach((pill, i) => {
+                // Update Icon based on role config
+                const icon = pill.querySelector('i');
+                if (icon) icon.className = roles[i].i;
+
+                if (i === index) {
+                    pill.classList.add('active');
+                    // Dynamic Theme: Apply Role Color to Background & Border
+                    pill.style.background = roles[i].glow ? roles[i].c : 'rgba(255, 255, 255, 0.15)'; // Default highlight for User
+                    pill.style.borderColor = roles[i].glow ? roles[i].c : 'rgba(255, 255, 255, 0.3)';
+                    pill.style.color = roles[i].glow ? '#0f172a' : '#fff'; // Dark text for colored buttons, White for User
+
+                    // Add glow effect ONLY if enabled (Peer/Pro)
+                    if (roles[i].glow) {
+                        pill.style.boxShadow = `0 0 15px ${roles[i].c}66`;
+                    } else {
+                        pill.style.boxShadow = 'none';
+                    }
+                } else {
+                    pill.classList.remove('active');
+                    // Reset inline styles
+                    pill.style.background = '';
+                    pill.style.borderColor = '';
+                    pill.style.color = '';
+                    pill.style.boxShadow = '';
+                }
+            });
+
+            // Save role to session
+            sessionStorage.setItem('loginIntent', r.code);
+        }
+
+        // Init - select first pill
+        setRole(0);
+
+        // --- 2. DEV BYPASS ---
+        // --- 2. DEV BYPASS ---
+        function handleDevBypass(event) {
+            if (event) event.preventDefault(); // FIX: Prevent form submission/reload
+
+            const intent = sessionStorage.getItem('loginIntent') || 'user';
+            const btn = document.querySelector('button[onclick="handleDevBypass()"]'); // This selector might fail if not exact match in DOM
+            // Better: use event.target if available
+            if (btn) btn.innerHTML = 'Entered Dev Mode...';
+
+            // Mock Data based on Role
+            const mockUser = {
+                uid: 'dev-' + intent,
+                displayName: 'Dev ' + intent.charAt(0).toUpperCase() + intent.slice(1),
+                email: intent + '@soulamore.dev',
+                isDev: true
+            };
+
+            // NEW: Create valid session compatible with auth-guard.js
+            const session = {
+                isLoggedIn: true,
+                userId: 'dev-' + intent,
+                role: intent,
+                email: intent + '@soulamore.dev'
+            };
+
+            localStorage.setItem('soulamore_session', JSON.stringify(session));
+
+            // Legacy fallbacks (optional but safe)
+            sessionStorage.setItem('user', JSON.stringify(mockUser));
+            sessionStorage.setItem('userRole', intent);
+
+            console.log(`Bypassing login as [${intent}]...`);
+            setTimeout(() => { manualRedirect(intent); }, 500);
+        }
+
+        function manualRedirect(intent) {
+            let target = 'user-dashboard.html';
+            if (intent === 'peer') target = 'peer-dashboard.html';
+            if (intent === 'psychologist' || intent === 'pro') target = 'psych-dashboard.html'; // Handle 'pro' alias
+
+            console.log(`Redirecting to: ${target}`);
+            window.location.href = target;
+        }
+        window.manualRedirect = manualRedirect;
+
+        // --- 3. PARTICLES ---
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 4 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            particleContainer.appendChild(p);
+        }
+    </script>
+
+</body>
+
+</html>

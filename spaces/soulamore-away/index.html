@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Navigate the Unknown with Soulamore. Resources, stories, and connection for students living away from home. You are not alone in this orbit.">
+    <title>Navigate the Unknown | Soulamore Away</title>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soulamore.com/spaces/soulamore-away.html">
+    <meta property="og:title" content="Navigate the Unknown | Soulamore Away">
+    <meta property="og:description"
+        content="Living away from home? Find your footing with curated resources, relatable stories, and a community that gets it.">
+    <meta property="og:image" content="https://soulamore-f0a64.web.app/assets/images/logo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://soulamore.com/spaces/soulamore-away.html">
+    <meta name="twitter:title" content="Navigate the Unknown | Soulamore Away">
+    <meta name="twitter:description"
+        content="Living away from home? Find your footing with curated resources, relatable stories, and a community that gets it.">
+    <meta name="twitter:image" content="https://soulamore-f0a64.web.app/assets/images/logo.png">
+    <!-- GLOBAL ASSETS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="icon" href="../../assets/images/favicons/favicon_earth.svg" type="image/svg+xml">
+
+    <!-- Presence System -->
+    <script type="module" src="../../assets/js/firebase-config.js"></script>
+    <script type="module" src="../../assets/js/presence-handler.js"></script>
+
+    <style>
+        /* --- DESIGN SYSTEM: ORBITAL THEME (Enhanced) --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.6);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --earth-blue: #3b82f6;
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #3b82f6 100%);
+            --insta-gradient: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 10%, rgba(59, 130, 246, 0.15), transparent 60%);
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 110px 24px 100px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- BACKGROUND LAYERS --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        /* MISSING CSS FOR FLOATING TEXT */
+        #atmosphere {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .geo-tag {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.15);
+            /* Faint text */
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            animation: floatUp linear infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(110vh) scale(0.8);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 0.4;
+            }
+
+            80% {
+                opacity: 0.4;
+            }
+
+            to {
+                transform: translateY(-10vh) scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        /* --- HERO --- */
+        .hero {
+            padding: 0 0 100px;
+            text-align: center;
+            position: relative;
+        }
+
+        .globe-icon {
+            font-size: 5rem;
+            margin-bottom: 30px;
+            display: inline-block;
+            animation: spinGlobe 20s linear infinite, glowPulse 4s infinite alternate;
+            filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.5));
+        }
+
+        @keyframes spinGlobe {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes glowPulse {
+            0% {
+                filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.4));
+            }
+
+            100% {
+                filter: drop-shadow(0 0 50px rgba(78, 205, 196, 0.6));
+            }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto 50px;
+            font-weight: 300;
+        }
+
+        /* --- POSTCARD (Floating) --- */
+        .postcard-box {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            color: #333;
+            padding: 40px;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+            transform: rotate(-1deg);
+            transition: 0.5s;
+            animation: floatCard 6s ease-in-out infinite;
+        }
+
+        @keyframes floatCard {
+
+            0%,
+            100% {
+                transform: rotate(-1deg) translateY(0);
+            }
+
+            50% {
+                transform: rotate(-1deg) translateY(-15px);
+            }
+        }
+
+        .postcard-box:hover {
+            transform: rotate(0deg) scale(1.02);
+            box-shadow: 0 30px 100px rgba(78, 205, 196, 0.2);
+            animation-play-state: paused;
+        }
+
+        .postcard-box::after {
+            content: '✈️';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 70px;
+            height: 80px;
+            border: 2px dotted #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #ccc;
+            transform: rotate(5deg);
+        }
+
+        .paper-input {
+            width: 100%;
+            height: 120px;
+            background: transparent;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            padding: 10px 0;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            resize: none;
+            outline: none;
+            line-height: 2;
+            background-image: repeating-linear-gradient(transparent, transparent 31px, #eee 32px);
+        }
+
+        .send-btn {
+            background: var(--deep-space);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            margin-top: 25px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            background: var(--earth-blue);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        /* --- MIGRATION STATS --- */
+        .migration-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            margin-bottom: 80px;
+        }
+
+        @media (max-width: 768px) {
+            .migration-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mig-num {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--earth-blue);
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            display: block;
+            line-height: 1.1;
+            font-family: 'Outfit';
+        }
+
+        .mig-label {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- REALITIES GRID (Enhanced) --- */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 60px;
+        }
+
+        .challenge-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 35px;
+            border-radius: 24px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .challenge-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(78, 205, 196, 0.1), transparent 60%);
+            opacity: 0;
+            transition: 0.4s;
+        }
+
+        .challenge-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--teal-glow);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 20px rgba(78, 205, 196, 0.2);
+        }
+
+        .challenge-card:hover::before {
+            opacity: 1;
+        }
+
+        .icon-header {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--peach-glow);
+            transition: 0.3s;
+        }
+
+        .challenge-card:hover .icon-header {
+            transform: scale(1.1);
+            text-shadow: 0 0 15px var(--peach-glow);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            opacity: 0.75;
+            line-height: 1.7;
+        }
+
+        /* --- RADAR SECTION --- */
+        .radar-section {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(15, 23, 42, 0.4) 100%);
+            padding: 80px;
+            border-radius: 40px;
+            border: 1px solid var(--border-glass);
+            text-align: center;
+            margin: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .radar-box {
+            position: relative;
+            z-index: 2;
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        .loc-input {
+            flex: 1;
+            padding: 18px 25px;
+            border-radius: 50px;
+            border: 1px solid var(--border-glass);
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .loc-btn {
+            padding: 18px 40px;
+            border-radius: 50px;
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+            transition: 0.3s;
+        }
+
+        .loc-btn:hover {
+            box-shadow: 0 0 40px rgba(78, 205, 196, 0.6);
+            transform: scale(1.05);
+        }
+
+        /* --- AUDIO CONTROL --- */
+        .audio-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            /* Increased from 99 */
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-glass);
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: 0.3s;
+        }
+
+        .audio-control:hover {
+            border-color: var(--teal-glow);
+        }
+
+        @media(max-width: 768px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .migration-grid,
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .location-input-group {
+                flex-direction: column;
+            }
+        }
+
+        /* --- MISSING STYLES FIX --- */
+        .location-input-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        /* --- PEER PROFILES --- */
+        .peer-section {
+            margin: 100px 0;
+        }
+
+        .peer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .peer-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 30px;
+            border-radius: 24px;
+            text-align: center;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .peer-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--teal-glow);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .avatar-placeholder {
+            width: 80px;
+            height: 80px;
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            font-size: 2rem;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .status-dot {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--teal-glow);
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--teal-glow);
+            border-radius: 50%;
+            box-shadow: 0 0 0 rgba(78, 205, 196, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(78, 205, 196, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(78, 205, 196, 0);
+            }
+        }
+
+        .book-btn {
+            background: transparent;
+            border: 1px solid var(--border-glass);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .book-btn:hover {
+            background: white;
+            color: var(--deep-space);
+        }
+
+        /* --- INSTAGRAM SECTION --- */
+        .insta-section {
+            text-align: center;
+            margin: 100px 0 150px;
+        }
+
+        .insta-card {
+            max-width: 500px;
+            margin: 50px auto;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .insta-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .insta-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .insta-avatar {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            border-radius: 50%;
+        }
+
+        .slider-window {
+            height: 300px;
+            background: #111;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .slide-content {
+            font-size: 1.2rem;
+            font-style: italic;
+            line-height: 1.6;
+            transition: opacity 0.2s;
+        }
+
+        .slide-btn {
+            position: absolute;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: 0.3s;
+        }
+
+        .slide-btn:hover {
+            opacity: 1;
+        }
+
+        .slide-btn.prev {
+            left: 10px;
+        }
+
+        .slide-btn.next {
+            right: 10px;
+        }
+
+        .insta-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            color: black;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            margin-top: 30px;
+            transition: 0.3s;
+        }
+
+        .insta-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .container {
+                padding: 120px 20px 80px;
+            }
+
+            .migration-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .postcard-box {
+                transform: rotate(0deg);
+                /* No rotation on mobile */
+                animation: none;
+                /* Disable float to prevent overflow */
+                margin: 0 10px;
+                /* Safety margin */
+            }
+
+            .postcard-box:hover {
+                transform: none;
+            }
+
+            .postcard-box::after {
+                top: -10px;
+                right: 0;
+            }
+        }
+    </style>
+    <link rel="icon" href="./assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <!-- GLOBAL HEADER (ISLAND STYLE) -->
+    <div id="app-shell">
+
+        <!-- GLOBAL HEADER (ISLAND STYLE) -->
+        <div id="shell-fixed">
+            <header></header>
+        </div>
+
+        <!-- AUDIO -->
+        <audio id="ambientAudio" loop>
+            <!-- Using Google Sounds (Reliable Cafe Ambience) -->
+            <source src="https://actions.google.com/sounds/v1/nature/river_small.ogg" type="audio/ogg">
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+        </audio>
+        <div class="audio-control" onclick="toggleAudio()">
+            <div class="audio-bars" id="audioVisualizer">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <span id="audioText">Play Travel Ambience</span>
+        </div>
+
+        <!-- PARTICLES & GEO-TAGS -->
+        <div id="particles"></div>
+        <div id="atmosphere"></div>
+
+        <main id="shell-content">
+            <div class="container">
+
+                <!-- HERO -->
+                <section class="hero fade-in">
+                    <div class="globe-icon">🌍</div>
+                    <div class="hero-subhead-premium">From Foreign to Familiar</div>
+                    <h1 class="hero-title-premium">Navigate the Unknown Together</h1>
+                    <p
+                        style="font-size: 1.25rem; opacity: 0.8; max-width: 800px; margin: 0 auto 50px; font-weight: 300;">
+                        Moving to a new country is an adventure filled with excitement, but it can also bring feelings
+                        of
+                        homesickness and loneliness. We're here to offer a compassionate ear and a friendly voice.
+                        <br><br>Let's make living abroad feel a little more like home.
+                    </p>
+
+                    <!-- Quick Nav to Sub-pages -->
+                    <div style="margin-bottom: 50px;">
+                        <a href="soulamore-away/who-its-for.html" class="insta-cta"
+                            style="background: var(--teal-glow); color: var(--deep-space); margin: 10px;">Who Is This
+                            For?</a>
+                        <a href="soulamore-away/resources.html" class="insta-cta"
+                            style="background: transparent; border: 1px solid var(--teal-glow); color: var(--teal-glow); margin: 10px;">Explore
+                            Resources</a>
+                    </div>
+
+                    <!-- POSTCARD INTERACTION -->
+                    <div class="postcard-box" id="postcardContainer">
+                        <div style="font-family:'Courier New'; font-size:0.9rem; margin-bottom:10px; color:#999;">From:
+                            Me
+                            <br>To: The World
+                        </div>
+                        <textarea class="paper-input" id="messageText"
+                            placeholder="What do you miss the most right now? (Type here...)"></textarea>
+                        <button class="send-btn" onclick="sendPostcard()">Send to the Community <i
+                                class="fas fa-paper-plane"></i></button>
+                    </div>
+
+                    <div id="postSuccess" style="display:none; margin-top:30px; text-align:center;">
+                        <h3 style="color:var(--teal-glow);">Message Sent. ✈️</h3>
+                        <p>You are not alone in this feeling.</p>
+                        <button onclick="location.reload()"
+                            style="background:none; border:none; color:#999; text-decoration:underline; cursor:pointer;">Write
+                            another</button>
+                    </div>
+                </section>
+
+                <!-- MIGRATION DATA -->
+                <div class="stats-section fade-in">
+                    <div class="migration-grid">
+                        <div>
+                            <span class="mig-num" id="stat1">0</span>
+                            <div class="mig-label">Students Abroad</div>
+                        </div>
+                        <div>
+                            <span class="mig-num" id="stat2">0</span>
+                            <div class="mig-label">New This Year</div>
+                        </div>
+                        <div>
+                            <span class="mig-num" id="stat3">0</span>
+                            <div class="mig-label">Community Peers</div>
+                        </div>
+                    </div>
+                    <p style="text-align: center; margin-top: 20px; opacity: 0.7; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> Over 6 million students study outside their home country. We
+                        are
+                        a global family.
+                    </p>
+                </div>
+
+                <!-- THE 8 REALITIES (FULL CONTENT INTEGRATION) -->
+                <div class="section-header" style="text-align:center; margin-top:100px;">
+                    <h2>The Realities of Moving Abroad</h2>
+                    <p style="opacity:0.6; max-width: 600px; margin: 0 auto 10px;">Our compassionate community is here
+                        to
+                        guide and support you. You don't have to face these challenges alone.</p>
+                </div>
+                <div class="grid-layout fade-in">
+                    <!-- 1 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-earth-americas"></i></div>
+                        <div class="card-title">Cultural Shock & Isolation</div>
+                        <div class="card-desc">The shift to a new country often comes with cultural differences that may
+                            lead to feelings of isolation. Hearing stories helps you find connection.</div>
+                    </div>
+                    <!-- 2 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-home"></i></div>
+                        <div class="card-title">Homesickness</div>
+                        <div class="card-desc">The longing for familiar faces and places is common. Knowing that others
+                            have
+                            experienced this offers comfort and shared understanding.</div>
+                    </div>
+                    <!-- 3 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-coins"></i></div>
+                        <div class="card-title">Financial Stress</div>
+                        <div class="card-desc">Managing finances in a new country can be stressful. Get practical advice
+                            on
+                            budgeting and navigating financial uncertainties.</div>
+                    </div>
+                    <!-- 4 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-battery-quarter"></i></div>
+                        <div class="card-title">Expat Burnout</div>
+                        <div class="card-desc">The pressure of adapting to a new culture can lead to burnout. Hearing
+                            strategies from others can encourage self-care.</div>
+                    </div>
+                    <!-- 5 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-language"></i></div>
+                        <div class="card-title">Language Barriers</div>
+                        <div class="card-desc">Mastering a new language can be overwhelming. Others who have faced this
+                            can
+                            share tips on overcoming communication barriers.</div>
+                    </div>
+                    <!-- 6 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-briefcase"></i></div>
+                        <div class="card-title">Work Environment</div>
+                        <div class="card-desc">Adapting to professional norms can be daunting. Learn from the
+                            experiences of
+                            those who have successfully integrated.</div>
+                    </div>
+                    <!-- 7 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-hospital-user"></i></div>
+                        <div class="card-title">Healthcare System</div>
+                        <div class="card-desc">Understanding a new healthcare system can be confusing. Peers can provide
+                            valuable insights on accessing proper care.</div>
+                    </div>
+                    <!-- 8 -->
+                    <div class="challenge-card">
+                        <div class="icon-header"><i class="fas fa-compass"></i></div>
+                        <div class="card-title">Uncertainty</div>
+                        <div class="card-desc">From visa processes to adjusting to a new lifestyle. Hearing stories
+                            helps
+                            you offer perspectives on embracing the unknown.</div>
+                    </div>
+                </div>
+
+                <!-- PEER RADAR (Location Finder) -->
+                <div class="radar-section fade-in">
+                    <div class="radar-ring"></div>
+                    <div class="radar-box">
+                        <i class="fas fa-map-marker-alt"
+                            style="font-size: 2.5rem; color: var(--peach-glow); margin-bottom: 15px;"></i>
+                        <h2>Are you alone in your city?</h2>
+                        <p style="opacity:0.8;">Enter your city to check if a Soulamore Peer is nearby.</p>
+                        <div class="location-input-group">
+                            <input type="text" id="cityInput" class="loc-input"
+                                placeholder="e.g. Berlin, London, Toronto...">
+                            <button class="loc-btn" onclick="findPeers()">Scan Area</button>
+                        </div>
+                        <div id="radarResult" class="radar-result"></div>
+                    </div>
+                </div>
+
+                <!-- PEER PROFILES -->
+                <div class="peer-section fade-in">
+                    <div class="section-header" style="text-align:center;">
+                        <h2>Get in Touch</h2>
+                        <p style="opacity:0.6; max-width: 700px; margin: 0 auto;">Remember, you're not alone. Connect
+                            with
+                            experienced peers who have been through similar situations and are ready to provide support.
+                        </p>
+                    </div>
+                    <div class="peer-grid">
+                        <!-- Peer 1 -->
+                        <div class="peer-card">
+                            <div class="status-dot">
+                                <div class="pulse"></div> Online
+                            </div>
+                            <div class="avatar-placeholder">L</div>
+                            <h3>Lakshit</h3>
+                            <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">"Living abroad is a unique
+                                experience, that I've embraced with open arms and, at times, weary hearts."</p>
+                            <button class="book-btn">Read More</button>
+                        </div>
+                        <!-- Peer 2 -->
+                        <div class="peer-card">
+                            <div class="status-dot">
+                                <div class="pulse"></div> Online
+                            </div>
+                            <div class="avatar-placeholder">A</div>
+                            <h3>Aditya</h3>
+                            <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">"Finding Hope in Hard Times:
+                                We're
+                                Here for You."</p>
+                            <button class="book-btn">Read More</button>
+                        </div>
+                        <!-- Peer 3 -->
+                        <div class="peer-card">
+                            <div class="status-dot">
+                                <div class="pulse"></div> Online
+                            </div>
+                            <div class="avatar-placeholder" style="background:var(--peach-glow);">Aa</div>
+                            <h3>Aarti</h3>
+                            <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">"Healing touch to the Soul,
+                                Making
+                                Abroad Feel Like Home."</p>
+                            <button class="book-btn">Read More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INSTAGRAM CAROUSEL -->
+                <div class="insta-section fade-in">
+                    <h2>The Digital Campfire</h2>
+                    <p style="opacity:0.7;">We don't post hacks. We post hope. <br>Follow for community stories and
+                        daily
+                        reminders.</p>
+
+                    <div class="insta-card">
+                        <div class="insta-header">
+                            <div class="insta-user">
+                                <div class="insta-avatar"></div> soulamore_
+                            </div>
+                            <i class="fas fa-ellipsis-h" style="color:#aaa;"></i>
+                        </div>
+
+                        <!-- SLIDER AREA -->
+                        <div class="slider-window">
+                            <button class="slide-btn prev" onclick="changeSlide(-1)"><i
+                                    class="fas fa-chevron-left"></i></button>
+                            <div class="slide-content" id="slideText">
+                                "It's okay if you didn't fall in love with your new city immediately. Give it time." 🧡
+                            </div>
+                            <button class="slide-btn next" onclick="changeSlide(1)"><i
+                                    class="fas fa-chevron-right"></i></button>
+                        </div>
+
+                        <div style="text-align:left; margin-top:15px; font-size:0.85rem; display:flex; gap:15px;">
+                            <i class="far fa-heart" style="font-size:1.2rem;"></i> <i class="far fa-comment"
+                                style="font-size:1.2rem;"></i> <i class="far fa-paper-plane"
+                                style="font-size:1.2rem;"></i>
+                        </div>
+                        <div style="text-align:left; margin-top:10px; font-weight:600; font-size:0.8rem;">342 likes
+                        </div>
+                    </div>
+
+                    <a href="https://www.instagram.com/soulamore_/" target="_blank" class="insta-cta"><i
+                            class="fab fa-instagram"></i> Join
+                        the Circle</a>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- GLOBAL FOOTER (HASHLILLY STANDARD) -->
+
+
+
+    <!-- STANDARDIZED FOOTER -->
+    <!-- STANDARDIZED FOOTER -->
+    <footer class="away-footer"></footer>
+
+    <script src="../../assets/js/components.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script>
+        // --- 1. MIGRATION STATS ANIMATION ---
+        function animateValue(id, start, end, duration, suffix = "") {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                let currentVal = Math.floor(progress * (end - start) + start);
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = currentVal.toLocaleString() + suffix;
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target.classList.contains('stats-section')) {
+                        animateValue("stat1", 0, 6400000, 2500, "+"); // 6.4 Million
+                        animateValue("stat2", 0, 1200000, 2500, "+"); // 1.2 Million
+                        animateValue("stat3", 0, 850, 2000);
+                        observer.unobserve(entry.target);
+                    }
+                }
+            });
+        });
+        const statsSection = document.querySelector('.stats-section');
+        if (statsSection) observer.observe(statsSection);
+
+        // --- 2. INSTAGRAM SLIDER ---
+        const slides = [
+            "\"It's okay if you didn't fall in love with your new city immediately. Give it time.\" 🧡",
+            "\"Your accent is your history. Don't hide it. Wear it proudly.\"",
+            "\"Loneliness is just the tuition fee for independence. It gets better.\"",
+            "\"You are growing in ways you can't even see yet. Keep going.\"",
+            "\"Home isn't just a place. It's the people who make you feel seen.\""
+        ];
+        let currentSlide = 0;
+        const slideText = document.getElementById('slideText');
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide >= slides.length) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = slides.length - 1;
+
+            // Fade out, change text, fade in
+            slideText.style.opacity = 0;
+            setTimeout(() => {
+                slideText.innerText = slides[currentSlide];
+                slideText.style.opacity = 1;
+            }, 200);
+        }
+
+        // --- 3. PEER RADAR ---
+        function findPeers() {
+            const cityInput = document.getElementById('cityInput');
+            const result = document.getElementById('radarResult');
+            const btn = document.querySelector('.loc-btn');
+
+            if (!cityInput || cityInput.value.trim() === "") return;
+            const city = cityInput.value.trim();
+
+            btn.innerText = "Scanning...";
+            setTimeout(() => {
+                let count = Math.floor(Math.random() * 30) + 5;
+                if (city.toLowerCase() === "berlin") count = 42;
+                result.style.display = "block";
+                // Sanitize input
+                const escapeHTML = (str) => str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
+                const safeCity = escapeHTML(city);
+
+                result.innerHTML = `<i class="fas fa-users"></i> We found <span style="color:white; font-size:1.5rem;">${count}</span> peers near ${safeCity} ready to help!`;
+                btn.innerText = "Scan Area";
+            }, 1500);
+        }
+
+        // --- PARTICLES ---
+        const particleContainer = document.getElementById('particles');
+        if (particleContainer) {
+            for (let i = 0; i < 30; i++) {
+                let p = document.createElement('div');
+                p.classList.add('particle');
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.width = Math.random() * 5 + 'px';
+                p.style.height = p.style.width;
+                p.style.animationDuration = Math.random() * 20 + 10 + 's';
+                particleContainer.appendChild(p);
+            }
+        }
+
+        // --- BACKGROUND ATMOSPHERE ---
+        const atmosphere = document.getElementById('atmosphere');
+        const labels = ["Hello", "Hallo", "Hola", "Namaste", "Bonjour", "Ciao", "Salaam", "Home", "Distance", "Dreams"];
+
+        if (atmosphere) {
+            setInterval(() => {
+                let t = document.createElement('div');
+                t.classList.add('geo-tag');
+                t.innerText = labels[Math.floor(Math.random() * labels.length)];
+                t.style.left = Math.random() * 90 + 'vw';
+                t.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                atmosphere.appendChild(t);
+                setTimeout(() => t.remove(), 25000);
+            }, 1500);
+        }
+
+        // --- AUDIO TOGGLE ---
+        const audio = document.getElementById('ambientAudio');
+        const vis = document.getElementById('audioVisualizer');
+        const aText = document.getElementById('audioText');
+        let isPlaying = false;
+        function toggleAudio() {
+            if (isPlaying) { audio.pause(); vis.classList.remove('playing'); aText.innerText = "Play Travel Ambience"; }
+            else { audio.volume = 0.3; audio.play(); vis.classList.add('playing'); aText.innerText = "Pause"; }
+            isPlaying = !isPlaying;
+        }
+
+        <!-- MODULE: Backend -->
+    </script>
+    <script type="module" src="../assets/js/firebase-config.js"></script>
+    <script type="module" src="../assets/js/data-handler.js"></script>
+
+    <script>
+        // --- POSTCARD LOGIC ---
+        function sendPostcard() {
+            const txt = document.getElementById('messageText');
+            const val = txt.value.trim();
+            const btn = document.querySelector('.send-btn');
+
+            if (val.length > 5) {
+                // UI Feedback
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+                // Call Backend
+                if (window.SoulBackend && window.SoulBackend.submitPostcard) {
+                    window.SoulBackend.submitPostcard(val, "WebUser").then(success => {
+                        if (success) {
+                            // Transformation Animation
+                            const card = document.getElementById('postcardContainer');
+                            card.style.transform = "rotateX(90deg)"; // Fold up
+                            card.style.opacity = "0";
+
+                            setTimeout(() => {
+                                card.style.display = 'none';
+                                const successMsg = document.getElementById('postSuccess');
+                                successMsg.style.display = 'block';
+                                successMsg.classList.add('fade-in');
+                            }, 500);
+                        } else {
+                            btn.innerText = "Error. Try again.";
+                        }
+                    });
+                } else {
+                    console.error("Backend not loaded");
+                }
+            } else {
+                txt.style.borderColor = 'var(--peach-glow)';
+                txt.placeholder = "Please write a bit more...";
+            }
+        }
+
+        // --- FADE IN ---
+        const fadeObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = "translateY(0)";
+                }
+            });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => fadeObserver.observe(el));
+    </script>
+    <script src="../assets/js/soulbot-beta.js"></script>
+    <!-- LIVE USER WIDGET -->
+    <div class="live-pill">
+        <div class="live-dot"></div>
+        <span class="live-count-display">Connecting...</span>
+    </div>
+
+</body>
+
+</html>

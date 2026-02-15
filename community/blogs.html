@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Read stories and insights from students and professionals about mental health, college life, and personal growth.">
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+    <title>Blogs | Soulamore Stories</title>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soulamore-f0a64.web.app/blogs.html">
+    <meta property="og:title" content="Blogs | Soulamore Stories">
+    <meta property="og:description"
+        content="Read real stories from students who've been there. Insights, journals, and shared experiences.">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <style>
+        body {
+            background-color: #0f172a;
+            /* Fallback */
+        }
+
+        .blog-wrapper {
+            max-width: 1200px;
+            /* Aligned with standard container */
+            margin: 0 auto;
+            /* Dynamic spacing respecting fixed header */
+            padding-top: 20px;
+            /* Reduced from calc() because #shell-content adds 140px */
+            padding-bottom: 80px;
+            padding-left: 20px;
+            padding-right: 20px;
+
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 50px;
+            /* Increased gap for breathing room */
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar {
+            position: sticky;
+            /* Dynamic stickiness below header */
+            top: 120px;
+            height: fit-content;
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 15px 12px 40px;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--teal-glow);
+            outline: none;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .filter-section h4 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 15px;
+            margin-top: 25px;
+        }
+
+        .filter-section h4:first-child {
+            margin-top: 0;
+        }
+
+        .filter-opt {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px 12px;
+            background: transparent;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .filter-opt:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .filter-opt.active {
+            background: rgba(78, 205, 196, 0.15);
+            color: var(--teal-glow);
+            font-weight: 600;
+        }
+
+        .filter-opt i {
+            width: 24px;
+            opacity: 0.7;
+        }
+
+        /* --- HERO & GRID --- */
+        .page-header {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #fbbf24);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sort-control select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .blog-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(78, 205, 196, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+            background: #1e293b;
+        }
+
+        .card-body {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-meta {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .author-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-psych {
+            background: rgba(78, 205, 196, 0.1);
+            color: var(--teal-glow);
+        }
+
+        .badge-peer {
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--gold-glow);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            color: #f1f5f9;
+        }
+
+        .card-excerpt {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: #64748b;
+        }
+
+        .read-link {
+            color: var(--teal-glow);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- MOBILE --- */
+        @media (max-width: 900px) {
+            .blog-wrapper {
+                grid-template-columns: 1fr;
+                padding-top: 110px;
+            }
+
+            .sidebar {
+                position: relative;
+                top: 0;
+                margin-bottom: 30px;
+            }
+
+            .page-header h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header></header>
+        </div>
+
+        <!-- PARTICLES BG -->
+        <div id="particles"
+            style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:-1;"></div>
+
+        <main id="shell-content">
+            <div class="blog-wrapper">
+                <!-- SIDEBAR -->
+                <aside class="sidebar fade-in">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search stories...">
+                    </div>
+
+                    <div class="filter-section">
+                        <h4>Browse By</h4>
+                        <button class="filter-opt active" onclick="setFilter('all', this)"><i class="fas fa-globe"></i>
+                            All
+                            Stories</button>
+                    </div>
+
+                    <div class="filter-section">
+                        <h4>By Author</h4>
+                        <button class="filter-opt" onclick="setFilter('Psychologist', this)"><i
+                                class="fas fa-user-md"></i>
+                            Experts</button>
+                        <button class="filter-opt" onclick="setFilter('Peer', this)"><i class="fas fa-user"></i> Peer
+                            Stories</button>
+                    </div>
+
+                    <div class="filter-section">
+                        <h4>Topics</h4>
+                        <button class="filter-opt" onclick="setFilter('Anxiety', this)"><i class="fas fa-wind"></i>
+                            Anxiety</button>
+                        <button class="filter-opt" onclick="setFilter('Student Life', this)"><i
+                                class="fas fa-graduation-cap"></i> Student Life</button>
+                        <button class="filter-opt" onclick="setFilter('Family', this)"><i class="fas fa-home"></i>
+                            Family
+                            Pressure</button>
+                    </div>
+                </aside>
+
+                <!-- MAIN CONTENT -->
+                <section class="blog-main">
+                    <div class="page-header fade-in">
+                        <div>
+                            <h1>Soulamore Stories</h1>
+                            <p style="color:#94a3b8;">Lived experiences and expert guidance, unfiltered.</p>
+                        </div>
+                        <div class="sort-control">
+                            <select onchange="sortPosts(this.value)">
+                                <option value="newest">Newest First</option>
+                                <option value="popular">Most Read</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="blog-grid" id="blogGrid">
+                        <!-- Posts injected by JS -->
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer></footer>
+    </div>
+
+    <script src="../assets/js/components.js"></script>
+    <script type="module">
+        import { getAllPosts } from '../assets/js/blog-data.js';
+
+        // State
+        let posts = getAllPosts();
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let sortMode = 'newest';
+
+        const grid = document.getElementById('blogGrid');
+        const searchInput = document.getElementById('searchInput');
+
+        // Init
+        render();
+
+        // Search Listener
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            render();
+        });
+
+        // Global functions for HTML onclick
+        window.setFilter = (filter, btn) => {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            render();
+        }
+
+        window.sortPosts = (mode) => {
+            sortMode = mode;
+            render();
+        }
+
+        function render() {
+            // 1. Filter
+            let filtered = posts.filter(post => {
+                const matchesFilter = currentFilter === 'all' || post.type === currentFilter || post.topic === currentFilter;
+                const matchesSearch = post.title.toLowerCase().includes(searchQuery) || post.excerpt.toLowerCase().includes(searchQuery);
+                return matchesFilter && matchesSearch;
+            });
+
+            // 2. Sort
+            if (sortMode === 'popular') {
+                filtered.sort((a, b) => parseInt(b.views) - parseInt(a.views)); // Rough sort if views are numbers
+            } else {
+                // Mock date sort (simplified)
+                filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+
+            // 3. Render
+            grid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 60px; color:#64748b;">
+                    <i class="fas fa-search" style="font-size:2rem; margin-bottom:15px;"></i>
+                    <p>No stories found matching your criteria.</p>
+                </div>`;
+                return;
+            }
+
+            filtered.forEach(post => {
+                const badgeClass = post.type === 'Psychologist' ? 'badge-psych' : 'badge-peer';
+                const icon = post.type === 'Psychologist' ? 'fa-user-md' : 'fa-user';
+
+                const card = document.createElement('div');
+                card.className = 'blog-card fade-in';
+                card.onclick = () => window.location.href = `blog-detail.html?id=${post.id}`;
+
+                card.innerHTML = `
+                    <img src="${post.image}" class="card-img" alt="${post.title}">
+                    <div class="card-body">
+                        <div class="card-meta">
+                            <span class="author-badge ${badgeClass}"><i class="fas ${icon}"></i> ${post.type}</span>
+                            <span>${post.date}</span>
+                        </div>
+                        <h3 class="card-title">${post.title}</h3>
+                        <p class="card-excerpt">${post.excerpt}</p>
+                        <div class="card-footer">
+                            <span><i class="fas fa-eye" style="margin-right:5px;"></i> ${post.views}</span>
+                            <span class="read-link">Read <i class="fas fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Re-trigger fade-in for new elements
+            document.querySelectorAll('.fade-in').forEach(el => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            });
+        }
+    </script>
+</body>
+
+</html>

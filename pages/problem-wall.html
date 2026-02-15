@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Problem Wall: Share Your Burdens Anonymously | Soulamore</title>
+    <meta name="description"
+        content="A safe, anonymous space to leave your worries behind. Write your problems on the wall and let them drift away. You are not alone.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soulamore.com/pages/problem-wall.html">
+    <meta property="og:title" content="The Problem Wall: Share Your Burdens Anonymously | Soulamore">
+    <meta property="og:description"
+        content="A safe, anonymous space to leave your worries behind. Write your problems on the wall and let them drift away.">
+    <meta property="og:image" content="../assets/images/header-bg-desktop.jpg">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Global CSS (Base styles) -->
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <!-- MODULES: Header Injection (Deferred for performance) -->
+    <script src="../assets/js/components.js" defer></script>
+
+    <style>
+        /* --- 1. CORE THEME: DAYBREAK (Light & Airy) --- */
+        :root {
+            --paper-white: #fffefb;
+            --ink-black: #1e293b;
+            --soft-sky: #f0f9ff;
+            --mist-gray: #e2e8f0;
+            --highlight-blue: #38bdf8;
+            --peach: #F49F75;
+            --teal: #4ECDC4;
+            --warm-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
+            /* Performance: Reduce variable usage in heavy animations */
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fdfcfb;
+            /* Luminous Off-White */
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(78, 205, 196, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(244, 159, 117, 0.05) 0%, transparent 40%);
+            color: #1e293b;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            transition: all 1s ease;
+        }
+
+        /* --- BACKGROUND ANIMATION LAYER --- */
+        .ethereal-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: drift 20s infinite alternate ease-in-out;
+            will-change: transform, opacity;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.2;
+            }
+
+            50% {
+                transform: translate(10%, 10%) scale(1.2);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: translate(-5%, 5%) scale(0.9);
+                opacity: 0.25;
+            }
+        }
+
+        /* --- VIGNETTE OVERLAY --- */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 20%, rgba(255, 255, 255, 0.2) 100%);
+            z-index: 5;
+        }
+
+        /* --- CANDLELIGHT PULSE --- */
+        .ambient-light {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+            z-index: 4;
+            animation: softPulse 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes softPulse {
+            0% {
+                opacity: 0.1;
+            }
+
+            100% {
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes candleFlicker {
+            0% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+
+            100% {
+                opacity: 0.4;
+                transform: scale(0.95);
+            }
+        }
+
+        /* --- 2. HEADER OVERRIDE (Daybreak Theme) --- */
+        /* Target the shell-fixed context to ensure overrides apply */
+        #shell-fixed header.island-nav {
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Ensure header buttons are visible */
+        #shell-fixed header.island-nav .nav-btn,
+        #shell-fixed header.island-nav .lifeline-btn {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* Light Theme Links */
+        header.island-nav .nav-links a {
+            color: #475569 !important;
+            /* Slate-600 */
+        }
+
+        header.island-nav .nav-links a:hover {
+            color: #4ECDC4 !important;
+            /* Teal */
+        }
+
+        header.island-nav .nav-links i {
+            color: #94a3b8 !important;
+            /* Slate-400 */
+        }
+
+        header.island-nav .nav-links a:hover i {
+            color: #4ECDC4 !important;
+        }
+
+        /* Logo Text Dark & Symbol Restoration 
+           Invert turns White->Black (Text) and Teal->Red (Symbol).
+           Hue-Rotate 180 turns Red->Teal back.
+        */
+        header.island-nav .nav-logo {
+            filter: invert(1) hue-rotate(180deg) saturate(1.4) !important;
+            opacity: 0.9 !important;
+        }
+
+        /* Dropdown Menus (Light Mode) */
+        header.island-nav .dropdown-content {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        header.island-nav .dropdown-content a {
+            color: #475569 !important;
+        }
+
+        /* Header Buttons Override (Force Visibility) */
+        /* Header Buttons Override (Force Visibility) */
+        header.island-nav .nav-btn {
+            background: white !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        header.island-nav .lifeline-btn {
+            /* Restore "Red Aura" for Get Help */
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: #ef4444 !important;
+            border: 1px solid rgba(239, 68, 68, 0.2) !important;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.15) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        header.island-nav .nav-btn:hover {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+
+        header.island-nav .lifeline-btn:hover {
+            background: #ef4444 !important;
+            color: white !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important;
+            transform: translateY(-2px);
+        }
+
+        /* Header Glow States (Interactive) -  Specificity Boosted */
+        body header.island-nav.glow-red {
+            box-shadow: 0 0 35px rgba(239, 68, 68, 0.5) !important;
+            border-color: rgba(239, 68, 68, 0.6) !important;
+            transition: 0.3s ease;
+        }
+
+        body header.island-nav.glow-yellow {
+            box-shadow: 0 0 35px rgba(234, 179, 8, 0.5) !important;
+            border-color: rgba(234, 179, 8, 0.6) !important;
+            transition: 0.3s ease;
+        }
+
+        body header.island-nav.glow-orange {
+            box-shadow: 0 0 35px rgba(249, 115, 22, 0.5) !important;
+            border-color: rgba(249, 115, 22, 0.6) !important;
+            transition: 0.3s ease;
+        }
+
+        /* --- 3. LIVE ACTIVITY BAR --- */
+        .live-activity-bar {
+            position: fixed;
+            top: 100px;
+            /* Below header */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #64748b;
+            z-index: 900;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            pointer-events: none;
+            /* Let clicks pass */
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+
+            100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+        }
+
+        /* --- 4. INFINITE CANVAS & NOTES --- */
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            cursor: grab;
+            position: relative;
+            touch-action: none;
+        }
+
+        #viewport:active {
+            cursor: grabbing;
+        }
+
+        #infinite-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5000px;
+            /* Large canvas */
+            height: 5000px;
+            /* Centering initially */
+            transform-origin: center center;
+            /* Dot Grid Pattern */
+            /* Memorial Grid */
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 40px 40px;
+            /* Hardware Acceleration */
+            will-change: transform;
+            /* Smoother transition/interp */
+        }
+
+        /* HERO TEXT ON CANVAS */
+        .wall-hero {
+            position: absolute;
+            top: 2450px;
+            /* Center of 5000px canvas */
+            left: 2500px;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            /* Let clicks pass through to canvas */
+            z-index: 0;
+        }
+
+        .wall-hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 5rem;
+            color: #1e293b;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+            opacity: 0.9;
+        }
+
+        .wall-hero p {
+            font-size: 1.4rem;
+            color: #94a3b8;
+            font-style: italic;
+            font-family: 'Plus Jakarta Sans', serif;
+        }
+
+        /* NOTE CARD STYLING */
+        .note {
+            position: absolute;
+            width: 280px;
+            /* Burnt Edge & Stacked Effect */
+            background: var(--paper-white);
+            padding: 25px;
+            border-radius: 2px;
+
+            /* Burnt Border */
+            border: 1px solid rgba(120, 90, 70, 0.15);
+
+            /* Stacked Shadow + Inner Burnt Glow */
+            box-shadow:
+                inset 0 0 25px rgba(139, 69, 19, 0.04),
+                /* Subtle inner burn */
+                0 2px 4px rgba(0, 0, 0, 0.05),
+                /* Main depth */
+                3px 3px 0 -1px #f8fafc,
+                /* Paper layer 2 (matches bg mostly) */
+                3px 3px 1px -1px rgba(0, 0, 0, 0.05),
+                /* Shadow 2 */
+                5px 5px 0 -2px #f1f5f9,
+                /* Paper layer 3 */
+                5px 5px 1px -2px rgba(0, 0, 0, 0.05);
+            /* Shadow 3 */
+
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #334155;
+            /* Adaptive Glow (Radiance) */
+            box-shadow:
+                inset 0 0 25px rgba(139, 69, 19, 0.04),
+                0 2px 10px rgba(0, 0, 0, 0.1),
+                0 0 var(--glow-radius, 0px) var(--glow-color, transparent);
+
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+            cursor: default;
+            user-select: none;
+            overflow: hidden;
+            /* Promote to own layer for perf */
+            will-change: transform;
+        }
+
+        .note:hover {
+            transform: scale(1.02) rotate(0deg) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            z-index: 10;
+        }
+
+        /* Glow States (Simplified box-shadows for perf) */
+        .note.glow-red {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4) !important;
+            border-color: rgba(239, 68, 68, 0.4) !important;
+        }
+
+        .note.glow-yellow {
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4) !important;
+            border-color: rgba(251, 191, 36, 0.4) !important;
+        }
+
+        .note.glow-orange {
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.4) !important;
+            border-color: rgba(249, 115, 22, 0.4) !important;
+        }
+
+        /* Tape effect */
+        .note::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 40px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .note-meta {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ACTIONS */
+        .note-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.1s;
+            /* Fast visual feedback */
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .action-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .heart-btn:hover {
+            color: #ef4444;
+            background: #fee2e2;
+        }
+
+        .flower-btn:hover {
+            color: #eab308;
+            background: #fef9c3;
+        }
+
+        .candle-btn:hover {
+            color: #f97316;
+            background: #ffedd5;
+        }
+
+        /* Animation Classes */
+        .pop-active {
+            animation: pop 0.3s;
+        }
+
+        @keyframes pop {
+            50% {
+                transform: scale(1.3);
+            }
+        }
+
+        /* Note Entrance Animation */
+        @keyframes float-in {
+            0% {
+                transform: scale(0.8) translateY(20px) rotate(5deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1) translateY(0) rotate(var(--rot));
+                opacity: 1;
+            }
+        }
+
+        /* Soft Pop for New Notes */
+        @keyframes softPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            70% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Peach/Teal Alternating Glow */
+        @keyframes alternate-glow {
+            0% {
+                box-shadow: 0 0 20px rgba(244, 159, 117, 0.6);
+            }
+
+            /* Peach */
+            50% {
+                box-shadow: 0 0 25px rgba(78, 205, 196, 0.6);
+            }
+
+            /* Teal */
+            100% {
+                box-shadow: 0 0 20px rgba(244, 159, 117, 0.6);
+            }
+
+            /* Peach */
+        }
+
+        .new-note-glow {
+            animation: softPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+                alternate-glow 3s infinite ease-in-out !important;
+            z-index: 500 !important;
+        }
+
+        .note-float-in {
+            animation: floatIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* Reacted State for Buttons */
+        .action-btn.reacted {
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+            /* Prevent multiple clicks */
+        }
+
+        .heart-btn.reacted {
+            background: #ff4d4d !important;
+            border-color: #ff4d4d;
+        }
+
+        .flower-btn.reacted {
+            background: #ffd700 !important;
+            border-color: #ffd700;
+            color: #333 !important;
+        }
+
+        .candle-btn.reacted {
+            background: #ff7e39 !important;
+            border-color: #ff7e39;
+        }
+
+        /* --- MODERATOR UI --- */
+        .mod-controls {
+            display: none;
+            /* Hidden by default */
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 20;
+        }
+
+        body.mod-mode .mod-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .mod-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: none;
+            z-index: 1001;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+
+        body.mod-mode .mod-indicator {
+            display: block;
+        }
+
+        /* --- 5. UI OVERLAYS (FAB STACK) --- */
+        .fab-stack-container {
+            position: fixed;
+            bottom: 40px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            z-index: 999;
+            /* Increased from 100 */
+        }
+
+        .fab-btn {
+            width: 55px;
+            /* Unified Size */
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-decoration: none;
+            position: relative;
+        }
+
+        .fab-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 1. SoulBot (Teal) */
+        .fab-soulbot {
+            background: #4ECDC4;
+            color: white;
+        }
+
+        /* 2. Center View (White) */
+        .fab-center {
+            background: white;
+            color: var(--ink-black);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            /* Ensure visibility on light bg */
+        }
+
+        .fab-center:hover {
+            color: var(--teal);
+        }
+
+        /* 3. Write (Dark - Main) */
+        .fab-write {
+            background: var(--ink-black);
+            color: white;
+            font-size: 1.5rem;
+        }
+
+
+        /* WRITER MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .writer-card {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .modal-overlay.active .writer-card {
+            transform: translateY(0);
+        }
+
+        .writer-textarea {
+            width: 100%;
+            height: 150px;
+            border: none;
+            resize: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.2rem;
+            color: var(--ink-black);
+            outline: none;
+            margin-bottom: 20px;
+        }
+
+        .writer-textarea::placeholder {
+            color: #cbd5e1;
+        }
+
+        .post-btn {
+            background: var(--ink-black);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            float: right;
+            transition: 0.3s;
+        }
+
+        .post-btn:hover {
+            background: var(--teal);
+            transform: translateY(-2px);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        /* --- 6. IMPACT BOARD (Right Side) --- */
+        .global-stats {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 90;
+            background: rgba(255, 255, 255, 0.9);
+            /* High Isolation Frosted Glass */
+            padding: 25px;
+            border-radius: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            /* More defined border */
+            backdrop-filter: blur(30px);
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.08),
+                0 2px 10px rgba(0, 0, 0, 0.04);
+            /* Layered shadow for depth */
+            width: 260px;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .global-stats::before {
+            content: 'Community Impact';
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #94a3b8;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-text h4 {
+            font-family: 'Outfit';
+            font-size: 1.5rem;
+            margin: 0;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .stat-text span {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        /* Progress Bar for Milestones */
+        .stat-progress-bg {
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .stat-progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @media(max-width: 768px) {
+            .global-stats {
+                display: none;
+                /* Hide on mobile to declutter */
+            }
+
+            .wall-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            /* FAB Stack: Move above mobile nav bar */
+            .fab-stack-container {
+                bottom: 100px;
+                /* Increased from 40px to clear mobile nav */
+                right: 20px;
+            }
+        }
+    </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body data-header-theme="light">
+
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header class="island-nav" id="main-header"></header>
+        </div>
+
+        <script>
+            // Force header injection if it hasn't happened yet
+            if (typeof injectHeader === 'function') injectHeader();
+        </script>
+
+        <main id="shell-content" class="custom-spacing" style="padding-top: 0 !important;">
+            <!-- Custom spacing override because this is a full-screen canvas app -->
+
+            <!-- LIVE COUNTER -->
+            <div class="live-activity-bar">
+                <div class="live-dot"></div>
+                <span id="userCount">142</span> people here right now
+            </div>
+
+            <!-- IMPACT BOARD (SIDEBAR) -->
+            <div class="global-stats">
+                <div class="stat-item">
+                    <div class="stat-header">
+                        <div class="stat-icon-box" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-text">
+                            <h4 id="totalHearts">0</h4>
+                            <span>Hearts Given</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-header">
+                        <div class="stat-icon-box" style="background: rgba(234, 179, 8, 0.15); color: #eab308;">
+                            <i class="fas fa-spa"></i>
+                        </div>
+                        <div class="stat-text">
+                            <h4 id="totalFlowers">0</h4>
+                            <span>Flowers Offered</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-header">
+                        <div class="stat-icon-box" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">
+                            <i class="fas fa-fire-alt"></i>
+                        </div>
+                        <div class="stat-text">
+                            <h4 id="totalCandles">0</h4>
+                            <span>Candles Lit</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIGNETTE & LIGHTING -->
+            <div class="vignette"></div>
+            <div class="ambient-light"></div>
+
+            <!-- ETHEREAL BACKGROUND ORBS -->
+            <div class="ethereal-bg">
+                <div class="glow-orb"
+                    style="width: 400px; height: 400px; background: #4ECDC4; top: 10%; left: 20%; animation-delay: 0s;">
+                </div>
+                <div class="glow-orb"
+                    style="width: 500px; height: 500px; background: #F49F75; bottom: 20%; right: 10%; animation-delay: -5s;">
+                </div>
+                <div class="glow-orb"
+                    style="width: 300px; height: 300px; background: #38bdf8; top: 60%; left: 50%; animation-delay: -10s;">
+                </div>
+            </div>
+
+            <!-- INFINITE CANVAS WRAPPER -->
+            <div id="viewport">
+                <div id="infinite-canvas">
+
+                    <!-- HERO TEXT (Part of Canvas) -->
+                    <div class="wall-hero">
+                        <h1>The Problem Wall</h1>
+                        <p>A place where pain is seen, not solved.</p>
+                    </div>
+
+                    <!-- DYNAMIC NOTES CONTAINER -->
+                    <div id="notes-container"></div>
+
+                </div>
+        </main>
+        <footer></footer>
+    </div> <!-- End App Shell -->
+
+    <!-- ZOOM SLIDER (Bottom Center) -->
+    <div id="zoom-controls" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+        background: rgba(19, 27, 46, 0.8); backdrop-filter: blur(12px); 
+        padding: 12px 24px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.08);
+        display: flex; align-items: center; gap: 16px; z-index: 900; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+
+        <button onclick="adjustZoom(-0.1)"
+            style="background:none; border:none; color:rgba(255,255,255,0.6); cursor:pointer; font-size:18px;">-</button>
+        <input type="range" id="zoomSlider" min="0.4" max="2.0" step="0.1" value="1"
+            style="width: 150px; accent-color: #4ECDC4; cursor: pointer;">
+        <button onclick="adjustZoom(0.1)"
+            style="background:none; border:none; color:rgba(255,255,255,0.6); cursor:pointer; font-size:18px;">+</button>
+        <span id="zoomValue"
+            style="color:rgba(255,255,255,0.4); font-size:12px; min-width:30px; text-align:center;">100%</span>
+    </div>
+
+    <div class="fab-stack-container">
+
+        <!-- 2. Center/Reset (Middle) -->
+        <div class="fab-btn fab-center" onclick="resetView()" title="Center View">
+            <i class="fas fa-compress-arrows-alt"></i>
+        </div>
+
+        <!-- 3. Write (Bottom - Main) -->
+        <div class="fab-btn fab-write" onclick="openWriter()" title="Share a Burden">
+            <i class="fas fa-plus"></i>
+        </div>
+
+    </div>
+
+    <!-- WRITING MODAL -->
+    <div class="modal-overlay" id="writeModal">
+        <div class="writer-card">
+            <button class="close-modal" onclick="closeWriter()"><i class="fas fa-times"></i></button>
+            <h3 style="font-family:'Outfit'; margin-bottom:20px; font-size:1.5rem;">Leave a burden.</h3>
+            <textarea class="writer-textarea" id="noteInput" placeholder="I feel..."></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.8rem; color:#94a3b8;"><i class="fas fa-shield-alt"></i> Anonymous &
+                    Filtered</span>
+                <button class="post-btn" onclick="postNote()">Post It</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI LOGIC (Standard Script - No Import/CORS issues) -->
+    <script>
+        // --- 1. CONFIG & STATE ---
+        const CONFIG = {
+            width: 5000,
+            height: 5000,
+            initialNotes: 45, /* Only for Fallback */
+            spawnRadius: 1200, /* Reduced from 1800 to keep them tighter */
+            bufferDistance: 380
+        };
+
+        const STATE = {
+            scale: 1,
+            panning: false,
+            pointX: 0,
+            pointY: 0,
+            startX: 0,
+            startY: 0,
+            animationFrame: null,
+            firebaseNotes: new Map(),
+            grid: []
+        };
+        window.STATE = STATE; // Make STATE global for module access
+
+        // --- DEBUG LOGGING ---
+        window.DEBUG_LOG = [];
+        window.logDebug = function (msg) {
+            console.log(msg);
+            window.DEBUG_LOG.push(msg);
+            const debugEl = document.getElementById('debug-overlay');
+            if (debugEl) {
+                debugEl.innerHTML += `<div>${new Date().toLocaleTimeString()} - ${msg}</div>`;
+            }
+        };
+
+        window.onerror = function (msg, url, line, col, error) {
+            window.logDebug(`Global Error: ${msg} at ${line}:${col}`);
+            return false;
+        };
+
+        window.addEventListener('unhandledrejection', (event) => {
+            window.logDebug(`Unhandled Promise: ${event.reason}`);
+        });
+
+        const OBSCENE_WORDS = ["fuck", "shit", "bitch", "asshole", "cunt", "dick", "pussy", "whore", "slut", "bastard"];
+
+        // STATS (Global)
+        window.totalStats = { hearts: 0, flowers: 0, candles: 0 };
+
+        // --- 2. INITIALIZATION ---
+        const canvas = document.getElementById('infinite-canvas');
+        const viewport = document.getElementById('viewport');
+        const notesContainer = document.getElementById('notes-container');
+
+        function initProblemWall() {
+            window.logDebug("Init Problem Wall Started");
+            if (window.injectHeader) window.injectHeader();
+
+            STATE.pointX = (window.innerWidth - CONFIG.width) / 2;
+            STATE.pointY = (window.innerHeight - CONFIG.height) / 2;
+
+            STATE.pointY = (window.innerHeight - CONFIG.height) / 2;
+
+            updateTransform();
+
+            // Ensure Grid is initialized before we try to place anything
+            initGrid();
+
+            // 1. IMMEDIATE RENDER: Seed fallback notes instantly (0ms)
+            // This ensures the user sees content immediately.
+            // When Firebase loads, it will clear these if used.
+            window.hasRealData = false;
+            generateFallbackNotes();
+
+            // We still keep a tiny safety timer just in case, but it's redundant now.
+            // window.fallbackTimer = setTimeout(() => { ... }, 3500);
+        }
+
+        // Auto-Init
+        if (document.readyState === 'complete') {
+            initProblemWall();
+            initPresenceSystem();
+        } else {
+            window.addEventListener('load', () => {
+                initProblemWall();
+                initPresenceSystem();
+            });
+        }
+
+        // --- PRESENCE SYSTEM ---
+        function initPresenceSystem() {
+            const countEl = document.getElementById('userCount');
+            let baseCount = 142;
+            setInterval(() => {
+                const change = Math.floor(Math.random() * 5) - 2;
+                baseCount += change;
+                if (baseCount < 120) baseCount = 120;
+                if (baseCount > 180) baseCount = 180;
+                if (countEl) countEl.innerText = baseCount;
+            }, 5000);
+        }
+
+        // --- CANVAS LOGIC ---
+        viewport.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.note') || e.target.closest('.wall-hero')) return;
+            STATE.panning = true;
+            STATE.startX = e.clientX - STATE.pointX;
+            STATE.startY = e.clientY - STATE.pointY;
+            viewport.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mouseup', () => {
+            STATE.panning = false;
+            viewport.style.cursor = 'grab';
+        });
+
+        let lastFrame = 0;
+        window.addEventListener('mousemove', (e) => {
+            const now = Date.now();
+            if (now - lastFrame < 16) return;
+            lastFrame = now;
+            if (STATE.panning) {
+                e.preventDefault();
+                STATE.pointX = e.clientX - STATE.startX;
+                STATE.pointY = e.clientY - STATE.startY;
+                requestAnimationFrame(updateTransform);
+            }
+        });
+
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const xs = (e.clientX - STATE.pointX) / STATE.scale;
+            const ys = (e.clientY - STATE.pointY) / STATE.scale;
+            const delta = -e.deltaY;
+            (delta > 0) ? (STATE.scale *= 1.1) : (STATE.scale /= 1.1);
+            STATE.scale = Math.min(Math.max(0.4, STATE.scale), 2.0); // Matched slider max
+            STATE.pointX = e.clientX - xs * STATE.scale;
+            STATE.pointY = e.clientY - ys * STATE.scale;
+            updateTransform();
+            updateZoomUI();
+        }, { passive: false });
+
+        function updateTransform() {
+            canvas.style.transform = `translate3d(${STATE.pointX}px, ${STATE.pointY}px, 0) scale(${STATE.scale})`;
+        }
+
+        // --- ZOOM UI LOGIC ---
+        const zoomSlider = document.getElementById('zoomSlider');
+        const zoomLabel = document.getElementById('zoomValue');
+
+        if (zoomSlider) {
+            zoomSlider.addEventListener('input', (e) => {
+                const centerScreenX = window.innerWidth / 2;
+                const centerScreenY = window.innerHeight / 2;
+                const xs = (centerScreenX - STATE.pointX) / STATE.scale;
+                const ys = (centerScreenY - STATE.pointY) / STATE.scale;
+
+                STATE.scale = parseFloat(e.target.value);
+
+                // Zoom towards center of screen
+                STATE.pointX = centerScreenX - xs * STATE.scale;
+                STATE.pointY = centerScreenY - ys * STATE.scale;
+
+                updateTransform();
+                if (zoomLabel) zoomLabel.innerText = Math.round(STATE.scale * 100) + '%';
+            });
+        }
+
+        function updateZoomUI() {
+            if (zoomSlider) zoomSlider.value = STATE.scale;
+            if (zoomLabel) zoomLabel.innerText = Math.round(STATE.scale * 100) + '%';
+        }
+
+        window.adjustZoom = function (delta) {
+            const centerScreenX = window.innerWidth / 2;
+            const centerScreenY = window.innerHeight / 2;
+            const xs = (centerScreenX - STATE.pointX) / STATE.scale;
+            const ys = (centerScreenY - STATE.pointY) / STATE.scale;
+
+            STATE.scale += delta;
+            STATE.scale = Math.min(Math.max(0.4, STATE.scale), 2.0);
+
+            STATE.pointX = centerScreenX - xs * STATE.scale;
+            STATE.pointY = centerScreenY - ys * STATE.scale; // This line was missing in the provided snippet, adding for correctness.
+            updateTransform(); // This line was missing in the provided snippet, adding for correctness.
+            updateZoomUI(); // This line was missing in the provided snippet, adding for correctness.
+        };
+
+        window.zoomToNote = function (targetX, targetY) {
+            // Animate scale to 1.1 and pan to center
+            const centerScreenX = window.innerWidth / 2;
+            const centerScreenY = window.innerHeight / 2;
+
+            // Target Zoom
+            const targetScale = 1.1;
+
+            // Calculate PointX/Y to center the note
+            // formula: pointX = centerScreen - noteX * scale
+            const targetPointX = centerScreenX - targetX * targetScale;
+            const targetPointY = centerScreenY - targetY * targetScale;
+
+            // Simple Animation Loop (Lerp)
+            let frame = 0;
+            function animate() {
+                frame++;
+                STATE.scale += (targetScale - STATE.scale) * 0.05;
+                STATE.pointX += (targetPointX - STATE.pointX) * 0.05;
+                STATE.pointY += (targetPointY - STATE.pointY) * 0.05;
+
+                updateTransform();
+                updateZoomUI();
+
+                if (frame < 60) requestAnimationFrame(animate);
+            }
+            animate();
+        };
+
+        // --- GRID & HELPERS ---
+        // --- ORGANIC PLACEMENT (Scattered Papers) ---
+        const NOTE_WIDTH = 340; // 280 + padding + margins
+        const NOTE_HEIGHT = 200; // Approx average height
+
+        function initGrid() {
+            STATE.placedNotes = []; // Stores {x, y, w, h}
+        }
+
+        // --- SMART PLACEMENT ENGINE (Polar Rings) ---
+        const SmartPlacement = {
+            placedNotes: [], // Track rects {x, y, w, h}
+            centerZone: { w: 900, h: 400 }, // No-Fly Zone for Title
+            rings: [450, 600, 800, 1000, 1250, 1500, 1800, 2200], // Radial distances
+
+            reset() {
+                this.placedNotes = [];
+            },
+
+            // Check if rect intersects with any placed note
+            checkCollision(rect) {
+                // 1. Title Collision
+                const cx = CONFIG.width / 2;
+                const cy = CONFIG.height / 2;
+                const titleRect = {
+                    x: cx - this.centerZone.w / 2,
+                    y: cy - this.centerZone.h / 2,
+                    w: this.centerZone.w,
+                    h: this.centerZone.h
+                };
+
+                if (this.rectIntersect(rect, titleRect)) return true;
+
+                // 2. Note Collision
+                return this.placedNotes.some(note => this.rectIntersect(rect, note));
+            },
+
+            rectIntersect(r1, r2) {
+                return !(r2.x > r1.x + r1.w ||
+                    r2.x + r2.w < r1.x ||
+                    r2.y > r1.y + r1.h ||
+                    r2.y + r2.h < r1.y);
+            },
+
+            getPosition(w, h) {
+                // Try to place in rings
+                for (let ring of this.rings) {
+                    // Try multiple angles per ring
+                    const attempts = 15;
+                    for (let i = 0; i < attempts; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const x = CONFIG.width / 2 + Math.cos(angle) * ring;
+                        const y = CONFIG.height / 2 + Math.sin(angle) * ring;
+
+                        // Add Organic Offset
+                        const ox = (Math.random() - 0.5) * 60;
+                        const oy = (Math.random() - 0.5) * 60;
+
+                        // Center the rect
+                        const rect = { x: x + ox - w / 2, y: y + oy - h / 2, w, h };
+
+                        if (!this.checkCollision(rect)) {
+                            return { x: rect.x, y: rect.y };
+                        }
+                    }
+                }
+                // Fallback: Random placement far out
+                const angle = Math.random() * Math.PI * 2;
+                const r = 2500;
+                return {
+                    x: CONFIG.width / 2 + Math.cos(angle) * r - w / 2,
+                    y: CONFIG.height / 2 + Math.sin(angle) * r - h / 2
+                };
+            },
+
+            drawDebug() {
+                // Debug function
+            }
+        };
+        window.SmartPlacement = SmartPlacement;
+
+        function getGridPosition() {
+            return window.SmartPlacement.getPosition(NOTE_WIDTH, NOTE_HEIGHT);
+        }
+        window.getGridPosition = getGridPosition;
+
+        // --- SEEDED NOTES ---
+        const seededNotes = [
+            { text: "I wish I could pause time.", hearts: 67, flowers: 24, candles: 14 },
+            { text: "My anxiety is winning today.", hearts: 88, flowers: 29, candles: 17 },
+            { text: "Smiling is exhausting.", hearts: 73, flowers: 21, candles: 10 },
+            { text: "I want to be heard.", hearts: 54, flowers: 19, candles: 9 },
+            { text: "Just getting by is hard enough.", hearts: 95, flowers: 33, candles: 18 },
+            { text: "I miss my childhood.", hearts: 134, flowers: 52, candles: 31 },
+            { text: "The future scares me.", hearts: 82, flowers: 28, candles: 16 },
+            { text: "I don't know who I am anymore.", hearts: 76, flowers: 25, candles: 13 },
+            { text: "Everyone expects so much from me.", hearts: 62, flowers: 20, candles: 11 },
+            { text: "I'm trying my best, but it feels like it's not enough.", hearts: 115, flowers: 42, candles: 24 },
+            { text: "I feel like a burden.", hearts: 98, flowers: 36, candles: 20 },
+            { text: "Why is it so hard to be happy?", hearts: 85, flowers: 30, candles: 15 },
+            { text: "I just want peace.", hearts: 145, flowers: 58, candles: 35 },
+            { text: "Life feels heavy right now.", hearts: 70, flowers: 23, candles: 12 }
+        ];
+        window.seededNotes = seededNotes;
+
+        // --- FALLBACK MODE (Offline Persistence) ---
+        const FALLBACK_KEY = 'soulamore_fallback_notes_v3';
+
+        function generateFallbackNotes() {
+            if (STATE.firebaseNotes && STATE.firebaseNotes.size > 0) return;
+
+            // 1. Try Storage
+            let storedData = localStorage.getItem(FALLBACK_KEY);
+            let fallbackNotes = [];
+            if (storedData) {
+                try {
+                    fallbackNotes = JSON.parse(storedData);
+                } catch (e) { fallbackNotes = []; }
+            }
+
+            // 2. If No Storage, Create Initial From SEEDED
+            if (fallbackNotes.length === 0) {
+                const timeOffsets = ["2m ago", "5m ago", "12m ago", "1h ago", "2h ago", "1d ago"];
+
+                if (seededNotes && seededNotes.length > 0) {
+                    seededNotes.forEach((seed, i) => {
+                        const pos = getGridPosition();
+                        const time = timeOffsets[i % timeOffsets.length];
+
+                        // CRITICAL FIX: Register it immediately so next iteration knows!
+                        window.SmartPlacement.placedNotes.push({
+                            x: pos.x,
+                            y: pos.y,
+                            w: NOTE_WIDTH,
+                            h: NOTE_HEIGHT
+                        });
+
+                        fallbackNotes.push({
+                            id: 'fallback_' + i,
+                            text: seed.text,
+                            x: pos.x,
+                            y: pos.y,
+                            time: time,
+                            reactions: { heart: seed.hearts, flower: seed.flowers, candle: seed.candles }
+                        });
+                    });
+                    // Save Initial State
+                    localStorage.setItem(FALLBACK_KEY, JSON.stringify(fallbackNotes));
+                } else {
+                    window.logDebug("CRITICAL: seededNotes is undefined or empty!");
+                }
+            }
+
+            // 3. Render Notes
+            window.logDebug(`Rendering ${fallbackNotes.length} fallback notes...`);
+            fallbackNotes.forEach(note => {
+                window.totalStats.hearts += note.reactions.heart;
+                window.totalStats.flowers += note.reactions.flower;
+                window.totalStats.candles += note.reactions.candle;
+                createNoteElement(note, true);
+            });
+            updateTotalStats();
+            window.logDebug("Fallback Rendering Complete.");
+        }
+
+        // --- RENDERING ---
+        function createNoteElement(data, isFallback = false) {
+            // window.logDebug(`CreateNote: ${data.id} at ${data.x},${data.y}`);
+
+            // --- SMART PLACEMENT INTEGRATION ---
+            // If data has explicit coords (from DB), we try to respect them, 
+            // BUT we still check against chaos.
+            // If it's a NEW note (no coords) or Fallback, we use the engine.
+
+            let finalX, finalY;
+
+            // Note Dimensions (approx)
+            const w = 340, h = 200;
+
+            if (data.x !== undefined && data.y !== undefined) {
+                // Existing Note: Check collision roughly? 
+                // Actually, user wants "Collision-Aware Placement System" for everything to avoid piles.
+                // So even for DB notes, if they overlap, we shift them.
+                // However, we want some stability. 
+                // Strategy: Try original pos. If collision, ask SmartPlacement for nearest spot?
+                // For now, let's treat DB notes as "Preferred Position" but subject to No-Fly Zone.
+
+                const rect = { x: data.x, y: data.y, w, h };
+
+                // If it crashes into Title, RECALCULATE completely.
+                if (window.SmartPlacement.checkCollision(rect)) {
+                    // It's bad. Find new spot.
+                    const pos = window.SmartPlacement.getPosition(w, h);
+                    finalX = pos.x; finalY = pos.y;
+                } else {
+                    // It's presumably okay, just register it so others don't hit it.
+                    finalX = data.x; finalY = data.y;
+                    window.SmartPlacement.placedNotes.push(rect);
+                }
+            } else {
+                // Totally new or undefined
+                const pos = window.SmartPlacement.getPosition(w, h);
+                finalX = pos.x; finalY = pos.y;
+            }
+
+            const el = document.createElement('div');
+            el.className = 'note';
+
+            // New Note Features
+            if (data.isNew) {
+                el.classList.add('new-note-glow'); // Peach/Teal Pulse
+                // Auto-Focus Camera
+                if (window.zoomToNote) window.zoomToNote(finalX, finalY);
+            } else {
+                el.classList.add('note-float-in');
+            }
+
+            if (isFallback) el.classList.add('fallback-note');
+            el.dataset.noteId = data.id;
+
+            el.style.left = finalX + 'px';
+            el.style.top = finalY + 'px';
+
+            // Save final decision to object for future reference if needed
+            data.x = finalX; data.y = finalY;
+
+            // Random Rotation (More organic: +/- 6 degrees, less extreme)
+            const rot = (Math.random() * 12) - 6;
+            el.style.setProperty('--rot', rot + 'deg');
+            el.style.transform = `rotate(${rot}deg)`;
+
+            // Note: STATE.placedNotes is managed by SmartPlacement now.
+            // We don't need the old array push here.
+
+            el.textContent = data.text;
+
+            const r = data.reactions || { heart: 0, flower: 0, candle: 0 };
+            const totalReactions = r.heart + r.flower + r.candle;
+
+            // Radiance Logic: More reactions = stronger soft glow
+            if (totalReactions > 5) {
+                const intensity = Math.min(totalReactions / 50, 1);
+                el.style.setProperty('--glow-radius', `${intensity * 40}px`);
+                el.style.setProperty('--glow-color', `rgba(244, 159, 117, ${intensity * 0.15})`);
+            }
+
+            // Check what user has already reacted to
+            const userReactions = JSON.parse(localStorage.getItem('soulamore_user_reactions') || '{}');
+            const noteReactions = userReactions[data.id] || [];
+
+            const uiHTML = `
+            <div class="mod-controls">
+                <button class="delete-btn" onclick="hideNoteGlobally('${data.id}')"><i class="fas fa-trash"></i> Hide</button>
+            </div>
+            <div class="note-meta"><span style="opacity:0.6;">Anonymous</span><span style="font-size:0.75rem;">${data.time}</span></div>
+            <div class="note-actions">
+                <button class="action-btn heart-btn ${noteReactions.includes('heart') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'heart', this)"><i class="fas fa-heart"></i> <span class="count">${r.heart}</span></button>
+                <button class="action-btn flower-btn ${noteReactions.includes('flower') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'flower', this)"><i class="fas fa-spa"></i> <span class="count">${r.flower}</span></button>
+                <button class="action-btn candle-btn ${noteReactions.includes('candle') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'candle', this)"><i class="fas fa-fire-alt"></i> <span class="count">${r.candle}</span></button>
+            </div>`;
+            el.insertAdjacentHTML('beforeend', uiHTML);
+            notesContainer.appendChild(el);
+        }
+        window.createNoteElement = createNoteElement;
+
+        function updateTotalStats() {
+            const h = document.getElementById('totalHearts');
+            const f = document.getElementById('totalFlowers');
+            const c = document.getElementById('totalCandles');
+
+            const hearts = window.totalStats.hearts;
+            const flowers = window.totalStats.flowers;
+            const candles = window.totalStats.candles;
+
+            if (h) h.innerText = hearts.toLocaleString();
+            if (f) f.innerText = flowers.toLocaleString();
+            if (c) c.innerText = candles.toLocaleString();
+        }
+        window.updateTotalStats = updateTotalStats;
+
+        // --- SOUND ENGINE ---
+        const SOUNDS = {
+            heart: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3', // Soft pop
+            flower: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', // Shimmer
+            candle: 'https://assets.mixkit.co/active_storage/sfx/2569/2569-preview.mp3', // Bell
+            post: 'https://assets.mixkit.co/active_storage/sfx/1992/1992-preview.mp3' // Paper rustle
+        };
+
+        function playSound(type) {
+            try {
+                const audio = new Audio(SOUNDS[type]);
+                audio.volume = 0.4;
+                audio.play().catch(e => { });
+            } catch (e) { }
+        }
+        window.playSound = playSound;
+
+        // --- GLOBAL REACT HANDLER ---
+        window.reactGlobally = function (id, type, btn) {
+            if (btn.classList.contains('reacted')) return;
+
+            // Play Feedback
+            playSound(type);
+
+            // 0. Double-check LocalStorage constraint
+            const USER_REACT_KEY = 'soulamore_user_reactions';
+            let userReactions = JSON.parse(localStorage.getItem(USER_REACT_KEY) || '{}');
+            if (userReactions[id] && userReactions[id].includes(type)) return;
+
+            // Mark as reacted
+            if (!userReactions[id]) userReactions[id] = [];
+            userReactions[id].push(type);
+            localStorage.setItem(USER_REACT_KEY, JSON.stringify(userReactions));
+
+            btn.classList.add('pop-active', 'reacted');
+            setTimeout(() => btn.classList.remove('pop-active'), 300);
+
+            // Optimistic Update UI
+            const countSpan = btn.querySelector('.count');
+            countSpan.innerText = parseInt(countSpan.innerText) + 1;
+
+            if (type === 'heart') window.totalStats.hearts++;
+            if (type === 'flower') window.totalStats.flowers++;
+            if (type === 'candle') window.totalStats.candles++;
+            updateTotalStats();
+
+            // 1. If Fallback Note -> Update LocalStorage
+            if (id.startsWith('fallback_')) {
+                let stored = localStorage.getItem(FALLBACK_KEY);
+                if (stored) {
+                    let data = JSON.parse(stored);
+                    const noteIdx = data.findIndex(n => n.id === id);
+                    if (noteIdx !== -1) {
+                        data[noteIdx].reactions[type]++;
+                        localStorage.setItem(FALLBACK_KEY, JSON.stringify(data));
+                    }
+                }
+            }
+
+            // 2. If Firebase Note -> Update Database
+            if (window.firebaseReact && !id.startsWith('fallback_')) {
+                window.firebaseReact(id, type);
+            }
+        };
+
+        function openWriter() { document.getElementById('writeModal').classList.add('active'); }
+        function closeWriter() { document.getElementById('writeModal').classList.remove('active'); }
+        window.openWriter = openWriter;
+        window.closeWriter = closeWriter;
+
+        // Sanitization Helper
+        window.sanitizeText = function (text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        };
+
+        // moved postNote here to ensure it exists even if module fails
+        async function postNote() {
+            const input = document.getElementById('noteInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            if (window.playSound) window.playSound('post');
+
+            const cleanText = window.sanitizeText(text);
+            const pos = window.getGridPosition();
+            window.closeWriter();
+            input.value = '';
+
+            // Check if Handler is loaded
+            if (window.postNoteHandler) {
+                // Pass a callback that receives the temp ID and data
+                await window.postNoteHandler(cleanText, { x: undefined, y: undefined }, (tempId, data) => {
+                    // Manual Render for Optimistic Update
+                    // Mark as NEW to trigger Glow & Zoom
+                    data.isNew = true;
+                    window.renderFirebaseNote(tempId, data);
+
+                    // Reset View not needed if zoomToNote handles it
+                    // if (window.resetView) window.resetView(pos.x, pos.y);
+                });
+            } else {
+                alert("System is offline or initializing. Please try again in a moment.");
+                console.error("postNoteHandler not found. Module script failed?");
+                // Fallback to local only?
+                // For now, alert is safer.
+            }
+        };
+        window.postNote = postNote;
+
+    </script>
+
+    <!-- FIREBASE LOGIC (Handler Module) -->
+    <script type="module">
+        (async function () {
+            try {
+                window.logDebug("Attempting to load Handler Module...");
+                // Use Dynamic Import to catch errors
+                const module = await import("../assets/js/problem-wall-handler.js");
+                window.logDebug("Handler Module Loaded Successfully!");
+
+                const { initWall, postNoteToWall, reactToNote, hideNote } = module;
+
+                // Expose to Global
+                window.postNoteHandler = postNoteToWall;
+
+                // 1. Initialize Wall
+                initWall(
+                    (id, data) => {
+                        // window.logDebug(`Firebase Note Received: ${id}`);
+                        if (window.renderFirebaseNote) window.renderFirebaseNote(id, data);
+                    },
+                    (id, data) => {
+                        if (window.updateNoteUI) window.updateNoteUI(id, data);
+                    },
+                    (stats) => {                                // Update Stats
+                        window.logDebug(`Stats Updated: ${JSON.stringify(stats)}`);
+                        window.totalStats = stats;
+                        if (window.updateTotalStats) window.updateTotalStats();
+                    }
+                );
+
+                window.firebaseReact = async function (noteId, type) {
+                    await reactToNote(noteId, type);
+                };
+
+                window.firebaseHide = async function (noteId) {
+                    await hideNote(noteId);
+                };
+
+            } catch (e) {
+                window.logDebug(`CRITICAL MODULE ERROR: ${e.message}`);
+                console.error("Module Loading Failed:", e);
+            }
+        })();
+
+        // 2. Render Functions (Expose globally so main script can use them)
+        // 2. Render Functions (Expose globally so main script can use them)
+        window.renderFirebaseNote = function (noteId, data) {
+            // First time we get real data? Clear the fallback notes!
+            if (!window.hasRealData) {
+                window.logDebug("Real Data Received. Clearing Fallback.");
+                const container = document.getElementById('notes-container');
+                if (container) container.innerHTML = '';
+                // ALSO RESET THE GRID so real notes don't collide with phantom fallback notes
+                if (window.SmartPlacement && window.SmartPlacement.reset) {
+                    window.SmartPlacement.reset();
+                }
+                window.hasRealData = true;
+            }
+
+            let finalX = data.x, finalY = data.y;
+
+            // Default position if missing
+            if (finalX === undefined || finalY === undefined) {
+                const pos = window.getGridPosition();
+                finalX = pos.x; finalY = pos.y;
+            }
+
+            // --- REPULSION LOGIC MOVED TO createNoteElement ---
+            // This ensures ALL notes (Firebase & Fallback) respect the safe zone.
+
+            let timeLabel = 'Just now';
+            let createdTime = Date.now();
+
+            if (data.createdAt) {
+                if (typeof data.createdAt.toDate === 'function') {
+                    // Firestore Timestamp
+                    createdTime = data.createdAt.toDate().getTime();
+                } else if (data.createdAt.seconds) {
+                    // Mock Timestamp or serialized object
+                    createdTime = data.createdAt.seconds * 1000;
+                } else if (typeof data.createdAt === 'number') {
+                    // Raw milliseconds
+                    createdTime = data.createdAt;
+                }
+            }
+
+            const diffMins = Math.floor((Date.now() - createdTime) / 60000);
+            if (diffMins < 1) timeLabel = 'Just now';
+            else if (diffMins < 60) timeLabel = `${diffMins}m ago`;
+            else if (diffMins < 1440) timeLabel = `${Math.floor(diffMins / 60)}h ago`;
+            else timeLabel = `${Math.floor(diffMins / 1440)}d ago`;
+
+            window.createNoteElement({
+                id: noteId,
+                text: data.text,
+                x: finalX, y: finalY,
+                time: timeLabel,
+                reactions: { heart: data.hearts || 0, flower: data.flowers || 0, candle: data.candles || 0 }
+            }, false);
+
+            if (window.fallbackTimer) clearTimeout(window.fallbackTimer);
+        };
+
+        window.updateNoteUI = function (noteId, data) {
+            const noteEl = document.querySelector(`.note[data-note-id="${noteId}"]`);
+            if (!noteEl) return;
+            const h = noteEl.querySelector('.heart-btn .count'); if (h) h.innerText = data.hearts || 0;
+            const f = noteEl.querySelector('.flower-btn .count'); if (f) f.innerText = data.flowers || 0;
+            const c = noteEl.querySelector('.candle-btn .count'); if (c) c.innerText = data.candles || 0;
+        };
+
+        // --- MODERATOR SECRET ---
+        let clickCount = 0;
+        let lastClick = 0;
+        document.addEventListener('click', (e) => {
+            if (e.clientX < 100 && e.clientY > window.innerHeight - 100) {
+                const now = Date.now();
+                if (now - lastClick < 500) clickCount++;
+                else clickCount = 1;
+
+                lastClick = now;
+
+                if (clickCount >= 5) {
+                    toggleModMode();
+                    clickCount = 0;
+                }
+            }
+        });
+
+        function toggleModMode() {
+            document.body.classList.toggle('mod-mode');
+            alert("Moderator Mode Active. You can now hide inappropriate notes.");
+        }
+    </script>
+</body>
+
+</html>

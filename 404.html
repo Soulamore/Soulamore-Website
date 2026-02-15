@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Soulamore is a student wellness platform offering anonymous support, peer connection, and mental health resources.">
+    <link rel="icon" href="assets/images/favicon_symbol.png" type="image/x-icon">
+    <title>Page Not Found | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/global.css"> <!-- CHANGED: Relative path -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- THEME: CSS VARIABLE FALLBACKS --- */
+        /* Restored to ensure 404 text is visible even if global.css fails to load */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.8);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            /* Inherited */
+            color: var(--starlight);
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        h1,
+        h2 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* --- INTERACTIVE CANVAS --- */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        /* --- CONTENT CARD --- */
+        .error-container {
+            margin: 80px auto 100px auto;
+            /* Reduced margin, shell handles header */
+            /* CHANGED: Massive top margin to clear header */
+            position: relative;
+            z-index: 10;
+            background: rgba(30, 41, 59, 0.8);
+            /* Fallback */
+            background: var(--navy-glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 60px 40px;
+            border-radius: 30px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            width: 90%;
+            animation: floatCard 6s infinite ease-in-out;
+        }
+
+        @keyframes floatCard {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .error-code {
+            font-size: 8rem;
+            font-weight: 700;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--peach-glow), var(--teal-glow));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .error-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .error-desc {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* --- BREATH BUTTON --- */
+        .breath-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--teal-glow);
+            color: var(--teal-glow);
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.5s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .breath-btn:hover {
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .breath-anim {
+            animation: deepBreath 4s ease-in-out;
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            border-color: var(--teal-glow);
+            transform: scale(1.1);
+        }
+
+        @keyframes deepBreath {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 0 30px var(--teal-glow);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* --- NAV LINKS --- */
+        .links-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-pill {
+            text-decoration: none;
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .nav-pill:hover {
+            background: white;
+            color: var(--deep-space);
+        }
+
+        /* --- AUDIO --- */
+        .audio-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            /* Increased from 99 */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: white;
+        }
+    </style>
+    <link rel="icon" href="assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <audio id="bgAudio" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_c8c8a73467.mp3" type="audio/mp3">
+    </audio>
+    <div class="audio-control" onclick="toggleAudio()"><i class="fas fa-music"></i> <span id="audioText">Ambience</span>
+    </div>
+
+    <!-- STAR CANVAS -->
+    <canvas id="starCanvas"></canvas>
+
+    <!-- APP SHELL START -->
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header class="island-nav"></header>
+        </div>
+
+        <main id="shell-content">
+
+            <div class="error-container">
+                <!-- INTERACTIVE TOY -->
+                <div class="dino-toy" onclick="jumpSoul()" style="cursor: pointer; margin-bottom: 10px;">
+                    <i class="fas fa-ghost" id="soulIcon"
+                        style="font-size: 3rem; color: var(--teal-glow); transition: 0.2s;"></i>
+                    <p id="jump-instruction" style="font-size: 0.8rem; opacity: 0.5; margin-top: 10px;">(Press Space to
+                        Jump)
+                    </p>
+                    <p id="jump-score"
+                        style="font-size: 0.9rem; font-weight:700; color:var(--peach-glow); display:none; margin-top:5px;">
+                        Score: 0</p>
+                </div>
+
+                <div class="error-code">404</div>
+                <h1 class="error-title">You haven't lost your way.</h1>
+                <p class="error-desc">
+                    The page you are looking for isn't here, but you are. <br>
+                    Take a moment. Breathe. There is no rush to go anywhere else just yet.
+                </p>
+
+                <button class="breath-btn" id="breathBtn" onclick="takeBreath()">
+                    <i class="fas fa-wind"></i> <span id="breathText">Take a deep breath</span>
+                </button>
+
+                <div class="links-row">
+                    <a href="index.html" class="nav-pill">Go Home</a>
+                    <a href="vent-box.html" class="nav-pill">The Vent Box</a>
+                    <a href="5-step-reset.html" class="nav-pill">5-Step Reset</a>
+                    <a href="playground.html" class="nav-pill">Mental Playground</a>
+                    <a href="tools/drop-it.html" class="nav-pill">Drop It (Game)</a>
+                    <a href="soulbot.html" class="nav-pill">SoulBot AI</a>
+                    <a href="confession-box.html" class="nav-pill">Confession Box</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- APP SHELL END -->
+
+    <script>
+        // --- STAR CONSTELLATION LOGIC ---
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let stars = [];
+
+        // Mouse tracking
+        let mouse = { x: null, y: null };
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+        window.addEventListener('touchmove', (e) => { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; });
+
+        function resize() {
+            width = window.innerWidth; height = window.innerHeight;
+            canvas.width = width; canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Star {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.fillStyle = "rgba(255,255,255,0.6)";
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 80; i++) stars.push(new Star());
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+
+                // Connect to mouse
+                const dx = mouse.x - star.x;
+                const dy = mouse.y - star.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 150) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(78, 205, 196, ${1 - distance / 150})`;
+                    ctx.lineWidth = 1;
+                    ctx.moveTo(star.x, star.y);
+                    ctx.lineTo(mouse.x, mouse.y);
+                    ctx.stroke();
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- BREATH BUTTON ---
+        function takeBreath() {
+            const btn = document.getElementById('breathBtn');
+            const txt = document.getElementById('breathText');
+
+            btn.classList.add('breath-anim');
+            txt.innerText = "Inhale...";
+
+            setTimeout(() => { txt.innerText = "Hold..."; }, 1500);
+            setTimeout(() => { txt.innerText = "Exhale..."; }, 2500);
+            setTimeout(() => {
+                txt.innerText = "Take a deep breath";
+                btn.classList.remove('breath-anim');
+            }, 4000);
+        }
+
+        // --- AUDIO ---
+        const audio = document.getElementById('bgAudio');
+        let playing = false;
+        function toggleAudio() {
+            if (playing) { audio.pause(); document.getElementById('audioText').innerText = "Ambience"; }
+            else { audio.volume = 0.3; audio.play(); document.getElementById('audioText').innerText = "Pause"; }
+            playing = !playing;
+        }
+        // --- JUMP TOY LOGIC ---
+        let score = 0;
+        const soulIcon = document.getElementById('soulIcon');
+        const scoreText = document.getElementById('jump-score');
+        const instrText = document.getElementById('jump-instruction');
+
+        function jumpSoul() {
+            if (soulIcon.classList.contains('fa-bounce')) return;
+
+            // Animation
+            soulIcon.classList.add('fa-bounce');
+            setTimeout(() => soulIcon.classList.remove('fa-bounce'), 800); // FontAwesome bounce is ~1s
+
+            // Score logic
+            score++;
+            scoreText.style.display = 'block';
+            scoreText.innerText = "Jumps: " + score;
+            instrText.style.opacity = '0';
+
+            // Message for high score
+            if (score === 10) scoreText.innerText = "Wow! 10 Jumps! 👻";
+            if (score === 20) scoreText.innerText = "You are bored, huh? 😂";
+            if (score === 50) scoreText.innerText = "Okay, go to the playground! 🎮";
+        }
+
+        // Spacebar support
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault(); // Prevent scrolling
+                jumpSoul();
+            }
+        });
+    </script>
+
+
+
+
+    <!-- STANDARDIZED FOOTER -->
+    <footer></footer>
+
+    <script src="assets/js/soulbot-beta.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

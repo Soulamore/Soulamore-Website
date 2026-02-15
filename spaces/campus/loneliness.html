@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Soulamore is a student wellness platform offering anonymous support, peer connection, and mental health resources.">
+    <title>Loneliness | Soulamore</title>
+    <!-- GLOBAL ASSETS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+
+    <!-- FIREBASE INTEGRATION -->
+    <script type="module" src="../../assets/js/firebase-config.js"></script>
+    <script type="module" src="../../assets/js/data-handler.js"></script>
+
+    <style>
+        /* --- PAGE THEME: LONELINESS (Navy/Peach) --- */
+        :root {
+            --bg-base: #f7f9fc;
+            --navy: #1A2B45;
+            --navy-soft: #2C3E50;
+            --peach: #F49F75;
+            --teal: #4ECDC4;
+            --white: #ffffff;
+            --text-main: #2d3748;
+            --shadow: 0 10px 40px rgba(26, 43, 69, 0.08);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #E5E9F0;
+            /* Darker BG for contrast */
+            color: var(--navy);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-top: 0;
+            /* REMOVED PADDING */
+        }
+
+        /* FIX: FORCE HEADER TO FLOAT */
+        header {
+            position: fixed !important;
+            top: 20px;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        /* --- HERO (Seamless Polish) --- */
+        .hero {
+            position: relative;
+            padding: 200px 0 40px;
+            /* Increased top padding */
+            background: linear-gradient(180deg, #F3E8FF 0%, #E5E9F0 100%);
+            /* Purple fades into body */
+            margin-bottom: 10px;
+            /* Minimal gap before content */
+            overflow: hidden;
+            text-align: center;
+            /* RESTORED ALIGNMENT */
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 15px;
+            color: var(--navy);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #555;
+            max-width: 600px;
+            margin-bottom: 20px;
+            margin: 0 auto;
+        }
+
+        /* PRESENCE COUNTER */
+        .presence-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            font-size: 0.9rem;
+            color: var(--navy);
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #48bb78;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* --- CONTENT CARDS (Light Glass) --- */
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(26, 43, 69, 0.1);
+            /* Darker shadow */
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        /* --- FEATURE: THE ECHO SPACE --- */
+        .echo-space {
+            background: linear-gradient(135deg, #1A2B45 0%, #162236 100%);
+            color: white;
+            border-radius: 24px;
+            padding: 50px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .echo-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            width: 100%;
+            max-width: 500px;
+            font-family: inherit;
+            margin: 20px 0;
+            transition: 0.3s;
+        }
+
+        .echo-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--teal);
+        }
+
+        .echo-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .echo-btn {
+            background: var(--teal);
+            color: var(--navy);
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .echo-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .echo-response {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 12px 12px 12px 0;
+            margin: 10px 0;
+            opacity: 0;
+            transform: translateY(20px);
+            max-width: 80%;
+            text-align: left;
+            align-self: flex-start;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .echo-container {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* --- I RELATE TOGGLE --- */
+        .relate-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .heart-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #555;
+            transition: 0.2s;
+        }
+
+        .heart-btn.active {
+            background: #ffebee;
+            color: #e53e3e;
+            border-color: #e53e3e;
+        }
+
+        .heart-btn i {
+            transition: 0.2s;
+        }
+
+        .heart-btn.active i {
+            transform: scale(1.2);
+        }
+
+        /* --- JOURNAL PROMPTS --- */
+        .line-input {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid #e2e8f0;
+            background: transparent;
+            padding: 8px 0;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .line-input:focus {
+            outline: none;
+            border-color: var(--navy);
+        }
+
+        /* --- CTA SECTION --- */
+        .cta-wrapper {
+            text-align: center;
+            padding: 50px 0;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 50px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--navy) !important;
+            /* FORCE OVERRIDE */
+        }
+
+        .therapist-btn {
+            background: var(--navy);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .therapist-btn:hover {
+            background: #2C3E50;
+        }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 43, 69, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 12px;
+            background: var(--navy);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            background: #eee;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border: none;
+            background: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media(max-width: 600px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .echo-space {
+                padding: 30px 20px;
+            }
+
+            .confession-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .confession-icon {
+                display: none;
+            }
+        }
+
+        .page-wrapper {
+            padding-top: 0 !important;
+            /* Fix visual gap */
+        }
+
+        .hero {
+            padding-top: 140px;
+            /* Ensure content clears header */
+        }
+
+        /* --- CONFESSION BOX CARD (NEW) --- */
+        .confession-card {
+            background: linear-gradient(135deg, #1A2B45 0%, #0F1A2A 100%);
+            /* Darker Navy for Loneliness */
+            color: white;
+            padding: 40px;
+            border-radius: 24px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .confession-content {
+            z-index: 2;
+            flex: 1;
+        }
+
+        .confession-content h2 {
+            color: #FFE66D;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .confession-content p {
+            color: #d0d0d0;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .confession-btn {
+            background: #FFE66D;
+            color: var(--navy);
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .confession-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .confession-icon {
+            font-size: 6rem;
+            color: white;
+            opacity: 0.1;
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            transform: rotate(-15deg);
+        }
+    </style>
+    <link rel="icon" href="../../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <!-- GLOBAL HEADER -->
+    <!-- GLOBAL HEADER (ISLAND STYLE) -->
+    <!-- APP SHELL -->
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header></header>
+        </div>
+
+        <main id="shell-content">
+            <!-- HERO -->
+            <section class="hero fade-in" style="padding-top: 40px;">
+                <div class="presence-badge">
+                    <div class="live-dot"></div>
+                    <span id="visitorCount">18</span> students are here with you right now.
+                </div>
+                <div style="font-size: 3rem; margin-bottom: 10px;">🧍</div>
+                <h1>Loneliness</h1>
+
+                <div class="footer-socials">
+                    <a href="https://www.instagram.com/soulamore_/" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/company/soulamore/" target="_blank"><i
+                            class="fab fa-linkedin"></i></a>
+                    <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank"><i
+                            class="fab fa-facebook"></i></a>
+                </div>
+                <p>Surrounded by people, but feeling alone.</p>
+            </section>
+
+            <div class="container">
+                <!-- Breadcrumb Removed -->
+
+                <!-- INTRO CARD -->
+                <div class="card fade-in" style="border-left: 5px solid var(--navy);">
+                    <h3 style="color: var(--navy);">Loneliness is not about being alone.</h3>
+                    <p style="margin-top: 15px;">
+                        It’s about feeling un-met. It’s the gap between what you feel inside and what you share with
+                        others.
+                        <br><br><strong>Important:</strong> You don't heal loneliness by forcing yourself to be loud.
+                        You
+                        heal it with one safe connection.
+                    </p>
+                </div>
+
+                <!-- FEATURE: THE ECHO SPACE -->
+                <div class="card fade-in" style="padding: 0; overflow: hidden;">
+                    <div class="echo-space" id="echoSpace">
+                        <div class="stars">✨ . * . ✨ . * . </div>
+
+                        <!-- STATE 1: INPUT -->
+                        <div id="echoInputState" style="width: 100%; max-width: 500px;">
+                            <h2 style="color:white; margin-bottom: 10px;">🌌 The Echo Space</h2>
+                            <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">Say something you wish someone
+                                knew about you. <br>(Anonymous. Safe. Witnessed.)</p>
+                            <input type="text" class="echo-input" id="userMsg" placeholder="I feel most alone when..."
+                                maxlength="100">
+                            <button class="echo-btn" onclick="sendEcho()">Send into the void</button>
+                        </div>
+
+                        <!-- STATE 2: RESPONSE -->
+                        <div class="echo-container" id="echoResponseState">
+                            <div style="margin-bottom: 20px; opacity: 0.6; font-size: 0.9rem;">Echoes returning...</div>
+                            <div class="echo-response" id="msg1">"I feel this too."</div>
+                            <div class="echo-response" id="msg2">"You are not strange for feeling this."</div>
+                            <div class="echo-response" id="msg3">"Someone else felt this today."</div>
+                            <button class="echo-btn"
+                                style="background: rgba(255,255,255,0.2); color: white; margin-top: 30px;"
+                                onclick="resetEcho()">Write another</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- I RELATE SECTION -->
+                <div class="card fade-in">
+                    <h2>Silent Connection</h2>
+                    <p>If you don't want to type, just place a hand on your chest and breathe. Acknowledge that you
+                        aren't
+                        the only one feeling this.</p>
+
+                    <div class="relate-wrapper">
+                        <span><strong>You're not the only one here.</strong></span>
+                        <button class="heart-btn" onclick="toggleRelate(this)">
+                            <i class="far fa-heart"></i> I relate
+                        </button>
+                    </div>
+                </div>
+
+                <!-- JOURNALING -->
+                <div class="card fade-in">
+                    <h2>Writing to be Seen</h2>
+                    <p style="font-size: 0.9rem; margin-bottom: 20px;">You don't need to show this to anyone. Writing is
+                        a
+                        form of connecting with yourself.</p>
+
+                    <label style="font-weight: 600; font-size: 0.9rem;">I wish someone noticed that I...</label>
+                    <input type="text" class="line-input">
+
+                    <label style="font-weight: 600; font-size: 0.9rem;">I feel most alone when...</label>
+                    <input type="text" class="line-input">
+
+                    <label style="font-weight: 600; font-size: 0.9rem;">What I'm afraid people wouldn't understand
+                        is...</label>
+                    <input type="text" class="line-input">
+                </div>
+
+                <!-- PEER SUPPORT INFO -->
+                <div class="card fade-in" style="background: #EBF8FF;">
+                    <h3>👥 Why Peer Support Matters</h3>
+                    <p style="margin-top: 10px;">
+                        Loneliness often whispers, "No one my age understands." Talking to a trained peer who speaks
+                        your
+                        language often breaks loneliness faster than adult advice.
+                    </p>
+                </div>
+
+                <!-- CONFESSION BOX CTA -->
+                <div class="confession-card fade-in">
+                    <div class="confession-content">
+                        <h2>Feeling unseen?</h2>
+                        <p>You are not invisible here. Share your story anonymously and let someone else say "Me too".
+                        </p>
+                        <a href="../confession-box.html" class="confession-btn">
+                            Open Confession Box <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    <i class="fas fa-paper-plane confession-icon"></i>
+                </div>
+
+                <!-- CTA SECTION -->
+                <div class="cta-wrapper fade-in">
+                    <h3 style="margin-bottom: 10px;">Loneliness deserves care, not silence.</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 30px;">One safe connection is enough to begin.</p>
+
+                    <button class="therapist-btn" onclick="openModal()">
+                        <i class="fas fa-user-md"></i> Talk to a School Therapist
+                    </button>
+
+                    <div style="margin-top: 30px; font-size: 0.9rem;">
+                        Or call Tele-MANAS (24/7): <strong style="color: var(--teal);">14416</strong>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer></footer>
+    </div>
+    <!-- APP SHELL END -->
+
+    <!-- FOOTER -->
+    <!-- GLOBAL FOOTER -->
+
+
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="therapistModal">
+        <div class="modal-card">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <div class="step-content active" id="step1">
+                <h3>Connect with support</h3>
+                <p style="color: #666; margin: 15px 0;">This request goes confidentially to your school counselor.</p>
+                <div class="btn-group">
+                    <button class="btn-secondary" onclick="closeModal()">Not right now</button>
+                    <button class="btn-primary" onclick="goToStep2()">Yes, I'd like to talk</button>
+                </div>
+            </div>
+            <div class="step-content" id="step2">
+                <h3>Request a Chat</h3>
+                <input type="text" placeholder="Name (Optional)"
+                    style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px;">
+                <select style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px;">
+                    <option>Select Class</option>
+                    <option>Class 9-12</option>
+                </select>
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="submitForm()">Send
+                    Request</button>
+            </div>
+            <div class="step-content" id="step3" style="text-align: center;">
+                <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--teal); margin-bottom: 20px;"></i>
+                <h3>Request Sent</h3>
+                <p>Your counselor has been notified.</p>
+                <button class="btn-secondary" style="margin-top: 20px;" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- STANDARDIZED FOOTER -->
+
+    <script src="../../assets/js/components.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script>
+        // --- RANDOM VISITOR COUNT ---
+        document.getElementById('visitorCount').innerText = Math.floor(Math.random() * (34 - 12 + 1) + 12);
+
+        // --- ECHO SPACE LOGIC ---
+        function sendEcho() {
+            const input = document.getElementById('userMsg');
+            if (input.value.trim() === "") return;
+
+            // Save Echo to Backend
+            if (window.SoulBackend && window.SoulBackend.submitEcho) {
+                window.SoulBackend.submitEcho(input.value);
+            }
+
+            const inputState = document.getElementById('echoInputState');
+            const responseState = document.getElementById('echoResponseState');
+
+            inputState.style.opacity = '0';
+            inputState.style.transition = 'opacity 0.5s';
+
+            setTimeout(() => {
+                inputState.style.display = 'none';
+                responseState.style.display = 'flex';
+                revealMessage('msg1', 500);
+                revealMessage('msg2', 1500);
+                revealMessage('msg3', 2500);
+            }, 500);
+        }
+
+        function revealMessage(id, delay) {
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+                el.style.transition = 'all 0.6s ease-out';
+            }, delay);
+        }
+
+        function resetEcho() {
+            document.getElementById('userMsg').value = '';
+            document.getElementById('echoResponseState').style.display = 'none';
+            const inputState = document.getElementById('echoInputState');
+            inputState.style.display = 'block';
+            setTimeout(() => { inputState.style.opacity = '1'; }, 100);
+            ['msg1', 'msg2', 'msg3'].forEach(id => {
+                const el = document.getElementById(id);
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+            });
+        }
+
+        // --- I RELATE TOGGLE ---
+        function toggleRelate(btn) {
+            btn.classList.toggle('active');
+            const icon = btn.querySelector('i');
+            if (btn.classList.contains('active')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                btn.innerHTML = '<i class="fas fa-heart"></i> Validated';
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                btn.innerHTML = '<i class="far fa-heart"></i> I relate';
+            }
+        }
+
+        // --- MODAL LOGIC ---
+        const modal = document.getElementById('therapistModal');
+        const s1 = document.getElementById('step1');
+        const s2 = document.getElementById('step2');
+        const s3 = document.getElementById('step3');
+        function openModal() { modal.style.display = 'flex'; resetModal(); }
+        function closeModal() { modal.style.display = 'none'; }
+        function goToStep2() { s1.classList.remove('active'); s2.classList.add('active'); }
+        function submitForm() { s2.classList.remove('active'); s3.classList.add('active'); }
+        function resetModal() { s1.classList.add('active'); s2.classList.remove('active'); s3.classList.remove('active'); }
+        window.onclick = function (e) { if (e.target == modal) closeModal(); }
+
+        // --- FADE IN ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = "translateY(0)";
+                }
+            });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+    <script src="../../assets/js/soulbot-beta.js"></script>
+</body>
+
+</html>

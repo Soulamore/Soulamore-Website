@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join the Inner Circle | Soulamore Newsletter</title>
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Shared Scripts (for Backend & Components) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <script type="module" src="assets/js/firebase-config.js"></script>
+    <script type="module" src="assets/js/data-handler.js"></script> <!-- Contains handleNewsletter -->
+    <script src="assets/js/components.js"></script>
+
+    <style>
+        body {
+            background-color: #0f172a;
+            /* Midnight Theme */
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .newsletter-page-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .newsletter-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
+            padding: 60px 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .icon-glow {
+            font-size: 4rem;
+            color: #4ECDC4;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 15px rgba(78, 205, 196, 0.4));
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, white, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 15px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input[type="email"]:focus {
+            border-color: #4ECDC4;
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.2);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #4ECDC4, #2dd4bf);
+            color: #0f172a;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.2);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(78, 205, 196, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <link rel="icon" href="./assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header class="island-nav"></header>
+        </div>
+
+        <main id="shell-content" class="newsletter-page-container" style="padding-top: 120px;">
+            <div class="newsletter-card">
+                <i class="fas fa-paper-plane icon-glow"></i>
+                <h1>Stay Connected</h1>
+                <p>
+                    We are building Soulamore to be a sanctuary for everyone. <br>
+                    Join our community to receive gentle updates, wellness tips, and early access to new features.
+                    <br><br>
+                    <em style="color: #4ECDC4;">No spam. Just soul.</em>
+                </p>
+
+                <form onsubmit="submitNewsletterPage(event)" class="input-group">
+                    <input type="email" id="newsPageEmail" placeholder="Enter your email address" required>
+                    <button type="submit" id="btnPageNews" class="submit-btn">Subscribe to Updates</button>
+                </form>
+                <p id="msgPageNews" style="margin-top: 20px; font-size: 0.9rem; margin-bottom: 0; min-height: 20px;">
+                </p>
+            </div>
+
+            <footer></footer>
+        </main>
+    </div>
+
+    <script>
+        // Newsletter Handling Logic
+        async function submitNewsletterPage(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('newsPageEmail');
+            const btn = document.getElementById('btnPageNews');
+            const msg = document.getElementById('msgPageNews');
+
+            const email = emailInput.value.trim();
+
+            if (!email) return;
+
+            // UI Loading State
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+            btn.disabled = true;
+            msg.style.color = "white";
+            msg.innerText = "";
+
+            try {
+                // Use the shared backend handleNewsletter function if available
+                let success = false;
+                // Check SoulBackend (module exposed) or global function
+                const submitFn = (window.SoulBackend && window.SoulBackend.submitNewsletter)
+                    ? window.SoulBackend.submitNewsletter
+                    : (window.handleNewsletter ? window.handleNewsletter : null);
+
+                if (submitFn) {
+                    success = await submitFn(email);
+                } else {
+                    console.error("Newsletter backend function missing.");
+                    throw new Error("Backend not loaded");
+                }
+
+                if (success) {
+                    btn.innerHTML = 'Welcome Home <i class="fas fa-check"></i>';
+                    btn.style.background = "#48bb78"; // Green
+                    msg.style.color = "#48bb78";
+                    msg.innerText = "You've successfully joined the list.";
+                    const emailInput = document.getElementById('newsPageEmail');
+                    if (emailInput) emailInput.value = "";
+                } else {
+                    throw new Error("Submission returned false");
+                }
+
+            } catch (err) {
+                console.error(err);
+                btn.innerHTML = 'Try Again';
+                btn.disabled = false;
+                msg.style.color = "#ef4444"; // Red
+                msg.innerText = "Something went wrong. Please try again.";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying... | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            text-align: center;
+        }
+
+        .spinner {
+            font-size: 3rem;
+            color: #4ECDC4;
+            animation: spin 1s infinite linear;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            margin-bottom: 10px;
+        }
+
+        p {
+            opacity: 0.7;
+        }
+
+        .error-card {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loading">
+        <div class="spinner"><i class="fas fa-circle-notch"></i></div>
+        <h1>Verifying Link</h1>
+        <p>Just a moment while we log you in...</p>
+    </div>
+
+    <div id="error" class="error-card">
+        <h2 style="color:#ef4444; margin-top:0;">Link Expired or Invalid</h2>
+        <p id="error-msg">The magic link didn't work. Please try requesting a new one.</p>
+        <button onclick="window.location.href='login.html'"
+            style="background:#ef4444; border:none; color:white; padding:10px 20px; border-radius:8px; cursor:pointer; margin-top:10px;">Back
+            to Login</button>
+    </div>
+
+    <!-- Font Awesome already loaded via CSS link in header -->
+    <script type="module">
+        import { completeEmailLogin } from "../assets/js/auth-service.js";
+        import { createOrUpdateUserProfile } from "../assets/js/profile-handler.js";
+
+        async function verify() {
+            const result = await completeEmailLogin(window.location.href);
+
+            if (result.success) {
+                document.querySelector('h1').innerText = "Success";
+                document.querySelector('p').innerText = "Redirecting you home...";
+
+                await createOrUpdateUserProfile(result.user);
+
+                setTimeout(() => {
+                    window.location.href = 'user-dashboard.html';
+                }, 1000);
+            } else {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                if (result.error) document.getElementById('error-msg').innerText = result.error;
+            }
+        }
+
+        verify();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoya | Peer Counselor</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <style>
+        /* --- THEME: PEER STANDARD (Aditya Style / Light) --- */
+        :root {
+            --bg-soft: #f0fdf4;
+            /* Mint/Soft Green */
+            --card-white: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #475569;
+            --accent-green: #dcfce7;
+            --accent-text: #166534;
+            --btn-sage: #86efac;
+            --gold-star: #fbbf24;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-soft);
+            color: var(--text-dark);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto 60px;
+            padding: 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 30px;
+            transition: 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--text-dark);
+            transform: translateX(-5px);
+        }
+
+        /* --- CARDS --- */
+        .soul-card {
+            background: var(--card-white);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            /* Soft natural shadow */
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- HEADER --- */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #fbbf24;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            border: 4px solid var(--accent-green);
+        }
+
+        .profile-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .profile-role {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #e0f2fe;
+            color: #0284c7;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* --- SECTIONS --- */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            display: inline-block;
+            background: linear-gradient(120deg, var(--accent-green) 0%, var(--accent-green) 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 0.4em;
+            background-position: 0 88%;
+        }
+
+        /* --- REVIEW UI (Adapted for Light Theme) --- */
+        .reviews-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 15px;
+        }
+
+        .write-review-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fafc;
+        }
+
+        .review-input {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: inherit;
+            margin-bottom: 15px;
+            background: white;
+            color: var(--text-dark);
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .star-rating i {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            transition: 0.2s;
+        }
+
+        .star-rating i.active,
+        .star-rating i:hover {
+            color: var(--gold-star);
+        }
+
+        .btn-publish {
+            background: var(--text-dark);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            float: right;
+        }
+
+        .btn-publish:hover {
+            background: #334155;
+        }
+
+        .review-item {
+            padding: 20px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        /* --- FAB --- */
+        .book-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #0f172a;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3);
+            transition: 0.3s;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .book-fab:hover {
+            transform: translateY(-5px);
+        }
+
+        @media(max-width: 600px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+    <!-- APP SHELL START -->
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header id="main-header"></header>
+        </div>
+
+        <main id="shell-content">
+            <div class="container fade-in">
+
+                <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Peers</a>
+
+                <!-- HEADER CARD -->
+                <div class="soul-card" style="padding: 30px;">
+                    <div class="profile-header">
+                        <div class="profile-avatar">Z</div>
+                        <div>
+                            <h1 class="profile-name">Zoya</h1>
+                            <div class="profile-role">Peer Counselor</div>
+                            <div class="verified-badge"><i class="fas fa-check-circle"></i> Verified Listener</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABOUT ME CARD -->
+                <div class="soul-card">
+                    <h2 class="section-title">Hello,</h2>
+                    <p style="margin-bottom: 15px; color: var(--text-muted); font-size:1.05rem; line-height:1.7;">
+                        "In here for you to cope up with negative emotions and get through the tough times."
+                    </p>
+                    <p style="margin-bottom: 15px; color: var(--text-muted);">
+                        Navigating the challenges of workplace stress can often feel like walking on a tightrope. At
+                        Soulamore, my purpose is to provide you with a sanctuary.
+                    </p>
+                    <p style="color: var(--text-muted);">
+                        As your peer counselor, I extend my hand to help you face negative emotions and uncertainties.
+                        Together, we'll create a space where you can share thoughts without judgment.
+                    </p>
+                </div>
+
+                <!-- TESTIMONIALS & REVIEWS CARD -->
+                <div class="soul-card">
+                    <div class="reviews-header">
+                        <h2 class="section-title" style="margin:0;">Reviews</h2>
+                        <div style="color:var(--text-dark); font-weight:600;">
+                            <i class="fas fa-star" style="color:var(--gold-star);"></i> 4.8 <span
+                                style="font-weight:400; opacity:0.6;">(12 Reviews)</span>
+                        </div>
+                    </div>
+
+                    <!-- WRITE REVIEW AREA -->
+                    <div class="write-review-box">
+                        <h4 style="margin-bottom:15px; color:var(--text-dark);">Write a review</h4>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                            <input type="text" class="review-input" placeholder="Name *" style="margin:0;" id="rName">
+                            <input type="email" class="review-input" placeholder="Email (Private)" style="margin:0;">
+                        </div>
+
+                        <div class="star-rating" id="starInput">
+                            <i class="far fa-star" onclick="rate(1)"></i>
+                            <i class="far fa-star" onclick="rate(2)"></i>
+                            <i class="far fa-star" onclick="rate(3)"></i>
+                            <i class="far fa-star" onclick="rate(4)"></i>
+                            <i class="far fa-star" onclick="rate(5)"></i>
+                        </div>
+
+                        <textarea class="review-input" placeholder="Share your experience..." rows="3"
+                            id="rMsg"></textarea>
+
+                        <div style="overflow:hidden;">
+                            <button class="btn-publish" onclick="submitReview()">Publish Review</button>
+                        </div>
+                    </div>
+
+                    <!-- REVIEW LIST -->
+                    <div id="reviewList">
+                        <div class="review-item">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <strong style="color:var(--text-dark);">Ankita</strong>
+                                <span style="color:var(--gold-star); font-size:0.8rem;"><i class="fas fa-star"></i><i
+                                        class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                        class="fas fa-star"></i></span>
+                            </div>
+                            <p style="color:var(--text-muted); font-style:italic;">"Thanks to Zoya, I now have coping
+                                strategies that make my workdays much more manageable."</p>
+                        </div>
+
+                        <div class="review-item">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <strong style="color:var(--text-dark);">Kritika</strong>
+                                <span style="color:var(--gold-star); font-size:0.8rem;"><i class="fas fa-star"></i><i
+                                        class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                        class="fas fa-star-half-alt"></i></span>
+                            </div>
+                            <p style="color:var(--text-muted); font-style:italic;">"She helped me understand the roots
+                                of my workplace stress and guided me towards healthier ways to cope."</p>
+                        </div>
+
+                        <div class="review-item">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <strong style="color:var(--text-dark);">Ashwin</strong>
+                                <span style="color:var(--gold-star); font-size:0.8rem;"><i class="fas fa-star"></i><i
+                                        class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                        class="fas fa-star"></i></span>
+                            </div>
+                            <p style="color:var(--text-muted); font-style:italic;">"Zoya's insights into relationships
+                                are remarkable. We couldn't have done it without her."</p>
+                        </div>
+
+                        <div class="review-item">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <strong style="color:var(--text-dark);">Komesh</strong>
+                                <span style="color:var(--gold-star); font-size:0.8rem;"><i class="fas fa-star"></i><i
+                                        class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                        class="far fa-star"></i></span>
+                            </div>
+                            <p style="color:var(--text-muted); font-style:italic;">"Zoya’s traveler profile inspired me
+                                to embrace new experiences."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOUNDARY CARD -->
+                <div class="soul-card" style="background: transparent; box-shadow: none; border: none; padding: 0;">
+                    <div
+                        style="background:#f1f5f9; padding:20px; border-left:4px solid #94a3b8; border-radius:0 10px 10px 0; color:var(--text-muted); font-style:italic;">
+                        <strong>Note on boundaries:</strong> I am here to listen and support, but I am not a medical
+                        professional.
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FLOAT CTA -->
+            <a href="#" class="book-fab">Connect Now <i class="fas fa-comment-dots"></i></a>
+        </main>
+        <footer></footer>
+    </div>
+
+    <script src="../assets/js/components.js"></script>
+    <script>
+        // Ensure Layout Calculation Runs
+        window.addEventListener('load', () => {
+            if (window.updateShellHeight) window.updateShellHeight();
+            if (window.injectHeader) injectHeader();
+            if (window.injectFooter) injectFooter();
+        });
+
+        let currentRating = 0;
+        function rate(n) {
+            currentRating = n;
+            const stars = document.querySelectorAll('#starInput i');
+            stars.forEach((s, i) => {
+                s.className = i < n ? "fas fa-star" : "far fa-star";
+                s.style.color = i < n ? "var(--gold-star)" : "#cbd5e1";
+            });
+        }
+
+        function submitReview() {
+            const btn = document.querySelector('.btn-publish');
+            const name = document.getElementById('rName').value || "Anonymous";
+            const msg = document.getElementById('rMsg').value;
+
+            if (!msg) return alert("Please share your experience.");
+
+            btn.innerText = "Publishing...";
+
+            setTimeout(() => {
+                btn.innerText = "Published!";
+                btn.style.background = "#22c55e";
+
+                // Add to list (SECURITY FIX: Use safe DOM methods instead of innerHTML)
+                const list = document.getElementById('reviewList');
+                const div = document.createElement('div');
+                div.className = 'review-item';
+
+                const header = document.createElement('div');
+                header.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:5px;';
+
+                const nameEl = document.createElement('strong');
+                nameEl.style.color = 'var(--text-dark)';
+                nameEl.textContent = name;  // Safe: textContent
+
+                const starsEl = document.createElement('span');
+                starsEl.style.cssText = 'color:var(--gold-star); font-size:0.8rem;';
+                for (let i = 0; i < currentRating; i++) {
+                    const star = document.createElement('i');
+                    star.className = 'fas fa-star';
+                    starsEl.appendChild(star);
+                }
+
+                header.appendChild(nameEl);
+                header.appendChild(starsEl);
+
+                const msgEl = document.createElement('p');
+                msgEl.style.cssText = 'color:var(--text-muted); font-style:italic;';
+                msgEl.textContent = `"${msg}"`;  // Safe: textContent
+
+                div.appendChild(header);
+                div.appendChild(msgEl);
+                list.insertBefore(div, list.firstChild);
+
+                setTimeout(() => {
+                    btn.innerText = "Publish Review";
+                    btn.style.background = "#1e293b";
+                    document.getElementById('rMsg').value = "";
+                }, 2000);
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>

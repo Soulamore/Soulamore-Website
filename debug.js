@@ -1,0 +1,1264 @@
+        let logoBase64 = (typeof LOGO_DATA !== 'undefined') ? LOGO_DATA : "";
+
+        // Legacy Preloader Removed (Now using external logo.js)
+
+        /* --- GAME ENGINE --- */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let running = false;
+        let speed = 0;
+        let maxSpeed = 3.5; // Zen Cap (Reduced from 5)
+        let distance = 0;
+        let score = 0;
+        let droppedWords = [];
+        let pulses = [];
+
+        // Heat System
+        let heat = 0;
+        const maxHeat = 100;
+        let overheated = false;
+        let fireRateCounter = 0;
+
+        let keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false, " ": false };
+        let isTouchFiring = false;
+
+        // GUIDANCE MESSAGES DATA
+        // INTRUSIVE POPUP CONTENT (The "Ads")
+        const thoughtContent = [
+            // CORE
+            { title: "DID YOU KNOW?", body: "Soulamore gives your thoughts a safe place to land." },
+            { title: "REMINDER", body: "Soulamore creates space without asking you to perform." },
+            { title: "NOTE", body: "Soulamore is to unload mental weight gently." },
+
+            // CONFESSION
+            { title: "CONFESS", body: "The Confession Box lets you share thoughts anonymously." },
+            { title: "PRIVACY", body: "Soulamore’s Confession Box keeps your identity out of it." },
+
+            // PEER SUPPORT
+            { title: "CONNECT", body: "Soulamore Peer Support connects you with real people." },
+            { title: "LISTEN", body: "Peer Support focuses on understanding, not fixing." },
+
+            // SOULBOT
+            { title: "SOULBOT", body: "SoulBot helps you sort thoughts when they feel tangled." },
+            { title: "REFLECT", body: "SoulBot listens anytime without judgment." },
+
+            // CAMPUS
+            { title: "STUDENTS", body: "Soulamore Campus supports students under quiet pressure." },
+            { title: "STRESS?", body: "Soulamore Campus helps when expectations pile up." },
+
+            // AWAY
+            { title: "FAR FROM HOME?", body: "Soulamore Away listens when home feels far." },
+
+            // PLAYGROUND
+            { title: "PLAY", body: "Soulamore Playground tools help release stress interactively." },
+            { title: "RESET", body: "Mental Playground tools help break mental loops." },
+
+            // ANCHOR
+            { title: "BREATHE", body: "Soulamore is a place to breathe." },
+            { title: "YOU ARE OK", body: "Soulamore supports you without rushing." }
+        ];
+
+        const guidanceMessages = [
+            // --- CORE SOULAMORE (Feature) ---
+            { text: "Soulamore gives your thoughts a safe place to land.", type: "feature" },
+            { text: "Soulamore is designed for moments when your mind feels crowded.", type: "feature" },
+            { text: "Soulamore helps you pause without needing answers.", type: "feature" },
+            { text: "Soulamore exists for thoughts you don’t know how to explain.", type: "feature" },
+            { text: "Soulamore creates space without asking you to perform.", type: "feature" },
+            { text: "Soulamore is a place to unload mental weight gently.", type: "feature" },
+            { text: "Soulamore supports reflection without pressure.", type: "feature" },
+            { text: "Soulamore helps when holding things quietly gets heavy.", type: "feature" },
+            { text: "Soulamore makes room for unfinished feelings.", type: "feature" },
+
+            // --- CONFESSION BOX (Feature) ---
+            { text: "The Soulamore Confession Box lets you share thoughts anonymously.", type: "feature" },
+            { text: "The Confession Box helps when saying things out loud feels hard.", type: "feature" },
+            { text: "Soulamore’s Confession Box accepts honesty without names.", type: "feature" },
+            { text: "The Confession Box gives your thoughts a private release.", type: "feature" },
+            { text: "Soulamore Confession Box is for unsaid words.", type: "feature" },
+            { text: "The Confession Box allows you to write without judgment.", type: "feature" },
+            { text: "Soulamore’s Confession Box keeps your identity out of it.", type: "feature" },
+            { text: "The Confession Box helps unload thoughts safely.", type: "feature" },
+            { text: "The Confession Box gives heavy thoughts somewhere to go.", type: "feature" },
+
+            // --- PEER SUPPORT (Feature) ---
+            { text: "Soulamore Peer Support lets you talk to someone who listens.", type: "feature" },
+            { text: "Peer Support on Soulamore focuses on understanding, not fixing.", type: "feature" },
+            { text: "Soulamore Peer Support connects you with real people.", type: "feature" },
+            { text: "Peer Support helps when you don’t want advice.", type: "feature" },
+            { text: "Soulamore Peer Support offers calm, human listening.", type: "feature" },
+            { text: "Peer Support is for conversations without judgment.", type: "feature" },
+            { text: "Soulamore Peer Support values being heard.", type: "feature" },
+            { text: "Peer Support lets you speak without rehearsing.", type: "feature" },
+            { text: "Peer Support can make emotional weight feel lighter.", type: "feature" },
+
+            // --- SOULAMORE AWAY (Feature) ---
+            { text: "Soulamore Away supports people living away from home.", type: "feature" },
+            { text: "Soulamore Away helps when distance makes emotions louder.", type: "feature" },
+            { text: "Soulamore Away is built for relocation and loneliness.", type: "feature" },
+            { text: "Soulamore Away listens when home feels far.", type: "feature" },
+            { text: "Soulamore Away supports expats and people in transition.", type: "feature" },
+            { text: "Soulamore Away understands cultural and emotional shifts.", type: "feature" },
+            { text: "Soulamore Away helps when starting over feels heavy.", type: "feature" },
+            { text: "Soulamore Away creates connection across distance.", type: "feature" },
+            { text: "Soulamore Away supports adjustment without pressure.", type: "feature" },
+
+            // --- SOULAMORE CAMPUS (Feature) ---
+            { text: "Soulamore Campus supports students under quiet pressure.", type: "feature" },
+            { text: "Soulamore Campus helps with academic stress.", type: "feature" },
+            { text: "Soulamore Campus is built for overwhelmed students.", type: "feature" },
+            { text: "Soulamore Campus supports burnout and exam pressure.", type: "feature" },
+            { text: "Soulamore Campus understands invisible student stress.", type: "feature" },
+            { text: "Soulamore Campus helps when expectations pile up.", type: "feature" },
+            { text: "Soulamore Campus supports mental wellbeing in education.", type: "feature" },
+            { text: "Soulamore Campus is for students who feel behind.", type: "feature" },
+            { text: "Soulamore Campus helps when campus life feels heavy.", type: "feature" },
+
+            // --- SOULBOT (Feature) ---
+            { text: "SoulBot helps you sort thoughts when they feel tangled.", type: "feature" },
+            { text: "SoulBot listens anytime without judgment.", type: "feature" },
+            { text: "SoulBot helps you reflect through conversation.", type: "feature" },
+            { text: "SoulBot is available when talking to people feels hard.", type: "feature" },
+            { text: "SoulBot supports emotional clarity through writing.", type: "feature" },
+            { text: "SoulBot helps you name what you’re feeling.", type: "feature" },
+            { text: "SoulBot is designed for late-night overthinking.", type: "feature" },
+            { text: "SoulBot offers calm responses without pressure.", type: "feature" },
+            { text: "SoulBot helps you pause and process.", type: "feature" },
+
+            // --- MENTAL PLAYGROUND (Feature) ---
+            { text: "Soulamore Playground tools help release stress interactively.", type: "feature" },
+            { text: "Mental Playground tools turn release into action.", type: "feature" },
+            { text: "Soulamore Playground offers playful emotional resets.", type: "feature" },
+            { text: "Mental Playground helps shift your headspace.", type: "feature" },
+            { text: "Soulamore Playground tools help unwind the mind.", type: "feature" },
+            { text: "Mental Playground makes emotional release feel lighter.", type: "feature" },
+            { text: "Soulamore Playground supports calm through interaction.", type: "feature" },
+            { text: "Mental Playground tools help break mental loops.", type: "feature" },
+            { text: "Soulamore Playground is for hands-on emotional relief.", type: "feature" },
+
+            // --- TALKING & RELEASE (Feature) ---
+            { text: "Soulamore Peer Support shows how talking can ease weight.", type: "feature" },
+            { text: "The Confession Box shows writing can release pressure.", type: "feature" },
+            { text: "SoulBot shows clarity can come from reflection.", type: "feature" },
+            { text: "Soulamore Away shows distance doesn’t cancel support.", type: "feature" },
+            { text: "Soulamore Campus shows stress doesn’t need silence.", type: "feature" },
+            { text: "Mental Playground shows release can feel playful.", type: "feature" },
+            { text: "Peer Support shows listening can change how things feel.", type: "feature" },
+            { text: "The Confession Box shows anonymity can feel safe.", type: "feature" },
+            { text: "SoulBot shows emotions can be explored gently.", type: "feature" },
+            { text: "Soulamore shows support can be flexible.", type: "feature" },
+
+            // --- FINDING SUPPORT (Stat/Awareness) ---
+            { text: "Soulamore helps you find the right kind of support.", type: "stat" },
+            { text: "Soulamore guides you from self-help to human support.", type: "stat" },
+            { text: "Soulamore helps match you with peers or professionals.", type: "stat" },
+            { text: "Soulamore supports different needs at different times.", type: "stat" },
+            { text: "Soulamore helps you choose support at your pace.", type: "stat" },
+            { text: "Soulamore adapts to how heavy things feel.", type: "stat" },
+            { text: "Soulamore helps you explore support without commitment.", type: "stat" },
+            { text: "Soulamore supports gradual steps toward help.", type: "stat" },
+            { text: "Soulamore lets you start small.", type: "stat" },
+            { text: "Soulamore supports emotional decision-making.", type: "stat" },
+
+            // --- CLOSING / ANCHOR (Stat/Awareness) ---
+            { text: "Soulamore is here when you’re ready.", type: "stat" },
+            { text: "Soulamore supports you without rushing.", type: "stat" },
+            { text: "Soulamore respects your pace.", type: "stat" },
+            { text: "Soulamore gives space before solutions.", type: "stat" },
+            { text: "Soulamore supports emotional honesty.", type: "stat" },
+            { text: "Soulamore makes room for imperfect thoughts.", type: "stat" },
+            { text: "Soulamore helps carry what feels heavy.", type: "stat" },
+            { text: "Soulamore is built around listening.", type: "stat" },
+            { text: "Soulamore supports quiet strength.", type: "stat" },
+            { text: "Soulamore is a place to breathe.", type: "stat" }
+        ];
+
+        let guidanceState = {
+            lastShownTime: 0,
+            shownCount: 0,
+            active: false,
+            history: [],
+            maxPerSession: 8,
+            interval: 25000 // 25 seconds
+        };
+
+        function updateGuidanceSystem(timestamp) {
+            if (!running || guidanceState.active || guidanceState.shownCount >= guidanceState.maxPerSession) return;
+            if (dangerMode || rescueItem) return; // Silent during chaos
+
+            if (timestamp - guidanceState.lastShownTime > guidanceState.interval) {
+                showGuidanceMessage(timestamp);
+            }
+        }
+
+        function showGuidanceMessage(timestamp) {
+            const container = document.getElementById('guidance-container');
+
+            // Selection Logic: 80% Feature, 20% Stat
+            // Filter available messages ensuring no immediate repeats
+            let pool = [];
+            const isFeatureRound = Math.random() < 0.8;
+
+            if (isFeatureRound) {
+                pool = guidanceMessages.filter(m => m.type === 'feature');
+            } else {
+                pool = guidanceMessages.filter(m => m.type === 'stat');
+            }
+
+            // Exclude last 3 shown to ensure variety
+            const recentText = guidanceState.history.slice(-3);
+            pool = pool.filter(m => !recentText.includes(m.text));
+
+            // Fallback if pool empty
+            if (pool.length === 0) pool = guidanceMessages;
+
+            const selected = pool[Math.floor(Math.random() * pool.length)];
+
+            // Render
+            container.innerText = selected.text;
+            container.classList.add('visible');
+            guidanceState.active = true;
+            guidanceState.shownCount++;
+            guidanceState.history.push(selected.text);
+            guidanceState.lastShownTime = timestamp;
+
+            // Hide after 4.5s
+            setTimeout(() => {
+                container.classList.remove('visible');
+                guidanceState.active = false;
+            }, 4500);
+        }
+
+        /* Audio */
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function sfx(type) {
+            if (!audioCtx) return;
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            const t = audioCtx.currentTime;
+
+            if (type === 'attach') {
+                o.frequency.setValueAtTime(120, t);
+                o.frequency.exponentialRampToValueAtTime(60, t + 0.3);
+                g.gain.setValueAtTime(0.1, t);
+                g.gain.linearRampToValueAtTime(0.01, t + 0.3);
+                o.start(t); o.stop(t + 0.3);
+            } else if (type === 'shoot') {
+                o.type = 'square';
+                o.frequency.setValueAtTime(400, t);
+                o.frequency.exponentialRampToValueAtTime(100, t + 0.1);
+                g.gain.setValueAtTime(0.03, t);
+                g.gain.linearRampToValueAtTime(0, t + 0.1);
+                o.start(t); o.stop(t + 0.1);
+            } else if (type === 'overheat') {
+                // Buzz sound
+                o.type = 'sawtooth';
+                o.frequency.setValueAtTime(150, t);
+                o.frequency.linearRampToValueAtTime(80, t + 0.5);
+                g.gain.setValueAtTime(0.1, t);
+                g.gain.linearRampToValueAtTime(0, t + 0.5);
+                o.start(t); o.stop(t + 0.5);
+            } else if (type === 'explode') {
+                o.type = 'sawtooth';
+                o.frequency.setValueAtTime(100, t);
+                o.frequency.exponentialRampToValueAtTime(30, t + 0.2);
+                g.gain.setValueAtTime(0.05, t);
+                g.gain.linearRampToValueAtTime(0, t + 0.2);
+                o.start(t); o.stop(t + 0.2);
+            } else if (type === 'milestone') {
+                o.type = 'sine';
+                o.frequency.setValueAtTime(440, t);
+                o.frequency.setValueAtTime(880, t + 0.2);
+                g.gain.setValueAtTime(0.1, t);
+                g.gain.linearRampToValueAtTime(0, t + 1.0);
+                o.start(t); o.stop(t + 1.0);
+            }
+        }
+
+        /* Entities & Content */
+        let player = { x: 0, y: 0, r: 20, color: '#4ECDC4' };
+        const stars = [];
+        const celestials = [];
+        const dust = [];
+        const missiles = [];
+        const explosions = [];
+        const rescueParticles = []; // NEW: Magical particles
+        let rescueItem = null; // Hope Orb
+        let dangerMode = false;
+
+        // Prepare Logo for Rescue Orb
+        const rescueLogo = new Image();
+        // Use the symbol favicon
+        rescueLogo.src = '../assets/images/favicon_symbol.png';
+        const words = ["Anxiety", "Depression", "Burnout", "Doomscrolling", "Imposter Syndrome", "Gaslighting", "Ghosting", "FOMO", "Overthinking", "Situationship", "Toxic Positivity", "Social Battery", "Comparison", "Expectations", "Loneliness", "Regret"];
+
+        // INTRUSIVE ADS CONFIG
+        const enableAds = true; // Easy toggle to reverse
+        const popups = [];
+
+        const quotes = [
+            "You are not behind. You are just becoming at your own pace.",
+            "You don’t have to earn rest to deserve it.",
+            "Who you are on tired days still counts.",
+            "Being gentle with yourself is not self-indulgence; it’s self-respect.",
+            "You are allowed to outgrow versions of yourself.",
+            "You are more than what you manage to hold together.",
+            "Some days, surviving quietly is strength.",
+            "Not every thought needs your attention.",
+            "Anxiety often sounds urgent, but it isn’t always true.",
+            "Some worries soften when you let them be unfinished.",
+            "Even quiet tears are a form of release.",
+            "You are allowed to feel heavy without fixing it immediately.",
+            "Healing is not linear; it loops, pauses, and revisits.",
+            "You’re allowed to heal without an audience.",
+            "Protecting your peace is not selfish.",
+            "You don’t have to hold everything by yourself.",
+            "You’re not meant to carry this alone.",
+            "Not everything needs closure today.",
+            "Strength can look like softness.",
+            "Resilience doesn’t always roar; sometimes it breathes.",
+            "You’re still here — that matters.",
+            "You don’t have to see the future to keep going."
+        ];
+
+        const palettes = [
+            'radial-gradient(circle at center, #1e1b4b 0%, #000 100%)',
+            'radial-gradient(circle at center, #4c1d95 0%, #000 100%)',
+            'radial-gradient(circle at center, #be123c 0%, #000 100%)',
+            'radial-gradient(circle at center, #047857 0%, #000 100%)',
+            'radial-gradient(circle at center, #0e7490 0%, #000 100%)',
+            'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
+        ];
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            player.x = width / 2;
+            player.y = height * 0.8;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        for (let i = 0; i < 80; i++) {
+            stars.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                z: Math.random() * 2 + 0.5
+            });
+        }
+
+        /* Inputs */
+        window.addEventListener('keydown', e => {
+            keys[e.key] = true;
+        });
+        window.addEventListener('keyup', e => keys[e.key] = false);
+
+        /* Touch Support - MOVEMENT & FIRE ZONE */
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            const t = e.touches[0];
+            player.x = t.clientX;
+            player.y = t.clientY - 60;
+            // Check Fire Zone (Bottom 15%)
+            if (player.y > window.innerHeight * 0.85) isTouchFiring = true;
+            else isTouchFiring = false;
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', e => {
+            e.preventDefault();
+            const t = e.touches[0];
+            player.x = t.clientX;
+            player.y = t.clientY - 60;
+            // Check Fire Zone
+            if (player.y > window.innerHeight * 0.85) isTouchFiring = true;
+            else isTouchFiring = false;
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', e => {
+            e.preventDefault();
+            isTouchFiring = false;
+        }, { passive: false });
+
+
+        /* Main Loop */
+        function loop() {
+            // --- ALWAYS RENDER BACKGROUND ---
+
+            // 0. Update Base Speed (Idle vs Running)
+            if (!running) speed = 0.5; // Slow drift when idle
+            else speed = 4.7; // 1.5x Fast (was 3.1)
+
+            // 1. Draw Background (Dynamic 100 LY Shift)
+            // 1. Draw Background (Dynamic 100 LY Shift)
+            const phase = Math.floor(distance / 100);
+            const targetHue = (240 + (phase * 40)) % 360;
+            if (!window.bgHue) window.bgHue = 240;
+            window.bgHue += (targetHue - window.bgHue) * 0.02;
+
+            ctx.fillStyle = `hsla(${window.bgHue}, 40%, 8%, 1)`; // No Trail (1.0)
+            ctx.fillRect(0, 0, width, height);
+
+            // 2. Stars (Always Move)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            stars.forEach(s => {
+                s.y += speed * s.z;
+                if (s.y > height) {
+                    s.y = 0;
+                    s.x = Math.random() * width;
+                }
+                const streakLen = speed * s.z * 0.6;
+                ctx.beginPath();
+                ctx.fillRect(s.x, s.y, Math.max(1, s.z * 0.8), streakLen);
+            });
+
+            // 3. Celestials (Always Move but reduced spawn in idle)
+            if (true) { // Always allowing celestials
+                if (Math.random() < (running ? 0.0005 : 0.0001)) spawnCelestial();
+
+                // GUIDANCE SYSTEM UPDATE
+                updateGuidanceSystem(performance.now());
+
+                celestials.forEach((c, idx) => {
+                    c.y += speed * c.z;
+                    if (c.y > height + 200) celestials.splice(idx, 1);
+
+                    // Draw Celestial
+                    ctx.save();
+                    ctx.globalAlpha = 0.3;
+                    ctx.translate(c.x, c.y);
+                    if (c.type === 'planet') {
+                        const grad = ctx.createRadialGradient(-c.r / 3, -c.r / 3, c.r / 10, 0, 0, c.r);
+                        grad.addColorStop(0, c.color1);
+                        grad.addColorStop(1, c.color2);
+                        ctx.fillStyle = grad;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, c.r, 0, Math.PI * 2);
+                        ctx.fill();
+                        if (c.hasRing) {
+                            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                            ctx.lineWidth = 4;
+                            ctx.beginPath();
+                            ctx.ellipse(0, 0, c.r * 1.8, c.r * 0.4, 0.5, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                    } else {
+                        ctx.rotate(distance * 0.002);
+                        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, c.r);
+                        grad.addColorStop(0, 'rgba(255,255,255,0.8)');
+                        grad.addColorStop(0.4, c.color1);
+                        grad.addColorStop(1, 'transparent');
+                        ctx.fillStyle = grad;
+                        for (let arm = 0; arm < 3; arm++) {
+                            ctx.rotate((Math.PI * 2) / 3);
+                            ctx.beginPath();
+                            ctx.ellipse(c.r / 2, 0, c.r, c.r / 3, 0.2, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                    ctx.restore();
+                });
+            }
+
+            // SPAWN POPUPS (Intrusive Thoughts)
+            // Reduced spawn rate from 0.002 to 0.001 (Less overwhelming)
+            if (running && enableAds && Math.random() < 0.001) {
+                spawnPopup();
+            }
+
+            // --- GAME LOGIC (ONLY WHEN RUNNING) ---
+            if (running) {
+                // Input & Firing
+                if ((keys[' '] || keys.Space || isTouchFiring) && !overheated) {
+                    if (fireRateCounter <= 0) {
+                        fireMissile();
+                        fireRateCounter = 5;
+                    }
+                }
+                fireRateCounter--;
+
+                // Heat Logic
+                if (!overheated && !keys[' '] && !keys.Space && !isTouchFiring) {
+                    heat = Math.max(0, heat - 1.0);
+                }
+                updateHeatVisuals();
+
+                // Ambient Logic
+                let bgR = 5, bgG = 5, bgB = 16;
+                let closestDist = Infinity;
+                let closestColor = null;
+                celestials.forEach(c => {
+                    const dx = c.x - width / 2;
+                    const dy = c.y - height / 2;
+                    const d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < closestDist) {
+                        closestDist = d;
+                        closestColor = c.color1;
+                    }
+                });
+                // Ambient Logic
+                // (Removed for Performance)
+
+                distance += speed * 0.06;
+
+                // Player Movement
+                const moveSpeed = 12; // 1.5x Faster (was 8)
+                if (keys.ArrowUp || keys.w) player.y -= moveSpeed;
+                if (keys.ArrowDown || keys.s) player.y += moveSpeed;
+                if (keys.ArrowLeft || keys.a) player.x -= moveSpeed;
+                if (keys.ArrowRight || keys.d) player.x += moveSpeed;
+                player.x = Math.max(20, Math.min(width - 20, player.x));
+                player.y = Math.max(20, Math.min(height - 20, player.y));
+
+                // Missiles
+                ctx.fillStyle = overheated ? '#FF6B6B' : '#C4FFF9';
+                // Shadows removed for performance
+                for (let i = missiles.length - 1; i >= 0; i--) {
+                    let m = missiles[i];
+                    m.y += m.vy;
+                    if (m.vx) m.x += m.vx;
+                    ctx.beginPath();
+                    ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (m.y < -50 || m.x < -100 || m.x > width + 100) missiles.splice(i, 1);
+                    else {
+                        // CHECK POPUP COLLISION
+                        // We need to check collisions for missiles against popups too
+                        for (let j = popups.length - 1; j >= 0; j--) {
+                            let p = popups[j];
+                            // Hitbox logic
+                            // Popup Box: p.x, p.y, p.w, p.h
+                            // X Button: p.x + p.w - 22, p.y + 2, 20x20
+
+                            // Check if missile hits the BOX
+                            if (m.x > p.x && m.x < p.x + p.w && m.y > p.y && m.y < p.y + p.h) {
+                                // Hit the box!
+                                missiles.splice(i, 1); // remove missile
+
+                                // HITBOX LOGIC: Only the Close Button (Top Right) kills it INSTANTLY
+                                // Button is approx 35x35 at top right
+                                const btnSize = 35;
+                                const isCloseHit = (m.x > (p.x + p.w - btnSize) && m.y < (p.y + btnSize));
+
+                                if (isCloseHit) {
+                                    // CRITICAL HIT - INSTANT DESTROY
+                                    createExplosion(m.x, m.y);
+                                    popups.splice(j, 1); // Close popup
+                                    sfx('explode');
+                                    score += 500; // Bonus points
+                                } else {
+                                    // BODY HIT - DAMAGE (Tanky)
+                                    p.hp--;
+                                    if (p.hp <= 0) {
+                                        // DESTROYED BY DAMAGE
+                                        createExplosion(m.x, m.y);
+                                        popups.splice(j, 1);
+                                        sfx('explode');
+                                        score += 500;
+                                    } else {
+                                        // RESIST / SHAKE
+                                        sfx('shoot'); // Just a thud
+                                        p.x += (Math.random() - 0.5) * 5;
+                                        p.y -= 2; // Knockback
+                                        p.isNew = false;
+                                    }
+                                }
+                                break; // Stop checking other collisions for this missile
+                            }
+                        }
+                    }
+                }
+
+                // Pulses
+                for (let i = pulses.length - 1; i >= 0; i--) {
+                    let p = pulses[i];
+                    p.r += 10;
+                    p.opacity -= 0.08;
+                    if (p.opacity <= 0) { pulses.splice(i, 1); continue; }
+                    ctx.strokeStyle = `rgba(78, 205, 196, ${p.opacity})`;
+                    ctx.lineWidth = 5;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // Dust (Words)
+                const baseRate = 0.025; // Increased from 0.012 for more challenge
+                const diffFactor = Math.min(0.04, distance / 20000); // Ramp up faster (20k instead of 30k)
+                const spawnRate = baseRate + diffFactor;
+                if (Math.random() < 0.015) {
+                    const word = words[Math.floor(Math.random() * words.length)];
+                    // Dynamic Radius based on text length to prevent overflow
+                    // Base 45px + 4px per character roughly
+                    const r = Math.max(45, 30 + word.length * 5);
+
+                    dust.push({
+                        x: Math.random() * (width - 100) + 50, // Keep onscreen
+                        y: -100,
+                        text: word,
+                        r: r,
+                        attached: false,
+                        cleared: false,
+                        driftX: (Math.random() - 0.5) * 4,
+                        driftY: 3 + Math.random() * 3, // slightly slower fall for larger items
+                        hp: Math.floor(r / 20) // HP scales with size (2-5 hits)
+                    });
+                }
+
+                for (let i = dust.length - 1; i >= 0; i--) {
+                    const d = dust[i];
+                    if (!d.cleared) {
+                        for (let j = missiles.length - 1; j >= 0; j--) {
+                            let m = missiles[j];
+                            let dx = m.x - d.x;
+                            let dy = m.y - d.y;
+                            if (Math.sqrt(dx * dx + dy * dy) < d.r + m.r) {
+                                // HIT LOGIC
+                                m.life = 0; // Destroy missile
+                                missiles.splice(j, 1);
+                                createExplosion(d.x, d.y); // Small hit fx
+
+                                d.hp--;
+                                if (d.hp <= 0) {
+                                    sfx('explode');
+                                    droppedWords.push(d.text);
+                                    dust.splice(i, 1);
+                                    gotoNextDust = true;
+                                } else {
+                                    // Hit reaction
+                                    sfx('shoot'); // quiet hit sound
+                                    d.r *= 0.9; // Shrink slightly
+                                    d.y -= 10; // Push back
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if (typeof gotoNextDust !== 'undefined' && gotoNextDust) {
+                        var gotoNextDust = false;
+                        continue;
+                    }
+
+                    if (!d.attached) {
+                        const approachSpeed = (speed * 0.3) + 2;
+                        d.y += approachSpeed + (d.driftY || 0);
+                        d.x += (d.driftX || 0);
+                        if (d.driftX) d.driftX *= 0.95;
+                        if (d.driftY) d.driftY *= 0.95;
+
+                        const dx = player.x - d.x;
+                        const dy = player.y - d.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < 350) {
+                            const forceMult = 5.0;
+                            const angle = Math.atan2(dy, dx);
+                            const intensity = 1 - (dist / 350);
+                            d.x += Math.cos(angle) * (forceMult * intensity);
+                            d.y += Math.sin(angle) * (forceMult * intensity);
+                        }
+
+                        if (dist < (player.r + d.r - 10)) {
+                            d.attached = true;
+                            d.offsetX = d.x - player.x;
+                            d.offsetY = d.y - player.y;
+                            sfx('attach');
+                        }
+                    } else {
+                        d.x = player.x + d.offsetX;
+                        d.y = player.y + d.offsetY;
+                        d.offsetX *= 0.995;
+                        d.offsetY *= 0.995;
+                    }
+                    if (d.y > height + 400 || d.y < -200 || d.x < -100 || d.x > width + 100) dust.splice(i, 1);
+                } // END DUST LOOP
+
+                // DANGER & RESCUE LOGIC (Runs once per frame)
+                const attachedCount = dust.filter(d => d.attached).length;
+                if (attachedCount > 3) {
+                    if (!dangerMode) {
+                        dangerMode = true;
+                        sfx('overheat'); // Warning sound
+                    }
+                    player.color = '#FF4136'; // Red Danger
+                    // Shake
+                    player.x += (Math.random() - 0.5) * 5;
+
+                    // Spawn Rescue Chance
+                    if (!rescueItem && Math.random() < 0.01) {
+                        rescueItem = { x: Math.random() * width, y: -50, r: 25 };
+                    }
+                } else {
+                    dangerMode = false;
+                    player.color = '#4ECDC4';
+                }
+
+                if (rescueItem) {
+                    rescueItem.y += 3;
+                    // Draw Rescue (Soulamore Logo Payload)
+                    ctx.save();
+                    // Peach Glow (#F49F75)
+                    ctx.shadowColor = '#F49F75';
+                    ctx.shadowBlur = 30;
+
+                    // Draw Image if loaded, else fallback to circle
+                    if (rescueLogo.complete && rescueLogo.naturalHeight !== 0) {
+                        ctx.drawImage(rescueLogo, rescueItem.x - rescueItem.r, rescueItem.y - rescueItem.r, rescueItem.r * 2, rescueItem.r * 2);
+                    } else {
+                        ctx.fillStyle = '#F49F75';
+                        ctx.beginPath();
+                        ctx.arc(rescueItem.x, rescueItem.y, rescueItem.r, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+
+                    // Collision with Player
+                    const dx = player.x - rescueItem.x;
+                    const dy = player.y - rescueItem.y;
+                    if (Math.sqrt(dx * dx + dy * dy) < player.r + rescueItem.r) {
+                        try {
+                            sfx('milestone'); // Success sound
+
+                            // MAGIC EXPLOSION
+                            if (typeof createRescueExplosion === 'function') {
+                                createRescueExplosion(player.x, player.y);
+                            }
+
+                            // SAFE REMOVAL: Loop backwards and splice
+                            let freedCount = 0;
+                            for (let k = dust.length - 1; k >= 0; k--) {
+                                if (dust[k].attached) {
+                                    // Chain reaction explosions on the enemies being cleared
+                                    if (typeof createRescueExplosion === 'function') {
+                                        createRescueExplosion(dust[k].x, dust[k].y, true);
+                                    }
+                                    droppedWords.push(dust[k].text);
+                                    dust.splice(k, 1);
+                                    freedCount++;
+                                }
+                            }
+
+                            // Visual Feedback for Rescue
+                            if (freedCount >= 0) { // Always show, even if 0 freed, for positive reinforcement
+                                const rescueMsg = document.createElement('div');
+                                rescueMsg.innerText = "MIND CLEARED";
+                                rescueMsg.style.position = "fixed"; // Interact with viewport directly
+                                rescueMsg.style.top = "40%";
+                                rescueMsg.style.left = "50%";
+                                rescueMsg.style.transform = "translate(-50%, -50%)";
+                                rescueMsg.style.color = "#F49F75";
+                                rescueMsg.style.fontSize = "clamp(2rem, 5vw, 4rem)"; // Responsive font
+                                rescueMsg.style.fontFamily = "Outfit, sans-serif";
+                                rescueMsg.style.fontWeight = "bold";
+                                rescueMsg.style.textShadow = "0 0 30px #F49F75, 0 0 10px white";
+                                rescueMsg.style.zIndex = "9999";
+                                rescueMsg.style.pointerEvents = "none";
+                                rescueMsg.style.whiteSpace = "nowrap"; // Prevent wrapping
+                                rescueMsg.style.animation = "floatUpFade 2.5s forwards cubic-bezier(0.25, 1, 0.5, 1)";
+                                document.body.appendChild(rescueMsg);
+                                setTimeout(() => rescueMsg.remove(), 2500);
+                            }
+
+                            rescueItem = null;
+                            dangerMode = false;
+                            player.color = '#4ECDC4';
+
+                        } catch (e) {
+                            console.error("Rescue Logic Crash detected:", e);
+                            // Fallback to prevent game freeze
+                            rescueItem = null;
+                            dangerMode = false;
+                        }
+                    }
+
+                    if (rescueItem && rescueItem.y > height + 50) rescueItem = null;
+                }
+
+                // DRAW POPUPS
+                popups.forEach((p, i) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // Draw Window Body
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+
+                    // Shadow
+                    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                    ctx.fillRect(5, 5, p.w, p.h);
+
+                    // Main Box
+                    ctx.fillStyle = '#1e1b4b'; // Dark Blue
+                    ctx.strokeStyle = '#F49F75'; // Peach Border
+                    ctx.lineWidth = 2;
+                    ctx.fillRect(0, 0, p.w, p.h);
+                    ctx.strokeRect(0, 0, p.w, p.h);
+
+                    // Title Bar
+                    ctx.fillStyle = '#F49F75';
+                    ctx.fillRect(0, 0, p.w, 25);
+
+                    // X Button (The Weak Point)
+                    ctx.fillStyle = '#FF4136'; // Red
+                    ctx.fillRect(p.w - 25, 0, 25, 25);
+                    ctx.fillStyle = '#FFF';
+                    ctx.font = 'bold 16px sans-serif';
+                    ctx.fillText('X', p.w - 18, 18);
+
+                    // Title Text (Left Aligned, avoiding X button)
+                    ctx.fillStyle = '#1e1b4b';
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(p.content.title, 5, 17);
+
+                    // Body Text (Centered in the dark blue area)
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#FFF';
+                    ctx.font = '14px sans-serif';
+                    ctx.fillText(p.content.body, p.w / 2, 55);
+
+                    // Instruction overlay (first few times)
+                    if (p.isNew) {
+                        ctx.fillStyle = '#F49F75';
+                        ctx.font = '10px sans-serif';
+                        ctx.textAlign = 'right';
+                        ctx.fillText('SHOOT THE [X]', p.w, -5);
+                    }
+
+                    ctx.restore();
+
+                    // Despawn
+                    if (p.y > height + 100) popups.splice(i, 1);
+                });
+
+                // Particles
+                for (let i = explosions.length - 1; i >= 0; i--) {
+                    let e = explosions[i];
+                    e.life--;
+                    e.x += e.vx;
+                    e.y += e.vy;
+                    ctx.globalAlpha = e.life / 30;
+                    ctx.fillStyle = e.color || '#F49F75';
+                    ctx.beginPath();
+                    ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (e.life <= 0) explosions.splice(i, 1);
+                }
+
+                // Rescue Particles (Magical)
+                for (let i = rescueParticles.length - 1; i >= 0; i--) {
+                    let p = rescueParticles[i];
+                    p.life--;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.r *= 0.95; // Shrink
+
+                    ctx.save();
+                    ctx.globalAlpha = p.life / 60;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = p.color;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+
+                    if (p.life <= 0) rescueParticles.splice(i, 1);
+                }
+                ctx.globalAlpha = 1;
+
+                // Draw Dust/Player
+                checkMilestone(distance);
+                document.getElementById('distDisplay').innerText = Math.floor(distance);
+                dust.forEach(d => {
+                    ctx.beginPath();
+                    ctx.fillStyle = d.attached ? 'rgba(255, 80, 80, 0.3)' : 'rgba(20, 20, 40, 0.8)';
+                    ctx.strokeStyle = d.attached ? '#ff6b6b' : 'rgba(255,255,255,0.8)';
+                    ctx.lineWidth = 2;
+                    ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.fillStyle = 'white';
+                    ctx.font = '700 13px Outfit';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(d.text, d.x, d.y);
+                });
+
+                // Player Visuals
+                const glow = ctx.createRadialGradient(player.x, player.y, player.r / 2, player.x, player.y, player.r * 3);
+                glow.addColorStop(0, player.color);
+                glow.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, player.r * 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, player.r / 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        function fireMissile() {
+            heat += 2.0; // Lower heat per shot
+            if (heat >= 100) {
+                overheated = true;
+                heat = 100;
+                sfx('overheat');
+                setTimeout(() => {
+                    overheated = false; // Quick Cooldown (1.5s)
+                    heat = 0;
+                }, 1500);
+                return;
+            }
+
+            sfx('shoot');
+            // Mobile Optimization: Single Stream vs Spread
+            const isMobile = window.innerWidth < 600;
+            const angles = isMobile ? [0] : [0, -0.3, 0.3];
+
+            angles.forEach(a => {
+                missiles.push({
+                    x: player.x,
+                    y: player.y - 20,
+                    vx: Math.sin(a) * 10,
+                    vy: -15,
+                    r: 6
+                });
+            });
+            // Shockwave
+            pulses.push({ x: player.x, y: player.y, r: 0, opacity: 1 });
+            dust.forEach(d => {
+                const dx = d.x - player.x;
+                const dy = d.y - player.y;
+                if (Math.sqrt(dx * dx + dy * dy) < 250) {
+                    d.attached = false;
+                    const angle = Math.atan2(dy, dx);
+                    d.driftX = Math.cos(angle) * 5;
+                    d.driftY = Math.sin(angle) * 5;
+                    d.x += Math.cos(angle) * 30;
+                    d.y += Math.sin(angle) * 30;
+                }
+            });
+        }
+
+        // Input Handling
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
+            const clientY = evt.clientY || (evt.touches && evt.touches[0].clientY);
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function updateHeatVisuals() {
+            const bar = document.getElementById('heatBar');
+            bar.style.width = heat + '%';
+
+            if (overheated) {
+                // Red Glow
+                player.color = '#FF6B6B';
+                document.getElementById('heatContainer').style.boxShadow = '0 0 15px #FF6B6B';
+                // Pulse effect in logic could go here, but color shift is enough
+            } else {
+                // Interpolate Color back to Teal
+                document.getElementById('heatContainer').style.boxShadow = 'none';
+                if (heat > 50) player.color = '#FFAA6B'; // Orange warning
+                else player.color = '#4ECDC4';
+            }
+        }
+
+
+        function createExplosion(x, y) {
+            for (let i = 0; i < 8; i++) {
+                explosions.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 5,
+                    life: 20,
+                    r: Math.random() * 3 + 2,
+                    color: '#FFF'
+                });
+            }
+        }
+
+        // Scheduler removed - logic moved to main loop usage
+
+        function spawnPopup() {
+            const w = 300; // Wider
+            const h = 120; // Taller
+            const x = Math.random() * (width - w);
+            popups.push({
+                x: x,
+                y: -150, // Start higher up
+                w: w,
+                h: h,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: 0.3 + Math.random() * 0.5, // Slower drift
+                content: thoughtContent[Math.floor(Math.random() * thoughtContent.length)], // Renamed from adContent
+                isNew: true,
+                hp: 20 // Tanky! Needs ~20 hits to destroy via body, or 1 hit via X button
+            });
+        }
+        function spawnCelestial() {
+            const types = ['planet', 'galaxy'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const colors = ['#4ECDC4', '#FF6B6B', '#C44DFF', '#FFE66D'];
+            celestials.push({
+                x: Math.random() * width,
+                y: -300,
+                z: 0.1 + Math.random() * 0.2,
+                r: 50 + Math.random() * 100,
+                type: type,
+                color1: colors[Math.floor(Math.random() * colors.length)],
+                color2: colors[Math.floor(Math.random() * colors.length)],
+                hasRing: Math.random() > 0.5
+            });
+        }
+        let lastMilestone = 0;
+        const milestones = [100, 500, 1000, 2000, 5000, 10000];
+        function checkMilestone(d) {
+            const m = milestones.find(val => d >= val && lastMilestone < val);
+            if (m) {
+                lastMilestone = m;
+                sfx('milestone');
+                showPopup(`${m} LY`, "Keep Flying");
+            }
+        }
+        function showPopup(main, sub) {
+            const el = document.getElementById('milestoneMsg');
+            el.innerHTML = `${main}<br><span style="font-size:1.5rem; color:white; font-weight:400;">${sub}</span>`;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 2000);
+        }
+        /* --- GAME INIT --- */
+        function initGame() {
+            console.log("Ignite Clicked");
+            try {
+                // Audio (might be blocked, so wrap in try)
+                try { initAudio(); } catch (e) { console.warn("Audio init failed", e); }
+
+                // Hide Start Screen (Explicit ID)
+                const startScreen = document.getElementById('startScreen');
+                if (startScreen) {
+                    startScreen.classList.remove('active');
+                    startScreen.style.display = 'none'; // Force hide
+                } else {
+                    // Fallback
+                    const overlay = document.querySelector('.overlay');
+                    if (overlay) overlay.classList.remove('active');
+                }
+
+                const endScreen = document.getElementById('endScreen');
+                if (endScreen) endScreen.classList.remove('active');
+
+                // Reset Stats
+                score = 0;
+                distance = 0;
+                heat = 0;
+                droppedWords = [];
+                pulses = [];
+                overheated = false;
+                running = true;
+                // Loop is global
+
+            } catch (e) {
+                alert("Game Start Error: " + e.message);
+                console.error(e);
+            }
+        }
+
+        // Alias for safety
+        function startGame() { initGame(); }
+
+        /* --- SHARE CARD GENERATION --- */
+        function endGame() {
+            running = false;
+            document.getElementById('hud').style.opacity = 0;
+            document.getElementById('heatContainer').style.opacity = 0;
+            document.getElementById('endScreen').classList.add('active');
+
+            const randColor = palettes[Math.floor(Math.random() * palettes.length)];
+            const randQuote = quotes[Math.floor(Math.random() * quotes.length)];
+
+            // Set Favicon Symbol or Fallback Text
+            const logoEl = document.getElementById('tpl_logo');
+            const titleEl = logoEl ? logoEl.nextElementSibling : null;
+
+            if (logoEl) {
+                if (logoBase64 && logoBase64.length > 200) {
+                    logoEl.src = logoBase64;
+                    logoEl.style.display = 'block';
+                    if (titleEl) titleEl.style.display = 'none';
+                } else {
+                    logoEl.style.display = 'none';
+                    if (titleEl) titleEl.style.display = 'block';
+                }
+                logoEl.style.backgroundColor = "transparent";
+                logoEl.style.borderRadius = "0";
+                logoEl.style.padding = "0";
+            }
+
+            if (typeof generateImage === 'function') generateImage(randColor, randQuote, true);
+        }
+
+        function generateImage(bgColor, quote, isPreview) {
+            const tpl = document.getElementById('shareTemplate');
+            const clone = tpl.cloneNode(true);
+            clone.id = "activeShareCapture";
+            clone.style.display = "flex";
+            clone.style.position = "fixed";
+            clone.style.top = "0px";
+            clone.style.left = "0px";
+            clone.style.zIndex = "-9999";
+            clone.style.opacity = "1";
+
+            const inner = clone.querySelector('#shareContainerInner');
+            inner.style.background = bgColor;
+
+            clone.querySelector('#tpl_shareDist').innerText = Math.floor(distance);
+            clone.querySelector('#tpl_shareQuote').innerHTML = `"${quote}"`;
+
+            let uniqueDrops = [...new Set(droppedWords)];
+            if (uniqueDrops.length > 5) uniqueDrops = uniqueDrops.slice(uniqueDrops.length - 5);
+            if (uniqueDrops.length === 0) {
+                clone.querySelector('#tpl_droppedList').innerHTML = '<span style="opacity:0.5; font-size:1.5rem;">Nothing... yet.</span>';
+            } else {
+                clone.querySelector('#tpl_droppedList').innerHTML = uniqueDrops.map(w =>
+                    `<span>${w}</span>`
+                ).join(' <span style="opacity:0.4">•</span> ');
+            }
+
+            document.body.appendChild(clone);
+
+            setTimeout(() => {
+                html2canvas(inner, {
+                    scale: isPreview ? 0.3 : 1,
+                    useCORS: true,
+                    backgroundColor: null,
+                    scrollX: 0,
+                    scrollY: -window.scrollY
+                }).then(canvas => {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    if (isPreview) {
+                        const previewImg = document.getElementById('generatedPreview');
+                        if (previewImg) previewImg.src = dataUrl;
+                    } else {
+                        // Attempt Download
+                        const link = document.createElement('a');
+                        link.download = `soulamore-journey-${Math.floor(distance)}.png`;
+                        link.href = dataUrl;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+
+                        // Mobile Fallback: Update the preview image too, so they can long-press
+                        document.getElementById('generatedPreview').src = dataUrl;
+
+                        const btn = document.querySelector('button[onclick="downloadShare()"]');
+                        if (btn) btn.innerHTML = 'Share Story <i class="fas fa-check"></i>';
+
+                        // 3. Add Logo (Restored with Base64 for reliability)
+                        const logoImg = document.createElement('img');
+                        // Use Base64 if available (loaded from logo.js), else fallback to path
+                        if (typeof logoBase64 !== 'undefined' && logoBase64) {
+                            logoImg.src = logoBase64;
+                        } else {
+                            logoImg.src = '../assets/images/logo.png';
+                        }
+                        logoImg.crossOrigin = "anonymous"; // Important for html2canvas
+                        logoImg.style.width = '180px';
+                        logoImg.style.marginBottom = '20px';
+                        logoImg.style.display = 'block';
+                        inner.insertBefore(logoImg, inner.firstChild);
+
+                        // 4. Add "My Journey" label
+                        const label = document.createElement('div');
+                        label.innerText = 'MY JOURNEY';
+                        label.style.fontSize = '1.2rem';
+                        label.style.color = '#4ECDC4';
+                        label.style.marginBottom = '10px';
+                        inner.insertBefore(label, logoImg.nextSibling);
+
+                        // Interaction Feedback
+                        const toast = document.createElement('div');
+                        toast.innerText = "Image Captured! If download didn't start, long-press the image above.";
+                        toast.style.position = 'fixed';
+                        toast.style.bottom = '20px';
+                        toast.style.left = '50%';
+                        toast.style.transform = 'translateX(-50%)';
+                        toast.style.background = 'rgba(0,0,0,0.8)';
+                        toast.style.color = '#4ECDC4';
+                        toast.style.padding = '15px 25px';
+                        toast.style.borderRadius = '30px';
+                        toast.style.zIndex = '999999';
+                        document.body.appendChild(toast);
+                        setTimeout(() => toast.remove(), 4000);
+                    }
+                    if (document.body.contains(clone)) document.body.removeChild(clone);
+                }).catch(err => {
+                    console.error("Capture error:", err);
+                    if (document.body.contains(clone)) document.body.removeChild(clone);
+                    alert("Capture failed. Please try screenshotting the result.");
+                });
+            }, 600); // 600ms safe wait
+        }
+
+        function downloadShare() {
+            const btn = event.currentTarget;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            const randColor = palettes[Math.floor(Math.random() * palettes.length)];
+            const randQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            generateImage(randColor, randQuote, false);
+        }
+
+        function createRescueExplosion(x, y, isSmall = false) {
+            const count = isSmall ? 10 : 30;
+            const size = isSmall ? 2 : 4;
+            const speed = isSmall ? 5 : 10;
+
+            // Particles
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const v = Math.random() * speed;
+                rescueParticles.push({
+                    x: x, y: y,
+                    vx: Math.cos(angle) * v,
+                    vy: Math.sin(angle) * v,
+                    life: 60,
+                    r: Math.random() * size + 2,
+                    color: Math.random() > 0.5 ? '#F49F75' : '#FFD700' // Peach or Gold
+                });
+            }
+
+            // Shockwave Ring
+            if (!isSmall) {
+                pulses.push({
+                    x: x, y: y,
+                    r: 10,
+                    maxR: 300,
+                    opacity: 1,
+                    color: '#F49F75'
+                });
+            }
+        }
+
+        // Start Background Animation
+        resize();
+        loop();

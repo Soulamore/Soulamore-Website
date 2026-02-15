@@ -1,0 +1,571 @@
+/* Dashboard Sidebar Layout */
+:root {
+    --sidebar-width: 280px;
+}
+
+body {
+    overflow-x: hidden;
+    background: var(--bg-deep, #131B2E);
+}
+
+/* MAIN LAYOUT CONTAINER */
+.dashboard-layout {
+    display: flex;
+    height: 100vh;
+    /* Fixed height */
+    overflow: hidden;
+    /* Prevent body scroll */
+    background: var(--bg-deep, #131B2E);
+}
+
+/* SIDEBAR */
+/* SIDEBAR */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-deep, #131B2E);
+    /* Matches app background for calm continuity */
+    border-right: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    /* Change from fixed to relative since parent is fixed */
+    height: 100%;
+    /* Full height of parent */
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, background 0.3s;
+    /* FIX: Prevent sidebar itself from shrinking in flex contexts */
+    flex-shrink: 0;
+}
+
+/* Slightly darken sidebar in light mode for separation */
+[data-mode='light'] .sidebar {
+    background: #f1f5f9;
+}
+
+.sidebar-header {
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid var(--border-soft);
+    /* FIX: Prevent header collapse */
+    flex-shrink: 0;
+}
+
+.user-avatar-lg {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    box-shadow: none;
+    flex-shrink: 0;
+}
+
+.user-info-text .name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.user-info-text .role {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+/* NAVIGATION */
+.sidebar-nav {
+    flex: 1;
+    padding: 30px 20px 30px 20px;
+    /* Increased padding */
+    padding-right: 10px;
+    /* Specific padding for scrollbar distance */
+    overflow-y: auto;
+    /* FIX: Smooth scroll */
+    scrollbar-width: thin;
+}
+
+.side-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 20px;
+    /* FIX: Force fallback color if var is missing */
+    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-muted, rgba(255, 255, 255, 0.7));
+    border-radius: 50px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    margin-bottom: 5px;
+    position: relative;
+    /* Prevents layout shift on borders */
+    border: 1px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    /* Ensure text doesn't wrap awkwardly */
+    flex-shrink: 0;
+}
+
+.side-link:hover {
+    background: var(--bg-elevated);
+    /* FIX: Force bright white on hover */
+    color: #ffffff;
+    color: var(--text-primary, #ffffff);
+    transform: translateX(3px);
+}
+
+.side-link.active {
+    background: var(--accent-theme, #2dd4bf) !important;
+    /* Solid Accent */
+    color: #000000 !important;
+    /* Force Black Text */
+    border: none !important;
+    /* No Border for Pill style */
+    font-weight: 700;
+    box-shadow: 0 4px 15px var(--accent-theme-shadow);
+    opacity: 1;
+}
+
+.side-link i {
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* BOTTOM SECTION */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid var(--border-soft);
+    flex-shrink: 0;
+}
+
+/* CUSTOM SCROLLBAR FOR SIDEBAR (Matched to Main Website) */
+.sidebar-nav::-webkit-scrollbar {
+    width: 12px;
+    /* 12px width to accommodate the transparent border */
+    display: block;
+}
+
+.sidebar-nav {
+    -ms-overflow-style: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--teal-glow) var(--bg-sidebar);
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    background-image: linear-gradient(180deg, #4ECDC4 0%, #F49F75 100%) !important;
+    border-radius: 10px;
+    /* Full pill shape */
+    border: 3px solid #131B2E !important;
+    /* Solid border matches sidebar bg to mask edges */
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background-image: linear-gradient(180deg, #5eddd4, #ff9f85) !important;
+}
+
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-error);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex: 1;
+    margin-left: 0;
+    /* Sidebar is now relative in flex */
+    padding: 40px;
+    width: 100%;
+    height: 100vh;
+    /* Full viewport height */
+    overflow-y: auto;
+    /* SCROLLS HERE */
+    scroll-behavior: smooth;
+    overflow: hidden !important;
+    /* NO PAGE SCROLL */
+}
+
+/* --- MASTER WORKSPACE DIRECTIVE --- */
+:root {
+    --content-max-width: 1000px;
+    /* Breathing Room */
+    --header-height: 109px;
+    /* Matches Sidebar Header 108px + border */
+}
+
+.view-section {
+    width: 100%;
+    /* CENTERED WORKSPACE MODEL */
+    margin: 0 auto !important;
+    max-width: var(--content-max-width) !important;
+    padding-left: 0 !important;
+    /* No rail padding, use container */
+    padding-right: 0 !important;
+
+    box-sizing: border-box;
+    position: relative;
+    display: none;
+    flex-direction: column;
+    padding-top: 0;
+    border: none;
+    height: 100%;
+    /* Fill Container for internal scroll */
+    overflow-y: auto;
+    /* FALLBACK: Allow view to scroll if internal content doesn't */
+    pointer-events: none;
+}
+
+/* Specific Views with Internal Scroll (OPT-IN) */
+.view-section.no-scroll {
+    overflow-y: hidden !important;
+}
+
+.view-section.active {
+    display: flex;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+/* HEADER ALIGNMENT UTILITY */
+.workspace-header {
+    height: 109px; /* MATCH SIDEBAR HEADER EXACTLY */
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    /* Match Sidebar Line */
+    margin-bottom: 0 !important;
+    padding: 0 20px !important;
+    /* Internal spacing */
+    flex-shrink: 0;
+    box-sizing: border-box; /* Prevent padding from adding height */
+}
+
+/* MOBILE TOGGLE */
+.mobile-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 200;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-soft);
+    padding: 10px;
+    border-radius: 8px;
+    color: var(--text-primary);
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 20px;
+    }
+
+    .mobile-toggle {
+        display: block;
+    }
+}
+
+/* --- IMPROVED CARD STYLING (The Quiet Room Look) --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.dash-card {
+    background: rgba(255, 255, 255, 0.03) !important;
+    /* Subtle glass effect instead of transparent */
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 25px;
+    backdrop-filter: blur(10px);
+    /* Restored blur for readability */
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    /* Added subtle shadow */
+    color: var(--text-secondary);
+}
+
+.dash-card h1,
+.dash-card h2,
+.dash-card h3,
+.dash-card h4 {
+    color: var(--text-primary);
+}
+
+.dash-card:hover {
+    background: rgba(255, 255, 255, 0.07) !important;
+    /* Slightly lighter on hover */
+    transform: translateY(-2px);
+    /* Restored slight lift */
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+[data-mode='light'] .dash-card:hover {
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+
+/* Link-Hover utility for clickable cards */
+.dash-card.link-hover {
+    cursor: pointer;
+}
+
+/* --- TOOL POPUP MODAL --- */
+.tool-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tool-modal-overlay.open {
+    display: flex;
+    opacity: 1;
+}
+
+.tool-modal-content {
+    background: var(--bg-primary);
+    width: 90%;
+    height: 90%;
+    max-width: 1200px;
+    border-radius: 20px;
+    border: 1px solid var(--border-soft);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-modal-header {
+    padding: 15px 25px;
+    background: var(--bg-surface);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.tool-modal-title {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.tool-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.tool-close-btn:hover {
+    color: var(--accent-error);
+    transform: rotate(90deg);
+}
+
+.tool-frame {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: var(--bg-primary);
+}
+
+/* --- INTERACTIVE ACTION ROWS --- */
+.action-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--bg-surface);
+    /* Stand out slightly from main bg */
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-soft);
+    /* Add border for better definition */
+    /* Prepare for border transition */
+    transition: all 0.2s ease;
+}
+
+.action-row:hover {
+    background: rgba(78, 205, 196, 0.05);
+    /* Very subtle teal tint */
+    border-color: var(--accent-primary);
+    transform: translateX(2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Specific Accent Colors for specific rows if needed, can be done via modifier classes */
+.action-row.peach:hover {
+    background: rgba(244, 159, 117, 0.05);
+    border-color: var(--accent-secondary);
+}
+
+/* --- SPECIFIC CARD HOVERS (Home Dashboard) --- */
+.card-peer {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card-peer:hover {
+    background: rgba(244, 159, 117, 0.1) !important;
+    border-color: var(--accent-secondary) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 25px -5px rgba(244, 159, 117, 0.15) !important;
+}
+
+.card-pro {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card-pro:hover {
+    background: rgba(78, 205, 196, 0.1) !important;
+    border-color: var(--teal-glow, #4ECDC4) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 25px -5px rgba(78, 205, 196, 0.15) !important;
+}
+
+/* --- MOOD BUTTONS --- */
+
+/* --- DASHBOARD BUTTONS --- */
+.btn-dash-primary {
+    background: var(--accent-primary);
+    color: #0f172a;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.2);
+    display: inline-block;
+}
+
+.btn-dash-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(78, 205, 196, 0.4);
+    filter: brightness(1.1);
+}
+
+.btn-dash-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+[data-mode='light'] .btn-dash-secondary {
+    background: #ffffff;
+    border-color: var(--border-soft);
+    color: var(--text-primary);
+}
+
+.btn-dash-secondary:hover {
+    background: var(--bg-elevated);
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mood-selector {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.mood-btn {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    padding: 15px 20px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    min-width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.mood-btn:hover {
+    background: var(--bg-elevated);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+}
+
+.mood-btn:active {
+    transform: scale(0.98);
+}

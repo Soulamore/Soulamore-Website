@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Soulamore is a student wellness platform offering anonymous support, peer connection, and mental health resources.">
+    <title>Profile | Soulamore</title>
+    <!-- Fonts: Outfit (UI), Lora (Storytelling) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Lora:ital,wght@0,400;0,500;1,400&family=Plus+Jakarta+Sans:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <style>
+        /* --- DYNAMIC THEME SYSTEM (Restored Sage/Soft) --- */
+        :root {
+            /* Default: Anxiety (Sage) */
+            --bg-color: #E6EFE8;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #5f6c7b;
+            --accent-color: #7A9E7E;
+            /* Deep Sage */
+            --accent-soft: #dbece0;
+            --btn-text: #ffffff;
+            --footer-bg: #0f172a;
+        }
+
+        /* Loneliness Theme (Dusty Peach) */
+        body.theme-lonely {
+            --bg-color: #F4E6DF;
+            --accent-color: #C08B7A;
+            --accent-soft: #ebdcd5;
+            --footer-bg: #2e201e;
+        }
+
+        /* Low Mood Theme (Warm Amber) */
+        body.theme-low {
+            --bg-color: #FFF8E1;
+            --accent-color: #D4A373;
+            --accent-soft: #faebd7;
+            --footer-bg: #2e241b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            transition: background-color 0.8s ease;
+            /* Smooth theme switch */
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+        }
+
+        p {
+            font-family: 'Lora', serif;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- NAV (Custom Profile Nav) --- */
+        .profile-nav {
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            color: var(--accent-color);
+        }
+
+        /* --- HERO SECTION --- */
+        .profile-hero {
+            text-align: center;
+            padding: 40px 0 60px;
+        }
+
+        .avatar-container {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: var(--card-bg);
+            padding: 5px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #eee;
+            object-fit: cover;
+        }
+
+        /* Initials Avatar Fallback */
+        .avatar-initials {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        .hero-name {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .hero-role {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .hero-quote {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .badge-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .soft-badge {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .soft-badge i {
+            color: var(--accent-color);
+            margin-right: 5px;
+        }
+
+        /* --- CONTENT CARDS --- */
+        .soft-card {
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+            margin-bottom: 30px;
+            transition: transform 0.3s;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* List Styles */
+        .check-list {
+            list-style: none;
+        }
+
+        .check-list li {
+            margin-bottom: 12px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .check-list li::before {
+            content: '•';
+            position: absolute;
+            left: 10px;
+            color: var(--accent-color);
+            font-size: 1.5rem;
+            line-height: 1rem;
+            top: 5px;
+        }
+
+        /* --- STYLE CHIPS --- */
+        .style-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .style-chip {
+            padding: 8px 16px;
+            background: var(--accent-soft);
+            color: var(--text-main);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* --- BOUNDARY NOTE --- */
+        .boundary-box {
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.4);
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        /* --- CTA --- */
+        .cta-section {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .primary-btn {
+            background: var(--accent-color);
+            color: white;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: none;
+            cursor: pointer;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            opacity: 0.9;
+        }
+
+        .save-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--text-muted);
+            padding: 12px 30px;
+            border-radius: 50px;
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .save-btn:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+            background: white;
+        }
+
+        .save-btn i {
+            transition: 0.2s;
+        }
+
+        .save-btn:hover i {
+            transform: scale(1.2);
+        }
+
+        /* --- REVIEWS STYLE --- */
+        .review-card {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* FOOTER OVERRIDES */
+        footer {
+            background-color: var(--footer-bg) !important;
+            transition: background-color 0.5s ease;
+            position: relative;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            text-align: center;
+        }
+
+        footer h3 {
+            font-family: 'Outfit', sans-serif !important;
+            color: #dbece0 !important;
+        }
+
+        footer p,
+        footer a {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
+            pointer-events: none;
+        }
+
+        @media(max-width: 600px) {
+            .hero-name {
+                font-size: 2rem;
+            }
+
+            .soft-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body class="theme-anxiety">
+
+    <div class="container">
+
+        <!-- NAV -->
+        <div class="profile-nav"
+            style="padding: 20px 0; display:flex; justify-content:space-between; align-items:center;">
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Peers
+            </a>
+
+            <div class="audio-control-pill" onclick="toggleProfileAudio()"
+                style="cursor:pointer; background:rgba(255,255,255,0.5); padding:8px 16px; border-radius:50px; font-size:0.9rem; display:flex; align-items:center; gap:8px; border:1px solid rgba(0,0,0,0.05);">
+                <i class="fas fa-music"></i> <span id="audioLabel">Play Ambience</span>
+            </div>
+        </div>
+
+        <audio id="profileAudio" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+        </audio>
+
+        <!-- LOAD STATE -->
+        <div id="loadingState" style="text-align:center; padding:100px 0; opacity:0.6;">
+            <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--accent-color);"></i>
+            <p style="margin-top:20px;">Finding space...</p>
+        </div>
+
+        <!-- PROFILE CONTENT (Hidden initially) -->
+        <div id="profileContent" style="display:none;">
+            <!-- HERO -->
+            <section class="profile-hero fade-in">
+                <div class="avatar-container">
+                    <img id="pAvatar" src="" class="avatar-img" style="display:none;">
+                    <div id="pAvatarInitial" class="avatar-initials" style="display:none;">A</div>
+                </div>
+                <h1 id="pName" class="hero-name">Name</h1>
+                <div id="pRole" class="hero-role">Peer Listener</div>
+                <p id="pQuote" class="hero-quote">"Quote"</p>
+
+                <div class="badge-row">
+                    <span class="soft-badge"><i class="fas fa-certificate"></i> Trained Peer</span>
+                    <span class="soft-badge"><i class="fas fa-comment"></i> Chat</span>
+                    <span class="soft-badge"><i class="fas fa-phone"></i> Call</span>
+                    <!-- Languages will be injected dynamically -->
+                    <span id="pLangs" class="soft-badge" style="display:none;"></span>
+                </div>
+            </section>
+
+            <!-- 1. ABOUT ME -->
+            <div class="soft-card fade-in">
+                <div class="section-title"><i class="far fa-user"></i> A little about me</div>
+                <p id="pBio">Loading bio...</p>
+            </div>
+
+            <!-- 2. IS THIS RIGHT FOR YOU? -->
+            <div class="soft-card fade-in">
+                <div class="section-title"><i class="far fa-check-circle"></i> This space may feel right if...</div>
+                <ul id="pMatch" class="check-list">
+                    <!-- Dynamic List -->
+                </ul>
+            </div>
+
+            <!-- 3. STYLE -->
+            <div class="soft-card fade-in">
+                <div class="section-title"><i class="far fa-comments"></i> How I show up</div>
+                <div id="pTags" class="style-grid">
+                    <!-- Dynamic Chips -->
+                </div>
+            </div>
+
+            <!-- 4. WHAT TO EXPECT -->
+            <div class="soft-card fade-in">
+                <div class="section-title"><i class="far fa-clock"></i> What our conversation looks like</div>
+                <ul id="pConvo" class="check-list">
+                    <!-- Dynamic List -->
+                </ul>
+            </div>
+
+            <!-- 5. REVIEWS (Added Support) -->
+            <div class="soft-card fade-in">
+                <div class="section-title"><i class="far fa-heart"></i> Wall of Love</div>
+                <div id="pReviews">
+                    <!-- Reviews injected here -->
+                </div>
+                <!-- LEAVE REVIEW FORM -->
+                <div style="margin-top:30px; border-top:1px solid rgba(0,0,0,0.05); padding-top:20px;">
+                    <h4 style="margin-bottom:10px; color:var(--text-main); font-family:'Outfit';">Leave a note</h4>
+                    <textarea id="newReviewMsg" rows="2"
+                        style="width:100%; border:1px solid rgba(0,0,0,0.1); padding:15px; border-radius:12px; font-family:inherit; margin-bottom:10px; background:rgba(255,255,255,0.5);"
+                        placeholder="How did this conversation help you?"></textarea>
+                    <div style="display:flex; gap:10px;">
+                        <input id="newReviewName" type="text"
+                            style="flex:1; border:1px solid rgba(0,0,0,0.1); padding:10px; border-radius:12px; font-family:inherit; background:rgba(255,255,255,0.5);"
+                            placeholder="Your Name (Optional)">
+                        <button onclick="submitReview()"
+                            style="background:var(--accent-color); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:600;"><i
+                                class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- 6. BOUNDARIES -->
+            <div class="boundary-box fade-in">
+                <h4 style="margin-bottom:10px; color:var(--text-main);">A gentle note on boundaries</h4>
+                <p id="pBound" style="font-size:0.95rem;">
+                    I am here to listen and support, but I am not a medical professional.
+                </p>
+            </div>
+
+            <!-- 7. CTA -->
+            <div class="cta-section fade-in">
+                <button class="primary-btn" onclick="startChat()">Start a Conversation</button>
+                <br>
+                <p style="font-size:0.9rem; margin-top:15px; opacity:0.7;">You can begin with a single sentence. Or none
+                    at
+                    all.</p>
+
+                <button id="bookmarkBtn" class="save-btn" onclick="toggleBookmark()">
+                    <i class="far fa-heart"></i> Not sure yet? Save this peer
+                </button>
+            </div>
+
+        </div> <!-- End Profile Content -->
+
+    </div>
+
+    <!-- STANDARDIZED FOOTER -->
+    <footer></footer>
+
+    <script src="../assets/js/components.js"></script>
+    <script type="module">
+        import { db, auth } from "../assets/js/firebase-config.js";
+        import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Global State
+        let currentUser = null;
+        let currentProfileId = null;
+        let isBookmarked = false;
+
+        // --- AUDIO COMPONENT ---
+        const pAudio = document.getElementById('profileAudio');
+        let pPlaying = false;
+
+        // Expose to window
+        window.toggleProfileAudio = function () {
+            const label = document.getElementById('audioLabel');
+            if (pPlaying) {
+                pAudio.pause();
+                label.innerText = "Play Ambience";
+            } else {
+                pAudio.volume = 0.2;
+                pAudio.play();
+                label.innerText = "Pause Music";
+            }
+            pPlaying = !pPlaying;
+        }
+
+        // --- LOAD LOGIC ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            currentProfileId = id;
+
+            if (!id) {
+                document.querySelector('.container').innerHTML = `<div style='text-align:center; padding:100px;'><h2>Profile Not Found</h2><a href='index.html'>Go Back</a></div>`;
+                return;
+            }
+
+            // --- DATA FETCHING ---
+            let profile = null;
+
+            try {
+                // Fetch from Firestore
+                const docRef = doc(db, "professionals", id);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    profile = {
+                        name: data.name,
+                        role: data.role || "Peer Listener",
+                        image: data.photoURL || "",
+                        quote: data.quote || `"Here to listen."`,
+                        bio: data.bio || "No bio available yet.",
+                        tags: data.tags || [],
+                        langs: data.languages || "",
+                        convo: data.conversationStyle || "• We start wherever you are.\n• No agenda, just listening.",
+                        match: data.bestMatch || "• You need a safe space to vent.\n• You are feeling overwhelmed.",
+                        bound: data.boundaries || "Use specific boundaries set by the peer.",
+                        reviews: data.reviews || []
+                    };
+                }
+            } catch (e) {
+                console.warn("DB Fetch Error (likely offline/demo):", e);
+            }
+
+            // Fallback Demo Data
+            if (!profile) {
+                if (id === '1') {
+                    profile = {
+                        name: "Aditya",
+                        role: "Peer Listener • Senior Student",
+                        image: "https://randomuser.me/api/portraits/men/45.jpg",
+                        quote: `"You don’t have to know what to say here. We can just sit with it."`,
+                        bio: "I’m here for conversations that feel tangled, slow, or unfinished. I know what it’s like when thoughts don’t stop looping, and when explaining yourself feels harder than just staying quiet.",
+                        tags: ["Slow-paced", "Gentle questions", "Comfortable with silence", "Reflective", "Patient"],
+                        langs: "English, Hindi",
+                        convo: "• We start wherever you are (no agenda).\n• You can talk, type, or take breaks.\n• I won’t interrupt or rush you.\n• There’s no “right” outcome expected.",
+                        match: "• You're overthinking small things that don’t feel small.\n• You feel emotionally tired but aren't sure why.\n• You want a calm listener, not a problem-solver.",
+                        bound: "Peers at Soulamore don’t diagnose or treat mental health conditions. If you’re feeling unsafe, I’ll help you find immediate professional support.",
+                        reviews: []
+                    };
+                } else if (id === '10') {
+                    profile = {
+                        name: "Zoya",
+                        role: "Peer Counselor",
+                        image: "",
+                        quote: `"Navigating workplace stress can feel like a tightrope. I'm here to hold the net."`,
+                        bio: "I am here for you to cope with negative emotions and get through difficult professional times. I believe in practical empathy.",
+                        tags: ["Workplace Stress", "Empathy", "Coping Strategies"],
+                        langs: "English, Spanish",
+                        convo: "• Open and non-judgmental space.\n• Focus on practical strategies if you ask for them.",
+                        match: "• You feel stressed at work.\n• You need someone to just listen.",
+                        bound: "I am here to listen and support, but I am not a medical professional.",
+                        reviews: [
+                            { text: "Zoya helped me so much.", author: "Ankita", date: "Recent" }
+                        ]
+                    };
+                }
+            }
+
+            // Render or Fail
+            if (profile) {
+                renderProfile(profile);
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('profileContent').style.display = 'block';
+            } else {
+                document.getElementById('loadingState').innerHTML = `<p>Profile not found.</p><a href="index.html">Back</a>`;
+            }
+        });
+
+        function renderProfile(p) {
+            document.getElementById('pName').innerText = p.name;
+            document.getElementById('pRole').innerText = p.role;
+            document.getElementById('pQuote').innerText = p.quote;
+            document.getElementById('pBio').innerText = p.bio;
+            document.getElementById('pBound').innerText = p.bound;
+
+            // Avatar
+            const avImg = document.getElementById('pAvatar');
+            const avInit = document.getElementById('pAvatarInitial');
+            if (p.image) {
+                avImg.src = p.image;
+                avImg.style.display = 'block';
+            } else {
+                avInit.style.display = 'flex';
+                avInit.innerText = p.name.charAt(0);
+            }
+
+            // Languages
+            if (p.langs) {
+                const lSpan = document.getElementById('pLangs');
+                lSpan.style.display = 'inline-block';
+                lSpan.innerText = Array.isArray(p.langs) ? p.langs.join(", ") : p.langs;
+            }
+
+            // Tags (Chips)
+            const tagContainer = document.getElementById('pTags');
+            tagContainer.innerHTML = '';
+            if (p.tags) {
+                p.tags.forEach(tag => {
+                    const span = document.createElement('span');
+                    span.className = 'style-chip';
+                    span.innerText = tag;
+                    tagContainer.appendChild(span);
+                });
+            }
+
+            // Lists helper
+            const renderList = (text, id) => {
+                const ul = document.getElementById(id);
+                ul.innerHTML = '';
+                if (!text) return;
+                const items = text.split(/\n|•/).filter(i => i.trim().length > 0);
+                items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerText = item.trim();
+                    ul.appendChild(li);
+                });
+            };
+
+            renderList(p.convo, 'pConvo');
+            renderList(p.match, 'pMatch');
+
+            // Reviews
+            renderReviews(p.reviews || []);
+        }
+
+        function renderReviews(reviews) {
+            const container = document.getElementById('pReviews');
+            if (!container) return;
+            if (reviews.length === 0) {
+                container.innerHTML = `<p style="opacity:0.6; font-style:italic; color:var(--text-muted);">No notes yet. Be the first to leave one!</p>`;
+                return;
+            }
+            container.innerHTML = '';
+            reviews.forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'review-card';
+
+                const p = document.createElement('p');
+                p.style.marginBottom = '5px';
+                p.textContent = `"${r.text}"`;
+
+                const metaDiv = document.createElement('div');
+                metaDiv.style.fontSize = '0.8rem';
+                metaDiv.style.fontWeight = '600';
+                metaDiv.style.opacity = '0.8';
+                metaDiv.textContent = `— ${r.author || 'Anon'}`;
+
+                div.appendChild(p);
+                div.appendChild(metaDiv);
+                container.appendChild(div);
+            });
+        }
+
+        // --- AUTH & BOOKMARK ---
+        onAuthStateChanged(auth, user => {
+            if (user) currentUser = user;
+        });
+
+        window.submitReview = async function () {
+            const msg = document.getElementById('newReviewMsg').value;
+            const name = document.getElementById('newReviewName').value || "Anonymous";
+            if (!msg.trim()) return alert("Message is empty");
+
+            // Optimistic UI
+            const container = document.getElementById('pReviews');
+            const emptyMsg = container.querySelector('p');
+            if (emptyMsg && emptyMsg.innerText.includes('No notes yet')) {
+                container.innerHTML = '';
+            }
+
+            const div = document.createElement('div');
+            div.className = 'review-card';
+            div.style.background = '#dbece0'; // Match sage
+
+            const p = document.createElement('p');
+            p.style.marginBottom = '5px';
+            p.textContent = `"${msg}"`;
+
+            const metaDiv = document.createElement('div');
+            metaDiv.style.fontSize = '0.8rem';
+            metaDiv.style.fontWeight = '600';
+            metaDiv.textContent = `— ${name} (Just now)`;
+
+            div.appendChild(p);
+            div.appendChild(metaDiv);
+            container.prepend(div);
+            document.getElementById('newReviewMsg').value = '';
+
+            // DB Save
+            if (currentProfileId && currentProfileId.length > 5) {
+                try {
+                    const docRef = doc(db, "professionals", currentProfileId);
+                    await updateDoc(docRef, { reviews: arrayUnion({ text: msg, author: name, date: new Date().toLocaleDateString() }) });
+                } catch (e) { console.error("Review save failed", e); }
+            }
+        }
+
+        window.toggleBookmark = function () {
+            if (!currentUser) return alert("Log in to save.");
+            const btn = document.getElementById('bookmarkBtn');
+            // Simplistic toggle for now
+            if (btn.innerHTML.includes('Not sure')) {
+                btn.innerHTML = '<i class="fas fa-heart" style="color:#ef4444;"></i> Saved';
+                btn.style.borderColor = '#ef4444';
+                btn.style.color = '#ef4444';
+            } else {
+                btn.innerHTML = '<i class="far fa-heart"></i> Not sure yet? Save this peer';
+                btn.style.borderColor = '';
+                btn.style.color = '';
+            }
+            // TODO: Connect actual DB Logic
+        }
+
+        window.startChat = function () {
+            alert("This would open the secure chat window.");
+        }
+    </script>
+</body>
+
+</html>

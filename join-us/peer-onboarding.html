@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Soulamore is a student wellness platform offering anonymous support, peer connection, and mental health resources.">
+    <title>Peer Onboarding | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <style>
+        /* --- THEME: MIDNIGHT VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --alert-red: #ef4444;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            position: relative;
+            z-index: 5;
+            flex: 1;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- BACKGROUND --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* --- HERO --- */
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        .welcome-badge {
+            color: var(--gold-glow);
+            border: 1px solid var(--gold-glow);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* --- STEPPER --- */
+        .stepper {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 60px;
+        }
+
+        .step-dot {
+            width: 40px;
+            height: 4px;
+            background: var(--border-glass);
+            border-radius: 2px;
+        }
+
+        .step-dot.active {
+            background: var(--teal-glow);
+        }
+
+        /* --- GUIDELINES GRID --- */
+        .guideline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .rule-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 30px;
+            border-radius: 20px;
+            transition: 0.3s;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .rule-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .rule-card.agreed {
+            border-color: var(--teal-glow);
+            background: rgba(78, 205, 196, 0.05);
+        }
+
+        .rule-card.agreed::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: var(--teal-glow);
+            font-weight: 900;
+            font-size: 1.2rem;
+        }
+
+        .rule-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--peach-glow);
+        }
+
+        .rule-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .rule-text {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            flex-grow: 1;
+        }
+
+        .agree-btn {
+            margin-top: 20px;
+            background: transparent;
+            border: 1px solid var(--starlight);
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .rule-card.agreed .agree-btn {
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            border-color: var(--teal-glow);
+            content: "Acknowledged";
+            pointer-events: none;
+        }
+
+        /* --- PROFILE SECTION --- */
+        .profile-section {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 40px;
+            align-items: start;
+            margin-bottom: 100px;
+            display: none;
+        }
+
+        .profile-section.active {
+            display: grid;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .glass-form {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--teal-glow);
+        }
+
+        .input-box {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-glass);
+            padding: 12px;
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 5px;
+            font-family: inherit;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-box:focus {
+            border-color: var(--teal-glow);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        select.input-box {
+            background-color: #0f172a;
+        }
+
+        /* Preview Card */
+        .preview-container {
+            position: sticky;
+            top: 100px;
+        }
+
+        .preview-label {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            letter-spacing: 1px;
+        }
+
+        .peer-card-preview {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid var(--teal-glow);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(78, 205, 196, 0.1);
+        }
+
+        .preview-avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--peach-glow);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--deep-space);
+            font-weight: 700;
+        }
+
+        .preview-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .preview-role {
+            font-size: 0.8rem;
+            color: var(--teal-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .preview-bio {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            font-style: italic;
+            margin-bottom: 25px;
+            min-height: 60px;
+        }
+
+        .preview-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .p-tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            opacity: 0.7;
+        }
+
+        .preview-btn {
+            background: transparent;
+            border: 1px solid var(--peach-glow);
+            color: var(--peach-glow);
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: default;
+        }
+
+        .action-bar {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .main-btn {
+            background: var(--border-glass);
+            color: rgba(255, 255, 255, 0.3);
+            padding: 15px 50px;
+            border-radius: 50px;
+            font-weight: 700;
+            border: none;
+            font-size: 1.2rem;
+            cursor: not-allowed;
+            transition: 0.3s;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .main-btn.enabled {
+            background: var(--gradient-primary);
+            color: var(--deep-space);
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(78, 205, 196, 0.4);
+        }
+
+        .main-btn.enabled:hover {
+            transform: scale(1.05);
+        }
+
+        @media(max-width: 800px) {
+            .profile-section {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-container {
+                display: none;
+            }
+        }
+    </style>
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <!-- GLOBAL HEADER -->
+    <header
+        style="background: #0f172a !important; border-bottom: none !important; backdrop-filter: none !important; box-shadow: none !important;">
+        <div class="main-nav">
+            <a href="../index.html" class="nav-logo"><img src="../assets/images/logo.png" alt="Soulamore Logo"></a>
+            <button class="mobile-toggle" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-group">
+                <div class="profile-badge"
+                    style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:50px; border:1px solid var(--border-glass); margin-right:20px;">
+                    <div
+                        style="width:10px; height:10px; background:var(--teal-glow); border-radius:50%; box-shadow:0 0 10px var(--teal-glow);">
+                    </div> Applicant Approved
+                </div>
+                <a href="../login.html" class="nav-btn">Log Output</a>
+            </div>
+        </div>
+    </header>
+
+    <div id="particles"></div>
+
+    <div class="container">
+
+        <!-- STEP 1: WELCOME & GUIDELINES -->
+        <div id="step1" class="fade-in">
+            <section class="hero">
+                <span class="welcome-badge">APPLICATION STATUS: ACCEPTED</span>
+                <h1>Welcome to the Circle.</h1>
+
+                <div class="footer-socials">
+                    <a href="https://www.instagram.com/soulamore_/" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/company/soulamore/" target="_blank"><i
+                            class="fab fa-linkedin"></i></a>
+                    <a href="https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr" target="_blank"><i
+                            class="fab fa-facebook"></i></a>
+                </div>
+                <p>Your story moved us. You are now part of a community that holds space for others. <br>Before we set
+                    up your profile, please acknowledge our core values.</p>
+            </section>
+
+            <div class="stepper">
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+            </div>
+
+            <h3 style="text-align:center; margin-bottom:30px;">The Peer Covenant</h3>
+
+            <div class="guideline-grid">
+                <!-- Card 1 -->
+                <div class="rule-card" onclick="agree(this)">
+                    <i class="fas fa-user-secret rule-icon"></i>
+                    <div class="rule-title">Confidentiality & Trust</div>
+                    <p class="rule-text">I will respect the privacy of every individual. What is shared in a session
+                        stays in the session, unless there is an immediate risk of harm.</p>
+                    <button class="agree-btn">I Commit</button>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="rule-card" onclick="agree(this)">
+                    <i class="fas fa-ear-listen rule-icon"></i>
+                    <div class="rule-title">Non-Directive Support</div>
+                    <p class="rule-text">I am here to listen, not to fix. I will offer empathy and validation, avoiding
+                        unsolicited advice or trying to solve their problems.</p>
+                    <button class="agree-btn">I Commit</button>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="rule-card" onclick="agree(this)">
+                    <i class="fas fa-shield-halved rule-icon"></i>
+                    <div class="rule-title">Boundaries & Safety</div>
+                    <p class="rule-text">I am not a therapist. If a situation escalates to self-harm or crisis, I will
+                        guide them to professional help and protect my own energy.</p>
+                    <button class="agree-btn">I Commit</button>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="rule-card" onclick="agree(this)">
+                    <i class="fas fa-hand-holding-heart rule-icon"></i>
+                    <div class="rule-title">Respect & Diversity</div>
+                    <p class="rule-text">I will honor every story without judgment, respecting cultural differences,
+                        backgrounds, and identities.</p>
+                    <button class="agree-btn">I Commit</button>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button id="nextBtn" class="main-btn" onclick="goToProfile()">Complete Setup</button>
+                <p id="lockMsg" style="font-size:0.8rem; opacity:0.5; margin-top:10px;">Please commit to all 4 pillars
+                    to proceed.</p>
+            </div>
+        </div>
+
+        <!-- STEP 2: PROFILE BUILDER -->
+        <div id="step2" class="profile-section">
+
+            <!-- Left: Form -->
+            <div class="glass-form">
+                <h2 style="margin-bottom:20px;">Your Public Profile</h2>
+                <p style="opacity:0.7; margin-bottom:30px;">This is how students will see you. Keep it warm and
+                    authentic.</p>
+
+                <div class="input-group">
+                    <label class="input-label">Display Name (First Name Only)</label>
+                    <input type="text" class="input-box" id="pName" placeholder="e.g. Aditya" onkeyup="updatePreview()">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Short Bio (Max 150 chars)</label>
+                    <textarea class="input-box" id="pBio" rows="3" maxlength="150"
+                        placeholder="e.g. I understand the silence of moving abroad. Here to listen."
+                        onkeyup="updatePreview()"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Availability Status</label>
+                    <select class="input-box">
+                        <option>Available Now</option>
+                        <option>Booking Required</option>
+                        <option>Weekend Only</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Primary Tags (Displayed on card)</label>
+                    <input type="text" class="input-box" id="pTags" placeholder="e.g. Anxiety, Expat Life"
+                        onkeyup="updatePreview()">
+                </div>
+
+                <div
+                    style="margin-top:30px; padding:20px; border:1px solid var(--alert-red); background:rgba(239,68,68,0.1); border-radius:12px;">
+                    <strong style="color:var(--alert-red); font-size:0.9rem;">Final Check:</strong>
+                    <p style="font-size:0.85rem; opacity:0.8; margin-top:5px;">By going live, you confirm you are ready
+                        to receive conversation requests.</p>
+                </div>
+
+                <button class="main-btn enabled" style="width:100%; margin-top:30px;" onclick="goLive()">Go Live & Enter
+                    Dashboard</button>
+            </div>
+
+            <!-- Right: Preview -->
+            <div class="preview-container">
+                <div class="preview-label">LIVE PREVIEW</div>
+                <div class="peer-card-preview">
+                    <div
+                        style="width:10px; height:10px; background:var(--teal-glow); border-radius:50%; box-shadow:0 0 10px var(--teal-glow); position:absolute; top:20px; right:20px;">
+                    </div>
+                    <div class="preview-avatar" id="prevAvatar">A</div>
+                    <div class="preview-name" id="prevName">Name</div>
+                    <span class="preview-role">Soulamore Peer</span>
+                    <div class="preview-bio" id="prevBio">"Your bio will appear here..."</div>
+                    <div class="preview-tags" id="prevTags">
+                        <span class="p-tag">Tag 1</span><span class="p-tag">Tag 2</span>
+                    </div>
+                    <button class="preview-btn">Connect</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- GLOBAL FOOTER -->
+    <!-- GLOBAL FOOTER -->
+
+
+
+
+
+
+    <!-- STANDARDIZED FOOTER -->
+    <footer></footer>
+
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script>
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 4 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            particleContainer.appendChild(p);
+        }
+
+        // --- CONFETTI (ON LOAD) ---
+        function fireConfetti() {
+            for (let i = 0; i < 50; i++) {
+                let c = document.createElement('div');
+                c.style.position = 'fixed';
+                c.style.top = '-10px';
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.width = '8px'; c.style.height = '8px';
+                c.style.backgroundColor = ['#F49F75', '#4ECDC4', '#fbbf24'][Math.floor(Math.random() * 3)];
+                c.style.borderRadius = '50%';
+                c.style.zIndex = '999';
+                c.style.animation = `float ${Math.random() * 2 + 2}s linear forwards`;
+                document.body.appendChild(c);
+            }
+        }
+        window.onload = fireConfetti;
+
+        // --- OATH LOGIC ---
+        let agreedCount = 0;
+        function agree(card) {
+            if (card.classList.contains('agreed')) return;
+            card.classList.add('agreed');
+            card.querySelector('.agree-btn').innerText = "Acknowledged ✓";
+            agreedCount++;
+
+            if (agreedCount === 4) {
+                const btn = document.getElementById('nextBtn');
+                btn.classList.add('enabled');
+                btn.removeAttribute('disabled');
+                document.getElementById('lockMsg').style.display = 'none';
+            }
+        }
+
+        function goToProfile() {
+            if (agreedCount < 4) return;
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // --- PREVIEW LOGIC ---
+        function updatePreview() {
+            const name = document.getElementById('pName').value;
+            const bio = document.getElementById('pBio').value;
+            const tags = document.getElementById('pTags').value;
+
+            document.getElementById('prevName').innerText = name || "Name";
+            document.getElementById('prevAvatar').innerText = name ? name.charAt(0).toUpperCase() : "A";
+            document.getElementById('prevBio').innerText = bio ? `"${bio}"` : '"Your bio will appear here..."';
+
+            // Tags logic
+            const tagContainer = document.getElementById('prevTags');
+            tagContainer.innerHTML = '';
+
+            // Sanitize
+            const escapeHTML = (str) => str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
+
+            if (tags) {
+                tags.split(',').forEach(tag => {
+                    if (tag.trim()) {
+                        tagContainer.innerHTML += `<span class="p-tag">${escapeHTML(tag.trim())}</span>`;
+                    }
+                });
+            } else {
+                tagContainer.innerHTML = '<span class="p-tag">Tag 1</span><span class="p-tag">Tag 2</span>';
+            }
+        }
+
+        function goLive() {
+            alert("Welcome to the team! Redirecting to Peer Dashboard...");
+            // Link to actual dashboard page here
+        }
+    </script>
+    <script src="../assets/js/soulbot-beta.js"></script>
+</body>
+
+</html>
