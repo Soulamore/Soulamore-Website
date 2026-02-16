@@ -1057,14 +1057,26 @@
         };
         window.STATE = STATE; // Make STATE global for module access
 
-        // --- DEBUG LOGGING ---
+        // --- DEBUG LOGGING (VISIBLE ON-SCREEN) ---
         window.DEBUG_LOG = [];
+        // Auto-create visible debug overlay
+        (function () {
+            let debugEl = document.getElementById('debug-overlay');
+            if (!debugEl) {
+                debugEl = document.createElement('div');
+                debugEl.id = 'debug-overlay';
+                debugEl.style.cssText = 'position:fixed; top:10px; left:10px; width:400px; max-height:300px; overflow-y:auto; background:rgba(0,0,0,0.85); color:#0f0; font-size:11px; font-family:monospace; padding:10px; border-radius:8px; z-index:99999; pointer-events:auto;';
+                document.body.appendChild(debugEl);
+                debugEl.innerHTML = '<div style="color:#4ECDC4;font-weight:bold;margin-bottom:5px;">🐛 Debug Panel (remove after fix)</div>';
+            }
+        })();
         window.logDebug = function (msg) {
             console.log(msg);
             window.DEBUG_LOG.push(msg);
             const debugEl = document.getElementById('debug-overlay');
             if (debugEl) {
                 debugEl.innerHTML += `<div>${new Date().toLocaleTimeString()} - ${msg}</div>`;
+                debugEl.scrollTop = debugEl.scrollHeight;
             }
         };
 
@@ -1077,7 +1089,6 @@
             window.logDebug(`Unhandled Promise: ${event.reason}`);
         });
 
-        const OBSCENE_WORDS = ["fuck", "shit", "bitch", "asshole", "cunt", "dick", "pussy", "whore", "slut", "bastard"];
 
         // STATS (Global)
         window.totalStats = { hearts: 0, flowers: 0, candles: 0 };
@@ -1094,21 +1105,13 @@
             STATE.pointX = (window.innerWidth - CONFIG.width) / 2;
             STATE.pointY = (window.innerHeight - CONFIG.height) / 2;
 
-            STATE.pointY = (window.innerHeight - CONFIG.height) / 2;
-
             updateTransform();
 
-            // Ensure Grid is initialized before we try to place anything
-            initGrid();
-
-            // 1. IMMEDIATE RENDER: Seed fallback notes instantly (0ms)
-            // This ensures the user sees content immediately.
-            // When Firebase loads, it will clear these if used.
+            // Wall loads exclusively from Firebase.
+            // The <script type="module"> block at the bottom calls initWall()
+            // which authenticates, subscribes, and pushes notes via renderFirebaseNote.
             window.hasRealData = false;
-            generateFallbackNotes();
-
-            // We still keep a tiny safety timer just in case, but it's redundant now.
-            // window.fallbackTimer = setTimeout(() => { ... }, 3500);
+            STATE.notesData = [];
         }
 
         // Auto-Init
@@ -1204,7 +1207,7 @@
         // --- KEYBOARD NAVIGATION (Arrow Keys) ---
         window.addEventListener('keydown', (e) => {
             const step = 50;
-            switch(e.key) {
+            switch (e.key) {
                 case 'ArrowUp': STATE.pointY += step; break;
                 case 'ArrowDown': STATE.pointY -= step; break;
                 case 'ArrowLeft': STATE.pointX += step; break;
@@ -1220,7 +1223,7 @@
 
         viewport.addEventListener('touchstart', (e) => {
             if (e.target.closest('.note') || e.target.closest('.wall-hero')) return;
-            
+
             if (e.touches.length === 1) {
                 // Single touch: Pan
                 STATE.panning = true;
@@ -1244,10 +1247,10 @@
                 e.preventDefault();
                 const currentDistance = getPinchDistance(e);
                 const ratio = currentDistance / initialPinchDistance;
-                
+
                 const newScale = initialScale * ratio;
                 STATE.scale = Math.min(Math.max(0.4, newScale), 2.0);
-                
+
                 // Note: accurate pinch-zoom center is complex, centering on screen for now
                 updateTransform();
                 updateZoomUI();
@@ -1315,28 +1318,76 @@
             animate();
         };
 
-        // --- GRID & HELPERS ---
-        // --- ORGANIC PLACEMENT (Scattered Papers) ---
-        const NOTE_WIDTH = 340; // 280 + padding + margins
-        const NOTE_HEIGHT = 200; // Approx average height
 
-        function initGrid() {
-            STATE.placedNotes = []; // Stores {x, y, w, h}
-        }
 
-        // --- SMART PLACEMENT ENGINE (Polar Rings) ---
-        const SmartPlacement = {
-            placedNotes: [], // Track rects {x, y, w, h}
-            centerZone: { w: 900, h: 400 }, // No-Fly Zone for Title
-            rings: [450, 600, 800, 1000, 1250, 1500, 1800, 2200], // Radial distances
+        // --- HYBRID LAYOUT ENGINE (Spiral + Repulsion) ---
+        const HybridLayout = {
+            centerZone: { w: 900, h: 400 }, // No-Fly Zone (Title)
+            NOTE_W: 340,
+            NOTE_H: 200,
 
-            reset() {
-                this.placedNotes = [];
+            // Main Entry Point
+            layoutAll() {
+                // 1. Sort by creation time (Oldest = Center, Newest = Edge)
+                // If we want newest in center, invert sort. Usually oldest in center is safer for stability.
+                // Let's go Oldest -> Center.
+                STATE.notesData.sort((a, b) => {
+                    const tA = a.createdAt ? (a.createdAt.seconds || a.createdAt) : 0;
+                    const tB = b.createdAt ? (b.createdAt.seconds || b.createdAt) : 0;
+                    return tA - tB;
+                });
+
+                // Clear current DOM or position Cache?
+                // We keep DOM elements but update positions.
+                // Reset placed list for collision checks.
+                this.placedRects = [];
+
+                STATE.notesData.forEach((note, index) => {
+                    const pos = this.computePosition(index, note.id);
+                    note.x = pos.x;
+                    note.y = pos.y;
+                    this.placedRects.push({ x: pos.x, y: pos.y, w: this.NOTE_W, h: this.NOTE_H });
+
+                    // Render/Update DOM immediately
+                    window.createOrUpdateNoteElement(note);
+                });
             },
 
-            // Check if rect intersects with any placed note
-            checkCollision(rect) {
-                // 1. Title Collision
+            computePosition(index, id) {
+                // Sudo-random seed based on index to rotate spiral slightly per node
+                // But mostly deterministic based on index order.
+                let theta = index * 0.5; // Spiral tightness
+                let radius = 450 + (index * 15); // Base radius + growth
+
+                // Search Loop
+                let safety = 0;
+                while (safety < 200) {
+                    const cx = CONFIG.width / 2;
+                    const cy = CONFIG.height / 2;
+
+                    const x = cx + radius * Math.cos(theta);
+                    const y = cy + radius * Math.sin(theta);
+                    const rect = { x: x - this.NOTE_W / 2, y: y - this.NOTE_H / 2, w: this.NOTE_W, h: this.NOTE_H };
+
+                    if (this.isValid(rect)) {
+                        return { x: rect.x, y: rect.y };
+                    }
+
+                    // Increment spiral
+                    theta += 0.2;
+                    radius += 2; // Slowly expand
+                    safety++;
+                }
+
+                // Fallback: Far out
+                return {
+                    x: CONFIG.width / 2 + (Math.random() - 0.5) * 4000,
+                    y: CONFIG.height / 2 + (Math.random() - 0.5) * 4000
+                };
+            },
+
+            isValid(rect) {
+                // 1. Center Exclusion
                 const cx = CONFIG.width / 2;
                 const cy = CONFIG.height / 2;
                 const titleRect = {
@@ -1345,478 +1396,166 @@
                     w: this.centerZone.w,
                     h: this.centerZone.h
                 };
+                if (this.overlapArea(rect, titleRect) > 0) return false; // Zero tolerance for title
 
-                if (this.rectIntersect(rect, titleRect)) return true;
-
-                // 2. Note Collision
-                return this.placedNotes.some(note => this.rectIntersect(rect, note));
-            },
-
-            rectIntersect(r1, r2) {
-                return !(r2.x > r1.x + r1.w ||
-                    r2.x + r2.w < r1.x ||
-                    r2.y > r1.y + r1.h ||
-                    r2.y + r2.h < r1.y);
-            },
-
-            getPosition(w, h) {
-                // Try to place in rings
-                for (let ring of this.rings) {
-                    // Try multiple angles per ring
-                    const attempts = 15;
-                    for (let i = 0; i < attempts; i++) {
-                        const angle = Math.random() * Math.PI * 2;
-                        const x = CONFIG.width / 2 + Math.cos(angle) * ring;
-                        const y = CONFIG.height / 2 + Math.sin(angle) * ring;
-
-                        // Add Organic Offset
-                        const ox = (Math.random() - 0.5) * 60;
-                        const oy = (Math.random() - 0.5) * 60;
-
-                        // Center the rect
-                        const rect = { x: x + ox - w / 2, y: y + oy - h / 2, w, h };
-
-                        if (!this.checkCollision(rect)) {
-                            return { x: rect.x, y: rect.y };
-                        }
-                    }
+                // 2. Note Overlap (5% Tolerance)
+                // We check against all previous processed notes in this batch
+                for (let other of this.placedRects) {
+                    const overlap = this.overlapArea(rect, other);
+                    const maxOverlap = (this.NOTE_W * this.NOTE_H) * 0.05; // 5%
+                    if (overlap > maxOverlap) return false;
                 }
-                // Fallback: Random placement far out
-                const angle = Math.random() * Math.PI * 2;
-                const r = 2500;
-                return {
-                    x: CONFIG.width / 2 + Math.cos(angle) * r - w / 2,
-                    y: CONFIG.height / 2 + Math.sin(angle) * r - h / 2
-                };
+
+                return true;
             },
 
-            drawDebug() {
-                // Debug function
+            overlapArea(a, b) {
+                const xOverlap = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
+                const yOverlap = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+                return xOverlap * yOverlap;
             }
         };
-        window.SmartPlacement = SmartPlacement;
+        window.HybridLayout = HybridLayout;
 
-        function getGridPosition() {
-            return window.SmartPlacement.getPosition(NOTE_WIDTH, NOTE_HEIGHT);
-        }
-        window.getGridPosition = getGridPosition;
-
-        // --- SEEDED NOTES ---
-        const seededNotes = [
-            { text: "I wish I could pause time.", hearts: 67, flowers: 24, candles: 14 },
-            { text: "My anxiety is winning today.", hearts: 88, flowers: 29, candles: 17 },
-            { text: "Smiling is exhausting.", hearts: 73, flowers: 21, candles: 10 },
-            { text: "I want to be heard.", hearts: 54, flowers: 19, candles: 9 },
-            { text: "Just getting by is hard enough.", hearts: 95, flowers: 33, candles: 18 },
-            { text: "I miss my childhood.", hearts: 134, flowers: 52, candles: 31 },
-            { text: "The future scares me.", hearts: 82, flowers: 28, candles: 16 },
-            { text: "I don't know who I am anymore.", hearts: 76, flowers: 25, candles: 13 },
-            { text: "Everyone expects so much from me.", hearts: 62, flowers: 20, candles: 11 },
-            { text: "I'm trying my best, but it feels like it's not enough.", hearts: 115, flowers: 42, candles: 24 },
-            { text: "I feel like a burden.", hearts: 98, flowers: 36, candles: 20 },
-            { text: "Why is it so hard to be happy?", hearts: 85, flowers: 30, candles: 15 },
-            { text: "I just want peace.", hearts: 145, flowers: 58, candles: 35 },
-            { text: "Life feels heavy right now.", hearts: 70, flowers: 23, candles: 12 }
-        ];
-        window.seededNotes = seededNotes;
-
-        // --- FALLBACK MODE (Offline Persistence) ---
-        const FALLBACK_KEY = 'soulamore_fallback_notes_v3';
-
-        function generateFallbackNotes() {
-            if (STATE.firebaseNotes && STATE.firebaseNotes.size > 0) return;
-
-            // 1. Try Storage
-            let storedData = localStorage.getItem(FALLBACK_KEY);
-            let fallbackNotes = [];
-            if (storedData) {
-                try {
-                    fallbackNotes = JSON.parse(storedData);
-                } catch (e) { fallbackNotes = []; }
-            }
-
-            // 2. If No Storage, Create Initial From SEEDED
-            if (fallbackNotes.length === 0) {
-                const timeOffsets = ["2m ago", "5m ago", "12m ago", "1h ago", "2h ago", "1d ago"];
-
-                if (seededNotes && seededNotes.length > 0) {
-                    seededNotes.forEach((seed, i) => {
-                        const pos = getGridPosition();
-                        const time = timeOffsets[i % timeOffsets.length];
-
-                        // CRITICAL FIX: Register it immediately so next iteration knows!
-                        window.SmartPlacement.placedNotes.push({
-                            x: pos.x,
-                            y: pos.y,
-                            w: NOTE_WIDTH,
-                            h: NOTE_HEIGHT
-                        });
-
-                        fallbackNotes.push({
-                            id: 'fallback_' + i,
-                            text: seed.text,
-                            x: pos.x,
-                            y: pos.y,
-                            time: time,
-                            reactions: { heart: seed.hearts, flower: seed.flowers, candle: seed.candles }
-                        });
-                    });
-                    // Save Initial State
-                    localStorage.setItem(FALLBACK_KEY, JSON.stringify(fallbackNotes));
-                } else {
-                    window.logDebug("CRITICAL: seededNotes is undefined or empty!");
-                }
-            }
-
-            // 3. Render Notes
-            window.logDebug(`Rendering ${fallbackNotes.length} fallback notes...`);
-            fallbackNotes.forEach(note => {
-                window.totalStats.hearts += note.reactions.heart;
-                window.totalStats.flowers += note.reactions.flower;
-                window.totalStats.candles += note.reactions.candle;
-                createNoteElement(note, true);
-            });
-            updateTotalStats();
-            window.logDebug("Fallback Rendering Complete.");
-        }
 
         // --- RENDERING ---
-        function createNoteElement(data, isFallback = false) {
-            // window.logDebug(`CreateNote: ${data.id} at ${data.x},${data.y}`);
+        window.createOrUpdateNoteElement = function (data) {
+            let el = document.querySelector(`.note[data-note-id="${data.id}"]`);
+            const isNewRender = !el;
 
-            // --- SMART PLACEMENT INTEGRATION ---
-            // If data has explicit coords (from DB), we try to respect them, 
-            // BUT we still check against chaos.
-            // If it's a NEW note (no coords) or Fallback, we use the engine.
+            if (isNewRender) {
+                el = document.createElement('div');
+                el.className = 'note';
+                el.dataset.noteId = data.id;
 
-            let finalX, finalY;
+                // Content
+                el.textContent = data.text;
 
-            // Note Dimensions (approx)
-            const w = 340, h = 200;
+                // Random Rotation (Stored or Generated?)
+                // Simple hash: sum of char codes % 12 - 6
+                let hash = 0;
+                for (let i = 0; i < data.id.length; i++) hash += data.id.charCodeAt(i);
+                const rot = (hash % 12) - 6;
+                el.style.transform = `rotate(${rot}deg)`;
 
-            if (data.x !== undefined && data.y !== undefined) {
-                // Existing Note: Check collision roughly? 
-                // Actually, user wants "Collision-Aware Placement System" for everything to avoid piles.
-                // So even for DB notes, if they overlap, we shift them.
-                // However, we want some stability. 
-                // Strategy: Try original pos. If collision, ask SmartPlacement for nearest spot?
-                // For now, let's treat DB notes as "Preferred Position" but subject to No-Fly Zone.
-
-                const rect = { x: data.x, y: data.y, w, h };
-
-                // If it crashes into Title, RECALCULATE completely.
-                if (window.SmartPlacement.checkCollision(rect)) {
-                    // It's bad. Find new spot.
-                    const pos = window.SmartPlacement.getPosition(w, h);
-                    finalX = pos.x; finalY = pos.y;
-                } else {
-                    // It's presumably okay, just register it so others don't hit it.
-                    finalX = data.x; finalY = data.y;
-                    window.SmartPlacement.placedNotes.push(rect);
+                // New Note Glow
+                if (data.isNew || (Date.now() - (data.createdAt?.seconds * 1000) < 5000)) {
+                    // el.classList.add('new-note-glow'); 
                 }
+
+                // Fallback ID check for styles
+                if (data.isSeeded) el.classList.add('fallback-note');
+
+                notesContainer.appendChild(el);
+            }
+
+            // Update Position (Smooth transition via CSS)
+            el.style.left = data.x + 'px';
+            el.style.top = data.y + 'px';
+
+            // Update Metadata / Reactions
+            // Update Metadata / Reactions
+            const r = {
+                heart: data.hearts || (data.reactions?.heart) || 0,
+                flower: data.flowers || (data.reactions?.flower) || 0,
+                candle: data.candles || (data.reactions?.candle) || 0
+            };
+
+            if (isNewRender) {
+                // Check what user has already reacted to
+                const userReactions = JSON.parse(localStorage.getItem('soulamore_user_reactions') || '{}');
+                const noteReactions = userReactions[data.id] || [];
+
+                let timeLabel = 'Just now';
+                let createdTime = Date.now();
+                if (data.createdAt) {
+                    createdTime = (data.createdAt.seconds ? data.createdAt.seconds * 1000 : data.createdAt) || Date.now();
+                }
+                const diffMins = Math.floor((Date.now() - createdTime) / 60000);
+                if (diffMins < 1) timeLabel = 'Just now';
+                else if (diffMins < 60) timeLabel = `${diffMins}m ago`;
+                else if (diffMins < 1440) timeLabel = `${Math.floor(diffMins / 60)}h ago`;
+                else timeLabel = `${Math.floor(diffMins / 1440)}d ago`;
+
+                const uiHTML = `
+                <div class="mod-controls">
+                    <button class="delete-btn" onclick="hideNoteGlobally('${data.id}')"><i class="fas fa-trash"></i> Hide</button>
+                </div>
+                <div class="note-meta"><span style="opacity:0.6;">Anonymous</span><span style="font-size:0.75rem;">${timeLabel}</span></div>
+                <div class="note-actions">
+                    <button class="action-btn heart-btn ${noteReactions.includes('heart') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'heart', this)"><i class="fas fa-heart"></i> <span class="count">${r.heart}</span></button>
+                    <button class="action-btn flower-btn ${noteReactions.includes('flower') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'flower', this)"><i class="fas fa-spa"></i> <span class="count">${r.flower}</span></button>
+                    <button class="action-btn candle-btn ${noteReactions.includes('candle') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'candle', this)"><i class="fas fa-fire-alt"></i> <span class="count">${r.candle}</span></button>
+                </div>`;
+                el.insertAdjacentHTML('beforeend', uiHTML);
             } else {
-                // Totally new or undefined
-                const pos = window.SmartPlacement.getPosition(w, h);
-                finalX = pos.x; finalY = pos.y;
+                // Just update counts if elements exist
+                const h = el.querySelector('.heart-btn .count'); if (h) h.innerText = r.heart;
+                const f = el.querySelector('.flower-btn .count'); if (f) f.innerText = r.flower;
+                const c = el.querySelector('.candle-btn .count'); if (c) c.innerText = r.candle;
             }
-
-            const el = document.createElement('div');
-            el.className = 'note';
-
-            // New Note Features
-            if (data.isNew) {
-                el.classList.add('new-note-glow'); // Peach/Teal Pulse
-                // Auto-Focus Camera
-                if (window.zoomToNote) window.zoomToNote(finalX, finalY);
-            } else {
-                el.classList.add('note-float-in');
-            }
-
-            if (isFallback) el.classList.add('fallback-note');
-            el.dataset.noteId = data.id;
-
-            el.style.left = finalX + 'px';
-            el.style.top = finalY + 'px';
-
-            // Save final decision to object for future reference if needed
-            data.x = finalX; data.y = finalY;
-
-            // Random Rotation (More organic: +/- 6 degrees, less extreme)
-            const rot = (Math.random() * 12) - 6;
-            el.style.setProperty('--rot', rot + 'deg');
-            el.style.transform = `rotate(${rot}deg)`;
-
-            // Note: STATE.placedNotes is managed by SmartPlacement now.
-            // We don't need the old array push here.
-
-            el.textContent = data.text;
-
-            const r = data.reactions || { heart: 0, flower: 0, candle: 0 };
-            const totalReactions = r.heart + r.flower + r.candle;
-
-            // Radiance Logic: More reactions = stronger soft glow
-            if (totalReactions > 5) {
-                const intensity = Math.min(totalReactions / 50, 1);
-                el.style.setProperty('--glow-radius', `${intensity * 40}px`);
-                el.style.setProperty('--glow-color', `rgba(244, 159, 117, ${intensity * 0.15})`);
-            }
-
-            // Check what user has already reacted to
-            const userReactions = JSON.parse(localStorage.getItem('soulamore_user_reactions') || '{}');
-            const noteReactions = userReactions[data.id] || [];
-
-            const uiHTML = `
-            <div class="mod-controls">
-                <button class="delete-btn" onclick="hideNoteGlobally('${data.id}')"><i class="fas fa-trash"></i> Hide</button>
-            </div>
-            <div class="note-meta"><span style="opacity:0.6;">Anonymous</span><span style="font-size:0.75rem;">${data.time}</span></div>
-            <div class="note-actions">
-                <button class="action-btn heart-btn ${noteReactions.includes('heart') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'heart', this)"><i class="fas fa-heart"></i> <span class="count">${r.heart}</span></button>
-                <button class="action-btn flower-btn ${noteReactions.includes('flower') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'flower', this)"><i class="fas fa-spa"></i> <span class="count">${r.flower}</span></button>
-                <button class="action-btn candle-btn ${noteReactions.includes('candle') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'candle', this)"><i class="fas fa-fire-alt"></i> <span class="count">${r.candle}</span></button>
-            </div>`;
-            el.insertAdjacentHTML('beforeend', uiHTML);
-            notesContainer.appendChild(el);
-        }
-        window.createNoteElement = createNoteElement;
-
-        function updateTotalStats() {
-            const h = document.getElementById('totalHearts');
-            const f = document.getElementById('totalFlowers');
-            const c = document.getElementById('totalCandles');
-
-            const hearts = window.totalStats.hearts;
-            const flowers = window.totalStats.flowers;
-            const candles = window.totalStats.candles;
-
-            if (h) h.innerText = hearts.toLocaleString();
-            if (f) f.innerText = flowers.toLocaleString();
-            if (c) c.innerText = candles.toLocaleString();
-        }
-        window.updateTotalStats = updateTotalStats;
-
-        // --- SOUND ENGINE ---
-        const SOUNDS = {
-            heart: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3', // Soft pop
-            flower: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', // Shimmer
-            candle: 'https://assets.mixkit.co/active_storage/sfx/2569/2569-preview.mp3', // Bell
-            post: 'https://assets.mixkit.co/active_storage/sfx/1992/1992-preview.mp3' // Paper rustle
-        };
-
-        function playSound(type) {
-            try {
-                const audio = new Audio(SOUNDS[type]);
-                audio.volume = 0.4;
-                audio.play().catch(e => { });
-            } catch (e) { }
-        }
-        window.playSound = playSound;
-
-        // --- GLOBAL REACT HANDLER ---
-        window.reactGlobally = function (id, type, btn) {
-            if (btn.classList.contains('reacted')) return;
-
-            // Play Feedback
-            playSound(type);
-
-            // 0. Double-check LocalStorage constraint
-            const USER_REACT_KEY = 'soulamore_user_reactions';
-            let userReactions = JSON.parse(localStorage.getItem(USER_REACT_KEY) || '{}');
-            if (userReactions[id] && userReactions[id].includes(type)) return;
-
-            // Mark as reacted
-            if (!userReactions[id]) userReactions[id] = [];
-            userReactions[id].push(type);
-            localStorage.setItem(USER_REACT_KEY, JSON.stringify(userReactions));
-
-            btn.classList.add('pop-active', 'reacted');
-            setTimeout(() => btn.classList.remove('pop-active'), 300);
-
-            // Optimistic Update UI
-            const countSpan = btn.querySelector('.count');
-            countSpan.innerText = parseInt(countSpan.innerText) + 1;
-
-            if (type === 'heart') window.totalStats.hearts++;
-            if (type === 'flower') window.totalStats.flowers++;
-            if (type === 'candle') window.totalStats.candles++;
-            updateTotalStats();
-
-            // 1. If Fallback Note -> Update LocalStorage
-            if (id.startsWith('fallback_')) {
-                let stored = localStorage.getItem(FALLBACK_KEY);
-                if (stored) {
-                    let data = JSON.parse(stored);
-                    const noteIdx = data.findIndex(n => n.id === id);
-                    if (noteIdx !== -1) {
-                        data[noteIdx].reactions[type]++;
-                        localStorage.setItem(FALLBACK_KEY, JSON.stringify(data));
-                    }
-                }
-            }
-
-            // 2. If Firebase Note -> Update Database
-            if (window.firebaseReact && !id.startsWith('fallback_')) {
-                window.firebaseReact(id, type);
-            }
-        };
-
-        function openWriter() { document.getElementById('writeModal').classList.add('active'); }
-        function closeWriter() { document.getElementById('writeModal').classList.remove('active'); }
-        window.openWriter = openWriter;
-        window.closeWriter = closeWriter;
-
-        // Sanitization Helper
-        window.sanitizeText = function (text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        };
-
-        // moved postNote here to ensure it exists even if module fails
-        async function postNote() {
-            const input = document.getElementById('noteInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            if (window.playSound) window.playSound('post');
-
-            const cleanText = window.sanitizeText(text);
-            const pos = window.getGridPosition();
-            window.closeWriter();
-            input.value = '';
-
-            // Check if Handler is loaded
-            if (window.postNoteHandler) {
-                // Pass a callback that receives the temp ID and data
-                await window.postNoteHandler(cleanText, { x: undefined, y: undefined }, (tempId, data) => {
-                    // Manual Render for Optimistic Update
-                    // Mark as NEW to trigger Glow & Zoom
-                    data.isNew = true;
-                    window.renderFirebaseNote(tempId, data);
-
-                    // Reset View not needed if zoomToNote handles it
-                    // if (window.resetView) window.resetView(pos.x, pos.y);
-                });
-            } else {
-                alert("System is offline or initializing. Please try again in a moment.");
-                console.error("postNoteHandler not found. Module script failed?");
-                // Fallback to local only?
-                // For now, alert is safer.
-            }
-        };
-        window.postNote = postNote;
-
-    </script>
-
-    <!-- FIREBASE LOGIC (Handler Module) -->
-    <script type="module">
-        (async function () {
-            try {
-                window.logDebug("Attempting to load Handler Module...");
-                // Use Dynamic Import to catch errors
-                const module = await import("../assets/js/problem-wall-handler.js");
-                window.logDebug("Handler Module Loaded Successfully!");
-
-                const { initWall, postNoteToWall, reactToNote, hideNote } = module;
-
-                // Expose to Global
-                window.postNoteHandler = postNoteToWall;
-
-                // 1. Initialize Wall
-                initWall(
-                    (id, data) => {
-                        // window.logDebug(`Firebase Note Received: ${id}`);
-                        if (window.renderFirebaseNote) window.renderFirebaseNote(id, data);
-                    },
-                    (id, data) => {
-                        if (window.updateNoteUI) window.updateNoteUI(id, data);
-                    },
-                    (stats) => {                                // Update Stats
-                        window.logDebug(`Stats Updated: ${JSON.stringify(stats)}`);
-                        window.totalStats = stats;
-                        if (window.updateTotalStats) window.updateTotalStats();
-                    }
-                );
-
-                window.firebaseReact = async function (noteId, type) {
-                    await reactToNote(noteId, type);
-                };
-
-                window.firebaseHide = async function (noteId) {
-                    await hideNote(noteId);
-                };
-
-            } catch (e) {
-                window.logDebug(`CRITICAL MODULE ERROR: ${e.message}`);
-                console.error("Module Loading Failed:", e);
-            }
-        })();
-
-        // 2. Render Functions (Expose globally so main script can use them)
-        // 2. Render Functions (Expose globally so main script can use them)
-        window.renderFirebaseNote = function (noteId, data) {
-            // First time we get real data? Clear the fallback notes!
-            if (!window.hasRealData) {
-                window.logDebug("Real Data Received. Clearing Fallback.");
-                const container = document.getElementById('notes-container');
-                if (container) container.innerHTML = '';
-                // ALSO RESET THE GRID so real notes don't collide with phantom fallback notes
-                if (window.SmartPlacement && window.SmartPlacement.reset) {
-                    window.SmartPlacement.reset();
-                }
-                window.hasRealData = true;
-            }
-
-            let finalX = data.x, finalY = data.y;
-
-            // Default position if missing
-            if (finalX === undefined || finalY === undefined) {
-                const pos = window.getGridPosition();
-                finalX = pos.x; finalY = pos.y;
-            }
-
-            // --- REPULSION LOGIC MOVED TO createNoteElement ---
-            // This ensures ALL notes (Firebase & Fallback) respect the safe zone.
-
-            let timeLabel = 'Just now';
-            let createdTime = Date.now();
-
-            if (data.createdAt) {
-                if (typeof data.createdAt.toDate === 'function') {
-                    // Firestore Timestamp
-                    createdTime = data.createdAt.toDate().getTime();
-                } else if (data.createdAt.seconds) {
-                    // Mock Timestamp or serialized object
-                    createdTime = data.createdAt.seconds * 1000;
-                } else if (typeof data.createdAt === 'number') {
-                    // Raw milliseconds
-                    createdTime = data.createdAt;
-                }
-            }
-
-            const diffMins = Math.floor((Date.now() - createdTime) / 60000);
-            if (diffMins < 1) timeLabel = 'Just now';
-            else if (diffMins < 60) timeLabel = `${diffMins}m ago`;
-            else if (diffMins < 1440) timeLabel = `${Math.floor(diffMins / 60)}h ago`;
-            else timeLabel = `${Math.floor(diffMins / 1440)}d ago`;
-
-            window.createNoteElement({
-                id: noteId,
-                text: data.text,
-                x: finalX, y: finalY,
-                time: timeLabel,
-                reactions: { heart: data.hearts || 0, flower: data.flowers || 0, candle: data.candles || 0 }
-            }, false);
-
-            if (window.fallbackTimer) clearTimeout(window.fallbackTimer);
         };
 
         window.updateNoteUI = function (noteId, data) {
-            const noteEl = document.querySelector(`.note[data-note-id="${noteId}"]`);
-            if (!noteEl) return;
-            const h = noteEl.querySelector('.heart-btn .count'); if (h) h.innerText = data.hearts || 0;
-            const f = noteEl.querySelector('.flower-btn .count'); if (f) f.innerText = data.flowers || 0;
-            const c = noteEl.querySelector('.candle-btn .count'); if (c) c.innerText = data.candles || 0;
+            // Update an existing note's data in STATE and re-render partial
+            const idx = STATE.notesData.findIndex(n => n.id === noteId);
+            if (idx !== -1) {
+                STATE.notesData[idx] = { ...STATE.notesData[idx], ...data };
+                window.createOrUpdateNoteElement(STATE.notesData[idx]);
+            }
+        };
+
+        // --- FIREBASE RENDERER INTEGRATION ---
+
+        // Ensure STATE is initialized
+        if (!window.STATE) window.STATE = {};
+        window.STATE.notesData = [];
+
+        window.renderFirebaseNote = function (noteId, data, isFullList) {
+            // Prevent clearing if we already have data, unless it's a full reload
+            if (!window.hasRealData && isFullList) {
+                window.logDebug("Real Data Received (Bulk). Clearing Container.");
+                const container = document.getElementById('notes-container');
+                if (container) container.innerHTML = '';
+                if (window.HybridLayout && window.HybridLayout.reset) window.HybridLayout.reset(); // If reset exists
+                window.hasRealData = true;
+            } else if (!window.hasRealData && !isFullList) {
+                // First note ever (e.g. empty DB + fresh post)
+                window.logDebug("First Real Note Received (Single). Clearing Placeholder Container.");
+                const container = document.getElementById('notes-container');
+                if (container) container.innerHTML = '';
+                window.hasRealData = true;
+            }
+
+            // data can be a single note object OR an array of notes (if isFullList)
+            if (isFullList && Array.isArray(data)) {
+                window.logDebug(`Bulk Render: ${data.length} notes.`);
+                STATE.notesData = data;
+                try { HybridLayout.layoutAll(); } catch (e) { console.error("Layout Error:", e); }
+            } else {
+                // Single Note Update/Add
+                const existingIdx = STATE.notesData.findIndex(n => n.id === noteId);
+
+                if (existingIdx !== -1) {
+                    STATE.notesData[existingIdx] = { ...STATE.notesData[existingIdx], ...data };
+                } else {
+                    STATE.notesData.push(data);
+                }
+
+                // Re-Layout needed to fit it in spiral?
+                try {
+                    HybridLayout.layoutAll();
+                } catch (e) {
+                    console.error("Layout Error:", e);
+                    window.createOrUpdateNoteElement(data); // Fallback
+                }
+
+                // If it's the specific new note, maybe zoom to it?
+                if (!isFullList && window.zoomToNote) {
+                    const note = STATE.notesData.find(n => n.id === noteId);
+                    if (note && note.x && note.y) window.zoomToNote(note.x, note.y);
+                }
+            }
         };
 
         // --- MODERATOR SECRET ---
@@ -1841,6 +1580,264 @@
             document.body.classList.toggle('mod-mode');
             alert("Moderator Mode Active. You can now hide inappropriate notes.");
         }
+
+        // --- MISSING GLOBAL FUNCTIONS (Restored) ---
+
+        // 1. RESET VIEW — Smoothly re-center the camera
+        function resetView(focusX = null, focusY = null) {
+            const canvasCenterX = CONFIG.width / 2;
+            const canvasCenterY = CONFIG.height / 2;
+            const targetPointX = focusX !== null ? focusX : canvasCenterX;
+            const targetPointY = focusY !== null ? focusY : canvasCenterY;
+            const targetX = (window.innerWidth / 2) - targetPointX;
+            const targetY = (window.innerHeight / 2) - targetPointY;
+            canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
+            STATE.pointX = targetX;
+            STATE.pointY = targetY;
+            STATE.scale = 1;
+            updateTransform();
+            updateZoomUI();
+            setTimeout(() => { canvas.style.transition = ""; }, 1200);
+        }
+        window.resetView = resetView;
+
+        // 2. WRITER MODAL
+        function openWriter() { document.getElementById('writeModal').classList.add('active'); }
+        function closeWriter() { document.getElementById('writeModal').classList.remove('active'); }
+        window.openWriter = openWriter;
+        window.closeWriter = closeWriter;
+
+        // 3. OBSCENE WORDS FILTER
+        const OBSCENE_WORDS = ["fuck", "shit", "bitch", "asshole", "cunt", "dick", "pussy", "whore", "slut", "bastard"];
+        function sanitizeText(text) {
+            let clean = text;
+            OBSCENE_WORDS.forEach(word => { clean = clean.replace(new RegExp(`\\b${word}\\b`, 'gi'), '***'); });
+            return clean;
+        }
+        window.sanitizeText = sanitizeText;
+
+        // 4. GLOBAL REACT HANDLER (Optimistic UI + Firestore via handler)
+        window.reactGlobally = function (id, type, btn) {
+            if (btn.classList.contains('reacted')) return;
+
+            // LocalStorage constraint (1 reaction per type per note)
+            const USER_REACT_KEY = 'soulamore_user_reactions';
+            let userReactions = JSON.parse(localStorage.getItem(USER_REACT_KEY) || '{}');
+            if (userReactions[id] && userReactions[id].includes(type)) return;
+
+            // Mark reacted
+            if (!userReactions[id]) userReactions[id] = [];
+            userReactions[id].push(type);
+            localStorage.setItem(USER_REACT_KEY, JSON.stringify(userReactions));
+
+            btn.classList.add('pop-active', 'reacted');
+            setTimeout(() => btn.classList.remove('pop-active'), 300);
+
+            // Optimistic count update
+            const countSpan = btn.querySelector('.count');
+            countSpan.innerText = parseInt(countSpan.innerText) + 1;
+
+            if (type === 'heart') window.totalStats.hearts++;
+            if (type === 'flower') window.totalStats.flowers++;
+            if (type === 'candle') window.totalStats.candles++;
+            updateTotalStats();
+
+            // Fire-and-forget Firestore update (handled by module script below)
+            if (window.firebaseReact) {
+                window.firebaseReact(id, type);
+            }
+        };
+
+        // 5. HIDE NOTE (Mod only)
+        window.hideNoteGlobally = function (noteId) {
+            const el = document.querySelector(`.note[data-note-id="${noteId}"]`);
+            if (el) el.remove();
+            if (window.firebaseHide) {
+                window.firebaseHide(noteId);
+            }
+        };
+
+        // 6. UPDATE TOTAL STATS
+        function updateTotalStats() {
+            const h = document.getElementById('totalHearts');
+            const f = document.getElementById('totalFlowers');
+            const c = document.getElementById('totalCandles');
+            if (h) h.innerText = window.totalStats.hearts.toLocaleString();
+            if (f) f.innerText = window.totalStats.flowers.toLocaleString();
+            if (c) c.innerText = window.totalStats.candles.toLocaleString();
+        }
+        window.updateTotalStats = updateTotalStats;
+
+        // 7. POST NOTE (Global — wired to module below)
+        window.postNote = function () {
+            const input = document.getElementById('noteInput');
+            const text = input.value.trim();
+            if (!text) return;
+            const cleanText = sanitizeText(text);
+            closeWriter();
+            input.value = '';
+
+            if (window.firebasePost) {
+                window.firebasePost(cleanText);
+            } else {
+                window.logDebug("Firebase Post not ready, rendering locally.");
+                window.renderFirebaseNote('temp-' + Date.now(), {
+                    text: cleanText,
+                    hearts: 0, flowers: 0, candles: 0,
+                    createdAt: { seconds: Date.now() / 1000 },
+                    isSeeded: false
+                }, false);
+            }
+        };
+
+    </script>
+
+    <!-- FIREBASE MODULE — Direct CDN imports (bypasses handler module chain) -->
+    <script type="module">
+        // Direct CDN imports — no auth needed, Problem Wall is fully public
+        import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {
+            getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit,
+            updateDoc, doc, increment, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        window.logDebug("Firebase Module: Starting...");
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+            authDomain: "soulamore-f0a64.firebaseapp.com",
+            projectId: "soulamore-f0a64",
+            storageBucket: "soulamore-f0a64.firebasestorage.app",
+            messagingSenderId: "649985161002",
+            appId: "1:649985161002:web:66141929d4acd4451a5053",
+            measurementId: "G-2K2Z1Q2D1W"
+        };
+
+        let app;
+        try { app = getApp(); } catch (e) { app = initializeApp(firebaseConfig); }
+        const db = getFirestore(app);
+        const WALL_COLLECTION = "problem-wall-notes";
+
+        window.logDebug("Firebase Module: App initialized.");
+
+        // --- Wire global functions (no auth required) ---
+        window.firebaseReact = async (noteId, type) => {
+            const map = { heart: 'hearts', flower: 'flowers', candle: 'candles' };
+            const field = map[type];
+            if (!field) return;
+            try {
+                await updateDoc(doc(db, WALL_COLLECTION, noteId), { [field]: increment(1) });
+            } catch (e) { console.error("Reaction failed:", e); }
+        };
+
+        window.firebaseHide = async (noteId) => {
+            try {
+                await updateDoc(doc(db, WALL_COLLECTION, noteId), { isHidden: true });
+            } catch (e) { console.error("Hide failed:", e); }
+        };
+
+        window.firebasePost = async (cleanText) => {
+            try {
+                const tempId = 'temp-' + Date.now();
+                const noteData = {
+                    text: cleanText, hearts: 0, flowers: 0, candles: 0,
+                    createdAt: { seconds: Date.now() / 1000 }, isSeeded: false, isHidden: false
+                };
+                if (window.renderFirebaseNote) {
+                    window.renderFirebaseNote(tempId, { id: tempId, ...noteData }, false);
+                }
+                await addDoc(collection(db, WALL_COLLECTION), {
+                    text: cleanText, hearts: 0, flowers: 0, candles: 0,
+                    createdAt: serverTimestamp(), isSeeded: false, isHidden: false
+                });
+                window.logDebug("Note posted to Firestore.");
+            } catch (e) {
+                window.logDebug("Post failed: " + e.message);
+                console.error("Post failed:", e);
+            }
+        };
+
+        // --- Subscribe immediately (fully public, no auth) ---
+        subscribeToNotes();
+
+        function subscribeToNotes() {
+            window.logDebug("Subscribing to Firestore notes...");
+
+            const q = query(
+                collection(db, WALL_COLLECTION),
+                orderBy("createdAt", "desc"),
+                limit(200)
+            );
+
+            let isFirstSnapshot = true;
+
+            onSnapshot(q, (snapshot) => {
+                const t0 = performance.now();
+                window.logDebug(`Snapshot: ${snapshot.size} docs, empty=${snapshot.empty}, first=${isFirstSnapshot}`);
+
+                const stats = { hearts: 0, flowers: 0, candles: 0 };
+                const allNotes = [];
+
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const noteId = docSnap.id;
+
+                    stats.hearts += (data.hearts || 0);
+                    stats.flowers += (data.flowers || 0);
+                    stats.candles += (data.candles || 0);
+
+                    if (data.isHidden || !data.text) return;
+
+                    allNotes.push({ id: noteId, ...data });
+                });
+
+                if (isFirstSnapshot) {
+                    // BULK RENDER — single layout pass for all notes
+                    window.logDebug(`Bulk rendering ${allNotes.length} notes...`);
+                    if (window.renderFirebaseNote) {
+                        window.renderFirebaseNote(null, allNotes, true);
+                    }
+                    isFirstSnapshot = false;
+                } else {
+                    // INCREMENTAL UPDATE — only update what changed
+                    snapshot.docChanges().forEach((change) => {
+                        const data = change.doc.data();
+                        const noteId = change.doc.id;
+                        if (data.isHidden || !data.text) {
+                            // Remove hidden notes from DOM
+                            const el = document.querySelector(`.note[data-note-id="${noteId}"]`);
+                            if (el) el.remove();
+                            return;
+                        }
+
+                        if (change.type === 'added') {
+                            if (window.renderFirebaseNote) {
+                                window.renderFirebaseNote(noteId, { id: noteId, ...data }, false);
+                            }
+                        } else if (change.type === 'modified') {
+                            if (window.updateNoteUI) {
+                                window.updateNoteUI(noteId, data);
+                            }
+                        } else if (change.type === 'removed') {
+                            const el = document.querySelector(`.note[data-note-id="${noteId}"]`);
+                            if (el) el.remove();
+                        }
+                    });
+                }
+
+                // Update stats
+                window.totalStats = stats;
+                if (window.updateTotalStats) window.updateTotalStats();
+
+                window.logDebug(`Render complete in ${Math.round(performance.now() - t0)}ms`);
+
+            }, (error) => {
+                window.logDebug(`Snapshot ERROR: ${error.message} (${error.code})`);
+                console.error("Firestore error:", error);
+            });
+        }
+
+        window.logDebug("Firebase Module: Loaded & subscribed.");
     </script>
 </body>
 
