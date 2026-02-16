@@ -1057,37 +1057,12 @@
         };
         window.STATE = STATE; // Make STATE global for module access
 
-        // --- DEBUG LOGGING (VISIBLE ON-SCREEN) ---
+        // --- DEBUG LOGGING (Console only) ---
         window.DEBUG_LOG = [];
-        // Auto-create visible debug overlay
-        (function () {
-            let debugEl = document.getElementById('debug-overlay');
-            if (!debugEl) {
-                debugEl = document.createElement('div');
-                debugEl.id = 'debug-overlay';
-                debugEl.style.cssText = 'position:fixed; top:10px; left:10px; width:400px; max-height:300px; overflow-y:auto; background:rgba(0,0,0,0.85); color:#0f0; font-size:11px; font-family:monospace; padding:10px; border-radius:8px; z-index:99999; pointer-events:auto;';
-                document.body.appendChild(debugEl);
-                debugEl.innerHTML = '<div style="color:#4ECDC4;font-weight:bold;margin-bottom:5px;">🐛 Debug Panel (remove after fix)</div>';
-            }
-        })();
         window.logDebug = function (msg) {
-            console.log(msg);
+            console.log('[ProblemWall]', msg);
             window.DEBUG_LOG.push(msg);
-            const debugEl = document.getElementById('debug-overlay');
-            if (debugEl) {
-                debugEl.innerHTML += `<div>${new Date().toLocaleTimeString()} - ${msg}</div>`;
-                debugEl.scrollTop = debugEl.scrollHeight;
-            }
         };
-
-        window.onerror = function (msg, url, line, col, error) {
-            window.logDebug(`Global Error: ${msg} at ${line}:${col}`);
-            return false;
-        };
-
-        window.addEventListener('unhandledrejection', (event) => {
-            window.logDebug(`Unhandled Promise: ${event.reason}`);
-        });
 
 
         // STATS (Global)
@@ -1398,12 +1373,10 @@
                 };
                 if (this.overlapArea(rect, titleRect) > 0) return false; // Zero tolerance for title
 
-                // 2. Note Overlap (5% Tolerance)
-                // We check against all previous processed notes in this batch
+                // 2. Note Overlap (Zero tolerance + 10px gap)
                 for (let other of this.placedRects) {
-                    const overlap = this.overlapArea(rect, other);
-                    const maxOverlap = (this.NOTE_W * this.NOTE_H) * 0.05; // 5%
-                    if (overlap > maxOverlap) return false;
+                    const padded = { x: other.x - 10, y: other.y - 10, w: other.w + 20, h: other.h + 20 };
+                    if (this.overlapArea(rect, padded) > 0) return false;
                 }
 
                 return true;
