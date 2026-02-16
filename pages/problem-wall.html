@@ -690,6 +690,61 @@
             display: block;
         }
 
+        /* --- LOADING OVERLAY --- */
+        #wall-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            /* Deep Space */
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #4ECDC4;
+            /* Teal Glow */
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        .loader-text {
+            font-family: 'Outfit', sans-serif;
+            color: #f1f5f9;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        body.loaded #wall-loader {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
         /* --- 5. UI OVERLAYS (FAB STACK) --- */
         .fab-stack-container {
             position: fixed;
@@ -934,6 +989,12 @@
 </head>
 
 <body data-header-theme="light">
+
+    <!-- LOADING OVERLAY -->
+    <div id="wall-loader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">CONNECTING SOULS...</div>
+    </div>
 
     <div id="app-shell">
         <div id="shell-fixed">
@@ -1548,6 +1609,16 @@
                 window.logDebug(`Bulk Render: ${data.length} notes.`);
                 STATE.notesData = data;
                 try { HybridLayout.layoutAll(); } catch (e) { console.error("Layout Error:", e); }
+
+                // Hide Loader with fade out
+                setTimeout(() => {
+                    document.body.classList.add('loaded');
+                    // Completely remove from DOM after fade
+                    setTimeout(() => {
+                        const loader = document.getElementById('wall-loader');
+                        if (loader) loader.remove();
+                    }, 1000);
+                }, 500); // 500ms min display time for smoothness
             } else {
                 // Single Note Update/Add
                 const existingIdx = STATE.notesData.findIndex(n => n.id === noteId);
