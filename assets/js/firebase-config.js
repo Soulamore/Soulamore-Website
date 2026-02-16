@@ -8,7 +8,7 @@ import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.7.1
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, linkWithCredential, EmailAuthProvider, updatePassword, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// Note: enableIndexedDbPersistence was removed in Firebase v10. Offline persistence is now enabled by default.
 
 // ... (existing code for firebaseConfig, initializeApp, etc. remains unchanged) ...
 
@@ -51,18 +51,7 @@ setPersistence(auth, browserLocalPersistence)
         console.error("Auth persistence error:", error);
     });
 
-// Enable Firestore offline persistence
-enableIndexedDbPersistence(db)
-    .then(() => {
-        console.log("Firestore offline persistence enabled");
-    })
-    .catch((err) => {
-        if (err.code === 'failed-precondition') {
-            console.warn("Multiple tabs open, persistence enabled in first tab only");
-        } else if (err.code === 'unimplemented') {
-            console.warn("Browser doesn't support offline persistence");
-        }
-    });
+// Firestore offline persistence is enabled by default in Firebase v10+.
 
 // --- Retry Logic with Exponential Backoff ---
 export async function retryWithBackoff(fn, maxRetries = 3, delay = 1000) {

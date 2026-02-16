@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Seed Problem Wall</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #4ECDC4;
+        }
+
+        #log {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .success {
+            color: #10b981;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+
+        .info {
+            color: #94a3b8;
+        }
+
+        button {
+            background: #4ECDC4;
+            color: #0f172a;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .warn {
+            background: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🌱 Problem Wall Seeder</h1>
+    <p>Click the button below to push 20 seed notes to your Firebase Firestore database.</p>
+    <button id="seedBtn" onclick="seedNow()">Seed 20 Notes</button>
+    <button id="clearBtn" class="warn" onclick="clearSeeds()">Clear All Seeds</button>
+    <div id="log"></div>
+
+    <script type="module">
+        import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+            authDomain: "soulamore-f0a64.firebaseapp.com",
+            projectId: "soulamore-f0a64",
+            storageBucket: "soulamore-f0a64.firebasestorage.app",
+            messagingSenderId: "649985161002",
+            appId: "1:649985161002:web:66141929d4acd4451a5053",
+            measurementId: "G-2K2Z1Q2D1W"
+        };
+
+        let app;
+        try { app = getApp(); } catch (e) { app = initializeApp(firebaseConfig); }
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const COLLECTION = "problem-wall-notes";
+
+        const SEEDS = [
+            { text: "I wish I could pause time.", hearts: 67, flowers: 24, candles: 14 },
+            { text: "My anxiety is winning today.", hearts: 88, flowers: 29, candles: 17 },
+            { text: "Smiling is exhausting.", hearts: 73, flowers: 21, candles: 10 },
+            { text: "I want to be heard.", hearts: 54, flowers: 19, candles: 9 },
+            { text: "Just getting by is hard enough.", hearts: 95, flowers: 33, candles: 18 },
+            { text: "I miss my childhood.", hearts: 134, flowers: 52, candles: 31 },
+            { text: "The future scares me.", hearts: 82, flowers: 28, candles: 16 },
+            { text: "I don't know who I am anymore.", hearts: 76, flowers: 25, candles: 13 },
+            { text: "Everyone expects so much from me.", hearts: 62, flowers: 20, candles: 11 },
+            { text: "I'm trying my best, but it feels like it's not enough.", hearts: 115, flowers: 42, candles: 24 },
+            { text: "I feel like a burden.", hearts: 98, flowers: 36, candles: 20 },
+            { text: "Why is it so hard to be happy?", hearts: 85, flowers: 30, candles: 15 },
+            { text: "I just want peace.", hearts: 145, flowers: 58, candles: 35 },
+            { text: "Life feels heavy right now.", hearts: 70, flowers: 23, candles: 12 },
+            { text: "I feel so lonely in a crowded room.", hearts: 92, flowers: 44, candles: 15 },
+            { text: "Am I the only one pretending?", hearts: 65, flowers: 18, candles: 8 },
+            { text: "I need a hug that lasts an hour.", hearts: 150, flowers: 60, candles: 40 },
+            { text: "Tomorrow is another battle.", hearts: 45, flowers: 12, candles: 5 },
+            { text: "I just want to sleep for a week.", hearts: 110, flowers: 35, candles: 22 },
+            { text: "Is it okay to not be okay?", hearts: 200, flowers: 80, candles: 50 }
+        ];
+
+        function log(msg, cls = 'info') {
+            const el = document.getElementById('log');
+            el.innerHTML += `<div class="${cls}">${new Date().toLocaleTimeString()} — ${msg}</div>`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        // Auth first
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                log(`✅ Authenticated as ${user.uid}`, 'success');
+                document.getElementById('seedBtn').disabled = false;
+                document.getElementById('clearBtn').disabled = false;
+            } else {
+                log('Signing in anonymously...', 'info');
+                signInAnonymously(auth);
+            }
+        });
+
+        window.seedNow = async function () {
+            const btn = document.getElementById('seedBtn');
+            btn.disabled = true;
+            btn.textContent = 'Seeding...';
+
+            try {
+                const coll = collection(db, COLLECTION);
+
+                // Check existing seeds
+                const existing = await getDocs(query(coll, where("isSeeded", "==", true)));
+                const existingTexts = new Set();
+                existing.forEach(d => existingTexts.add(d.data().text));
+                log(`Found ${existingTexts.size} existing seeds in DB.`, 'info');
+
+                let added = 0;
+                for (const seed of SEEDS) {
+                    if (existingTexts.has(seed.text)) {
+                        log(`⏭️ Skipped (exists): "${seed.text}"`, 'info');
+                        continue;
+                    }
+
+                    await addDoc(coll, {
+                        text: seed.text,
+                        hearts: seed.hearts,
+                        flowers: seed.flowers,
+                        candles: seed.candles,
+                        createdAt: serverTimestamp(),
+                        isSeeded: true,
+                        isHidden: false
+                    });
+                    added++;
+                    log(`✅ Added: "${seed.text}"`, 'success');
+                }
+
+                log(`🎉 Done! Added ${added} new seeds. Total seeds: ${existingTexts.size + added}`, 'success');
+            } catch (e) {
+                log(`❌ Error: ${e.message}`, 'error');
+                console.error(e);
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Seed 20 Notes';
+        };
+
+        window.clearSeeds = async function () {
+            if (!confirm('This will DELETE all seeded notes. Are you sure?')) return;
+            const btn = document.getElementById('clearBtn');
+            btn.disabled = true;
+
+            try {
+                const coll = collection(db, COLLECTION);
+                const snap = await getDocs(query(coll, where("isSeeded", "==", true)));
+                let count = 0;
+                for (const d of snap.docs) {
+                    await deleteDoc(doc(db, COLLECTION, d.id));
+                    count++;
+                }
+                log(`🗑️ Deleted ${count} seeded notes.`, 'success');
+            } catch (e) {
+                log(`❌ Error: ${e.message}`, 'error');
+            }
+
+            btn.disabled = false;
+        };
+    </script>
+</body>
+
+</html>
