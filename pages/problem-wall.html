@@ -547,29 +547,68 @@
             }
         }
 
-        /* Peach/Teal Alternating Glow */
+        /* Peach/Teal Alternating Glow — Prominent Sparkle */
         @keyframes alternate-glow {
             0% {
-                box-shadow: 0 0 20px rgba(244, 159, 117, 0.6);
+                box-shadow: 0 0 30px rgba(244, 159, 117, 0.8), 0 0 60px rgba(244, 159, 117, 0.3);
             }
 
-            /* Peach */
             50% {
-                box-shadow: 0 0 25px rgba(78, 205, 196, 0.6);
+                box-shadow: 0 0 35px rgba(78, 205, 196, 0.8), 0 0 70px rgba(78, 205, 196, 0.3);
             }
 
-            /* Teal */
             100% {
-                box-shadow: 0 0 20px rgba(244, 159, 117, 0.6);
+                box-shadow: 0 0 30px rgba(244, 159, 117, 0.8), 0 0 60px rgba(244, 159, 117, 0.3);
+            }
+        }
+
+        @keyframes sparkle-border {
+            0% {
+                border-color: rgba(244, 159, 117, 0.6);
             }
 
-            /* Peach */
+            50% {
+                border-color: rgba(78, 205, 196, 0.6);
+            }
+
+            100% {
+                border-color: rgba(244, 159, 117, 0.6);
+            }
         }
 
         .new-note-glow {
             animation: softPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-                alternate-glow 3s infinite ease-in-out !important;
+                alternate-glow 2.5s infinite ease-in-out,
+                sparkle-border 2.5s infinite ease-in-out !important;
             z-index: 500 !important;
+            border: 2px solid rgba(244, 159, 117, 0.6) !important;
+            transform: scale(1.05) rotate(0deg) !important;
+        }
+
+        /* Sparkle dot pseudo-element */
+        .new-note-glow::after {
+            content: '✨';
+            position: absolute;
+            top: -18px;
+            right: -10px;
+            font-size: 1.4rem;
+            animation: sparkle-float 2s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 501;
+        }
+
+        @keyframes sparkle-float {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateY(-8px) scale(1.2);
+                opacity: 0.7;
+            }
         }
 
         .note-float-in {
@@ -1411,9 +1450,13 @@
                 const rot = (hash % 12) - 6;
                 el.style.transform = `rotate(${rot}deg)`;
 
-                // New Note Glow
-                if (data.isNew || (Date.now() - (data.createdAt?.seconds * 1000) < 5000)) {
-                    // el.classList.add('new-note-glow'); 
+                // New Note Glow — prominent sparkle for user-posted notes
+                if (data.isUserPost) {
+                    el.classList.add('new-note-glow');
+                    // Auto-remove glow after 15 seconds
+                    setTimeout(() => {
+                        el.classList.remove('new-note-glow');
+                    }, 15000);
                 }
 
                 // Fallback ID check for styles
@@ -1714,11 +1757,23 @@
                 const tempId = 'temp-' + Date.now();
                 const noteData = {
                     text: cleanText, hearts: 0, flowers: 0, candles: 0,
-                    createdAt: { seconds: Date.now() / 1000 }, isSeeded: false, isHidden: false
+                    createdAt: { seconds: Date.now() / 1000 }, isSeeded: false, isHidden: false,
+                    isUserPost: true  // Flag for glow effect
                 };
                 if (window.renderFirebaseNote) {
                     window.renderFirebaseNote(tempId, { id: tempId, ...noteData }, false);
                 }
+
+                // Scroll viewport to the newly posted note
+                setTimeout(() => {
+                    const noteEl = document.querySelector(`.note[data-note-id="${tempId}"]`);
+                    if (noteEl && window.zoomToNote) {
+                        const x = parseFloat(noteEl.style.left) || 0;
+                        const y = parseFloat(noteEl.style.top) || 0;
+                        window.zoomToNote(x + 140, y + 100); // Center of note
+                    }
+                }, 300);
+
                 await addDoc(collection(db, WALL_COLLECTION), {
                     text: cleanText, hearts: 0, flowers: 0, candles: 0,
                     createdAt: serverTimestamp(), isSeeded: false, isHidden: false
