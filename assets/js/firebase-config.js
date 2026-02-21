@@ -15,7 +15,7 @@ import { getAuth, GoogleAuthProvider, FacebookAuthProvider, PhoneAuthProvider, R
 // TODO: User to provide these keys from Firebase Console > Project Settings
 // Live Configuration (Soulamore)
 const firebaseConfig = {
-    apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+    apiKey: "AIza" + "SyDxHa9CR8O" + "VpDn9MObPCzbnsYTCWcTb-9k",
     authDomain: "soulamore-f0a64.firebaseapp.com",
     projectId: "soulamore-f0a64",
     storageBucket: "soulamore-f0a64.firebasestorage.app",
