@@ -5,7 +5,6 @@
 
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, linkWithCredential, EmailAuthProvider, updatePassword, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 // Note: enableIndexedDbPersistence was removed in Firebase v10. Offline persistence is now enabled by default.
@@ -35,7 +34,16 @@ try {
     app = initializeApp(firebaseConfig);
     console.log("Firebase app initialized");
 }
-const analytics = getAnalytics(app);
+
+let analytics = null;
+// Load Analytics dynamically so adblockers don't crash the entire ES6 module
+import("https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js").then((module) => {
+    analytics = module.getAnalytics(app);
+    console.log("Firebase Analytics initialized");
+}).catch((error) => {
+    console.warn("Firebase Analytics could not be loaded (likely blocked by an adblocker). Data will gracefully continue without it.", error);
+});
+
 // Use default Firestore database (native Firestore, not MongoDB-compatible)
 const db = getFirestore(app);
 // Initialize Firebase Authentication
