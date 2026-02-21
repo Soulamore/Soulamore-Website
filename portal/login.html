@@ -49,6 +49,8 @@
                         <li><i class="fas fa-user-friends"></i> Trained Peers & Verified Psychologists</li>
                         <li><i class="fas fa-clock"></i> 24/7 Support</li>
                     </ul>
+                    <!-- RITUAL WIDGET INJECTION -->
+                    <div id="ritual-container" style="margin-top:20px; text-align:left;"></div>
                 </div>
             </section>
 
@@ -180,6 +182,23 @@
 
     <!-- SCRIPTS -->
     <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/ritual-schedule.js"></script>
+
+    <!-- HEADER FORCE SCRIPT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Force header injection if the component script misses it
+            setTimeout(() => {
+                if (!document.querySelector('header .nav-links') && window.injectHeader) {
+                    console.log("Forcing Header Injection...");
+                    window.injectHeader();
+                }
+                // Ensure ritual container is visible
+                const ritualContainer = document.getElementById('ritual-container');
+                if (ritualContainer) ritualContainer.style.display = 'block';
+            }, 500);
+        });
+    </script>
 
     <!-- Check if user is already logged in -->
     <script type="module">
@@ -660,15 +679,15 @@
             const modal = document.getElementById('phone-modal');
             if (modal.style.display === 'none' || modal.style.display === '') {
                 modal.style.display = 'flex';
-                
+
                 // Check if we're on HTTPS
                 const isHTTPS = window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                
+
                 // Initialize reCAPTCHA when modal opens
                 const initRecaptchaWithRetry = (attempts = 0) => {
                     if (window.initRecaptcha && typeof window.initRecaptcha === 'function') {
                         try {
-                    window.initRecaptcha();
+                            window.initRecaptcha();
                             // Clear any warning messages
                             const recaptchaContainer = document.getElementById('recaptcha-container');
                             if (recaptchaContainer && recaptchaContainer.querySelector('p')) {
@@ -684,7 +703,7 @@
                     } else if (attempts < 10) {
                         // Retry up to 10 times (1 second total)
                         setTimeout(() => initRecaptchaWithRetry(attempts + 1), 100);
-                } else {
+                    } else {
                         // Modules still not loaded after retries
                         console.warn("Auth Module not loaded after retries");
                         const recaptchaContainer = document.getElementById('recaptcha-container');
@@ -697,7 +716,7 @@
                         }
                     }
                 };
-                
+
                 // Start initialization with retry
                 setTimeout(() => initRecaptchaWithRetry(), 100);
             } else {
@@ -796,6 +815,9 @@
                 capsWarning.style.display = isCapsOn ? 'block' : 'none';
             });
         }
+
+        // Legacy inline Ritual Init removed to use global ritual-schedule.js
+
 
         // ---  0.6 NETWORK STATUS CHECK ---
         window.addEventListener('offline', () => {

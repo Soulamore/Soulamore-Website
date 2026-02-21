@@ -1190,7 +1190,7 @@ function injectSoulBotWidget() {
         <style>
             #soulbot-widget-container {
                 position: fixed;
-                bottom: 100px;
+                bottom: 40px; /* Desktop: Standard */
                 right: 30px;
                 z-index: 9999;
                 font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1199,8 +1199,8 @@ function injectSoulBotWidget() {
                 align-items: flex-end;
             }
             #soulbot-widget-fab {
-                width: 60px;
-                height: 60px;
+                width: 55px;
+                height: 55px;
                 background: var(--teal-glow, #4ECDC4);
                 border-radius: 50%;
                 display: flex;
@@ -1251,8 +1251,8 @@ function injectSoulBotWidget() {
 
             /* MOBILE TWEAKS */
             @media (max-width: 768px) {
-                #soulbot-widget-container { bottom: 160px !important; right: 20px; }
-                #sb-window { width: 90vw; right: 5vw; bottom: 120px; height: 60vh; }
+                #soulbot-widget-container { bottom: 220px !important; right: 20px !important; }
+                #sb-window { width: 90vw; right: 5vw; bottom: 280px; height: 50vh; }
             }
         </style>
         
