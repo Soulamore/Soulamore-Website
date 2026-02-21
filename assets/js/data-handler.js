@@ -260,35 +260,42 @@ export function updatePulseStats() {
 
     // Fallback values
     const setFallback = () => {
-        if (h && (h.innerText === '...' || h.innerText === '')) h.innerText = '1,280';
-        if (f && (f.innerText === '...' || f.innerText === '')) f.innerText = '850';
-        if (c && (c.innerText === '...' || c.innerText === '')) c.innerText = '430';
+        if (h && (h.innerText.includes('spin') || h.innerText === '...' || h.innerText.trim() === '')) h.innerText = '1,280';
+        if (f && (f.innerText.includes('spin') || f.innerText === '...' || f.innerText.trim() === '')) f.innerText = '850';
+        if (c && (c.innerText.includes('spin') || c.innerText === '...' || c.innerText.trim() === '')) c.innerText = '430';
     };
 
     const fallbackTimeout = setTimeout(setFallback, 2000);
 
     try {
-        const q = collection(db, "problem-wall-notes");
-        onSnapshot(q, (snapshot) => {
-            clearTimeout(fallbackTimeout);
-            let hearts = 0, flowers = 0, candles = 0;
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.isHidden !== true) {
-                    hearts += (data.hearts || 0);
-                    flowers += (data.flowers || 0);
-                    candles += (data.candles || 0);
-                }
+        // Match the Problem Wall logic exactly (limit 200)
+        // using dynamic import to prevent any dependency loop crashes
+        import("./firebase-config.js").then(({ db, collection, query, limit, onSnapshot }) => {
+            const q = query(collection(db, "problem-wall-notes"), limit(200));
+            onSnapshot(q, (snapshot) => {
+                clearTimeout(fallbackTimeout);
+                let hearts = 0, flowers = 0, candles = 0;
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.isHidden !== true) {
+                        hearts += (data.hearts || 0);
+                        flowers += (data.flowers || 0);
+                        candles += (data.candles || 0);
+                    }
+                });
+
+                if (h) h.innerText = hearts.toLocaleString();
+                if (f) f.innerText = flowers.toLocaleString();
+                if (c) c.innerText = candles.toLocaleString();
+
+                // Sync to any other listeners if needed
+                window.SoulPulseData = { hearts, flowers, candles };
+            }, (error) => {
+                console.error("Pulse Stats Error:", error);
+                setFallback();
             });
-
-            if (h) h.innerText = hearts.toLocaleString();
-            if (f) f.innerText = flowers.toLocaleString();
-            if (c) c.innerText = candles.toLocaleString();
-
-            // Sync to any other listeners if needed
-            window.SoulPulseData = { hearts, flowers, candles };
-        }, (error) => {
-            console.error("Pulse Stats Error:", error);
+        }).catch((e) => {
+            console.error("Firebase dynamic import error:", e);
             setFallback();
         });
     } catch (e) {
