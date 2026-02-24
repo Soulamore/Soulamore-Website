@@ -193,6 +193,7 @@
             margin-bottom: 20px;
             background: linear-gradient(to right, #fff, #60a5fa);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
         }
@@ -293,6 +294,124 @@
             background: var(--earth-blue);
             box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
         }
+
+        /* --- SOULAMORE AWAY V2 STYLES --- */
+        .v2-header {
+            font-size: 1.1rem;
+            color: var(--teal-glow);
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .mood-chip {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+            user-select: none;
+        }
+
+        .mood-chip:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .mood-chip.active {
+            background: rgba(78, 205, 196, 0.2);
+            border-color: var(--teal-glow);
+            color: var(--teal-glow);
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.1);
+        }
+
+        .prompt-select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-glass);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            outline: none;
+            backdrop-filter: blur(5px);
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+        }
+
+        .prompt-select option {
+            background: var(--deep-space);
+            color: white;
+        }
+
+        .v2-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            text-align: left;
+        }
+
+        .control-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .v2-select {
+            background: transparent;
+            border: none;
+            color: var(--starlight);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
+            padding-bottom: 2px;
+        }
+
+        .v2-select option {
+            background: var(--deep-space);
+        }
+
+        /* Checkbox styling */
+        .anon-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
 
         /* --- MIGRATION STATS --- */
         .migration-grid {
@@ -772,15 +891,87 @@
                             Resources</a>
                     </div>
 
-                    <!-- POSTCARD INTERACTION -->
-                    <div class="postcard-box" id="postcardContainer">
-                        <div style="font-family:'Courier New'; font-size:0.9rem; margin-bottom:10px; color:#999;">From:
-                            Me
-                            <br>To: The World
+                    <!-- POSTCARD INTERACTION V2 -->
+                    <div class="postcard-box" id="postcardContainer"
+                        style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(78, 205, 196, 0.3); backdrop-filter: blur(20px); text-align: left; color: #f1f5f9;">
+
+                        <div class="v2-header">Step 1: Choose Your Intention</div>
+                        <div class="mood-grid" id="moodGrid">
+                            <div class="mood-chip active" onclick="selectMood(this, 'Missing you')">Missing you</div>
+                            <div class="mood-chip" onclick="selectMood(this, 'Thinking of you')">Thinking of you</div>
+                            <div class="mood-chip" onclick="selectMood(this, 'I’m proud of you')">I’m proud of you</div>
+                            <div class="mood-chip" onclick="selectMood(this, 'I’m not okay')">I’m not okay</div>
+                            <div class="mood-chip" onclick="selectMood(this, 'Just checking in')">Just checking in</div>
+                            <div class="mood-chip" onclick="selectMood(this, 'You crossed my mind')">Crossed my mind
+                            </div>
+                            <div class="mood-chip" onclick="selectMood(this, 'I forgive you')">I forgive you</div>
+                            <div class="mood-chip" onclick="selectMood(this, 'Needed to say this')">Needed to say this
+                            </div>
                         </div>
+
+                        <div class="v2-header">Step 2: Choose a Prompt</div>
+                        <select class="prompt-select" id="promptSelect" onchange="updatePromptText()">
+                            <option value="">Start from scratch...</option>
+                            <option value="I don’t say this enough, but…">I don’t say this enough, but…</option>
+                            <option value="Writing this from a place of honesty…">Writing this from a place of honesty…
+                            </option>
+                            <option value="If I was braver, I would tell you…">If I was braver, I would tell you…
+                            </option>
+                            <option value="Just a reminder — you’re doing better than you think.">Just a reminder —
+                                you’re doing better than you think.</option>
+                            <option value="Something I never thanked you for…">Something I never thanked you for…
+                            </option>
+                            <option value="I’ve been meaning to say…">I’ve been meaning to say…</option>
+                            <option value="On a heavy day, I wanted you to know…">On a heavy day, I wanted you to know…
+                            </option>
+                            <option value="A small truth I’m carrying today…">A small truth I’m carrying today…</option>
+                            <option value="If you’re reading this late at night…">If you’re reading this late at night…
+                            </option>
+                            <option value="One thing I forgive you for…">One thing I forgive you for…</option>
+                            <option value="One thing I forgive myself for…">One thing I forgive myself for…</option>
+                            <option value="From someone who cares…">From someone who cares…</option>
+                            <option value="Something I wish I had said in person…">Something I wish I had said in
+                                person…</option>
+                            <option value="If we could reset one moment…">If we could reset one moment…</option>
+                            <option value="A memory that still feels warm…">A memory that still feels warm…</option>
+                            <option value="If you’re overwhelmed right now…">If you’re overwhelmed right now…</option>
+                            <option value="I don’t need a reply, I just needed to send this.">I don’t need a reply, I
+                                just needed to send this.</option>
+                            <option value="Carry this with you today…">Carry this with you today…</option>
+                            <option value="This isn’t closure, just honesty.">This isn’t closure, just honesty.</option>
+                            <option value="Sending this quietly, because some words are easier written than spoken.">
+                                Sending this quietly...</option>
+                        </select>
+
+                        <div style="font-family:'Courier New'; font-size:0.9rem; margin-bottom:10px; color:#cbd5e1;">To:
+                            <input type="email" id="friendEmail" placeholder="The World (or a friend's email)"
+                                style="background:transparent; border:none; border-bottom:1px dashed #4ECDC4; color:white; font-family:'Courier New'; font-size:0.9rem; outline:none; width:250px;">
+                        </div>
+
                         <textarea class="paper-input" id="messageText"
-                            placeholder="What do you miss the most right now? (Type here...)"></textarea>
-                        <button class="send-btn" onclick="sendPostcard()">Send to the Community <i
+                            placeholder="What do you need to send into the world today? (Type here...)"
+                            style="color:#ffffff; background-image: repeating-linear-gradient(transparent, transparent 31px, rgba(255,255,255,0.05) 32px);"></textarea>
+
+                        <div class="v2-controls">
+                            <div class="control-group">
+                                <span class="control-label">Deliver</span>
+                                <select class="v2-select" id="deliveryTime">
+                                    <option value="now">Send Now</option>
+                                    <option value="midnight">Deliver at Midnight</option>
+                                    <option value="7days">Deliver in 7 Days</option>
+                                </select>
+                            </div>
+
+                            <div class="control-group">
+                                <span class="control-label">Identity</span>
+                                <label class="anon-checkbox">
+                                    <input type="checkbox" id="isAnonymous" checked>
+                                    Send as "Someone who cares"
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="send-btn" onclick="sendPostcard()">Seal & Send <i
                                 class="fas fa-paper-plane"></i></button>
                     </div>
 
@@ -1130,24 +1321,54 @@
     <script type="module" src="../assets/js/data-handler.js"></script>
 
     <script>
-        // --- POSTCARD LOGIC ---
+        // --- POSTCARD LOGIC (V2) ---
+        let selectedMood = 'Missing you'; // Default mood
+
+        function selectMood(element, moodText) {
+            // Remove active from all chips
+            document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('active'));
+            // Add active to clicked chip
+            element.classList.add('active');
+            selectedMood = moodText;
+        }
+
+        function updatePromptText() {
+            const select = document.getElementById('promptSelect');
+            const textarea = document.getElementById('messageText');
+            if (select.value) {
+                textarea.value = select.value + "\n\n";
+                textarea.focus();
+            }
+        }
+
         function sendPostcard() {
             const txt = document.getElementById('messageText');
             const val = txt.value.trim();
             const btn = document.querySelector('.send-btn');
+            const friendEmailInput = document.getElementById('friendEmail');
+            const friendEmail = friendEmailInput ? friendEmailInput.value.trim() : null;
+
+            // Collect V2 Meta Variables
+            const deliveryTime = document.getElementById('deliveryTime') ? document.getElementById('deliveryTime').value : 'now';
+            const isAnonymous = document.getElementById('isAnonymous') ? document.getElementById('isAnonymous').checked : true;
 
             if (val.length > 5) {
                 // UI Feedback
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sealing...';
+                btn.disabled = true;
+
+                // Pack payload. A robust backend update in data-handler.js will properly parse this.
+                const payloadText = `[Intent: ${selectedMood}]\n[Delivery: ${deliveryTime}]\n[Anonymity: ${isAnonymous ? 'True' : 'False'}]\n\n${val}`;
 
                 // Call Backend
                 if (window.SoulBackend && window.SoulBackend.submitPostcard) {
-                    window.SoulBackend.submitPostcard(val, "WebUser").then(success => {
+                    window.SoulBackend.submitPostcard(payloadText, "WebUser", friendEmail).then(success => {
                         if (success) {
                             // Transformation Animation
                             const card = document.getElementById('postcardContainer');
-                            card.style.transform = "rotateX(90deg)"; // Fold up
+                            card.style.transform = "rotateX(90deg) scale(0.8)"; // Fold up
                             card.style.opacity = "0";
+                            card.style.transition = "0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
 
                             setTimeout(() => {
                                 card.style.display = 'none';
@@ -1157,6 +1378,7 @@
                             }, 500);
                         } else {
                             btn.innerText = "Error. Try again.";
+                            btn.disabled = false;
                         }
                     });
                 } else {
@@ -1180,12 +1402,7 @@
         document.querySelectorAll('.fade-in').forEach(el => fadeObserver.observe(el));
     </script>
     <script src="../assets/js/soulbot-beta.js"></script>
-    <!-- LIVE USER WIDGET -->
-    <div class="live-pill">
-        <div class="live-dot"></div>
-        <span class="live-count-display">Connecting...</span>
-    </div>
-
+    <!-- Remove Stray Pulse Widget -->
 </body>
 
 </html>

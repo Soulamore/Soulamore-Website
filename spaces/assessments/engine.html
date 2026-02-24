@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Soulamore Emotional Assessment Engine">
+    <title>Assessment | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+
+    <style>
+        /* --- THEME: MIDNIGHT VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --starlight: #f1f5f9;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --engine-theme: #4ECDC4;
+            /* Default, overridden dynamically */
+        }
+
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            /* No scrolling in the engine */
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+        }
+
+        /* --- BREATHING BACKGROUND --- */
+        .ambient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 60%);
+            animation: breathe 8s infinite alternate ease-in-out;
+            z-index: 0;
+        }
+
+        @keyframes breathe {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        /* --- EXIT BUTTON --- */
+        .exit-btn {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            z-index: 20;
+            transition: 0.3s;
+        }
+
+        .exit-btn:hover {
+            color: var(--starlight);
+            transform: scale(1.1);
+        }
+
+        /* --- PROGRESS BAR --- */
+        .progress-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 20;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--engine-theme);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--engine-theme);
+        }
+
+        /* --- UI CONTAINER --- */
+        .engine-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* --- ANIMATION CLASSES --- */
+        .screen {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        #screen-analyzing {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.90);
+            /* Deep space semi-transparent */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            /* Ensure it stays above other screens completely */
+            margin: 0;
+            padding: 0;
+            max-width: none;
+            border-radius: 0;
+            pointer-events: none;
+            /* Let active class handle pointer events */
+        }
+
+        /* --- QUESTION TEXT --- */
+        .question-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 300;
+            line-height: 1.3;
+            margin-bottom: 50px;
+            color: var(--starlight);
+        }
+
+        /* --- OPTIONS --- */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 20px 25px;
+            color: var(--starlight);
+            font-size: 1.1rem;
+            font-weight: 400;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--engine-theme);
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .option-btn.selected {
+            background: var(--engine-theme);
+            color: var(--deep-space);
+            border-color: var(--engine-theme);
+            transform: scale(1.02);
+            font-weight: 600;
+        }
+
+        .indicator-key {
+            background: rgba(255, 255, 255, 0.1);
+            color: inherit;
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            font-family: 'Outfit';
+            font-weight: 700;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .option-btn:hover .indicator-key {
+            background: var(--engine-theme);
+            color: var(--deep-space);
+        }
+
+        .option-btn.selected .indicator-key {
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--deep-space);
+        }
+
+        /* --- NAVIGATION BUTTONS --- */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 40px auto 0;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-glass);
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 50px;
+            padding: 12px 24px;
+            color: var(--starlight);
+            font-size: 1rem;
+            font-family: 'Outfit';
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-btn.primary {
+            background: var(--engine-theme);
+            color: var(--deep-space);
+            border-color: var(--engine-theme);
+            font-weight: 600;
+        }
+
+        .nav-btn.primary:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* --- GLASSMORPHIC INSIGHT CLOUD PANEL --- */
+        #insight-cloud-panel {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%) translateX(120%);
+            width: 340px;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 3px solid var(--engine-theme);
+            border-radius: 20px;
+            padding: 30px;
+            color: #e2e8f0;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        #insight-cloud-panel.visible {
+            transform: translateY(-50%) translateX(0);
+            pointer-events: auto;
+            opacity: 1;
+        }
+
+        .insight-icon {
+            font-size: 1.6rem;
+            color: var(--engine-theme);
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px var(--engine-theme));
+        }
+
+        .insight-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-bottom: 12px;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .insight-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            opacity: 0.85;
+            font-family: 'Outfit';
+        }
+
+        .insight-source {
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            font-family: 'Outfit';
+        }
+
+        @media (max-width: 1024px) {
+            #insight-cloud-panel {
+                top: auto;
+                bottom: 25px;
+                right: 50%;
+                transform: translateY(120%) translateX(50%);
+                width: 92%;
+                max-width: 400px;
+                padding: 20px;
+                border-left: 1px solid rgba(255, 255, 255, 0.1);
+                border-bottom: 3px solid var(--engine-theme);
+            }
+
+            #insight-cloud-panel.visible {
+                transform: translateY(0) translateX(50%);
+            }
+        }
+
+        /* --- CLINICAL TOOLTIP --- */
+        .q-clinical-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--starlight);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-family: 'Outfit';
+            margin-bottom: 20px;
+            cursor: help;
+            position: relative;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        .q-clinical-badge:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--engine-theme);
+        }
+
+        .q-clinical-popup {
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: var(--deep-space);
+            border: 1px solid var(--engine-theme);
+            padding: 15px;
+            border-radius: 12px;
+            width: max-content;
+            max-width: 280px;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            text-align: left;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            z-index: 100;
+        }
+
+        .q-clinical-badge:hover .q-clinical-popup {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* --- LOADING SPINNER / NEURAL ANIMATION --- */
+        .neural-loader {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            margin: 0 auto 30px;
+            animation: rotate 10s linear infinite;
+        }
+
+        .neural-node {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--engine-theme);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--engine-theme);
+        }
+
+        .node-1 {
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: pulseNode 1.5s infinite alternate;
+        }
+
+        .node-2 {
+            bottom: 15px;
+            left: 0;
+            animation: pulseNode 1.5s infinite alternate 0.5s;
+        }
+
+        .node-3 {
+            bottom: 15px;
+            right: 0;
+            animation: pulseNode 1.5s infinite alternate 1s;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulseNode {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+        }
+
+        .loader-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: var(--engine-theme);
+            letter-spacing: 2px;
+            animation: pulseText 2s infinite alternate;
+        }
+
+        @keyframes pulseText {
+            0% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 10px var(--engine-theme);
+            }
+        }
+
+        @media(max-width: 600px) {
+            .question-text {
+                font-size: 1.8rem;
+            }
+
+            .option-btn {
+                font-size: 1rem;
+                padding: 15px;
+            }
+
+            .option-btn:hover {
+                transform: translateX(5px);
+            }
+        }
+    </style>
+    <link rel="icon" href="../../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <!-- Ambient Base -->
+    <div class="ambient-bg" id="ambientBg"></div>
+
+    <!-- The Global Insight Cloud Panel -->
+    <div id="insight-cloud-panel"></div>
+
+    <!-- UI Overlay -->
+    <a href="index.html" class="exit-btn" id="exitBtn"><i class="fas fa-times"></i></a>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Main Engine Container -->
+    <div class="engine-container" id="engineContainer">
+
+        <!-- Opening Screen -->
+        <div class="screen active" id="screen-intro">
+            <h1 class="question-text" id="introTitle">Let's understand your emotional landscape.</h1>
+            <p style="opacity:0.7; font-size:1.1rem; margin-bottom: 40px; max-width:500px; margin-left:auto; margin-right:auto;"
+                id="introDesc">Take a deep breath. There are no right or wrong answers. Just observation.</p>
+            <button class="option-btn" style="justify-content:center; max-width:200px; margin:0 auto;"
+                onclick="startEngine()">
+                Begin <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Dynamic Question Screen Template -->
+        <div class="screen" id="screen-question">
+            <!-- Injected via JS -->
+        </div>
+
+        <!-- Reflection / Loading Screen -->
+        <div class="screen" id="screen-analyzing">
+            <div class="neural-loader">
+                <div class="neural-node node-1"></div>
+                <div class="neural-node node-2"></div>
+                <div class="neural-node node-3"></div>
+            </div>
+            <div class="loader-text">Analyzing your emotional patterns...</div>
+        </div>
+
+    </div>
+
+    <!-- REQUIRED SDKS & DATA -->
+    <script src="../../assets/js/assessment-data.js"></script>
+    <script>
+        // --- ENGINE STATE ---
+        let assessmentData = null;
+        let currentQuestionIndex = 0;
+        let userResponses = [];
+        let temporarySelectionIndex = null;
+
+        // Keyboard mappings A-D
+        const keyMap = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+        // --- INIT LISTENER ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const testId = urlParams.get('test') || 'emotional_regulation'; // fallback
+
+            try {
+                // Load Pre-Compiled JSON Schema from Memory
+                if (!window.SoulamoreAssessments || !window.SoulamoreAssessments[testId]) {
+                    throw new Error("Assessment data not found across local scopes.");
+                }
+                assessmentData = window.SoulamoreAssessments[testId];
+
+                // Set Custom Theme
+                const themeColor = assessmentData.theme_color || '#4ECDC4';
+                document.documentElement.style.setProperty('--engine-theme', themeColor);
+                document.getElementById('ambientBg').style.background = `radial-gradient(circle at 50% 50%, ${themeColor}10 0%, transparent 60%)`;
+
+                // Set Intro Text
+                document.getElementById('introTitle').textContent = assessmentData.title;
+                document.getElementById('introDesc').textContent = assessmentData.description;
+
+            } catch (error) {
+                console.error("Engine Error:", error);
+                document.getElementById('introTitle').textContent = "Assessment Unavailable";
+                document.getElementById('introDesc').textContent = "We could not load this experience. Please return to the menu.";
+                document.querySelector('#screen-intro button').style.display = 'none';
+            }
+        });
+
+        // --- NAVIGATION LOGIC ---
+        function switchScreen(hideId, showId) {
+            document.getElementById(hideId).classList.remove('active');
+            setTimeout(() => {
+                document.getElementById(showId).classList.add('active');
+            }, 400); // Wait for fade out
+        }
+
+        function updateProgress() {
+            if (!assessmentData) return;
+            const progress = (currentQuestionIndex / assessmentData.questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        // --- CORE PROCESS ---
+        function startEngine() {
+            switchScreen('screen-intro', 'screen-question');
+            renderQuestion(currentQuestionIndex);
+        }
+
+        function renderQuestion(index) {
+            const q = assessmentData.questions[index];
+            const qContainer = document.getElementById('screen-question');
+
+            updateProgress();
+
+            // Check if we already have a response for this
+            const existingResponse = userResponses[index];
+            let selectedOptIndex = existingResponse ? existingResponse.optIndex : null;
+            temporarySelectionIndex = selectedOptIndex;
+
+            // Trigger Insight Cloud Panel
+            const insightPanel = document.getElementById('insight-cloud-panel');
+            if (q.insight_cloud) {
+                let icon = 'fa-brain';
+                if (q.insight_cloud.type === 'guideline') icon = 'fa-balance-scale';
+                if (q.insight_cloud.type === 'stat') icon = 'fa-chart-pie';
+                if (q.insight_cloud.type === 'compassion') icon = 'fa-heart';
+
+                insightPanel.innerHTML = `
+                    <i class="fas ${icon} insight-icon"></i>
+                    <div class="insight-title">${q.insight_cloud.title}</div>
+                    <div class="insight-text">${q.insight_cloud.text}</div>
+                    ${q.insight_cloud.source_name ? `<div class="insight-source">Source: ${q.insight_cloud.source_name}</div>` : ''}
+                `;
+                // Slight delay to allow text animation to complete first
+                setTimeout(() => insightPanel.classList.add('visible'), 300);
+            } else {
+                insightPanel.classList.remove('visible');
+            }
+
+            let html = `<h2 class="question-text">${q.text}</h2><div class="options-grid">`;
+
+            q.options.forEach((opt, i) => {
+                const letter = keyMap[i];
+                const isSelected = (i === selectedOptIndex) ? 'selected' : '';
+                html += `
+                    <button class="option-btn ${isSelected}" onclick="selectOption(${index}, ${i})">
+                        <span class="indicator-key">${letter}</span>
+                        ${opt.text}
+                    </button>
+                `;
+            });
+            html += `</div>`;
+
+            // Add navigation bar
+            const isFirst = (index === 0);
+            const isLast = (index === assessmentData.questions.length - 1);
+
+            html += `
+                <div class="nav-bar">
+                    <button class="nav-btn" onclick="prevQuestion()" ${isFirst ? 'style="visibility:hidden;"' : ''}>
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()" ${temporarySelectionIndex !== null ? '' : 'disabled'}>
+                        ${isLast ? 'Finish <i class="fas fa-check"></i>' : 'Next <i class="fas fa-arrow-right"></i>'}
+                    </button>
+                </div>
+            `;
+
+            qContainer.innerHTML = html;
+        }
+
+        function selectOption(qIndex, optIndex) {
+            temporarySelectionIndex = optIndex;
+
+            // Visual feedback
+            const btns = document.querySelectorAll('#screen-question .option-btn');
+            btns.forEach(b => b.classList.remove('selected'));
+            btns[optIndex].classList.add('selected');
+
+            // Enable Next button
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) nextBtn.disabled = false;
+        }
+
+        function nextQuestion() {
+            if (temporarySelectionIndex === null) return;
+
+            // Save Response Data
+            const qData = assessmentData.questions[currentQuestionIndex];
+            const optData = qData.options[temporarySelectionIndex];
+
+            userResponses[currentQuestionIndex] = {
+                optIndex: temporarySelectionIndex,
+                question_id: qData.id,
+                domain: qData.domain,
+                subdomain: qData.subdomain,
+                selected_text: optData.text,
+                severity_weight: optData.severity_weight,
+                risk_weight: optData.risk_weight || 0,
+                functional_impairment: optData.functional_impairment || false
+            };
+
+            currentQuestionIndex++;
+            if (currentQuestionIndex < assessmentData.questions.length) {
+                transitionToQuestion(currentQuestionIndex);
+            } else {
+                finishAssessment();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                transitionToQuestion(currentQuestionIndex);
+            }
+        }
+
+        function transitionToQuestion(index) {
+            document.getElementById('screen-question').style.opacity = '0';
+            setTimeout(() => {
+                renderQuestion(index);
+                document.getElementById('screen-question').style.opacity = '1';
+            }, 300);
+        }
+
+        // --- FINISH & SCORE CALCULATION ---
+        function finishAssessment() {
+            // Calculate final score
+            let raw_score = 0;
+            let risk_flags = 0;
+            let functional_impairment = false;
+
+            userResponses.forEach(res => {
+                if (res) {
+                    raw_score += res.severity_weight;
+                    risk_flags += res.risk_weight;
+                    if (res.functional_impairment) functional_impairment = true;
+                }
+            });
+
+            document.getElementById('progressBar').style.width = `100%`;
+            switchScreen('screen-question', 'screen-analyzing');
+            document.getElementById('exitBtn').style.display = 'none';
+
+            // 1. Calculate final deterministic severity band based on JSON thresholds
+            let finalBand = assessmentData.scoring.bands.find(b =>
+                raw_score >= b.range[0] && raw_score <= b.range[1]
+            );
+
+            // Fallback if out of bounds
+            if (!finalBand) finalBand = assessmentData.scoring.bands[assessmentData.scoring.bands.length - 1];
+
+            // 2. Override Escalation Flag if raw risk flags exceed global threshold
+            if (risk_flags >= assessmentData.scoring.risk_threshold) {
+                finalBand.escalation_required = true;
+                finalBand.risk_category = "high";
+            }
+
+            // 3. Construct Structured Output for Gemini
+            const structuredResult = {
+                assessment_id: assessmentData.id,
+                timestamp: new Date().toISOString(),
+                domain: assessmentData.questions[0].domain, // Primary domain
+                deterministic_metrics: {
+                    raw_score: raw_score,
+                    max_possible: assessmentData.scoring.max_possible,
+                    severity_band: finalBand.label,
+                    risk_category: finalBand.risk_category,
+                    functional_impairment: functional_impairment,
+                    escalation_required: finalBand.escalation_required
+                },
+                responses: userResponses // For sub-domain cluster analysis
+            };
+
+            // 4. Save to Session Storage (Safe, cleared on close, not server DB yet)
+            sessionStorage.setItem('soulamore_assessment_result', JSON.stringify(structuredResult));
+
+            // Neural loading cinematic delay
+            setTimeout(() => {
+                // Redirect to Results Page (Layer 5/6)
+                window.location.href = "results.html";
+            }, 3500); // 3.5 second reflection pause
+        }
+
+        // --- KEYBOARD LISTENER ---
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('screen-question').classList.contains('active')) {
+                // Return/Enter goes next if option selected
+                if (e.key === 'Enter') {
+                    if (temporarySelectionIndex !== null) nextQuestion();
+                    return;
+                }
+
+                const key = e.key.toUpperCase();
+                const index = keyMap.indexOf(key);
+                if (index !== -1) {
+                    const btns = document.querySelectorAll('#screen-question .option-btn');
+                    if (btns[index] && btns[index].style.pointerEvents !== 'none') {
+                        selectOption(currentQuestionIndex, index);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

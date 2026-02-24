@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Soulamore Emotional Assessments. A guided inner experience backed by clinical science to help you understand your emotional landscape.">
+    <title>Emotional Assessments | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+
+    <style>
+        /* --- THEME: MIDNIGHT VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.7);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 15% 50%, rgba(78, 205, 196, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(244, 159, 117, 0.05), transparent 25%);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px 100px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- BACKGROUND ANIMATION (STARS) --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite, twinkle 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.1;
+                transform: scale(0.8);
+                box-shadow: 0 0 2px rgba(255, 255, 255, 0.1);
+            }
+
+            100% {
+                opacity: 0.6;
+                transform: scale(1.2);
+                box-shadow: 0 0 8px rgba(78, 205, 196, 0.4);
+            }
+        }
+
+        /* --- BACKGROUND ANIMATION (WORDS) --- */
+        #word-atmosphere {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .floating-word {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.03);
+            font-family: 'Outfit';
+            font-weight: 700;
+            user-select: none;
+            white-space: nowrap;
+            animation: floatUp linear infinite;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(105vh) scale(0.8);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            to {
+                transform: translateY(-10vh) scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        /* --- HERO --- */
+        .hero {
+            text-align: center;
+            padding: 40px 0 60px;
+        }
+
+        .hero-tag {
+            color: #a78bfa;
+            border: 1px solid #a78bfa;
+            background: rgba(167, 139, 250, 0.1);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* --- SCIENTIFIC TRUST BANNER --- */
+        .trust-banner {
+            background: rgba(78, 205, 196, 0.05);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 60px;
+            backdrop-filter: blur(10px);
+        }
+
+        .trust-icon {
+            font-size: 2.5rem;
+            color: var(--teal-glow);
+            flex-shrink: 0;
+        }
+
+        .trust-text h3 {
+            color: var(--starlight);
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .trust-text p {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .trust-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .trust-tags span {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            color: #94a3b8;
+        }
+
+        /* --- ASSESSMENTS LAUNCHPAD --- */
+        .assessments-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .assessment-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 40px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .assessment-card:hover {
+            border-color: var(--teal-glow);
+            background: rgba(78, 205, 196, 0.05);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(78, 205, 196, 0.05);
+        }
+
+        /* Themed Glows for specific cards */
+        .card-emotion:hover {
+            border-color: var(--peach-glow);
+            background: rgba(244, 159, 117, 0.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(244, 159, 117, 0.05);
+        }
+
+        .card-anxiety:hover {
+            border-color: var(--teal-glow);
+        }
+
+        .card-burnout:hover {
+            border-color: var(--gold-glow);
+            background: rgba(251, 191, 36, 0.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(251, 191, 36, 0.05);
+        }
+
+        .card-rel:hover {
+            border-color: #a78bfa;
+            background: rgba(167, 139, 250, 0.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(167, 139, 250, 0.05);
+        }
+
+        .card-icon {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
+
+        .card-emotion .card-icon {
+            color: var(--peach-glow);
+        }
+
+        .card-anxiety .card-icon {
+            color: var(--teal-glow);
+        }
+
+        .card-burnout .card-icon {
+            color: var(--gold-glow);
+        }
+
+        .card-rel .card-icon {
+            color: #a78bfa;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            opacity: 0.7;
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 15px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .card-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .assessment-card:hover .card-btn {
+            color: var(--starlight);
+            gap: 12px;
+        }
+
+        /* --- PLAYFUL SCIENCE POPUP --- */
+        .sci-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+        }
+
+        .sci-badge:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: scale(1.05) rotate(3deg);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .sci-popup {
+            position: absolute;
+            bottom: calc(100% + 15px);
+            right: -20px;
+            width: 320px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--teal-glow);
+            border-radius: 20px;
+            padding: 20px;
+            color: var(--starlight);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(78, 205, 196, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.9);
+            transform-origin: bottom right;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20;
+            text-align: left;
+            cursor: default;
+        }
+
+        /* The little triangle pointer */
+        .sci-popup::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 40px;
+            width: 15px;
+            height: 15px;
+            background: rgba(15, 23, 42, 0.95);
+            border-right: 1px solid inherit;
+            border-bottom: 1px solid inherit;
+            transform: rotate(45deg);
+        }
+
+        .sci-badge:hover .sci-popup {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .sci-popup-title {
+            font-family: 'Outfit';
+            font-size: 1.05rem;
+            color: var(--teal-glow);
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sci-citation {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 2px solid var(--peach-glow);
+            line-height: 1.4;
+        }
+
+        .citation-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .citation-desc {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .sci-disclaimer {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 15px;
+            text-align: center;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 10px;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        /* --- HOW IT WORKS --- */
+        .process-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 80px 0;
+            text-align: center;
+        }
+
+        .process-step {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+        }
+
+        .process-step-icon {
+            font-size: 2rem;
+            color: var(--starlight);
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .process-step h4 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--starlight);
+        }
+
+        .process-step p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* --- DISCLAIMER --- */
+        .legal-disclaimer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #64748b;
+            max-width: 800px;
+            margin: 0 auto;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 30px;
+            line-height: 1.6;
+        }
+
+        @media(max-width: 900px) {
+            .assessments-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .process-row {
+                grid-template-columns: 1fr;
+            }
+
+            .trust-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+    <link rel="icon" href="../../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header></header>
+        </div>
+
+        <!-- ANIMATED BACKGROUNDS -->
+        <div id="particles"></div>
+        <div id="word-atmosphere"></div>
+
+        <main id="shell-content">
+            <div class="container">
+
+                <!-- HERO -->
+                <section class="hero fade-in">
+                    <span class="hero-tag">Guided Inner Experience</span>
+                    <h1>Understand Your Emotional Architecture.</h1>
+                    <p>Not a quiz. An AI-powered, cinematic journey into your psychological landscape—grounded strictly
+                        in clinical science.</p>
+                </section>
+
+                <!-- SCIENTIFIC TRUST BANNER -->
+                <div class="trust-banner fade-in" style="animation-delay: 0.2s;">
+                    <i class="fas fa-shield-alt trust-icon"></i>
+                    <div class="trust-text">
+                        <h3>Built on Clinical Knowledge</h3>
+                        <p>Our assessment engine does not guess or hallucinate. It is deeply structured upon established
+                            psychological frameworks, cross-cutting symptom measures, and trauma-informed playbooks. AI
+                            is merely the intelligent narrator of your deterministic emotional fingerprint.</p>
+                        <div class="trust-tags">
+                            <span>PHQ-9 Inspired</span>
+                            <span>GAD-7 Influenced</span>
+                            <span>LSAS Metrics</span>
+                            <span>DERS Constructs</span>
+                            <span>GDPR Compliant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ASSESSMENTS GRID -->
+                <div class="assessments-grid fade-in" style="animation-delay: 0.4s;">
+
+                    <!-- Emotional Regulation -->
+                    <a href="engine.html?test=emotional_regulation" class="assessment-card card-emotion">
+                        <div class="sci-badge" data-citation="emotional_regulation">
+                            <i class="fas fa-microscope" style="color:var(--peach-glow);"></i> Clinical Backing
+                            <div class="sci-popup">Loading science...</div>
+                        </div>
+                        <i class="fas fa-water card-icon"></i>
+                        <h3 class="card-title">Emotional Regulation & Intensity</h3>
+                        <p class="card-desc">Understand how you process strong emotional waves, your reactivity
+                            patterns, and your nervous system's capacity to return to baseline.</p>
+                        <div class="card-meta">
+                            <span><i class="far fa-clock"></i> ~4 mins</span>
+                            <button class="card-btn">Begin Journey <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </a>
+
+                    <!-- Anxiety & Overthinking -->
+                    <a href="engine.html?test=anxiety_overthinking" class="assessment-card card-anxiety">
+                        <div class="sci-badge" data-citation="anxiety_overthinking">
+                            <i class="fas fa-microscope" style="color:var(--teal-glow);"></i> Clinical Backing
+                            <div class="sci-popup">Loading science...</div>
+                        </div>
+                        <i class="fas fa-wind card-icon"></i>
+                        <h3 class="card-title">Anxiety & Anticipatory Stress</h3>
+                        <p class="card-desc">Map out the architecture of your overthinking. Separate structural anxiety
+                            from situational worry and identify avoidance tendencies.</p>
+                        <div class="card-meta">
+                            <span><i class="far fa-clock"></i> ~5 mins</span>
+                            <button class="card-btn">Begin Journey <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </a>
+
+                    <!-- Burnout & Career Stress -->
+                    <a href="engine.html?test=burnout_career" class="assessment-card card-burnout">
+                        <div class="sci-badge" data-citation="burnout_career">
+                            <i class="fas fa-microscope" style="color:var(--gold-glow);"></i> Clinical Backing
+                            <div class="sci-popup">Loading science...</div>
+                        </div>
+                        <i class="fas fa-battery-quarter card-icon"></i>
+                        <h3 class="card-title">Burnout & Functional Depletion</h3>
+                        <p class="card-desc">Assess your emotional exhaustion, structural fatigue, and signs of
+                            prolonged professional or academic stress.</p>
+                        <div class="card-meta">
+                            <span><i class="far fa-clock"></i> ~4 mins</span>
+                            <button class="card-btn">Begin Journey <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </a>
+
+                    <!-- Relationship Patterns -->
+                    <a href="engine.html?test=relationship_patterns" class="assessment-card card-rel">
+                        <div class="sci-badge" data-citation="relationship_patterns">
+                            <i class="fas fa-microscope" style="color:#a78bfa;"></i> Clinical Backing
+                            <div class="sci-popup">Loading science...</div>
+                        </div>
+                        <i class="fas fa-link card-icon"></i>
+                        <h3 class="card-title">Relationship & Attachment Patterns</h3>
+                        <p class="card-desc">Discover your interpersonal friction points, attachment sensitivities, and
+                            how you naturally respond to emotional proximity.</p>
+                        <div class="card-meta">
+                            <span><i class="far fa-clock"></i> ~6 mins</span>
+                            <button class="card-btn">Begin Journey <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </a>
+
+                </div>
+
+                <!-- HOW IT WORKS -->
+                <div class="process-row fade-in" style="animation-delay: 0.6s;">
+                    <div class="process-step">
+                        <i class="fas fa-fingerprint process-step-icon"></i>
+                        <h4>1. Structured Scoring</h4>
+                        <p>You answer adaptive, gentle questions. Our deterministic engine maps your severity bands and
+                            functional disruptions in real-time, completely locally.</p>
+                    </div>
+                    <div class="process-step">
+                        <i class="fas fa-brain process-step-icon"></i>
+                        <h4>2. AI Translation</h4>
+                        <p>We pass only numerical signatures to Gemini. The AI safely translates raw data into a human,
+                            non-diagnostic reflection grounded in our knowledge base.</p>
+                    </div>
+                    <div class="process-step">
+                        <i class="fas fa-route process-step-icon"></i>
+                        <h4>3. Intelligent Routing</h4>
+                        <p>Depending on your unique fingerprint, you are seamlessly routed to specific articles, a
+                            curated Support Group, or a matched Peer Therapy companion.</p>
+                    </div>
+                </div>
+
+                <!-- LEGAL DISCLAIMER -->
+                <div class="legal-disclaimer fade-in" style="animation-delay: 0.8s;">
+                    <p>
+                        <strong>Clinical Disclaimer:</strong> Soulamore Emotional Assessments are designed for
+                        self-reflection and personal growth.
+                        They are <em>not</em> clinical diagnostic tools and cannot replace professional medical or
+                        psychiatric evaluations.
+                        The AI interpretation layer is carefully restricted to provide reflective, exploratory feedback
+                        rather than medical advice.
+                        <br><br>
+                        If you are experiencing acute distress, self-harm thoughts, or a mental health emergency, please
+                        stop the assessment and use our <a href="../../get-help-now.html"
+                            style="color:var(--teal-glow); text-decoration:none;">Immediate Crisis Resources</a>. By
+                        continuing, you acknowledge these terms.
+                    </p>
+                </div>
+
+            </div>
+        </main>
+        <!-- STANDARDIZED FOOTER -->
+        <footer></footer>
+    </div>
+
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script type="module" src="../../assets/js/firebase-config.js"></script>
+    <script src="../../assets/js/components.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/assessment-data.js"></script>
+
+    <script>
+        // --- PARTICLES (STARS & NEURAL THREADS) ---
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+
+            // Random sizes for stars
+            let size = Math.random() * 3 + 1;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+
+            p.style.animationDuration = Math.random() * 40 + 20 + 's, ' + (Math.random() * 3 + 2) + 's';
+            p.style.animationDelay = (Math.random() * -40) + 's, 0s';
+            particleContainer.appendChild(p);
+        }
+
+        // --- FLOATING WORDS LOGIC ---
+        const words = [
+            "Cognitive", "Emotional", "Somatic", "Regulation",
+            "Intensity", "Resilience", "Baseline", "Clarity",
+            "Self-Concept", "Attachment", "Pattern", "Reflection"
+        ];
+        const atmosphere = document.getElementById('word-atmosphere');
+
+        function createWord() {
+            const el = document.createElement('div');
+            el.classList.add('floating-word');
+            el.innerText = words[Math.floor(Math.random() * words.length)];
+
+            el.style.left = Math.random() * 90 + 'vw';
+            el.style.animationDuration = (Math.random() * 20 + 20) + 's';
+            el.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
+            el.style.opacity = Math.random() * 0.4 + 0.1;
+
+            atmosphere.appendChild(el);
+            setTimeout(() => { el.remove(); }, 40000);
+        }
+
+        for (let i = 0; i < 12; i++) setTimeout(createWord, i * 3000);
+        setInterval(createWord, 3000);
+
+        // --- FETCH CLINICAL CITATIONS ---
+        async function loadClinicalCitations() {
+            try {
+                if (!window.SoulamoreCitations) return;
+                const citationsData = window.SoulamoreCitations;
+
+                document.querySelectorAll('.sci-badge').forEach(badge => {
+                    const testId = badge.getAttribute('data-citation');
+                    const data = citationsData[testId];
+                    if (data) {
+                        const popup = badge.querySelector('.sci-popup');
+                        // Grab specific color from the card icon
+                        const cardIconColor = window.getComputedStyle(badge.closest('.assessment-card').querySelector('.card-icon')).color;
+
+                        let html = `<div class="sci-popup-title" style="color:${cardIconColor}"><i class="fas fa-brain"></i> Backed By Clinical Science</div>`;
+
+                        data.citations.forEach(c => {
+                            html += `
+                                <div class="sci-citation" style="border-left-color: ${cardIconColor};">
+                                    <div class="citation-name">${c.name}</div>
+                                    <div class="citation-desc">${c.description}</div>
+                                </div>
+                            `;
+                        });
+                        html += `<div class="sci-disclaimer">${data.disclaimer}</div>`;
+
+                        popup.innerHTML = html;
+                        popup.style.borderColor = cardIconColor;
+                        let afterRule = document.createElement('style');
+                        afterRule.innerHTML = `
+                            .sci-badge[data-citation="${testId}"] .sci-popup::after { 
+                                border-right-color: ${cardIconColor}; border-bottom-color: ${cardIconColor}; 
+                            }
+                        `;
+                        document.head.appendChild(afterRule);
+                    }
+                });
+            } catch (e) { console.error("Could not load clinical citations", e); }
+        }
+
+        loadClinicalCitations();
+
+        // Prevent navigation when clicking the badge
+        document.querySelectorAll('.sci-badge').forEach(badge => {
+            badge.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Toggle visibility on mobile intentionally
+            });
+        });
+
+    </script>
+</body>
+
+</html>

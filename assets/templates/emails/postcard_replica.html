@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Import modern typography and cursive font */
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Caveat:wght@400;700&family=Outfit:wght@300;400;600&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #0a0f1c;
+            margin: 0;
+            padding: 0;
+            color: #f1f5f9;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrapper {
+            width: 100%;
+            background-color: #0a0f1c;
+            padding: 50px 0;
+            table-layout: fixed;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .logo-img {
+            height: 40px;
+            margin-bottom: 20px;
+            display: inline-block;
+            filter: drop-shadow(0 0 10px rgba(78, 205, 196, 0.4));
+        }
+
+        .title {
+            font-family: 'Outfit', sans-serif;
+            color: #cbd5e1;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0 0 40px 0;
+            font-weight: 400;
+        }
+
+        .title-cursive {
+            font-family: 'Great Vibes', cursive, sans-serif;
+            color: #4ECDC4;
+            font-size: 42px;
+            margin: 0 0 20px 0;
+            font-weight: 400;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+            animation: typing 2.5s steps(20, end) forwards;
+            width: 0;
+            /* Starts hidden for typing effect */
+        }
+
+        /* Typewriter Animation Fallback for Email Clients */
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+
+            to {
+                width: 220px;
+            }
+
+            /* Adjust width based on max text length */
+        }
+
+        /* Typewriter Cursor (optional, might not render in all clients but safe to include) */
+        .title-cursive::after {
+            content: '|';
+            animation: blink-caret .75s step-end infinite;
+            color: #F49F75;
+        }
+
+        @keyframes blink-caret {
+
+            from,
+            to {
+                opacity: transparent;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Animations 
+       Note: These work in Apple Mail/iOS Mail/Modern clients. 
+       In Gmail and Outlook, the postcard simply graceful degrades to static. 
+    */
+        @keyframes floatPostcard {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-1deg);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            }
+
+            50% {
+                transform: translateY(-12px) rotate(1deg);
+                box-shadow: 0 25px 50px rgba(78, 205, 196, 0.2);
+            }
+        }
+
+        @keyframes flyPlane {
+            0% {
+                transform: translate(-100px, 150px) rotate(15deg) scale(0.8);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 0.8;
+            }
+
+            80% {
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translate(650px, -200px) rotate(25deg) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* Airplane wrapper */
+        .plane {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-size: 40px;
+            animation: flyPlane 15s linear infinite;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .postcard-wrapper {
+            position: relative;
+            margin: 0 auto 50px auto;
+            max-width: 520px;
+            background-color: #fdfbf7;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            animation: floatPostcard 6s ease-in-out infinite;
+            z-index: 10;
+            transform: rotate(-1deg);
+            /* Static fallback if animation unsupported */
+        }
+
+        /* Taped Note Aesthetic */
+        .tape {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            margin-left: -60px;
+            width: 120px;
+            height: 35px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: rotate(-2deg);
+            z-index: 20;
+            /* Slight texture */
+            background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0) 50%);
+            background-size: 4px 100%;
+            backdrop-filter: blur(2px);
+        }
+
+        .postcard {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .postcard td {
+            vertical-align: top;
+        }
+
+        /* Handwritten Font */
+        .handwritten {
+            font-family: 'Caveat', 'Comic Sans MS', cursive, sans-serif;
+            font-size: 26px;
+            color: #1e293b;
+            line-height: 1.5;
+            letter-spacing: 0.5px;
+            /* Lined paper effect */
+            background-image: repeating-linear-gradient(transparent, transparent 38px, #e2e0d8 38px, #e2e0d8 39px);
+            background-size: 100% 39px;
+        }
+
+        /* Wavy postmark lines */
+        .postmark-lines {
+            color: #94a3b8;
+            font-size: 20px;
+            letter-spacing: -3px;
+            font-weight: bold;
+        }
+
+        /* Soulamore stamp */
+        .stamp {
+            display: inline-block;
+            border: 2px dashed #94a3b8;
+            color: #94a3b8;
+            padding: 10px 8px;
+            font-size: 10px;
+            font-family: sans-serif;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            text-align: center;
+            transform: rotate(4deg);
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #4ECDC4;
+            color: #0a0f1c;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            margin: 10px;
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.2);
+        }
+
+        .btn:hover {
+            background-color: #3b82f6;
+            color: white;
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.7);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.6;
+            padding-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .wrapper {
+                padding: 40px 15px;
+            }
+
+            .postcard-wrapper {
+                animation: none;
+                transform: none;
+                padding: 15px;
+            }
+
+            .stack-mobile {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .stack-mobile-left {
+                padding-right: 0 !important;
+                margin-bottom: 20px;
+            }
+
+            .stack-mobile-right {
+                border-left: none !important;
+                border-top: 1px dotted #cbd5e1;
+                padding-left: 0 !important;
+                padding-top: 20px;
+            }
+
+            .handwritten {
+                font-size: 22px;
+                line-height: 1.4;
+                background-size: 100% 31px;
+            }
+
+            .plane {
+                display: none;
+            }
+
+            .btn {
+                width: 85%;
+                box-sizing: border-box;
+                margin: 10px auto;
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <!-- Animated Background Airplane -->
+        <div class="plane">✈️</div>
+
+        <div class="container">
+            <a href="https://soulamore.com" target="_blank">
+                <img src="https://soulamore-f0a64.web.app/assets/images/logo.png" alt="Soulamore" class="logo-img">
+            </a>
+            <div style="text-align: center;">
+                <h2 class="title-cursive">Soulamore Away</h2>
+            </div>
+
+            <p style="color: #94a3b8; font-size: 16px; margin-bottom: 40px;">Someone has sent you a digital postcard.
+            </p>
+
+            <!-- Floating Taped Postcard Container -->
+            <div class="postcard-wrapper">
+
+                <!-- Semi-transparent piece of tape at the top center -->
+                <div class="tape"></div>
+
+                <table class="postcard" width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <!-- LEFT SIDE: Aesthetic Image & City -->
+                        <td width="42%" class="stack-mobile stack-mobile-left" style="padding-right: 20px;">
+                            <!-- Travel-vibe image from Unsplash (Randomized) -->
+                            <img src="{{imageUrl}}" width="100%"
+                                style="border-radius: 6px; display: block; border: 1px solid #e2e0d8; filter: sepia(0.2) contrast(1.1);">
+
+                            <div style="margin-top: 15px; font-family: 'Outfit', sans-serif; text-align: left;">
+                                <div
+                                    style="font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">
+                                    Greetings from</div>
+                                <div
+                                    style="font-size: 22px; color: #f49f75; font-weight: bold; border-bottom: 2px solid #4ECDC4; padding-bottom: 5px; display: inline-block;">
+                                    {{city}}</div>
+                            </div>
+                        </td>
+
+                        <!-- RIGHT SIDE: Message & Stamps -->
+                        <td width="58%" class="stack-mobile stack-mobile-right"
+                            style="padding-left: 20px; border-left: 1px dotted #cbd5e1; text-align: left;">
+
+                            <!-- Stamp and Postmark Bar -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="left" valign="middle">
+                                        <div class="postmark-lines">〰️〰️〰️</div>
+                                    </td>
+                                    <td align="right" valign="top">
+                                        <div class="stamp">VIBE:<br>{{intent}}</div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Handwritten Message -->
+                            <div class="handwritten" style="margin-top: 25px; margin-bottom: 20px;">
+                                "{{message}}"
+                            </div>
+
+                            <!-- Sender Identity -->
+                            <div
+                                style="font-family: 'Outfit', sans-serif; font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; text-align: right;">
+                                — {{senderName}}
+                            </div>
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="btn-container">
+                <a href="https://soulamore.com/api/postcard/download?city={{city}}&msg={{message}}"
+                    class="btn btn-secondary"><span style="margin-right: 8px;">📥</span> Download Card</a>
+                <a href="https://soulamore.com/spaces/soulamore-away/mailbox.html?city={{city}}&msg={{message}}&intent={{intent}}&sender={{senderName}}"
+                    class="btn"><i class="fas fa-envelope-open-text" style="margin-right:8px;"></i> Open Postcard
+                    Interactively</a>
+            </div>
+
+            <div class="footer">
+                <p>Soulamore Away is a digital space for releasing thoughts into the world.</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
