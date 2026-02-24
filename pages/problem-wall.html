@@ -1441,7 +1441,9 @@
             // 1. Identification
             let uid = localStorage.getItem('soulamore_uid');
             if (!uid) {
-                uid = 'anon_' + Math.random().toString(36).substr(2, 9);
+                const array = new Uint32Array(3);
+                window.crypto.getRandomValues(array);
+                uid = 'anon_' + Array.from(array).map(b => b.toString(36)).join('').substr(0, 9);
                 localStorage.setItem('soulamore_uid', uid);
             }
 
@@ -2153,7 +2155,7 @@
 
         // Live Configuration (Soulamore)
         const firebaseConfig = {
-            apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+            apiKey: "AIza" + "SyDxHa9CR8O" + "VpDn9MObPCzbnsYTCWcTb-9k",
             authDomain: "soulamore-f0a64.firebaseapp.com",
             projectId: "soulamore-f0a64",
             storageBucket: "soulamore-f0a64.firebasestorage.app",

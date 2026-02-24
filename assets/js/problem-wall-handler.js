@@ -17,6 +17,7 @@ import {
     getDocs,
     where
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { validateSubmission } from "./safety-filter.js";
 
 const WALL_COLLECTION = "problem-wall-notes";
 
@@ -66,6 +67,7 @@ export function initWall(renderCallback, updateUICallback, statsCallback) {
                 .catch(e => log(`Seeding skipped: ${e.message}`))
                 .finally(() => {
                     setupWallListeners(renderCallback, updateUICallback, statsCallback);
+                    setupFormListener(); // Call the form listener setup here
                 });
         } else {
             log("Auth State: Signed Out. Attempting Anon Sign-In...");

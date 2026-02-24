@@ -70,7 +70,7 @@ export async function setPeerAvailability(peerId, availability) {
             console.warn("User is not a verified peer or psychologist:", peerId);
             // Still allow setting availability, but log warning
         }
-        
+
         const roleInfo = await getUserRole(peerId);
         const availabilityRef = doc(db, PEER_AVAILABILITY_COLLECTION, peerId);
         await setDoc(availabilityRef, {
@@ -80,7 +80,7 @@ export async function setPeerAvailability(peerId, availability) {
             timezone: "Asia/Kolkata", // Default timezone
             updatedAt: serverTimestamp()
         }, { merge: true });
-        
+
         console.log(`Availability set for ${roleInfo.role}:`, peerId);
         return true;
     } catch (error) {
@@ -98,7 +98,7 @@ export async function getPeerAvailability(peerId) {
     try {
         const availabilityRef = doc(db, PEER_AVAILABILITY_COLLECTION, peerId);
         const docSnap = await getDoc(availabilityRef);
-        
+
         if (docSnap.exists()) {
             return { id: docSnap.id, ...docSnap.data() };
         }
@@ -125,24 +125,24 @@ export async function checkSlotAvailability(peerId, startTime, endTime) {
             where("peerId", "==", peerId),
             where("status", "in", ["confirmed", "pending"])
         );
-        
+
         const snapshot = await getDocs(q);
         const existingBookings = snapshot.docs.map(doc => doc.data());
-        
+
         // Check for conflicts
         const bookingStart = new Date(startTime).getTime();
         const bookingEnd = new Date(endTime).getTime();
-        
+
         for (const booking of existingBookings) {
             const existingStart = booking.startTime?.toDate?.()?.getTime() || new Date(booking.startTime).getTime();
             const existingEnd = booking.endTime?.toDate?.()?.getTime() || new Date(booking.endTime).getTime();
-            
+
             // Check for overlap
             if ((bookingStart < existingEnd && bookingEnd > existingStart)) {
                 return false; // Slot is booked
             }
         }
-        
+
         return true; // Slot is available
     } catch (error) {
         console.error("Error checking slot availability:", error);
@@ -162,34 +162,34 @@ export async function getAvailableSlots(peerId, date) {
         if (!availability || !availability.availability) {
             return [];
         }
-        
+
         const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
         const daySchedule = availability.availability.find(slot => slot.day.toLowerCase() === dayName);
-        
+
         if (!daySchedule) {
             return []; // Peer not available on this day
         }
-        
+
         // Generate time slots (every hour or based on session duration)
         const slots = [];
         const [startHour, startMin] = daySchedule.startTime.split(':').map(Number);
         const [endHour, endMin] = daySchedule.endTime.split(':').map(Number);
-        
+
         const startTime = new Date(date);
         startTime.setHours(startHour, startMin, 0, 0);
-        
+
         const endTime = new Date(date);
         endTime.setHours(endHour, endMin, 0, 0);
-        
+
         // Generate slots (1 hour sessions by default)
         let currentTime = new Date(startTime);
         while (currentTime < endTime) {
             const slotEnd = new Date(currentTime);
             slotEnd.setHours(currentTime.getHours() + 1);
-            
+
             // Check if this slot is available (not booked)
             const isAvailable = await checkSlotAvailability(peerId, currentTime, slotEnd);
-            
+
             if (isAvailable) {
                 slots.push({
                     start: new Date(currentTime),
@@ -197,10 +197,10 @@ export async function getAvailableSlots(peerId, date) {
                     display: currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
                 });
             }
-            
+
             currentTime.setHours(currentTime.getHours() + 1);
         }
-        
+
         return slots;
     } catch (error) {
         console.error("Error getting available slots:", error);
@@ -221,13 +221,13 @@ export async function createBookingRequest(userId, peerId, planType, startTime, 
     try {
         // Get plan details
         const plan = DEFAULT_PLANS[planType] || DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION];
-        
+
         // Check availability
         const isAvailable = await checkSlotAvailability(peerId, startTime, endTime);
         if (!isAvailable) {
             throw new Error("Time slot is no longer available");
         }
-        
+
         // Create booking document
         const bookingRef = await addDoc(collection(db, PEER_BOOKINGS_COLLECTION), {
             userId: userId,
@@ -242,9 +242,9 @@ export async function createBookingRequest(userId, peerId, planType, startTime, 
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
         });
-        
+
         console.log("Booking request created:", bookingRef.id);
-        
+
         return {
             bookingId: bookingRef.id,
             amount: plan.price,
@@ -266,7 +266,8 @@ export async function createBookingRequest(userId, peerId, planType, startTime, 
 export async function confirmBooking(bookingId, paymentId, paymentData) {
     try {
         const bookingRef = doc(db, PEER_BOOKINGS_COLLECTION, bookingId);
-        
+        const bookingSnap = await getDoc(bookingRef);
+
         await updateDoc(bookingRef, {
             status: "confirmed",
             paymentId: paymentId,
@@ -274,7 +275,7 @@ export async function confirmBooking(bookingId, paymentId, paymentData) {
             confirmedAt: serverTimestamp(),
             updatedAt: serverTimestamp()
         });
-        
+
         // Also create payment record
         await addDoc(collection(db, PAYMENTS_COLLECTION), {
             bookingId: bookingId,
@@ -286,8 +287,55 @@ export async function confirmBooking(bookingId, paymentId, paymentData) {
             metadata: paymentData,
             createdAt: serverTimestamp()
         });
-        
+
         console.log("Booking confirmed:", bookingId);
+
+        // TRIGGER EMAIL RECEIPT
+        try {
+            if (bookingSnap.exists() && window.SoulBackend && window.SoulBackend.triggerEmail) {
+                const bData = bookingSnap.data();
+                if (bData.userId) {
+                    // Fetch user email
+                    const userDoc = await getDoc(doc(db, "users", bData.userId));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const userEmail = userData.email;
+                        const userName = userData.displayName || "Friend";
+
+                        // Get peer name
+                        let peerName = "Your Peer Companion";
+                        if (bData.peerId) {
+                            const peerDoc = await getDoc(doc(db, "users", bData.peerId));
+                            if (peerDoc.exists() && peerDoc.data().displayName) {
+                                peerName = peerDoc.data().displayName;
+                            }
+                        }
+
+                        // Provide dummy calendar/meet links for now
+                        const meetingLink = "https://meet.soulamore.com/" + bookingId;
+                        const calendarLink = "https://calendar.google.com/calendar/r/eventedit?text=Soulamore+Session";
+
+                        await window.SoulBackend.triggerEmail(
+                            userEmail,
+                            "Your Soulamore Session is Confirmed",
+                            "booking_confirmed",
+                            {
+                                name: userName,
+                                email: userEmail,
+                                peerName: peerName,
+                                date: bData.startTime ? bData.startTime.toDate().toLocaleString() : "TBD",
+                                meetingLink: meetingLink,
+                                calendarLink: calendarLink
+                            }
+                        );
+                        console.log("Booking success email triggered for:", userEmail);
+                    }
+                }
+            }
+        } catch (emailErr) {
+            console.error("Failed to trigger booking confirmation email:", emailErr);
+        }
+
         return true;
     } catch (error) {
         console.error("Error confirming booking:", error);
@@ -304,7 +352,7 @@ export async function getUserBookings(userId) {
     try {
         const bookingsRef = collection(db, PEER_BOOKINGS_COLLECTION);
         const q = query(bookingsRef, where("userId", "==", userId));
-        
+
         const snapshot = await getDocs(q);
         return snapshot.docs.map(doc => ({
             id: doc.id,
@@ -327,7 +375,7 @@ export async function getPeerBookings(peerId) {
     try {
         const bookingsRef = collection(db, PEER_BOOKINGS_COLLECTION);
         const q = query(bookingsRef, where("peerId", "==", peerId));
-        
+
         const snapshot = await getDocs(q);
         return snapshot.docs.map(doc => ({
             id: doc.id,

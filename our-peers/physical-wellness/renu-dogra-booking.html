@@ -518,7 +518,23 @@
                 <span class="summary-label">Total Amount:</span>
                 <span class="summary-value" id="summaryAmount">₹0</span>
             </div>
-            <button class="book-button" id="bookButton" disabled>
+
+            <!-- Liability Disclaimer (MANDATORY) -->
+            <div class="liability-disclaimer"
+                style="margin-top: 20px; font-size: 0.85rem; color: #94a3b8; display: flex; align-items: flex-start; gap: 10px;">
+                <input type="checkbox" id="liabilityTerms"
+                    style="margin-top: 4px; cursor: pointer; accent-color: #F49F75;">
+                <label for="liabilityTerms" style="cursor: pointer; line-height: 1.4;">
+                    I understand that Soulamore Campus Peers are trained companions/listeners, not licensed medical
+                    professionals, psychologists, or psychiatrists.
+                    This session is strictly for emotional support, not clinical therapy or medical treatment.
+                    I agree to the <a href="/legal/terms-of-service.html" target="_blank"
+                        style="color: #2DD4BF; text-decoration: underline;">Terms of Service</a>
+                    and acknowledge that this platform cannot handle acute medical emergencies or suicidal crises.
+                </label>
+            </div>
+
+            <button class="book-button" id="bookButton" disabled style="margin-top: 15px;">
                 Proceed to Payment
             </button>
         </div>
@@ -795,7 +811,8 @@
                 document.getElementById('summaryTime').textContent = selectedTimeSlot.display;
                 document.getElementById('summaryAmount').textContent = `₹${plan.price}`;
 
-                bookButton.disabled = false;
+                const liabilityChecked = document.getElementById('liabilityTerms').checked;
+                bookButton.disabled = !liabilityChecked;
             } else {
                 summarySection.style.display = 'none';
                 bookButton.disabled = true;
@@ -812,6 +829,14 @@
             document.getElementById('nextMonth').addEventListener('click', () => {
                 currentMonth.setMonth(currentMonth.getMonth() + 1);
                 renderCalendar();
+            });
+
+            // Liability Checkbox Toggle
+            document.getElementById('liabilityTerms').addEventListener('change', () => {
+                const bookButton = document.getElementById('bookButton');
+                if (selectedPlan && selectedDate && selectedTimeSlot) {
+                    bookButton.disabled = !document.getElementById('liabilityTerms').checked;
+                }
             });
 
             // Book button
