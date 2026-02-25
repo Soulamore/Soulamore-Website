@@ -237,11 +237,67 @@
         }
 
         /* --- ASSESSMENTS LAUNCHPAD --- */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: #94a3b8;
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Outfit';
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(78, 205, 196, 0.1);
+            color: white;
+            border-color: var(--teal-glow);
+        }
+
+        .badge-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .tag-badge {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ccc;
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .assessments-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .load-more-container {
+            text-align: center;
             margin-bottom: 60px;
+            display: none;
+            /* hidden if no more to load */
         }
 
         .assessment-card {
@@ -506,6 +562,12 @@
             line-height: 1.6;
         }
 
+        @media(max-width: 1200px) {
+            .assessments-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
         @media(max-width: 900px) {
             .assessments-grid {
                 grid-template-columns: 1fr;
@@ -730,6 +792,125 @@
         for (let i = 0; i < 12; i++) setTimeout(createWord, i * 3000);
         setInterval(createWord, 3000);
 
+        // --- DYNAMIC GRID & FILTERING LOGIC ---
+        const ALL_TESTS = Object.values(window.SoulamoreAssessments || {});
+        let filteredTests = [...ALL_TESTS];
+        let currentlyDisplayed = 0;
+        const BATCH_SIZE = 6;
+        let activeFilter = 'All';
+
+        const gridEl = document.getElementById('assessments-grid');
+        const filterBar = document.getElementById('filter-bar');
+        const loadMoreContainer = document.getElementById('load-more-container');
+        const loadMoreBtn = document.getElementById('load-more-btn');
+
+        // Extract unique audiences for filters
+        function setupFilters() {
+            const audiences = new Set();
+            ALL_TESTS.forEach(test => {
+                if (test.target_audience) {
+                    test.target_audience.forEach(a => audiences.add(a));
+                }
+            });
+
+            // Create buttons
+            audiences.forEach(aud => {
+                if (aud === 'General' || aud === 'Everyone') return; // Skip generic tags
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.dataset.filter = aud;
+                btn.innerText = aud;
+                filterBar.appendChild(btn);
+            });
+
+            // Add Event Listeners
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    activeFilter = e.target.dataset.filter;
+
+                    if (activeFilter === 'All') {
+                        filteredTests = [...ALL_TESTS];
+                    } else {
+                        filteredTests = ALL_TESTS.filter(t => t.target_audience && (t.target_audience.includes(activeFilter) || t.target_audience.includes('Everyone') || t.target_audience.includes('General')));
+                    }
+
+                    renderGrid(true); // Reset grid
+                });
+            });
+        }
+
+        function createCardHTML(test) {
+            const color = test.theme_color || "var(--teal-glow)";
+
+            // Generate icon dynamically based on tags/title (or fallback)
+            let icon = 'fa-brain';
+            const str = (test.title + " " + (test.tags ? test.tags.join(' ') : "")).toLowerCase();
+            if (str.includes('anxiety')) icon = 'fa-wind';
+            if (str.includes('burnout') || str.includes('career')) icon = 'fa-battery-quarter';
+            if (str.includes('relation') || str.includes('attachment')) icon = 'fa-link';
+            if (str.includes('emotion') || str.includes('mood')) icon = 'fa-water';
+            if (str.includes('trauma')) icon = 'fa-heart-broken';
+
+            // Badges
+            let badgesHTML = '';
+            if (test.target_audience) {
+                test.target_audience.forEach(aud => {
+                    if (aud !== 'Everyone' && aud !== 'General') {
+                        badgesHTML += `<span class="tag-badge" style="border-bottom: 1px solid ${color}">${aud}</span>`;
+                    }
+                });
+            }
+
+            return `
+                <a href="engine.html?test=${test.id}" class="assessment-card" style="--hover-color: ${color};" onmouseover="this.style.borderColor='${color}'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.4), inset 0 0 20px ${color}10'" onmouseout="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+                    ${badgesHTML ? `<div class="badge-container">${badgesHTML}</div>` : ''}
+                    <div class="sci-badge" data-citation="${test.id}">
+                        <i class="fas fa-microscope" style="color:${color};"></i> Clinical Backing
+                        <div class="sci-popup">Loading science...</div>
+                    </div>
+                    <i class="fas ${icon} card-icon" style="color:${color};"></i>
+                    <h3 class="card-title">${test.title}</h3>
+                    <p class="card-desc">${test.description}</p>
+                    <div class="card-meta">
+                        <span><i class="far fa-clock"></i> ~5 mins</span>
+                        <button class="card-btn">Begin Journey <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </a>
+            `;
+        }
+
+        function renderGrid(reset = false) {
+            if (reset) {
+                gridEl.innerHTML = '';
+                currentlyDisplayed = 0;
+            }
+
+            const slice = filteredTests.slice(currentlyDisplayed, currentlyDisplayed + BATCH_SIZE);
+
+            slice.forEach(test => {
+                gridEl.insertAdjacentHTML('beforeend', createCardHTML(test));
+            });
+
+            currentlyDisplayed += slice.length;
+
+            if (currentlyDisplayed >= filteredTests.length) {
+                loadMoreContainer.style.display = 'none';
+            } else {
+                loadMoreContainer.style.display = 'block';
+            }
+
+            // Must re-bind citation logic for newly injected DOM nodes
+            loadClinicalCitations();
+        }
+
+        loadMoreBtn.addEventListener('click', () => renderGrid(false));
+
+        // Initialize
+        setupFilters();
+        renderGrid(true);
+
         // --- FETCH CLINICAL CITATIONS ---
         async function loadClinicalCitations() {
             try {
@@ -737,49 +918,40 @@
                 const citationsData = window.SoulamoreCitations;
 
                 document.querySelectorAll('.sci-badge').forEach(badge => {
+                    // Prevent binding multiple times to the same element
+                    if (badge.dataset.bound) return;
+                    badge.dataset.bound = "true";
+
                     const testId = badge.getAttribute('data-citation');
                     const data = citationsData[testId];
                     if (data) {
                         const popup = badge.querySelector('.sci-popup');
-                        // Grab specific color from the card icon
-                        const cardIconColor = window.getComputedStyle(badge.closest('.assessment-card').querySelector('.card-icon')).color;
+                        const cardIconColor = badge.closest('.assessment-card').style.getPropertyValue('--hover-color') || "var(--teal-glow)";
 
                         let html = `<div class="sci-popup-title" style="color:${cardIconColor}"><i class="fas fa-brain"></i> Backed By Clinical Science</div>`;
 
-                        data.citations.forEach(c => {
-                            html += `
-                                <div class="sci-citation" style="border-left-color: ${cardIconColor};">
-                                    <div class="citation-name">${c.name}</div>
-                                    <div class="citation-desc">${c.description}</div>
-                                </div>
-                            `;
-                        });
-                        html += `<div class="sci-disclaimer">${data.disclaimer}</div>`;
+                        if (data.citations) {
+                            data.citations.forEach(c => {
+                                html += `
+                                    <div class="sci-citation" style="border-left-color: ${cardIconColor};">
+                                        <div class="citation-name">${c.name}</div>
+                                        <div class="citation-desc">${c.description}</div>
+                                    </div>
+                                `;
+                            });
+                        }
+                        if (data.disclaimer) {
+                            html += `<div class="sci-disclaimer">${data.disclaimer}</div>`;
+                        }
 
                         popup.innerHTML = html;
                         popup.style.borderColor = cardIconColor;
-                        let afterRule = document.createElement('style');
-                        afterRule.innerHTML = `
-                            .sci-badge[data-citation="${testId}"] .sci-popup::after { 
-                                border-right-color: ${cardIconColor}; border-bottom-color: ${cardIconColor}; 
-                            }
-                        `;
-                        document.head.appendChild(afterRule);
+
+                        badge.addEventListener('click', (e) => e.preventDefault());
                     }
                 });
             } catch (e) { console.error("Could not load clinical citations", e); }
         }
-
-        loadClinicalCitations();
-
-        // Prevent navigation when clicking the badge
-        document.querySelectorAll('.sci-badge').forEach(badge => {
-            badge.addEventListener('click', (e) => {
-                e.preventDefault();
-                // Toggle visibility on mobile intentionally
-            });
-        });
-
     </script>
 </body>
 
