@@ -531,6 +531,13 @@ const NAV_DATA = [
         ]
     },
     {
+        id: 'nav-assessments',
+        label: 'Assessments',
+        icon: 'fas fa-brain',
+        href: 'spaces/assessments/index.html',
+        type: 'link',
+    },
+    {
         id: 'nav-community',
         label: 'Community',
         icon: 'fas fa-users',
@@ -685,6 +692,18 @@ const getFooterHTML = (rootPath) => `
             </ul>
         </div>
 
+        <!-- ASSESSMENTS COLUMN -->
+        <div class="footer-col">
+            <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Assessments</h4>
+            <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}spaces/assessments/index.html" style="color:var(--peach-glow); font-weight:600;">Assessment Library</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=burnout_career">Burnout & Career</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=anxiety_overthinking">Anxiety & Stress</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=emotional_regulation">Emotional Regulation</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=relationship_patterns">Relationship Patterns</a></li>
+            </ul>
+        </div>
+
         <!-- SPACES COLUMN -->
         <div class="footer-col">
             <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Community</h4>
@@ -726,7 +745,8 @@ function getRootPath() {
     // 2-Levels Deep Check
     if (location.pathname.includes('/spaces/campus/') ||
         location.pathname.includes('/spaces/soulamore-away/') ||
-        location.pathname.includes('/spaces/soulamore-workplace/') || /* ADDED LINE */
+        location.pathname.includes('/spaces/soulamore-workplace/') ||
+        location.pathname.includes('/spaces/assessments/') ||
         location.pathname.includes('/our-peers/physical-wellness/') ||
         location.pathname.includes('/our-peers/academic-wellness/') ||
         location.pathname.includes('/our-peers/mental-wellness/') ||
