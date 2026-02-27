@@ -183,20 +183,6 @@ try {
                 height: auto !important;
                 line-height: 1 !important;
             }
-            /* NEWS TICKER ANIMATION */
-            @keyframes ticker-scroll {
-                0% { transform: translateX(100%); }
-                100% { transform: translateX(-100%); }
-            }
-            .news-ticker-content {
-                display: inline-block !important;
-                padding-left: 100% !important;
-                animation: ticker-scroll 120s linear infinite !important;
-                white-space: nowrap !important;
-            }
-            .news-ticker-container:hover .news-ticker-content {
-                animation-play-state: paused !important;
-            }
             /* Ensure logo looks good on desktop */
             .logo-wrapper {
                 display: flex !important;
