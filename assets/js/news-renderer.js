@@ -9,36 +9,58 @@ async function initNewsFeed(containerId, limit = 6) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Show Loading State
-    container.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; padding: 50px; opacity: 0.5;">
-            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 20px;"></i>
-            <p>Scanning global mental health headlines...</p>
-        </div>
-    `;
+    const cacheKey = `soulamore_news_cache_${containerId}`;
+    const rootPath = window.location.pathname.includes('/company/') || window.location.pathname.includes('/community/') ? '../' : '';
+
+    // 1. Check Cache First (Instant Load)
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+        try {
+            const articles = JSON.parse(cachedData);
+            if (articles && articles.length > 0) {
+                renderArticles(container, articles.slice(0, limit));
+                // Optional: Update ticker if it exists
+                const ticker = document.getElementById('news-ticker');
+                if (ticker) renderTicker(ticker, articles);
+            }
+        } catch (e) {
+            console.warn("News cache invalid", e);
+        }
+    } else {
+        // Show Loading State ONLY if no cache exists
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 50px; opacity: 0.5;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 20px;"></i>
+                <p>Curating your mental health ritual...</p>
+            </div>
+        `;
+    }
 
     try {
-        const rootPath = window.location.pathname.includes('/company/') || window.location.pathname.includes('/community/') ? '../' : '';
-        const response = await fetch(`${rootPath}assets/data/news-feed.json`);
+        // 2. Fetch Fresh Data with Cache Buster
+        const response = await fetch(`${rootPath}assets/data/news-feed.json?t=${new Date().getTime()}`);
         if (!response.ok) throw new Error('News feed currently unavailable');
 
         const articles = await response.json();
 
-        if (!articles || articles.length === 0) {
+        if (articles && articles.length > 0) {
+            // Update UI with fresh data
+            renderArticles(container, articles.slice(0, limit));
+
+            // Update Global Ticker
+            const ticker = document.getElementById('news-ticker');
+            if (ticker) renderTicker(ticker, articles);
+
+            // 3. Save to Cache for next visit
+            localStorage.setItem(cacheKey, JSON.stringify(articles));
+        } else if (!cachedData) {
             container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No news rituals active at this moment.</p>';
-            return;
-        }
-
-        renderArticles(container, articles.slice(0, limit));
-
-        // Populate Global Ticker if it exists
-        const ticker = document.getElementById('news-ticker');
-        if (ticker) {
-            renderTicker(ticker, articles);
         }
     } catch (error) {
         console.error("News Load Error:", error);
-        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">Stay tuned. Live news feed is refreshing.</p>';
+        if (!cachedData) {
+            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">Stay tuned. Live news feed is refreshing.</p>';
+        }
     }
 }
 
