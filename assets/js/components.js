@@ -22,6 +22,21 @@ try {
     const style = document.createElement('style');
     style.id = 'header-styles-v2'; // Changed ID to force refresh/avoid conflicts
     style.innerHTML = `
+        /* NEWS TICKER GLOBAL ANIMATION */
+        @keyframes ticker-scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .news-ticker-content {
+            display: inline-block !important;
+            padding-left: 100% !important;
+            animation: ticker-scroll 120s linear infinite !important;
+            white-space: nowrap !important;
+        }
+        .news-ticker-container:hover .news-ticker-content {
+            animation-play-state: paused !important;
+        }
+
         /* DESKTOP (Width > 1024px) */
         @media (min-width: 1025px) {
             header {
