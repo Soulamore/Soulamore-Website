@@ -98,6 +98,7 @@ try {
                 display: flex;
                 align-items: center;
                 margin-right: 10px !important; /* Add small breathing room */
+                overflow: visible !important; /* FIX: Prevent scaling clipping */
             }
             .logo-wrapper {
                 display: flex !important;
@@ -1060,8 +1061,38 @@ document.addEventListener('DOMContentLoaded', () => {
     bindMobileToggle(); // ADDED: Ensure mobile toggle binding
     injectSoulBotWidget(); // ADDED: Ensure SoulBot widget injection
     injectCookieBanner(); // ADDED: GDPR Compliance
-    if (window.initGlobalTicker) window.initGlobalTicker(); // Initialize news feed news ticker on all pages
+    ensureNewsRenderer(); // Dynamically load news-renderer.js if missing
 });
+
+/**
+ * Ensures news-renderer.js is loaded and initializes the global ticker.
+ */
+function ensureNewsRenderer() {
+    if (typeof window.initGlobalTicker === 'function') {
+        window.initGlobalTicker();
+        return;
+    }
+
+    // Determine path prefix
+    const path = window.location.pathname;
+    let prefix = '';
+    if (path.includes('/spaces/') || path.includes('/tools/') || path.includes('/company/') || path.includes('/community/') || path.includes('/our-peers/') || path.includes('/our-psychologists/') || path.includes('/portal/') || path.includes('/join-us/') || path.includes('/pages/')) {
+        const folderCount = (path.match(/\//g) || []).length;
+        const isLocal = window.location.protocol === 'file:';
+        const depth = isLocal ? folderCount - 1 : folderCount;
+
+        if (depth >= 3) prefix = '../../';
+        else if (depth >= 2) prefix = '../';
+    }
+
+    const script = document.createElement('script');
+    script.src = `${prefix}assets/js/news-renderer.js`;
+    script.onload = () => {
+        if (window.initGlobalTicker) window.initGlobalTicker();
+    };
+    script.onerror = () => console.error("Failed to load news-renderer.js dynamically");
+    document.head.appendChild(script);
+}
 
 // --- 5. ACTIVE STATE LOGIC ---
 

@@ -79,10 +79,6 @@ function renderSync(container, articles, limit) {
     }
 }
 
-/**
- * Global Ticker Initialization
- * Used when no grid container is present but the global ticker needs loading.
- */
 async function initGlobalTicker() {
     const ticker = document.getElementById('news-ticker');
     if (!ticker) return;
@@ -100,17 +96,24 @@ async function initGlobalTicker() {
         try {
             renderTicker(ticker, JSON.parse(cachedData));
             return;
-        } catch (e) { console.warn("Ticker cache parse failed", e); }
+        } catch (e) {
+            console.warn("Ticker cache parse failed", e);
+        }
     }
 
-    // 2. Fetch Fresh Data
+    // 2. Fetch Fresh Data (Robust Root Detection)
     try {
-        const rootPath = window.location.pathname.includes('/company/') || window.location.pathname.includes('/community/') || window.location.pathname.includes('/spaces/') || window.location.pathname.includes('/tools/') ? '../' : '';
-        // Better root detection for deep pages
-        const folderCount = (window.location.pathname.match(/\//g) || []).length;
         let finalRoot = '';
-        if (folderCount >= 3) finalRoot = '../../';
-        else if (folderCount >= 2) finalRoot = '../';
+        const path = window.location.pathname;
+        if (path.includes('/spaces/') || path.includes('/tools/') || path.includes('/company/') || path.includes('/community/') || path.includes('/our-peers/') || path.includes('/our-psychologists/') || path.includes('/portal/') || path.includes('/join-us/') || path.includes('/pages/')) {
+            const folderCount = (path.match(/\//g) || []).length;
+            // Adjustment for local file vs hosted
+            const isLocal = window.location.protocol === 'file:';
+            const depth = isLocal ? folderCount - 1 : folderCount;
+
+            if (depth >= 3) finalRoot = '../../';
+            else if (depth >= 2) finalRoot = '../';
+        }
 
         const response = await fetch(`${finalRoot}assets/data/news-feed.json?t=${now}`);
         if (!response.ok) throw new Error('Unavailable');
@@ -122,6 +125,7 @@ async function initGlobalTicker() {
             localStorage.setItem(expiryKey, now.toString());
         }
     } catch (e) {
+        console.error("Global Ticker Load Error:", e);
         if (cachedData) renderTicker(ticker, JSON.parse(cachedData));
     }
 }
@@ -139,16 +143,14 @@ function renderTicker(ticker, articles) {
     // Update Content
     ticker.innerHTML = tickerContent + tickerContent;
 
-    // --- STABILIZE SPEED ---
-    // We want a constant speed (pixels per second)
-    // Formula: Total Width / Speed = Duration
-    // Base: 150s was for ~15 items. 
-    // Let's target ~50 pixels per second for readability.
-    const containerWidth = ticker.scrollWidth / 2; // Half because we duplicate
-    const speed = 40; // Pixels per second (Adjusted for readability)
+    // --- STABILIZE SPEED (Constant Pixels-per-second) ---
+    // We want a constant speed regardless of content width
+    const scrollContent = ticker;
+    const containerWidth = scrollContent.scrollWidth / 2;
+    const speed = 40; // Pixels per second (Comfortable reading speed)
     const duration = containerWidth / speed;
 
-    ticker.style.animationDuration = `${duration}s`;
+    scrollContent.style.animationDuration = `${duration}s`;
 }
 
 function renderArticles(container, articles) {
