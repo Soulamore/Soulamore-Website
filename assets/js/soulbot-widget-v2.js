@@ -90,10 +90,11 @@
             .sb-msg-bot { background: rgba(255,255,255,0.05); align-self: flex-start; color: #e2e8f0; }
             .sb-msg-user { background: #2dd4bf; align-self: flex-end; color: #0f172a; }
 
-            /* MOBILE TWEAKS */
-            @media (max-width: 768px) {
-                #soulbot-widget-container { bottom: 80px !important; right: 20px; }
-                #sb-window { width: 90vw; right: 5vw; bottom: 120px; height: 60vh; }
+            /* MOBILE TWEAKS (Aligned with components.js) */
+            @media (max-width: 1024px) {
+                #soulbot-widget-container { display: none !important; visibility: hidden !important; }
+                #soulbot-widget-fab { display: none !important; visibility: hidden !important; pointer-events: none !important; }
+                #sb-window { display: none !important; }
             }
         </style>
         
