@@ -116,6 +116,7 @@ try {
                 position: absolute !important;
                 left: 0 !important;
                 z-index: 2 !important;
+                transition: transform 0.3s ease !important; /* ADDED transition */
             }
             .logo-text-overlay {
                 height: 100% !important;
@@ -126,6 +127,13 @@ try {
                 filter: brightness(0) invert(1) !important; /* Make white */
                 clip-path: inset(0 0 0 32%) !important; /* Show only text part */
                 z-index: 1 !important;
+                transition: transform 0.3s ease !important; /* ADDED transition */
+            }
+            .nav-logo:hover .logo-icon, 
+            .nav-logo:hover .logo-text-overlay {
+                transform: scale(1.08) !important; /* Scale specific layers */
+                clip-path: inset(-5% -5% -5% -5%) !important; /* RELAX CLIPPING on hover to prevent edges from cutting */
+                z-index: 10 !important;
             }
             /* Button Consistency - FIXED COLORS */
             .nav-btn, .lifeline-btn {
@@ -1062,7 +1070,40 @@ document.addEventListener('DOMContentLoaded', () => {
     injectSoulBotWidget(); // ADDED: Ensure SoulBot widget injection
     injectCookieBanner(); // ADDED: GDPR Compliance
     ensureNewsRenderer(); // Dynamically load news-renderer.js if missing
+
+    // Auto-init particles if container exists
+    initParticles();
+
+    // Inject Bottom Nav (Global)
+    injectMobileBottomNav();
+
+    // Set Active State
+    setActiveState();
+
+    // Auto-init Smart Counters
+    initSmartCounters();
 });
+
+/**
+ * Unified Path Detection
+ * Returns relative path prefix to get to project root from current page.
+ */
+function getRootPath() {
+    const path = window.location.pathname;
+    let prefix = '';
+
+    // Check for standard sub-folders
+    if (path.includes('/spaces/') || path.includes('/tools/') || path.includes('/company/') || path.includes('/community/') || path.includes('/our-peers/') || path.includes('/our-psychologists/') || path.includes('/portal/') || path.includes('/join-us/') || path.includes('/pages/')) {
+        const folderCount = (path.match(/\//g) || []).length;
+        const isLocal = window.location.protocol === 'file:';
+        // Adjustment for local file (pathname includes C:/...) vs hosted
+        const depth = isLocal ? folderCount - 1 : folderCount;
+
+        if (depth >= 3) prefix = '../../';
+        else if (depth >= 2) prefix = '../';
+    }
+    return prefix;
+}
 
 /**
  * Ensures news-renderer.js is loaded and initializes the global ticker.
@@ -1073,18 +1114,7 @@ function ensureNewsRenderer() {
         return;
     }
 
-    // Determine path prefix
-    const path = window.location.pathname;
-    let prefix = '';
-    if (path.includes('/spaces/') || path.includes('/tools/') || path.includes('/company/') || path.includes('/community/') || path.includes('/our-peers/') || path.includes('/our-psychologists/') || path.includes('/portal/') || path.includes('/join-us/') || path.includes('/pages/')) {
-        const folderCount = (path.match(/\//g) || []).length;
-        const isLocal = window.location.protocol === 'file:';
-        const depth = isLocal ? folderCount - 1 : folderCount;
-
-        if (depth >= 3) prefix = '../../';
-        else if (depth >= 2) prefix = '../';
-    }
-
+    const prefix = getRootPath();
     const script = document.createElement('script');
     script.src = `${prefix}assets/js/news-renderer.js`;
     script.onload = () => {
@@ -1327,7 +1357,6 @@ function injectSoulBotWidget() {
                 color: #0f172a;
                 font-size: 1.8rem;
                 transition: transform 0.3s;
-            }
             #soulbot-widget-fab:hover i { transform: scale(1.1); }
 
             #sb-window {
@@ -1587,35 +1616,8 @@ function injectMobileBottomNav() {
     document.head.appendChild(style);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    if (typeof injectHeader === 'function') injectHeader();
-    // Guard Footer Injection: Do not inject on Auth pages (Viewport Scenes)
-    if (typeof injectFooter === 'function') injectFooter();
-    initParticles(); // Auto-init particles if container exists
-
-    // Auto-init News Ticker (Global)
-    if (document.getElementById('news-ticker') && typeof initNewsFeed === 'function') {
-        initNewsFeed('news-ticker', 10);
-    }
-
-    // Original Initialization steps (retained)
-    try { injectSoulBotWidget(); } catch (e) { console.error("SoulBot Widget Failed:", e); }
-    try { injectFavicon(); } catch (e) { console.error("Favicon Injection Failed:", e); }
-
-    // 2. Set Active State
-    try { setActiveState(); } catch (e) { console.warn("Active State Error:", e); }
-
-    // 3. Initialize Interactions
-    try {
-        bindMobileToggle();
-        initializeHeaderLogic();
-    } catch (e) { console.warn("Header Logic Error:", e); }
-
-    // 4. Inject Bottom Nav (Global)
-    try { injectMobileBottomNav(); } catch (e) { console.warn("Bottom Nav Error:", e); }
-
-    console.log("Soulamore: Initialization Complete.");
-});
+// DEPRECATED: Combined into main listener above
+// document.addEventListener("DOMContentLoaded", () => { ... });
 
 // --- PARTICLES ENGINE ---
 function initParticles() {
@@ -1667,7 +1669,8 @@ function initSmartCounters() {
 }
 
 // Auto-Run
-document.addEventListener('DOMContentLoaded', initSmartCounters);
+// Consolidated into main listener
+// document.addEventListener('DOMContentLoaded', initSmartCounters);
 
 
 // --- NAVIGATION LOGIC (SPA Fallback) ---

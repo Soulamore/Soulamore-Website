@@ -147,7 +147,7 @@ function renderTicker(ticker, articles) {
     // We want a constant speed regardless of content width
     const scrollContent = ticker;
     const containerWidth = scrollContent.scrollWidth / 2;
-    const speed = 40; // Pixels per second (Comfortable reading speed)
+    const speed = 25; // Slower (25px/sec) for maximum readability as requested
     const duration = containerWidth / speed;
 
     scrollContent.style.animationDuration = `${duration}s`;
