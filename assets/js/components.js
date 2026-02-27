@@ -30,7 +30,7 @@ try {
         .news-ticker-content {
             display: inline-block !important;
             padding-left: 50px !important;
-            animation: ticker-scroll 150s linear infinite !important; /* Slowed down significantly for readability */
+            animation: ticker-scroll 250s linear infinite !important; /* Ultra-slow for placeholder */
             white-space: nowrap !important;
         }
         .news-ticker-container:hover .news-ticker-content {
@@ -129,10 +129,14 @@ try {
                 z-index: 1 !important;
                 transition: transform 0.3s ease !important; /* ADDED transition */
             }
-            .nav-logo:hover .logo-icon, 
+            .nav-logo:hover .logo-icon {
+                transform: scale(1.08) !important;
+                clip-path: inset(-5% 68% -5% -5%) !important; /* Keep icon part only */
+                z-index: 10 !important;
+            }
             .nav-logo:hover .logo-text-overlay {
-                transform: scale(1.08) !important; /* Scale specific layers */
-                clip-path: inset(-5% -5% -5% -5%) !important; /* RELAX CLIPPING on hover to prevent edges from cutting */
+                transform: scale(1.08) !important;
+                clip-path: inset(-5% -5% -5% 32%) !important; /* Keep text part only */
                 z-index: 10 !important;
             }
             /* Button Consistency - FIXED COLORS */
@@ -431,38 +435,8 @@ try {
     console.error("Soulamore: Style injection failed", e);
 }
 
-// --- FAVICON MANAGER (Peach Branding) ---
-function setupFavicon(rootPath) {
-    let link = document.querySelector("link[rel~='icon']");
-    if (!link) {
-        link = document.createElement('link');
-        link.rel = 'icon';
-        document.head.appendChild(link);
-    }
 
-    const PEACH = '%23F49F75'; // #F49F75 encoded
-    const path = window.location.pathname;
-
-    // Default Logo (Use Symbol to avoid squeezing)
-    let iconHref = rootPath + 'assets/images/favicon_symbol.png';
-
-    // Special Pages (SVG Data URIs)
-    if (path.includes('vent-box')) {
-        // Fire Icon
-        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M200.3 66.8c12.3-15.8 35.1-15.9 47.6-.2l13.9 17.5c18.5 23.3 54 26.3 76.2 6.5l8.7-7.8c16.3-14.5 41.8-10.7 53.6 7.9 23.3 36.6 63 94.7 44.8 169.3-18.4 75.3-69.8 126.8-132.8 135-66.2 8.6-130.6-32.9-158.7-98.3-25.1-58.4-14.8-119.3 12.3-162.7 10.3-16.5 23-32.1 35.3-48.4zm-14.9 378.6c59.9 8.6 117.9-20.9 146-69.5 26.6-45.9 22.9-106.3-8.8-149.7-8.1-11.1-12.7-22.3-13.6-33.1-6.1 4.5-12.6 8.5-19.4 11.7-29.3 13.7-65 4.9-88.7-19.8-5-5.2-9.6-10.8-13.8-16.9-15.6 27.6-26.6 57.1-32.3 87.7-6.1 33.1.6 66.9 17.5 95.8 19.3 33 55.4 69.4 113.1 93.8z'/></svg>`;
-    } else if (path.includes('confession-box')) {
-        // Ghost Icon
-        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M256 96c31.1 0 61.2 6.7 88.5 19.1 27.3 12.4 51.6 29.8 70.8 50.8 19.2 21 33.5 45.4 42.1 72.1 8.6 26.7 10.6 55 6.1 82.8-5.3 32.8-21.6 62.7-45.1 85.5-23.5 22.7-53.9 36.3-86.3 38.3-1.6.1-3.2.1-4.8.1-18.4 0-36.2-3.8-52.6-10.7-16.3 6.9-34.1 10.7-52.6 10.7-1.6 0-3.3 0-4.9-.1-32.4-1.9-62.8-15.6-86.3-38.3-23.5-22.7-39.8-52.7-45.1-85.5-4.5-27.8-2.5-56.1 6.1-82.8 8.6-26.7 22.9-51.1 42.1-72.1 19.2-21 43.5-38.4 70.8-50.8C194.8 102.7 224.9 96 256 96zm0-32C114.6 64 0 178.6 0 320c0 36.6 7.7 71.3 21.7 103.3C38.4 461.3 75.2 489 119.5 491.5c1.6.1 3.3.1 4.9.1 14.9 0 29.2-2.5 42.8-7.2 4.1-1.4 8.1-3 12-4.8 1.9-2.8 4-5.5 6.3-8.1 18.2-20.7 41.6-35.9 67-43.8 1.1-.3 2.3-.6 3.4-1 25.4 7.9 48.9 23.1 67 43.8 2.3 2.6 4.4 5.3 6.3 8.1 4 1.8 8 3.4 12 4.8 13.6 4.7 27.9 7.2 42.8 7.2 1.6 0 3.3-.1 4.9-.1 44.3-2.5 81-30.2 97.8-68.2C407.5 401.7 416 391.3 416 320 416 178.6 301.4 64 160 64c-32.5 0-63.5 6.1-92.4 17.1-19.1 7.2-36.1 17.6-50.4 30.7z'/></svg>`;
-    } else if (path.includes('renu-dogra')) {
-        // Lotus/Om
-        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M256 160c-52.9 0-96 43.1-96 96s43.1 96 96 96 96-43.1 96-96-43.1-96-96-96zm-17.7-93.5C227.8 77.4 212 96 198.8 113.8c-28.9 39.1-38.3 42.8-49 53.5-32 32-58.3 12.8-58.3 12.8-21.5-13.6-54.8 10-63.2 24.3-9.5 16.2.7 34.6 2.3 37.4 39.4 66.8 95.7 66.8 95.7 66.8 15.6 0 34.4 3.7 34.4 19.3v.1c0 15.6-18.8 19.3-34.4 19.3 0 0-56.3 0-95.7-66.8-1.7-2.8-11.8-21.2-2.3-37.4 8.5-14.3 41.7-37.9 63.2-24.3 0 0 26.3 19.2 58.3-12.8 10.7-10.7 20.1-14.4 49-53.5 13.2-17.8 29-36.4 39.5-47.3 3.9-4.1 10.6-4.1 14.5 0 10.5 10.9 26.3 29.5 39.5 47.3 28.9 39.1 38.3 42.8 49 53.5 32 32 58.3 12.8 58.3 12.8 21.5-13.6 54.8 10 63.2 24.3 9.5 16.2-.7 34.6-2.3 37.4-39.4-66.8-95.7-66.8-95.7-66.8-15.6 0-34.4-3.7-34.4-19.3v-.1c0-15.6 18.8-19.3 34.4-19.3 0 0 56.3 0 95.7 66.8 1.7 2.8 11.8 21.2 2.3 37.4-8.5 14.3-41.7 37.9-63.2 24.3 0 0-26.3 19.2-58.3 12.8-10.7 10.7-20.1 14.4-49 53.5-13.2 17.8-29 36.4-39.5 47.3-3.9 4.1-10.6 4.1-14.5 0z'/></svg>`;
-    } else if (path.includes('5-step-reset')) {
-        // Leaf Icon
-        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M440.5 88.5C397.9 45.3 340.5 24 286 24c-92.6 0-176.4 56.5-212 141.5-17.8 42.5-19.3 90.7-4.1 134.4 15.2 43.7 45.4 79.9 85.3 102.4C195.1 425 242.9 432 288 432c6.2 0 12.5-.2 18.7-.5 47.8-2.6 88-29.4 116.6-66.4 28.6-37 43.1-83.3 40.8-132.8l-.2-3.8c7.8-20.1 13.9-40.8 18.3-62.2 4.4-21.4 6.7 43.2-6.7 43.2 13.4 0 26.8-5.2 37-15.6l9.6 9.6c20.5 20.5 53.6 20.5 74.1 0s20.5-53.6 0-74.1l-68-68c-20.5-20.5-53.6-20.5-74.1 0z'/></svg>`;
-    }
-
-    link.href = iconHref;
-}
+// --- 1. DATA CONFIGURATION ---
 
 // execute setup
 // setupFavicon(rootPath); // MOVED to init function to ensure rootPath is available
@@ -791,50 +765,13 @@ const getFooterHTML = (rootPath) => `
         © 2025 by Hashlilly! All rights reserved. <br>
         <span style="font-size:0.7rem;">Disclaimer: We are not a replacement for professional medical help.</span>
     </div>
-
-    <!-- LIVE NEWS TICKER (Global Integration) -->
-    <div class="news-ticker-container" style="background: rgba(15, 23, 42, 0.95); border-top: 1px solid rgba(244, 159, 117, 0.3); height: 32px; display: flex; align-items: center; overflow: hidden; white-space: nowrap; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999; backdrop-filter: blur(10px); text-align: left !important;">
-        <div class="news-ticker-label" style="background: #F49F75; color: #0f172a; padding: 0 12px; height: 100%; display: flex; align-items: center; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; position: relative; z-index: 2; box-shadow: 10px 0 20px rgba(15, 23, 42, 0.95); flex-shrink: 0;">Live News Feed</div>
-        <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif;">
-            Fetching the latest mental health rituals and global insights...
-        </div>
-    </div>
 </div>
 `;
 
 
 // --- 3. HELPERS ---
 
-function getRootPath() {
-    // 2-Levels Deep Check
-    if (location.pathname.includes('/spaces/campus/') ||
-        location.pathname.includes('/spaces/soulamore-away/') ||
-        location.pathname.includes('/spaces/soulamore-workplace/') ||
-        location.pathname.includes('/spaces/assessments/') ||
-        location.pathname.includes('/our-peers/physical-wellness/') ||
-        location.pathname.includes('/our-peers/academic-wellness/') ||
-        location.pathname.includes('/our-peers/mental-wellness/') ||
-        location.pathname.includes('/our-peers/financial-wellness/') ||
-        location.pathname.includes('/tools/confession-box/')) {
-        return "../../";
-    }
-
-    // 1-Level Deep Check
-    if (location.pathname.includes('/spaces/') ||
-        location.pathname.includes('/join-us/') ||
-        location.pathname.includes('/our-peers/') ||
-        location.pathname.includes('/our-psychologists/') ||
-        location.pathname.includes('/tools/') ||
-        location.pathname.includes('/community/') ||
-        location.pathname.includes('/company/') ||
-        location.pathname.includes('/auth/') ||
-        location.pathname.includes('/portal/') || /* ADDED: Critical for Dashboards/Login */
-        location.pathname.includes('/New Pages/') || location.pathname.includes('/New%20Pages/') || /* FIXED: Support URL encoded space */
-        location.pathname.includes('/pages/')) {
-        return "../";
-    }
-    return "";
-}
+// getRootPath() moved to end for consolidation.
 
 // --- 4. INJECTION LOGIC ---
 
@@ -909,7 +846,43 @@ function injectFooter() {
     }
 }
 
+function injectNewsTicker() {
+    // 1. Remove existing if any
+    const existing = document.querySelector('.news-ticker-container');
+    if (existing) existing.remove();
+
+    // 2. Create high-priority body child
+    const ticker = document.createElement('div');
+    ticker.className = 'news-ticker-container';
+    ticker.style = `
+        background: rgba(15, 23, 42, 0.95); 
+        border-top: 1px solid rgba(244, 159, 117, 0.3); 
+        height: 32px; 
+        display: flex; 
+        align-items: center; 
+        overflow: hidden; 
+        white-space: nowrap; 
+        position: fixed; 
+        bottom: 0; 
+        left: 0; 
+        width: 100%; 
+        z-index: 99998; /* Below mobile toggle but above everything else */
+        backdrop-filter: blur(10px); 
+        text-align: left !important;
+    `;
+
+    ticker.innerHTML = `
+        <div class="news-ticker-label" style="background: #F49F75; color: #0f172a; padding: 0 12px; height: 100%; display: flex; align-items: center; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; position: relative; z-index: 2; box-shadow: 10px 0 20px rgba(15, 23, 42, 0.95); flex-shrink: 0;">Live News Feed</div>
+        <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+            Fetching the latest mental health rituals and global insights...
+        </div>
+    `;
+
+    document.body.appendChild(ticker);
+}
+
 // --- FAVICON INJECTION ---
+// --- FAVICON MANAGER (Peach Branding) ---
 function injectFavicon() {
     let link = document.querySelector("link[rel~='icon']");
     if (!link) {
@@ -918,30 +891,29 @@ function injectFavicon() {
         document.head.appendChild(link);
     }
 
+    const PEACH = '%23F49F75'; // #F49F75 encoded
     const path = window.location.pathname;
-    let iconSVG = '';
+    const rootPath = getRootPath();
 
-    // TEAL: #4ECDC4, PEACH: #F49F75, GOLD: #fbbf24
+    // Default Logo (Use Symbol to avoid squeezing)
+    let iconHref = rootPath + 'assets/images/favicon_symbol.png';
 
-    if (path.includes('soulamore-workplace')) {
-        // WORKPLACE (Briefcase) - PEACH
-        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23F49F75" d="M128 480h256V80c0-26.5-21.5-48-48-48H176c-26.5 0-48 21.5-48 48v400zm64-400h128v32H192V80z"/><path fill="%23F49F75" d="M32 128h448v352H32z"/></svg>`;
-    } else if (path.includes('soulamore-campus')) {
-        // CAMPUS (Grad Cap) - PEACH
-        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="%23F49F75" d="M320 32l-320 160h640L320 32z"/><path fill="%23F49F75" d="M112 256v128c0 70.7 93.1 128 208 128s208-57.3 208-128V256c-34.9 20.3-88.7 32-144 32s-109.1-11.7-144-32z"/></svg>`;
-    } else if (path.includes('physical-wellness') || path.includes('renu-dogra')) {
-        // PHYSICAL/RENU (Lotus/Flower) - Saffron/Orange
-        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23f59e0b" d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0 0 114.6 0 256s114.6 256 256 256zm0-48c-114.9 0-208-93.1-208-208S141.1 48 256 48s208 93.1 208 208-93.1 208-208 208z"/><circle cx="256" cy="256" r="64" fill="white"/></svg>`;
-    } else if (path.includes('soulamore-away')) {
-        // SOULAMORE AWAY (Earth/Globe) - Peach
-        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23F49F75" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256zM208.4 208H16C23.51 113.8 97.23 37.98 191.6 29.35C199.1 63.86 205.1 82.25 208.4 208zM240 208H467.6C458.7 131.6 405.2 68.34 329.8 41.59C341.3 76.84 374.3 125.1 240 208zM492.6 304H272C384.8 322.2 411.3 400.9 414.9 418.5C460.7 391.2 491.5 344.8 496 291.9C495.2 296 493.9 300.1 492.6 304zM240 256H16.37C17.06 268 18.67 279.7 21 291.1C65.57 326.6 96.09 377.9 123.4 468.9C189.9 439.4 235.6 381.1 240 256z"/></svg>`;
+    // Special Pages (SVG Data URIs)
+    if (path.includes('vent-box')) {
+        // Fire Icon
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M200.3 66.8c12.3-15.8 35.1-15.9 47.6-.2l13.9 17.5c18.5 23.3 54 26.3 76.2 6.5l8.7-7.8c16.3-14.5 41.8-10.7 53.6 7.9 23.3 36.6 63 94.7 44.8 169.3-18.4 75.3-69.8 126.8-132.8 135-66.2 8.6-130.6-32.9-158.7-98.3-25.1-58.4-14.8-119.3 12.3-162.7 10.3-16.5 23-32.1 35.3-48.4zm-14.9 378.6c59.9 8.6 117.9-20.9 146-69.5 26.6-45.9 22.9-106.3-8.8-149.7-8.1-11.1-12.7-22.3-13.6-33.1-6.1 4.5-12.6 8.5-19.4 11.7-29.3 13.7-65 4.9-88.7-19.8-5-5.2-9.6-10.8-13.8-16.9-15.6 27.6-26.6 57.1-32.3 87.7-6.1 33.1.6 66.9 17.5 95.8 19.3 33 55.4 69.4 113.1 93.8z'/></svg>`;
+    } else if (path.includes('confession-box')) {
+        // Ghost Icon
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M256 96c31.1 0 61.2 6.7 88.5 19.1 27.3 12.4 51.6 29.8 70.8 50.8 19.2 21 33.5 45.4 42.1 72.1 8.6 26.7 10.6 55 6.1 82.8-5.3 32.8-21.6 62.7-45.1 85.5-23.5 22.7-53.9 36.3-86.3 38.3-1.6.1-3.2.1-4.8.1-18.4 0-36.2-3.8-52.6-10.7-16.3 6.9-34.1 10.7-52.6 10.7-1.6 0-3.3 0-4.9-.1-32.4-1.9-62.8-15.6-86.3-38.3-23.5-22.7-39.8-52.7-45.1-85.5-4.5-27.8-2.5-56.1 6.1-82.8 8.6-26.7 22.9-51.1 42.1-72.1 19.2-21 43.5-38.4 70.8-50.8C194.8 102.7 224.9 96 256 96zm0-32C114.6 64 0 178.6 0 320c0 36.6 7.7 71.3 21.7 103.3C38.4 461.3 75.2 489 119.5 491.5c1.6.1 3.3.1 4.9.1 14.9 0 29.2-2.5 42.8-7.2 4.1-1.4 8.1-3 12-4.8 1.9-2.8 4-5.5 6.3-8.1 18.2-20.7 41.6-35.9 67-43.8 1.1-.3 2.3-.6 3.4-1 25.4 7.9 48.9 23.1 67 43.8 2.3 2.6 4.4 5.3 6.3 8.1 4 1.8 8 3.4 12 4.8 13.6 4.7 27.9 7.2 42.8 7.2 1.6 0 3.3-.1 4.9-.1 44.3-2.5 81-30.2 97.8-68.2C407.5 401.7 416 391.3 416 320 416 178.6 301.4 64 160 64c-32.5 0-63.5 6.1-92.4 17.1-19.1 7.2-36.1 17.6-50.4 30.7z'/></svg>`;
+    } else if (path.includes('renu-dogra')) {
+        // Lotus/Om
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M256 160c-52.9 0-96 43.1-96 96s43.1 96 96 96 96-43.1 96-96-43.1-96-96-96zm-17.7-93.5C227.8 77.4 212 96 198.8 113.8c-28.9 39.1-38.3 42.8-49 53.5-32 32-58.3 12.8-58.3 12.8-21.5-13.6-54.8 10-63.2 24.3-9.5 16.2.7 34.6 2.3 37.4 39.4 66.8 95.7 66.8 95.7 66.8 15.6 0 34.4 3.7 34.4 19.3v.1c0 15.6-18.8 19.3-34.4 19.3 0 0-56.3 0-95.7-66.8-1.7-2.8-11.8-21.2-2.3-37.4 8.5-14.3 41.7-37.9 63.2-24.3 0 0 26.3 19.2 58.3-12.8 10.7-10.7 20.1-14.4 49-53.5 13.2-17.8 29-36.4 39.5-47.3 3.9-4.1 10.6-4.1 14.5 0 10.5 10.9 26.3 29.5 39.5 47.3 28.9 39.1 38.3 42.8 49 53.5 32 32 58.3 12.8 58.3 12.8 21.5-13.6 54.8 10 63.2 24.3 9.5 16.2-.7 34.6-2.3 37.4-39.4-66.8-95.7-66.8-95.7-66.8-15.6 0-34.4-3.7-34.4-19.3v-.1c0-15.6 18.8-19.3 34.4-19.3 0 0 56.3 0 95.7 66.8 1.7 2.8 11.8 21.2 2.3 37.4-8.5 14.3-41.7 37.9-63.2 24.3 0 0-26.3 19.2-58.3 12.8-10.7 10.7-20.1 14.4-49 53.5-13.2 17.8-29 36.4-39.5 47.3-3.9 4.1-10.6 4.1-14.5 0z'/></svg>`;
+    } else if (path.includes('5-step-reset')) {
+        // Leaf Icon
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M440.5 88.5C397.9 45.3 340.5 24 286 24c-92.6 0-176.4 56.5-212 141.5-17.8 42.5-19.3 90.7-4.1 134.4 15.2 43.7 45.4 79.9 85.3 102.4C195.1 425 242.9 432 288 432c6.2 0 12.5-.2 18.7-.5 47.8-2.6 88-29.4 116.6-66.4 28.6-37 43.1-83.3 40.8-132.8l-.2-3.8c7.8-20.1 13.9-40.8 18.3-62.2 4.4-21.4 6.7 43.2-6.7 43.2 13.4 0 26.8-5.2 37-15.6l9.6 9.6c20.5 20.5 53.6 20.5 74.1 0s20.5-53.6 0-74.1l-68-68c-20.5-20.5-53.6-20.5-74.1 0z'/></svg>`;
     }
 
-    // Only override if we have a specific SVG for this section. 
-    // Otherwise, we respect the static <link> tag already present in the HTML.
-    if (iconSVG) {
-        link.href = `data:image/svg+xml,${iconSVG}`;
-    }
+    link.href = iconHref;
 }
 
 // --- 4b. SUB-NAV INJECTION (Layout Shell Binding) ---
@@ -1063,45 +1035,61 @@ function injectCookieBanner() {
 
 // Auto-run subnav and other injections on load
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Core Structural Injections
+    injectHeader(); // RESTORED
+    injectFooter(); // RESTORED
     injectSubnav();
-    injectFavicon(); // ADDED: Fix missing favicons
-    initializeHeaderLogic(); // ADDED: Ensure listener binding
-    bindMobileToggle(); // ADDED: Ensure mobile toggle binding
-    injectSoulBotWidget(); // ADDED: Ensure SoulBot widget injection
-    injectCookieBanner(); // ADDED: GDPR Compliance
-    ensureNewsRenderer(); // Dynamically load news-renderer.js if missing
+    injectFavicon();
 
-    // Auto-init particles if container exists
+    // 2. Interaction & Logic Binding
+    initializeHeaderLogic();
+    bindMobileToggle();
+    injectSoulBotWidget();
+    injectCookieBanner();
+    injectNewsTicker(); // NEW: Injected directly to body for z-index dominance
+    ensureNewsRenderer();
+
+    // 3. Animation & Features
     initParticles();
-
-    // Inject Bottom Nav (Global)
     injectMobileBottomNav();
-
-    // Set Active State
     setActiveState();
-
-    // Auto-init Smart Counters
     initSmartCounters();
 });
 
 /**
- * Unified Path Detection
+ * Unified Path Detection (v3.0)
  * Returns relative path prefix to get to project root from current page.
+ * Correctly handles both hosted (web) and local (file://) environments.
  */
 function getRootPath() {
     const path = window.location.pathname;
+    const isLocal = window.location.protocol === 'file:';
     let prefix = '';
 
-    // Check for standard sub-folders
-    if (path.includes('/spaces/') || path.includes('/tools/') || path.includes('/company/') || path.includes('/community/') || path.includes('/our-peers/') || path.includes('/our-psychologists/') || path.includes('/portal/') || path.includes('/join-us/') || path.includes('/pages/')) {
-        const folderCount = (path.match(/\//g) || []).length;
-        const isLocal = window.location.protocol === 'file:';
-        // Adjustment for local file (pathname includes C:/...) vs hosted
-        const depth = isLocal ? folderCount - 1 : folderCount;
-
-        if (depth >= 3) prefix = '../../';
-        else if (depth >= 2) prefix = '../';
+    // 2-Levels Deep Check
+    if (path.includes('/spaces/campus/') ||
+        path.includes('/spaces/soulamore-away/') ||
+        path.includes('/spaces/soulamore-workplace/') ||
+        path.includes('/spaces/assessments/') ||
+        path.includes('/tools/confession-box/') ||
+        (path.includes('/our-peers/') && path.split('/our-peers/')[1]?.includes('/'))) {
+        return "../../";
     }
+
+    // 1-Level Deep Check
+    if (path.includes('/spaces/') ||
+        path.includes('/tools/') ||
+        path.includes('/company/') ||
+        path.includes('/community/') ||
+        path.includes('/our-peers/') ||
+        path.includes('/our-psychologists/') ||
+        path.includes('/portal/') ||
+        path.includes('/join-us/') ||
+        path.includes('/pages/') ||
+        path.includes('/New Pages/') || path.includes('/New%20Pages/')) {
+        return "../";
+    }
+
     return prefix;
 }
 
@@ -1155,8 +1143,6 @@ function setActiveState() {
 
     findMatch(NAV_DATA);
 }
-
-// --- 6. INTERACTION LOGIC ---
 
 // --- 6. INTERACTION LOGIC ---
 
@@ -1357,6 +1343,7 @@ function injectSoulBotWidget() {
                 color: #0f172a;
                 font-size: 1.8rem;
                 transition: transform 0.3s;
+            }
             #soulbot-widget-fab:hover i { transform: scale(1.1); }
 
             #sb-window {
@@ -1558,13 +1545,7 @@ function injectMobileBottomNav() {
             justify-content: space-around;
             align-items: center;
             padding: 12px 20px;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px 20px;
             z-index: 8000; /* Layer: Below Modal (9999), Above Content */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease;
-        }
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             transition: transform 0.3s ease;
         }
