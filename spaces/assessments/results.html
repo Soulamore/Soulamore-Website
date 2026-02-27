@@ -825,22 +825,25 @@
                 });
             }
 
-            let linksHTML = '';
+            routerLinks.innerHTML = "";
             paths.forEach(p => {
-                linksHTML += `
-                    <a href="${p.url}" class="router-card">
-                        <i class="${p.icon} router-icon" style="color: ${p.color}; text-shadow: 0 0 10px ${p.color}40;"></i>
-                        <div class="router-title">${p.title}</div>
-                        <div style="font-size:0.9rem;opacity:0.7;">${p.desc}</div>
-                    </a>
+                const card = document.createElement('a');
+                card.href = p.url;
+                card.className = "router-card";
+                card.innerHTML = `
+                    <i class="${p.icon} router-icon" style="color: ${p.color}; text-shadow: 0 0 10px ${p.color}40;"></i>
+                    <div class="router-title"></div>
+                    <div style="font-size:0.9rem;opacity:0.7;" class="router-desc"></div>
                 `;
+                card.querySelector('.router-title').textContent = p.title;
+                card.querySelector('.router-desc').textContent = p.desc;
+                routerLinks.appendChild(card);
             });
-            routerLinks.innerHTML = linksHTML;
 
             // --- NEW: IDENTITY REFINEMENT ---
             const leadGenBox = document.getElementById('leadGenBox');
             if (!isAnonymous) {
-                // User already identified, change lead gen to a "Thank You" or "Connect" message
+                // User already identified
                 leadGenBox.innerHTML = `
                     <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--engine-theme); margin-bottom: 20px;"></i>
                     <h3>Got it, <span id="userName"></span>!</h3>
@@ -903,7 +906,19 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
                 const responseText = result.response.text();
 
                 // Inject and Reveal
-                document.getElementById('reflectionContent').innerHTML = responseText.replace(/```html|```/g, ''); // strip markdown blocks
+                // Sanitization Helper
+                function sanitizeHTML(str) {
+                    const temp = document.createElement('div');
+                    temp.textContent = str;
+                    return temp.innerHTML.replace(/&lt;p&gt;/g, '<p>').replace(/&lt;\/p&gt;/g, '</p>')
+                        .replace(/&lt;ul&gt;/g, '<ul>').replace(/&lt;\/ul&gt;/g, '</ul>')
+                        .replace(/&lt;li&gt;/g, '<li>').replace(/&lt;\/li&gt;/g, '</li>')
+                        .replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>')
+                        .replace(/&lt;strong&gt;/g, '<strong>').replace(/&lt;\/strong&gt;/g, '</strong>');
+                }
+
+                const cleanedResponse = responseText.replace(/```html|```/g, '').trim();
+                document.getElementById('reflectionContent').innerHTML = sanitizeHTML(cleanedResponse);
 
                 document.getElementById('loadingState').style.display = 'none';
                 document.getElementById('resultsUI').style.display = 'block';
@@ -988,6 +1003,7 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
 
                 document.getElementById('loadingState').style.display = 'none';
                 document.getElementById('resultsUI').style.display = 'block';
+                // Fallback is hardcoded trustable HTML
                 document.getElementById('reflectionContent').innerHTML = fallbackHTML;
             }
 
@@ -1037,7 +1053,11 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
                     btn.style.display = 'none';
                     status.style.display = 'block';
                     status.style.color = '#10b981';
-                    status.innerHTML = '<i class="fas fa-check-circle"></i> Received. Our team has been alerted.';
+                    status.textContent = ''; // Clear
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-check-circle';
+                    status.appendChild(icon);
+                    status.appendChild(document.createTextNode(' Received. Our team has been alerted.'));
                 } catch (err) {
                     console.error("Lead Gen Error:", err);
                     btn.disabled = false;

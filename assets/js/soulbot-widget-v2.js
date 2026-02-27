@@ -25,7 +25,7 @@
             /* Scoped Styles for SoulBot Widget */
             #soulbot-widget-container {
                 position: fixed;
-                bottom: 100px;
+                bottom: 80px; /* Matched with Play Audio button to avoid ticker overlap comfortably */
                 right: 30px;
                 z-index: 10000; /* High Z-index */
                 font-family: 'Plus Jakarta Sans', sans-serif;
@@ -92,7 +92,7 @@
 
             /* MOBILE TWEAKS */
             @media (max-width: 768px) {
-                #soulbot-widget-container { bottom: 100px !important; right: 20px; }
+                #soulbot-widget-container { bottom: 80px !important; right: 20px; }
                 #sb-window { width: 90vw; right: 5vw; bottom: 120px; height: 60vh; }
             }
         </style>

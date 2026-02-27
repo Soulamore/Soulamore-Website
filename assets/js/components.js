@@ -24,13 +24,13 @@ try {
     style.innerHTML = `
         /* NEWS TICKER GLOBAL ANIMATION */
         @keyframes ticker-scroll {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
         .news-ticker-content {
             display: inline-block !important;
-            padding-left: 100% !important;
-            animation: ticker-scroll 360s linear infinite !important;
+            padding-left: 50px !important;
+            animation: ticker-scroll 40s linear infinite !important; /* Optimized speed to match fetching placeholder */
             white-space: nowrap !important;
         }
         .news-ticker-container:hover .news-ticker-content {
@@ -784,7 +784,7 @@ const getFooterHTML = (rootPath) => `
     </div>
 
     <!-- LIVE NEWS TICKER (Global Integration) -->
-    <div class="news-ticker-container" style="background: rgba(15, 23, 42, 0.95); border-top: 1px solid rgba(244, 159, 117, 0.3); padding: 8px 0; overflow: hidden; white-space: nowrap; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999; backdrop-filter: blur(10px);">
+    <div class="news-ticker-container" style="background: rgba(15, 23, 42, 0.95); border-top: 1px solid rgba(244, 159, 117, 0.3); padding: 8px 0; overflow: hidden; white-space: nowrap; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999; backdrop-filter: blur(10px); text-align: left !important;">
         <div class="news-ticker-label" style="display: inline-block; background: #F49F75; color: #0f172a; padding: 2px 12px; font-weight: 800; font-size: 0.75rem; margin-right: 20px; text-transform: uppercase; position: relative; z-index: 2; box-shadow: 10px 0 20px rgba(15, 23, 42, 0.95);">Live News Feed</div>
         <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.9rem; font-family: 'Plus Jakarta Sans', sans-serif;">
             Fetching the latest mental health rituals and global insights...
@@ -1265,7 +1265,7 @@ function injectSoulBotWidget() {
         <style>
             #soulbot-widget-container {
                 position: fixed;
-                bottom: 40px; /* Desktop: Standard */
+                bottom: 80px; /* Matched with SoulBot Widget V2 and Play Audio button */
                 right: 30px;
                 z-index: 9999;
                 font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1326,7 +1326,7 @@ function injectSoulBotWidget() {
 
             /* MOBILE TWEAKS */
             @media (max-width: 768px) {
-                #soulbot-widget-container { bottom: 220px !important; right: 20px !important; }
+                #soulbot-widget-container { bottom: 80px !important; right: 20px !important; }
                 #sb-window { width: 90vw; right: 5vw; bottom: 280px; height: 50vh; }
             }
         </style>
@@ -1638,7 +1638,48 @@ function initSmartCounters() {
 document.addEventListener('DOMContentLoaded', initSmartCounters);
 
 
-// --- GLOBAL EXPORTS ---
+// --- NAVIGATION LOGIC (SPA Fallback) ---
+window.navTo = function (targetId) {
+    const sections = ['main', 'programs', 'employees', 'financial', 'hr', 'policy'];
+    sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (id === targetId) {
+                el.classList.add('active');
+                el.style.display = 'block';
+                el.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                el.classList.remove('active');
+                el.style.display = 'none';
+            }
+        }
+    });
+
+    // Update subnav active state
+    document.querySelectorAll('.workplace-btn').forEach(btn => {
+        if (btn.getAttribute('data-page') === targetId) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Update hash for deep linking
+    window.location.hash = targetId;
+};
+
+window.handleHash = function () {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+        window.navTo(hash);
+    }
+};
+
+window.addEventListener('popstate', window.handleHash);
+window.addEventListener('load', () => {
+    if (window.location.hash) window.handleHash();
+});
+
 // Fix: Expose toggleMobileMenu for bottom nav usage
 window.toggleMobileMenu = function () {
     // 1. Try Standard Header Toggle First
