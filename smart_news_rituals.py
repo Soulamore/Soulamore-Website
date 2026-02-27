@@ -17,19 +17,38 @@ os.makedirs(KNOWLEDGE_DIR, exist_ok=True)
 
 # Queries that fit Soulamore's vibe
 QUERIES = [
-    "mental health crisis",
-    "student stress exam",
-    "loneliness epidemic",
-    "burnout work",
-    "therapy innovation"
+    "mental health",
+    "emotional wellness",
+    "psychology",
+    "therapy innovation",
+    "self care rituals"
 ]
 
 def fetch_news():
     today = datetime.now()
     last_week = today - timedelta(days=7)
     
-    all_articles = []
+    indian_articles = []
+    global_articles = []
     
+    # 1. Fetch Trending Indian News (Core Focus)
+    try:
+        print("Fetching trending news from India...")
+        india_params = {
+            "country": "in",
+            "apiKey": API_KEY,
+            "pageSize": 50
+        }
+        res = requests.get("https://newsapi.org/v2/top-headlines", params=india_params)
+        res.raise_for_status()
+        data = res.json()
+        if data.get("status") == "ok":
+            indian_articles = data.get("articles", [])
+            print(f"Found {len(indian_articles)} Indian headlines.")
+    except Exception as e:
+        print(f"Error fetching Indian news: {e}")
+
+    # 2. Fetch Global Mental Health News (Expertise)
     for query in QUERIES:
         params = {
             "q": query,
@@ -38,39 +57,60 @@ def fetch_news():
             "sortBy": "relevancy",
             "language": "en",
             "apiKey": API_KEY,
-            "pageSize": 5
+            "pageSize": 10
         }
         try:
-            print(f"Fetching news for: {query}...")
+            print(f"Fetching global news for: {query}...")
             response = requests.get(NEWS_API_URL, params=params)
             response.raise_for_status()
             data = response.json()
             if data.get("status") == "ok":
-                all_articles.extend(data.get("articles", []))
+                global_articles.extend(data.get("articles", []))
         except Exception as e:
-            print(f"Error fetching '{query}': {e}")
+            print(f"Error fetching global '{query}': {e}")
             
-    return all_articles
+    # Combine with 80/20 target
+    # We want ~40 Indian and ~10 Global for a top 50 feed
+    target_total = 50
+    target_india = int(target_total * 0.8)
+    target_global = target_total - target_india
+    
+    final_articles = indian_articles[:target_india] + global_articles[:target_global]
+    
+    # If we don't have enough Indian news, fill with global
+    if len(final_articles) < target_total:
+        remaining = target_total - len(final_articles)
+        final_articles.extend(global_articles[target_global : target_global + remaining])
+        
+    return final_articles
 
 def save_to_knowledge_source(articles):
     if not articles:
         return
         
-    date_str = datetime.now().strftime("%Y-%m-%d")
+    now = datetime.now()
+    year = now.strftime("%Y")
+    month = now.strftime("%m")
+    date_str = now.strftime("%Y-%m-%d")
+    
+    # Structured Archive: Year / Month / news_archive_date.json
+    archive_dir = os.path.join(KNOWLEDGE_DIR, year, month)
+    os.makedirs(archive_dir, exist_ok=True)
+    
     filename = f"news_archive_{date_str}.json"
-    filepath = os.path.join(KNOWLEDGE_DIR, filename)
+    filepath = os.path.join(archive_dir, filename)
     
     with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(articles, f, indent=4)
+        json.dump(articles, f, indent=4, default=str)
     print(f"Archived {len(articles)} articles to {filepath}")
     
     # Also update the LIVE feed for the website
     os.makedirs(os.path.dirname(NEWS_FEED_FILE), exist_ok=True)
     with open(NEWS_FEED_FILE, 'w', encoding='utf-8') as f:
-        # Filter for quality and limit to 20 articles
+        # Filter for quality
         quality_articles = [a for a in articles if a.get('title') and "[Removed]" not in a.get('title')]
-        json.dump(quality_articles[:20], f, indent=4)
-    print(f"Updated live news feed at {NEWS_FEED_FILE}")
+        json.dump(quality_articles, f, indent=4, default=str)
+    print(f"Updated live news feed at {NEWS_FEED_FILE} with {len(quality_articles)} articles.")
 
 def update_rituals(articles):
     if not articles:
