@@ -108,6 +108,7 @@ try {
                 width: 180px !important; /* Estimated width to fit both icon and text */
                 overflow: visible !important; /* FIX: Allow logo to scale on hover without clipping */
             }
+            /* LOGO SYSTEM (Universal Positioning with Desktop Hover Scalability) */
             .logo-icon {
                 height: 100% !important;
                 width: auto !important;
@@ -116,7 +117,7 @@ try {
                 position: absolute !important;
                 left: 0 !important;
                 z-index: 2 !important;
-                transition: transform 0.3s ease !important; /* ADDED transition */
+                transition: transform 0.3s ease !important;
             }
             .logo-text-overlay {
                 height: 100% !important;
@@ -127,18 +128,21 @@ try {
                 filter: brightness(0) invert(1) !important; /* Make white */
                 clip-path: inset(0 0 0 32%) !important; /* Show only text part */
                 z-index: 1 !important;
-                transition: transform 0.3s ease !important; /* ADDED transition */
+                transition: transform 0.3s ease !important;
             }
-            .nav-logo:hover .logo-icon {
-                transform: scale(1.08) !important;
-                clip-path: inset(-5% 68% -5% -5%) !important; /* Keep icon part only */
-                z-index: 10 !important;
-            }
-            .nav-logo:hover .logo-text-overlay {
-                transform: scale(1.08) !important;
-                clip-path: inset(-5% -5% -5% 32%) !important; /* Keep text part only */
-                z-index: 10 !important;
-            }
+            
+            @media (min-width: 1025px) {
+                .nav-logo:hover .logo-icon {
+                    transform: scale(1.08) !important;
+                    clip-path: inset(-5% 68% -5% -5%) !important; /* Keep icon part only */
+                    z-index: 10 !important;
+                }
+                .nav-logo:hover .logo-text-overlay {
+                    transform: scale(1.08) !important;
+                    clip-path: inset(-5% -5% -5% 32%) !important; /* Keep text part only */
+                    z-index: 10 !important;
+                }
+                /* ...rest of desktop styles... */
             /* Button Consistency - FIXED COLORS */
             .nav-btn, .lifeline-btn {
                 background: linear-gradient(135deg, #4ECDC4, #2a9d8f) !important; /* BRAND GRADIENT */
@@ -424,8 +428,13 @@ try {
         }
         
         /* MOBILE GLOBAL FIXES */
-        @media (max-width: 768px) {
-            body { padding-bottom: 80px !important; } /* Space for FAB/Nav */
+        @media (max-width: 1024px) {
+            header.island-nav {
+                background: rgba(15, 23, 42, 0.98) !important;
+                backdrop-filter: blur(20px) !important;
+                border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+            }
+            body { padding-bottom: 90px !important; } /* Space for Floating Nav/Ticker */
             .container { padding-left: 20px !important; padding-right: 20px !important; }
         }
     `;
@@ -1545,9 +1554,9 @@ function injectMobileBottomNav() {
             justify-content: space-around;
             align-items: center;
             padding: 12px 20px;
-            z-index: 8000; /* Layer: Below Modal (9999), Above Content */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease;
+            z-index: 100001; /* Layer: ABOVE everything else including news ticker */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
        /* HIDE NAV WHEN MOBILE MENU IS OPEN */
