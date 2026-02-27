@@ -126,11 +126,6 @@ try {
                 margin-left: -5px; /* Slight overlap for tight branding */
             }
 
-            @media (max-width: 1024px) {
-                .logo-text-overlay { display: none !important; } /* Simplify to Icon Only on Mobile Header */
-                .logo-wrapper { width: 48px !important; }
-            }
-
             @media (min-width: 1025px) {
                 .logo-icon {
                     clip-path: inset(0 68% 0 0) !important;
@@ -151,6 +146,12 @@ try {
                     transform: scale(1.08) !important;
                     clip-path: inset(-5% -5% -5% 32%) !important;
                 }
+            }
+
+            /* MOBILE (Width <= 1024px) */
+            @media (max-width: 1024px) {
+                .logo-text-overlay { display: none !important; } /* Simplify to Icon Only on Mobile Header */
+                .logo-wrapper { width: 48px !important; }
             }
             /* Button Consistency - FIXED COLORS */
             .nav-btn, .lifeline-btn {
@@ -1516,14 +1517,6 @@ function injectMobileBottomNav() {
             <i class="fas fa-robot" style="color:#4ECDC4;"></i>
             <span>Chat</span>
         </button>
-        <a href="${pathPrefix}index.html" class="nav-item ${location.pathname.endsWith('index.html') && depth < 2 ? 'active' : ''}">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </a>
-        <button class="nav-item" onclick="if(window.toggleWidget) window.toggleWidget(); else alert('SoulBot initializing...');">
-            <i class="fas fa-robot" style="color:#4ECDC4;"></i>
-            <span>Chat</span>
-        </button>
         <a href="${pathPrefix}get-help-now.html" class="nav-item ${location.pathname.includes('get-help-now') ? 'active' : ''}">
             <i class="fas fa-heart-pulse" style="color:#ef4444;"></i>
             <span>Crisis</span>
@@ -1623,8 +1616,8 @@ function injectMobileBottomNav() {
             transform: translateY(-2px);
         }
 
-        /* MOBILE AUDIO BUTTON REFINEMENT */
-        @media (max-width: 900px) {
+        /* MOBILE UI REFINEMENTS (Width <= 1024px) */
+        @media (max-width: 1024px) {
             .audio-control {
                 width: 50px !important;
                 height: 50px !important;
@@ -1634,7 +1627,7 @@ function injectMobileBottomNav() {
                 justify-content: center !important;
                 border-radius: 50% !important;
                 left: 20px !important;
-                bottom: 155px !important; /* Floating above nav pill */
+                bottom: 160px !important; /* Floating safely above nav pill */
                 background: rgba(15, 23, 42, 0.9) !important;
                 border: 2px solid #F49F75 !important;
                 box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important;
@@ -1649,7 +1642,7 @@ function injectMobileBottomNav() {
                 color: #F49F75;
                 font-size: 1.2rem;
             }
-            #soulbot-widget-fab { display: none !important; }
+            #soulbot-widget-fab { display: none !important; visibility: hidden !important; }
             #sb-window { bottom: 140px !important; }
         }
 
