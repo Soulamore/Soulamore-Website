@@ -84,11 +84,32 @@ try {
                 align-items: center;
                 margin-right: 10px !important; /* Add small breathing room */
             }
-            .nav-logo img {
-                height: 40px !important;
+            .logo-wrapper {
+                display: flex !important;
+                align-items: center !important;
+                height: 48px !important;
+                position: relative !important;
+                width: 180px !important; /* Estimated width to fit both icon and text */
+                overflow: hidden !important;
+            }
+            .logo-icon {
+                height: 100% !important;
                 width: auto !important;
-                flex-shrink: 0 !important; /* Critical: Prevent logo img shrinking */
-                object-fit: contain;
+                object-fit: contain !important;
+                clip-path: inset(0 68% 0 0) !important; /* Show only peach heart */
+                position: absolute !important;
+                left: 0 !important;
+                z-index: 2 !important;
+            }
+            .logo-text-overlay {
+                height: 100% !important;
+                width: auto !important;
+                object-fit: contain !important;
+                position: absolute !important;
+                left: 0 !important;
+                filter: brightness(0) invert(1) !important; /* Make white */
+                clip-path: inset(0 0 0 32%) !important; /* Show only text part */
+                z-index: 1 !important;
             }
             /* Button Consistency - FIXED COLORS */
             .nav-btn, .lifeline-btn {
@@ -146,6 +167,27 @@ try {
                 width: auto !important;
                 height: auto !important;
                 line-height: 1 !important;
+            }
+            /* NEWS TICKER ANIMATION */
+            @keyframes ticker-scroll {
+                0% { transform: translateX(100%); }
+                100% { transform: translateX(-100%); }
+            }
+            .news-ticker-content {
+                display: inline-block !important;
+                padding-left: 100% !important;
+                animation: ticker-scroll 30s linear infinite !important;
+                white-space: nowrap !important;
+            }
+            .news-ticker-container:hover .news-ticker-content {
+                animation-play-state: paused !important;
+            }
+            /* Ensure logo looks good on desktop */
+            .logo-wrapper {
+                display: flex !important;
+                align-items: center !important;
+                height: 48px !important;
+                position: relative !important;
             }
         }
         /* MOBILE (Width <= 1024px) */
@@ -622,7 +664,10 @@ function generateSubmenuHTML(children, rootPath) {
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
-        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; width: auto; max-width: 100%;">
+        <div class="logo-wrapper">
+            <img src="${rootPath}assets/images/logo.png" class="logo-icon" alt="">
+            <img src="${rootPath}assets/images/logo.png" class="logo-text-overlay" alt="Soulamore">
+        </div>
     </a>
 
     <nav class="nav-links">
@@ -735,6 +780,14 @@ const getFooterHTML = (rootPath) => `
     <div class="footer-bottom" style="margin-top:50px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); text-align:center; font-size:0.8rem; opacity:0.4;">
         © 2025 by Hashlilly! All rights reserved. <br>
         <span style="font-size:0.7rem;">Disclaimer: We are not a replacement for professional medical help.</span>
+    </div>
+
+    <!-- LIVE NEWS TICKER (Global Integration) -->
+    <div class="news-ticker-container" style="background: rgba(15, 23, 42, 0.95); border-top: 1px solid rgba(244, 159, 117, 0.3); padding: 8px 0; overflow: hidden; white-space: nowrap; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999; backdrop-filter: blur(10px);">
+        <div class="news-ticker-label" style="display: inline-block; background: #F49F75; color: #0f172a; padding: 2px 12px; font-weight: 800; font-size: 0.75rem; margin-right: 20px; text-transform: uppercase; position: relative; z-index: 2; box-shadow: 10px 0 20px rgba(15, 23, 42, 0.95);">Live News Feed</div>
+        <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.9rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+            Fetching the latest mental health rituals and global insights...
+        </div>
     </div>
 </div>
 `;
@@ -1506,6 +1559,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Guard Footer Injection: Do not inject on Auth pages (Viewport Scenes)
     if (typeof injectFooter === 'function') injectFooter();
     initParticles(); // Auto-init particles if container exists
+
+    // Auto-init News Ticker (Global)
+    if (document.getElementById('news-ticker') && typeof initNewsFeed === 'function') {
+        initNewsFeed('news-ticker', 10);
+    }
 
     // Original Initialization steps (retained)
     try { injectSoulBotWidget(); } catch (e) { console.error("SoulBot Widget Failed:", e); }

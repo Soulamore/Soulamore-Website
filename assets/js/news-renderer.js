@@ -30,10 +30,27 @@ async function initNewsFeed(containerId, limit = 6) {
         }
 
         renderArticles(container, articles.slice(0, limit));
+
+        // Populate Global Ticker if it exists
+        const ticker = document.getElementById('news-ticker');
+        if (ticker) {
+            renderTicker(ticker, articles);
+        }
     } catch (error) {
         console.error("News Load Error:", error);
         container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">Stay tuned. Live news feed is refreshing.</p>';
     }
+}
+
+function renderTicker(ticker, articles) {
+    // Combine all headlines into a single scrolling string
+    const tickerContent = articles.map(article =>
+        `<a href="${article.url}" target="_blank" style="color: #e2e8f0; text-decoration: none; margin-right: 50px; transition: color 0.3s;">
+            <span style="color: #4ECDC4;">•</span> ${article.title}
+         </a>`
+    ).join('');
+
+    ticker.innerHTML = tickerContent + tickerContent; // Duplicate for seamless looping
 }
 
 function renderArticles(container, articles) {
