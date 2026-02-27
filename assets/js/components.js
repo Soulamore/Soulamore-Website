@@ -148,10 +148,11 @@ try {
                 }
             }
 
-            /* MOBILE (Width <= 1024px) */
+            /* MOBILE LOGO (Width <= 1024px) - Unified Rule */
             @media (max-width: 1024px) {
-                .logo-text-overlay { display: none !important; } /* Simplify to Icon Only on Mobile Header */
-                .logo-wrapper { width: 48px !important; }
+                .logo-text-overlay { display: none !important; visibility: hidden !important; } 
+                .logo-icon { clip-path: none !important; position: static !important; height: 35px !important; }
+                .logo-wrapper { width: 45px !important; min-width: 45px !important; }
             }
             /* Button Consistency - FIXED COLORS */
             .nav-btn, .lifeline-btn {
@@ -1559,22 +1560,22 @@ function injectMobileBottomNav() {
     style.innerHTML = `
         .mobile-bottom-nav {
             position: fixed;
-            bottom: 90px; /* HIGHER to avoid News Ticker overlap completely */
+            bottom: 90px;
             left: 50%;
             transform: translateX(-50%);
-            width: 92%;
-            max-width: 400px;
-            background: rgba(15, 23, 42, 0.95);
+            width: 92%; /* MATCH TOP HEADER WIDTH EXACTLY */
+            max-width: 1600px;
+            background: rgba(15, 23, 42, 0.9);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 50px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 12px 20px;
-            z-index: 100001; /* Layer: ABOVE everything else including news ticker */
+            padding: 10px 15px;
+            z-index: 100001;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
        /* HIDE NAV WHEN MOBILE MENU IS OPEN */
@@ -1589,16 +1590,16 @@ function injectMobileBottomNav() {
         }
 
         .nav-item {
+            flex: 1; /* EQUAL SPACING */
             display: flex;
             flex-direction: column;
             align-items: center;
             text-decoration: none;
             color: #94a3b8;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             gap: 4px;
             transition: all 0.2s;
             cursor: pointer;
-            /* Button Reset */
             background: none;
             border: none;
             padding: 0;
@@ -1619,30 +1620,29 @@ function injectMobileBottomNav() {
         /* MOBILE UI REFINEMENTS (Width <= 1024px) */
         @media (max-width: 1024px) {
             .audio-control {
-                width: 50px !important;
-                height: 50px !important;
-                padding: 0 !important;
+                width: auto !important;
+                height: 42px !important;
+                padding: 0 16px !important;
                 display: flex !important;
                 align-items: center !important;
-                justify-content: center !important;
-                border-radius: 50% !important;
+                gap: 10px !important;
+                border-radius: 50px !important;
                 left: 20px !important;
-                bottom: 160px !important; /* Floating safely above nav pill */
+                bottom: 155px !important; /* Above wide nav bar */
                 background: rgba(15, 23, 42, 0.9) !important;
-                border: 2px solid #F49F75 !important;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important;
+                border: 1px solid #F49F75 !important;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.5) !important;
             }
-            .audio-control #audioText, .audio-control .audio-bars {
-                display: none !important;
+            .audio-control #audioText {
+                display: block !important;
+                font-size: 0.85rem !important;
+                font-weight: 600 !important;
+                color: white !important;
             }
-            .audio-control::after {
-                content: '\f001'; /* FontAwesome Music Icon */
-                font-family: 'Font Awesome 5 Free';
-                font-weight: 900;
-                color: #F49F75;
-                font-size: 1.2rem;
+            .audio-control .audio-bars {
+                display: flex !important;
             }
-            #soulbot-widget-fab { display: none !important; visibility: hidden !important; }
+            #soulbot-widget-fab { display: none !important; visibility: hidden !important; pointer-events: none !important; }
             #sb-window { bottom: 140px !important; }
         }
 
