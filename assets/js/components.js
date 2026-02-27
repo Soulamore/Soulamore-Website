@@ -30,7 +30,7 @@ try {
         .news-ticker-content {
             display: inline-block !important;
             padding-left: 50px !important;
-            animation: ticker-scroll 40s linear infinite !important; /* Optimized speed to match fetching placeholder */
+            animation: ticker-scroll 80s linear infinite !important; /* Slowed down further for readability */
             white-space: nowrap !important;
         }
         .news-ticker-container:hover .news-ticker-content {
