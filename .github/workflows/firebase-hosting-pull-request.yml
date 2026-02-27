@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: FirebaseExtended/action-hosting-deploy@v0
-        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SOULAMORE_F0A64 != '' }}
+        if: github.event_name != 'pull_request' || secrets.FIREBASE_SERVICE_ACCOUNT_SOULAMORE_F0A64 != null
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SOULAMORE_F0A64 }}
