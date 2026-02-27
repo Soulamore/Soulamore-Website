@@ -1150,7 +1150,7 @@
                         <p class="card-desc">${test.description}</p>
                         <div class="card-meta">
                             <span><i class="far fa-clock"></i> ~5 mins</span>
-                            <a href="engine.html?test=${test.id}" class="card-btn">Begin Journey <i class="fas fa-arrow-right"></i></a>
+                            <a href="landing.html?id=${test.id}" class="card-btn">Explore Journey <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </div>
 
@@ -1295,6 +1295,29 @@
                 });
             } catch (e) { console.error("Could not load clinical citations", e); }
         }
+        // Initialize
+        renderAssessments('all');
+        renderActiveFilters();
+
+        // Inject ItemList Schema for SEO
+        (function injectIndexSchema() {
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "ItemList",
+                "name": "Soulamore Personal Emotional Assessments",
+                "description": "A comprehensive directory of clinical-grade emotional assessments for anxiety, burnout, relationships, and more.",
+                "itemListElement": Object.keys(window.SoulamoreAssessments || {}).map((id, index) => ({
+                    "@type": "ListItem",
+                    "position": index + 1,
+                    "url": `https://soulamore.com/spaces/assessments/landing.html?id=${id}`,
+                    "name": window.SoulamoreAssessments[id] ? window.SoulamoreAssessments[id].title : "Assessment"
+                }))
+            };
+            script.text = JSON.stringify(schema);
+            document.head.appendChild(script);
+        })();
     </script>
 </body>
 
