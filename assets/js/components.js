@@ -106,7 +106,8 @@ try {
                 display: flex !important;
                 align-items: center !important;
                 height: 48px !important;
-                width: 180px !important;
+                width: auto !important;
+                min-width: 48px !important;
                 overflow: visible !important;
                 text-decoration: none;
             }
@@ -114,28 +115,38 @@ try {
                 height: 100% !important;
                 width: auto !important;
                 object-fit: contain !important;
-                clip-path: inset(0 68% 0 0) !important; /* Icon part */
-                position: absolute !important;
-                left: 0 !important;
                 z-index: 2 !important;
-                transition: transform 0.3s ease !important;
             }
             .logo-text-overlay {
                 height: 100% !important;
                 width: auto !important;
                 object-fit: contain !important;
-                position: absolute !important;
-                left: 0 !important;
                 filter: brightness(0) invert(1) !important; /* White */
-                clip-path: inset(0 0 0 32%) !important; /* Text part */
                 z-index: 1 !important;
-                transition: transform 0.3s ease !important;
+                margin-left: -5px; /* Slight overlap for tight branding */
+            }
+
+            @media (max-width: 1024px) {
+                .logo-text-overlay { display: none !important; } /* Simplify to Icon Only on Mobile Header */
+                .logo-wrapper { width: 48px !important; }
             }
 
             @media (min-width: 1025px) {
-                .logo-wrapper:hover .logo-icon {
-                    transform: scale(1.08) !important;
+                .logo-icon {
+                    clip-path: inset(0 68% 0 0) !important;
+                    position: absolute !important;
+                    left: 0 !important;
+                    transition: transform 0.3s ease !important;
                 }
+                .logo-text-overlay {
+                    display: block !important;
+                    position: absolute !important;
+                    left: 0 !important;
+                    clip-path: inset(0 0 0 32%) !important;
+                    transition: transform 0.3s ease !important;
+                }
+                .logo-wrapper { width: 180px !important; }
+                .logo-wrapper:hover .logo-icon { transform: scale(1.08) !important; }
                 .logo-wrapper:hover .logo-text-overlay {
                     transform: scale(1.08) !important;
                     clip-path: inset(-5% -5% -5% 32%) !important;
@@ -1505,9 +1516,13 @@ function injectMobileBottomNav() {
             <i class="fas fa-robot" style="color:#4ECDC4;"></i>
             <span>Chat</span>
         </button>
-        <button class="nav-item" onclick="if(window.toggleMusic) window.toggleMusic(); else alert('Audio initializing...');">
-            <i class="fas fa-music" style="color:#F49F75;"></i>
-            <span>Music</span>
+        <a href="${pathPrefix}index.html" class="nav-item ${location.pathname.endsWith('index.html') && depth < 2 ? 'active' : ''}">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <button class="nav-item" onclick="if(window.toggleWidget) window.toggleWidget(); else alert('SoulBot initializing...');">
+            <i class="fas fa-robot" style="color:#4ECDC4;"></i>
+            <span>Chat</span>
         </button>
         <a href="${pathPrefix}get-help-now.html" class="nav-item ${location.pathname.includes('get-help-now') ? 'active' : ''}">
             <i class="fas fa-heart-pulse" style="color:#ef4444;"></i>
@@ -1608,8 +1623,32 @@ function injectMobileBottomNav() {
             transform: translateY(-2px);
         }
 
-        /* HIDE FLOATING FAB ON MOBILE - INTEGRATED INTO NAV */
+        /* MOBILE AUDIO BUTTON REFINEMENT */
         @media (max-width: 900px) {
+            .audio-control {
+                width: 50px !important;
+                height: 50px !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+                left: 20px !important;
+                bottom: 155px !important; /* Floating above nav pill */
+                background: rgba(15, 23, 42, 0.9) !important;
+                border: 2px solid #F49F75 !important;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important;
+            }
+            .audio-control #audioText, .audio-control .audio-bars {
+                display: none !important;
+            }
+            .audio-control::after {
+                content: '\f001'; /* FontAwesome Music Icon */
+                font-family: 'Font Awesome 5 Free';
+                font-weight: 900;
+                color: #F49F75;
+                font-size: 1.2rem;
+            }
             #soulbot-widget-fab { display: none !important; }
             #sb-window { bottom: 140px !important; }
         }
