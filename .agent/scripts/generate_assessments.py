@@ -5,7 +5,7 @@ import time
 import google.generativeai as genai
 
 # Configure Google Gemini API
-api_key = "AIzaSyCIt5CSNvqf1g8sE6eiUbfn_w1J2qhqDTQ"
+api_key = os.environ.get("GEMINI_API_KEY")
 
 genai.configure(api_key=api_key)
 

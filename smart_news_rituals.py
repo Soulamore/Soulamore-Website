@@ -7,9 +7,11 @@ API_KEY = "e6ffb12e8abc4005bcedf37ed19e8161"
 NEWS_API_URL = "https://newsapi.org/v2/everything"
 
 # Paths
-BASE_DIR = r"C:\Users\adity\Desktop\Projects\Soulamore-Website"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = SCRIPT_DIR
 KNOWLEDGE_DIR = os.path.join(BASE_DIR, "knowledge source", "news sourced")
 RITUALS_FILE = os.path.join(BASE_DIR, "assets", "data", "rituals.json")
+NEWS_FEED_FILE = os.path.join(BASE_DIR, "assets", "data", "news-feed.json")
 
 os.makedirs(KNOWLEDGE_DIR, exist_ok=True)
 
@@ -61,6 +63,14 @@ def save_to_knowledge_source(articles):
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(articles, f, indent=4)
     print(f"Archived {len(articles)} articles to {filepath}")
+    
+    # Also update the LIVE feed for the website
+    os.makedirs(os.path.dirname(NEWS_FEED_FILE), exist_ok=True)
+    with open(NEWS_FEED_FILE, 'w', encoding='utf-8') as f:
+        # Filter for quality and limit to 20 articles
+        quality_articles = [a for a in articles if a.get('title') and "[Removed]" not in a.get('title')]
+        json.dump(quality_articles[:20], f, indent=4)
+    print(f"Updated live news feed at {NEWS_FEED_FILE}")
 
 def update_rituals(articles):
     if not articles:

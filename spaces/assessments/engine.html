@@ -151,10 +151,10 @@
         /* --- QUESTION TEXT --- */
         .question-text {
             font-family: 'Outfit', sans-serif;
-            font-size: 2.5rem;
+            font-size: clamp(1.4rem, 6vw, 2.5rem);
             font-weight: 300;
             line-height: 1.3;
-            margin-bottom: 50px;
+            margin-bottom: 5vw;
             color: var(--starlight);
         }
 
@@ -195,8 +195,9 @@
             background: var(--engine-theme);
             color: var(--deep-space);
             border-color: var(--engine-theme);
-            transform: scale(1.02);
-            font-weight: 600;
+            transform: scale(1.02) translateX(5px);
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(var(--engine-theme-rgb, 78, 205, 196), 0.4);
         }
 
         .indicator-key {
@@ -217,8 +218,9 @@
         }
 
         .option-btn.selected .indicator-key {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.15);
             color: var(--deep-space);
+            box-shadow: none;
         }
 
         /* --- NAVIGATION BUTTONS --- */
@@ -257,12 +259,13 @@
             background: var(--engine-theme);
             color: var(--deep-space);
             border-color: var(--engine-theme);
-            font-weight: 600;
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(var(--engine-theme-rgb, 78, 205, 196), 0.3);
         }
 
         .nav-btn.primary:hover:not(:disabled) {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 20px rgba(var(--engine-theme-rgb, 78, 205, 196), 0.4);
         }
 
         .nav-btn:disabled {
@@ -373,6 +376,52 @@
             opacity: 1;
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--engine-theme);
+        }
+
+        @media(max-width: 600px) {
+            .engine-container {
+                padding: 15px;
+                justify-content: flex-start;
+                padding-top: 80px;
+            }
+
+            .exit-btn {
+                top: 20px;
+                left: 20px;
+                font-size: 1.2rem;
+            }
+
+            .option-btn {
+                padding: 15px 18px;
+                font-size: 0.95rem;
+                gap: 10px;
+                border-radius: 12px;
+            }
+
+            .indicator-key {
+                padding: 3px 8px;
+                font-size: 0.7rem;
+                min-width: 25px;
+            }
+
+            .nav-bar {
+                margin-top: 30px;
+                padding-top: 15px;
+            }
+
+            .nav-btn {
+                padding: 10px 18px;
+                font-size: 0.9rem;
+            }
+
+            /* Tooltip adjustment */
+            .q-clinical-popup {
+                bottom: auto;
+                top: 130%;
+                width: 240px;
+                left: 50%;
+                transform: translateX(-50%) translateY(-10px);
+            }
         }
 
         .q-clinical-popup {
@@ -490,6 +539,49 @@
                 transform: translateX(5px);
             }
         }
+
+        /* --- ID SCREEN STYLES --- */
+        .id-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .id-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 15px 20px;
+            color: white;
+            font-family: 'Outfit';
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .id-input:focus {
+            outline: none;
+            border-color: var(--engine-theme);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .skip-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Outfit';
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 20px;
+            text-decoration: underline;
+            transition: 0.3s;
+        }
+
+        .skip-btn:hover {
+            color: var(--starlight);
+        }
     </style>
     <link rel="icon" href="../../assets/images/favicon_symbol.png" type="image/x-icon">
 </head>
@@ -517,9 +609,31 @@
             <p style="opacity:0.7; font-size:1.1rem; margin-bottom: 40px; max-width:500px; margin-left:auto; margin-right:auto;"
                 id="introDesc">Take a deep breath. There are no right or wrong answers. Just observation.</p>
             <button class="option-btn" style="justify-content:center; max-width:200px; margin:0 auto;"
-                onclick="startEngine()">
+                onclick="goToIdScreen()">
                 Begin <i class="fas fa-arrow-right"></i>
             </button>
+        </div>
+
+        <!-- Identification Screen (Optional) -->
+        <div class="screen" id="screen-id">
+            <h2 class="question-text">Identify Yourself (Optional)</h2>
+            <p
+                style="opacity:0.7; font-size:1.0rem; margin-bottom: 30px; max-width:500px; margin-left:auto; margin-right:auto;">
+                This helps us analyze your patterns and suggest personalized Peer Therapy companions.
+                Your data remains under your control.
+            </p>
+            <form class="id-form" onsubmit="saveIdAndStart(event)">
+                <input type="text" id="userName" name="name" class="id-input" placeholder="Full Name"
+                    autocomplete="name">
+                <input type="email" id="userEmail" name="email" class="id-input" placeholder="Email Address"
+                    autocomplete="email">
+                <input type="tel" id="userPhone" name="phone" class="id-input" placeholder="Phone Number"
+                    autocomplete="tel">
+                <button type="submit" class="nav-btn primary" style="width:100%; justify-content:center;">
+                    Start Assessment
+                </button>
+            </form>
+            <button class="skip-btn" onclick="startEngine(true)">Stay Anonymous & Start</button>
         </div>
 
         <!-- Dynamic Question Screen Template -->
@@ -540,6 +654,7 @@
     </div>
 
     <!-- REQUIRED SDKS & DATA -->
+    <script type="module" src="../../assets/js/firebase-config.js"></script>
     <script src="../../assets/js/assessment-data.js"></script>
     <script>
         // --- ENGINE STATE ---
@@ -547,6 +662,7 @@
         let currentQuestionIndex = 0;
         let userResponses = [];
         let temporarySelectionIndex = null;
+        let userIdentity = { anonymous: true };
 
         // Keyboard mappings A-D
         const keyMap = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -566,6 +682,16 @@
                 // Set Custom Theme
                 const themeColor = assessmentData.theme_color || '#4ECDC4';
                 document.documentElement.style.setProperty('--engine-theme', themeColor);
+
+                // Helper to set RGB for glow
+                const hexToRgb = (hex) => {
+                    const r = parseInt(hex.slice(1, 3), 16);
+                    const g = parseInt(hex.slice(3, 5), 16);
+                    const b = parseInt(hex.slice(5, 7), 16);
+                    return `${r}, ${g}, ${b}`;
+                };
+                document.documentElement.style.setProperty('--engine-theme-rgb', hexToRgb(themeColor));
+
                 document.getElementById('ambientBg').style.background = `radial-gradient(circle at 50% 50%, ${themeColor}10 0%, transparent 60%)`;
 
                 // Set Intro Text
@@ -595,9 +721,30 @@
         }
 
         // --- CORE PROCESS ---
-        function startEngine() {
-            switchScreen('screen-intro', 'screen-question');
+        function startEngine(anonymous = false) {
+            if (anonymous) {
+                userIdentity = { anonymous: true };
+                switchScreen('screen-id', 'screen-question');
+            } else {
+                // If not anonymous, it's called from saveIdAndStart
+                switchScreen('screen-id', 'screen-question');
+            }
             renderQuestion(currentQuestionIndex);
+        }
+
+        function goToIdScreen() {
+            switchScreen('screen-intro', 'screen-id');
+        }
+
+        function saveIdAndStart(e) {
+            e.preventDefault();
+            userIdentity = {
+                anonymous: false,
+                name: document.getElementById('userName').value || 'Anonymous',
+                email: document.getElementById('userEmail').value || null,
+                phone: document.getElementById('userPhone').value || null
+            };
+            startEngine(false);
         }
 
         function renderQuestion(index) {
@@ -718,7 +865,7 @@
         }
 
         // --- FINISH & SCORE CALCULATION ---
-        function finishAssessment() {
+        async function finishAssessment() {
             // Calculate final score
             let raw_score = 0;
             let risk_flags = 0;
@@ -750,11 +897,13 @@
                 finalBand.risk_category = "high";
             }
 
-            // 3. Construct Structured Output for Gemini
+            // 3. Construct Structured Output for Gemini & DB
             const structuredResult = {
                 assessment_id: assessmentData.id,
+                test_title: assessmentData.title,
                 timestamp: new Date().toISOString(),
                 domain: assessmentData.questions[0].domain, // Primary domain
+                user_identity: userIdentity,
                 deterministic_metrics: {
                     raw_score: raw_score,
                     max_possible: assessmentData.scoring.max_possible,
@@ -766,8 +915,27 @@
                 responses: userResponses // For sub-domain cluster analysis
             };
 
-            // 4. Save to Session Storage (Safe, cleared on close, not server DB yet)
+            // 4. Save to Session Storage
             sessionStorage.setItem('soulamore_assessment_result', JSON.stringify(structuredResult));
+
+            // 5. Save to Firebase (FIRE AND FORGET)
+            try {
+                const { db, collection, addDoc, serverTimestamp } = await import("../../assets/js/firebase-config.js");
+                if (db) {
+                    const docData = {
+                        ...structuredResult,
+                        db_timestamp: serverTimestamp()
+                    };
+
+                    // Categorized Path: test_results (Root) -> Test ID (Category) -> entries (Sub-collection)
+                    const docRef = await addDoc(collection(db, "test_results", assessmentData.id, "entries"), docData);
+
+                    console.log("Assessment stored in categorized path with ID:", docRef.id);
+                    sessionStorage.setItem('soulamore_last_assessment_id', docRef.id);
+                }
+            } catch (err) {
+                console.warn("Database storage failed, continuing with session data.", err);
+            }
 
             // Neural loading cinematic delay
             setTimeout(() => {

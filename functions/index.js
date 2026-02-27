@@ -12,6 +12,7 @@ const Razorpay = require('razorpay');
 const allowedOrigins = [
   'https://soulamore-f0a64.web.app',
   'https://soulamore-f0a64.firebaseapp.com',
+  'https://soulamore.com',
   'https://www.soulamore.com', // Assuming custom domain
   'http://localhost:5000',     // Local testing
   'http://127.0.0.1:5500'      // VS Code Live Server

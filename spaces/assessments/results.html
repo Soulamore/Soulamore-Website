@@ -340,6 +340,172 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(78, 205, 196, 0.2);
         }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media(max-width: 900px) {
+            h1 {
+                font-size: clamp(2rem, 8vw, 3rem);
+            }
+
+            .container {
+                padding: 60px 20px;
+            }
+
+            .score-banner {
+                flex-wrap: wrap;
+                gap: 20px;
+                padding: 24px;
+            }
+
+            .metric-box {
+                flex: 1 1 40%;
+            }
+
+            .reflection-block {
+                padding: 30px 24px;
+                font-size: 1rem;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .header-section {
+                margin-bottom: 30px;
+            }
+
+            .score-banner {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                padding: 20px 15px;
+            }
+
+            .metric-box {
+                flex: none;
+                width: 100%;
+            }
+
+            .metric-box h4 {
+                font-size: 0.75rem;
+            }
+
+            .metric-box .metric-val {
+                font-size: 1.4rem;
+            }
+
+            .severity-badge {
+                font-size: 0.8rem;
+                padding: 4px 12px;
+            }
+
+            .reflection-block {
+                padding: 24px 20px;
+                border-radius: 16px;
+                border-left-width: 3px;
+                font-size: 0.95rem;
+                line-height: 1.7;
+            }
+
+            .router-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .router-card {
+                padding: 24px;
+            }
+
+            .router-icon {
+                font-size: 1.6rem;
+            }
+
+            .router-title {
+                font-size: 1.1rem;
+            }
+
+            .lead-gen-box {
+                padding: 24px 20px;
+            }
+
+            .lead-gen-box h3 {
+                font-size: 1.3rem;
+            }
+
+            .lead-input {
+                padding: 12px;
+                font-size: 16px;
+                /* Prevents auto-zoom on iOS */
+            }
+
+            #escalationUI {
+                padding: 40px 20px;
+            }
+
+            #escalationUI h2 {
+                font-size: 1.8rem;
+            }
+
+            #escalationUI p {
+                font-size: 1rem;
+            }
+        }
+
+        /* --- NEW: SHARE & PREMIUM STYLES --- */
+        .results-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin: 40px 0;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-glass);
+        }
+
+        .share-section {
+            text-align: center;
+        }
+
+        .share-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .share-btn {
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 1px solid var(--border-glass);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--starlight);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .share-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+            border-color: var(--engine-theme);
+        }
+
+        .premium-incentive {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(244, 159, 117, 0.1));
+            border: 1px dashed var(--engine-theme);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .premium-incentive i {
+            font-size: 1.5rem;
+            color: var(--gold-glow);
+        }
     </style>
 </head>
 
@@ -375,10 +541,13 @@
                 <h3 style="color: #ef4444;">Prefer we reach out?</h3>
                 <p style="opacity: 0.8; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">Leave your details below.
                     Our human team—peers or psychologists—will be alerted immediately.</p>
-                <form class="lead-form" id="crisisLeadForm">
-                    <input type="text" id="crisisName" class="lead-input" placeholder="Name or Alias (Optional)">
-                    <input type="email" id="crisisEmail" class="lead-input" placeholder="Email Address (Optional)">
-                    <input type="tel" id="crisisPhone" class="lead-input" placeholder="Phone Number (Optional)">
+                <form class="id-form" id="crisisLeadForm">
+                    <input type="text" id="crisisName" name="name" class="id-input"
+                        placeholder="Name or Alias (Optional)" autocomplete="name">
+                    <input type="email" id="crisisEmail" name="email" class="id-input"
+                        placeholder="Email Address (Optional)" autocomplete="email">
+                    <input type="tel" id="crisisPhone" name="phone" class="id-input"
+                        placeholder="Phone Number (Optional)" autocomplete="tel">
                     <button type="submit" class="lead-btn" id="crisisSubmitBtn"
                         style="background: #ef4444; color: white;">Alert Support Team</button>
                     <div id="crisisStatus" style="font-size: 0.85rem; margin-top: 10px; display: none;"></div>
@@ -421,18 +590,50 @@
                 <!-- Dynamically populated based on severity -->
             </div>
 
-            <!-- LEAD GEN FORM -->
-            <div class="lead-gen-box" id="leadGenBox">
-                <h3>Want personalized matching?</h3>
-                <p style="opacity: 0.8; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">Allow our team to review
-                    your anonymous pattern and match you with the perfect Peer Listener or Psychologist.</p>
-                <form class="lead-form" id="assessmentLeadForm">
-                    <input type="text" id="leadName" class="lead-input" placeholder="Your First Name" required>
-                    <input type="email" id="leadEmail" class="lead-input" placeholder="Your Email Address" required>
-                    <input type="tel" id="leadPhone" class="lead-input" placeholder="Phone Number (Optional)">
-                    <button type="submit" class="lead-btn" id="leadSubmitBtn">Find My Match</button>
-                    <div id="leadStatus" style="font-size: 0.85rem; margin-top: 10px; display: none;"></div>
-                </form>
+            <div class="results-actions">
+                <!-- SHARE SECTION -->
+                <div class="share-section">
+                    <h4 style="font-family: 'Outfit'; font-size: 1.2rem; opacity: 0.8;">Share Your Psychological
+                        Signature</h4>
+                    <div class="share-grid">
+                        <button onclick="shareResults('twitter')" class="share-btn">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </button>
+                        <button onclick="shareResults('instagram')" class="share-btn">
+                            <i class="fab fa-instagram"></i> Instagram
+                        </button>
+                        <button onclick="shareResults('copy')" class="share-btn">
+                            <i class="fas fa-link"></i> Copy Link
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LEAD GEN FORM (Premium Version) -->
+                <div class="lead-gen-box" id="leadGenBox">
+                    <div class="premium-incentive">
+                        <i class="fas fa-file-medical-alt"></i>
+                        <div>
+                            <strong>Get Your Deep-Dive Clinical Report</strong><br>
+                            We'll send a 12-page PDF breakdown of your results, including citation analysis and recovery
+                            roadmap.
+                        </div>
+                    </div>
+                    <h3>Want personalized professional matching?</h3>
+                    <p style="opacity: 0.8; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">Allow our team to
+                        review
+                        your anonymous pattern and match you with the perfect Peer Listener or Psychologist.</p>
+                    <form class="id-form" id="assessmentLeadForm">
+                        <input type="text" id="leadName" name="name" class="id-input" placeholder="Your First Name"
+                            required autocomplete="given-name">
+                        <input type="email" id="leadEmail" name="email" class="id-input"
+                            placeholder="Your Email Address" required autocomplete="email">
+                        <input type="tel" id="leadPhone" name="phone" class="id-input"
+                            placeholder="Phone Number (Optional)" autocomplete="tel">
+                        <button type="submit" class="nav-btn primary" id="leadSubmitBtn"
+                            style="width: 100%; margin-top: 10px;">Send My Report & Find Match</button>
+                        <div id="leadStatus" style="font-size: 0.85rem; margin-top: 10px; display: none;"></div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -594,6 +795,36 @@
             }
 
             const paths = getRecommendedPaths(data.domain, metrics.severity_band);
+
+            // --- NEW: ANONYMOUS ADAPTATION ---
+            const isAnonymous = data.user_identity && data.user_identity.anonymous;
+            if (isAnonymous) {
+                // Ensure Confession Box and Problem Wall are present for anonymous users
+                const anonymousTools = [
+                    {
+                        url: "../../tools/confession-box/index.html",
+                        icon: "fas fa-ghost",
+                        title: "Confession Box",
+                        desc: "Anonymously share what you cannot say. Perfect for staying private.",
+                        color: "#f87171"
+                    },
+                    {
+                        url: "../../tools/problem-wall.html",
+                        icon: "fas fa-layer-group",
+                        title: "The Problem Wall",
+                        desc: "See how others navigate stress anonymously.",
+                        color: "#60a5fa"
+                    }
+                ];
+
+                // Append if not already there
+                anonymousTools.forEach(tool => {
+                    if (!paths.some(p => p.url === tool.url)) {
+                        paths.unshift(tool); // Put at the beginning
+                    }
+                });
+            }
+
             let linksHTML = '';
             paths.forEach(p => {
                 linksHTML += `
@@ -605,6 +836,17 @@
                 `;
             });
             routerLinks.innerHTML = linksHTML;
+
+            // --- NEW: IDENTITY REFINEMENT ---
+            const leadGenBox = document.getElementById('leadGenBox');
+            if (!isAnonymous) {
+                // User already identified, change lead gen to a "Thank You" or "Connect" message
+                leadGenBox.innerHTML = `
+                    <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--engine-theme); margin-bottom: 20px;"></i>
+                    <h3>Got it, ${data.user_identity.name.split(' ')[0]}!</h3>
+                    <p style="opacity: 0.8; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">We have your contact details. Our team is reviewing your pattern and will reach out with your personalized peer matching soon.</p>
+                `;
+            }
 
             // 5. THE SAFETY GATE
             if (metrics.escalation_required) {
@@ -777,6 +1019,7 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
                     raw_score: metrics.raw_score,
                     risk_flags: metrics.functional_impairment,
                     escalation_required: metrics.escalation_required,
+                    assessment_result_id: sessionStorage.getItem('soulamore_last_assessment_id') || null,
                     submittedAt: new Date().toISOString()
                 };
 
@@ -815,6 +1058,22 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
             if (crisisForm) {
                 crisisForm.addEventListener('submit', (e) => submitLeadData(e, 'crisisName', 'crisisEmail', 'crisisPhone', 'crisisSubmitBtn', 'crisisStatus'));
             }
+
+            // --- SHARE FUNCTIONALITY ---
+            window.shareResults = function (platform) {
+                const text = `I just mapped my emotional signature on Soulamore. My ${data.title} intensity is ${metrics.raw_score}/${metrics.max_possible}. Explore your own inner landscape at:`;
+                const url = window.location.origin + window.location.pathname.replace('results.html', 'landing.html') + '?id=' + data.assessment_id;
+
+                if (platform === 'twitter') {
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+                } else if (platform === 'instagram') {
+                    alert('To share on Instagram: Save your results as a screenshot and tag @Soulamore!');
+                } else if (platform === 'copy') {
+                    navigator.clipboard.writeText(`${text} ${url}`).then(() => {
+                        alert('Link copied to clipboard!');
+                    });
+                }
+            };
         });
     </script>
 </body>
