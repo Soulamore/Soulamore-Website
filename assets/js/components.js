@@ -22,6 +22,21 @@ try {
     const style = document.createElement('style');
     style.id = 'header-styles-v2'; // Changed ID to force refresh/avoid conflicts
     style.innerHTML = `
+        /* NEWS TICKER GLOBAL ANIMATION */
+        @keyframes ticker-scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .news-ticker-content {
+            display: inline-block !important;
+            padding-left: 100% !important;
+            animation: ticker-scroll 360s linear infinite !important;
+            white-space: nowrap !important;
+        }
+        .news-ticker-container:hover .news-ticker-content {
+            animation-play-state: paused !important;
+        }
+
         /* DESKTOP (Width > 1024px) */
         @media (min-width: 1025px) {
             header {
@@ -84,11 +99,32 @@ try {
                 align-items: center;
                 margin-right: 10px !important; /* Add small breathing room */
             }
-            .nav-logo img {
-                height: 40px !important;
+            .logo-wrapper {
+                display: flex !important;
+                align-items: center !important;
+                height: 48px !important;
+                position: relative !important;
+                width: 180px !important; /* Estimated width to fit both icon and text */
+                overflow: hidden !important;
+            }
+            .logo-icon {
+                height: 100% !important;
                 width: auto !important;
-                flex-shrink: 0 !important; /* Critical: Prevent logo img shrinking */
-                object-fit: contain;
+                object-fit: contain !important;
+                clip-path: inset(0 68% 0 0) !important; /* Show only peach heart */
+                position: absolute !important;
+                left: 0 !important;
+                z-index: 2 !important;
+            }
+            .logo-text-overlay {
+                height: 100% !important;
+                width: auto !important;
+                object-fit: contain !important;
+                position: absolute !important;
+                left: 0 !important;
+                filter: brightness(0) invert(1) !important; /* Make white */
+                clip-path: inset(0 0 0 32%) !important; /* Show only text part */
+                z-index: 1 !important;
             }
             /* Button Consistency - FIXED COLORS */
             .nav-btn, .lifeline-btn {
@@ -146,6 +182,13 @@ try {
                 width: auto !important;
                 height: auto !important;
                 line-height: 1 !important;
+            }
+            /* Ensure logo looks good on desktop */
+            .logo-wrapper {
+                display: flex !important;
+                align-items: center !important;
+                height: 48px !important;
+                position: relative !important;
             }
         }
         /* MOBILE (Width <= 1024px) */
@@ -531,6 +574,13 @@ const NAV_DATA = [
         ]
     },
     {
+        id: 'nav-assessments',
+        label: 'Assessments',
+        icon: 'fas fa-brain',
+        href: 'spaces/assessments/index.html',
+        type: 'link',
+    },
+    {
         id: 'nav-community',
         label: 'Community',
         icon: 'fas fa-users',
@@ -615,7 +665,10 @@ function generateSubmenuHTML(children, rootPath) {
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
-        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; width: auto; max-width: 100%;">
+        <div class="logo-wrapper">
+            <img src="${rootPath}assets/images/logo.png" class="logo-icon" alt="">
+            <img src="${rootPath}assets/images/logo.png" class="logo-text-overlay" alt="Soulamore">
+        </div>
     </a>
 
     <nav class="nav-links">
@@ -685,6 +738,18 @@ const getFooterHTML = (rootPath) => `
             </ul>
         </div>
 
+        <!-- ASSESSMENTS COLUMN -->
+        <div class="footer-col">
+            <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Assessments</h4>
+            <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}spaces/assessments/index.html" style="color:var(--peach-glow); font-weight:600;">Assessment Library</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=burnout_career">Burnout & Career</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=anxiety_overthinking">Anxiety & Stress</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=emotional_regulation">Emotional Regulation</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=relationship_patterns">Relationship Patterns</a></li>
+            </ul>
+        </div>
+
         <!-- SPACES COLUMN -->
         <div class="footer-col">
             <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Community</h4>
@@ -703,6 +768,7 @@ const getFooterHTML = (rootPath) => `
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
                 <!-- <li><a href="${rootPath}tools/index.html">Tools</a></li> Removed: Dead Link -->
                 <li><a href="${rootPath}newsletter.html">Newsletter</a></li>
+                <li><a href="${rootPath}company/press.html">Press & Media Kit</a></li>
                 <li><a href="${rootPath}company/why-soulamore-exists.html">Why Soulamore Exists</a></li>
                 <li><a href="${rootPath}company/contact.html">Contact</a></li>
                 <li><a href="${rootPath}company/legal.html">Privacy & Legal</a></li>
@@ -716,6 +782,14 @@ const getFooterHTML = (rootPath) => `
         © 2025 by Hashlilly! All rights reserved. <br>
         <span style="font-size:0.7rem;">Disclaimer: We are not a replacement for professional medical help.</span>
     </div>
+
+    <!-- LIVE NEWS TICKER (Global Integration) -->
+    <div class="news-ticker-container" style="background: rgba(15, 23, 42, 0.95); border-top: 1px solid rgba(244, 159, 117, 0.3); padding: 8px 0; overflow: hidden; white-space: nowrap; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999; backdrop-filter: blur(10px);">
+        <div class="news-ticker-label" style="display: inline-block; background: #F49F75; color: #0f172a; padding: 2px 12px; font-weight: 800; font-size: 0.75rem; margin-right: 20px; text-transform: uppercase; position: relative; z-index: 2; box-shadow: 10px 0 20px rgba(15, 23, 42, 0.95);">Live News Feed</div>
+        <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.9rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+            Fetching the latest mental health rituals and global insights...
+        </div>
+    </div>
 </div>
 `;
 
@@ -726,7 +800,8 @@ function getRootPath() {
     // 2-Levels Deep Check
     if (location.pathname.includes('/spaces/campus/') ||
         location.pathname.includes('/spaces/soulamore-away/') ||
-        location.pathname.includes('/spaces/soulamore-workplace/') || /* ADDED LINE */
+        location.pathname.includes('/spaces/soulamore-workplace/') ||
+        location.pathname.includes('/spaces/assessments/') ||
         location.pathname.includes('/our-peers/physical-wellness/') ||
         location.pathname.includes('/our-peers/academic-wellness/') ||
         location.pathname.includes('/our-peers/mental-wellness/') ||
@@ -1190,7 +1265,7 @@ function injectSoulBotWidget() {
         <style>
             #soulbot-widget-container {
                 position: fixed;
-                bottom: 100px;
+                bottom: 40px; /* Desktop: Standard */
                 right: 30px;
                 z-index: 9999;
                 font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1199,8 +1274,8 @@ function injectSoulBotWidget() {
                 align-items: flex-end;
             }
             #soulbot-widget-fab {
-                width: 60px;
-                height: 60px;
+                width: 55px;
+                height: 55px;
                 background: var(--teal-glow, #4ECDC4);
                 border-radius: 50%;
                 display: flex;
@@ -1251,8 +1326,8 @@ function injectSoulBotWidget() {
 
             /* MOBILE TWEAKS */
             @media (max-width: 768px) {
-                #soulbot-widget-container { bottom: 160px !important; right: 20px; }
-                #sb-window { width: 90vw; right: 5vw; bottom: 120px; height: 60vh; }
+                #soulbot-widget-container { bottom: 220px !important; right: 20px !important; }
+                #sb-window { width: 90vw; right: 5vw; bottom: 280px; height: 50vh; }
             }
         </style>
         
@@ -1485,6 +1560,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Guard Footer Injection: Do not inject on Auth pages (Viewport Scenes)
     if (typeof injectFooter === 'function') injectFooter();
     initParticles(); // Auto-init particles if container exists
+
+    // Auto-init News Ticker (Global)
+    if (document.getElementById('news-ticker') && typeof initNewsFeed === 'function') {
+        initNewsFeed('news-ticker', 10);
+    }
 
     // Original Initialization steps (retained)
     try { injectSoulBotWidget(); } catch (e) { console.error("SoulBot Widget Failed:", e); }

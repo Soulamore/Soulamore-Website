@@ -1,0 +1,44 @@
+name: Update Mental Health News
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '0 */12 * * *' # Every 12 hours
+  push:
+    branches:
+      - aditya
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run News Sync Script
+        run: python smart_news_rituals.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "Soulamore Bot"
+          git config --global user.email "bot@soulamore.com"
+          # Stage files only if they exist
+          git add assets/data/news-feed.json || true
+          git add assets/data/rituals.json || true
+          # Add any existing archive JSONs
+          find "knowledge source/news sourced" -name "*.json" | xargs -r git add || true
+          git commit -m "chore: dynamic news update [skip ci]" || echo "No changes to commit"
+          git push

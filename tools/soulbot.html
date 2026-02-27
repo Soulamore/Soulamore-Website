@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../assets/images/favicon_symbol.png">
-    <title>SoulBot | Soulamore</title>
+    <title>SoulBot | Anonymous AI Mental Health Companion India</title>
+    <meta name="description"
+        content="Meet SoulBot, India's first anonymous AI mental health companion. Get instant emotional support, anxiety relief, and clinical guidance without judgment. 2026 AI Wellness leader.">
+    <meta name="keywords"
+        content="AI mental health, AI therapist India, anonymous emotional support, SoulBot, Soulamore, mental wellness AI">
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -549,38 +553,52 @@
                 </div>
             </div>
 
-            <footer></footer>
-        </main>
-    </div>
+            <!-- SCHEMAS -->
+            <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "SoulBot",
+        "operatingSystem": "Web",
+        "applicationCategory": "HealthApplication",
+        "description": "An anonymous AI mental health companion providing emotional support and clinical guidance.",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "INR"
+        }
+    }
+    </script>
+            <script src="../assets/js/components.js"></script>
 
-    <!-- SCRIPTS -->
-    <script src="../assets/js/components.js"></script>
-    <script src="../assets/js/soulbot-visuals.js"></script>
+            <!-- SCRIPTS -->
+            <script src="../assets/js/components.js"></script>
+            <script src="../assets/js/soulbot-visuals.js"></script>
 
-    <script type="module">
-        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+            <script type="module">
+                import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-        // --- CONFIGURATION ---
-        // --- CONFIGURATION ---
-        // IMPORTANT: API key is injected during CI/CD build from environment variable
-        // For local development, run: GEMINI_API_KEY=your_key ./scripts/inject-api-key.sh
-        const API_KEY = "YOUR_GEMINI_API_KEY_HERE"; // Placeholder - replaced during build/development
-        const genAI = new GoogleGenerativeAI(API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+                // --- CONFIGURATION ---
+                // --- CONFIGURATION ---
+                // IMPORTANT: API key is injected during CI/CD build from environment variable
+                // For local development, run: GEMINI_API_KEY=your_key ./scripts/inject-api-key.sh
+                const API_KEY = "YOUR_GEMINI_API_KEY_HERE"; // Placeholder - replaced during build/development
+                const genAI = new GoogleGenerativeAI(API_KEY);
+                const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-        // --- INTERNAL DATABASE (FOR MATCHING) ---
-        const peers = [
-            { name: "Aditya", tags: ["anxiety", "stress", "work", "overthinking"], role: "Peer Listener" },
-            { name: "Lakshit", tags: ["expat", "lonely", "moving", "abroad", "home"], role: "Expat Peer" },
-            { name: "Renu", tags: ["body", "pain", "health", "yoga", "breathing"], role: "Yoga Instructor" }
-        ];
+                // --- INTERNAL DATABASE (FOR MATCHING) ---
+                const peers = [
+                    { name: "Aditya", tags: ["anxiety", "stress", "work", "overthinking"], role: "Peer Listener" },
+                    { name: "Lakshit", tags: ["expat", "lonely", "moving", "abroad", "home"], role: "Expat Peer" },
+                    { name: "Renu", tags: ["body", "pain", "health", "yoga", "breathing"], role: "Yoga Instructor" }
+                ];
 
-        const psychs = [
-            { name: "Dr. Sharma", tags: ["depression", "trauma", "deep", "therapy"], role: "Clinical Psychologist" }
-        ];
+                const psychs = [
+                    { name: "Dr. Sharma", tags: ["depression", "trauma", "deep", "therapy"], role: "Clinical Psychologist" }
+                ];
 
-        // --- SYSTEM PROMPT ---
-        const SYSTEM_INSTRUCTION = `
+                // --- SYSTEM PROMPT ---
+                const SYSTEM_INSTRUCTION = `
             You are SoulBot, a calm, emotionally intelligent reflection companion by Soulamore.
             
             TONE:
@@ -604,137 +622,137 @@
             - If user mentions suicide, self-harm, or killing themselves, reply ONLY with: "CRISIS_ALERT". Do not say anything else.
         `;
 
-        // --- STATE ---
-        let chatHistory = [];
+                // --- STATE ---
+                let chatHistory = [];
 
-        // --- UI FUNCTIONS ---
-        window.switchView = function (viewId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + viewId).classList.add('active');
-            if (viewId === 'chat' && chatHistory.length === 0) {
-                setTimeout(() => addBotMessage("You don’t have to explain everything perfectly. Just start where you are."), 600);
-            }
-        };
+                // --- UI FUNCTIONS ---
+                window.switchView = function (viewId) {
+                    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+                    document.getElementById('view-' + viewId).classList.add('active');
+                    if (viewId === 'chat' && chatHistory.length === 0) {
+                        setTimeout(() => addBotMessage("You don’t have to explain everything perfectly. Just start where you are."), 600);
+                    }
+                };
 
-        function scrollToBottom() {
-            const box = document.getElementById('chatBox');
-            box.scrollTop = box.scrollHeight;
-        }
-
-        function addBotMessage(text) {
-            const div = document.createElement('div');
-            div.className = 'message msg-bot';
-            div.innerHTML = text.replace(/\n/g, '<br>');
-            document.getElementById('chatBox').appendChild(div);
-            scrollToBottom();
-            chatHistory.push({ role: "model", parts: [{ text: text }] });
-        }
-
-        function addUserMessage(text) {
-            const div = document.createElement('div');
-            div.className = 'message msg-user';
-            div.innerText = text;
-            document.getElementById('chatBox').appendChild(div);
-            scrollToBottom();
-            chatHistory.push({ role: "user", parts: [{ text: text }] });
-        }
-
-        function showTyping(show) {
-            document.getElementById('typingInd').style.display = show ? 'block' : 'none';
-            scrollToBottom();
-        }
-
-        window.autoResize = function (el) {
-            el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px';
-        };
-
-        window.handleEnter = function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        };
-
-        // --- INTELLIGENCE ENGINE ---
-        window.sendMessage = async function () {
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            input.value = "";
-            input.style.height = 'auto';
-            addUserMessage(text);
-
-            // 1. SAFETY CHECK (Client Side First Line of Defense)
-            const crisisKeywords = ['suicide', 'kill myself', 'die', 'end it all', 'self harm'];
-            if (crisisKeywords.some(w => text.toLowerCase().includes(w))) {
-                renderCrisisCard();
-                return;
-            }
-
-            // 2. CONTEXT MATCHING (Internal Ecosystem)
-            const lowerText = text.toLowerCase();
-            let resourceCard = null;
-
-            // Check Peers
-            const matchedPeer = peers.find(p => p.tags.some(tag => lowerText.includes(tag)));
-            if (matchedPeer) {
-                resourceCard = createCard(matchedPeer.name, matchedPeer.role, `/peer/${matchedPeer.name.toLowerCase()}`);
-            }
-
-            // Check Psych
-            if (lowerText.includes("therapy") || lowerText.includes("psychologist") || lowerText.includes("depression")) {
-                resourceCard = createCard("Dr. Sharma", "Clinical Psychologist", "/join-psychologist");
-            }
-
-            // 3. API CALL
-            showTyping(true);
-            try {
-                const chat = model.startChat({
-                    history: [
-                        { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
-                        { role: "model", parts: [{ text: "Understood. I am ready." }] },
-                        ...chatHistory
-                    ]
-                });
-
-                const result = await chat.sendMessage(text);
-                const response = result.response.text();
-
-                showTyping(false);
-
-                if (response.includes("CRISIS_ALERT")) {
-                    renderCrisisCard();
-                } else {
-                    addBotMessage(response);
-                    if (resourceCard) document.getElementById('chatBox').appendChild(resourceCard);
+                function scrollToBottom() {
+                    const box = document.getElementById('chatBox');
+                    box.scrollTop = box.scrollHeight;
                 }
 
-            } catch (error) {
-                showTyping(false);
-                addBotMessage("I'm having trouble connecting to the cloud. But I'm still here listening.");
-                console.error(error);
-            }
-        };
+                function addBotMessage(text) {
+                    const div = document.createElement('div');
+                    div.className = 'message msg-bot';
+                    div.innerHTML = text.replace(/\n/g, '<br>');
+                    document.getElementById('chatBox').appendChild(div);
+                    scrollToBottom();
+                    chatHistory.push({ role: "model", parts: [{ text: text }] });
+                }
 
-        // --- COMPONENT RENDERERS ---
-        function renderCrisisCard() {
-            const div = document.createElement('div');
-            div.className = 'crisis-alert';
-            div.innerHTML = `
+                function addUserMessage(text) {
+                    const div = document.createElement('div');
+                    div.className = 'message msg-user';
+                    div.innerText = text;
+                    document.getElementById('chatBox').appendChild(div);
+                    scrollToBottom();
+                    chatHistory.push({ role: "user", parts: [{ text: text }] });
+                }
+
+                function showTyping(show) {
+                    document.getElementById('typingInd').style.display = show ? 'block' : 'none';
+                    scrollToBottom();
+                }
+
+                window.autoResize = function (el) {
+                    el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px';
+                };
+
+                window.handleEnter = function (e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                };
+
+                // --- INTELLIGENCE ENGINE ---
+                window.sendMessage = async function () {
+                    const input = document.getElementById('userInput');
+                    const text = input.value.trim();
+                    if (!text) return;
+
+                    input.value = "";
+                    input.style.height = 'auto';
+                    addUserMessage(text);
+
+                    // 1. SAFETY CHECK (Client Side First Line of Defense)
+                    const crisisKeywords = ['suicide', 'kill myself', 'die', 'end it all', 'self harm'];
+                    if (crisisKeywords.some(w => text.toLowerCase().includes(w))) {
+                        renderCrisisCard();
+                        return;
+                    }
+
+                    // 2. CONTEXT MATCHING (Internal Ecosystem)
+                    const lowerText = text.toLowerCase();
+                    let resourceCard = null;
+
+                    // Check Peers
+                    const matchedPeer = peers.find(p => p.tags.some(tag => lowerText.includes(tag)));
+                    if (matchedPeer) {
+                        resourceCard = createCard(matchedPeer.name, matchedPeer.role, `/peer/${matchedPeer.name.toLowerCase()}`);
+                    }
+
+                    // Check Psych
+                    if (lowerText.includes("therapy") || lowerText.includes("psychologist") || lowerText.includes("depression")) {
+                        resourceCard = createCard("Dr. Sharma", "Clinical Psychologist", "/join-psychologist");
+                    }
+
+                    // 3. API CALL
+                    showTyping(true);
+                    try {
+                        const chat = model.startChat({
+                            history: [
+                                { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
+                                { role: "model", parts: [{ text: "Understood. I am ready." }] },
+                                ...chatHistory
+                            ]
+                        });
+
+                        const result = await chat.sendMessage(text);
+                        const response = result.response.text();
+
+                        showTyping(false);
+
+                        if (response.includes("CRISIS_ALERT")) {
+                            renderCrisisCard();
+                        } else {
+                            addBotMessage(response);
+                            if (resourceCard) document.getElementById('chatBox').appendChild(resourceCard);
+                        }
+
+                    } catch (error) {
+                        showTyping(false);
+                        addBotMessage("I'm having trouble connecting to the cloud. But I'm still here listening.");
+                        console.error(error);
+                    }
+                };
+
+                // --- COMPONENT RENDERERS ---
+                function renderCrisisCard() {
+                    const div = document.createElement('div');
+                    div.className = 'crisis-alert';
+                    div.innerHTML = `
                 <div style="font-size:1.5rem; margin-bottom:10px;">❤️</div>
                 <strong>I hear how much pain you are in.</strong><br>
                 Please, let's keep you safe.<br><br>
                 <a href="tel:14416" style="display:inline-block; background:var(--alert-red); color:white; padding:10px 20px; border-radius:30px; text-decoration:none; font-weight:700;">📞 Call Tele-MANAS (14416)</a>
             `;
-            document.getElementById('chatBox').appendChild(div);
-            scrollToBottom();
-        }
+                    document.getElementById('chatBox').appendChild(div);
+                    scrollToBottom();
+                }
 
-        function createCard(name, role, link) {
-            const div = document.createElement('div');
-            div.className = 'suggestion-card';
-            div.innerHTML = `
+                function createCard(name, role, link) {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-card';
+                    div.innerHTML = `
                 <div class="card-avatar">${name[0]}</div>
                 <div>
                     <div style="font-weight:700; color:white;">${name}</div>
@@ -742,10 +760,10 @@
                 </div>
                 <i class="fas fa-chevron-right" style="margin-left:auto; opacity:0.5;"></i>
             `;
-            div.onclick = () => alert(`Redirecting to ${name}'s profile...`); // In real app, use window.location
-            return div;
-        }
-    </script>
+                    div.onclick = () => alert(`Redirecting to ${name}'s profile...`); // In real app, use window.location
+                    return div;
+                }
+            </script>
 </body>
 
 </html>

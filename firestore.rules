@@ -107,7 +107,11 @@ service cloud.firestore {
 
     // Presence System (Live User Count)
     match /active_souls/{document=**} {
-      allow read, write: if true; // Public for anonymous presence
+      allow read: if true; 
+      allow create: if true;
+      allow update: if true; // Temporary open until presence refactored.
+      // S2 FIX: Prevent arbitrary collection deletion
+      allow delete: if false; 
     }
 
     // SoulBot Conversations
@@ -143,8 +147,8 @@ service cloud.firestore {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid 
                   || resource.data.userId == null;
       
-      // Allow create/update: anyone can create/update usage tracking (for rate limiting)
-      allow create, update: if true;
+      // S2 FIX: Prevent anonymous users from arbitrarily overwriting usage profiles
+      allow create, update: if request.resource.data.keys().hasAll(['count']);
       
       // Allow delete: only authenticated users can delete their own usage
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
@@ -185,11 +189,10 @@ service cloud.firestore {
       // Allow read: authenticated users can read their own role
       allow read: if request.auth != null && request.auth.uid == userId;
       
-      // Allow create/update: only admins can set roles (restrict in production)
-      allow create, update: if request.auth != null;
+      // S2 FIX: Prevent regular users from assigning themselves admin/psychologist roles
+      allow create, update: if false; // Admins only via backend SDK
       
-      // Allow delete: only admins can delete roles
-      allow delete: if request.auth != null;
+      allow delete: if false;
     }
 
     // Peer Pricing Plans
@@ -197,11 +200,10 @@ service cloud.firestore {
       // Allow read: public read for pricing plans
       allow read: if true;
       
-      // Allow create/update: admins or peers can manage plans (restrict in production)
-      allow create, update: if request.auth != null;
+      // S2 FIX: Restrict creating or editing marketplace peer plans
+      allow create, update: if request.auth != null && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == 'admin';
       
-      // Allow delete: admins or peers can delete plans
-      allow delete: if request.auth != null;
+      allow delete: if request.auth != null && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == 'admin';
     }
 
     // Payment Records

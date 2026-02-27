@@ -19,11 +19,22 @@
     <link rel="stylesheet" href="../assets/css/global.css">
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            overflow-x: hidden;
+            /* Prevent horizontal scrolling on mobile */
+        }
+
         body {
             background-color: #0f172a;
         }
 
         .post-container {
+            width: 100%;
             max-width: 800px;
             margin: 0 auto;
             padding: 40px 20px 80px;
@@ -148,20 +159,20 @@
         .engagement-bar {
             position: fixed;
             left: calc(50% - 520px);
-            /* Position to left of content */
             top: 250px;
             display: flex;
             flex-direction: column;
             gap: 20px;
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(10px);
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(12px);
             padding: 15px;
             border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: 0.3s;
             opacity: 0;
             transform: translateX(-20px);
             animation: slideInLeft 0.5s 0.5s ease-out forwards;
+            z-index: 1000;
         }
 
         @keyframes slideInLeft {
@@ -205,11 +216,11 @@
             top: -5px;
             right: -10px;
             font-size: 0.7rem;
-            background: var(--deep-space);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 2px 6px;
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            font-weight: 700;
+            padding: 2px 7px;
             border-radius: 10px;
-            color: white;
         }
 
         /* --- AUTHOR CARD --- */
@@ -262,14 +273,13 @@
         @media (max-width: 1100px) {
             .engagement-bar {
                 position: fixed;
-                bottom: fixed;
                 top: auto;
-                bottom: 20px;
+                bottom: 30px;
                 left: 50%;
                 transform: translateX(-50%) !important;
                 flex-direction: row;
                 width: auto;
-                z-index: 100;
+                z-index: 1000;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
                 border-color: var(--teal-glow);
             }
@@ -280,6 +290,38 @@
 
             .hero-image {
                 height: 250px;
+            }
+        }
+
+        /* --- SMARTPHONE SPECIFIC --- */
+        @media (max-width: 768px) {
+            .post-container {
+                padding: 30px 20px 80px;
+            }
+
+            .post-body {
+                font-size: 1.1rem;
+                overflow-wrap: break-word;
+                /* Ensure long words break instead of overflowing */
+                word-wrap: break-word;
+            }
+
+            .post-body blockquote {
+                padding: 15px 15px 15px 20px;
+                /* Reduce padding on mobile */
+                margin: 30px 0;
+                font-size: 1.2rem;
+                /* Reduce font size slightly */
+            }
+
+            .author-box {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .author-box a {
+                margin: 15px auto 0 !important;
             }
         }
     </style>
@@ -330,6 +372,7 @@
     <script src="../assets/js/components.js"></script>
     <script type="module">
         import { getPostById } from '../assets/js/blog-data.js';
+        import { db, doc, getDoc, setDoc, updateDoc, increment } from '../assets/js/firebase-config.js';
 
         // 1. Get ID from URL
         const params = new URLSearchParams(window.location.search);
@@ -337,16 +380,21 @@
         const container = document.getElementById('mainContent');
         const engageBar = document.getElementById('engageBar');
 
-        if (!postId) {
-            container.innerHTML = `<div style="text-align:center;"><h2>Post not found</h2><a href="blogs.html" style="color:var(--teal-glow);">Back to Stories</a></div>`;
-        } else {
+        let isLikeUpdating = false;
+
+        async function initPost() {
+            if (!postId) {
+                container.innerHTML = `<div style="text-align:center;"><h2>Post not found</h2><a href="blogs.html" style="color:var(--teal-glow);">Back to Stories</a></div>`;
+                return;
+            }
+
             const post = getPostById(postId);
 
             if (post) {
                 // UPDATE METADATA
                 document.title = `${post.title} | Soulamore Stories`;
 
-                // RENDER
+                // RENDER (Author portion is already correctly updated in preceding chunks, but we re-render here)
                 container.innerHTML = `
                     <div class="post-header">
                         <div class="post-meta">
@@ -368,38 +416,71 @@
                     </article>
 
                     <div class="author-box">
-                        <div class="author-avatar">
-                            <i class="fas ${post.type === 'Psychologist' ? 'fa-user-md' : 'fa-user'}"></i>
-                        </div>
+                        ${post.authorImage ? '<img src="' + post.authorImage + '" alt="' + post.author + '" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">' : '<div class="author-avatar"><i class="fas ' + (post.type === 'Psychologist' ? 'fa-user-md' : 'fa-user') + '"></i></div>'}
                         <div class="author-info">
                             <span class="author-role">${post.authorRole}</span>
                             <h4>${post.author}</h4>
                             <p class="author-bio">${post.authorBio}</p>
                         </div>
+                        ${post.authorLinkedin ? '<a href="' + post.authorLinkedin + '" target="_blank" style="margin-left: auto; color: var(--teal-glow); text-decoration: none; font-size: 1rem; font-weight: 500; display: flex; align-items: center; gap: 8px; padding: 10px 24px; border: 1px solid var(--teal-glow); border-radius: 50px; transition: 0.3s;"><i class="fab fa-linkedin" style="font-size: 1.1rem;"></i> Connect</a>' : ''}
                     </div>
                 `;
 
                 // Show Engagement Bar
                 engageBar.style.display = 'flex';
-                document.getElementById('likeCount').innerText = post.likes;
+
+                // Fetch dynamic likes
+                try {
+                    const postRef = doc(db, 'blogs', postId);
+                    const docSnap = await getDoc(postRef);
+                    if (docSnap.exists()) {
+                        document.getElementById('likeCount').innerText = docSnap.data().likes || post.likes || 0;
+                    } else {
+                        // Initialize it in DB on first load
+                        await setDoc(postRef, { likes: post.likes || 0 });
+                        document.getElementById('likeCount').innerText = post.likes || 0;
+                    }
+                } catch (err) {
+                    console.error("Firebase error loading likes:", err);
+                    document.getElementById('likeCount').innerText = post.likes || 0; // fallback
+                }
 
             } else {
                 container.innerHTML = `<div style="text-align:center;"><h2>Post not found</h2><a href="blogs.html" style="color:var(--teal-glow);">Back to Stories</a></div>`;
             }
         }
 
+        initPost();
+
         // ENGAGEMENT FUNCTIONS
-        window.toggleLike = (btn) => {
+        window.toggleLike = async (btn) => {
+            if (isLikeUpdating) return;
+            isLikeUpdating = true;
+
             btn.classList.toggle('active');
             const countEl = document.getElementById('likeCount');
             let count = parseInt(countEl.innerText);
-            if (btn.classList.contains('active')) {
-                count++;
-                // In real app, API call here
-            } else {
-                count--;
+
+            try {
+                const postRef = doc(db, 'blogs', postId);
+                if (btn.classList.contains('active')) {
+                    count++;
+                    countEl.innerText = count; // Optimistic update
+                    await updateDoc(postRef, { likes: increment(1) });
+                } else {
+                    count--;
+                    countEl.innerText = count; // Optimistic update
+                    await updateDoc(postRef, { likes: increment(-1) });
+                }
+            } catch (err) {
+                console.error("Failed to update likes:", err);
+                // Revert optimistic update nicely
+                btn.classList.toggle('active');
+                if (btn.classList.contains('active')) countEl.innerText = count + 1;
+                else countEl.innerText = count - 1;
+            } finally {
+                isLikeUpdating = false;
             }
-            countEl.innerText = count;
         }
 
         window.copyLink = () => {
@@ -414,7 +495,6 @@
         }
 
         window.scrollToComments = () => {
-            // Placeholder for comments section
             alert('Comments section coming soon!');
         }
     </script>

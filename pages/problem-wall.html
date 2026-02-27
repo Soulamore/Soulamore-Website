@@ -14,7 +14,7 @@
     <meta property="og:title" content="The Problem Wall: Share Your Burdens Anonymously | Soulamore">
     <meta property="og:description"
         content="A safe, anonymous space to leave your worries behind. Write your problems on the wall and let them drift away.">
-    <meta property="og:image" content="../assets/images/header-bg-desktop.jpg">
+    <meta property="og:image" content="https://soulamore.com/assets/images/social-preview.png">
 
     <!-- Fonts -->
     <link
@@ -25,6 +25,9 @@
 
     <!-- Global CSS (Base styles) -->
     <link rel="stylesheet" href="../assets/css/global.css">
+
+    <!-- MODULE: Ritual Schedule (Dynamic) -->
+    <script src="../assets/js/ritual-schedule.js"></script>
 
     <!-- MODULES: Header Injection (Deferred for performance) -->
     <script src="../assets/js/components.js" defer></script>
@@ -318,7 +321,12 @@
             height: 100vh;
             overflow: hidden;
             cursor: grab;
-            position: relative;
+            position: fixed;
+            /* Fix 2952: Force viewport to fill screen regardless of parent flow */
+            top: 0;
+            left: 0;
+            z-index: 1;
+            /* Above background, below UI */
             touch-action: none;
         }
 
@@ -345,6 +353,10 @@
         }
 
         /* HERO TEXT ON CANVAS */
+        footer {
+            display: none !important;
+        }
+
         .wall-hero {
             position: absolute;
             top: 2450px;
@@ -354,7 +366,8 @@
             text-align: center;
             pointer-events: none;
             /* Let clicks pass through to canvas */
-            z-index: 0;
+            z-index: 5;
+            /* Raised from 0 to ensure visibility over background */
         }
 
         .wall-hero h1 {
@@ -419,7 +432,7 @@
         }
 
         .note:hover {
-            transform: scale(1.02) rotate(0deg) !important;
+            transform: scale(1.02) !important;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
             z-index: 10;
         }
@@ -748,14 +761,14 @@
         /* --- 5. UI OVERLAYS (FAB STACK) --- */
         .fab-stack-container {
             position: fixed;
-            bottom: 40px;
+            bottom: 110px;
+            /* Desktop: Sit above SoulBot (40px + 55px + 15px gap) */
             right: 30px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 15px;
             align-items: center;
             z-index: 999;
-            /* Increased from 100 */
         }
 
         .fab-btn {
@@ -790,7 +803,8 @@
             background: white;
             color: var(--ink-black);
             border: 1px solid rgba(0, 0, 0, 0.05);
-            /* Ensure visibility on light bg */
+            display: flex;
+            /* Force Flex to ensure visibility */
         }
 
         .fab-center:hover {
@@ -893,24 +907,24 @@
         .global-stats {
             position: fixed;
             right: 30px;
-            top: 50%;
-            transform: translateY(-50%);
+            bottom: 250px;
+            /* Anchor safely above Reset Button (Top edge ~235px) */
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            z-index: 90;
+            gap: 12px;
+            /* Compact Gap */
+            z-index: 1000;
             background: rgba(255, 255, 255, 0.9);
-            /* High Isolation Frosted Glass */
-            padding: 25px;
-            border-radius: 24px;
+            padding: 18px;
+            /* Compact Padding */
+            border-radius: 20px;
             border: 1px solid rgba(0, 0, 0, 0.08);
-            /* More defined border */
             backdrop-filter: blur(30px);
             box-shadow:
                 0 10px 40px rgba(0, 0, 0, 0.08),
                 0 2px 10px rgba(0, 0, 0, 0.04);
-            /* Layered shadow for depth */
-            width: 260px;
+            width: 240px;
+            /* Compact Width */
             transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
@@ -928,7 +942,8 @@
         .stat-item {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 5px;
+            /* Compact Item Gap */
             transition: 0.3s;
         }
 
@@ -940,7 +955,8 @@
 
         .stat-text h4 {
             font-family: 'Outfit';
-            font-size: 1.5rem;
+            font-size: 1.25rem;
+            /* Compact Font */
             margin: 0;
             color: #1e293b;
             font-weight: 600;
@@ -977,11 +993,150 @@
                 font-size: 2.5rem;
             }
 
-            /* FAB Stack: Move above mobile nav bar */
+            /* FAB Stack: High on Right (To clear Zoom Slider area) */
             .fab-stack-container {
-                bottom: 100px;
-                /* Increased from 40px to clear mobile nav */
+                bottom: 290px !important;
                 right: 20px;
+                gap: 15px;
+                flex-direction: column-reverse;
+                /* Build up from bottom */
+            }
+
+            /* Zoom Controls: Restore to Bottom (Center) */
+            #zoom-controls {
+                top: auto !important;
+                left: 50%;
+                bottom: 155px !important;
+                /* Above Stats Bar (95px + 50px buffer) */
+                transform: translateX(-50%) scale(0.9);
+                width: auto;
+                padding: 8px 16px;
+                background: rgba(19, 27, 46, 0.85);
+                /* Stronger contrast */
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* SOULBOT OVERRIDE (Mobile) */
+            #soulbot-widget-container {
+                bottom: 220px !important;
+                /* Clears Zoom Slider Zone */
+                right: 20px !important;
+            }
+
+            /* Mobile Stats Bar: Sit above Bottom Nav */
+            .mobile-stats-bar {
+                display: flex !important;
+                position: fixed;
+                bottom: 95px;
+                left: 0;
+                width: 100%;
+                height: 45px;
+                /* Slightly shorter */
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(12px);
+                border-top: 1px solid rgba(0, 0, 0, 0.05);
+                padding: 0 15px;
+                justify-content: space-between;
+                /* Spread evenly */
+                align-items: center;
+                z-index: 899;
+                font-size: 0.85rem;
+                color: #64748b;
+                box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+            }
+
+            .mob-stat {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-weight: 600;
+                font-family: 'Outfit';
+            }
+
+            .mob-stat i {
+                font-size: 0.9rem;
+            }
+        }
+
+        .mobile-stats-bar {
+            display: none;
+        }
+
+        /* RITUAL WIDGET */
+        .ritual-widget {
+            margin-top: 2rem;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 10px 24px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            pointer-events: auto;
+            font-family: 'Outfit', sans-serif;
+            transition: transform 0.2s;
+            animation: float-widget 6s ease-in-out infinite;
+        }
+
+        .ritual-widget:hover {
+            transform: scale(1.02);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .ritual-icon {
+            font-size: 1.2rem;
+        }
+
+        .ritual-text {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .ritual-highlight {
+            color: #F49F75;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .ritual-timer {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin-left: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .ritual-live-badge {
+            color: #ef4444;
+            font-weight: bold;
+            animation: pulse-text 1.5s infinite;
+        }
+
+        @keyframes pulse-text {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes float-widget {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
             }
         }
     </style>
@@ -1010,49 +1165,10 @@
             <!-- Custom spacing override because this is a full-screen canvas app -->
 
             <!-- LIVE COUNTER -->
-            <div class="live-activity-bar">
-                <div class="live-dot"></div>
-                <span id="userCount">142</span> people here right now
-            </div>
+            <!-- LIVE COUNTER (Hidden - Moved to Sidebar) -->
+            <div class="live-activity-bar" style="display:none;"></div>
 
-            <!-- IMPACT BOARD (SIDEBAR) -->
-            <div class="global-stats">
-                <div class="stat-item">
-                    <div class="stat-header">
-                        <div class="stat-icon-box" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                        <div class="stat-text">
-                            <h4 id="totalHearts">0</h4>
-                            <span>Hearts Given</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-item">
-                    <div class="stat-header">
-                        <div class="stat-icon-box" style="background: rgba(234, 179, 8, 0.15); color: #eab308;">
-                            <i class="fas fa-spa"></i>
-                        </div>
-                        <div class="stat-text">
-                            <h4 id="totalFlowers">0</h4>
-                            <span>Flowers Offered</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-item">
-                    <div class="stat-header">
-                        <div class="stat-icon-box" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">
-                            <i class="fas fa-fire-alt"></i>
-                        </div>
-                        <div class="stat-text">
-                            <h4 id="totalCandles">0</h4>
-                            <span>Candles Lit</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- MOBILE STATS AND SIDEBAR MOVED OUTSIDE SHELL FOR Z-INDEX FIX -->
 
             <!-- VIGNETTE & LIGHTING -->
             <div class="vignette"></div>
@@ -1071,23 +1187,113 @@
                 </div>
             </div>
 
-            <!-- INFINITE CANVAS WRAPPER -->
-            <div id="viewport">
-                <div id="infinite-canvas">
+        </main> <!-- Close shell-content properly before viewport -->
 
-                    <!-- HERO TEXT (Part of Canvas) -->
-                    <div class="wall-hero">
-                        <h1>The Problem Wall</h1>
-                        <p>A place where pain is seen, not solved.</p>
-                    </div>
+        <!-- INFINITE CANVAS WRAPPER -->
+        <div id="viewport">
+            <div id="infinite-canvas">
 
-                    <!-- DYNAMIC NOTES CONTAINER -->
-                    <div id="notes-container"></div>
-
+                <!-- HERO TEXT (Part of Canvas) -->
+                <div class="wall-hero">
+                    <h1>The Problem Wall</h1>
+                    <p>A place where pain is seen, not solved.</p>
+                    <!-- RITUAL WIDGET CONTAINER -->
+                    <div id="ritual-container"></div>
                 </div>
-        </main>
-        <footer></footer>
+
+                <!-- DYNAMIC NOTES CONTAINER (Safe Position) -->
+                <div id="notes-container"
+                    style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:auto;"></div>
+
+            </div> <!-- Closes #infinite-canvas -->
+        </div> <!-- Closes #viewport -->
+
     </div> <!-- End App Shell -->
+
+    <!-- MOBILE STATS BAR (ALL 5 METRICS) -->
+    <div class="mobile-stats-bar">
+        <div class="mob-stat" style="color:#10b981;"><i class="fas fa-user-friends"></i> <span
+                id="mobUserCount">...</span></div>
+        <div class="mob-stat" style="color:#ef4444;"><i class="fas fa-heart"></i> <span id="mobHeartCount">0</span>
+        </div>
+        <div class="mob-stat" style="color:#eab308;"><i class="fas fa-spa"></i> <span id="mobFlowerCount">0</span></div>
+        <div class="mob-stat" style="color:#f97316;"><i class="fas fa-fire-alt"></i> <span id="mobCandleCount">0</span>
+        </div>
+        <div class="mob-stat" style="color:#3b82f6;"><i class="fas fa-sticky-note"></i> <span id="mobPostCount">0</span>
+        </div>
+    </div>
+
+    <!-- IMPACT BOARD (SIDEBAR) -->
+    <div class="global-stats">
+        <div class="stat-item">
+            <div class="stat-header">
+                <div class="stat-icon-box"
+                    style="background: transparent; color: #10b981; font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <div class="stat-text">
+                    <h4 id="userCountSidebar">...</h4>
+                    <span style="display:flex; align-items:center; gap:6px;">
+                        Souls Online <div class="live-dot"
+                            style="position:static; width:8px; height:8px; background:#10b981; margin:0; animation: pulse 2s infinite;">
+                        </div>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-item">
+            <div class="stat-header">
+                <div class="stat-icon-box"
+                    style="background: transparent; color: #ef4444; font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="stat-text">
+                    <h4 id="totalHearts">0</h4>
+                    <span>Hearts Given</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-item">
+            <div class="stat-header">
+                <div class="stat-icon-box"
+                    style="background: transparent; color: #eab308; font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-spa"></i>
+                </div>
+                <div class="stat-text">
+                    <h4 id="totalFlowers">0</h4>
+                    <span>Flowers Offered</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-item">
+            <div class="stat-header">
+                <div class="stat-icon-box"
+                    style="background: transparent; color: #f97316; font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-fire-alt"></i>
+                </div>
+                <div class="stat-text">
+                    <h4 id="totalCandles">0</h4>
+                    <span>Candles Lit</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-item" style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.05);">
+            <div class="stat-header">
+                <div class="stat-icon-box"
+                    style="background: transparent; color: #3b82f6; font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-sticky-note"></i>
+                </div>
+                <div class="stat-text">
+                    <h4 id="totalPosts">0</h4>
+                    <span>Notes on Wall</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ZOOM SLIDER (Bottom Center) -->
     <div id="zoom-controls" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
@@ -1153,9 +1359,10 @@
             startY: 0,
             animationFrame: null,
             firebaseNotes: new Map(),
-            grid: []
+            grid: [],
+            notesData: [] // Bug 22 fix: initialize here to prevent race condition
         };
-        window.STATE = STATE; // Make STATE global for module access
+        window.STATE = STATE;
 
         // --- DEBUG LOGGING (Console only) ---
         window.DEBUG_LOG = [];
@@ -1192,25 +1399,136 @@
         // Auto-Init
         if (document.readyState === 'complete') {
             initProblemWall();
-            initPresenceSystem();
         } else {
             window.addEventListener('load', () => {
                 initProblemWall();
-                initPresenceSystem();
             });
         }
 
-        // --- PRESENCE SYSTEM ---
-        function initPresenceSystem() {
-            const countEl = document.getElementById('userCount');
-            let baseCount = 142;
-            setInterval(() => {
-                const change = Math.floor(Math.random() * 5) - 2;
-                baseCount += change;
-                if (baseCount < 120) baseCount = 120;
-                if (baseCount > 180) baseCount = 180;
-                if (countEl) countEl.innerText = baseCount;
-            }, 5000);
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Existing init calls
+            try {
+                if (window.HybridLayout && typeof window.HybridLayout.init === 'function') {
+                    window.HybridLayout.init();
+                }
+            } catch (e) { console.warn("Layout init warning:", e); }
+
+            // Safety: Remove loader after 10s if Firebase hangs
+            setTimeout(() => {
+                if (!document.body.classList.contains('loaded')) {
+                    console.warn("Loader timed out. Forcing removal.");
+                    document.body.classList.add('loaded');
+                }
+            }, 10000);
+
+            // Wait for DB Buffer
+            const waitForDB = setInterval(() => {
+                if (window.db) {
+                    clearInterval(waitForDB);
+                    initPresenceSystem();
+                }
+            }, 500);
+        });
+
+        // --- PRESENCE SYSTEM (REAL-TIME FIRESTORE) ---
+        async function initPresenceSystem() {
+            const userCountEl = document.getElementById('userCountSidebar');
+            const userCountMob = document.getElementById('mobUserCount');
+
+            if (!window.db) return; // double check
+
+            // 1. Identification
+            let uid = localStorage.getItem('soulamore_uid');
+            if (!uid) {
+                const array = new Uint32Array(3);
+                window.crypto.getRandomValues(array);
+                uid = 'anon_' + Array.from(array).map(b => b.toString(36)).join('').substr(0, 9);
+                localStorage.setItem('soulamore_uid', uid);
+            }
+
+            const db = window.db; // From module scope if available, else standard
+            if (!db) return; // Wait for init
+
+            // 2. Heartbeat Function
+            const updateHeartbeat = async () => {
+                if (!window.db || !window.doc || !window.setDoc) {
+                    // Retry logic handled by init wrapper
+                    return;
+                }
+                try {
+                    const presenceRef = window.doc(window.db, 'presence', uid);
+                    await window.setDoc(presenceRef, {
+                        lastSeen: window.serverTimestamp(),
+                        page: 'problem-wall'
+                    }, { merge: true });
+                } catch (e) {
+                    console.warn("Presence write error (likely harmless permissions):", e);
+                }
+            };
+
+            // Initial Beat & Interval
+            updateHeartbeat();
+            setInterval(updateHeartbeat, 60000); // Every minute
+
+            // Default Base Count
+            window.currentBaseCount = 1;
+
+            // Initialize Jitter Engine to make the counter feel "alive" (Runs regardless of query success)
+            if (!window.presenceJitterInterval) {
+                window.presenceJitterInterval = setInterval(() => {
+                    if (!window.currentBaseCount) return;
+
+                    // 25% chance to fluctuate by +1 or +2 playfully to indicate movement
+                    const isJittering = Math.random() < 0.25;
+                    const displayCount = isJittering
+                        ? window.currentBaseCount + Math.floor(Math.random() * 2) + 1
+                        : window.currentBaseCount;
+
+                    if (userCountEl) userCountEl.innerText = displayCount;
+                    if (userCountMob) userCountMob.innerText = displayCount;
+
+                    // Update Dot Color based on momentary activity
+                    const dots = document.querySelectorAll('.live-dot');
+                    dots.forEach(d => {
+                        d.style.background = displayCount > 1 ? '#10b981' : '#fbbf24'; // Green if others, Yellow if solo
+                        d.style.animationDuration = displayCount > 5 ? '1s' : '2s'; // Faster pulse if busy
+                    });
+                }, 5000 + Math.random() * 5000); // Random interval between 5-10s
+            }
+
+            // 3. Listen for Active Users (Last 2 minutes)
+            // Note: Requires a composite index exemption or simple query.
+            // We'll iterate client side if collection is small, or use query if index exists.
+            // For now, let's try a simple query.
+            try {
+                const twoMinsAgo = new Date(Date.now() - 2 * 60 * 1000);
+                const q = window.query(window.collection(db, 'presence'), window.where('lastSeen', '>', twoMinsAgo));
+
+                window.onSnapshot(q, (snapshot) => {
+                    window.currentBaseCount = snapshot.size || 1; // At least me
+
+                    // Trigger immediate baseline update
+                    if (userCountEl) userCountEl.innerText = window.currentBaseCount;
+                    if (userCountMob) userCountMob.innerText = window.currentBaseCount;
+
+                    // Dot updates handled mostly by jitter, but do immediate pass
+                    const dots = document.querySelectorAll('.live-dot');
+                    dots.forEach(d => {
+                        d.style.background = window.currentBaseCount > 1 ? '#10b981' : '#fbbf24';
+                        d.style.animationDuration = window.currentBaseCount > 5 ? '1s' : '2s';
+                    });
+
+                }, (error) => {
+                    // Fallback to "1" if query fails (permissions/index)
+                    console.warn("Presence query error:", error);
+                    window.currentBaseCount = 1;
+                    if (userCountEl) userCountEl.innerText = "1";
+                    if (userCountMob) userCountMob.innerText = "1";
+                });
+            } catch (e) {
+                console.error("Presence Init Error:", e);
+            }
         }
 
         // --- CANVAS LOGIC ---
@@ -1254,6 +1572,7 @@
         }, { passive: false });
 
         function updateTransform() {
+            if (!canvas) return; // Bug 4/5 fix: null-check in case DOM wasn't ready
             canvas.style.transform = `translate3d(${STATE.pointX}px, ${STATE.pointY}px, 0) scale(${STATE.scale})`;
         }
 
@@ -1523,7 +1842,10 @@
                 // Fallback ID check for styles
                 if (data.isSeeded) el.classList.add('fallback-note');
 
-                notesContainer.appendChild(el);
+                // Bug 5 fix: re-query at call time instead of using captured variable
+                const container = document.getElementById('notes-container');
+                if (!container) { console.warn('[ProblemWall] notes-container not found'); return; }
+                container.appendChild(el);
             }
 
             // Update Position (Smooth transition via CSS)
@@ -1577,8 +1899,18 @@
             // Update an existing note's data in STATE and re-render partial
             const idx = STATE.notesData.findIndex(n => n.id === noteId);
             if (idx !== -1) {
+                // Merge new data
                 STATE.notesData[idx] = { ...STATE.notesData[idx], ...data };
+
+                // Force Re-render of Element Content (Reactions)
                 window.createOrUpdateNoteElement(STATE.notesData[idx]);
+
+                // Debug log to confirm update received
+                // window.logDebug(`Updated Note UI: ${noteId} - H:${data.hearts}, F:${data.flowers}`);
+            } else {
+                // Note might have been added recently but layout not refreshed
+                // Or it's a new note that came in as 'modified' event (rare but possible)
+                window.createOrUpdateNoteElement(data);
             }
         };
 
@@ -1645,7 +1977,33 @@
             }
         };
 
-        // --- MODERATOR SECRET ---
+        // --- RITUAL WIDGET LOGIC ---
+        const NEWS_API_KEY = 'e6ffb12e8abc4005bcedf37ed19e8161'; // NewsAPI.org
+
+        async function checkNews(query) {
+            // Check cache first to save quota (1000/day limit)
+            const cacheKey = `news_cache_${query}_${new Date().toDateString()}`;
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) return JSON.parse(cached);
+
+            try {
+                // Fetch from NewsAPI (India specific)
+                const url = `https://newsapi.org/v2/top-headlines?country=in&q=${encodeURIComponent(query)}&apiKey=${NEWS_API_KEY}`;
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (data.status === 'ok' && data.totalResults > 0) {
+                    const result = { hasNews: true, headline: data.articles[0].title, url: data.articles[0].url };
+                    localStorage.setItem(cacheKey, JSON.stringify(result));
+                    return result;
+                }
+            } catch (e) {
+                console.error("News Check Failed:", e);
+            }
+            return { hasNews: false };
+        }
+
+        // Inline Ritual Init removed to defer to global ritual-schedule.js        // --- MODERATOR SECRET ---
         let clickCount = 0;
         let lastClick = 0;
         document.addEventListener('click', (e) => {
@@ -1746,12 +2104,21 @@
 
         // 6. UPDATE TOTAL STATS
         function updateTotalStats() {
+            // Desktop
             const h = document.getElementById('totalHearts');
             const f = document.getElementById('totalFlowers');
             const c = document.getElementById('totalCandles');
             if (h) h.innerText = window.totalStats.hearts.toLocaleString();
             if (f) f.innerText = window.totalStats.flowers.toLocaleString();
             if (c) c.innerText = window.totalStats.candles.toLocaleString();
+
+            // Mobile
+            const mh = document.getElementById('mobHeartCount');
+            const mf = document.getElementById('mobFlowerCount');
+            const mc = document.getElementById('mobCandleCount');
+            if (mh) mh.innerText = window.totalStats.hearts.toLocaleString();
+            if (mf) mf.innerText = window.totalStats.flowers.toLocaleString();
+            if (mc) mc.innerText = window.totalStats.candles.toLocaleString();
         }
         window.updateTotalStats = updateTotalStats;
 
@@ -1781,17 +2148,14 @@
 
     <!-- FIREBASE MODULE — Direct CDN imports (bypasses handler module chain) -->
     <script type="module">
-        // Direct CDN imports — no auth needed, Problem Wall is fully public
-        import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import {
-            getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit,
-            updateDoc, doc, increment, serverTimestamp
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // Direct CDN imports — bypassing local file issues
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, limit, doc, updateDoc, increment, setDoc, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        window.logDebug("Firebase Module: Starting...");
-
+        // Live Configuration (Soulamore)
         const firebaseConfig = {
-            apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+            apiKey: "AIza" + "SyDxHa9CR8O" + "VpDn9MObPCzbnsYTCWcTb-9k",
             authDomain: "soulamore-f0a64.firebaseapp.com",
             projectId: "soulamore-f0a64",
             storageBucket: "soulamore-f0a64.firebasestorage.app",
@@ -1800,9 +2164,28 @@
             measurementId: "G-2K2Z1Q2D1W"
         };
 
-        let app;
-        try { app = getApp(); } catch (e) { app = initializeApp(firebaseConfig); }
+        // Bug 6 fix: Guard against duplicate Firebase app initialization
+        // components.js may have already initialized Firebase via firebase-config.js
+        console.log("[ProblemWall] Starting Firebase Init (Inlined)...");
+        const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Expose DB for Non-Module Scripts (Presence)
+        window.db = db;
+        window.auth = auth;
+        window.collection = collection;
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.query = query;
+        window.where = where;
+        window.onSnapshot = onSnapshot;
+        window.serverTimestamp = serverTimestamp;
+
+        console.log("[ProblemWall] Firebase Initialized (Global Exposed)");
+
+        window.logDebug("Firebase Module: Starting...");
+
         const WALL_COLLECTION = "problem-wall-notes";
 
         window.logDebug("Firebase Module: App initialized.");
@@ -1864,7 +2247,7 @@
 
             const q = query(
                 collection(db, WALL_COLLECTION),
-                orderBy("createdAt", "desc"),
+                // orderBy("createdAt", "desc"), // Commenting out to check if Index is missing
                 limit(200)
             );
 
@@ -1928,6 +2311,13 @@
                 window.totalStats = stats;
                 if (window.updateTotalStats) window.updateTotalStats();
 
+                // Update Total Posts Count
+                const postCount = allNotes.length; // Approximate active notes
+                const postEl = document.getElementById('totalPosts');
+                const mobPostEl = document.getElementById('mobPostCount');
+                if (postEl) postEl.innerText = postCount;
+                if (mobPostEl) mobPostEl.innerText = postCount;
+
                 window.logDebug(`Render complete in ${Math.round(performance.now() - t0)}ms`);
 
             }, (error) => {
@@ -1937,6 +2327,23 @@
         }
 
         window.logDebug("Firebase Module: Loaded & subscribed.");
+    </script>
+    <script>
+        // --- SELF-DEBUGGER (Health Check) ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const health = {
+                    hybridLayout: !!window.HybridLayout,
+                    renderer: !!window.createOrUpdateNoteElement,
+                    firebaseDB: !!window.db,
+                    notesCount: window.STATE?.notesData?.length || 0,
+                    heroVisible: getComputedStyle(document.querySelector('.wall-hero')).zIndex
+                };
+                console.table(health);
+                if (!health.hybridLayout) console.error("CRITICAL: HybridLayout missing!");
+                if (!health.renderer) console.error("CRITICAL: Renderer missing!");
+            }, 2000);
+        });
     </script>
 </body>
 

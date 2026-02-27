@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Soulamore Emotional Assessments. A guided inner experience backed by clinical science to help you understand your emotional landscape.">
+    <title>Emotional Assessments | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+
+    <style>
+        /* --- THEME: MIDNIGHT VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.7);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 15% 50%, rgba(78, 205, 196, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(244, 159, 117, 0.05), transparent 25%);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px 100px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- BACKGROUND ANIMATION (STARS) --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite, twinkle 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.1;
+                transform: scale(0.8);
+                box-shadow: 0 0 2px rgba(255, 255, 255, 0.1);
+            }
+
+            100% {
+                opacity: 0.6;
+                transform: scale(1.2);
+                box-shadow: 0 0 8px rgba(78, 205, 196, 0.4);
+            }
+        }
+
+        /* --- BACKGROUND ANIMATION (WORDS) --- */
+        #word-atmosphere {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .floating-word {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.03);
+            font-family: 'Outfit';
+            font-weight: 700;
+            user-select: none;
+            white-space: nowrap;
+            animation: floatUp linear infinite;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(105vh) scale(0.8);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            to {
+                transform: translateY(-10vh) scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        /* --- HERO --- */
+        .hero {
+            text-align: center;
+            padding: 40px 0 60px;
+        }
+
+        .hero-tag {
+            color: #a78bfa;
+            border: 1px solid #a78bfa;
+            background: rgba(167, 139, 250, 0.1);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            margin-bottom: 20px;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* --- SCIENTIFIC TRUST BANNER --- */
+        .trust-banner {
+            background: rgba(78, 205, 196, 0.05);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 60px;
+            backdrop-filter: blur(10px);
+        }
+
+        .trust-icon {
+            font-size: 2.5rem;
+            color: var(--teal-glow);
+            flex-shrink: 0;
+        }
+
+        .trust-text h3 {
+            color: var(--starlight);
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .trust-text p {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .trust-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .trust-tags span {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            color: #94a3b8;
+        }
+
+        /* --- ASSESSMENTS LAUNCHPAD --- */
+        .filter-section {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .filter-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #64748b;
+            margin-bottom: 12px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: #94a3b8;
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Outfit';
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(78, 205, 196, 0.1);
+            color: white;
+            border-color: var(--teal-glow);
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.2);
+        }
+
+        .context-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0 40px;
+        }
+
+        .context-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #64748b;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .context-btn:hover,
+        .context-btn.active {
+            border-color: var(--peach-glow);
+            color: var(--peach-glow);
+            background: rgba(244, 159, 117, 0.05);
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(78, 205, 196, 0.1);
+            color: white;
+            border-color: var(--teal-glow);
+        }
+
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+            z-index: 10;
+        }
+
+        .tag-badge {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ccc;
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .assessments-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .load-more-container {
+            text-align: center;
+            margin-bottom: 60px;
+            display: none;
+            /* hidden if no more to load */
+        }
+
+        .assessment-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 40px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .assessment-card:hover {
+            border-color: var(--teal-glow);
+            background: rgba(78, 205, 196, 0.05);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(78, 205, 196, 0.05);
+        }
+
+        /* Themed Glows for specific cards */
+        .card-emotion:hover {
+            border-color: var(--peach-glow);
+            background: rgba(244, 159, 117, 0.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(244, 159, 117, 0.05);
+        }
+
+        .card-anxiety:hover {
+            border-color: var(--teal-glow);
+        }
+
+        .card-burnout:hover {
+            border-color: var(--gold-glow);
+            background: rgba(251, 191, 36, 0.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(251, 191, 36, 0.05);
+        }
+
+        .card-rel:hover {
+            border-color: #a78bfa;
+            background: rgba(167, 139, 250, 0.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(167, 139, 250, 0.05);
+        }
+
+        .card-icon {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
+
+        .card-emotion .card-icon {
+            color: var(--peach-glow);
+        }
+
+        .card-anxiety .card-icon {
+            color: var(--teal-glow);
+        }
+
+        .card-burnout .card-icon {
+            color: var(--gold-glow);
+        }
+
+        .card-rel .card-icon {
+            color: #a78bfa;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            opacity: 0.7;
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 15px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .card-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .assessment-card:hover .card-btn {
+            color: var(--starlight);
+            gap: 12px;
+        }
+
+        /* --- PLAYFUL SCIENCE POPUP --- */
+        .sci-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+        }
+
+        .sci-badge:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: scale(1.05);
+            /* Removed the tilt */
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .assessment-card:hover .card-inner {
+            transform: translateY(-5px);
+        }
+
+        .assessment-card.sci-hover .card-inner {
+            filter: blur(15px);
+            opacity: 0.15;
+            transform: scale(0.98);
+        }
+
+        .sci-overlay {
+            position: absolute;
+            inset: 0;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 30;
+            background: rgba(15, 23, 42, 0.2);
+            pointer-events: none;
+        }
+
+        .assessment-card.sci-hover .sci-overlay {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .sci-popup-title {
+            font-family: 'Outfit';
+            font-size: 1.1rem;
+            color: var(--teal-glow);
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sci-citation {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 2px solid var(--peach-glow);
+            line-height: 1.4;
+        }
+
+        .citation-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .citation-desc {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .sci-disclaimer {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 15px;
+            text-align: center;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 10px;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        /* --- HOW IT WORKS --- */
+        .process-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 80px 0;
+            text-align: center;
+        }
+
+        .process-step {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+        }
+
+        .process-step-icon {
+            font-size: 2rem;
+            color: var(--starlight);
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .process-step h4 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--starlight);
+        }
+
+        .process-step p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* --- DISCLAIMER --- */
+        .legal-disclaimer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #64748b;
+            max-width: 800px;
+            margin: 0 auto;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 30px;
+            line-height: 1.6;
+        }
+
+        @media(max-width: 1200px) {
+            .assessments-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media(max-width: 900px) {
+            .assessments-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .process-row {
+                grid-template-columns: 1fr;
+            }
+
+            .trust-banner {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .trust-icon {
+                font-size: 2rem;
+            }
+
+            .hero {
+                padding: 20px 0 40px;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .container {
+                padding: 20px 16px 80px;
+            }
+
+            .hero-tag {
+                font-size: 0.7rem;
+                padding: 4px 12px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .filter-bar {
+                gap: 5px;
+            }
+
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+
+            .assessment-card {
+                padding: 30px 24px;
+            }
+
+            .card-title {
+                font-size: 1.3rem;
+            }
+
+            .trust-banner h3 {
+                font-size: 1.1rem;
+            }
+
+            .trust-text p {
+                font-size: 0.85rem;
+            }
+        }
+
+        .pager-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 450px;
+            margin: 40px auto;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .pager-btn {
+            background: none;
+            border: none;
+            color: var(--starlight);
+            font-family: 'Outfit';
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: 0.3s all;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pager-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--teal-glow);
+        }
+
+        .pager-btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        .pager-info {
+            font-family: 'Outfit';
+            font-size: 0.9rem;
+            color: var(--teal-glow);
+            font-weight: 600;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .page-counter {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- SIDE NAVIGATION --- */
+        .side-nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            pointer-events: none;
+            width: 100%;
+            left: 0;
+            padding: 0 40px;
+            justify-content: space-between;
+            flex-direction: row;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s;
+            visibility: hidden;
+        }
+
+        .side-nav.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .side-nav-btn {
+            pointer-events: auto;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0.6;
+        }
+
+        .side-nav-btn:hover:not(:disabled) {
+            opacity: 1;
+            border-color: var(--teal-glow);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+            color: var(--teal-glow);
+        }
+
+        .side-nav-btn:disabled {
+            opacity: 0.05;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        @media(max-width: 1300px) {
+            .side-nav {
+                display: none;
+                /* Hide on smaller screens to avoid overlap */
+            }
+        }
+
+        .load-more-container {
+            display: none !important;
+        }
+    </style>
+    <link rel="icon" href="../../assets/images/favicon_symbol.png" type="image/x-icon">
+</head>
+
+<body>
+    <div id="app-shell">
+        <div id="shell-fixed">
+            <header></header>
+        </div>
+
+        <!-- ANIMATED BACKGROUNDS -->
+        <div id="particles"></div>
+        <div id="word-atmosphere"></div>
+
+        <main id="shell-content">
+            <div class="container">
+
+                <!-- HERO -->
+                <section class="hero fade-in">
+                    <span class="hero-tag">Guided Inner Experience</span>
+                    <h1>Understand Your Emotional Architecture.</h1>
+                    <p>Not a quiz. An AI-powered, cinematic journey into your psychological landscape—grounded strictly
+                        in clinical science.</p>
+                </section>
+
+                <!-- SCIENTIFIC TRUST BANNER -->
+                <div class="trust-banner fade-in" style="animation-delay: 0.2s;">
+                    <i class="fas fa-shield-alt trust-icon"></i>
+                    <div class="trust-text">
+                        <h3>Built on Clinical Knowledge</h3>
+                        <p>Our assessment engine does not guess or hallucinate. It is deeply structured upon established
+                            psychological frameworks, cross-cutting symptom measures, and trauma-informed playbooks. AI
+                            is merely the intelligent narrator of your deterministic emotional fingerprint.</p>
+                        <div class="trust-tags">
+                            <span>PHQ-9 Inspired</span>
+                            <span>GAD-7 Influenced</span>
+                            <span>LSAS Metrics</span>
+                            <span>DERS Constructs</span>
+                            <span>GDPR Compliant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MASTER TAG SYSTEM FILTERS -->
+                <div class="filter-section fade-in" style="animation-delay: 0.3s;">
+                    <span class="filter-label">Primary Clinical Domains</span>
+                    <div class="filter-bar" id="primary-filters">
+                        <button class="filter-btn active" data-domain="All">All Architecture</button>
+                        <!-- Injected by JS -->
+                    </div>
+
+                    <span class="filter-label" style="margin-top: 20px;">Filter by Situation</span>
+                    <div class="context-filters" id="context-filters">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- TOP PAGER -->
+                <div class="pager-container fade-in" id="top-pager-container" style="animation-delay: 0.35s;">
+                    <button class="pager-btn prev-btn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <div class="pager-info">
+                        <span class="item-range">1 - 6 of 110</span>
+                        <span class="page-counter">Page 1 of 19</span>
+                    </div>
+                    <button class="pager-btn next-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- ASSESSMENTS GRID -->
+                <div class="assessments-grid fade-in" id="assessments-grid" style="animation-delay: 0.4s;">
+                    <!-- Auto-populated via JS -->
+                </div>
+
+                <!-- BOTTOM PAGER -->
+                <div class="pager-container fade-in" id="pager-container" style="animation-delay: 0.5s;">
+                    <button class="pager-btn prev-btn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <div class="pager-info">
+                        <span class="item-range">1 - 6 of 110</span>
+                        <span class="page-counter">Page 1 of 19</span>
+                    </div>
+                    <button class="pager-btn next-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- SIDE NAVIGATION ARROWS -->
+                <div class="side-nav">
+                    <button class="side-nav-btn prev-btn" title="Previous Page" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="side-nav-btn next-btn" title="Next Page">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- HOW IT WORKS -->
+                <div class="process-row fade-in" style="animation-delay: 0.6s;">
+                    <div class="process-step">
+                        <i class="fas fa-fingerprint process-step-icon"></i>
+                        <h4>1. Structured Scoring</h4>
+                        <p>You answer adaptive, gentle questions. Our deterministic engine maps your severity bands and
+                            functional disruptions in real-time, completely locally.</p>
+                    </div>
+                    <div class="process-step">
+                        <i class="fas fa-brain process-step-icon"></i>
+                        <h4>2. AI Translation</h4>
+                        <p>We pass only numerical signatures to Gemini. The AI safely translates raw data into a human,
+                            non-diagnostic reflection grounded in our knowledge base.</p>
+                    </div>
+                    <div class="process-step">
+                        <i class="fas fa-route process-step-icon"></i>
+                        <h4>3. Intelligent Routing</h4>
+                        <p>Depending on your unique fingerprint, you are seamlessly routed to specific articles, a
+                            curated Support Group, or a matched Peer Therapy companion.</p>
+                    </div>
+                </div>
+
+                <!-- LEGAL DISCLAIMER -->
+                <div class="legal-disclaimer fade-in" style="animation-delay: 0.8s;">
+                    <p>
+                        <strong>Clinical Disclaimer:</strong> Soulamore Emotional Assessments are designed for
+                        self-reflection and personal growth.
+                        They are <em>not</em> clinical diagnostic tools and cannot replace professional medical or
+                        psychiatric evaluations.
+                        The AI interpretation layer is carefully restricted to provide reflective, exploratory feedback
+                        rather than medical advice.
+                        <br><br>
+                        If you are experiencing acute distress, self-harm thoughts, or a mental health emergency, please
+                        stop the assessment and use our <a href="../../get-help-now.html"
+                            style="color:var(--teal-glow); text-decoration:none;">Immediate Crisis Resources</a>. By
+                        continuing, you acknowledge these terms.
+                    </p>
+                </div>
+
+            </div>
+        </main>
+        <!-- STANDARDIZED FOOTER -->
+        <footer></footer>
+    </div>
+
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script type="module" src="../../assets/js/firebase-config.js"></script>
+    <script src="../../assets/js/components.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/assessment-data.js"></script>
+
+    <script>
+        // --- PARTICLES (STARS & NEURAL THREADS) ---
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+
+            // Random sizes for stars
+            let size = Math.random() * 3 + 1;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+
+            p.style.animationDuration = Math.random() * 40 + 20 + 's, ' + (Math.random() * 3 + 2) + 's';
+            p.style.animationDelay = (Math.random() * -40) + 's, 0s';
+            particleContainer.appendChild(p);
+        }
+
+        // --- FLOATING WORDS LOGIC ---
+        const words = [
+            "Cognitive", "Emotional", "Somatic", "Regulation",
+            "Intensity", "Resilience", "Baseline", "Clarity",
+            "Self-Concept", "Attachment", "Pattern", "Reflection"
+        ];
+        const atmosphere = document.getElementById('word-atmosphere');
+
+        function createWord() {
+            const el = document.createElement('div');
+            el.classList.add('floating-word');
+            el.innerText = words[Math.floor(Math.random() * words.length)];
+
+            el.style.left = Math.random() * 90 + 'vw';
+            el.style.animationDuration = (Math.random() * 20 + 20) + 's';
+            el.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
+            el.style.opacity = Math.random() * 0.4 + 0.1;
+
+            atmosphere.appendChild(el);
+            setTimeout(() => { el.remove(); }, 40000);
+        }
+
+        for (let i = 0; i < 12; i++) setTimeout(createWord, i * 3000);
+        setInterval(createWord, 3000);
+
+        // --- DYNAMIC GRID & FILTERING LOGIC ---
+        let ALL_TESTS = Object.values(window.SoulamoreAssessments || {});
+
+        // Sticky Randomization (Persistent discovery order)
+        function getDiscoveryOrder(array) {
+            const STORAGE_KEY = 'SoulamoreDiscoveryOrder';
+            let idOrder = [];
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) idOrder = JSON.parse(stored);
+            } catch (e) { }
+
+            const mapped = new Map(array.map(test => [test.id, test]));
+            let finalIds = idOrder.filter(id => mapped.has(id));
+            const currentIds = array.map(t => t.id);
+            const newIds = currentIds.filter(id => !idOrder.includes(id));
+
+            if (newIds.length > 0) {
+                const shuffledNew = [...newIds];
+                for (let i = shuffledNew.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledNew[i], shuffledNew[j]] = [shuffledNew[j], shuffledNew[i]];
+                }
+                finalIds = [...finalIds, ...shuffledNew];
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(finalIds));
+            }
+            return finalIds.map(id => mapped.get(id));
+        }
+
+        ALL_TESTS = getDiscoveryOrder([...ALL_TESTS]);
+
+        let filteredTests = [...ALL_TESTS];
+        let currentPage = 0;
+        const BATCH_SIZE = 6;
+        let activeDomain = 'All';
+        let activeContexts = new Set();
+
+        const gridEl = document.getElementById('assessments-grid');
+        const primaryFilterBar = document.getElementById('primary-filters');
+        const contextFilterBar = document.getElementById('context-filters');
+
+        // Navigation Elements
+        const pagers = document.querySelectorAll('.pager-container');
+        const sideNav = document.querySelector('.side-nav');
+        const allPrevBtns = document.querySelectorAll('.prev-btn');
+        const allNextBtns = document.querySelectorAll('.next-btn');
+
+        const DOMAINS = [
+            "Anxiety Spectrum", "Mood & Depression", "Trauma & Nervous System",
+            "Attachment & Relationships", "Burnout & Functional Exhaustion",
+            "Identity & Self-Concept", "Loneliness & Social Isolation",
+            "Grief & Loss", "Youth & Development", "Migration & Cultural Transition"
+        ];
+
+        const CONTEXTS = [
+            "Student", "Workplace", "Leadership", "Expat", "Romantic",
+            "Family", "Academic", "Creative", "Digital", "Somatic", "Performance"
+        ];
+
+        function setupFilters() {
+            // Build Primary Domains
+            DOMAINS.forEach(dom => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.dataset.domain = dom;
+                btn.innerText = dom;
+                primaryFilterBar.appendChild(btn);
+            });
+
+            // Build Context Tags
+            CONTEXTS.forEach(ctx => {
+                const btn = document.createElement('button');
+                btn.className = 'context-btn';
+                btn.dataset.context = ctx;
+                btn.innerText = ctx;
+                contextFilterBar.appendChild(btn);
+            });
+
+            // Domain click events
+            primaryFilterBar.addEventListener('click', (e) => {
+                const btn = e.target.closest('.filter-btn');
+                if (!btn) return;
+
+                primaryFilterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeDomain = btn.dataset.domain;
+                applyFilters();
+            });
+
+            // Context toggle events
+            contextFilterBar.addEventListener('click', (e) => {
+                const btn = e.target.closest('.context-btn');
+                if (!btn) return;
+
+                if (activeContexts.has(btn.dataset.context)) {
+                    activeContexts.delete(btn.dataset.context);
+                    btn.classList.remove('active');
+                } else {
+                    activeContexts.add(btn.dataset.context);
+                    btn.classList.add('active');
+                }
+                applyFilters();
+            });
+        }
+
+        function applyFilters() {
+            filteredTests = ALL_TESTS.filter(test => {
+                const matchDomain = (activeDomain === 'All' || test.primary_domain === activeDomain);
+                const matchContext = (activeContexts.size === 0 ||
+                    (test.context_tags && test.context_tags.some(t => activeContexts.has(t))));
+                return matchDomain && matchContext;
+            });
+
+            renderGrid(true);
+        }
+
+        function getIconForDomain(domain) {
+            const icons = {
+                "Anxiety Spectrum": "fa-wind",
+                "Mood & Depression": "fa-cloud-showers-heavy",
+                "Trauma & Nervous System": "fa-bolt",
+                "Attachment & Relationships": "fa-link",
+                "Burnout & Functional Exhaustion": "fa-battery-quarter",
+                "Identity & Self-Concept": "fa-user-astronaut",
+                "Loneliness & Social Isolation": "fa-street-view",
+                "Grief & Loss": "fa-leaf",
+                "Youth & Development": "fa-seedling",
+                "Migration & Cultural Transition": "fa-globe-americas"
+            };
+            return icons[domain] || "fa-brain";
+        }
+
+        function createCardHTML(test) {
+            const color = test.theme_color || "var(--teal-glow)";
+            const icon = getIconForDomain(test.primary_domain);
+
+            // Badges (Primary + Context)
+            let badgesHTML = '';
+            if (test.primary_domain) {
+                badgesHTML += `<span class="tag-badge" style="border-color: var(--teal-glow); color: var(--teal-glow)">${test.primary_domain}</span>`;
+            }
+            if (test.context_tags) {
+                test.context_tags.forEach(tag => {
+                    badgesHTML += `<span class="tag-badge">${tag}</span>`;
+                });
+            }
+
+            return `
+                <div class="assessment-card" style="--hover-color: ${color};" onmouseover="this.style.borderColor='${color}'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.4), inset 0 0 20px ${color}10'" onmouseout="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+                    <div class="card-inner">
+                        <i class="fas ${icon} card-icon" style="color:${color};"></i>
+                        <h3 class="card-title">${test.title}</h3>
+                        ${badgesHTML ? `<div class="badge-container">${badgesHTML}</div>` : ''}
+                        <p class="card-desc">${test.description}</p>
+                        <div class="card-meta">
+                            <span><i class="far fa-clock"></i> ~5 mins</span>
+                            <a href="landing.html?id=${test.id}" class="card-btn">Explore Journey <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="sci-badge" data-citation="${test.id}">
+                        <i class="fas fa-microscope" style="color:${color};"></i> Clinical Backing
+                    </div>
+
+                    <div class="sci-overlay">
+                        <div class="sci-overlay-content">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGrid(page = 0) {
+            currentPage = page;
+            gridEl.innerHTML = '';
+
+            const start = currentPage * BATCH_SIZE;
+            const end = Math.min(start + BATCH_SIZE, filteredTests.length);
+            const slice = filteredTests.slice(start, end);
+
+            slice.forEach(test => {
+                gridEl.insertAdjacentHTML('beforeend', createCardHTML(test));
+            });
+
+            updatePager(start, end);
+            loadClinicalCitations();
+        }
+
+        function updatePager(start, end) {
+            const total = filteredTests.length;
+            const totalPages = Math.ceil(total / BATCH_SIZE) || 1;
+            const currentPageHuman = currentPage + 1;
+
+            pagers.forEach(pager => {
+                const info = pager.querySelector('.pager-info');
+                const rangeSpan = info.querySelector('.item-range');
+                const counterSpan = info.querySelector('.page-counter');
+
+                if (total === 0) {
+                    rangeSpan.innerText = "0 - 0 of 0";
+                    counterSpan.innerText = "Page 0 of 0";
+                } else {
+                    rangeSpan.innerText = `${start + 1} - ${end} of ${total}`;
+                    counterSpan.innerText = `Page ${currentPageHuman} of ${totalPages}`;
+                }
+            });
+
+            const isFirstPage = (currentPage === 0);
+            const isLastPage = (end >= total);
+
+            allPrevBtns.forEach(btn => btn.disabled = isFirstPage);
+            allNextBtns.forEach(btn => btn.disabled = isLastPage);
+        }
+
+        function handleNavigate(direction) {
+            const total = filteredTests.length;
+            const maxPage = Math.floor((total - 1) / BATCH_SIZE);
+
+            if (direction === 'prev' && currentPage > 0) {
+                renderGrid(currentPage - 1);
+                window.scrollTo({ top: gridEl.offsetTop - 150, behavior: 'smooth' });
+            } else if (direction === 'next' && currentPage < maxPage) {
+                renderGrid(currentPage + 1);
+                window.scrollTo({ top: gridEl.offsetTop - 150, behavior: 'smooth' });
+            }
+        }
+
+        allPrevBtns.forEach(btn => btn.addEventListener('click', () => handleNavigate('prev')));
+        allNextBtns.forEach(btn => btn.addEventListener('click', () => handleNavigate('next')));
+
+        // Side Nav Visibility Observer
+        const navObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    sideNav.classList.add('visible');
+                } else {
+                    // Check if we are above or below the grid
+                    const rect = entry.boundingClientRect;
+                    if (rect.top > 0 || rect.bottom < 0) {
+                        sideNav.classList.remove('visible');
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+
+        navObserver.observe(gridEl);
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') handleNavigate('prev');
+            if (e.key === 'ArrowRight') handleNavigate('next');
+        });
+
+        setupFilters();
+        renderGrid(0);
+
+        async function loadClinicalCitations() {
+            try {
+                if (!window.SoulamoreCitations) return;
+                const citationsData = window.SoulamoreCitations;
+
+                document.querySelectorAll('.assessment-card').forEach(card => {
+                    if (card.dataset.boundSci) return;
+                    card.dataset.boundSci = "true";
+
+                    const badge = card.querySelector('.sci-badge');
+                    const contentEl = card.querySelector('.sci-overlay-content');
+                    const testId = badge.getAttribute('data-citation');
+                    const data = citationsData[testId];
+
+                    if (data) {
+                        const color = card.style.getPropertyValue('--hover-color') || "var(--teal-glow)";
+                        let html = `<div class="sci-popup-title" style="color:${color}"><i class="fas fa-brain"></i> Backed By Clinical Science</div>`;
+
+                        if (data.citations) {
+                            data.citations.forEach(c => {
+                                html += `
+                                    <div class="sci-citation" style="border-left-color: ${color};">
+                                        <div class="citation-name">${c.name}</div>
+                                        <div class="citation-desc">${c.description}</div>
+                                    </div>
+                                `;
+                            });
+                        }
+                        if (data.disclaimer) {
+                            html += `<div class="sci-disclaimer">${data.disclaimer}</div>`;
+                        }
+                        contentEl.innerHTML = html;
+                    }
+
+                    badge.addEventListener('mouseenter', () => {
+                        card.classList.add('sci-hover');
+                    });
+
+                    badge.addEventListener('mouseleave', () => {
+                        card.classList.remove('sci-hover');
+                    });
+                });
+            } catch (e) { console.error("Could not load clinical citations", e); }
+        }
+        // Initialize
+        renderAssessments('all');
+        renderActiveFilters();
+
+        // Inject ItemList Schema for SEO
+        (function injectIndexSchema() {
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "ItemList",
+                "name": "Soulamore Personal Emotional Assessments",
+                "description": "A comprehensive directory of clinical-grade emotional assessments for anxiety, burnout, relationships, and more.",
+                "itemListElement": Object.keys(window.SoulamoreAssessments || {}).map((id, index) => ({
+                    "@type": "ListItem",
+                    "position": index + 1,
+                    "url": `https://soulamore.com/spaces/assessments/landing.html?id=${id}`,
+                    "name": window.SoulamoreAssessments[id] ? window.SoulamoreAssessments[id].title : "Assessment"
+                }))
+            };
+            script.text = JSON.stringify(schema);
+            document.head.appendChild(script);
+        })();
+    </script>
+</body>
+
+</html>

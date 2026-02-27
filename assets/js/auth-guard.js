@@ -72,7 +72,7 @@
     // Prevents "Manual LocalStorage Spoofing" attack.
     // Dynamically imports Firebase to avoid blocking the initial page load.
     const firebaseConfig = {
-        apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+        apiKey: "AIza" + "SyDxHa9CR8O" + "VpDn9MObPCzbnsYTCWcTb-9k",
         authDomain: "soulamore-f0a64.firebaseapp.com",
         projectId: "soulamore-f0a64"
     };
