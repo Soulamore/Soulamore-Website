@@ -172,7 +172,7 @@
         }
 
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: clamp(2rem, 8vw, 3.5rem);
             margin-bottom: 20px;
             line-height: 1.1;
             background: linear-gradient(to right, #fff, #94a3b8);
@@ -237,10 +237,25 @@
         }
 
         /* --- ASSESSMENTS LAUNCHPAD --- */
+        .filter-section {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .filter-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #64748b;
+            margin-bottom: 12px;
+            display: block;
+            font-weight: 600;
+        }
+
         .filter-bar {
             display: flex;
-            gap: 12px;
-            margin-bottom: 30px;
+            gap: 10px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
             justify-content: center;
         }
@@ -249,12 +264,47 @@
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-glass);
             color: #94a3b8;
-            padding: 8px 18px;
+            padding: 8px 16px;
             border-radius: 30px;
             cursor: pointer;
             transition: 0.3s;
             font-family: 'Outfit';
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(78, 205, 196, 0.1);
+            color: white;
+            border-color: var(--teal-glow);
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.2);
+        }
+
+        .context-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0 40px;
+        }
+
+        .context-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #64748b;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .context-btn:hover,
+        .context-btn.active {
+            border-color: var(--peach-glow);
+            color: var(--peach-glow);
+            background: rgba(244, 159, 117, 0.05);
         }
 
         .filter-btn:hover,
@@ -265,12 +315,10 @@
         }
 
         .badge-container {
-            position: absolute;
-            top: 20px;
-            left: 20px;
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
+            margin-bottom: 12px;
             z-index: 10;
         }
 
@@ -427,61 +475,52 @@
         .sci-badge:hover {
             background: rgba(255, 255, 255, 0.1);
             color: white;
-            transform: scale(1.05) rotate(3deg);
+            transform: scale(1.05);
+            /* Removed the tilt */
             border-color: rgba(255, 255, 255, 0.3);
         }
 
-        .sci-popup {
+        .assessment-card:hover .card-inner {
+            transform: translateY(-5px);
+        }
+
+        .assessment-card.sci-hover .card-inner {
+            filter: blur(15px);
+            opacity: 0.15;
+            transform: scale(0.98);
+        }
+
+        .sci-overlay {
             position: absolute;
-            bottom: calc(100% + 15px);
-            right: -20px;
-            width: 320px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--teal-glow);
-            border-radius: 20px;
-            padding: 20px;
-            color: var(--starlight);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(78, 205, 196, 0.1);
+            inset: 0;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(20px) scale(0.9);
-            transform-origin: bottom right;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 20;
-            text-align: left;
-            cursor: default;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 30;
+            background: rgba(15, 23, 42, 0.2);
+            pointer-events: none;
         }
 
-        /* The little triangle pointer */
-        .sci-popup::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            right: 40px;
-            width: 15px;
-            height: 15px;
-            background: rgba(15, 23, 42, 0.95);
-            border-right: 1px solid inherit;
-            border-bottom: 1px solid inherit;
-            transform: rotate(45deg);
-        }
-
-        .sci-badge:hover .sci-popup {
+        .assessment-card.sci-hover .sci-overlay {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0) scale(1);
+            transform: translateY(0);
         }
 
         .sci-popup-title {
             font-family: 'Outfit';
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             color: var(--teal-glow);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .sci-citation {
@@ -580,11 +619,186 @@
             .trust-banner {
                 flex-direction: column;
                 text-align: center;
+                padding: 20px;
+            }
+
+            .trust-icon {
+                font-size: 2rem;
+            }
+
+            .hero {
+                padding: 20px 0 40px;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .container {
+                padding: 20px 16px 80px;
+            }
+
+            .hero-tag {
+                font-size: 0.7rem;
+                padding: 4px 12px;
             }
 
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: 2rem;
             }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .filter-bar {
+                gap: 5px;
+            }
+
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+
+            .assessment-card {
+                padding: 30px 24px;
+            }
+
+            .card-title {
+                font-size: 1.3rem;
+            }
+
+            .trust-banner h3 {
+                font-size: 1.1rem;
+            }
+
+            .trust-text p {
+                font-size: 0.85rem;
+            }
+        }
+
+        .pager-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 450px;
+            margin: 40px auto;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .pager-btn {
+            background: none;
+            border: none;
+            color: var(--starlight);
+            font-family: 'Outfit';
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: 0.3s all;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pager-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--teal-glow);
+        }
+
+        .pager-btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        .pager-info {
+            font-family: 'Outfit';
+            font-size: 0.9rem;
+            color: var(--teal-glow);
+            font-weight: 600;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .page-counter {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- SIDE NAVIGATION --- */
+        .side-nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            pointer-events: none;
+            width: 100%;
+            left: 0;
+            padding: 0 40px;
+            justify-content: space-between;
+            flex-direction: row;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s;
+            visibility: hidden;
+        }
+
+        .side-nav.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .side-nav-btn {
+            pointer-events: auto;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0.6;
+        }
+
+        .side-nav-btn:hover:not(:disabled) {
+            opacity: 1;
+            border-color: var(--teal-glow);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+            color: var(--teal-glow);
+        }
+
+        .side-nav-btn:disabled {
+            opacity: 0.05;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        @media(max-width: 1300px) {
+            .side-nav {
+                display: none;
+                /* Hide on smaller screens to avoid overlap */
+            }
+        }
+
+        .load-more-container {
+            display: none !important;
         }
     </style>
     <link rel="icon" href="../../assets/images/favicon_symbol.png" type="image/x-icon">
@@ -629,10 +843,32 @@
                     </div>
                 </div>
 
-                <!-- FILTER BAR -->
-                <div class="filter-bar fade-in" id="filter-bar" style="animation-delay: 0.3s;">
-                    <button class="filter-btn active" data-filter="All">All Tests</button>
-                    <!-- Remaining filters injected by JS -->
+                <!-- MASTER TAG SYSTEM FILTERS -->
+                <div class="filter-section fade-in" style="animation-delay: 0.3s;">
+                    <span class="filter-label">Primary Clinical Domains</span>
+                    <div class="filter-bar" id="primary-filters">
+                        <button class="filter-btn active" data-domain="All">All Architecture</button>
+                        <!-- Injected by JS -->
+                    </div>
+
+                    <span class="filter-label" style="margin-top: 20px;">Filter by Situation</span>
+                    <div class="context-filters" id="context-filters">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- TOP PAGER -->
+                <div class="pager-container fade-in" id="top-pager-container" style="animation-delay: 0.35s;">
+                    <button class="pager-btn prev-btn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <div class="pager-info">
+                        <span class="item-range">1 - 6 of 110</span>
+                        <span class="page-counter">Page 1 of 19</span>
+                    </div>
+                    <button class="pager-btn next-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
 
                 <!-- ASSESSMENTS GRID -->
@@ -640,8 +876,28 @@
                     <!-- Auto-populated via JS -->
                 </div>
 
-                <div class="load-more-container fade-in" id="load-more-container" style="animation-delay: 0.5s;">
-                    <button class="nav-btn" id="load-more-btn">Load More <i class="fas fa-chevron-down"></i></button>
+                <!-- BOTTOM PAGER -->
+                <div class="pager-container fade-in" id="pager-container" style="animation-delay: 0.5s;">
+                    <button class="pager-btn prev-btn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <div class="pager-info">
+                        <span class="item-range">1 - 6 of 110</span>
+                        <span class="page-counter">Page 1 of 19</span>
+                    </div>
+                    <button class="pager-btn next-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- SIDE NAVIGATION ARROWS -->
+                <div class="side-nav">
+                    <button class="side-nav-btn prev-btn" title="Previous Page" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="side-nav-btn next-btn" title="Next Page">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
 
                 <!-- HOW IT WORKS -->
@@ -739,147 +995,284 @@
         setInterval(createWord, 3000);
 
         // --- DYNAMIC GRID & FILTERING LOGIC ---
-        const ALL_TESTS = Object.values(window.SoulamoreAssessments || {});
+        let ALL_TESTS = Object.values(window.SoulamoreAssessments || {});
+
+        // Sticky Randomization (Persistent discovery order)
+        function getDiscoveryOrder(array) {
+            const STORAGE_KEY = 'SoulamoreDiscoveryOrder';
+            let idOrder = [];
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) idOrder = JSON.parse(stored);
+            } catch (e) { }
+
+            const mapped = new Map(array.map(test => [test.id, test]));
+            let finalIds = idOrder.filter(id => mapped.has(id));
+            const currentIds = array.map(t => t.id);
+            const newIds = currentIds.filter(id => !idOrder.includes(id));
+
+            if (newIds.length > 0) {
+                const shuffledNew = [...newIds];
+                for (let i = shuffledNew.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledNew[i], shuffledNew[j]] = [shuffledNew[j], shuffledNew[i]];
+                }
+                finalIds = [...finalIds, ...shuffledNew];
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(finalIds));
+            }
+            return finalIds.map(id => mapped.get(id));
+        }
+
+        ALL_TESTS = getDiscoveryOrder([...ALL_TESTS]);
+
         let filteredTests = [...ALL_TESTS];
-        let currentlyDisplayed = 0;
+        let currentPage = 0;
         const BATCH_SIZE = 6;
-        let activeFilter = 'All';
+        let activeDomain = 'All';
+        let activeContexts = new Set();
 
         const gridEl = document.getElementById('assessments-grid');
-        const filterBar = document.getElementById('filter-bar');
-        const loadMoreContainer = document.getElementById('load-more-container');
-        const loadMoreBtn = document.getElementById('load-more-btn');
+        const primaryFilterBar = document.getElementById('primary-filters');
+        const contextFilterBar = document.getElementById('context-filters');
 
-        // Extract unique audiences for filters
+        // Navigation Elements
+        const pagers = document.querySelectorAll('.pager-container');
+        const sideNav = document.querySelector('.side-nav');
+        const allPrevBtns = document.querySelectorAll('.prev-btn');
+        const allNextBtns = document.querySelectorAll('.next-btn');
+
+        const DOMAINS = [
+            "Anxiety Spectrum", "Mood & Depression", "Trauma & Nervous System",
+            "Attachment & Relationships", "Burnout & Functional Exhaustion",
+            "Identity & Self-Concept", "Loneliness & Social Isolation",
+            "Grief & Loss", "Youth & Development", "Migration & Cultural Transition"
+        ];
+
+        const CONTEXTS = [
+            "Student", "Workplace", "Leadership", "Expat", "Romantic",
+            "Family", "Academic", "Creative", "Digital", "Somatic", "Performance"
+        ];
+
         function setupFilters() {
-            const audiences = new Set();
-            ALL_TESTS.forEach(test => {
-                if (test.target_audience) {
-                    test.target_audience.forEach(a => audiences.add(a));
-                }
-            });
-
-            // Create buttons
-            audiences.forEach(aud => {
-                if (aud === 'General' || aud === 'Everyone') return; // Skip generic tags
+            // Build Primary Domains
+            DOMAINS.forEach(dom => {
                 const btn = document.createElement('button');
                 btn.className = 'filter-btn';
-                btn.dataset.filter = aud;
-                btn.innerText = aud;
-                filterBar.appendChild(btn);
+                btn.dataset.domain = dom;
+                btn.innerText = dom;
+                primaryFilterBar.appendChild(btn);
             });
 
-            // Add Event Listeners
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    e.target.classList.add('active');
-                    activeFilter = e.target.dataset.filter;
-
-                    if (activeFilter === 'All') {
-                        filteredTests = [...ALL_TESTS];
-                    } else {
-                        filteredTests = ALL_TESTS.filter(t => t.target_audience && (t.target_audience.includes(activeFilter) || t.target_audience.includes('Everyone') || t.target_audience.includes('General')));
-                    }
-
-                    renderGrid(true); // Reset grid
-                });
+            // Build Context Tags
+            CONTEXTS.forEach(ctx => {
+                const btn = document.createElement('button');
+                btn.className = 'context-btn';
+                btn.dataset.context = ctx;
+                btn.innerText = ctx;
+                contextFilterBar.appendChild(btn);
             });
+
+            // Domain click events
+            primaryFilterBar.addEventListener('click', (e) => {
+                const btn = e.target.closest('.filter-btn');
+                if (!btn) return;
+
+                primaryFilterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeDomain = btn.dataset.domain;
+                applyFilters();
+            });
+
+            // Context toggle events
+            contextFilterBar.addEventListener('click', (e) => {
+                const btn = e.target.closest('.context-btn');
+                if (!btn) return;
+
+                if (activeContexts.has(btn.dataset.context)) {
+                    activeContexts.delete(btn.dataset.context);
+                    btn.classList.remove('active');
+                } else {
+                    activeContexts.add(btn.dataset.context);
+                    btn.classList.add('active');
+                }
+                applyFilters();
+            });
+        }
+
+        function applyFilters() {
+            filteredTests = ALL_TESTS.filter(test => {
+                const matchDomain = (activeDomain === 'All' || test.primary_domain === activeDomain);
+                const matchContext = (activeContexts.size === 0 ||
+                    (test.context_tags && test.context_tags.some(t => activeContexts.has(t))));
+                return matchDomain && matchContext;
+            });
+
+            renderGrid(true);
+        }
+
+        function getIconForDomain(domain) {
+            const icons = {
+                "Anxiety Spectrum": "fa-wind",
+                "Mood & Depression": "fa-cloud-showers-heavy",
+                "Trauma & Nervous System": "fa-bolt",
+                "Attachment & Relationships": "fa-link",
+                "Burnout & Functional Exhaustion": "fa-battery-quarter",
+                "Identity & Self-Concept": "fa-user-astronaut",
+                "Loneliness & Social Isolation": "fa-street-view",
+                "Grief & Loss": "fa-leaf",
+                "Youth & Development": "fa-seedling",
+                "Migration & Cultural Transition": "fa-globe-americas"
+            };
+            return icons[domain] || "fa-brain";
         }
 
         function createCardHTML(test) {
             const color = test.theme_color || "var(--teal-glow)";
+            const icon = getIconForDomain(test.primary_domain);
 
-            // Generate icon dynamically based on tags/title (or fallback)
-            let icon = 'fa-brain';
-            const str = (test.title + " " + (test.tags ? test.tags.join(' ') : "")).toLowerCase();
-            if (str.includes('anxiety')) icon = 'fa-wind';
-            if (str.includes('burnout') || str.includes('career')) icon = 'fa-battery-quarter';
-            if (str.includes('relation') || str.includes('attachment')) icon = 'fa-link';
-            if (str.includes('emotion') || str.includes('mood')) icon = 'fa-water';
-            if (str.includes('trauma')) icon = 'fa-heart-broken';
-
-            // Badges
+            // Badges (Primary + Context)
             let badgesHTML = '';
-            if (test.target_audience) {
-                test.target_audience.forEach(aud => {
-                    if (aud !== 'Everyone' && aud !== 'General') {
-                        badgesHTML += `<span class="tag-badge" style="border-bottom: 1px solid ${color}">${aud}</span>`;
-                    }
+            if (test.primary_domain) {
+                badgesHTML += `<span class="tag-badge" style="border-color: var(--teal-glow); color: var(--teal-glow)">${test.primary_domain}</span>`;
+            }
+            if (test.context_tags) {
+                test.context_tags.forEach(tag => {
+                    badgesHTML += `<span class="tag-badge">${tag}</span>`;
                 });
             }
 
             return `
-                <a href="engine.html?test=${test.id}" class="assessment-card" style="--hover-color: ${color};" onmouseover="this.style.borderColor='${color}'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.4), inset 0 0 20px ${color}10'" onmouseout="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
-                    ${badgesHTML ? `<div class="badge-container">${badgesHTML}</div>` : ''}
+                <div class="assessment-card" style="--hover-color: ${color};" onmouseover="this.style.borderColor='${color}'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.4), inset 0 0 20px ${color}10'" onmouseout="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+                    <div class="card-inner">
+                        <i class="fas ${icon} card-icon" style="color:${color};"></i>
+                        <h3 class="card-title">${test.title}</h3>
+                        ${badgesHTML ? `<div class="badge-container">${badgesHTML}</div>` : ''}
+                        <p class="card-desc">${test.description}</p>
+                        <div class="card-meta">
+                            <span><i class="far fa-clock"></i> ~5 mins</span>
+                            <a href="engine.html?test=${test.id}" class="card-btn">Begin Journey <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
                     <div class="sci-badge" data-citation="${test.id}">
                         <i class="fas fa-microscope" style="color:${color};"></i> Clinical Backing
-                        <div class="sci-popup">Loading science...</div>
                     </div>
-                    <i class="fas ${icon} card-icon" style="color:${color};"></i>
-                    <h3 class="card-title">${test.title}</h3>
-                    <p class="card-desc">${test.description}</p>
-                    <div class="card-meta">
-                        <span><i class="far fa-clock"></i> ~5 mins</span>
-                        <button class="card-btn">Begin Journey <i class="fas fa-arrow-right"></i></button>
+
+                    <div class="sci-overlay">
+                        <div class="sci-overlay-content">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
-                </a>
+                </div>
             `;
         }
 
-        function renderGrid(reset = false) {
-            if (reset) {
-                gridEl.innerHTML = '';
-                currentlyDisplayed = 0;
-            }
+        function renderGrid(page = 0) {
+            currentPage = page;
+            gridEl.innerHTML = '';
 
-            const slice = filteredTests.slice(currentlyDisplayed, currentlyDisplayed + BATCH_SIZE);
+            const start = currentPage * BATCH_SIZE;
+            const end = Math.min(start + BATCH_SIZE, filteredTests.length);
+            const slice = filteredTests.slice(start, end);
 
             slice.forEach(test => {
                 gridEl.insertAdjacentHTML('beforeend', createCardHTML(test));
             });
 
-            currentlyDisplayed += slice.length;
-
-            if (currentlyDisplayed >= filteredTests.length) {
-                loadMoreContainer.style.display = 'none';
-            } else {
-                loadMoreContainer.style.display = 'block';
-            }
-
-            // Must re-bind citation logic for newly injected DOM nodes
+            updatePager(start, end);
             loadClinicalCitations();
         }
 
-        loadMoreBtn.addEventListener('click', () => renderGrid(false));
+        function updatePager(start, end) {
+            const total = filteredTests.length;
+            const totalPages = Math.ceil(total / BATCH_SIZE) || 1;
+            const currentPageHuman = currentPage + 1;
 
-        // Initialize
+            pagers.forEach(pager => {
+                const info = pager.querySelector('.pager-info');
+                const rangeSpan = info.querySelector('.item-range');
+                const counterSpan = info.querySelector('.page-counter');
+
+                if (total === 0) {
+                    rangeSpan.innerText = "0 - 0 of 0";
+                    counterSpan.innerText = "Page 0 of 0";
+                } else {
+                    rangeSpan.innerText = `${start + 1} - ${end} of ${total}`;
+                    counterSpan.innerText = `Page ${currentPageHuman} of ${totalPages}`;
+                }
+            });
+
+            const isFirstPage = (currentPage === 0);
+            const isLastPage = (end >= total);
+
+            allPrevBtns.forEach(btn => btn.disabled = isFirstPage);
+            allNextBtns.forEach(btn => btn.disabled = isLastPage);
+        }
+
+        function handleNavigate(direction) {
+            const total = filteredTests.length;
+            const maxPage = Math.floor((total - 1) / BATCH_SIZE);
+
+            if (direction === 'prev' && currentPage > 0) {
+                renderGrid(currentPage - 1);
+                window.scrollTo({ top: gridEl.offsetTop - 150, behavior: 'smooth' });
+            } else if (direction === 'next' && currentPage < maxPage) {
+                renderGrid(currentPage + 1);
+                window.scrollTo({ top: gridEl.offsetTop - 150, behavior: 'smooth' });
+            }
+        }
+
+        allPrevBtns.forEach(btn => btn.addEventListener('click', () => handleNavigate('prev')));
+        allNextBtns.forEach(btn => btn.addEventListener('click', () => handleNavigate('next')));
+
+        // Side Nav Visibility Observer
+        const navObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    sideNav.classList.add('visible');
+                } else {
+                    // Check if we are above or below the grid
+                    const rect = entry.boundingClientRect;
+                    if (rect.top > 0 || rect.bottom < 0) {
+                        sideNav.classList.remove('visible');
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+
+        navObserver.observe(gridEl);
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') handleNavigate('prev');
+            if (e.key === 'ArrowRight') handleNavigate('next');
+        });
+
         setupFilters();
-        renderGrid(true);
+        renderGrid(0);
 
-        // --- FETCH CLINICAL CITATIONS ---
         async function loadClinicalCitations() {
             try {
                 if (!window.SoulamoreCitations) return;
                 const citationsData = window.SoulamoreCitations;
 
-                document.querySelectorAll('.sci-badge').forEach(badge => {
-                    // Prevent binding multiple times to the same element
-                    if (badge.dataset.bound) return;
-                    badge.dataset.bound = "true";
+                document.querySelectorAll('.assessment-card').forEach(card => {
+                    if (card.dataset.boundSci) return;
+                    card.dataset.boundSci = "true";
 
+                    const badge = card.querySelector('.sci-badge');
+                    const contentEl = card.querySelector('.sci-overlay-content');
                     const testId = badge.getAttribute('data-citation');
                     const data = citationsData[testId];
-                    if (data) {
-                        const popup = badge.querySelector('.sci-popup');
-                        const cardIconColor = badge.closest('.assessment-card').style.getPropertyValue('--hover-color') || "var(--teal-glow)";
 
-                        let html = `<div class="sci-popup-title" style="color:${cardIconColor}"><i class="fas fa-brain"></i> Backed By Clinical Science</div>`;
+                    if (data) {
+                        const color = card.style.getPropertyValue('--hover-color') || "var(--teal-glow)";
+                        let html = `<div class="sci-popup-title" style="color:${color}"><i class="fas fa-brain"></i> Backed By Clinical Science</div>`;
 
                         if (data.citations) {
                             data.citations.forEach(c => {
                                 html += `
-                                    <div class="sci-citation" style="border-left-color: ${cardIconColor};">
+                                    <div class="sci-citation" style="border-left-color: ${color};">
                                         <div class="citation-name">${c.name}</div>
                                         <div class="citation-desc">${c.description}</div>
                                     </div>
@@ -889,12 +1282,16 @@
                         if (data.disclaimer) {
                             html += `<div class="sci-disclaimer">${data.disclaimer}</div>`;
                         }
-
-                        popup.innerHTML = html;
-                        popup.style.borderColor = cardIconColor;
-
-                        badge.addEventListener('click', (e) => e.preventDefault());
+                        contentEl.innerHTML = html;
                     }
+
+                    badge.addEventListener('mouseenter', () => {
+                        card.classList.add('sci-hover');
+                    });
+
+                    badge.addEventListener('mouseleave', () => {
+                        card.classList.remove('sci-hover');
+                    });
                 });
             } catch (e) { console.error("Could not load clinical citations", e); }
         }
