@@ -29,6 +29,16 @@ async function initNewsFeed(containerId, limit = 6) {
         } catch (e) { console.warn("Cache parse failed", e); }
     }
 
+    // Show Loading State
+    if (!cachedData) {
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 50px; opacity: 0.5;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 20px;"></i>
+                <p>Curating your mental health ritual...</p>
+            </div>
+        `;
+    }
+
     // 2. Fetch Fresh Data with Cache Buster
     try {
         const response = await fetch(`${rootPath}assets/data/news-feed.json?t=${now}`);
