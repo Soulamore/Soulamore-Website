@@ -75,27 +75,46 @@
                 through historical headlines.</p>
         </div>
         <div class="container">
-            <div class="archive-controls">
-                <select id="archive-year">
-                    <option value="2026">2026</option>
-                    <option value="2025">2025</option>
-                </select>
-                <select id="archive-month">
-                    <option value="01">January</option>
-                    <option value="02" selected>February</option>
-                    <option value="03">March</option>
-                    <option value="04">April</option>
-                    <option value="05">May</option>
-                    <option value="06">June</option>
-                    <option value="07">July</option>
-                    <option value="08">August</option>
-                    <option value="09">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
-                <button id="load-archive"
-                    style="background: #4ECDC4; border: none; padding: 10px 25px; border-radius: 12px; font-weight: 700; cursor: pointer;">Browse</button>
+            <!-- ARCHIVE SEARCH BAR -->
+            <div style="max-width: 800px; margin: 0 auto 40px; position: relative;">
+                <input type="text" id="archive-search" placeholder="Search archived headlines, rituals, or keywords..."
+                    style="width: 100%; padding: 18px 25px; border-radius: 50px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(78, 205, 196, 0.2); color: white; font-family: inherit; font-size: 1rem; transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                <i class="fas fa-search"
+                    style="position: absolute; right: 25px; top: 50%; transform: translateY(-50%); color: #4ECDC4; opacity: 0.5;"></i>
+            </div>
+
+            <div class="archive-controls"
+                style="margin-bottom: 60px; padding: 20px; background: rgba(30, 41, 59, 0.4); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); gap: 15px;">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label style="font-size: 0.8rem; opacity: 0.6; font-weight: 600;">YEAR</label>
+                        <select id="archive-year" style="padding: 12px 25px; min-width: 120px;">
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label style="font-size: 0.8rem; opacity: 0.6; font-weight: 600;">MONTH</label>
+                        <select id="archive-month" style="padding: 12px 25px; min-width: 150px;">
+                            <option value="01">January</option>
+                            <option value="02" selected>February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    <button id="load-archive"
+                        style="background: #4ECDC4; border: none; padding: 14px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; color: #0f172a; transition: 0.3s; margin-left: 10px;">
+                        <i class="fas fa-calendar-check" style="margin-right: 8px;"></i>Browse Archive
+                    </button>
+                </div>
             </div>
             <div id="archive-grid" class="news-grid">
                 <!-- Archived news injected by JS -->
@@ -111,29 +130,56 @@
             const yearBtn = document.getElementById('archive-year');
             const monthBtn = document.getElementById('archive-month');
             const loadBtn = document.getElementById('load-archive');
+            const searchInput = document.getElementById('archive-search');
+
+            let allArticles = [];
 
             async function loadArchive() {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">Loading historical records...</p>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; opacity: 0.5;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 20px;"></i><p>Retrieving mental wellness records...</p></div>';
                 const year = yearBtn.value;
                 const month = monthBtn.value;
                 const rootPath = '../';
 
                 try {
-                    // Try to load any archive from this month (simplified for now to news_archive_YYYY-MM-DD format)
-                    // In a production scenario, this would ideally list all files in the directory
-                    // Since we're client-side, we'll try to fetch the latest for that month
+                    // Fetch the latest for that month
                     const date = new Date();
                     const day = date.getDate().toString().padStart(2, '0');
                     const response = await fetch(`${rootPath}knowledge source/news sourced/${year}/${month}/news_archive_${year}-${month}-${day}.json`);
 
-                    if (!response.ok) throw new Error('No archive found for this period.');
-                    const articles = await response.json();
-                    renderArticles(grid, articles);
+                    if (!response.ok) throw new Error('No archive found for this period. Try browsing the current month.');
+
+                    allArticles = await response.json();
+                    renderWithFilter();
                 } catch (e) {
-                    grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">${e.message}</p>`;
+                    grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; opacity: 0.5; padding: 50px;">${e.message}</p>`;
                 }
             }
 
+            function renderWithFilter() {
+                const query = searchInput.value.toLowerCase();
+                const filtered = allArticles.filter(a =>
+                    a.title.toLowerCase().includes(query) ||
+                    (a.description && a.description.toLowerCase().includes(query)) ||
+                    a.source.name.toLowerCase().includes(query)
+                );
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.3; padding: 50px;">No records match your search query.</p>';
+                } else {
+                    renderArticles(grid, filtered);
+                    // Customize badges for archive (less "Live", more "Insight")
+                    document.querySelectorAll('.news-card span').forEach(span => {
+                        if (span.textContent === 'Live') {
+                            span.textContent = 'Archive';
+                            span.style.background = 'rgba(78, 205, 196, 0.2)';
+                            span.style.color = '#4ECDC4';
+                            span.style.border = '1px solid rgba(78, 205, 196, 0.3)';
+                        }
+                    });
+                }
+            }
+
+            searchInput.addEventListener('input', renderWithFilter);
             loadBtn.addEventListener('click', loadArchive);
             loadArchive(); // Initial load
         });
