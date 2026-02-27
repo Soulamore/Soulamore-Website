@@ -35,6 +35,10 @@ jobs:
         run: |
           git config --global user.name "Soulamore Bot"
           git config --global user.email "bot@soulamore.com"
-          git add assets/data/news-feed.json assets/data/rituals.json "knowledge source/news sourced/**/*.json"
+          # Stage files only if they exist
+          git add assets/data/news-feed.json || true
+          git add assets/data/rituals.json || true
+          # Add any existing archive JSONs
+          find "knowledge source/news sourced" -name "*.json" | xargs -r git add || true
           git commit -m "chore: dynamic news update [skip ci]" || echo "No changes to commit"
           git push
