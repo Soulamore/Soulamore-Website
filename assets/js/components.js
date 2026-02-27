@@ -105,7 +105,7 @@ try {
                 height: 48px !important;
                 position: relative !important;
                 width: 180px !important; /* Estimated width to fit both icon and text */
-                overflow: hidden !important;
+                overflow: visible !important; /* FIX: Allow logo to scale on hover without clipping */
             }
             .logo-icon {
                 height: 100% !important;
@@ -784,9 +784,9 @@ const getFooterHTML = (rootPath) => `
     </div>
 
     <!-- LIVE NEWS TICKER (Global Integration) -->
-    <div class="news-ticker-container" style="background: rgba(15, 23, 42, 0.95); border-top: 1px solid rgba(244, 159, 117, 0.3); padding: 8px 0; overflow: hidden; white-space: nowrap; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999; backdrop-filter: blur(10px); text-align: left !important;">
-        <div class="news-ticker-label" style="display: inline-block; background: #F49F75; color: #0f172a; padding: 2px 12px; font-weight: 800; font-size: 0.75rem; margin-right: 20px; text-transform: uppercase; position: relative; z-index: 2; box-shadow: 10px 0 20px rgba(15, 23, 42, 0.95);">Live News Feed</div>
-        <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.9rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+    <div class="news-ticker-container" style="background: rgba(15, 23, 42, 0.95); border-top: 1px solid rgba(244, 159, 117, 0.3); height: 32px; display: flex; align-items: center; overflow: hidden; white-space: nowrap; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999; backdrop-filter: blur(10px); text-align: left !important;">
+        <div class="news-ticker-label" style="background: #F49F75; color: #0f172a; padding: 0 12px; height: 100%; display: flex; align-items: center; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; position: relative; z-index: 2; box-shadow: 10px 0 20px rgba(15, 23, 42, 0.95); flex-shrink: 0;">Live News Feed</div>
+        <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif;">
             Fetching the latest mental health rituals and global insights...
         </div>
     </div>
@@ -1060,6 +1060,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindMobileToggle(); // ADDED: Ensure mobile toggle binding
     injectSoulBotWidget(); // ADDED: Ensure SoulBot widget injection
     injectCookieBanner(); // ADDED: GDPR Compliance
+    if (window.initGlobalTicker) window.initGlobalTicker(); // Initialize news feed news ticker on all pages
 });
 
 // --- 5. ACTIVE STATE LOGIC ---

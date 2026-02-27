@@ -79,15 +79,76 @@ function renderSync(container, articles, limit) {
     }
 }
 
+/**
+ * Global Ticker Initialization
+ * Used when no grid container is present but the global ticker needs loading.
+ */
+async function initGlobalTicker() {
+    const ticker = document.getElementById('news-ticker');
+    if (!ticker) return;
+
+    const cacheKey = 'soulamore_news_cache_global';
+    const expiryKey = 'soulamore_news_expiry_global';
+    const REFRESH_INTERVAL = 30 * 60 * 1000;
+    const now = new Date().getTime();
+
+    // 1. Check Cache
+    const cachedData = localStorage.getItem(cacheKey);
+    const lastFetch = localStorage.getItem(expiryKey);
+
+    if (cachedData && lastFetch && (now - parseInt(lastFetch) < REFRESH_INTERVAL)) {
+        try {
+            renderTicker(ticker, JSON.parse(cachedData));
+            return;
+        } catch (e) { console.warn("Ticker cache parse failed", e); }
+    }
+
+    // 2. Fetch Fresh Data
+    try {
+        const rootPath = window.location.pathname.includes('/company/') || window.location.pathname.includes('/community/') || window.location.pathname.includes('/spaces/') || window.location.pathname.includes('/tools/') ? '../' : '';
+        // Better root detection for deep pages
+        const folderCount = (window.location.pathname.match(/\//g) || []).length;
+        let finalRoot = '';
+        if (folderCount >= 3) finalRoot = '../../';
+        else if (folderCount >= 2) finalRoot = '../';
+
+        const response = await fetch(`${finalRoot}assets/data/news-feed.json?t=${now}`);
+        if (!response.ok) throw new Error('Unavailable');
+        const articles = await response.json();
+
+        if (articles && articles.length > 0) {
+            renderTicker(ticker, articles);
+            localStorage.setItem(cacheKey, JSON.stringify(articles));
+            localStorage.setItem(expiryKey, now.toString());
+        }
+    } catch (e) {
+        if (cachedData) renderTicker(ticker, JSON.parse(cachedData));
+    }
+}
+
 function renderTicker(ticker, articles) {
-    // Combine all headlines into a single scrolling string
+    if (!articles || articles.length === 0) return;
+
+    // Combine all headlines
     const tickerContent = articles.map(article =>
-        `<a href="${article.url}" target="_blank" style="color: #e2e8f0; text-decoration: none; margin-right: 50px; transition: color 0.3s;">
+        `<a href="${article.url}" target="_blank" style="color: #e2e8f0; text-decoration: none; margin-right: 60px; transition: color 0.3s; display: inline-block;">
             <span style="color: #4ECDC4;">•</span> ${article.title}
          </a>`
     ).join('');
 
-    ticker.innerHTML = tickerContent + tickerContent; // Duplicate for seamless looping
+    // Update Content
+    ticker.innerHTML = tickerContent + tickerContent;
+
+    // --- STABILIZE SPEED ---
+    // We want a constant speed (pixels per second)
+    // Formula: Total Width / Speed = Duration
+    // Base: 150s was for ~15 items. 
+    // Let's target ~50 pixels per second for readability.
+    const containerWidth = ticker.scrollWidth / 2; // Half because we duplicate
+    const speed = 40; // Pixels per second (Adjusted for readability)
+    const duration = containerWidth / speed;
+
+    ticker.style.animationDuration = `${duration}s`;
 }
 
 function renderArticles(container, articles) {
