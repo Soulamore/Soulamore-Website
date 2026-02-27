@@ -10,57 +10,62 @@ async function initNewsFeed(containerId, limit = 6) {
     if (!container) return;
 
     const cacheKey = `soulamore_news_cache_${containerId}`;
+    const expiryKey = `soulamore_news_expiry_${containerId}`;
+    const REFRESH_INTERVAL = 30 * 60 * 1000; // 30 minutes
     const rootPath = window.location.pathname.includes('/company/') || window.location.pathname.includes('/community/') ? '../' : '';
 
-    // 1. Check Cache First (Instant Load)
+    // 1. Check Cache and Expiry
     const cachedData = localStorage.getItem(cacheKey);
-    if (cachedData) {
+    const lastFetch = localStorage.getItem(expiryKey);
+    const now = new Date().getTime();
+
+    if (cachedData && lastFetch && (now - parseInt(lastFetch) < REFRESH_INTERVAL)) {
         try {
             const articles = JSON.parse(cachedData);
             if (articles && articles.length > 0) {
-                renderArticles(container, articles.slice(0, limit));
-                // Optional: Update ticker if it exists
-                const ticker = document.getElementById('news-ticker');
-                if (ticker) renderTicker(ticker, articles);
+                renderSync(container, articles, limit);
+                return; // Valid cache
             }
-        } catch (e) {
-            console.warn("News cache invalid", e);
-        }
-    } else {
-        // Show Loading State ONLY if no cache exists
-        container.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 50px; opacity: 0.5;">
-                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 20px;"></i>
-                <p>Curating your mental health ritual...</p>
-            </div>
-        `;
+        } catch (e) { console.warn("Cache parse failed", e); }
     }
 
+    // 2. Fetch Fresh Data with Cache Buster
     try {
-        // 2. Fetch Fresh Data with Cache Buster
-        const response = await fetch(`${rootPath}assets/data/news-feed.json?t=${new Date().getTime()}`);
+        const response = await fetch(`${rootPath}assets/data/news-feed.json?t=${now}`);
         if (!response.ok) throw new Error('News feed currently unavailable');
 
         const articles = await response.json();
 
         if (articles && articles.length > 0) {
-            // Update UI with fresh data
-            renderArticles(container, articles.slice(0, limit));
+            // Update UI
+            renderSync(container, articles, limit);
 
-            // Update Global Ticker
-            const ticker = document.getElementById('news-ticker');
-            if (ticker) renderTicker(ticker, articles);
-
-            // 3. Save to Cache for next visit
+            // 3. Save to Cache for 30 mins
             localStorage.setItem(cacheKey, JSON.stringify(articles));
+            localStorage.setItem(expiryKey, now.toString());
         } else if (!cachedData) {
             container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No news rituals active at this moment.</p>';
         }
     } catch (error) {
         console.error("News Load Error:", error);
-        if (!cachedData) {
-            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">Stay tuned. Live news feed is refreshing.</p>';
+        if (cachedData) {
+            renderSync(container, JSON.parse(cachedData), limit);
         }
+    }
+}
+
+/**
+ * Synchronized Rendering
+ * Ensures both the grid and ticker use the exact same slice of data.
+ */
+function renderSync(container, articles, limit) {
+    // Show up to the requested limit in the grid
+    renderArticles(container, articles.slice(0, limit));
+
+    // Update Global Ticker if it exists
+    const ticker = document.getElementById('news-ticker');
+    if (ticker) {
+        renderTicker(ticker, articles);
     }
 }
 

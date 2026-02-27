@@ -35,7 +35,7 @@ def fetch_news():
     try:
         print("Fetching mental health news from India...")
         india_params = {
-            "q": "(mental health OR psychology OR wellness) AND India",
+            "q": "(mental health OR psychology OR \"emotional well-being\") AND India",
             "from": last_week.strftime("%Y-%m-%d"),
             "to": today.strftime("%Y-%m-%d"),
             "sortBy": "relevancy",
