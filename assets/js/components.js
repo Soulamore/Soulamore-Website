@@ -37,6 +37,90 @@ try {
             animation-play-state: paused !important;
         }
 
+        /* LOGO SYSTEM (Universal Positioning) */
+        .logo-wrapper {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 48px !important;
+            width: auto !important;
+            min-width: 48px !important;
+            overflow: visible !important;
+            text-decoration: none;
+        }
+        .logo-icon {
+            height: 100% !important;
+            width: auto !important;
+            object-fit: contain !important;
+            z-index: 2 !important;
+        }
+        .logo-text-overlay {
+            height: 100% !important;
+            width: auto !important;
+            object-fit: contain !important;
+            filter: brightness(0) invert(1) !important; /* White */
+            z-index: 1 !important;
+            margin-left: -5px; /* Slight overlap for tight branding */
+        }
+
+        /* Button Consistency - FIXED COLORS */
+        .nav-btn, .lifeline-btn {
+            background: linear-gradient(135deg, #4ECDC4, #2a9d8f) !important; /* BRAND GRADIENT */
+            border: 1px solid rgba(78, 205, 196, 0.3) !important;
+            border-radius: 50px !important;
+            color: #0f172a !important; /* Dark text on bright background */
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2) !important;
+        }
+        .nav-btn {
+             padding: 0 14px !important;
+             height: 42px !important;
+             font-size: 0.9rem !important;
+             flex-shrink: 0 !important;
+             overflow: hidden !important;
+        }
+        .nav-btn:hover, .lifeline-btn:hover {
+            background: linear-gradient(135deg, #5eddd4, #3aad9f) !important; /* Brighter on hover */
+            color: #0f172a !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4) !important;
+        }
+        /* Specific override for Get Help to distinguish slightly if needed, or keep uniform */
+        .lifeline-btn {
+            border-color: #ef4444 !important; /* Solid Red Border */
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: #fca5a5 !important; /* Light Red Text for Contrast */
+            padding: 0 15px !important;
+            height: 42px !important;
+            font-size: 0.9rem !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            width: fit-content !important;
+            min-width: 0 !important;
+            flex-grow: 0 !important;
+            overflow: hidden !important; /* Isolate shimmer */
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important;
+        }
+        .lifeline-btn:hover {
+            background: #ef4444 !important;
+            color: white !important;
+            border-color: #ef4444 !important;
+        }
+        .user-icon-btn i {
+            font-size: 2.2rem !important; /* FORCE LARGE SIZE */
+            display: block !important;
+            width: auto !important;
+            height: auto !important;
+            line-height: 1 !important;
+        }
+
         /* DESKTOP (Width > 1024px) */
         @media (min-width: 1025px) {
             header {
@@ -60,7 +144,6 @@ try {
                 gap: clamp(2px, 0.5vw, 6px) !important; /* TIGHTER GAP MAX */
                 align-items: center !important;
                 visibility: visible !important; /* Ensure visibility */
-                opacity: 1 !important;
                 opacity: 1 !important;
                 overflow: visible !important; /* FIX SCROLLBAR */
                 border: none !important;
@@ -100,127 +183,38 @@ try {
                 margin-right: 10px !important; /* Add small breathing room */
                 overflow: visible !important; /* FIX: Prevent scaling clipping */
             }
-            /* LOGO SYSTEM (Universal Positioning) */
-            .logo-wrapper {
-                position: relative !important;
-                display: flex !important;
-                align-items: center !important;
-                height: 48px !important;
-                width: auto !important;
-                min-width: 48px !important;
-                overflow: visible !important;
-                text-decoration: none;
-            }
             .logo-icon {
-                height: 100% !important;
-                width: auto !important;
-                object-fit: contain !important;
-                z-index: 2 !important;
+                clip-path: inset(0 68% 0 0) !important;
+                position: absolute !important;
+                left: 0 !important;
+                transition: transform 0.3s ease !important;
             }
             .logo-text-overlay {
-                height: 100% !important;
-                width: auto !important;
-                object-fit: contain !important;
-                filter: brightness(0) invert(1) !important; /* White */
-                z-index: 1 !important;
-                margin-left: -5px; /* Slight overlap for tight branding */
-            }
-
-            @media (min-width: 1025px) {
-                .logo-icon {
-                    clip-path: inset(0 68% 0 0) !important;
-                    position: absolute !important;
-                    left: 0 !important;
-                    transition: transform 0.3s ease !important;
-                }
-                .logo-text-overlay {
-                    display: block !important;
-                    position: absolute !important;
-                    left: 0 !important;
-                    clip-path: inset(0 0 0 32%) !important;
-                    transition: transform 0.3s ease !important;
-                }
-                .logo-wrapper { width: 180px !important; }
-                .logo-wrapper:hover .logo-icon { transform: scale(1.08) !important; }
-                .logo-wrapper:hover .logo-text-overlay {
-                    transform: scale(1.08) !important;
-                    clip-path: inset(-5% -5% -5% 32%) !important;
-                }
-            }
-
-            /* MOBILE LOGO (Width <= 1024px) - Unified Rule */
-            @media (max-width: 1024px) {
-                .logo-text-overlay { display: none !important; visibility: hidden !important; } 
-                .logo-icon { clip-path: none !important; position: static !important; height: 35px !important; }
-                .logo-wrapper { width: 45px !important; min-width: 45px !important; }
-            }
-            /* Button Consistency - FIXED COLORS */
-            .nav-btn, .lifeline-btn {
-                background: linear-gradient(135deg, #4ECDC4, #2a9d8f) !important; /* BRAND GRADIENT */
-                border: 1px solid rgba(78, 205, 196, 0.3) !important;
-                border-radius: 50px !important;
-                color: #0f172a !important; /* Dark text on bright background */
-                font-weight: 600 !important;
-                transition: all 0.3s ease !important;
-                text-decoration: none !important;
-                white-space: nowrap !important;
-                display: flex !important;
-                align-items: center !important;
-                gap: 8px !important;
-                box-sizing: border-box !important;
-                box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2) !important;
-            }
-            .nav-btn {
-                 padding: 0 14px !important;
-                 height: 42px !important;
-                 font-size: 0.9rem !important;
-                 flex-shrink: 0 !important;
-                 overflow: hidden !important;
-            }
-            .nav-btn:hover, .lifeline-btn:hover {
-                background: linear-gradient(135deg, #5eddd4, #3aad9f) !important; /* Brighter on hover */
-                color: #0f172a !important;
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4) !important;
-            }
-            /* Specific override for Get Help to distinguish slightly if needed, or keep uniform */
-            .lifeline-btn {
-                border-color: #ef4444 !important; /* Solid Red Border */
-                background: rgba(239, 68, 68, 0.15) !important;
-                color: #fca5a5 !important; /* Light Red Text for Contrast */
-                padding: 0 15px !important;
-                height: 42px !important;
-                font-size: 0.9rem !important;
-                justify-content: center !important;
-                flex-shrink: 0 !important;
-                width: fit-content !important;
-                min-width: 0 !important;
-                flex-grow: 0 !important;
-                overflow: hidden !important; /* Isolate shimmer */
-                box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important;
-            }
-            .lifeline-btn:hover {
-                background: #ef4444 !important;
-                color: white !important;
-                border-color: #ef4444 !important;
-            }
-            .user-icon-btn i {
-                font-size: 2.2rem !important; /* FORCE LARGE SIZE */
                 display: block !important;
-                width: auto !important;
-                height: auto !important;
-                line-height: 1 !important;
+                position: absolute !important;
+                left: 0 !important;
+                clip-path: inset(0 0 0 32%) !important;
+                transition: transform 0.3s ease !important;
             }
-            /* Ensure logo looks good on desktop */
-            .logo-wrapper {
-                display: flex !important;
-                align-items: center !important;
-                height: 48px !important;
-                position: relative !important;
+            .logo-wrapper { width: 180px !important; }
+            .logo-wrapper:hover .logo-icon { transform: scale(1.08) !important; }
+            .logo-wrapper:hover .logo-text-overlay {
+                transform: scale(1.08) !important;
+                clip-path: inset(-5% -5% -5% 32%) !important;
             }
         }
+
         /* MOBILE (Width <= 1024px) */
         @media (max-width: 1024px) {
+            .logo-text-overlay { display: none !important; visibility: hidden !important; } 
+            .logo-icon { 
+                clip-path: none !important; 
+                position: static !important; 
+                height: 38px !important; 
+                width: auto !important;
+            }
+            .logo-wrapper { width: 150px !important; min-width: 150px !important; }
+
             .auth-box { display: none !important; }
             .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
             .main-nav {
@@ -396,14 +390,45 @@ try {
                 background: rgba(0,0,0,0.001) !important; /* Ensure Toggle is ALWAYS on top */
                 z-index: 1001 !important;
             }
-.mobile-toggle {
-    z-index: 99999 !important; /* SAFE HIGH Z-INDEX */
-    pointer-events: auto !important;
-    cursor: pointer !important;
-    /* Above nuclear menu */
-    /* Must be above the menu (2050) */
-    /* Highest priority */
-}
+            /* Level 3: Deep Nested */
+            .dropdown-content .dropdown-content .dropdown-content {
+                left: 100% !important;
+                top: 0 !important;
+                margin-top: -5px !important;
+            }
+
+            .dropdown-content a, .dropdown-submenu a {
+                color: #e2e8f0 !important;
+                display: block !important;
+                margin: 2px 4px !important; /* Reduced margins */
+                border-radius: 6px !important;
+                padding: 6px 10px !important; /* Reduced padding */
+                width: auto !important; 
+                box-sizing: border-box !important;
+                font-size: 0.9rem !important; /* Smaller text */
+            }
+            .dropdown-content a:hover, .dropdown-submenu a:hover {
+                background: rgba(255,255,255,0.1) !important;
+                color: #4ECDC4 !important;
+            }
+            
+            /* Prevent Header Scattering - Only for Auth Box & Main Nav Container */
+            .main-nav, .auth-box {
+                flex-wrap: nowrap !important;
+            }
+             /* FORCE SINGLE LINE HEADER */
+            .nav-links {
+               flex-wrap: nowrap !important; 
+               white-space: nowrap !important;
+               justify-content: center !important;
+            }
+        }
+
+        .mobile-toggle {
+            z-index: 99999 !important; /* SAFE HIGH Z-INDEX */
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
             /* Level 3: Deep Nested */
             .dropdown-content .dropdown-content .dropdown-content {
                 left: 100% !important;
@@ -1560,7 +1585,7 @@ function injectMobileBottomNav() {
     style.innerHTML = `
         .mobile-bottom-nav {
             position: fixed;
-            bottom: 90px;
+            bottom: 45px;
             left: 50%;
             transform: translateX(-50%);
             width: 92%; /* MATCH TOP HEADER WIDTH EXACTLY */
@@ -1619,31 +1644,32 @@ function injectMobileBottomNav() {
 
         /* MOBILE UI REFINEMENTS (Width <= 1024px) */
         @media (max-width: 1024px) {
+            /* 1. Audio Control: Circular Glass Icon */
             .audio-control {
-                width: auto !important;
-                height: 42px !important;
-                padding: 0 16px !important;
+                width: 50px !important;
+                height: 50px !important;
+                padding: 0 !important;
                 display: flex !important;
                 align-items: center !important;
-                gap: 10px !important;
-                border-radius: 50px !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
                 left: 20px !important;
-                bottom: 155px !important; /* Above wide nav bar */
-                background: rgba(15, 23, 42, 0.9) !important;
+                bottom: 120px !important; /* Above wide nav bar */
+                background: rgba(15, 23, 42, 0.85) !important;
+                backdrop-filter: blur(12px) !important;
                 border: 1px solid #F49F75 !important;
                 box-shadow: 0 8px 20px rgba(0,0,0,0.5) !important;
             }
-            .audio-control #audioText {
-                display: block !important;
-                font-size: 0.85rem !important;
-                font-weight: 600 !important;
-                color: white !important;
-            }
+            .audio-control #audioText { display: none !important; }
             .audio-control .audio-bars {
                 display: flex !important;
+                margin: 0 !important;
             }
-            #soulbot-widget-fab { display: none !important; visibility: hidden !important; pointer-events: none !important; }
-            #sb-window { bottom: 140px !important; }
+
+            /* 2. SoulBot: Hide ONLY on Mobile */
+            #soulbot-widget-container { display: none !important; visibility: hidden !important; }
+            #soulbot-widget-fab { display: none !important; visibility: hidden !important; }
+            #sb-window { display: none !important; }
         }
 
         /* HIDE ON DESKTOP */

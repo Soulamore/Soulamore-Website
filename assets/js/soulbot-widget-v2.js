@@ -92,9 +92,9 @@
 
             /* MOBILE TWEAKS (Aligned with components.js) */
             @media (max-width: 1024px) {
-                #soulbot-widget-container { bottom: 140px !important; right: 20px; display: none !important; }
+                #soulbot-widget-container { display: none !important; visibility: hidden !important; }
                 #soulbot-widget-fab { display: none !important; visibility: hidden !important; pointer-events: none !important; }
-                #sb-window { width: 90vw; right: 5vw; bottom: 145px; height: 60vh; }
+                #sb-window { display: none !important; }
             }
         </style>
         
