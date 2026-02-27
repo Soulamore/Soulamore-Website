@@ -176,7 +176,7 @@ try {
             .news-ticker-content {
                 display: inline-block !important;
                 padding-left: 100% !important;
-                animation: ticker-scroll 30s linear infinite !important;
+                animation: ticker-scroll 120s linear infinite !important;
                 white-space: nowrap !important;
             }
             .news-ticker-container:hover .news-ticker-content {

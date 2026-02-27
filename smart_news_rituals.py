@@ -33,13 +33,17 @@ def fetch_news():
     
     # 1. Fetch Trending Indian News (Core Focus)
     try:
-        print("Fetching trending news from India...")
+        print("Fetching mental health news from India...")
         india_params = {
-            "country": "in",
+            "q": "(mental health OR psychology OR wellness) AND India",
+            "from": last_week.strftime("%Y-%m-%d"),
+            "to": today.strftime("%Y-%m-%d"),
+            "sortBy": "relevancy",
+            "language": "en",
             "apiKey": API_KEY,
             "pageSize": 50
         }
-        res = requests.get("https://newsapi.org/v2/top-headlines", params=india_params)
+        res = requests.get(NEWS_API_URL, params=india_params)
         res.raise_for_status()
         data = res.json()
         if data.get("status") == "ok":
