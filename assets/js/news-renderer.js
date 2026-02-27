@@ -140,7 +140,6 @@ function renderTicker(ticker, articles) {
          </a>`
     ).join('');
 
-    // Update Content
     ticker.innerHTML = tickerContent + tickerContent;
 
     // --- STABILIZE SPEED (Constant Pixels-per-second) ---
