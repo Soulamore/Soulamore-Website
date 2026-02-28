@@ -31,6 +31,11 @@ const RITUAL_SCHEDULE = [
         "description": "For the unseen caste and class divide."
     },
     {
+        "date": "2026-02-28",
+        "name": "Solidarity with Iran",
+        "description": "Collective moment for the safety and peace of those in Iran."
+    },
+    {
         "date": "2026-03-03",
         "name": "Holi",
         "description": "Colors of Emotion. Release shame."
@@ -443,6 +448,7 @@ window.renderRitualWidget = function (containerId, isDarkTheme = false) {
     else if (nameLower.includes("brother") || nameLower.includes("raksha")) icon = "🧶";
     else if (nameLower.includes("health") || nameLower.includes("prevention")) icon = "💚";
     else if (nameLower.includes("justice") || nameLower.includes("gandhi")) icon = "⚖️";
+    else if (nameLower.includes("iran") || nameLower.includes("solidarity")) icon = "🕯️";
 
     const descriptionHtml = nextRitual.description
         ? `<div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-top: 4px; margin-left: 32px;">${nextRitual.description}</div>`
