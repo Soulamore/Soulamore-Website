@@ -1428,92 +1428,77 @@
 
             </script>
             <!-- DASHBOARD HYDRATION SCRIPT -->
-            <script type="module">import {
-                    onAuthChange
-                }
+            <script type="module">
+                import { onAuthChange } from "../assets/js/auth-service.js";
+                import { getUserProfile, createOrUpdateUserProfile } from "../assets/js/profile-handler.js";
 
-                    from "../assets/js/auth-service.js";
+                // Hydrate dashboard UI whenever auth state changes
+                onAuthChange(async (user) => {
+                    if (!user) {
+                        console.log("Dashboard: no authenticated user.");
+                        return;
+                    }
 
-                import {
+                    try {
+                        console.log("Dashboard: user detected", user.uid);
 
-                    getUserProfile,
-                    createOrUpdateUserProfile
-                }
+                        // 1. Get Profile
+                        let profile = await getUserProfile(user.uid);
 
-                    from "../assets/js/profile-handler.js";
-
-                document.addEventListener('DOMContentLoaded', () => {
-                    onAuthChange(async (user) => {
-                        if (user) {
-                            // 1. Get Profile
-                            let profile = await getUserProfile(user.uid);
-
-                            // 2. If no profile, try to create one (recovery)
-                            if (!profile) {
-                                console.info("Profile missing in dashboard, attempting recovery...");
-                                await createOrUpdateUserProfile(user);
-                                profile = await getUserProfile(user.uid);
-                            }
-
-                            if (profile) {
-                                // 3. Update UI
-                                const name = profile.displayName || user.displayName || 'Friend';
-                                const email = profile.email || user.email;
-                                const phone = profile.phone || '';
-
-                                // Personal Greeting
-                                const greetingEl = document.getElementById('welcome-greeting');
-
-                                if (greetingEl) greetingEl.innerHTML = `Welcome back, <span style="color:var(--teal-accent);" >${name
-                                    }
-
-                                </span>.`;
-
-                                // URL Masking (Client-Side Routing Feel) - Makes it look personalized
-                                // Only change if not already clean (avoids loop)
-                                if (window.history && window.history.replaceState) {
-                                    // Use replaceState to change URL bar without reload
-                                    // From: /portal/user-dashboard.html
-                                    // To:   /portal/my-space
-                                    const cleanUrl = window.location.href.replace('user-dashboard.html', 'my-space');
-                                    // window.history.replaceState({}, document.title, cleanUrl);
-                                    // CAUTION: Only do this if we are confident user won't 404 on refresh.
-                                    // Since we don't control server rewrites yet, let's stick to a safe query param or hash for now to be safe?
-                                    // User explicitly asked for "redirected to HIS page". 
-                                    // Let's settle for a visual hash for now which is 100% safe: #/my-space/aditya
-                                    // OR just update the greeting as the main "Personal" indicator as per my plan.
-
-                                    // Let's go with the greeting update as the primary "Personalization" proof.
-                                    // And maybe add a hash:
-                                    // window.location.hash = `/space/${user.uid}`;
-                                }
-
-                                // Sidebar
-                                const sbName = document.getElementById('sidebar-name');
-                                if (sbName) sbName.innerText = name;
-
-                                const sbRole = document.getElementById('sidebar-role');
-                                if (sbRole) sbRole.innerText = (profile.role || 'Member');
-
-                                // Settings inputs
-                                const inName = document.getElementById('profile-name');
-                                if (inName) inName.value = name;
-
-                                const inPhone = document.getElementById('profile-phone');
-                                if (inPhone) inPhone.value = phone;
-
-                                const elEmail = document.getElementById('profile-email');
-                                if (elEmail) elEmail.innerText = email;
-
-                            }
+                        // 2. If no profile, try to create one (recovery)
+                        if (!profile) {
+                            console.info("Profile missing in dashboard, attempting recovery...");
+                            await createOrUpdateUserProfile(user);
+                            profile = await getUserProfile(user.uid);
                         }
 
-                        else {
-                            console.log("No user found in dashboard.");
+                        if (!profile) {
+                            console.warn("Dashboard: profile still missing after recovery.");
+                            return;
                         }
-                    });
+
+                        // 3. Compute display values
+                        const name = profile.displayName || user.displayName || 'Friend';
+                        const email = profile.email || user.email || '';
+                        const phone = profile.phone || user.phoneNumber || '';
+
+                        // Personal Greeting
+                        const greetingEl = document.getElementById('welcome-greeting');
+                        if (greetingEl) {
+                            greetingEl.innerHTML = `Welcome back, <span style="color:var(--teal-accent);">${name}</span>.`;
+                        }
+
+                        // Sidebar
+                        const sbName = document.getElementById('sidebar-name');
+                        if (sbName) sbName.innerText = name;
+
+                        const sbRole = document.getElementById('sidebar-role');
+                        if (sbRole) sbRole.innerText = (profile.role || 'Member');
+
+                        // Primary profile card
+                        const inName = document.getElementById('profile-name');
+                        if (inName) inName.value = name;
+
+                        const inPhone = document.getElementById('profile-phone');
+                        if (inPhone) inPhone.value = phone;
+
+                        const elEmail = document.getElementById('profile-email');
+                        if (elEmail) elEmail.innerText = email;
+
+                        // Secondary "Profile" view (detailed tab)
+                        const inName2 = document.getElementById('profile-name2');
+                        if (inName2) inName2.value = name;
+
+                        const inPhone2 = document.getElementById('profile-phone2');
+                        if (inPhone2) inPhone2.value = phone;
+
+                        const elEmail2 = document.getElementById('profile-email2');
+                        if (elEmail2) elEmail2.innerText = email;
+
+                    } catch (error) {
+                        console.error("Dashboard hydration error:", error);
+                    }
                 });
-
             </script>
 
 
