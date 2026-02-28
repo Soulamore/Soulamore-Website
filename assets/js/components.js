@@ -210,16 +210,19 @@ try {
             .logo-icon { 
                 clip-path: none !important; 
                 position: static !important; 
-                height: 38px !important; 
+                height: 32px !important; 
                 width: auto !important;
                 margin: 0 !important;
+                display: block !important;
             }
             .logo-wrapper { 
                 width: auto !important; 
                 min-width: 40px !important;
                 display: flex !important;
                 align-items: center !important;
+                justify-content: center !important;
                 gap: 0 !important;
+                height: 48px !important;
             }
 
             .auth-box { display: none !important; }
@@ -228,9 +231,14 @@ try {
                  display: flex !important;
                  justify-content: space-between !important;
                  align-items: center !important;
-                 padding: 15px 20px !important;
+                 padding: 10px 15px !important;
+                 height: 100% !important;
             }
-            .nav-logo img { height: 35px !important; }
+            .nav-logo {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
             header { z-index: 9999 !important; position: fixed !important; width: 100% !important; top: 0 !important; }
         }
         /* GLOBAL FOOTER FIX */
@@ -1188,7 +1196,7 @@ function bindMobileToggle() {
             e.preventDefault();
             e.stopPropagation();
 
-    const navLinks = document.querySelector('.nav-links');
+            const navLinks = document.querySelector('.nav-links');
             if (!navLinks) return;
 
             // Toggle State
@@ -1220,8 +1228,8 @@ function bindMobileToggle() {
             if (e.target.closest('.dropdown > a') || e.target.closest('.dropdown-submenu > a')) return;
 
             // Otherwise (Outside click OR non-dropdown link click) -> Close
-                navLinks.classList.remove('open');
-                document.body.classList.remove('no-scroll');
+            navLinks.classList.remove('open');
+            document.body.classList.remove('no-scroll');
 
             // Reset Toggles
             document.querySelectorAll('.mobile-toggle').forEach(btn => {
