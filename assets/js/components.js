@@ -299,24 +299,41 @@ try {
         /* ADAPTIVE ICON MODE: 1025px - 1420px (Targeted Laptop Range) */
         /* Hides text labels ONLY when necessary on smaller screens */
         @media (min-width: 1025px) and (max-width: 1420px) {
-            header.island-nav { width: 92% !important; } /* Match Bottom Nav exactly */
+            header.island-nav { 
+                width: 92% !important; 
+                max-width: 1200px !important; /* Pull Auth box closer to links */
+                padding: 6px 20px !important;
+            }
+            
+            header .nav-links a span, 
+            header .nav-links .dropdown a span,
+            .lifeline-btn span {
+                display: none !important; /* ROBUST HIDE */
+            }
             
             header .nav-links a, 
             header .nav-links .dropdown a {
-                font-size: 0 !important; /* Hide Text */
-                color: transparent !important; /* Nuclear Hide */
                 gap: 0 !important;
-                padding: 0 12px !important;
-                border: none !important;
+                padding: 0 15px !important;
+                display: flex !important;
+                align-items: center !important;
             }
-            header .nav-links a::after { content: none !important; }
             
             header .nav-links i {
-                font-size: 1.3rem !important; /* Bigger Icons */
+                font-size: 1.4rem !important;
                 color: #F49F75 !important;
                 margin: 0 !important;
-                display: inline-block !important; /* Ensure visibility */
             }
+            
+            /* COMPACT GET HELP BTN */
+            .lifeline-btn {
+                width: 45px !important;
+                height: 45px !important;
+                padding: 0 !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+            }
+            .lifeline-btn i { font-size: 1.4rem !important; margin: 0 !important; }
             /* Hide Chevron */
             header .nav-links .fa-chevron-down { display: none !important; }
             
@@ -660,13 +677,13 @@ function generateNavHTML(rootPath) {
     NAV_DATA.forEach(item => {
         if (item.type === 'link') {
             // Standard Link
-            html += `<a href="${rootPath}${item.href}" id="${item.id || ''}"><i class="${item.icon}"></i>${item.label}</a>`;
+            html += `<a href="${rootPath}${item.href}" id="${item.id || ''}"><i class="${item.icon}"></i><span>${item.label}</span></a>`;
         } else if (item.type === 'dropdown') {
             // First-level Dropdown
             html += `
             <div class="dropdown">
                 <a href="${item.href === '#' ? '#' : rootPath + item.href}" id="${item.id || ''}">
-                    <i class="${item.icon}"></i>${item.label}
+                    <i class="${item.icon}"></i><span>${item.label}</span>
                     <i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i>
                 </a>
                 <div class="dropdown-content">
@@ -739,12 +756,12 @@ const getHeaderHTML = (rootPath) => `
 
     <!-- Auth Group -->
     <div class="auth-box">
-            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help Now</a>
+            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> <span>Get Help Now</span></a>
             <a href="${rootPath}portal/user-dashboard.html" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
             <a href="${rootPath}portal/login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
     
-    <button class="mobile-toggle" aria-label="Toggle Navigation">
+    <button class="mobile-toggle" aria-label="Toggle Navigation" onclick="if(window.toggleMobileMenu) window.toggleMobileMenu();">
         <i class="fas fa-bars"></i>
     </button>
 </div>
