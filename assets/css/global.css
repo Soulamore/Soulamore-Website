@@ -441,23 +441,30 @@ header.island-nav {
 }
 
 .main-nav {
-    /* GRID-BASED ARCHITECTURE (Industry Standard) */
-    /* GRID-BASED ARCHITECTURE (Industry Standard) */
     display: flex !important;
     justify-content: space-between;
-    /* INCREASED GAP to 40px */
-    /* Force 3 specific columns */
-    gap: 12px;
-    /* STRICTLY REDUCED to prevent overlap */
-    /* ADDED: Global gap between Logo, Links, and Auth */
     align-items: center;
+    gap: 8px;
     width: 100%;
-    max-width: 100%;
+    min-width: 0;
     margin: 0 auto;
-    padding: 0 clamp(16px, 2.5vw, 40px) !important;
-    /* FIX: Prevent edge touching on desktop */
+    padding: 0 clamp(12px, 2vw, 24px) !important;
     position: relative;
-    /* REQUIRED for absolute centering of children */
+    box-sizing: border-box;
+}
+
+.main-nav > .nav-logo {
+    flex-shrink: 0;
+}
+
+.main-nav > .nav-links {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: center;
+}
+
+.main-nav > .auth-box {
+    flex-shrink: 0;
 }
 
 
@@ -573,10 +580,10 @@ header.island-nav {
 .auth-box {
     display: flex;
     align-items: center;
-    gap: 15px;
-    /* REDUCED: 10px → 8px */
+    gap: 12px;
     white-space: nowrap;
-    /* Natural width, never shrinks */
+    flex-shrink: 0;
+    /* Never shrink - Login/Sign Up must always be visible */
 }
 
 .user-icon-btn {
@@ -1471,8 +1478,25 @@ footer a {
     }
 }
 
-/* NOTE: Removed laptop-width icon-only compression to ensure
-   all dropdown labels remain visible at every breakpoint. */
+/* --- TIGHT WIDTH: Slightly compress nav so Login/Sign Up never clips --- */
+@media (max-width: 1500px) {
+    header.island-nav .main-nav {
+        padding: 0 12px !important;
+        gap: 6px !important;
+    }
+    header.island-nav .nav-links a {
+        font-size: 0.75rem !important;
+        padding: 6px 2px !important;
+    }
+    header.island-nav .nav-btn {
+        font-size: 0.85rem !important;
+        padding: 6px 12px !important;
+    }
+    header.island-nav .lifeline-btn {
+        font-size: 0.8rem !important;
+        padding: 6px 10px !important;
+    }
+}
 
 /* Scroll Lock Class (Toggled by JS) */
 body.no-scroll {

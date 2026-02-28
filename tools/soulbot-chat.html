@@ -1224,7 +1224,7 @@
                     }
                 }
 
-                // UI Updates
+            // UI Updates
                 inputEl.value = "";
                 inputEl.style.height = 'auto';
                 if (emptyStateEl) emptyStateEl.classList.add('hidden');
@@ -1238,16 +1238,16 @@
                     });
                 }
 
-                // Add Thinking Placeholder
+            // Add Thinking Placeholder
                 const thinkingId = appendThinking(getMessagesContainer());
                 scrollToBottom(getMessagesContainer());
 
-                // API Logic
-                try {
-                    // Safety Check First
-                    const crisisKeywords = ['suicide', 'kill myself', 'die', 'end it all'];
-                    if (crisisKeywords.some(w => text.toLowerCase().includes(w))) {
-                        removeThinking(thinkingId);
+            // API Logic
+            try {
+                // Safety Check First
+                const crisisKeywords = ['suicide', 'kill myself', 'die', 'end it all'];
+                if (crisisKeywords.some(w => text.toLowerCase().includes(w))) {
+                    removeThinking(thinkingId);
                         appendCrisisCard(getMessagesContainer());
                         if (conversationId) {
                             addMessageToConversation(conversationId, 'bot', 'CRISIS_ALERT', { type: 'crisis' }).catch(err => console.error(err));
@@ -1255,31 +1255,31 @@
                         btnEl.disabled = false;
                         inputEl.disabled = false;
                         inputEl.focus();
-                        return;
-                    }
+                    return;
+                }
 
-                    const chat = model.startChat({
-                        history: [
-                            { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
-                            { role: "model", parts: [{ text: "Understood." }] },
-                            ...chatHistory
-                        ]
-                    });
+                const chat = model.startChat({
+                    history: [
+                        { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
+                        { role: "model", parts: [{ text: "Understood." }] },
+                        ...chatHistory
+                    ]
+                });
 
-                    const result = await chat.sendMessage(text);
-                    const response = result.response.text();
+                const result = await chat.sendMessage(text);
+                const response = result.response.text();
 
-                    removeThinking(thinkingId);
+                removeThinking(thinkingId);
 
-                    if (response.includes("CRISIS_ALERT")) {
+                if (response.includes("CRISIS_ALERT")) {
                         appendCrisisCard(getMessagesContainer());
                         if (conversationId) {
                             addMessageToConversation(conversationId, 'bot', 'CRISIS_ALERT', { type: 'crisis' }).catch(err => console.error(err));
                         }
-                    } else {
+                } else {
                         appendMessage('bot', response, getMessagesContainer());
-                        chatHistory.push({ role: "user", parts: [{ text: text }] });
-                        chatHistory.push({ role: "model", parts: [{ text: response }] });
+                    chatHistory.push({ role: "user", parts: [{ text: text }] });
+                    chatHistory.push({ role: "model", parts: [{ text: response }] });
 
                         // Save bot message to Firestore (non-blocking)
                         if (conversationId) {
@@ -1303,10 +1303,10 @@
                                 }
                             }).catch(err => console.error("Failed to get conversation:", err));
                         }
-                    }
+                }
 
-                } catch (err) {
-                    removeThinking(thinkingId);
+            } catch (err) {
+                removeThinking(thinkingId);
                     const errorMsg = "I'm having a little trouble connecting. Please try again in a moment.";
                     appendMessage('bot', errorMsg, getMessagesContainer());
                     if (conversationId) {
@@ -1465,7 +1465,7 @@
         function scrollToBottom(container = null) {
             const messagesContainer = container || getMessagesContainer();
             if (messagesContainer) {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
         }
 
