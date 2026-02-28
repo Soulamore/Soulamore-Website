@@ -204,7 +204,7 @@ try {
             }
         }
 
-        /* MOBILE (Width <= 1024px) */
+        /* MOBILE (Width <= 1024px) - CONSOLIDATED & FINAL */
         @media (max-width: 1024px) {
             .logo-text-overlay { display: none !important; visibility: hidden !important; } 
             .logo-icon { 
@@ -229,12 +229,14 @@ try {
 
             .auth-box { display: none !important; }
             .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
+            
             .main-nav {
                  display: flex !important;
                  justify-content: space-between !important;
                  align-items: center !important;
-                 padding: 8px 15px !important;
-                 height: 48px !important;
+                 padding: 0 15px !important;
+                 height: 52px !important; /* Slightly taller for breathing room */
+                 width: 100% !important;
             }
             .nav-logo {
                 display: flex !important;
@@ -255,10 +257,22 @@ try {
                 border-radius: 50px !important;
                 background: rgba(15, 23, 42, 0.98) !important;
                 backdrop-filter: blur(20px) !important;
-                border: 1px solid rgba(255,255,255,0.1) !important;
+                border: 1px solid rgba(255,255,255,0.15) !important;
                 padding: 0 !important; 
                 overflow: hidden !important;
+                opacity: 1 !important; /* Ensure visibility */
+                visibility: visible !important;
             }
+
+            /* Fix dropdowns in mobile menu */
+            .nav-links.open {
+                background: rgba(15, 23, 42, 0.98) !important;
+            }
+            header .nav-links:not(.open) {
+                display: none !important;
+            }
+            body { padding-bottom: 90px !important; }
+            .container { padding-left: 20px !important; padding-right: 20px !important; }
         }
         /* GLOBAL FOOTER FIX */
         footer {
@@ -472,28 +486,6 @@ try {
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
         
-        /* MOBILE GLOBAL FIXES */
-        @media (max-width: 1024px) {
-            header.island-nav {
-                background: rgba(15, 23, 42, 0.98) !important;
-                backdrop-filter: blur(20px) !important;
-                border: 1px solid rgba(255,255,255,0.1) !important;
-                padding: 8px 15px !important;
-                width: 94% !important;
-                max-width: 450px !important;
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-                top: 15px !important;
-            }
-
-            /* HIDE Confusing icon-only links on mobile header bar */
-            header .nav-links:not(.open) {
-                display: none !important;
-            }
-
-            body { padding-bottom: 90px !important; } /* Space for Floating Nav/Ticker */
-            .container { padding-left: 20px !important; padding-right: 20px !important; }
-        }
     `;
     document.head.appendChild(style);
     // console.log("Soulamore: Critical styles v2 injected.");
