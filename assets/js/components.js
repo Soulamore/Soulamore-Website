@@ -214,6 +214,7 @@ try {
                 width: auto !important;
                 margin: 0 !important;
                 display: block !important;
+                visibility: visible !important;
             }
             .logo-wrapper { 
                 width: auto !important; 
@@ -223,6 +224,7 @@ try {
                 justify-content: center !important;
                 gap: 0 !important;
                 height: 48px !important;
+                visibility: visible !important;
             }
 
             .auth-box { display: none !important; }
@@ -231,15 +233,32 @@ try {
                  display: flex !important;
                  justify-content: space-between !important;
                  align-items: center !important;
-                 padding: 10px 15px !important;
-                 height: 100% !important;
+                 padding: 8px 15px !important;
+                 height: 48px !important;
             }
             .nav-logo {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                flex-shrink: 0 !important;
+                width: auto !important;
+                height: 100% !important;
             }
-            header { z-index: 9999 !important; position: fixed !important; width: 100% !important; top: 0 !important; }
+            header.island-nav { 
+                z-index: 9999 !important; 
+                position: fixed !important; 
+                width: 94% !important; 
+                max-width: 450px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                top: 15px !important;
+                border-radius: 50px !important;
+                background: rgba(15, 23, 42, 0.98) !important;
+                backdrop-filter: blur(20px) !important;
+                border: 1px solid rgba(255,255,255,0.1) !important;
+                padding: 0 !important; 
+                overflow: hidden !important;
+            }
         }
         /* GLOBAL FOOTER FIX */
         footer {
