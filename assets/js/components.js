@@ -48,19 +48,11 @@ try {
             overflow: visible !important;
             text-decoration: none;
         }
-        .logo-icon {
+        .logo-img {
             height: 100% !important;
             width: auto !important;
             object-fit: contain !important;
-            z-index: 2 !important;
-        }
-        .logo-text-overlay {
-            height: 100% !important;
-            width: auto !important;
-            object-fit: contain !important;
-            filter: brightness(0) invert(1) !important; /* White */
-            z-index: 1 !important;
-            margin-left: -5px; /* Slight overlap for tight branding */
+            transition: transform 0.3s ease !important;
         }
 
         /* Button Consistency - FIXED COLORS */
@@ -171,7 +163,15 @@ try {
                 margin: 0 !important;
                 width: fit-content !important;
                 max-width: 1600px !important;
-                padding: 6px 30px !important; /* Slightly more dynamic padding */
+                padding: 6px 30px !important; 
+                top: 15px !important;
+                border-radius: 50px !important;
+                background: rgba(15, 23, 42, 0.9) !important;
+                backdrop-filter: blur(20px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+                position: fixed !important;
+                overflow: visible !important;
             }
             .nav-links i {
                 color: #F49F75 !important; /* Force Peach Glow for Icons */
@@ -183,55 +183,102 @@ try {
                 margin-right: 10px !important; /* Add small breathing room */
                 overflow: visible !important; /* FIX: Prevent scaling clipping */
             }
-            .logo-icon {
-                clip-path: none !important; /* No longer needed for logo-peach.png */
-                position: absolute !important;
-                left: 0 !important;
-                transition: transform 0.3s ease !important;
-            }
-            .logo-text-overlay {
-                display: block !important;
-                position: absolute !important;
-                left: 0 !important;
-                clip-path: inset(0 0 0 32%) !important;
-                transition: transform 0.3s ease !important;
-            }
             .logo-wrapper { width: 180px !important; }
-            .logo-wrapper:hover .logo-icon { transform: scale(1.08) !important; }
-            .logo-wrapper:hover .logo-text-overlay {
-                transform: scale(1.08) !important;
-                clip-path: inset(-5% -5% -5% 32%) !important;
-            }
+            .logo-wrapper:hover .logo-img { transform: scale(1.05) !important; }
         }
 
-        /* MOBILE (Width <= 1024px) */
+        /* MOBILE (Width <= 1024px) - CONSOLIDATED & FINAL */
         @media (max-width: 1024px) {
-            .logo-text-overlay { display: none !important; visibility: hidden !important; } 
-            .logo-icon { 
-                clip-path: none !important; 
-                position: static !important; 
-                height: 38px !important; 
+            .logo-img { 
+                height: 42px !important; 
                 width: auto !important;
-                margin: 0 !important;
+                display: block !important;
+                visibility: visible !important;
             }
             .logo-wrapper { 
                 width: auto !important; 
-                min-width: 40px !important;
+                min-width: 120px !important;
                 display: flex !important;
                 align-items: center !important;
-                gap: 0 !important;
+                justify-content: flex-start !important;
+                height: 42px !important;
+                visibility: visible !important;
             }
 
             .auth-box { display: none !important; }
             .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
+            
             .main-nav {
                  display: flex !important;
                  justify-content: space-between !important;
                  align-items: center !important;
-                 padding: 15px 20px !important;
+                 padding: 0 10px 0 15px !important;
+                 height: 60px !important;
+                 width: 100% !important;
+                 position: relative !important;
             }
-            .nav-logo img { height: 35px !important; }
-            header { z-index: 9999 !important; position: fixed !important; width: 100% !important; top: 0 !important; }
+            .nav-logo {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex-shrink: 0 !important;
+                width: auto !important;
+                height: 100% !important;
+            }
+            header.island-nav { 
+                z-index: 99999 !important; 
+                position: fixed !important; 
+                width: 92% !important; /* SYNC WITH BOTTOM NAV */
+                max-width: 1400px !important; /* MATCH SITE CONTENT */
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                top: 15px !important;
+                border-radius: 50px !important;
+                background: rgba(15, 23, 42, 0.98) !important;
+                backdrop-filter: blur(20px) !important;
+                border: 1px solid rgba(255,255,255,0.15) !important;
+                padding: 0 !important; 
+                overflow: visible !important; /* CRITICAL FIX: Allow Menu to show */
+                opacity: 1 !important;
+                visibility: visible !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
+            }
+
+            .mobile-toggle {
+                display: flex !important;
+                background: transparent !important;
+                border: none !important;
+                color: #e2e8f0 !important;
+                font-size: 1.5rem !important;
+                cursor: pointer !important;
+                padding: 10px !important;
+                z-index: 1000 !important;
+            }
+
+            /* Fix Mobile Menu Positioning & Visibility */
+            .nav-links.open {
+                display: flex !important;
+                flex-direction: column !important;
+                position: absolute !important;
+                top: 70px !important;
+                left: 0 !important;
+                width: 100% !important;
+                background: rgba(15, 23, 42, 0.98) !important;
+                border: 1px solid rgba(255,255,255,0.1) !important;
+                border-radius: 24px !important;
+                padding: 20px !important;
+                box-shadow: 0 20px 50px rgba(0,0,0,0.8) !important;
+                z-index: 9999 !important;
+                max-height: 80vh !important;
+                overflow-y: auto !important;
+                backdrop-filter: blur(15px) !important;
+            }
+            
+            header .nav-links:not(.open) {
+                display: none !important;
+            }
+            body { padding-bottom: 90px !important; }
+            .container { padding-left: 20px !important; padding-right: 20px !important; }
         }
         /* GLOBAL FOOTER FIX */
         footer {
@@ -252,19 +299,41 @@ try {
         /* ADAPTIVE ICON MODE: 1025px - 1420px (Targeted Laptop Range) */
         /* Hides text labels ONLY when necessary on smaller screens */
         @media (min-width: 1025px) and (max-width: 1420px) {
-            header .nav-links > a, 
-            header .nav-links > .dropdown > a {
-                font-size: 0 !important; /* Hide Text */
-                gap: 0 !important;
-                padding: 0 12px !important;
-                border: none !important; /* Remove separators */
+            header.island-nav { 
+                width: 92% !important; 
+                max-width: 1200px !important; /* Pull Auth box closer to links */
+                padding: 6px 20px !important;
             }
-            header .nav-links > a::after { content: none !important; } /* Kill pseudo-elements */
+            
+            header .nav-links a span, 
+            header .nav-links .dropdown a span,
+            .lifeline-btn span {
+                display: none !important; /* ROBUST HIDE */
+            }
+            
+            header .nav-links a, 
+            header .nav-links .dropdown a {
+                gap: 0 !important;
+                padding: 0 15px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
             
             header .nav-links i {
-                font-size: 1.3rem !important; /* Bigger Icons */
+                font-size: 1.4rem !important;
+                color: #F49F75 !important;
                 margin: 0 !important;
             }
+            
+            /* COMPACT GET HELP BTN */
+            .lifeline-btn {
+                width: 45px !important;
+                height: 45px !important;
+                padding: 0 !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+            }
+            .lifeline-btn i { font-size: 1.4rem !important; margin: 0 !important; }
             /* Hide Chevron */
             header .nav-links .fa-chevron-down { display: none !important; }
             
@@ -445,28 +514,6 @@ try {
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
         
-        /* MOBILE GLOBAL FIXES */
-        @media (max-width: 1024px) {
-            header.island-nav {
-                background: rgba(15, 23, 42, 0.98) !important;
-                backdrop-filter: blur(20px) !important;
-                border: 1px solid rgba(255,255,255,0.1) !important;
-                padding: 8px 15px !important;
-                width: 94% !important;
-                max-width: 450px !important;
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-                top: 15px !important;
-            }
-
-            /* HIDE Confusing icon-only links on mobile header bar */
-            header .nav-links:not(.open) {
-                display: none !important;
-            }
-
-            body { padding-bottom: 90px !important; } /* Space for Floating Nav/Ticker */
-            .container { padding-left: 20px !important; padding-right: 20px !important; }
-        }
     `;
     document.head.appendChild(style);
     // console.log("Soulamore: Critical styles v2 injected.");
@@ -630,13 +677,13 @@ function generateNavHTML(rootPath) {
     NAV_DATA.forEach(item => {
         if (item.type === 'link') {
             // Standard Link
-            html += `<a href="${rootPath}${item.href}" id="${item.id || ''}"><i class="${item.icon}"></i>${item.label}</a>`;
+            html += `<a href="${rootPath}${item.href}" id="${item.id || ''}"><i class="${item.icon}"></i><span>${item.label}</span></a>`;
         } else if (item.type === 'dropdown') {
             // First-level Dropdown
             html += `
             <div class="dropdown">
                 <a href="${item.href === '#' ? '#' : rootPath + item.href}" id="${item.id || ''}">
-                    <i class="${item.icon}"></i>${item.label}
+                    <i class="${item.icon}"></i><span>${item.label}</span>
                     <i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i>
                 </a>
                 <div class="dropdown-content">
@@ -681,8 +728,7 @@ const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
         <div class="logo-wrapper">
-            <img src="${rootPath}assets/images/logo-peach.png" class="logo-icon" alt="">
-            <img src="${rootPath}assets/images/logo.png" class="logo-text-overlay" alt="Soulamore">
+            <img src="${rootPath}assets/images/logo-premium.png" class="logo-img" alt="Soulamore">
         </div>
     </a>
 
@@ -710,12 +756,12 @@ const getHeaderHTML = (rootPath) => `
 
     <!-- Auth Group -->
     <div class="auth-box">
-            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help Now</a>
+            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> <span>Get Help Now</span></a>
             <a href="${rootPath}portal/user-dashboard.html" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
             <a href="${rootPath}portal/login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
     
-    <button class="mobile-toggle" aria-label="Toggle Navigation">
+    <button class="mobile-toggle" aria-label="Toggle Navigation" onclick="if(window.toggleMobileMenu) window.toggleMobileMenu();">
         <i class="fas fa-bars"></i>
     </button>
 </div>
@@ -1086,6 +1132,10 @@ document.addEventListener('DOMContentLoaded', () => {
     injectMobileBottomNav();
     setActiveState();
     initSmartCounters();
+
+    // 4. Interaction Initialization (MANDATORY)
+    bindMobileToggle();
+    initializeHeaderLogic();
 });
 
 /**
@@ -1188,7 +1238,7 @@ function bindMobileToggle() {
             e.preventDefault();
             e.stopPropagation();
 
-    const navLinks = document.querySelector('.nav-links');
+            const navLinks = document.querySelector('.nav-links');
             if (!navLinks) return;
 
             // Toggle State
@@ -1220,8 +1270,8 @@ function bindMobileToggle() {
             if (e.target.closest('.dropdown > a') || e.target.closest('.dropdown-submenu > a')) return;
 
             // Otherwise (Outside click OR non-dropdown link click) -> Close
-                navLinks.classList.remove('open');
-                document.body.classList.remove('no-scroll');
+            navLinks.classList.remove('open');
+            document.body.classList.remove('no-scroll');
 
             // Reset Toggles
             document.querySelectorAll('.mobile-toggle').forEach(btn => {

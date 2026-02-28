@@ -16,8 +16,8 @@ def load_soulbot():
         print("Please wait for Step 2 (Training) to finish 100% first!")
         return None, None
 
-    print(f"Loading Base Model: {MODEL_NAME}...")
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    print(f"Loading SoulBot Engine: {ADAPTER_PATH}...")
+    tokenizer = AutoTokenizer.from_pretrained(ADAPTER_PATH)
     tokenizer.pad_token = tokenizer.eos_token
 
     quantization_config = BitsAndBytesConfig(
@@ -28,15 +28,12 @@ def load_soulbot():
     )
 
     model = AutoModelForCausalLM.from_pretrained(
-        MODEL_NAME,
+        ADAPTER_PATH,
         quantization_config=quantization_config,
         device_map="auto",
         trust_remote_code=True,
         torch_dtype=torch.bfloat16,
     )
-
-    print(f"Applying Fine-Tuned Clinical Knowledge (Adapter)...")
-    model = PeftModel.from_pretrained(model, ADAPTER_PATH)
     model.eval()
     
     print(f"SUCCESS: SoulBot is awake and ready.")
