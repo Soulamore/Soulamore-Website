@@ -73,9 +73,10 @@
     /* Positioning for Body-Direct Header */
     position: fixed;
     top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 92%;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    transform: none;
     max-width: 1600px;
     z-index: 9999;
 
@@ -91,8 +92,7 @@
     border-color: rgba(244, 159, 117, 0.4);
     /* Peach Glow */
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(244, 159, 117, 0.15);
-    transform: translateX(-50%) translateY(-2px);
-    /* Maintain Center */
+    transform: translateY(-2px);
     /* Slight lift */
 }
 
@@ -447,14 +447,14 @@ header.island-nav {
     justify-content: space-between;
     /* INCREASED GAP to 40px */
     /* Force 3 specific columns */
-    gap: 15px;
+    gap: 12px;
     /* STRICTLY REDUCED to prevent overlap */
     /* ADDED: Global gap between Logo, Links, and Auth */
     align-items: center;
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
-    padding: 0 40px !important;
+    padding: 0 clamp(16px, 2.5vw, 40px) !important;
     /* FIX: Prevent edge touching on desktop */
     position: relative;
     /* REQUIRED for absolute centering of children */
@@ -468,8 +468,8 @@ header.island-nav {
     padding: 5px 0;
     margin-right: 0;
     /* Gap handled by grid now */
-    min-width: 160px;
-    /* Ensure logo area has space */
+    min-width: 0;
+    flex: 0 1 auto;
 }
 
 .nav-logo img {
@@ -478,6 +478,20 @@ header.island-nav {
     width: auto;
     object-fit: contain;
     transition: transform 0.3s;
+}
+
+.nav-logo .logo-wrapper {
+    display: grid;
+    align-items: center;
+}
+
+.nav-logo .logo-wrapper > img {
+    grid-area: 1 / 1;
+}
+
+/* Default to single-rendered logo to avoid header overflow */
+.nav-logo .logo-icon {
+    display: none;
 }
 
 .nav-logo:hover img {
@@ -1081,21 +1095,16 @@ footer a {
     /* FIX: RESTORE FLOATING ISLAND (Laptop Mode) */
     /* User requested gaps on sides ("remove this" pointing to edges) */
     header.island-nav {
-        width: 92% !important;
-        /* Safer than VW for scrollbars */
-        max-width: 1400px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        top: 20px !important;
-        /* Floating spacing */
-        border-radius: 50px !important;
-        /* Rounded corners */
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-bottom: none !important;
-        /* Use border scaling */
-        padding: 12px 30px !important;
-        background: rgba(15, 23, 42, 0.90) !important;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        transform: none !important;
+        top: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        border-bottom: 1px solid var(--border-glass) !important;
+        padding: 12px 16px !important;
     }
 
     /* HIDE DECORATIVE ELEMENTS THAT CAUSE SCROLL */
@@ -1459,6 +1468,32 @@ footer a {
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
+    }
+}
+
+/* --- LAPTOP WIDTH COMPRESSION (Prevent logo / auth clipping) --- */
+@media (max-width: 1450px) {
+    header.island-nav .nav-links a {
+        font-size: 0 !important;
+        padding: 10px 12px !important;
+    }
+
+    header.island-nav .nav-links i {
+        margin-right: 0 !important;
+        font-size: 1.25rem !important;
+    }
+
+    header.island-nav .dropdown > a > .fa-chevron-down {
+        display: none !important;
+    }
+
+    header.island-nav .nav-btn {
+        font-size: 0.85rem !important;
+        padding: 8px 12px !important;
+    }
+
+    header.island-nav .main-nav {
+        padding: 0 16px !important;
     }
 }
 
