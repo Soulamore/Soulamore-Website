@@ -286,13 +286,13 @@ try {
         /* FULL TEXT MODE: > 1420px (Standard Desktop) */
         /* Now possible because we unlocked max-width to 99.5vw */
         @media (min-width: 1421px) {
-            header a, footer a {
+        header a, footer a {
                 font-size: 0.85rem !important; /* Slightly Smaller for Fit */
                 letter-spacing: normal !important;
                 padding: 6px 5px !important; /* Tighter Padding */
-                color: #e2e8f0 !important;
-                text-decoration: none !important;
-                transition: color 0.3s ease;
+            color: #e2e8f0 !important;
+            text-decoration: none !important;
+            transition: color 0.3s ease;
             }
         }
         
@@ -498,13 +498,6 @@ try {
 // --- 1. DATA CONFIGURATION ---
 
 const NAV_DATA = [
-    {
-        id: 'nav-home',
-        label: 'Home',
-        icon: 'fas fa-home',
-        href: 'index.html',
-        type: 'link',
-    },
     {
         id: 'nav-spaces',
         label: 'Find Your Space',
@@ -1208,7 +1201,7 @@ function bindMobileToggle() {
             e.preventDefault();
             e.stopPropagation();
 
-            const navLinks = document.querySelector('.nav-links');
+    const navLinks = document.querySelector('.nav-links');
             if (!navLinks) return;
 
             // Toggle State
@@ -1240,8 +1233,8 @@ function bindMobileToggle() {
             if (e.target.closest('.dropdown > a') || e.target.closest('.dropdown-submenu > a')) return;
 
             // Otherwise (Outside click OR non-dropdown link click) -> Close
-            navLinks.classList.remove('open');
-            document.body.classList.remove('no-scroll');
+                navLinks.classList.remove('open');
+                document.body.classList.remove('no-scroll');
 
             // Reset Toggles
             document.querySelectorAll('.mobile-toggle').forEach(btn => {
