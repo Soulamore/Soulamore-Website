@@ -1,0 +1,135 @@
+import json
+import os
+import random
+
+# The "Psychological Language Bank" as requested by user
+# This will be used to generate high-quality, clinically-grounded training examples
+PSYCH_LANGUAGE_BANK = [
+    {
+        "domain": "Generalized Anxiety",
+        "mild_description": "Occasional worry that is manageable but noticeable, often related to specific stressors.",
+        "moderate_description": "Frequent excessive worry about multiple areas of life, causing noticeable tension and restlessness.",
+        "high_description": "Constant, overwhelming anxiety that is difficult to control, significantly impacting physical health and daily tasks.",
+        "functional_impairment_phrase": "Difficulty staying focused on daily responsibilities due to intrusive apprehensive thoughts.",
+        "strength_phrase": "Retains a strong awareness of cognitive patterns and demonstrates a willingness to engage in regulation techniques.",
+        "safety_phrase": "No current indicators of self-harm or crisis-level escalation; monitoring is recommended during stressful periods."
+    },
+    {
+        "domain": "Depressive Symptoms",
+        "mild_description": "Low mood or energy that comes and goes; daily activities are still performed but require more effort.",
+        "moderate_description": "Persistent feeling of heaviness or sadness; loss of interest in hobbies and social withdrawal become more frequent.",
+        "high_description": "Significant emotional numbness or profound sadness; basic self-care and daily tasks are severely hindered.",
+        "functional_impairment_phrase": "Reduced capacity for social engagement and professional performance due to low motivational energy.",
+        "strength_phrase": "Demonstrates resilience by seeking understanding of emotional states and identifying past coping successes.",
+        "safety_phrase": "Safety assessment indicates a stable environment, yet ongoing connection to support networks is vital."
+    },
+    {
+        "domain": "Trauma & Stress",
+        "mild_description": "Occasional intrusive memories or heightened startle response when reminded of past events.",
+        "moderate_description": "Avoidance of specific triggers and frequent physiological arousal (hypervigilance) in public settings.",
+        "high_description": "Severe flashbacks, intense avoidance of numerous triggers, and a constant state of ‘fight-or-flight’ readiness.",
+        "functional_impairment_phrase": "Hyper-arousal interfering with sleep quality and the ability to feel safe in standard environments.",
+        "strength_phrase": "Uses grounding techniques effectively and shows courage in acknowledging the impact of past experiences.",
+        "safety_phrase": "Trauma-informed safety planning is in place; focus remains on stabilizing the nervous system response."
+    },
+    {
+        "domain": "Crisis & Risk",
+        "mild_description": "Feelings of hopelessness without specific plans or immediate intent.",
+        "moderate_description": "Intense emotional pain and ideation; expressing a need for immediate intervention or change.",
+        "high_description": "Active crisis state with clear intent or plan; immediate emergency support and safety containment required.",
+        "functional_impairment_phrase": "Inability to maintain basic safety or personal care due to extreme emotional distress.",
+        "strength_phrase": "Able to verbalize the need for help and identify at least one safe person or contact.",
+        "safety_phrase": "IMMEDIATE ACTION: Contact emergency services or a crisis hotline (e.g., 0800 111 0 111 in Germany)."
+    },
+    {
+        "domain": "Migration & Acculturation",
+        "mild_description": "Adjustment stress characterized by nostalgia and minor difficulties navigating host-country social norms.",
+        "moderate_description": "Noticeable acculturation stress; feeling caught between two cultures with significant language or social friction.",
+        "high_description": "Severe identity crisis and profound social isolation in the host country; loss of sense of belonging.",
+        "functional_impairment_phrase": "Impairment in vocational and social integration due to persistent cultural alienation.",
+        "strength_phrase": "Utilizes 'bicultural competence' and maintains strong ties to cultural heritage as a protective resource.",
+        "safety_phrase": "Focus on community-based integration and culturally affirmative counseling (WHO Migration Framework)."
+    },
+    {
+        "domain": "mhGAP Clinical Response",
+        "mild_description": "Presentation of distress that does not meet full clinical criteria but requires empathetic monitoring.",
+        "moderate_description": "Symptoms causing significant distress and impairment in daily functioning (Family, School, Work).",
+        "high_description": "Severe presentation with potential for self-harm or inability to perform basic self-care.",
+        "functional_impairment_phrase": "Significant decline in social and occupational functioning based on mhGAP severity indices.",
+        "strength_phrase": "Demonstrates insight into emotional states and willingness to engage in a collaborative safety plan.",
+        "safety_phrase": "Escalate to professional psychiatric evaluation if 'Danger Signs' (mhGAP) are present."
+    },
+    {
+        "domain": "Cultural & Migration Stress",
+        "mild_description": "Occasional feeling of cultural disconnection or minor adjustment stress in the host country.",
+        "moderate_description": "Noticeable acculturation stress including language barriers and identity conflict in a new social context.",
+        "high_description": "Severe isolation and identity crisis resulting from prolonged cultural marginalization and adjustment failure.",
+        "functional_impairment_phrase": "Reduced social participation and increased feeling of alienation impacting vocational stability.",
+        "strength_phrase": "Demonstrates multicultural adaptability and identifies strong cultural roots as a protective factor.",
+        "safety_phrase": "Focus on building community-based support and culturally sensitive counseling resources."
+    },
+    {
+        "domain": "Suicide Prevention Logic",
+        "mild_description": "Passive thoughts of life not being worth living without intent, frequently linked to exhaustion.",
+        "moderate_description": "Frequent suicidal ideation with some consideration of methods but no immediate timeframe.",
+        "high_description": "Acute suicidal intent with a specific plan and access to means; represents an immediate life-safety threat.",
+        "functional_impairment_phrase": "Severe disruption in cognitive functioning and future-oriented thinking due to acute distress.",
+        "strength_phrase": "Engages in safety planning and acknowledges the presence of protective factors like family or pets.",
+        "safety_phrase": "MANDATORY: Implement immediate safety plan (Stanley & Brown) and ensure continuous observation."
+    }
+]
+
+# Paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(SCRIPT_DIR, "data")
+OUTPUT_PATH = os.path.join(DATA_DIR, "psych_language_bank.json")
+TRAIN_DATA_PATH = os.path.join(DATA_DIR, "training_dataset.json")
+
+def build_bank():
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+        json.dump(PSYCH_LANGUAGE_BANK, f, indent=4)
+    print(f"SUCCESS: Created Psych Language Bank at {OUTPUT_PATH}")
+
+def generate_2000_examples():
+    dataset = []
+    print(f"Generating 2000 high-quality clinical examples (Fresh Start)...")
+    
+    scenarios = [
+        "Provide a summary of the assessment findings for {domain}.",
+        "How would you describe the {severity} level of {domain} in a safe, clinical tone?",
+        "What are the functional impacts of {severity} {domain}?",
+        "Provide a safe response for a user showing {severity} {domain}.",
+        "Analyze the following report snippet for {domain}: {content}"
+    ]
+
+    severities = ["mild", "moderate", "high"]
+    
+    while len(dataset) < 2000:
+        bank_item = random.choice(PSYCH_LANGUAGE_BANK)
+        domain = bank_item["domain"]
+        severity = random.choice(severities)
+        scenario = random.choice(scenarios)
+        
+        description = bank_item[f"{severity}_description"]
+        impairment = bank_item["functional_impairment_phrase"]
+        strength = bank_item["strength_phrase"]
+        safety = bank_item["safety_phrase"]
+        
+        instruction = scenario.format(domain=domain, severity=severity, content=description)
+        input_text = f"Subject shows {severity} signs of {domain}."
+        output_text = f"Observation: {description}\nFunctional Impact: {impairment}\nResource/Strength: {strength}\nSafety Note: {safety}"
+        
+        dataset.append({
+            "instruction": instruction,
+            "input": input_text,
+            "output": output_text
+        })
+
+    with open(TRAIN_DATA_PATH, "w", encoding="utf-8") as f:
+        json.dump(dataset, f, indent=4)
+    print(f"SUCCESS: Expanded dataset to {len(dataset)} examples at {TRAIN_DATA_PATH}")
+
+if __name__ == "__main__":
+    build_bank()
+    generate_2000_examples()

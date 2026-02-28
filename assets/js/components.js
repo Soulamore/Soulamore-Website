@@ -184,7 +184,7 @@ try {
                 overflow: visible !important; /* FIX: Prevent scaling clipping */
             }
             .logo-icon {
-                clip-path: inset(0 68% 0 0) !important;
+                clip-path: none !important; /* No longer needed for logo-peach.png */
                 position: absolute !important;
                 left: 0 !important;
                 transition: transform 0.3s ease !important;
@@ -212,8 +212,15 @@ try {
                 position: static !important; 
                 height: 38px !important; 
                 width: auto !important;
+                margin: 0 !important;
             }
-            .logo-wrapper { width: 150px !important; min-width: 150px !important; }
+            .logo-wrapper { 
+                width: auto !important; 
+                min-width: 40px !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 0 !important;
+            }
 
             .auth-box { display: none !important; }
             .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
@@ -428,39 +435,14 @@ try {
             z-index: 99999 !important; /* SAFE HIGH Z-INDEX */
             pointer-events: auto !important;
             cursor: pointer !important;
-        }
-            /* Level 3: Deep Nested */
-            .dropdown-content .dropdown-content .dropdown-content {
-                left: 100% !important;
-                top: 0 !important;
-                margin-top: -5px !important;
-            }
-
-            .dropdown-content a, .dropdown-submenu a {
-                color: #e2e8f0 !important;
-                display: block !important;
-                margin: 2px 4px !important; /* Reduced margins */
-                border-radius: 6px !important;
-                padding: 6px 10px !important; /* Reduced padding */
-                width: auto !important; 
-                box-sizing: border-box !important;
-                font-size: 0.9rem !important; /* Smaller text */
-            }
-            .dropdown-content a:hover, .dropdown-submenu a:hover {
-                background: rgba(255,255,255,0.1) !important;
-                color: #4ECDC4 !important;
-            }
-            
-            /* Prevent Header Scattering - Only for Auth Box & Main Nav Container */
-            .main-nav, .auth-box {
-                flex-wrap: nowrap !important;
-            }
-             /* FORCE SINGLE LINE HEADER */
-            .nav-links {
-               flex-wrap: nowrap !important; 
-               white-space: nowrap !important;
-               justify-content: center !important;
-            }
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 45px !important;
+            height: 45px !important;
+            border-radius: 50% !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
         
         /* MOBILE GLOBAL FIXES */
@@ -468,8 +450,13 @@ try {
             header.island-nav {
                 background: rgba(15, 23, 42, 0.98) !important;
                 backdrop-filter: blur(20px) !important;
-                border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-                padding: 8px 15px !important; /* More compact mobile padding */
+                border: 1px solid rgba(255,255,255,0.1) !important;
+                padding: 8px 15px !important;
+                width: 94% !important;
+                max-width: 450px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                top: 15px !important;
             }
 
             /* HIDE Confusing icon-only links on mobile header bar */
@@ -694,7 +681,7 @@ const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
         <div class="logo-wrapper">
-            <img src="${rootPath}assets/images/logo.png" class="logo-icon" alt="">
+            <img src="${rootPath}assets/images/logo-peach.png" class="logo-icon" alt="">
             <img src="${rootPath}assets/images/logo.png" class="logo-text-overlay" alt="Soulamore">
         </div>
     </a>

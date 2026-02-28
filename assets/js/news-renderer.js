@@ -5,77 +5,58 @@
  * Supports: Grid layout, fallback for missing images, and "Live" status indicators.
  */
 
+// --- GLOBAL CACHE CONFIG ---
+const NEWS_CACHE_KEY = 'soulamore_global_news_cache';
+const NEWS_EXPIRY_KEY = 'soulamore_global_news_expiry';
+const REFRESH_INTERVAL = 15 * 60 * 1000; // Reduced to 15 mins for better "Live" feel
+
 async function initNewsFeed(containerId, limit = 6) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const cacheKey = `soulamore_news_cache_${containerId}`;
-    const expiryKey = `soulamore_news_expiry_${containerId}`;
-    const REFRESH_INTERVAL = 30 * 60 * 1000; // 30 minutes
-    const rootPath = window.location.pathname.includes('/company/') || window.location.pathname.includes('/community/') ? '../' : '';
-
-    // 1. Check Cache and Expiry
-    const cachedData = localStorage.getItem(cacheKey);
-    const lastFetch = localStorage.getItem(expiryKey);
     const now = new Date().getTime();
+    const cachedData = localStorage.getItem(NEWS_CACHE_KEY);
+    const lastFetch = localStorage.getItem(NEWS_EXPIRY_KEY);
 
-    if (cachedData && lastFetch && (now - parseInt(lastFetch) < REFRESH_INTERVAL)) {
+    // 1. Try to render from cache first
+    if (cachedData) {
         try {
             const articles = JSON.parse(cachedData);
-            if (articles && articles.length > 0) {
-                renderSync(container, articles, limit);
-                return; // Valid cache
+            renderSync(container, articles, limit);
+
+            // If cache is still "fresh", don't fetch
+            if (lastFetch && (now - parseInt(lastFetch) < REFRESH_INTERVAL)) {
+                return;
             }
         } catch (e) { console.warn("Cache parse failed", e); }
-    }
-
-    // Show Loading State
-    if (!cachedData) {
+    } else {
+        // Show Loading State only if no cache
         container.innerHTML = `
             <div style="grid-column: 1/-1; text-align: center; padding: 50px; opacity: 0.5;">
                 <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 20px;"></i>
-                <p>Curating your mental health ritual...</p>
+                <p>Syncing live mental health insights...</p>
             </div>
         `;
     }
 
-    // 2. Fetch Fresh Data with Cache Buster
+    // 2. Fetch Fresh Data
     try {
+        const rootPath = getRootPath();
         const response = await fetch(`${rootPath}assets/data/news-feed.json?t=${now}`);
-        if (!response.ok) throw new Error('News feed currently unavailable');
+        if (!response.ok) throw new Error('Unavailable');
 
-        const articles = await response.json();
+        let articles = await response.json();
 
         if (articles && articles.length > 0) {
-            // Update UI
-            renderSync(container, articles, limit);
+            // Safety Sort: Ensure newest is always first
+            articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
-            // 3. Save to Cache for 30 mins
-            localStorage.setItem(cacheKey, JSON.stringify(articles));
-            localStorage.setItem(expiryKey, now.toString());
-        } else if (!cachedData) {
-            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No news rituals active at this moment.</p>';
+            renderSync(container, articles, limit);
+            localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(articles));
+            localStorage.setItem(NEWS_EXPIRY_KEY, now.toString());
         }
     } catch (error) {
-        console.error("News Load Error:", error);
-        if (cachedData) {
-            renderSync(container, JSON.parse(cachedData), limit);
-        }
-    }
-}
-
-/**
- * Synchronized Rendering
- * Ensures both the grid and ticker use the exact same slice of data.
- */
-function renderSync(container, articles, limit) {
-    // Show up to the requested limit in the grid
-    renderArticles(container, articles.slice(0, limit));
-
-    // Update Global Ticker if it exists
-    const ticker = document.getElementById('news-ticker');
-    if (ticker) {
-        renderTicker(ticker, articles);
+        console.error("News Fetch Error:", error);
     }
 }
 
@@ -83,50 +64,62 @@ async function initGlobalTicker() {
     const ticker = document.getElementById('news-ticker');
     if (!ticker) return;
 
-    const cacheKey = 'soulamore_news_cache_global';
-    const expiryKey = 'soulamore_news_expiry_global';
-    const REFRESH_INTERVAL = 30 * 60 * 1000;
     const now = new Date().getTime();
+    const cachedData = localStorage.getItem(NEWS_CACHE_KEY);
+    const lastFetch = localStorage.getItem(NEWS_EXPIRY_KEY);
 
-    // 1. Check Cache
-    const cachedData = localStorage.getItem(cacheKey);
-    const lastFetch = localStorage.getItem(expiryKey);
-
-    if (cachedData && lastFetch && (now - parseInt(lastFetch) < REFRESH_INTERVAL)) {
-        try {
-            renderTicker(ticker, JSON.parse(cachedData));
-            return;
-        } catch (e) {
-            console.warn("Ticker cache parse failed", e);
-        }
+    if (cachedData) {
+        renderTicker(ticker, JSON.parse(cachedData));
+        if (lastFetch && (now - parseInt(lastFetch) < REFRESH_INTERVAL)) return;
     }
 
-    // 2. Fetch Fresh Data (Robust Root Detection)
     try {
-        let finalRoot = '';
-        const path = window.location.pathname;
-        if (path.includes('/spaces/') || path.includes('/tools/') || path.includes('/company/') || path.includes('/community/') || path.includes('/our-peers/') || path.includes('/our-psychologists/') || path.includes('/portal/') || path.includes('/join-us/') || path.includes('/pages/')) {
-            const folderCount = (path.match(/\//g) || []).length;
-            // Adjustment for local file vs hosted
-            const isLocal = window.location.protocol === 'file:';
-            const depth = isLocal ? folderCount - 1 : folderCount;
-
-            if (depth >= 3) finalRoot = '../../';
-            else if (depth >= 2) finalRoot = '../';
-        }
-
-        const response = await fetch(`${finalRoot}assets/data/news-feed.json?t=${now}`);
+        const rootPath = getRootPath();
+        const response = await fetch(`${rootPath}assets/data/news-feed.json?t=${now}`);
         if (!response.ok) throw new Error('Unavailable');
-        const articles = await response.json();
+        let articles = await response.json();
 
         if (articles && articles.length > 0) {
+            articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
             renderTicker(ticker, articles);
-            localStorage.setItem(cacheKey, JSON.stringify(articles));
-            localStorage.setItem(expiryKey, now.toString());
+            localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(articles));
+            localStorage.setItem(NEWS_EXPIRY_KEY, now.toString());
         }
     } catch (e) {
-        console.error("Global Ticker Load Error:", e);
-        if (cachedData) renderTicker(ticker, JSON.parse(cachedData));
+        console.error("Ticker Load Error:", e);
+    }
+}
+
+function getRootPath() {
+    const path = window.location.pathname;
+    if (path.includes('/spaces/') || path.includes('/tools/') || path.includes('/company/') ||
+        path.includes('/community/') || path.includes('/our-peers/') || path.includes('/portal/') ||
+        path.includes('/pages/')) {
+
+        const isLocal = window.location.protocol === 'file:';
+        // Local files often have deeper paths, hosted files are usually /folder/file.html
+        if (isLocal) {
+            return '../'; // Simplified for common dev setup
+        }
+
+        // Count depth if needed
+        const depth = (path.match(/\//g) || []).length;
+        if (depth >= 3) return '../../';
+        if (depth >= 2) return '../';
+    }
+    return '';
+}
+
+function renderSync(container, articles, limit) {
+    if (!articles || articles.length === 0) return;
+
+    // Show up to the requested limit in the grid
+    renderArticles(container, articles.slice(0, limit));
+
+    // Update Global Ticker if it exists
+    const ticker = document.getElementById('news-ticker');
+    if (ticker) {
+        renderTicker(ticker, articles);
     }
 }
 
