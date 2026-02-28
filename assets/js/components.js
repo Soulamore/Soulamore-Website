@@ -205,8 +205,9 @@ try {
                  justify-content: space-between !important;
                  align-items: center !important;
                  padding: 0 10px 0 15px !important;
-                 height: 60px !important; /* INCREASED HEIGHT */
+                 height: 60px !important;
                  width: 100% !important;
+                 position: relative !important;
             }
             .nav-logo {
                 display: flex !important;
@@ -217,10 +218,10 @@ try {
                 height: 100% !important;
             }
             header.island-nav { 
-                z-index: 9999 !important; 
+                z-index: 99999 !important; 
                 position: fixed !important; 
-                width: 95% !important; /* MATCHING NAV BAR WIDTH */
-                max-width: 480px !important;
+                width: 92% !important; /* SYNC WITH BOTTOM NAV */
+                max-width: 1400px !important; /* MATCH SITE CONTENT */
                 left: 50% !important;
                 transform: translateX(-50%) !important;
                 top: 15px !important;
@@ -229,17 +230,42 @@ try {
                 backdrop-filter: blur(20px) !important;
                 border: 1px solid rgba(255,255,255,0.15) !important;
                 padding: 0 !important; 
-                overflow: hidden !important;
+                overflow: visible !important; /* CRITICAL FIX: Allow Menu to show */
                 opacity: 1 !important;
                 visibility: visible !important;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
             }
 
-            /* Fix dropdowns in mobile menu */
-            .nav-links.open {
-                background: rgba(15, 23, 42, 0.98) !important;
-                top: 70px !important; /* Positioned below island */
+            .mobile-toggle {
+                display: flex !important;
+                background: transparent !important;
+                border: none !important;
+                color: #e2e8f0 !important;
+                font-size: 1.5rem !important;
+                cursor: pointer !important;
+                padding: 10px !important;
+                z-index: 1000 !important;
             }
+
+            /* Fix Mobile Menu Positioning & Visibility */
+            .nav-links.open {
+                display: flex !important;
+                flex-direction: column !important;
+                position: absolute !important;
+                top: 70px !important;
+                left: 0 !important;
+                width: 100% !important;
+                background: rgba(15, 23, 42, 0.98) !important;
+                border: 1px solid rgba(255,255,255,0.1) !important;
+                border-radius: 24px !important;
+                padding: 20px !important;
+                box-shadow: 0 20px 50px rgba(0,0,0,0.8) !important;
+                z-index: 9999 !important;
+                max-height: 80vh !important;
+                overflow-y: auto !important;
+                backdrop-filter: blur(15px) !important;
+            }
+            
             header .nav-links:not(.open) {
                 display: none !important;
             }
