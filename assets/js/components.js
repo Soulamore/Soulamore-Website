@@ -206,25 +206,35 @@ try {
 
         /* MOBILE (Width <= 1024px) - CONSOLIDATED & FINAL */
         @media (max-width: 1024px) {
-            .logo-text-overlay { display: none !important; visibility: hidden !important; } 
+            .logo-text-overlay { 
+                display: block !important; 
+                visibility: visible !important; 
+                position: absolute !important;
+                left: 0 !important;
+                height: 100% !important;
+                width: auto !important;
+                clip-path: inset(0 0 0 35%) !important; /* Scale to show text */
+            } 
             .logo-icon { 
                 clip-path: none !important; 
-                position: static !important; 
-                height: 32px !important; 
+                position: absolute !important; 
+                left: 0 !important;
+                height: 38px !important; 
                 width: auto !important;
                 margin: 0 !important;
                 display: block !important;
                 visibility: visible !important;
             }
             .logo-wrapper { 
-                width: auto !important; 
-                min-width: 40px !important;
+                width: 140px !important; 
+                min-width: 140px !important;
                 display: flex !important;
                 align-items: center !important;
-                justify-content: center !important;
+                justify-content: flex-start !important;
                 gap: 0 !important;
-                height: 48px !important;
+                height: 52px !important;
                 visibility: visible !important;
+                position: relative !important;
             }
 
             .auth-box { display: none !important; }
@@ -234,8 +244,8 @@ try {
                  display: flex !important;
                  justify-content: space-between !important;
                  align-items: center !important;
-                 padding: 0 15px !important;
-                 height: 52px !important; /* Slightly taller for breathing room */
+                 padding: 0 10px 0 15px !important;
+                 height: 60px !important; /* INCREASED HEIGHT */
                  width: 100% !important;
             }
             .nav-logo {
@@ -249,8 +259,8 @@ try {
             header.island-nav { 
                 z-index: 9999 !important; 
                 position: fixed !important; 
-                width: 94% !important; 
-                max-width: 450px !important;
+                width: 95% !important; /* MATCHING NAV BAR WIDTH */
+                max-width: 480px !important;
                 left: 50% !important;
                 transform: translateX(-50%) !important;
                 top: 15px !important;
@@ -260,13 +270,15 @@ try {
                 border: 1px solid rgba(255,255,255,0.15) !important;
                 padding: 0 !important; 
                 overflow: hidden !important;
-                opacity: 1 !important; /* Ensure visibility */
+                opacity: 1 !important;
                 visibility: visible !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
             }
 
             /* Fix dropdowns in mobile menu */
             .nav-links.open {
                 background: rgba(15, 23, 42, 0.98) !important;
+                top: 70px !important; /* Positioned below island */
             }
             header .nav-links:not(.open) {
                 display: none !important;
@@ -1105,6 +1117,10 @@ document.addEventListener('DOMContentLoaded', () => {
     injectMobileBottomNav();
     setActiveState();
     initSmartCounters();
+
+    // 4. Interaction Initialization (MANDATORY)
+    bindMobileToggle();
+    initializeHeaderLogic();
 });
 
 /**
