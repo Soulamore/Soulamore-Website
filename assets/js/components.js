@@ -163,7 +163,15 @@ try {
                 margin: 0 !important;
                 width: fit-content !important;
                 max-width: 1600px !important;
-                padding: 6px 30px !important; /* Slightly more dynamic padding */
+                padding: 6px 30px !important; 
+                top: 15px !important;
+                border-radius: 50px !important;
+                background: rgba(15, 23, 42, 0.9) !important;
+                backdrop-filter: blur(20px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+                position: fixed !important;
+                overflow: visible !important;
             }
             .nav-links i {
                 color: #F49F75 !important; /* Force Peach Glow for Icons */
@@ -291,18 +299,23 @@ try {
         /* ADAPTIVE ICON MODE: 1025px - 1420px (Targeted Laptop Range) */
         /* Hides text labels ONLY when necessary on smaller screens */
         @media (min-width: 1025px) and (max-width: 1420px) {
-            header .nav-links > a, 
-            header .nav-links > .dropdown > a {
+            header.island-nav { width: 92% !important; } /* Match Bottom Nav exactly */
+            
+            header .nav-links a, 
+            header .nav-links .dropdown a {
                 font-size: 0 !important; /* Hide Text */
+                color: transparent !important; /* Nuclear Hide */
                 gap: 0 !important;
                 padding: 0 12px !important;
-                border: none !important; /* Remove separators */
+                border: none !important;
             }
-            header .nav-links > a::after { content: none !important; } /* Kill pseudo-elements */
+            header .nav-links a::after { content: none !important; }
             
             header .nav-links i {
                 font-size: 1.3rem !important; /* Bigger Icons */
+                color: #F49F75 !important;
                 margin: 0 !important;
+                display: inline-block !important; /* Ensure visibility */
             }
             /* Hide Chevron */
             header .nav-links .fa-chevron-down { display: none !important; }
