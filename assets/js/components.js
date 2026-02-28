@@ -48,19 +48,11 @@ try {
             overflow: visible !important;
             text-decoration: none;
         }
-        .logo-icon {
+        .logo-img {
             height: 100% !important;
             width: auto !important;
             object-fit: contain !important;
-            z-index: 2 !important;
-        }
-        .logo-text-overlay {
-            height: 100% !important;
-            width: auto !important;
-            object-fit: contain !important;
-            filter: brightness(0) invert(1) !important; /* White */
-            z-index: 1 !important;
-            margin-left: -5px; /* Slight overlap for tight branding */
+            transition: transform 0.3s ease !important;
         }
 
         /* Button Consistency - FIXED COLORS */
@@ -183,58 +175,26 @@ try {
                 margin-right: 10px !important; /* Add small breathing room */
                 overflow: visible !important; /* FIX: Prevent scaling clipping */
             }
-            .logo-icon {
-                clip-path: none !important; /* No longer needed for logo-peach.png */
-                position: absolute !important;
-                left: 0 !important;
-                transition: transform 0.3s ease !important;
-            }
-            .logo-text-overlay {
-                display: block !important;
-                position: absolute !important;
-                left: 0 !important;
-                clip-path: inset(0 0 0 32%) !important;
-                transition: transform 0.3s ease !important;
-            }
             .logo-wrapper { width: 180px !important; }
-            .logo-wrapper:hover .logo-icon { transform: scale(1.08) !important; }
-            .logo-wrapper:hover .logo-text-overlay {
-                transform: scale(1.08) !important;
-                clip-path: inset(-5% -5% -5% 32%) !important;
-            }
+            .logo-wrapper:hover .logo-img { transform: scale(1.05) !important; }
         }
 
         /* MOBILE (Width <= 1024px) - CONSOLIDATED & FINAL */
         @media (max-width: 1024px) {
-            .logo-text-overlay { 
-                display: block !important; 
-                visibility: visible !important; 
-                position: absolute !important;
-                left: 0 !important;
-                height: 100% !important;
+            .logo-img { 
+                height: 42px !important; 
                 width: auto !important;
-                clip-path: inset(0 0 0 35%) !important; /* Scale to show text */
-            } 
-            .logo-icon { 
-                clip-path: none !important; 
-                position: absolute !important; 
-                left: 0 !important;
-                height: 38px !important; 
-                width: auto !important;
-                margin: 0 !important;
                 display: block !important;
                 visibility: visible !important;
             }
             .logo-wrapper { 
-                width: 140px !important; 
-                min-width: 140px !important;
+                width: auto !important; 
+                min-width: 120px !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: flex-start !important;
-                gap: 0 !important;
-                height: 52px !important;
+                height: 42px !important;
                 visibility: visible !important;
-                position: relative !important;
             }
 
             .auth-box { display: none !important; }
@@ -712,8 +672,7 @@ const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
         <div class="logo-wrapper">
-            <img src="${rootPath}assets/images/logo-peach.png" class="logo-icon" alt="">
-            <img src="${rootPath}assets/images/logo.png" class="logo-text-overlay" alt="Soulamore">
+            <img src="${rootPath}assets/images/logo-premium.png" class="logo-img" alt="Soulamore">
         </div>
     </a>
 
