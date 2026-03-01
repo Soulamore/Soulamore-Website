@@ -4,7 +4,7 @@ import sys
 
 # Paths
 CACHE_DIR = "C:/Users/adity/.cache/huggingface/hub/models--mistralai--Mistral-7B-v0.1"
-ADAPTER_PATH = "soulbot/models/soulamore_mistral_adapter"
+ADAPTER_PATH = "soulbot/models/soulamore.ai"
 
 def check_system():
     print("--- SYSTEM CHECK ---")
