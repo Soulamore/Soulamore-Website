@@ -1040,11 +1040,11 @@
         const BATCH_SIZE = 6;
         let activeDomain = 'All';
         let activeContexts = new Set();
+        const gridEl = document.getElementById('assessments-grid');
 
+        // Helper to render assessments
         function renderAssessments(filter) {
-            if (typeof injectHeader === 'function') injectHeader();
-            if (typeof injectFooter === 'function') injectFooter();
-
+            // Shell injections (Header/Footer/Subnav) are now handled by components.js
             activeDomain = filter === 'all' ? 'All' : filter;
             if (typeof applyFilters === 'function') applyFilters();
         }
@@ -1125,7 +1125,12 @@
                 return matchDomain && matchContext;
             });
 
-            renderGrid(true);
+            renderGrid(0);
+        }
+
+        function renderActiveFilters() {
+            // Optional: Update UI to show active filters summary
+            // console.log("Active Domain:", activeDomain, "Active Contexts:", [...activeContexts]);
         }
 
         function getIconForDomain(domain) {
@@ -1198,7 +1203,7 @@
             });
 
             updatePager(start, end);
-            loadClinicalCitations();
+            if (typeof loadClinicalCitations === 'function') loadClinicalCitations();
         }
 
         function updatePager(start, end) {
