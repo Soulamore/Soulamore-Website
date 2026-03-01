@@ -41,7 +41,7 @@ def train():
         quantization_config=quantization_config,
         device_map="auto",
         trust_remote_code=True,
-        dtype=torch.bfloat16, # Use 'dtype' instead of 'torch_dtype'
+        torch_dtype=torch.bfloat16,
     )
 
     model.config.torch_dtype = torch.bfloat16 # Ensure config matches
@@ -63,8 +63,12 @@ def train():
     # Load local dataset
     dataset = load_dataset("json", data_files=DATASET_PATH, split="train")
 
-    def format_prompts(example):
-        return f"### Instruction:\n{example['instruction']}\n\n### Input:\n{example['input']}\n\n### Response:\n{example['output']}"
+    def format_prompts(examples):
+        output_texts = []
+        for i in range(len(examples['instruction'])):
+            text = f"### Instruction:\n{examples['instruction'][i]}\n\n### Input:\n{examples['input'][i]}\n\n### Response:\n{examples['output'][i]}"
+            output_texts.append(text)
+        return output_texts
 
     # SFTConfig replaces TrainingArguments in modern TRL
     training_args = SFTConfig(
@@ -81,7 +85,7 @@ def train():
         save_strategy="epoch",
         optim="paged_adamw_32bit", # Better stability on Windows
         report_to="none",
-        max_length=1024, # In 0.29.0 it is 'max_length' inside SFTConfig
+        max_seq_length=1024, # In modern TRL, use 'max_seq_length'
     )
 
     trainer = SFTTrainer(
