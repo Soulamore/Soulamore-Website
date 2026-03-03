@@ -1134,8 +1134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initSmartCounters();
 
     // 4. Interaction Initialization (MANDATORY)
-    bindMobileToggle();
-    initializeHeaderLogic();
+    // Note: Removed duplicate bindMobileToggle and initializeHeaderLogic calls
 });
 
 /**
@@ -1769,20 +1768,36 @@ function initSmartCounters() {
 
 // --- NAVIGATION LOGIC (SPA Fallback) ---
 window.navTo = function (targetId) {
+    const isSPA = document.body.dataset.mode === 'spa';
     const sections = ['main', 'programs', 'employees', 'financial', 'hr', 'policy'];
-    sections.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            if (id === targetId) {
-                el.classList.add('active');
-                el.style.display = 'block';
-                el.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                el.classList.remove('active');
-                el.style.display = 'none';
-            }
+
+    // 1. Scrolling Logic (Always try to scroll first)
+    const el = document.getElementById(targetId);
+    if (el) {
+        if (!isSPA) {
+            // Long-scrolling behavior: Show all, just scroll
+            sections.forEach(id => {
+                const s = document.getElementById(id);
+                if (s) s.style.display = 'block';
+            });
+            el.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            // SPA behavior: Hide/Show
+            sections.forEach(id => {
+                const s = document.getElementById(id);
+                if (s) {
+                    if (id === targetId) {
+                        s.classList.add('active');
+                        s.style.display = 'block';
+                        s.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        s.classList.remove('active');
+                        s.style.display = 'none';
+                    }
+                }
+            });
         }
-    });
+    }
 
     // Update subnav active state
     document.querySelectorAll('.workplace-btn').forEach(btn => {
