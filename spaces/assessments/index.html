@@ -96,14 +96,12 @@
         @keyframes twinkle {
             0% {
                 opacity: 0.1;
-                transform: scale(0.8);
-                box-shadow: 0 0 2px rgba(255, 255, 255, 0.1);
+                filter: brightness(0.5);
             }
 
             100% {
-                opacity: 0.6;
-                transform: scale(1.2);
-                box-shadow: 0 0 8px rgba(78, 205, 196, 0.4);
+                opacity: 0.7;
+                filter: brightness(2) drop-shadow(0 0 4px rgba(78, 205, 196, 0.5));
             }
         }
 
@@ -121,7 +119,7 @@
 
         .floating-word {
             position: absolute;
-            color: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.015);
             font-family: 'Outfit';
             font-weight: 700;
             user-select: none;
@@ -239,11 +237,14 @@
 
         /* --- ASSESSMENTS LAUNCHPAD --- */
         .filter-section {
-            margin-bottom: 40px;
-            text-align: center;
+            position: sticky;
+            top: 90px;
+            z-index: 10005;
+            margin-bottom: 28px;
+            text-align: left;
         }
 
-        .filter-label {
+        .dropdown-filter-label {
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -455,22 +456,57 @@
         }
 
         /* --- PLAYFUL SCIENCE POPUP --- */
-        .sci-badge {
+        .card-badge-stack {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-glass);
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            color: #94a3b8;
-            cursor: pointer;
-            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .intel-badge,
+        .sci-badge {
+            position: static !important;
             display: flex;
             align-items: center;
             gap: 6px;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 50px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            pointer-events: auto;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .sci-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: #94a3b8;
+            cursor: pointer;
+        }
+
+        .intel-badge.quick {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .intel-badge.sensitive {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .intel-badge.popular {
+            background: rgba(78, 205, 196, 0.1);
+            color: var(--teal-glow);
+            border: 1px solid rgba(78, 205, 196, 0.25);
         }
 
         .sci-badge:hover {
@@ -738,17 +774,14 @@
         .side-nav {
             position: fixed;
             top: 50%;
+            left: 0;
+            width: 100%;
             transform: translateY(-50%);
             z-index: 1000;
             display: flex;
-            flex-direction: column;
-            gap: 20px;
-            pointer-events: none;
-            width: 100%;
-            left: 0;
-            padding: 0 40px;
             justify-content: space-between;
-            flex-direction: row;
+            padding: 0 30px;
+            pointer-events: none;
             opacity: 0;
             transition: opacity 0.5s ease-in-out, visibility 0.5s;
             visibility: hidden;
@@ -791,15 +824,309 @@
             filter: grayscale(1);
         }
 
-        @media(max-width: 1300px) {
+        @media(max-width: 600px) {
             .side-nav {
-                display: none;
-                /* Hide on smaller screens to avoid overlap */
+                padding: 0 20px;
             }
         }
 
         .load-more-container {
             display: none !important;
+        }
+
+        /* Hide pagers if grid is empty */
+        .assessments-grid:empty+.pager-container,
+        #top-pager-container:has(+ .assessments-grid:empty) {
+            display: none;
+        }
+
+        /* ---- GUIDED ENTRY STRIP ---- */
+        .guided-entry {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            background: rgba(78, 205, 196, 0.05);
+            border: 1px solid rgba(78, 205, 196, 0.18);
+            border-radius: 16px;
+            padding: 14px 24px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .guided-entry p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #94a3b8;
+        }
+
+        .guided-entry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--gradient-primary);
+            color: #0f172a;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 9px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2);
+            white-space: nowrap;
+        }
+
+        .guided-entry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        /* ---- SEARCH BAR ---- */
+        .assessment-search-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: 50px;
+            padding: 10px 20px;
+            margin-bottom: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .assessment-search-wrap:focus-within {
+            border-color: rgba(78, 205, 196, 0.4);
+        }
+
+        .assessment-search-wrap i {
+            color: #64748b;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        #assessment-search {
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--starlight);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+
+        #assessment-search::placeholder {
+            color: #475569;
+        }
+
+        /* ---- DROPDOWN CHECKBOX FILTERS ---- */
+        .filter-dropdowns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 0;
+        }
+
+        .filter-dropdown-wrap {
+            position: relative;
+        }
+
+        .filter-dropdown-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            color: var(--starlight);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.9rem;
+            padding: 10px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .filter-dropdown-btn:hover,
+        .filter-dropdown-btn.has-selection {
+            border-color: var(--teal-glow);
+            color: var(--teal-glow);
+        }
+
+        .filter-dropdown-btn.open {
+            border-color: rgba(78, 205, 196, 0.5);
+            background: rgba(78, 205, 196, 0.06);
+            color: var(--teal-glow);
+        }
+
+        .filter-dropdown-btn .chevron {
+            transition: transform 0.3s ease;
+        }
+
+        .filter-dropdown-btn.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .filter-dropdown-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            min-width: 230px;
+            max-width: 300px;
+            background: rgba(13, 20, 40, 0.97);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 10px;
+            z-index: 100000;
+            max-height: 320px;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(78, 205, 196, 0.3) transparent;
+            display: none;
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+
+        .filter-dropdown-panel.open {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+        @keyframes ddFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .filter-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.88rem;
+            color: #94a3b8;
+            user-select: none;
+        }
+
+        .filter-checkbox-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--starlight);
+        }
+
+        .filter-checkbox-item.selected {
+            color: var(--starlight);
+            font-weight: 600;
+        }
+
+        .filter-checkbox-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            min-width: 16px;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+            background: transparent;
+        }
+
+        .filter-checkbox-item input[type="checkbox"]:checked {
+            background: var(--teal-glow);
+            border-color: var(--teal-glow);
+        }
+
+        .filter-checkbox-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: #0f172a;
+            font-size: 10px;
+            font-weight: 900;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .dropdown-clear-row {
+            display: flex;
+            justify-content: flex-end;
+            padding: 4px 8px 8px;
+            border-bottom: 1px solid var(--border-glass);
+            margin-bottom: 4px;
+        }
+
+        .dropdown-clear-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: 0.2s;
+        }
+
+        .dropdown-clear-btn:hover {
+            color: var(--teal-glow);
+        }
+
+        /* ---- INLINE SEARCH (right-edge pill, same height as dropdown btns) ---- */
+        .inline-search-wrap {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: 50px;
+            padding: 10px 18px;
+            width: 200px;
+            transition: border-color 0.3s, width 0.3s;
+        }
+
+        .inline-search-wrap:focus-within {
+            border-color: rgba(78, 205, 196, 0.5);
+            width: 260px;
+        }
+
+        .inline-search-wrap i {
+            color: #64748b;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .inline-search-wrap input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--starlight);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.88rem;
+            width: 100%;
+        }
+
+        .inline-search-wrap input::placeholder {
+            color: #64748b;
+        }
+
+        .assessment-card {
+            position: relative;
         }
     </style>
     <link rel="icon" href="../../assets/images/favicon_symbol.png" type="image/x-icon">
@@ -812,144 +1139,186 @@
     <div id="app-shell">
         <div id="shell-fixed">
             <header id="main-header"></header>
+            <div id="shell-subnav"></div>
         </div>
 
         <main id="shell-content">
             <div id="word-atmosphere"></div>
 
+            <!-- SIDE NAVIGATION ARROWS (Moved outside transformed container for true fixed positioning) -->
+            <div class="side-nav">
+                <button class="side-nav-btn prev-btn" title="Previous Page" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="side-nav-btn next-btn" title="Next Page">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
             <div class="container fade-in">
-                <div class="container">
 
-                    <!-- HERO -->
-                    <section class="hero fade-in">
-                        <span class="hero-tag">Guided Inner Experience</span>
-                        <h1>Understand Your Emotional Architecture.</h1>
-                        <p>Not a quiz. An AI-powered, cinematic journey into your psychological landscape—grounded
-                            strictly
-                            in clinical science.</p>
-                    </section>
+                <!-- HERO -->
+                <section class="hero fade-in">
+                    <span class="hero-tag">Guided Inner Experience</span>
+                    <h1>Understand Your Emotional Architecture.</h1>
+                    <p>Not a quiz. An AI-powered, cinematic journey into your psychological landscape—grounded
+                        strictly
+                        in clinical science.</p>
+                </section>
 
-                    <!-- SCIENTIFIC TRUST BANNER -->
-                    <div class="trust-banner fade-in" style="animation-delay: 0.2s;">
-                        <i class="fas fa-shield-alt trust-icon"></i>
-                        <div class="trust-text">
-                            <h3>Built on Clinical Knowledge</h3>
-                            <p>Our assessment engine does not guess or hallucinate. It is deeply structured upon
-                                established
-                                psychological frameworks, cross-cutting symptom measures, and trauma-informed playbooks.
-                                AI
-                                is merely the intelligent narrator of your deterministic emotional fingerprint.</p>
-                            <div class="trust-tags">
-                                <span>PHQ-9 Inspired</span>
-                                <span>GAD-7 Influenced</span>
-                                <span>LSAS Metrics</span>
-                                <span>DERS Constructs</span>
-                                <span>GDPR Compliant</span>
+                <!-- SCIENTIFIC TRUST BANNER -->
+                <div class="trust-banner fade-in" style="animation-delay: 0.2s;">
+                    <i class="fas fa-shield-alt trust-icon"></i>
+                    <div class="trust-text">
+                        <h3>Built on Clinical Knowledge</h3>
+                        <p>Our assessment engine does not guess or hallucinate. It is deeply structured upon
+                            established
+                            psychological frameworks, cross-cutting symptom measures, and trauma-informed playbooks.
+                            AI
+                            is merely the intelligent narrator of your deterministic emotional fingerprint.</p>
+                        <div class="trust-tags">
+                            <span>PHQ-9 Inspired</span>
+                            <span>GAD-7 Influenced</span>
+                            <span>LSAS Metrics</span>
+                            <span>DERS Constructs</span>
+                            <span>GDPR Compliant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GUIDED ENTRY STRIP -->
+                <div class="guided-entry fade-in" style="animation-delay: 0.25s;">
+                    <p>Not sure where to begin?</p>
+                    <a href="engine.html?id=anxiety_gad7" class="guided-entry-btn">
+                        <i class="fas fa-magic"></i> Take Smart Start →
+                    </a>
+                </div>
+
+                <!-- MASTER TAG SYSTEM FILTERS -->
+                <div class="filter-section fade-in" style="animation-delay: 0.3s;">
+
+                    <!-- DUAL DROPDOWN FILTERS + INLINE SEARCH -->
+                    <div class="filter-dropdowns">
+
+                        <!-- Domain Dropdown -->
+                        <div class="filter-dropdown-wrap" id="domain-dropdown-wrap">
+                            <button class="filter-dropdown-btn" id="domain-dropdown-btn" aria-haspopup="listbox"
+                                aria-expanded="false">
+                                <i class="fas fa-brain"></i>
+                                <span id="domain-btn-label">Domain: All</span>
+                                <i class="fas fa-chevron-down chevron"></i>
+                            </button>
+                            <div class="filter-dropdown-panel" id="domain-dropdown-panel">
+                                <!-- Injected by JS -->
                             </div>
                         </div>
-                    </div>
 
-                    <!-- MASTER TAG SYSTEM FILTERS -->
-                    <div class="filter-section fade-in" style="animation-delay: 0.3s;">
-                        <span class="filter-label">Primary Clinical Domains</span>
-                        <div class="filter-bar" id="primary-filters">
-                            <button class="filter-btn active" data-domain="All">All Architecture</button>
-                            <!-- Injected by JS -->
+                        <!-- Situation Dropdown -->
+                        <div class="filter-dropdown-wrap" id="situation-dropdown-wrap">
+                            <button class="filter-dropdown-btn" id="situation-dropdown-btn" aria-haspopup="listbox"
+                                aria-expanded="false">
+                                <i class="fas fa-sliders-h"></i>
+                                <span id="situation-btn-label">Situation: Any</span>
+                                <i class="fas fa-chevron-down chevron"></i>
+                            </button>
+                            <div class="filter-dropdown-panel" id="situation-dropdown-panel">
+                                <!-- Injected by JS -->
+                            </div>
                         </div>
 
-                        <span class="filter-label" style="margin-top: 20px;">Filter by Situation</span>
-                        <div class="context-filters" id="context-filters">
-                            <!-- Injected by JS -->
+                        <!-- Inline search -->
+                        <div class="inline-search-wrap">
+                            <i class="fas fa-search"></i>
+                            <input id="assessment-search" type="text" placeholder="Search assessments..."
+                                autocomplete="off" />
                         </div>
+
                     </div>
 
-                    <!-- TOP PAGER -->
-                    <div class="pager-container fade-in" id="top-pager-container" style="animation-delay: 0.35s;">
-                        <button class="pager-btn prev-btn" disabled>
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </button>
-                        <div class="pager-info">
-                            <span class="item-range">1 - 6 of 110</span>
-                            <span class="page-counter">Page 1 of 19</span>
-                        </div>
-                        <button class="pager-btn next-btn">
-                            Next <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-
-                    <!-- ASSESSMENTS GRID -->
-                    <div class="assessments-grid fade-in" id="assessments-grid" style="animation-delay: 0.4s;">
-                        <!-- Auto-populated via JS -->
-                    </div>
-
-                    <!-- BOTTOM PAGER -->
-                    <div class="pager-container fade-in" id="pager-container" style="animation-delay: 0.5s;">
-                        <button class="pager-btn prev-btn" disabled>
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </button>
-                        <div class="pager-info">
-                            <span class="item-range">1 - 6 of 110</span>
-                            <span class="page-counter">Page 1 of 19</span>
-                        </div>
-                        <button class="pager-btn next-btn">
-                            Next <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-
-                    <!-- SIDE NAVIGATION ARROWS -->
-                    <div class="side-nav">
-                        <button class="side-nav-btn prev-btn" title="Previous Page" disabled>
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button class="side-nav-btn next-btn" title="Next Page">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-
-                    <!-- HOW IT WORKS -->
-                    <div class="process-row fade-in" style="animation-delay: 0.6s;">
-                        <div class="process-step">
-                            <i class="fas fa-fingerprint process-step-icon"></i>
-                            <h4>1. Structured Scoring</h4>
-                            <p>You answer adaptive, gentle questions. Our deterministic engine maps your severity bands
-                                and
-                                functional disruptions in real-time, completely locally.</p>
-                        </div>
-                        <div class="process-step">
-                            <i class="fas fa-brain process-step-icon"></i>
-                            <h4>2. AI Translation</h4>
-                            <p>We pass only numerical signatures to Gemini. The AI safely translates raw data into a
-                                human,
-                                non-diagnostic reflection grounded in our knowledge base.</p>
-                        </div>
-                        <div class="process-step">
-                            <i class="fas fa-route process-step-icon"></i>
-                            <h4>3. Intelligent Routing</h4>
-                            <p>Depending on your unique fingerprint, you are seamlessly routed to specific articles, a
-                                curated Support Group, or a matched Peer Therapy companion.</p>
-                        </div>
-                    </div>
-
-                    <!-- LEGAL DISCLAIMER -->
-                    <div class="legal-disclaimer fade-in" style="animation-delay: 0.8s;">
-                        <p>
-                            <strong>Clinical Disclaimer:</strong> Soulamore Emotional Assessments are designed for
-                            self-reflection and personal growth.
-                            They are <em>not</em> clinical diagnostic tools and cannot replace professional medical or
-                            psychiatric evaluations.
-                            The AI interpretation layer is carefully restricted to provide reflective, exploratory
-                            feedback
-                            rather than medical advice.
-                            <br><br>
-                            If you are experiencing acute distress, self-harm thoughts, or a mental health emergency,
-                            please
-                            stop the assessment and use our <a href="../../get-help-now.html"
-                                style="color:var(--teal-glow); text-decoration:none;">Immediate Crisis Resources</a>. By
-                            continuing, you acknowledge these terms.
-                        </p>
-                    </div>
-
+                    <!-- Hidden stubs keep JS getElementById refs alive -->
+                    <div id="primary-filters" style="display:none;"></div>
+                    <div id="context-filters" style="display:none;"></div>
                 </div>
+
+                <!-- TOP PAGER -->
+                <div class="pager-container fade-in" id="top-pager-container" style="animation-delay: 0.35s;">
+                    <button class="pager-btn prev-btn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <div class="pager-info">
+                        <span class="item-range">1 - 6 of 110</span>
+                        <span class="page-counter">Page 1 of 19</span>
+                    </div>
+                    <button class="pager-btn next-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- ASSESSMENTS GRID -->
+                <div class="assessments-grid fade-in" id="assessments-grid" style="animation-delay: 0.4s;">
+                    <!-- Auto-populated via JS -->
+                </div>
+
+                <!-- BOTTOM PAGER -->
+                <div class="pager-container fade-in" id="pager-container" style="animation-delay: 0.5s;">
+                    <button class="pager-btn prev-btn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <div class="pager-info">
+                        <span class="item-range">1 - 6 of 110</span>
+                        <span class="page-counter">Page 1 of 19</span>
+                    </div>
+                    <button class="pager-btn next-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+
+
+                <!-- HOW IT WORKS -->
+                <div class="process-row fade-in" style="animation-delay: 0.6s;">
+                    <div class="process-step">
+                        <i class="fas fa-fingerprint process-step-icon"></i>
+                        <h4>1. Structured Scoring</h4>
+                        <p>You answer adaptive, gentle questions. Our deterministic engine maps your severity bands
+                            and
+                            functional disruptions in real-time, completely locally.</p>
+                    </div>
+                    <div class="process-step">
+                        <i class="fas fa-brain process-step-icon"></i>
+                        <h4>2. AI Translation</h4>
+                        <p>We pass only numerical signatures to Gemini. The AI safely translates raw data into a
+                            human,
+                            non-diagnostic reflection grounded in our knowledge base.</p>
+                    </div>
+                    <div class="process-step">
+                        <i class="fas fa-route process-step-icon"></i>
+                        <h4>3. Intelligent Routing</h4>
+                        <p>Depending on your unique fingerprint, you are seamlessly routed to specific articles, a
+                            curated Support Group, or a matched Peer Therapy companion.</p>
+                    </div>
+                </div>
+
+                <!-- LEGAL DISCLAIMER -->
+                <div class="legal-disclaimer fade-in" style="animation-delay: 0.8s;">
+                    <p>
+                        <strong>Clinical Disclaimer:</strong> Soulamore Emotional Assessments are designed for
+                        self-reflection and personal growth.
+                        They are <em>not</em> clinical diagnostic tools and cannot replace professional medical or
+                        psychiatric evaluations.
+                        The AI interpretation layer is carefully restricted to provide reflective, exploratory
+                        feedback
+                        rather than medical advice.
+                        <br><br>
+                        If you are experiencing acute distress, self-harm thoughts, or a mental health emergency,
+                        please
+                        stop the assessment and use our <a href="../../get-help-now.html"
+                            style="color:var(--teal-glow); text-decoration:none;">Immediate Crisis Resources</a>. By
+                        continuing, you acknowledge these terms.
+                    </p>
+                </div>
+
+            </div>
         </main>
         <!-- STANDARDIZED FOOTER -->
         <footer></footer>
@@ -958,7 +1327,6 @@
     <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
     <script type="module" src="../../assets/js/firebase-config.js"></script>
     <script src="../../assets/js/components.js?v=3.3"></script>
-    <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/assessment-data.js"></script>
 
     <script>
@@ -1001,184 +1369,304 @@
             setTimeout(() => { el.remove(); }, 40000);
         }
 
-        for (let i = 0; i < 12; i++) setTimeout(createWord, i * 3000);
-        setInterval(createWord, 3000);
+        for (let i = 0; i < 6; i++) setTimeout(createWord, i * 3000);
+        setInterval(createWord, 6000);
 
         // --- DYNAMIC GRID & FILTERING LOGIC ---
-        let ALL_TESTS = Object.values(window.SoulamoreAssessments || {});
+        window.addEventListener('load', () => {
+            const gridEl = document.getElementById('assessments-grid');
 
-        // Sticky Randomization (Persistent discovery order)
-        function getDiscoveryOrder(array) {
-            const STORAGE_KEY = 'SoulamoreDiscoveryOrder';
-            let idOrder = [];
-            try {
-                const stored = localStorage.getItem(STORAGE_KEY);
-                if (stored) idOrder = JSON.parse(stored);
-            } catch (e) { }
-
-            const mapped = new Map(array.map(test => [test.id, test]));
-            let finalIds = idOrder.filter(id => mapped.has(id));
-            const currentIds = array.map(t => t.id);
-            const newIds = currentIds.filter(id => !idOrder.includes(id));
-
-            if (newIds.length > 0) {
-                const shuffledNew = [...newIds];
-                for (let i = shuffledNew.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffledNew[i], shuffledNew[j]] = [shuffledNew[j], shuffledNew[i]];
-                }
-                finalIds = [...finalIds, ...shuffledNew];
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(finalIds));
+            // --- HARD DEFENSIVE GUARD ---
+            if (!window.SoulamoreAssessments || Object.keys(window.SoulamoreAssessments).length === 0) {
+                console.error('[Soulamore] Assessment data failed to initialize.');
+                if (gridEl) gridEl.innerHTML = '<div style="text-align:center;padding:60px;color:#94a3b8;"><i class="fas fa-circle-exclamation" style="font-size:2rem;margin-bottom:15px;display:block;color:var(--peach-glow)"></i><p>Assessment data failed to load. Please refresh the page.</p></div>';
+                return;
             }
-            return finalIds.map(id => mapped.get(id));
-        }
 
-        ALL_TESTS = getDiscoveryOrder([...ALL_TESTS]);
+            let ALL_TESTS = Object.values(window.SoulamoreAssessments);
+            console.log('[Soulamore] Loaded Tests:', ALL_TESTS.length);
 
-        let filteredTests = [...ALL_TESTS];
-        let currentPage = 0;
-        const BATCH_SIZE = 6;
-        let activeDomain = 'All';
-        let activeContexts = new Set();
-        const gridEl = document.getElementById('assessments-grid');
+            let filteredTests = [];
+            let currentPage = 0;
+            const BATCH_SIZE = 6;
+            let activeDomains = new Set();   // empty = All
+            let activeContexts = new Set();
 
-        // Helper to render assessments
-        function renderAssessments(filter) {
-            // Shell injections (Header/Footer/Subnav) are now handled by components.js
-            activeDomain = filter === 'all' ? 'All' : filter;
-            if (typeof applyFilters === 'function') applyFilters();
-        }
+            const primaryFilterBar = document.getElementById('primary-filters');
+            const contextFilterBar = document.getElementById('context-filters');
+            const pagers = document.querySelectorAll('.pager-container');
+            const sideNav = document.querySelector('.side-nav');
+            const allPrevBtns = document.querySelectorAll('.prev-btn');
+            const allNextBtns = document.querySelectorAll('.next-btn');
 
-        const container = document.getElementById('assessments-grid');
-        const primaryFilterBar = document.getElementById('primary-filters');
-        const contextFilterBar = document.getElementById('context-filters');
+            // --- MUST BE DECLARED BEFORE initializeEngine() ---
+            const DOMAINS = [
+                "Anxiety Spectrum",
+                "Mood & Depression",
+                "Trauma & Nervous System",
+                "Relationship & Intimacy",
+                "Burnout & Functional Exhaustion",
+                "Career & Performance",
+                "Academic Stress",
+                "Grief & Loss",
+                "Loneliness & Connection",
+                "Expats & Migration",
+                "Adolescents & Youth"
+            ];
 
-        // Navigation Elements
-        const pagers = document.querySelectorAll('.pager-container');
-        const sideNav = document.querySelector('.side-nav');
-        const allPrevBtns = document.querySelectorAll('.prev-btn');
-        const allNextBtns = document.querySelectorAll('.next-btn');
+            const CONTEXTS = [
+                "Workplace", "Academic", "Digital", "Somatic", "Identity",
+                "Family", "Romantic", "Social", "Trauma", "Loneliness",
+                "Performance", "Creative", "Leadership", "Youth", "Migration",
+                "Grief", "Students", "Expat"
+            ];
 
-        const DOMAINS = [
-            "Anxiety Spectrum", "Mood & Depression", "Trauma & Nervous System",
-            "Attachment & Relationships", "Burnout & Functional Exhaustion",
-            "Identity & Self-Concept", "Loneliness & Social Isolation",
-            "Grief & Loss", "Youth & Development", "Migration & Cultural Transition"
-        ];
+            initializeEngine();
 
-        const CONTEXTS = [
-            "Student", "Workplace", "Leadership", "Expat", "Romantic",
-            "Family", "Academic", "Creative", "Digital", "Somatic", "Performance"
-        ];
 
-        function setupFilters() {
-            // Build Primary Domains
-            DOMAINS.forEach(dom => {
-                const btn = document.createElement('button');
-                btn.className = 'filter-btn';
-                btn.dataset.domain = dom;
-                btn.innerText = dom;
-                primaryFilterBar.appendChild(btn);
-            });
+            function initializeEngine() {
+                ALL_TESTS = getDiscoveryOrder([...ALL_TESTS]);
+                filteredTests = [...ALL_TESTS];
+                // Initialize filters after DOM is ready
+                document.addEventListener('DOMContentLoaded', setupFilters);
+                renderGrid(0);
+                injectIndexSchema();
+            }
 
-            // Build Context Tags
-            CONTEXTS.forEach(ctx => {
-                const btn = document.createElement('button');
-                btn.className = 'context-btn';
-                btn.dataset.context = ctx;
-                btn.innerText = ctx;
-                contextFilterBar.appendChild(btn);
-            });
 
-            // Domain click events
-            primaryFilterBar.addEventListener('click', (e) => {
-                const btn = e.target.closest('.filter-btn');
-                if (!btn) return;
-
-                primaryFilterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                activeDomain = btn.dataset.domain;
+            // Helper to render assessments
+            window.renderAssessments = function (filter) {
+                activeDomains.clear();
+                if (filter && filter !== 'all') activeDomains.add(filter);
                 applyFilters();
-            });
-
-            // Context toggle events
-            contextFilterBar.addEventListener('click', (e) => {
-                const btn = e.target.closest('.context-btn');
-                if (!btn) return;
-
-                if (activeContexts.has(btn.dataset.context)) {
-                    activeContexts.delete(btn.dataset.context);
-                    btn.classList.remove('active');
-                } else {
-                    activeContexts.add(btn.dataset.context);
-                    btn.classList.add('active');
-                }
-                applyFilters();
-            });
-        }
-
-        function applyFilters() {
-            filteredTests = ALL_TESTS.filter(test => {
-                const matchDomain = (activeDomain === 'All' || test.primary_domain === activeDomain);
-                const matchContext = (activeContexts.size === 0 ||
-                    (test.context_tags && test.context_tags.some(t => activeContexts.has(t))));
-                return matchDomain && matchContext;
-            });
-
-            renderGrid(0);
-        }
-
-        function renderActiveFilters() {
-            // Optional: Update UI to show active filters summary
-            // console.log("Active Domain:", activeDomain, "Active Contexts:", [...activeContexts]);
-        }
-
-        function getIconForDomain(domain) {
-            const icons = {
-                "Anxiety Spectrum": "fa-wind",
-                "Mood & Depression": "fa-cloud-showers-heavy",
-                "Trauma & Nervous System": "fa-bolt",
-                "Attachment & Relationships": "fa-link",
-                "Burnout & Functional Exhaustion": "fa-battery-quarter",
-                "Identity & Self-Concept": "fa-user-astronaut",
-                "Loneliness & Social Isolation": "fa-street-view",
-                "Grief & Loss": "fa-leaf",
-                "Youth & Development": "fa-seedling",
-                "Migration & Cultural Transition": "fa-globe-americas"
             };
-            return icons[domain] || "fa-brain";
-        }
 
-        function createCardHTML(test) {
-            const color = test.theme_color || "var(--teal-glow)";
-            const icon = getIconForDomain(test.primary_domain);
 
-            // Badges (Primary + Context)
-            let badgesHTML = '';
-            if (test.primary_domain) {
-                badgesHTML += `<span class="tag-badge" style="border-color: var(--teal-glow); color: var(--teal-glow)">${test.primary_domain}</span>`;
+            // Sticky Randomization (Persistent discovery order)
+            function getDiscoveryOrder(array) {
+                const STORAGE_KEY = 'SoulamoreDiscoveryOrder';
+                let idOrder = [];
+                try {
+                    const stored = localStorage.getItem(STORAGE_KEY);
+                    if (stored) idOrder = JSON.parse(stored);
+                } catch (e) { }
+
+                const mapped = new Map(array.map(test => [test.id, test]));
+                let finalIds = idOrder.filter(id => mapped.has(id));
+                const currentIds = array.map(t => t.id);
+                const newIds = currentIds.filter(id => !idOrder.includes(id));
+
+                if (newIds.length > 0) {
+                    const shuffledNew = [...newIds];
+                    for (let i = shuffledNew.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [shuffledNew[i], shuffledNew[j]] = [shuffledNew[j], shuffledNew[i]];
+                    }
+                    finalIds = [...finalIds, ...shuffledNew];
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(finalIds));
+                }
+                return finalIds.map(id => mapped.get(id));
             }
-            if (test.context_tags) {
-                test.context_tags.forEach(tag => {
-                    badgesHTML += `<span class="tag-badge">${tag}</span>`;
+
+            function setupFilters() {
+                const DOMAIN_LABELS = {
+                    "Anxiety Spectrum": "Anxiety",
+                    "Mood & Depression": "Depression",
+                    "Trauma & Nervous System": "Trauma",
+                    "Relationship & Intimacy": "Relationships",
+                    "Burnout & Functional Exhaustion": "Burnout",
+                    "Career & Performance": "Career",
+                    "Academic Stress": "Academic",
+                    "Grief & Loss": "Grief",
+                    "Loneliness & Connection": "Loneliness",
+                    "Expats & Migration": "Expats",
+                    "Adolescents & Youth": "Youth",
+                };
+
+                const domainPanel = document.getElementById('domain-dropdown-panel');
+                const domainBtn = document.getElementById('domain-dropdown-btn');
+                const domainLabel = document.getElementById('domain-btn-label');
+
+                const situPanel = document.getElementById('situation-dropdown-panel');
+                const situBtn = document.getElementById('situation-dropdown-btn');
+                const situLabel = document.getElementById('situation-btn-label');
+
+                // ---- Build domain checkboxes ----
+                domainPanel.innerHTML = `<div class="dropdown-clear-row"><button class="dropdown-clear-btn" id="domain-clear-btn">Clear all</button></div>`;
+                DOMAINS.forEach(dom => {
+                    const label = document.createElement('label');
+                    label.className = 'filter-checkbox-item';
+                    label.innerHTML = `<input type="checkbox" value="${dom}"> ${DOMAIN_LABELS[dom] || dom}`;
+                    domainPanel.appendChild(label);
                 });
+
+                // ---- Build situation checkboxes ----
+                situPanel.innerHTML = `<div class="dropdown-clear-row"><button class="dropdown-clear-btn" id="situ-clear-btn">Clear all</button></div>`;
+                CONTEXTS.forEach(ctx => {
+                    const label = document.createElement('label');
+                    label.className = 'filter-checkbox-item';
+                    label.innerHTML = `<input type="checkbox" value="${ctx}"> ${ctx}`;
+                    situPanel.appendChild(label);
+                });
+
+                // ---- Toggle panels open/close ----
+                function closeAll() {
+                    domainPanel.classList.remove('open'); domainBtn.classList.remove('open'); domainBtn.setAttribute('aria-expanded', 'false');
+                    situPanel.classList.remove('open'); situBtn.classList.remove('open'); situBtn.setAttribute('aria-expanded', 'false');
+                }
+
+                function togglePanel(btn, panel) {
+                    const isOpen = panel.classList.contains('open');
+                    closeAll();
+                    if (!isOpen) {
+                        panel.classList.add('open');
+                        btn.classList.add('open');
+                        btn.setAttribute('aria-expanded', 'true');
+                    } else {
+                        btn.setAttribute('aria-expanded', 'false');
+                    }
+                }
+
+                domainBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    togglePanel(domainBtn, domainPanel);
+                });
+                situBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    togglePanel(situBtn, situPanel);
+                });
+
+
+
+                // Close on outside click
+                document.addEventListener('click', (e) => { if (!e.target.closest('.filter-dropdown-wrap')) { closeAll(); } });
+
+                // ---- Domain checkbox change ----
+                function updateDomainLabel() {
+                    if (activeDomains.size === 0) { domainLabel.textContent = 'Domain: All'; domainBtn.classList.remove('has-selection'); }
+                    else { domainLabel.textContent = `Domain: ${activeDomains.size} selected`; domainBtn.classList.add('has-selection'); }
+                }
+                domainPanel.addEventListener('change', (e) => {
+                    if (e.target.type !== 'checkbox') return;
+                    if (e.target.checked) activeDomains.add(e.target.value);
+                    else activeDomains.delete(e.target.value);
+                    e.target.closest('.filter-checkbox-item').classList.toggle('selected', e.target.checked);
+                    updateDomainLabel();
+                    applyFilters();
+                });
+                document.getElementById('domain-clear-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    activeDomains.clear();
+                    domainPanel.querySelectorAll('input[type=checkbox]').forEach(cb => { cb.checked = false; cb.closest('.filter-checkbox-item').classList.remove('selected'); });
+                    updateDomainLabel();
+                    applyFilters();
+                });
+
+                // ---- Situation checkbox change ----
+                function updateSituLabel() {
+                    if (activeContexts.size === 0) { situLabel.textContent = 'Situation: Any'; situBtn.classList.remove('has-selection'); }
+                    else { situLabel.textContent = `Situation: ${activeContexts.size} selected`; situBtn.classList.add('has-selection'); }
+                }
+                situPanel.addEventListener('change', (e) => {
+                    if (e.target.type !== 'checkbox') return;
+                    if (e.target.checked) activeContexts.add(e.target.value);
+                    else activeContexts.delete(e.target.value);
+                    e.target.closest('.filter-checkbox-item').classList.toggle('selected', e.target.checked);
+                    updateSituLabel();
+                    applyFilters();
+                });
+                document.getElementById('situ-clear-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    activeContexts.clear();
+                    situPanel.querySelectorAll('input[type=checkbox]').forEach(cb => { cb.checked = false; cb.closest('.filter-checkbox-item').classList.remove('selected'); });
+                    updateSituLabel();
+                    applyFilters();
+                });
+
+                // ---- Search input ----
+                document.getElementById('assessment-search').addEventListener('input', applyFilters);
             }
 
-            return `
+            function applyFilters() {
+                const searchTerm = (document.getElementById('assessment-search')?.value || '').toLowerCase().trim();
+
+                filteredTests = ALL_TESTS.filter(test => {
+                    const matchDomain = (activeDomains.size === 0 || activeDomains.has(test.primary_domain));
+                    const matchContext = (activeContexts.size === 0 ||
+                        (test.context_tags && test.context_tags.some(t => activeContexts.has(t))));
+                    const matchSearch = !searchTerm ||
+                        (test.title && test.title.toLowerCase().includes(searchTerm)) ||
+                        (test.description && test.description.toLowerCase().includes(searchTerm)) ||
+                        (test.primary_domain && test.primary_domain.toLowerCase().includes(searchTerm));
+                    return matchDomain && matchContext && matchSearch;
+                });
+
+                renderGrid(0);
+            }
+
+
+            function getIconForDomain(domain) {
+                const icons = {
+                    "Anxiety Spectrum": "fa-wind",
+                    "Mood & Depression": "fa-cloud-showers-heavy",
+                    "Trauma & Nervous System": "fa-bolt",
+                    "Relationship & Intimacy": "fa-link",
+                    "Attachment & Relationships": "fa-link",
+                    "Burnout & Functional Exhaustion": "fa-battery-quarter",
+                    "Career & Performance": "fa-briefcase",
+                    "Career & Burnout": "fa-briefcase",
+                    "Academic Stress": "fa-graduation-cap",
+                    "Identity & Self-Concept": "fa-user-astronaut",
+                    "Loneliness & Connection": "fa-street-view",
+                    "Loneliness & Social Isolation": "fa-street-view",
+                    "Grief & Loss": "fa-leaf",
+                    "Adolescents & Youth": "fa-seedling",
+                    "Youth & Development": "fa-seedling",
+                    "Expats & Migration": "fa-globe-americas",
+                    "Migration & Cultural Transition": "fa-globe-americas"
+                };
+                return icons[domain] || "fa-brain";
+            }
+
+            function createCardHTML(test, index) {
+                const color = test.theme_color || "var(--teal-glow)";
+                const icon = getIconForDomain(test.primary_domain);
+
+                // Primary domain tag only (context tags shown via filter, not card)
+                const domainBadge = test.primary_domain
+                    ? `<span class="tag-badge" style="border-color: var(--teal-glow); color: var(--teal-glow)">${test.primary_domain}</span>`
+                    : '';
+
+                // Intelligence signal badge
+                const domain = (test.primary_domain || '').toLowerCase();
+                const SENSITIVE_DOMAINS = ['trauma', 'grief', 'mood', 'depression'];
+                const QUICK_DOMAINS = ['anxiety', 'burnout', 'career', 'academic'];
+                let intelBadge = '';
+                if (index < 6) {
+                    intelBadge = `<span class="intel-badge popular"><i class="fas fa-fire"></i> Popular</span>`;
+                } else if (SENSITIVE_DOMAINS.some(k => domain.includes(k))) {
+                    intelBadge = `<span class="intel-badge sensitive"><i class="fas fa-shield-alt"></i> Sensitive</span>`;
+                } else if (QUICK_DOMAINS.some(k => domain.includes(k))) {
+                    intelBadge = `<span class="intel-badge quick"><i class="fas fa-bolt"></i> Quick Screen</span>`;
+                }
+
+                return `
                 <div class="assessment-card" style="--hover-color: ${color};" onmouseover="this.style.borderColor='${color}'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.4), inset 0 0 20px ${color}10'" onmouseout="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+                    <div class="card-badge-stack">
+                        ${intelBadge}
+                        <div class="sci-badge" data-citation="${test.id}">
+                            <i class="fas fa-microscope" style="color:${color};"></i> Clinical Backing
+                        </div>
+                    </div>
                     <div class="card-inner">
                         <i class="fas ${icon} card-icon" style="color:${color};"></i>
                         <h3 class="card-title">${test.title}</h3>
-                        ${badgesHTML ? `<div class="badge-container">${badgesHTML}</div>` : ''}
+                        ${domainBadge ? `<div class="badge-container">${domainBadge}</div>` : ''}
                         <p class="card-desc">${test.description}</p>
                         <div class="card-meta">
                             <span><i class="far fa-clock"></i> ~5 mins</span>
-                            <a href="engine.html?id=${test.id}" class="card-btn">Explore Journey <i class="fas fa-arrow-right"></i></a>
+                            <a href="engine.html?id=${test.id}" class="card-btn">Start Assessment <i class="fas fa-arrow-right"></i></a>
                         </div>
-                    </div>
-
-                    <div class="sci-badge" data-citation="${test.id}">
-                        <i class="fas fa-microscope" style="color:${color};"></i> Clinical Backing
                     </div>
 
                     <div class="sci-overlay">
@@ -1188,138 +1676,160 @@
                     </div>
                 </div>
             `;
-        }
-
-        function renderGrid(page = 0) {
-            currentPage = page;
-            gridEl.innerHTML = '';
-
-            const start = currentPage * BATCH_SIZE;
-            const end = Math.min(start + BATCH_SIZE, filteredTests.length);
-            const slice = filteredTests.slice(start, end);
-
-            slice.forEach(test => {
-                gridEl.insertAdjacentHTML('beforeend', createCardHTML(test));
-            });
-
-            updatePager(start, end);
-            if (typeof loadClinicalCitations === 'function') loadClinicalCitations();
-        }
-
-        function updatePager(start, end) {
-            const total = filteredTests.length;
-            const totalPages = Math.ceil(total / BATCH_SIZE) || 1;
-            const currentPageHuman = currentPage + 1;
-
-            pagers.forEach(pager => {
-                const info = pager.querySelector('.pager-info');
-                const rangeSpan = info.querySelector('.item-range');
-                const counterSpan = info.querySelector('.page-counter');
-
-                if (total === 0) {
-                    rangeSpan.innerText = "0 - 0 of 0";
-                    counterSpan.innerText = "Page 0 of 0";
-                } else {
-                    rangeSpan.innerText = `${start + 1} - ${end} of ${total}`;
-                    counterSpan.innerText = `Page ${currentPageHuman} of ${totalPages}`;
-                }
-            });
-
-            const isFirstPage = (currentPage === 0);
-            const isLastPage = (end >= total);
-
-            allPrevBtns.forEach(btn => btn.disabled = isFirstPage);
-            allNextBtns.forEach(btn => btn.disabled = isLastPage);
-        }
-
-        function handleNavigate(direction) {
-            const total = filteredTests.length;
-            const maxPage = Math.floor((total - 1) / BATCH_SIZE);
-
-            if (direction === 'prev' && currentPage > 0) {
-                renderGrid(currentPage - 1);
-                window.scrollTo({ top: gridEl.offsetTop - 150, behavior: 'smooth' });
-            } else if (direction === 'next' && currentPage < maxPage) {
-                renderGrid(currentPage + 1);
-                window.scrollTo({ top: gridEl.offsetTop - 150, behavior: 'smooth' });
             }
-        }
 
-        allPrevBtns.forEach(btn => btn.addEventListener('click', () => handleNavigate('prev')));
-        allNextBtns.forEach(btn => btn.addEventListener('click', () => handleNavigate('next')));
+            function renderGrid(page = 0) {
+                currentPage = page;
+                gridEl.innerHTML = '';
 
-        // Side Nav Visibility Observer
-        const navObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    sideNav.classList.add('visible');
-                } else {
-                    // Check if we are above or below the grid
-                    const rect = entry.boundingClientRect;
-                    if (rect.top > 0 || rect.bottom < 0) {
-                        sideNav.classList.remove('visible');
-                    }
+                if (filteredTests.length === 0) {
+                    gridEl.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1; padding: 60px 20px; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed var(--border-glass); border-radius: 24px;">
+                            <i class="fas fa-search" style="font-size: 3rem; color: var(--teal-glow); opacity: 0.3; margin-bottom: 20px;"></i>
+                            <h3 style="font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 10px;">No assessments found</h3>
+                            <p style="opacity: 0.7;">Try adjusting your filters or search terms.</p>
+                            <button onclick="activeContexts.clear(); document.querySelectorAll('.context-btn').forEach(b => b.classList.remove('active')); renderAssessments('all')" class="nav-btn" style="margin: 20px auto 0; display: inline-flex;">Clear All Filters</button>
+                        </div>
+                    `;
+                    pagers.forEach(p => p.style.display = 'none');
+                    updatePager(0, 0);
+                    return;
                 }
+
+                const start = currentPage * BATCH_SIZE;
+                const end = Math.min(start + BATCH_SIZE, filteredTests.length);
+                const slice = filteredTests.slice(start, end);
+
+                slice.forEach((test, idx) => {
+                    gridEl.insertAdjacentHTML('beforeend', createCardHTML(test, start + idx));
+                });
+
+                updatePager(start, end);
+                if (typeof loadClinicalCitations === 'function') loadClinicalCitations();
+            }
+
+            function updatePager(start, end) {
+                const total = filteredTests.length;
+                const totalPages = Math.ceil(total / BATCH_SIZE) || 1;
+                const currentPageHuman = currentPage + 1;
+
+                // Hide pagers if 0 or only 1 page
+                if (total === 0 || totalPages <= 1) {
+                    pagers.forEach(p => p.style.display = 'none');
+                } else {
+                    pagers.forEach(p => p.style.display = 'flex');
+                }
+
+                pagers.forEach(pager => {
+                    const info = pager.querySelector('.pager-info');
+                    const rangeSpan = info.querySelector('.item-range');
+                    const counterSpan = info.querySelector('.page-counter');
+
+                    if (total === 0) {
+                        rangeSpan.innerText = "0 - 0 of 0";
+                        counterSpan.innerText = "Page 0 of 0";
+                    } else {
+                        rangeSpan.innerText = `${start + 1} - ${end} of ${total}`;
+                        counterSpan.innerText = `Page ${currentPageHuman} of ${totalPages}`;
+                    }
+                });
+
+                const isFirstPage = (currentPage === 0);
+                const isLastPage = (end >= total);
+
+                allPrevBtns.forEach(btn => btn.disabled = isFirstPage);
+                allNextBtns.forEach(btn => btn.disabled = isLastPage);
+            }
+
+            function handleNavigate(direction) {
+                const total = filteredTests.length;
+                const maxPage = Math.floor((total - 1) / BATCH_SIZE);
+
+                if (direction === 'prev' && currentPage > 0) {
+                    renderGrid(currentPage - 1);
+                    window.scrollTo({ top: gridEl.offsetTop - 150, behavior: 'smooth' });
+                } else if (direction === 'next' && currentPage < maxPage) {
+                    renderGrid(currentPage + 1);
+                    window.scrollTo({ top: gridEl.offsetTop - 150, behavior: 'smooth' });
+                }
+            }
+
+            allPrevBtns.forEach(btn => btn.addEventListener('click', () => handleNavigate('prev')));
+            allNextBtns.forEach(btn => btn.addEventListener('click', () => handleNavigate('next')));
+
+            // Side Nav Visibility Observer
+            const navObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        sideNav.classList.add('visible');
+                    } else {
+                        // Check if we are above or below the grid
+                        const rect = entry.boundingClientRect;
+                        if (rect.top > 0 || rect.bottom < 0) {
+                            sideNav.classList.remove('visible');
+                        }
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            navObserver.observe(gridEl);
+
+            // Keyboard Navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') handleNavigate('prev');
+                if (e.key === 'ArrowRight') handleNavigate('next');
             });
-        }, { threshold: 0.1 });
 
-        navObserver.observe(gridEl);
+            setupFilters();
+            // renderGrid(0); // Called inside initializeEngine now
 
-        // Keyboard Navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') handleNavigate('prev');
-            if (e.key === 'ArrowRight') handleNavigate('next');
-        });
 
-        setupFilters();
-        renderGrid(0);
+            async function loadClinicalCitations() {
+                try {
+                    if (!window.SoulamoreCitations) return;
+                    const citationsData = window.SoulamoreCitations;
 
-        async function loadClinicalCitations() {
-            try {
-                if (!window.SoulamoreCitations) return;
-                const citationsData = window.SoulamoreCitations;
+                    document.querySelectorAll('.assessment-card').forEach(card => {
+                        if (card.dataset.boundSci) return;
+                        card.dataset.boundSci = "true";
 
-                document.querySelectorAll('.assessment-card').forEach(card => {
-                    if (card.dataset.boundSci) return;
-                    card.dataset.boundSci = "true";
+                        const badge = card.querySelector('.sci-badge');
+                        const contentEl = card.querySelector('.sci-overlay-content');
+                        const testId = badge.getAttribute('data-citation');
+                        const data = citationsData[testId];
 
-                    const badge = card.querySelector('.sci-badge');
-                    const contentEl = card.querySelector('.sci-overlay-content');
-                    const testId = badge.getAttribute('data-citation');
-                    const data = citationsData[testId];
+                        if (data) {
+                            const color = card.style.getPropertyValue('--hover-color') || "var(--teal-glow)";
+                            let html = `<div class="sci-popup-title" style="color:${color}"><i class="fas fa-brain"></i> Backed By Clinical Science</div>`;
 
-                    if (data) {
-                        const color = card.style.getPropertyValue('--hover-color') || "var(--teal-glow)";
-                        let html = `<div class="sci-popup-title" style="color:${color}"><i class="fas fa-brain"></i> Backed By Clinical Science</div>`;
-
-                        if (data.citations && data.citations.length > 0) {
-                            data.citations.forEach(c => {
-                                html += `
+                            if (data.citations && data.citations.length > 0) {
+                                data.citations.forEach(c => {
+                                    html += `
                                     <div class="sci-citation" style="border-left-color: ${color};">
                                         <div class="citation-name">${c.name}</div>
                                         <div class="citation-desc">${c.description}</div>
                                     </div>
                                 `;
-                            });
-                        } else {
-                            // FALLBACK CLINICAL CONTEXT
-                            html += `
+                                });
+                            } else {
+                                // FALLBACK CLINICAL CONTEXT
+                                html += `
                                 <div class="sci-citation" style="border-left-color: ${color};">
                                     <div class="citation-name">Standardized Assessment Protocol</div>
                                     <div class="citation-desc">This assessment is built upon deterministic emotional architecture frameworks and clinical screening benchmarks.</div>
                                 </div>
                             `;
-                        }
-                        if (data.disclaimer) {
-                            html += `<div class="sci-disclaimer">${data.disclaimer}</div>`;
+                            }
+                            if (data.disclaimer) {
+                                html += `<div class="sci-disclaimer">${data.disclaimer}</div>`;
+                            } else {
+                                html += `<div class="sci-disclaimer">Grounded in psychological framework benchmarks for self-reflection. Not a diagnostic tool.</div>`;
+                            }
+                            contentEl.innerHTML = html;
                         } else {
-                            html += `<div class="sci-disclaimer">Grounded in psychological framework benchmarks for self-reflection. Not a diagnostic tool.</div>`;
-                        }
-                        contentEl.innerHTML = html;
-                    } else {
-                        // TOTAL FALLBACK IF CITATION OBJECT MISSING (Should not happen with fallback arriba)
-                        const color = card.style.getPropertyValue('--hover-color') || "var(--teal-glow)";
-                        contentEl.innerHTML = `
+                            // TOTAL FALLBACK IF CITATION OBJECT MISSING (Should not happen with fallback arriba)
+                            const color = card.style.getPropertyValue('--hover-color') || "var(--teal-glow)";
+                            contentEl.innerHTML = `
                             <div class="sci-popup-title" style="color:${color}"><i class="fas fa-brain"></i> Clinical Foundation</div>
                             <div class="sci-citation" style="border-left-color: ${color};">
                                 <div class="citation-name">Soulamore Clinical Architecture</div>
@@ -1327,41 +1837,43 @@
                             </div>
                             <div class="sci-disclaimer">Standard screening protocol for emotional intensity tracking.</div>
                         `;
-                    }
+                        }
 
-                    badge.addEventListener('mouseenter', () => {
-                        card.classList.add('sci-hover');
+                        badge.addEventListener('mouseenter', () => {
+                            card.classList.add('sci-hover');
+                        });
+
+                        badge.addEventListener('mouseleave', () => {
+                            card.classList.remove('sci-hover');
+                        });
                     });
+                } catch (e) { console.error("Could not load clinical citations", e); }
+            }
 
-                    badge.addEventListener('mouseleave', () => {
-                        card.classList.remove('sci-hover');
-                    });
-                });
-            } catch (e) { console.error("Could not load clinical citations", e); }
-        }
-        // Initialize
-        renderAssessments('all');
-        renderActiveFilters();
+            // Inject ItemList Schema for SEO
+            function injectIndexSchema() {
+                const checkData = window.SoulamoreAssessments || {};
+                if (Object.keys(checkData).length === 0) return;
 
-        // Inject ItemList Schema for SEO
-        (function injectIndexSchema() {
-            const script = document.createElement('script');
-            script.type = 'application/ld+json';
-            const schema = {
-                "@context": "https://schema.org",
-                "@type": "ItemList",
-                "name": "Soulamore Personal Emotional Assessments",
-                "description": "A comprehensive directory of clinical-grade emotional assessments for anxiety, burnout, relationships, and more.",
-                "itemListElement": Object.keys(window.SoulamoreAssessments || {}).map((id, index) => ({
-                    "@type": "ListItem",
-                    "position": index + 1,
-                    "url": `https://soulamore.com/spaces/assessments/landing.html?id=${id}`,
-                    "name": window.SoulamoreAssessments[id] ? window.SoulamoreAssessments[id].title : "Assessment"
-                }))
-            };
-            script.text = JSON.stringify(schema);
-            document.head.appendChild(script);
-        })();
+                const script = document.createElement('script');
+                script.type = 'application/ld+json';
+                const schema = {
+                    "@context": "https://schema.org",
+                    "@type": "ItemList",
+                    "name": "Soulamore Personal Emotional Assessments",
+                    "description": "A comprehensive directory of clinical-grade emotional assessments for anxiety, burnout, relationships, and more.",
+                    "itemListElement": Object.keys(checkData).map((id, index) => ({
+                        "@type": "ListItem",
+                        "position": index + 1,
+                        "url": `https://soulamore.com/spaces/assessments/landing.html?id=${id}`,
+                        "name": checkData[id] ? checkData[id].title : "Assessment"
+                    }))
+                };
+                script.text = JSON.stringify(schema);
+                document.head.appendChild(script);
+            }
+        });
+
     </script>
 </body>
 
