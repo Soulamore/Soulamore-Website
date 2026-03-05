@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -506,374 +506,388 @@
             font-size: 1.5rem;
             color: var(--gold-glow);
         }
-    </style>
+</style>
 </head>
 
-<body>
+<div id="app-shell">
+    <div id="shell-fixed">
+        <header id="main-header"></header>
+        <div id="shell-subnav"></div>
+    </div>
 
-    <div class="container">
-        <!-- LOADING STATE -->
-        <div id="loadingState">
-            <div class="neural-loader">
-                <div class="neural-node node-1"></div>
-                <div class="neural-node node-2"></div>
-                <div class="neural-node node-3"></div>
-            </div>
-            <h2 id="loadingText"
-                style="font-weight:300; letter-spacing:1px; animation: pulseText 2s infinite alternate;">Formulating
-                Reflection...</h2>
-        </div>
-
-        <!-- STRICT ESCALATION SCREEN -->
-        <div id="escalationUI">
-            <i class="fas fa-heartbeat"
-                style="font-size: 4rem; color:#ef4444; margin-bottom: 20px; animation: pulseNode 1s infinite alternate;"></i>
-            <h2>We See How Heavy This Is.</h2>
-            <p>Your responses indicate that you are carrying a significant level of distress right now. We want to
-                ensure you are safe and supported.</p>
-            <p style="font-size: 1rem; opacity: 0.7; margin-bottom: 40px;">Because your well-being matters immensely, we
-                are pausing AI reflections and routing you directly to human crisis support.</p>
-            <a href="../../get-help-now.html" class="crisis-btn"
-                style="margin-bottom: 30px; display: inline-block;">Access Immediate Support</a>
-
-            <div class="lead-gen-box"
-                style="margin-top: 10px; border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05);">
-                <h3 style="color: #ef4444;">Prefer we reach out?</h3>
-                <p style="opacity: 0.8; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">Leave your details below.
-                    Our human team—peers or psychologists—will be alerted immediately.</p>
-                <form class="id-form" id="crisisLeadForm">
-                    <input type="text" id="crisisName" name="name" class="id-input"
-                        placeholder="Name or Alias (Optional)" autocomplete="name">
-                    <input type="email" id="crisisEmail" name="email" class="id-input"
-                        placeholder="Email Address (Optional)" autocomplete="email">
-                    <input type="tel" id="crisisPhone" name="phone" class="id-input"
-                        placeholder="Phone Number (Optional)" autocomplete="tel">
-                    <button type="submit" class="lead-btn" id="crisisSubmitBtn"
-                        style="background: #ef4444; color: white;">Alert Support Team</button>
-                    <div id="crisisStatus" style="font-size: 0.85rem; margin-top: 10px; display: none;"></div>
-                </form>
-            </div>
-        </div>
-
-        <!-- STANDARD RESULTS UI -->
-        <div id="resultsUI">
-            <div class="header-section">
-                <h1>Your Emotional Blueprint</h1>
-                <p style="opacity: 0.7; font-size: 1.1rem;">A structured translation of your inner landscape.</p>
-            </div>
-
-            <!-- DETERMINISTIC SCORES -->
-            <div class="score-banner">
-                <div class="metric-box">
-                    <h4>Primary Domain</h4>
-                    <div class="metric-val" id="resDomain" style="text-transform: capitalize;">-</div>
+    <main id="shell-content">
+        <div class="container">
+            <!-- LOADING STATE -->
+            <div id="loadingState">
+                <div class="neural-loader">
+                    <div class="neural-node node-1"></div>
+                    <div class="neural-node node-2"></div>
+                    <div class="neural-node node-3"></div>
                 </div>
-                <div class="metric-box">
-                    <h4>Intensity Score</h4>
-                    <div class="metric-val"><span id="resScore">0</span><span
-                            style="font-size:1rem; opacity:0.5;">/<span id="resMax">0</span></span></div>
-                </div>
-                <div class="metric-box">
-                    <h4>Pattern Signature</h4>
-                    <div class="severity-badge" id="resBand">-</div>
-                </div>
+                <h2 id="loadingText"
+                    style="font-weight:300; letter-spacing:1px; animation: pulseText 2s infinite alternate;">Formulating
+                    Reflection...</h2>
             </div>
 
-            <!-- GEMINI REFLECTION -->
-            <div class="reflection-block" id="reflectionContent">
-                <div style="opacity: 0.5;">Loading AI translation...</div>
-            </div>
+            <!-- STRICT ESCALATION SCREEN -->
+            <div id="escalationUI">
+                <i class="fas fa-heartbeat"
+                    style="font-size: 4rem; color:var(--alert-red); margin-bottom: 20px; animation: pulseNode 1s infinite alternate;"></i>
+                <h2>We See How Heavy This Is.</h2>
+                <p>Your responses indicate that you are carrying a significant level of distress right now. We want to
+                    ensure you are safe and supported.</p>
+                <p style="font-size: 1rem; opacity: 0.7; margin-bottom: 40px;">Because your well-being matters
+                    immensely, we
+                    are pausing AI reflections and routing you directly to human crisis support.</p>
+                <a href="../../get-help-now.html" class="crisis-btn"
+                    style="margin-bottom: 30px; display: inline-block;">Access Immediate Support</a>
 
-            <!-- LAYER 6: RECOMMENDATION ROUTER -->
-            <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Recommended Paths</h3>
-            <div class="router-grid" id="routerLinks">
-                <!-- Dynamically populated based on severity -->
-            </div>
-
-            <div class="results-actions">
-                <!-- SHARE SECTION -->
-                <div class="share-section">
-                    <h4 style="font-family: 'Outfit'; font-size: 1.2rem; opacity: 0.8;">Share Your Psychological
-                        Signature</h4>
-                    <div class="share-grid">
-                        <button onclick="shareResults('twitter')" class="share-btn">
-                            <i class="fab fa-twitter"></i> Twitter
-                        </button>
-                        <button onclick="shareResults('instagram')" class="share-btn">
-                            <i class="fab fa-instagram"></i> Instagram
-                        </button>
-                        <button onclick="shareResults('copy')" class="share-btn">
-                            <i class="fas fa-link"></i> Copy Link
-                        </button>
-                    </div>
-                </div>
-
-                <!-- LEAD GEN FORM (Premium Version) -->
-                <div class="lead-gen-box" id="leadGenBox">
-                    <div class="premium-incentive">
-                        <i class="fas fa-file-medical-alt"></i>
-                        <div>
-                            <strong>Get Your Deep-Dive Clinical Report</strong><br>
-                            We'll send a 12-page PDF breakdown of your results, including citation analysis and recovery
-                            roadmap.
-                        </div>
-                    </div>
-                    <h3>Want personalized professional matching?</h3>
-                    <p style="opacity: 0.8; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">Allow our team to
-                        review
-                        your anonymous pattern and match you with the perfect Peer Listener or Psychologist.</p>
-                    <form class="id-form" id="assessmentLeadForm">
-                        <input type="text" id="leadName" name="name" class="id-input" placeholder="Your First Name"
-                            required autocomplete="given-name">
-                        <input type="email" id="leadEmail" name="email" class="id-input"
-                            placeholder="Your Email Address" required autocomplete="email">
-                        <input type="tel" id="leadPhone" name="phone" class="id-input"
+                <div class="lead-gen-box"
+                    style="margin-top: 10px; border-color:var(--alert-red-bg); background: rgba(239, 68, 68, 0.05);">
+                    <h3 style="color:var(--alert-red);">Prefer we reach out?</h3>
+                    <p style="opacity: 0.8; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">Leave your details
+                        below.
+                        Our human team-peers or psychologists-will be alerted immediately.</p>
+                    <form class="id-form" id="crisisLeadForm">
+                        <input type="text" id="crisisName" name="name" class="id-input"
+                            placeholder="Name or Alias (Optional)" autocomplete="name">
+                        <input type="email" id="crisisEmail" name="email" class="id-input"
+                            placeholder="Email Address (Optional)" autocomplete="email">
+                        <input type="tel" id="crisisPhone" name="phone" class="id-input"
                             placeholder="Phone Number (Optional)" autocomplete="tel">
-                        <button type="submit" class="nav-btn primary" id="leadSubmitBtn"
-                            style="width: 100%; margin-top: 10px;">Send My Report & Find Match</button>
-                        <div id="leadStatus" style="font-size: 0.85rem; margin-top: 10px; display: none;"></div>
+                        <button type="submit" class="lead-btn" id="crisisSubmitBtn"
+                            style="background:var(--alert-red); color: white;">Alert Support Team</button>
+                        <div id="crisisStatus" style="font-size: 0.85rem; margin-top: 10px; display: none;"></div>
                     </form>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- REQUIRED SDKS & DATA -->
-    <script type="module" src="../../assets/js/firebase-config.js"></script>
-    <script src="../../assets/js/assessment-data.js"></script>
-    <script type="module">
-        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+            <!-- STANDARD RESULTS UI -->
+            <div id="resultsUI">
+                <div class="header-section">
+                    <h1>Your Emotional Blueprint</h1>
+                    <p style="opacity: 0.7; font-size: 1.1rem;">A structured translation of your inner landscape.</p>
+                </div>
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 1. Retrieve Deterministic JSON
-            const resultDataStr = sessionStorage.getItem('soulamore_assessment_result');
-            if (!resultDataStr) {
-                window.location.href = "index.html"; // No data, kick out
-                return;
-            }
+                <!-- DETERMINISTIC SCORES -->
+                <div class="score-banner">
+                    <div class="metric-box">
+                        <h4>Primary Domain</h4>
+                        <div class="metric-val" id="resDomain" style="text-transform: capitalize;">-</div>
+                    </div>
+                    <div class="metric-box">
+                        <h4>Intensity Score</h4>
+                        <div class="metric-val"><span id="resScore">0</span><span
+                                style="font-size:1rem; opacity:0.5;">/<span id="resMax">0</span></span></div>
+                    </div>
+                    <div class="metric-box">
+                        <h4>Pattern Signature</h4>
+                        <div class="severity-badge" id="resBand">-</div>
+                    </div>
+                </div>
 
-            const data = JSON.parse(resultDataStr);
-            const metrics = data.deterministic_metrics;
+                <!-- GEMINI REFLECTION -->
+                <div class="reflection-block" id="reflectionContent">
+                    <div style="opacity: 0.5;">Loading AI translation...</div>
+                </div>
 
-            // 2. Color Coding based on Domain/Assessment type
-            let themeColor = "#4ECDC4"; // default
-            if (data.assessment_id === 'emotional_regulation') themeColor = "#F49F75";
-            if (data.assessment_id === 'burnout_career') themeColor = "#fbbf24";
-            document.documentElement.style.setProperty('--engine-theme', themeColor);
+                <!-- LAYER 6: RECOMMENDATION ROUTER -->
+                <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Recommended Paths</h3>
+                <div class="router-grid" id="routerLinks">
+                    <!-- Dynamically populated based on severity -->
+                </div>
 
-            // 3. Populate Deterministic UI First (Layer 4)
-            document.getElementById('resDomain').textContent = data.domain.replace('_', ' ');
-            document.getElementById('resScore').textContent = metrics.raw_score;
-            document.getElementById('resMax').textContent = metrics.max_possible;
+                <div class="results-actions">
+                    <!-- SHARE SECTION -->
+                    <div class="share-section">
+                        <h4 style="font-family: 'Outfit'; font-size: 1.2rem; opacity: 0.8;">Share Your Psychological
+                            Signature</h4>
+                        <div class="share-grid">
+                            <button onclick="shareResults('twitter')" class="share-btn">
+                                <i class="fab fa-twitter"></i> Twitter
+                            </button>
+                            <button onclick="shareResults('instagram')" class="share-btn">
+                                <i class="fab fa-instagram"></i> Instagram
+                            </button>
+                            <button onclick="shareResults('copy')" class="share-btn">
+                                <i class="fas fa-link"></i> Copy Link
+                            </button>
+                        </div>
+                    </div>
 
-            const badge = document.getElementById('resBand');
-            badge.textContent = metrics.severity_band;
-            if (metrics.severity_band === 'severe') badge.style.background = '#ef4444';
-            else if (metrics.severity_band === 'moderate') badge.style.background = '#f59e0b';
-            else badge.style.background = '#10b981';
+                    <!-- LEAD GEN FORM (Premium Version) -->
+                    <div class="lead-gen-box" id="leadGenBox">
+                        <div class="premium-incentive">
+                            <i class="fas fa-file-medical-alt"></i>
+                            <div>
+                                <strong>Get Your Deep-Dive Clinical Report</strong><br>
+                                We'll send a 12-page PDF breakdown of your results, including citation analysis and
+                                recovery
+                                roadmap.
+                            </div>
+                        </div>
+                        <h3>Want personalized professional matching?</h3>
+                        <p style="opacity: 0.8; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">Allow our team to
+                            review
+                            your anonymous pattern and match you with the perfect Peer Listener or Psychologist.</p>
+                        <form class="id-form" id="assessmentLeadForm">
+                            <input type="text" id="leadName" name="name" class="id-input" placeholder="Your First Name"
+                                required autocomplete="given-name">
+                            <input type="email" id="leadEmail" name="email" class="id-input"
+                                placeholder="Your Email Address" required autocomplete="email">
+                            <input type="tel" id="leadPhone" name="phone" class="id-input"
+                                placeholder="Phone Number (Optional)" autocomplete="tel">
+                            <button type="submit" class="nav-btn primary" id="leadSubmitBtn"
+                                style="width: 100%; margin-top: 10px;">Send My Report & Find Match</button>
+                            <div id="leadStatus" style="font-size: 0.85rem; margin-top: 10px; display: none;"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    </main>
+</div>
+<footer id="main-footer"></footer>
+</div>
 
-            // 4. PRE-FETCH CLINICAL CITATIONS FOR THE PROMPT
-            let clinicalContext = "General psychological frameworks.";
-            try {
-                if (window.SoulamoreCitations) {
-                    const citationsData = window.SoulamoreCitations;
-                    const assessmentMeta = citationsData[data.assessment_id];
-                    if (assessmentMeta && assessmentMeta.citations) {
-                        clinicalContext = assessmentMeta.citations.map(c => `- ${c.name}: ${c.description}`).join('\n');
-                    }
+<!-- REQUIRED SDKS & DATA -->
+<script type="module" src="../../assets/js/firebase-config.js"></script>
+<script src="../../assets/js/components.js"></script>
+<script src="../../assets/js/assessment-data.js"></script>
+<script type="module">
+    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (typeof injectHeader === 'function') injectHeader();
+        if (typeof injectFooter === 'function') injectFooter();
+        // 1. Retrieve Deterministic JSON
+        const resultDataStr = sessionStorage.getItem('soulamore_assessment_result');
+        if (!resultDataStr) {
+            window.location.href = "index.html"; // No data, kick out
+            return;
+        }
+
+        const data = JSON.parse(resultDataStr);
+        const metrics = data.deterministic_metrics;
+
+        // 2. Color Coding based on Domain/Assessment type
+        let themeColor = "#4ECDC4"; // default
+        if (data.assessment_id === 'emotional_regulation') themeColor = "#F49F75";
+        if (data.assessment_id === 'burnout_career') themeColor = "#fbbf24";
+        document.documentElement.style.setProperty('--engine-theme', themeColor);
+
+        // 3. Populate Deterministic UI First (Layer 4)
+        document.getElementById('resDomain').textContent = data.domain.replace('_', ' ');
+        document.getElementById('resScore').textContent = metrics.raw_score;
+        document.getElementById('resMax').textContent = metrics.max_possible;
+
+        const badge = document.getElementById('resBand');
+        badge.textContent = metrics.severity_band;
+        if (metrics.severity_band === 'severe') badge.style.background = '#ef4444';
+        else if (metrics.severity_band === 'moderate') badge.style.background = '#f59e0b';
+        else badge.style.background = '#10b981';
+
+        // 4. PRE-FETCH CLINICAL CITATIONS FOR THE PROMPT
+        let clinicalContext = "General psychological frameworks.";
+        try {
+            if (window.SoulamoreCitations) {
+                const citationsData = window.SoulamoreCitations;
+                const assessmentMeta = citationsData[data.assessment_id];
+                if (assessmentMeta && assessmentMeta.citations) {
+                    clinicalContext = assessmentMeta.citations.map(c => `- ${c.name}: ${c.description}`).join('\n');
                 }
-            } catch (e) { console.error("Could not load citations for AI context", e); }
+            }
+        } catch (e) { console.error("Could not load citations for AI context", e); }
 
-            // 5. LAYER 6: ROUTING LOGIC & DYNAMIC RECOMMENDATIONS
-            const routerLinks = document.getElementById('routerLinks');
+        // 5. LAYER 6: ROUTING LOGIC & DYNAMIC RECOMMENDATIONS
+        const routerLinks = document.getElementById('routerLinks');
 
-            function getRecommendedPaths(domain, severity) {
-                // Base structure for returned paths
-                let paths = [];
+        function getRecommendedPaths(domain, severity) {
+            // Base structure for returned paths
+            let paths = [];
 
-                if (domain === 'emotional_regulation') {
-                    if (severity === 'severe' || severity === 'moderate') {
-                        paths.push({
-                            url: "../../tools/5-step-reset.html",
-                            icon: "fas fa-leaf",
-                            title: "5-Step Reset",
-                            desc: "An immediate somatic grounding exercise.",
-                            color: "#4ECDC4"
-                        });
-                        paths.push({
-                            url: "../../community/blogs.html?tag=emotional-overwhelm",
-                            icon: "fas fa-book-open",
-                            title: "Navigating Overwhelm",
-                            desc: "Read stories from others who experience extreme emotional tides.",
-                            color: "#F49F75"
-                        });
-                    } else {
-                        paths.push({
-                            url: "../../journal/index.html",
-                            icon: "fas fa-pen-fancy",
-                            title: "Reflective Journal",
-                            desc: "Document your emotional shifts securely.",
-                            color: "#4ECDC4"
-                        });
-                        paths.push({
-                            url: "../../tools/playground.html",
-                            icon: "fas fa-shapes",
-                            title: "Mental Playground",
-                            desc: "Light interactive tools to sustain balance.",
-                            color: "#F49F75"
-                        });
-                    }
-                } else if (domain === 'burnout_career') {
-                    if (severity === 'severe' || severity === 'moderate') {
-                        paths.push({
-                            url: "../../tools/vent-box.html",
-                            icon: "fas fa-fire",
-                            title: "The Vent Box",
-                            desc: "Release occupational frustration securely.",
-                            color: "#ef4444"
-                        });
-                        paths.push({
-                            url: "../../community/blogs.html?tag=burnout-recovery",
-                            icon: "fas fa-battery-quarter",
-                            title: "Burnout Recovery",
-                            desc: "Insights on recovering from functional depletion.",
-                            color: "#fbbf24"
-                        });
-                    } else {
-                        paths.push({
-                            url: "../../spaces/soulamore-workplace/index.html",
-                            icon: "fas fa-building",
-                            title: "Workplace Guidelines",
-                            desc: "Learn how to establish boundaries.",
-                            color: "#fbbf24"
-                        });
-                    }
-                } else if (domain === 'relationship_patterns') {
+            if (domain === 'emotional_regulation') {
+                if (severity === 'severe' || severity === 'moderate') {
                     paths.push({
-                        url: "../../tools/confession-box/index.html",
-                        icon: "fas fa-ghost",
-                        title: "Confession Box",
-                        desc: "Anonymously share what you cannot say to them.",
-                        color: "#f87171"
-                    });
-                    paths.push({
-                        url: "../../community/blogs.html?tag=attachment-styles",
-                        icon: "fas fa-link",
-                        title: "Understanding Attachment",
-                        desc: "Dive deep into why we pull away or cling tight.",
-                        color: "#a78bfa"
-                    });
-                } else if (domain === 'anxiety_overthinking') {
-                    paths.push({
-                        url: "../../tools/drop-it.html",
-                        icon: "fas fa-parachute-box",
-                        title: "Drop It",
-                        desc: "A gamified way to physically let go of recurring thoughts.",
+                        url: "../../tools/5-step-reset.html",
+                        icon: "fas fa-leaf",
+                        title: "5-Step Reset",
+                        desc: "An immediate somatic grounding exercise.",
                         color: "#4ECDC4"
                     });
                     paths.push({
-                        url: "../../tools/problem-wall.html",
-                        icon: "fas fa-layer-group",
-                        title: "The Problem Wall",
-                        desc: "See how others navigate anticipatory stress.",
-                        color: "#60a5fa"
+                        url: "../../community/blogs.html?tag=emotional-overwhelm",
+                        icon: "fas fa-book-open",
+                        title: "Navigating Overwhelm",
+                        desc: "Read stories from others who experience extreme emotional tides.",
+                        color: "#F49F75"
                     });
-                }
-
-                // Global additions based on severity
-                if (severity === 'severe' || severity === 'moderate') {
+                } else {
                     paths.push({
-                        url: "../../our-peers/index.html",
-                        icon: "fas fa-user-friends",
-                        title: "Talk to a Peer Listener",
-                        desc: "Connect 1-on-1 with someone who understands.",
+                        url: "../../journal/index.html",
+                        icon: "fas fa-pen-fancy",
+                        title: "Reflective Journal",
+                        desc: "Document your emotional shifts securely.",
+                        color: "#4ECDC4"
+                    });
+                    paths.push({
+                        url: "../../tools/playground.html",
+                        icon: "fas fa-shapes",
+                        title: "Mental Playground",
+                        desc: "Light interactive tools to sustain balance.",
                         color: "#F49F75"
                     });
                 }
-
-                return paths;
-            }
-
-            const paths = getRecommendedPaths(data.domain, metrics.severity_band);
-
-            // --- NEW: ANONYMOUS ADAPTATION ---
-            const isAnonymous = data.user_identity && data.user_identity.anonymous;
-            if (isAnonymous) {
-                // Ensure Confession Box and Problem Wall are present for anonymous users
-                const anonymousTools = [
-                    {
-                        url: "../../tools/confession-box/index.html",
-                        icon: "fas fa-ghost",
-                        title: "Confession Box",
-                        desc: "Anonymously share what you cannot say. Perfect for staying private.",
-                        color: "#f87171"
-                    },
-                    {
-                        url: "../../tools/problem-wall.html",
-                        icon: "fas fa-layer-group",
-                        title: "The Problem Wall",
-                        desc: "See how others navigate stress anonymously.",
-                        color: "#60a5fa"
-                    }
-                ];
-
-                // Append if not already there
-                anonymousTools.forEach(tool => {
-                    if (!paths.some(p => p.url === tool.url)) {
-                        paths.unshift(tool); // Put at the beginning
-                    }
+            } else if (domain === 'burnout_career') {
+                if (severity === 'severe' || severity === 'moderate') {
+                    paths.push({
+                        url: "../../tools/vent-box.html",
+                        icon: "fas fa-fire",
+                        title: "The Vent Box",
+                        desc: "Release occupational frustration securely.",
+                        color: "#ef4444"
+                    });
+                    paths.push({
+                        url: "../../community/blogs.html?tag=burnout-recovery",
+                        icon: "fas fa-battery-quarter",
+                        title: "Burnout Recovery",
+                        desc: "Insights on recovering from functional depletion.",
+                        color: "#fbbf24"
+                    });
+                } else {
+                    paths.push({
+                        url: "../../spaces/soulamore-workplace/index.html",
+                        icon: "fas fa-building",
+                        title: "Workplace Guidelines",
+                        desc: "Learn how to establish boundaries.",
+                        color: "#fbbf24"
+                    });
+                }
+            } else if (domain === 'relationship_patterns') {
+                paths.push({
+                    url: "../../tools/confession-box/index.html",
+                    icon: "fas fa-ghost",
+                    title: "Confession Box",
+                    desc: "Anonymously share what you cannot say to them.",
+                    color: "#f87171"
+                });
+                paths.push({
+                    url: "../../community/blogs.html?tag=attachment-styles",
+                    icon: "fas fa-link",
+                    title: "Understanding Attachment",
+                    desc: "Dive deep into why we pull away or cling tight.",
+                    color: "#a78bfa"
+                });
+            } else if (domain === 'anxiety_overthinking') {
+                paths.push({
+                    url: "../../tools/drop-it.html",
+                    icon: "fas fa-parachute-box",
+                    title: "Drop It",
+                    desc: "A gamified way to physically let go of recurring thoughts.",
+                    color: "#4ECDC4"
+                });
+                paths.push({
+                    url: "../../tools/problem-wall.html",
+                    icon: "fas fa-layer-group",
+                    title: "The Problem Wall",
+                    desc: "See how others navigate anticipatory stress.",
+                    color: "#60a5fa"
                 });
             }
 
-            routerLinks.innerHTML = "";
-            paths.forEach(p => {
-                const card = document.createElement('a');
-                card.href = p.url;
-                card.className = "router-card";
-                card.innerHTML = `
+            // Global additions based on severity
+            if (severity === 'severe' || severity === 'moderate') {
+                paths.push({
+                    url: "../../our-peers/index.html",
+                    icon: "fas fa-user-friends",
+                    title: "Talk to a Peer Listener",
+                    desc: "Connect 1-on-1 with someone who understands.",
+                    color: "#F49F75"
+                });
+            }
+
+            return paths;
+        }
+
+        const paths = getRecommendedPaths(data.domain, metrics.severity_band);
+
+        // --- NEW: ANONYMOUS ADAPTATION ---
+        const isAnonymous = data.user_identity && data.user_identity.anonymous;
+        if (isAnonymous) {
+            // Ensure Confession Box and Problem Wall are present for anonymous users
+            const anonymousTools = [
+                {
+                    url: "../../tools/confession-box/index.html",
+                    icon: "fas fa-ghost",
+                    title: "Confession Box",
+                    desc: "Anonymously share what you cannot say. Perfect for staying private.",
+                    color: "#f87171"
+                },
+                {
+                    url: "../../tools/problem-wall.html",
+                    icon: "fas fa-layer-group",
+                    title: "The Problem Wall",
+                    desc: "See how others navigate stress anonymously.",
+                    color: "#60a5fa"
+                }
+            ];
+
+            // Append if not already there
+            anonymousTools.forEach(tool => {
+                if (!paths.some(p => p.url === tool.url)) {
+                    paths.unshift(tool); // Put at the beginning
+                }
+            });
+        }
+
+        routerLinks.innerHTML = "";
+        paths.forEach(p => {
+            const card = document.createElement('a');
+            card.href = p.url;
+            card.className = "router-card";
+            card.innerHTML = `
                     <i class="${p.icon} router-icon" style="color: ${p.color}; text-shadow: 0 0 10px ${p.color}40;"></i>
                     <div class="router-title"></div>
                     <div style="font-size:0.9rem;opacity:0.7;" class="router-desc"></div>
                 `;
-                card.querySelector('.router-title').textContent = p.title;
-                card.querySelector('.router-desc').textContent = p.desc;
-                routerLinks.appendChild(card);
-            });
+            card.querySelector('.router-title').textContent = p.title;
+            card.querySelector('.router-desc').textContent = p.desc;
+            routerLinks.appendChild(card);
+        });
 
-            // --- NEW: IDENTITY REFINEMENT ---
-            const leadGenBox = document.getElementById('leadGenBox');
-            if (!isAnonymous) {
-                // User already identified
-                leadGenBox.innerHTML = `
+        // --- NEW: IDENTITY REFINEMENT ---
+        const leadGenBox = document.getElementById('leadGenBox');
+        if (!isAnonymous) {
+            // User already identified
+            leadGenBox.innerHTML = `
                     <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--engine-theme); margin-bottom: 20px;"></i>
                     <h3>Got it, <span id="userName"></span>!</h3>
                     <p style="opacity: 0.8; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">We have your contact details. Our team is reviewing your pattern and will reach out with your personalized peer matching soon.</p>
                 `;
-                document.getElementById('userName').textContent = data.user_identity.name.split(' ')[0];
+            document.getElementById('userName').textContent = data.user_identity.name.split(' ')[0];
+        }
+
+        // 5. THE SAFETY GATE
+        if (metrics.escalation_required) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('escalationUI').style.display = 'block';
+            return; // HALT EXECUTION. Do not invoke Gemini.
+        }
+
+        // 6. LAYER 5: GEMINI INTERPRETATION (Fine-tuned System Instructions)
+        try {
+            // Fetch API Key from backend service
+            const apiKey = await typeof window.SoulBackend !== 'undefined' && window.SoulBackend.getGeminiKey
+                ? await window.SoulBackend.getGeminiKey()
+                : localStorage.getItem('GEMINI_API_KEY'); // Fallback dev setup
+
+            if (!apiKey) {
+                throw new Error("Missing API Key for Interpretation Engine");
             }
 
-            // 5. THE SAFETY GATE
-            if (metrics.escalation_required) {
-                document.getElementById('loadingState').style.display = 'none';
-                document.getElementById('escalationUI').style.display = 'block';
-                return; // HALT EXECUTION. Do not invoke Gemini.
-            }
-
-            // 6. LAYER 5: GEMINI INTERPRETATION (Fine-tuned System Instructions)
-            try {
-                // Fetch API Key from backend service
-                const apiKey = await typeof window.SoulBackend !== 'undefined' && window.SoulBackend.getGeminiKey
-                    ? await window.SoulBackend.getGeminiKey()
-                    : localStorage.getItem('GEMINI_API_KEY'); // Fallback dev setup
-
-                if (!apiKey) {
-                    throw new Error("Missing API Key for Interpretation Engine");
-                }
-
-                const genAI = new GoogleGenerativeAI(apiKey);
-                const model = genAI.getGenerativeModel({
-                    model: "gemini-1.5-pro",
-                    systemInstruction: `You are Soulamore's Clinical Assessment Interpreter. 
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({
+                model: "gemini-1.5-pro",
+                systemInstruction: `You are Soulamore's Clinical Assessment Interpreter. 
 You act as a fine-tuned engine heavily grounded in the following clinical literature and frameworks:
 ${clinicalContext}
 
@@ -881,17 +895,17 @@ YOUR DIRECTIVE: You will receive deterministic scoring data (severity bands, raw
 Your ONLY job is to translate this mathematical severity into a warm, empathetic, non-diagnostic reflection. 
 You must weave the concepts of the provided clinical frameworks into your language, proving that your analysis is backed by science without sounding clinically sterile.
 NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clinical".`
-                });
+            });
 
-                // STRICT PROMPT CONSTRUCTION
-                const prompt = `
+            // STRICT PROMPT CONSTRUCTION
+            const prompt = `
                     Data to Interpret:
                     ${JSON.stringify({
-                    assessment_domain: data.domain,
-                    severity_signature: metrics.severity_band,
-                    functional_impairment_flagged: metrics.functional_impairment,
-                    raw_score_intensity: metrics.raw_score
-                }, null, 2)}
+                assessment_domain: data.domain,
+                severity_signature: metrics.severity_band,
+                functional_impairment_flagged: metrics.functional_impairment,
+                raw_score_intensity: metrics.raw_score
+            }, null, 2)}
                     
                     RULES:
                     1. Output in HTML format using ONLY <p> and <ul> tags.
@@ -902,201 +916,202 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
                     3. Keep it concise, poetic but grounded, like a warm letter from an insightful psychologist.
                 `;
 
-                const result = await model.generateContentSafe ? await model.generateContentSafe(prompt) : await model.generateContent(prompt);
-                const responseText = result.response.text();
+            const result = await model.generateContentSafe ? await model.generateContentSafe(prompt) : await model.generateContent(prompt);
+            const responseText = result.response.text();
 
-                // Inject and Reveal
-                // Sanitization Helper
-                function sanitizeHTML(str) {
-                    const temp = document.createElement('div');
-                    temp.textContent = str;
-                    return temp.innerHTML.replace(/&lt;p&gt;/g, '<p>').replace(/&lt;\/p&gt;/g, '</p>')
-                        .replace(/&lt;ul&gt;/g, '<ul>').replace(/&lt;\/ul&gt;/g, '</ul>')
-                        .replace(/&lt;li&gt;/g, '<li>').replace(/&lt;\/li&gt;/g, '</li>')
-                        .replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>')
-                        .replace(/&lt;strong&gt;/g, '<strong>').replace(/&lt;\/strong&gt;/g, '</strong>');
-                }
+            // Inject and Reveal
+            // Sanitization Helper
+            function sanitizeHTML(str) {
+                const temp = document.createElement('div');
+                temp.textContent = str;
+                return temp.innerHTML.replace(/&lt;p&gt;/g, '<p>').replace(/&lt;\/p&gt;/g, '</p>')
+                    .replace(/&lt;ul&gt;/g, '<ul>').replace(/&lt;\/ul&gt;/g, '</ul>')
+                    .replace(/&lt;li&gt;/g, '<li>').replace(/&lt;\/li&gt;/g, '</li>')
+                    .replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>')
+                    .replace(/&lt;strong&gt;/g, '<strong>').replace(/&lt;\/strong&gt;/g, '</strong>');
+            }
 
-                const cleanedResponse = responseText.replace(/```html|```/g, '').trim();
-                document.getElementById('reflectionContent').innerHTML = sanitizeHTML(cleanedResponse);
+            const cleanedResponse = responseText.replace(/```html|```/g, '').trim();
+            document.getElementById('reflectionContent').innerHTML = sanitizeHTML(cleanedResponse);
 
-                document.getElementById('loadingState').style.display = 'none';
-                document.getElementById('resultsUI').style.display = 'block';
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('resultsUI').style.display = 'block';
 
-            } catch (error) {
-                console.error("Gemini Interpretation Failed:", error);
+        } catch (error) {
+            console.error("Gemini Interpretation Failed:", error);
 
-                // --- GENERIC FALLBACK ENGINE (Rate Limit Protection) ---
-                const fallbackResponses = {
-                    "emotional_regulation": {
-                        "minimal": `<p><b>The Pattern We See</b><br>Your responses suggest a strong, stable baseline when navigating emotional waves. You seem capable of experiencing feelings without being entirely overwhelmed by them.</p>
+            // --- GENERIC FALLBACK ENGINE (Rate Limit Protection) ---
+            const fallbackResponses = {
+                "emotional_regulation": {
+                    "minimal": `<p><b>The Pattern We See</b><br>Your responses suggest a strong, stable baseline when navigating emotional waves. You seem capable of experiencing feelings without being entirely overwhelmed by them.</p>
                                     <p><b>Your Protective Strengths</b><br>This stability is a profound strength, often built through lived experience and self-awareness.</p>
                                     <p><b>Gentle Next Steps</b><br>Continue nurturing the practices that keep you grounded.</p>`,
-                        "mild": `<p><b>The Pattern We See</b><br>You experience noticeable emotional swells, but generally maintain your footing. Occasionally, intense feelings might linger or cause temporary friction.</p>
+                    "mild": `<p><b>The Pattern We See</b><br>You experience noticeable emotional swells, but generally maintain your footing. Occasionally, intense feelings might linger or cause temporary friction.</p>
                                  <p><b>Your Protective Strengths</b><br>Your awareness of these shifts is your greatest asset. Your nervous system is alert, processing the environment deeply.</p>
                                  <p><b>Gentle Next Steps</b><br>Explore our suggested paths to add a few more grounding tools to your toolkit.</p>`,
-                        "moderate": `<p><b>The Pattern We See</b><br>Your emotional landscape is currently quite turbulent. Feelings likely hit fast and hard, sometimes making it difficult to return to a calm baseline, leading to functional exhaustion.</p>
+                    "moderate": `<p><b>The Pattern We See</b><br>Your emotional landscape is currently quite turbulent. Feelings likely hit fast and hard, sometimes making it difficult to return to a calm baseline, leading to functional exhaustion.</p>
                                      <p><b>Your Protective Strengths</b><br>This intensity is often a sign of deep empathy and a nervous system working overtime to protect you from perceived emotional danger.</p>
                                      <p><b>Gentle Next Steps</b><br>You don't have to navigate these waves alone. The deeply curated spaces below are designed specifically for this level of intensity.</p>`,
-                        "severe": `<p><b>The Pattern We See</b><br>Your responses indicate severe emotional flooding. You are carrying a heavy, overwhelming burden that is actively disrupting your daily peace and stability.</p>
+                    "severe": `<p><b>The Pattern We See</b><br>Your responses indicate severe emotional flooding. You are carrying a heavy, overwhelming burden that is actively disrupting your daily peace and stability.</p>
                                    <p><b>Your Protective Strengths</b><br>The fact that you are here, seeking understanding, shows immense resilience. Your mind is sounding an alarm because it knows you deserve relief.</p>
                                    <p><b>Gentle Next Steps</b><br>Please lean into the support structures we've highlighted below. Radical care is needed right now.</p>`
-                    },
-                    "anxiety_overthinking": {
-                        "minimal": `<p><b>The Pattern We See</b><br>You display a calm, structured approach to uncertainty. While you may prepare for the future, you do not seem paralyzed by it.</p>
+                },
+                "anxiety_overthinking": {
+                    "minimal": `<p><b>The Pattern We See</b><br>You display a calm, structured approach to uncertainty. While you may prepare for the future, you do not seem paralyzed by it.</p>
                                     <p><b>Your Protective Strengths</b><br>Your cognitive boundaries are serving you well, allowing you to separate real threats from imagined ones.</p>
                                     <p><b>Gentle Next Steps</b><br>Keep anchoring yourself in the present moment through your current routines.</p>`,
-                        "mild": `<p><b>The Pattern We See</b><br>You experience a mild hum of anticipatory stress. There are moments of overthinking, but they rarely stop you from participating in life.</p>
+                    "mild": `<p><b>The Pattern We See</b><br>You experience a mild hum of anticipatory stress. There are moments of overthinking, but they rarely stop you from participating in life.</p>
                                  <p><b>Your Protective Strengths</b><br>This mild anxiety is your mind's way of ensuring you are prepared and engaged.</p>
                                  <p><b>Gentle Next Steps</b><br>Small, mindful pauses during your day can help quiet the occasional lingering noise.</p>`,
-                        "moderate": `<p><b>The Pattern We See</b><br>Your mind is carrying a significant cognitive load. The architecture of your overthinking is likely causing physical tension and leading you to avoid certain stressful situations.</p>
+                    "moderate": `<p><b>The Pattern We See</b><br>Your mind is carrying a significant cognitive load. The architecture of your overthinking is likely causing physical tension and leading you to avoid certain stressful situations.</p>
                                      <p><b>Your Protective Strengths</b><br>Your hyper-vigilance is a bodyguard that has forgotten how to clock out. It is trying to keep you safe from every possible outcome.</p>
                                      <p><b>Gentle Next Steps</b><br>It's time to gently ask that bodyguard to step back. The resources below can help you begin that conversation.</p>`,
-                        "severe": `<p><b>The Pattern We See</b><br>Your responses reflect a state of paralyzing dread and severe somatic symptoms. The anxiety has become structural, heavily impacting your sleep and daily functioning.</p>
+                    "severe": `<p><b>The Pattern We See</b><br>Your responses reflect a state of paralyzing dread and severe somatic symptoms. The anxiety has become structural, heavily impacting your sleep and daily functioning.</p>
                                    <p><b>Your Protective Strengths</b><br>Enduring this level of internal noise takes profound energy. Your system is exhausted because it is fighting so incredibly hard for you.</p>
                                    <p><b>Gentle Next Steps</b><br>You deserve immediate, compassionate relief. Please utilize the dedicated support paths connected to your profile below.</p>`
-                    },
-                    "burnout_career": {
-                        "minimal": `<p><b>The Pattern We See</b><br>You appear engaged and generally energized by your daily responsibilities, showing few signs of structural fatigue.</p>
+                },
+                "burnout_career": {
+                    "minimal": `<p><b>The Pattern We See</b><br>You appear engaged and generally energized by your daily responsibilities, showing few signs of structural fatigue.</p>
                                     <p><b>Your Protective Strengths</b><br>You likely have good boundaries distinguishing your work/academic life from your rest periods.</p>
                                     <p><b>Gentle Next Steps</b><br>Protect those boundaries fiercely as you continue forward.</p>`,
-                        "mild": `<p><b>The Pattern We See</b><br>There are early signs of emotional drag. You might be feeling the initial friction of prolonged effort without adequate replenishment.</p>
+                    "mild": `<p><b>The Pattern We See</b><br>There are early signs of emotional drag. You might be feeling the initial friction of prolonged effort without adequate replenishment.</p>
                                  <p><b>Your Protective Strengths</b><br>Catching this early is crucial. Your body is whispering that it needs a slightly slower pace.</p>
                                  <p><b>Gentle Next Steps</b><br>Explore the grounding rituals below to re-introduce quiet space into your days.</p>`,
-                        "moderate": `<p><b>The Pattern We See</b><br>You are experiencing significant functional depletion. A sense of dread, brain fog, and a growing disconnect from your peers or daily tasks are evident.</p>
+                    "moderate": `<p><b>The Pattern We See</b><br>You are experiencing significant functional depletion. A sense of dread, brain fog, and a growing disconnect from your peers or daily tasks are evident.</p>
                                      <p><b>Your Protective Strengths</b><br>This numbness or cynicism isn't a failure of character; it is a clinical defense mechanism against chronic, unsustainable stress.</p>
                                      <p><b>Gentle Next Steps</b><br>Your mind requires structural rest, not just a weekend off. The paths below offer ways to begin unpacking this weight.</p>`,
-                        "severe": `<p><b>The Pattern We See</b><br>Your responses indicate severe exhaustion, deep depersonalization, and potential neglect of your basic physical needs. Your system has hit a wall.</p>
-                                   <p><b>Your Protective Strengths</b><br>Somatic collapse—when your body forces you to stop—is the ultimate protective mechanism when we ignore emotional limits.</p>
+                    "severe": `<p><b>The Pattern We See</b><br>Your responses indicate severe exhaustion, deep depersonalization, and potential neglect of your basic physical needs. Your system has hit a wall.</p>
+                                   <p><b>Your Protective Strengths</b><br>Somatic collapse-when your body forces you to stop-is the ultimate protective mechanism when we ignore emotional limits.</p>
                                    <p><b>Gentle Next Steps</b><br>Please remove the pressure to 'push through.' Your sole priority right now must be profound care and recovery through the channels provided below.</p>`
-                    },
-                    "relationship_patterns": {
-                        "minimal": `<p><b>The Pattern We See</b><br>You demonstrate a secure approach to attachment. You seem comfortable with intimacy, communicating needs, and handling basic interpersonal friction.</p>
+                },
+                "relationship_patterns": {
+                    "minimal": `<p><b>The Pattern We See</b><br>You demonstrate a secure approach to attachment. You seem comfortable with intimacy, communicating needs, and handling basic interpersonal friction.</p>
                                     <p><b>Your Protective Strengths</b><br>This emotional security provides a strong foundation for both independence and connection.</p>
                                     <p><b>Gentle Next Steps</b><br>Continue fostering these healthy dynamics.</p>`,
-                        "mild": `<p><b>The Pattern We See</b><br>You experience mild sensitivities in close connections—perhaps occasional fears of rejection or brief desires to pull away when overwhelmed.</p>
+                    "mild": `<p><b>The Pattern We See</b><br>You experience mild sensitivities in close connections-perhaps occasional fears of rejection or brief desires to pull away when overwhelmed.</p>
                                  <p><b>Your Protective Strengths</b><br>These sensitivities act as subtle sensors, helping you gauge trust and safety in your environment.</p>
                                  <p><b>Gentle Next Steps</b><br>Awareness is the first step toward easing those subtle fears. The spaces below offer room for that reflection.</p>`,
-                        "moderate": `<p><b>The Pattern We See</b><br>Your interpersonal terrain is highly charged. Whether driving you toward intense attachment anxiety or distinct avoidance, these patterns are causing significant friction in how you relate to others.</p>
+                    "moderate": `<p><b>The Pattern We See</b><br>Your interpersonal terrain is highly charged. Whether driving you toward intense attachment anxiety or distinct avoidance, these patterns are causing significant friction in how you relate to others.</p>
                                      <p><b>Your Protective Strengths</b><br>These push-pull dynamics were likely forged long ago as necessary survival tactics. They are fiercely protective, even if they currently cause you pain.</p>
                                      <p><b>Gentle Next Steps</b><br>Understanding the root of these reflexes changes everything. The resources below are tailored to help you explore this safely.</p>`,
-                        "severe": `<p><b>The Pattern We See</b><br>Your responses suggest deep attachment wounds, leading to intense fear, erratic conflict responses, or staying in harmful dynamics. The pain of connection and disconnection feels equally overwhelming.</p>
+                    "severe": `<p><b>The Pattern We See</b><br>Your responses suggest deep attachment wounds, leading to intense fear, erratic conflict responses, or staying in harmful dynamics. The pain of connection and disconnection feels equally overwhelming.</p>
                                    <p><b>Your Protective Strengths</b><br>To carry this level of relational fear means you have likely survived environments that demanded these extreme adaptations.</p>
                                    <p><b>Gentle Next Steps</b><br>You deserve connections that feel secure, starting with the deeply supportive paths we have prepared for you below.</p>`
-                    }
-                };
+                }
+            };
 
-                // Retrieve fallback based on test ID and severity band
-                let fallbackHTML = "";
-                const domainResponses = fallbackResponses[data.assessment_id];
+            // Retrieve fallback based on test ID and severity band
+            let fallbackHTML = "";
+            const domainResponses = fallbackResponses[data.assessment_id];
 
-                if (domainResponses && domainResponses[metrics.severity_band]) {
-                    fallbackHTML = domainResponses[metrics.severity_band];
-                } else {
-                    // Ultimate generic fallback if mapping fails
-                    fallbackHTML = `
+            if (domainResponses && domainResponses[metrics.severity_band]) {
+                fallbackHTML = domainResponses[metrics.severity_band];
+            } else {
+                // Ultimate generic fallback if mapping fails
+                fallbackHTML = `
                         <p>Your responses have been processed securely.</p>
                         <p>We are currently experiencing heavy traffic and our primary interpretation engine is resting. Based on your pattern signature (<strong>${metrics.severity_band.toUpperCase()}</strong>), your nervous system is working hard to navigate your current emotional landscape.</p>
                         <p>We encourage you to explore the carefully recommended paths below to continue your journey of exploration and care.</p>
                     `;
-                }
-
-                document.getElementById('loadingState').style.display = 'none';
-                document.getElementById('resultsUI').style.display = 'block';
-                // Fallback is hardcoded trustable HTML
-                document.getElementById('reflectionContent').innerHTML = fallbackHTML;
             }
 
-            // --- LEAD GENERATION SUBMISSION (REUSABLE LOGIC) ---
-            async function submitLeadData(e, nameId, emailId, phoneId, btnId, statusId) {
-                e.preventDefault();
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('resultsUI').style.display = 'block';
+            // Fallback is hardcoded trustable HTML
+            document.getElementById('reflectionContent').innerHTML = fallbackHTML;
+        }
 
-                const btn = document.getElementById(btnId);
-                const status = document.getElementById(statusId);
+        // --- LEAD GENERATION SUBMISSION (REUSABLE LOGIC) ---
+        async function submitLeadData(e, nameId, emailId, phoneId, btnId, statusId) {
+            e.preventDefault();
 
-                // Ensure at least one contact method is provided if both are optional in UI
-                const emailVal = document.getElementById(emailId).value;
-                const phoneVal = document.getElementById(phoneId).value;
-                if (!emailVal && !phoneVal) {
-                    status.style.display = 'block';
-                    status.style.color = '#f59e0b';
-                    status.innerText = 'Please provide either an email or phone number so we can reach you.';
-                    return;
-                }
+            const btn = document.getElementById(btnId);
+            const status = document.getElementById(statusId);
 
-                btn.disabled = true;
-                btn.innerText = 'Submitting...';
-
-                const leadData = {
-                    name: document.getElementById(nameId).value || 'Anonymous',
-                    email: emailVal || null,
-                    phone: phoneVal || null,
-                    assessment_domain: data.domain,
-                    severity_band: metrics.severity_band,
-                    raw_score: metrics.raw_score,
-                    risk_flags: metrics.functional_impairment,
-                    escalation_required: metrics.escalation_required,
-                    assessment_result_id: sessionStorage.getItem('soulamore_last_assessment_id') || null,
-                    submittedAt: new Date().toISOString()
-                };
-
-                try {
-                    const { db, collection, addDoc } = await import("../../assets/js/firebase-config.js");
-
-                    if (db) {
-                        await addDoc(collection(db, "assessment_leads"), leadData);
-                    } else {
-                        console.warn("Database not connected. Writing to console for fallback.");
-                        console.log("Lead captured:", leadData);
-                    }
-
-                    btn.style.display = 'none';
-                    status.style.display = 'block';
-                    status.style.color = '#10b981';
-                    status.textContent = ''; // Clear
-                    const icon = document.createElement('i');
-                    icon.className = 'fas fa-check-circle';
-                    status.appendChild(icon);
-                    status.appendChild(document.createTextNode(' Received. Our team has been alerted.'));
-                } catch (err) {
-                    console.error("Lead Gen Error:", err);
-                    btn.disabled = false;
-                    btn.innerText = 'Try Again';
-                    status.style.display = 'block';
-                    status.style.color = '#ef4444';
-                    status.innerText = 'An error occurred connecting to the server. Please try again.';
-                }
+            // Ensure at least one contact method is provided if both are optional in UI
+            const emailVal = document.getElementById(emailId).value;
+            const phoneVal = document.getElementById(phoneId).value;
+            if (!emailVal && !phoneVal) {
+                status.style.display = 'block';
+                status.style.color = '#f59e0b';
+                status.innerText = 'Please provide either an email or phone number so we can reach you.';
+                return;
             }
 
-            // Attach to Standard Form
-            const stdForm = document.getElementById('assessmentLeadForm');
-            if (stdForm) {
-                stdForm.addEventListener('submit', (e) => submitLeadData(e, 'leadName', 'leadEmail', 'leadPhone', 'leadSubmitBtn', 'leadStatus'));
-            }
+            btn.disabled = true;
+            btn.innerText = 'Submitting...';
 
-            // Attach to Crisis Form
-            const crisisForm = document.getElementById('crisisLeadForm');
-            if (crisisForm) {
-                crisisForm.addEventListener('submit', (e) => submitLeadData(e, 'crisisName', 'crisisEmail', 'crisisPhone', 'crisisSubmitBtn', 'crisisStatus'));
-            }
-
-            // --- SHARE FUNCTIONALITY ---
-            window.shareResults = function (platform) {
-                const text = `I just mapped my emotional signature on Soulamore. My ${data.title} intensity is ${metrics.raw_score}/${metrics.max_possible}. Explore your own inner landscape at:`;
-                const url = window.location.origin + window.location.pathname.replace('results.html', 'landing.html') + '?id=' + data.assessment_id;
-
-                if (platform === 'twitter') {
-                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
-                } else if (platform === 'instagram') {
-                    alert('To share on Instagram: Save your results as a screenshot and tag @Soulamore!');
-                } else if (platform === 'copy') {
-                    navigator.clipboard.writeText(`${text} ${url}`).then(() => {
-                        alert('Link copied to clipboard!');
-                    });
-                }
+            const leadData = {
+                name: document.getElementById(nameId).value || 'Anonymous',
+                email: emailVal || null,
+                phone: phoneVal || null,
+                assessment_domain: data.domain,
+                severity_band: metrics.severity_band,
+                raw_score: metrics.raw_score,
+                risk_flags: metrics.functional_impairment,
+                escalation_required: metrics.escalation_required,
+                assessment_result_id: sessionStorage.getItem('soulamore_last_assessment_id') || null,
+                submittedAt: new Date().toISOString()
             };
-        });
-    </script>
+
+            try {
+                const { db, collection, addDoc } = await import("../../assets/js/firebase-config.js");
+
+                if (db) {
+                    await addDoc(collection(db, "assessment_leads"), leadData);
+                } else {
+                    console.warn("Database not connected. Writing to console for fallback.");
+                    console.log("Lead captured:", leadData);
+                }
+
+                btn.style.display = 'none';
+                status.style.display = 'block';
+                status.style.color = '#10b981';
+                status.textContent = ''; // Clear
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-check-circle';
+                status.appendChild(icon);
+                status.appendChild(document.createTextNode(' Received. Our team has been alerted.'));
+            } catch (err) {
+                console.error("Lead Gen Error:", err);
+                btn.disabled = false;
+                btn.innerText = 'Try Again';
+                status.style.display = 'block';
+                status.style.color = '#ef4444';
+                status.innerText = 'An error occurred connecting to the server. Please try again.';
+            }
+        }
+
+        // Attach to Standard Form
+        const stdForm = document.getElementById('assessmentLeadForm');
+        if (stdForm) {
+            stdForm.addEventListener('submit', (e) => submitLeadData(e, 'leadName', 'leadEmail', 'leadPhone', 'leadSubmitBtn', 'leadStatus'));
+        }
+
+        // Attach to Crisis Form
+        const crisisForm = document.getElementById('crisisLeadForm');
+        if (crisisForm) {
+            crisisForm.addEventListener('submit', (e) => submitLeadData(e, 'crisisName', 'crisisEmail', 'crisisPhone', 'crisisSubmitBtn', 'crisisStatus'));
+        }
+
+        // --- SHARE FUNCTIONALITY ---
+        window.shareResults = function (platform) {
+            const text = `I just mapped my emotional signature on Soulamore. My ${data.title} intensity is ${metrics.raw_score}/${metrics.max_possible}. Explore your own inner landscape at:`;
+            const url = window.location.origin + window.location.pathname.replace('results.html', 'landing.html') + '?id=' + data.assessment_id;
+
+            if (platform === 'twitter') {
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+            } else if (platform === 'instagram') {
+                alert('To share on Instagram: Save your results as a screenshot and tag @Soulamore!');
+            } else if (platform === 'copy') {
+                navigator.clipboard.writeText(`${text} ${url}`).then(() => {
+                    alert('Link copied to clipboard!');
+                });
+            }
+        };
+    });
+</script>
 </body>
 
 </html>
+
