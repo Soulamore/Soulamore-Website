@@ -61,8 +61,10 @@ class ConstellationField {
     animate() {
         this.ctx.clearRect(0, 0, this.w, this.h);
 
+        const isLightMode = document.body.classList.contains('light-mode');
+
         // BATCH DRAWING: Draw all dots first
-        this.ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+        this.ctx.fillStyle = isLightMode ? "rgba(78, 205, 196, 0.5)" : "rgba(255, 255, 255, 0.2)"; // Teal in light, White in dark
         this.ctx.beginPath();
 
         for (let i = 0; i < this.particles.length; i++) {
@@ -82,8 +84,8 @@ class ConstellationField {
         this.ctx.fill();
 
         // BATCH DRAWING: Draw connections
-        // We use a fixed color for efficiency: faint white
-        this.ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+        // We use a fixed color for efficiency: faint white in dark mode, faint slate in light mode
+        this.ctx.strokeStyle = isLightMode ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.04)";
         this.ctx.lineWidth = 0.5;
         this.ctx.beginPath();
 
@@ -122,7 +124,7 @@ class ConstellationField {
         this.ctx.stroke();
 
         // MOUSE CONNECTIONS (Separate Batch for different color)
-        this.ctx.strokeStyle = "rgba(78, 205, 196, 0.4)";
+        this.ctx.strokeStyle = isLightMode ? "rgba(244, 159, 117, 0.5)" : "rgba(78, 205, 196, 0.4)"; // Peach in light, Teal in dark
         this.ctx.lineWidth = 1;
         this.ctx.beginPath();
         for (let i = 0; i < this.particles.length; i++) {

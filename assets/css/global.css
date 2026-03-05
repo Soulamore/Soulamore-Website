@@ -1,5 +1,5 @@
-/* --- GLOBAL RESET & TYPOGRAPHY --- */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+@import url('./theme.css');
 
 :root {
     /* Global Variables */
@@ -34,26 +34,33 @@
 /* HEADER ZONE */
 #shell-fixed {
     position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 15px;
+    /* Matches Landing Page air */
+    left: 0;
     width: 100%;
     z-index: 1000;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    /* Tighter gap between header and tabs */
     pointer-events: none;
     /* Container is pass-through */
-    padding-left: 0 !important;
-    padding-right: 0 !important;
 }
 
 #shell-fixed header {
     pointer-events: auto;
-    margin-top: 0;
+    position: relative !important;
+    /* Force out of fixed mode to obey flex stack */
+    top: 0 !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
     /* Gap is now handled by parent top */
     /* Ensure it doesn't stretch */
     width: fit-content;
     max-width: 1600px;
+    margin: 0 !important;
 }
 
 /* Force specific styling for the header when inside shell to ensure it matches index */
@@ -104,7 +111,6 @@
     flex: 1;
     /* Pushes footer down */
     position: relative;
-    z-index: 1;
     display: flex;
     flex-direction: column;
 }
@@ -184,6 +190,11 @@ body {
     /* Smooth scroll for iOS */
 }
 
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+}
+
 /* --- CUSTOM SCROLLBAR (Site-wide Premium Design) --- */
 ::-webkit-scrollbar {
     width: 12px;
@@ -221,23 +232,39 @@ body.light-mode ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
 }
 
-/* --- GLOBAL CONTENT SPACING (Standardized) --- */
-/* Header is fixed at top:20px with ~80px height = needs 110px total clearance */
-/* STANDARDIZED: All pages now use 110px after batch fix */
+/* --- GLOBAL CONTENT SPACING (Standardized via Theme) --- */
+/* STANDARDIZED: Uses var(--header-clearance) */
 main:not(.custom-spacing),
 .page-wrapper:not(.custom-spacing) {
-    padding-top: 110px !important;
+    padding-top: var(--header-clearance) !important;
 }
 
-/* Hero sections and containers manage their own spacing */
-section.hero,
-.container {
-    padding-top: inherit;
+/* Sections & Gaps */
+.section {
+    position: relative;
+    width: 100%;
+}
+
+.section-gap-sm {
+    margin-top: var(--section-gap-sm);
+}
+
+.section-gap-md {
+    margin-top: var(--section-gap-md);
+}
+
+.section-gap-lg {
+    margin-top: var(--section-gap-lg);
+}
+
+.section-gap-xl {
+    margin-top: var(--section-gap-xl);
 }
 
 /* Pages can override with .custom-spacing class */
 main.custom-spacing,
-.page-wrapper.custom-spacing {
+.page-wrapper.custom-spacing,
+section.custom-spacing {
     padding-top: inherit !important;
 }
 
@@ -660,21 +687,19 @@ header.island-nav {
 /* --- GLOBAL FOOTER --- */
 footer {
     width: 100%;
-    background-color: var(--deep-space);
-    color: var(--starlight);
-    padding: 60px 20px !important;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    padding: var(--section-gap-lg) 20px !important;
     /* Force side padding to prevent text touching edges */
-    border-top: 1px solid var(--border-glass);
+    border-top: 1px solid var(--border-subtle);
     position: relative;
     z-index: 10;
 }
 
 footer p,
 footer a {
-    color: var(--starlight) !important;
-    /* Force White Text */
-    opacity: 1 !important;
-    /* Force Full Opacity */
+    color: var(--text-primary);
+    opacity: 1;
 }
 
 .footer-content {
@@ -1572,17 +1597,37 @@ body.no-scroll {
 
 /* --- WORKPLACE REDESIGN (Glassmorphism & Cards) --- */
 .glass-card {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(30, 41, 59, 0.5);
+    /* Slightly more transparent */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    /* Doubled border opacity */
+    backdrop-filter: blur(16px);
+    /* Increased blur */
+    -webkit-backdrop-filter: blur(16px);
     border-radius: 24px;
     padding: 35px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    /* Edge highlight */
+}
+
+/* ADDED: Glass Reflection Overlay */
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
 }
 
 .glass-card:hover {
@@ -2088,4 +2133,745 @@ body[data-page="problem-wall"] header.island-nav {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+}
+
+/* --- SUB-NAVIGATION SYSTEM (Workplace) --- */
+.sub-nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 95%;
+    max-width: 1260px;
+    margin: 40px auto 0;
+    padding: 20px 10px;
+    flex-wrap: nowrap;
+    overflow-x: visible;
+    gap: 10px;
+    position: relative;
+    z-index: 500;
+}
+
+.sub-nav-container::-webkit-scrollbar {
+    display: none;
+}
+
+.workplace-btn {
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.workplace-btn:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.workplace-btn.active,
+.workplace-btn.active-teal {
+    background: rgba(78, 205, 196, 0.15);
+    border-color: var(--teal-glow);
+    color: var(--teal-glow);
+    font-weight: 600;
+    box-shadow: 0 0 25px rgba(78, 205, 196, 0.2), inset 0 0 10px rgba(78, 205, 196, 0.05);
+    text-shadow: 0 0 10px rgba(78, 205, 196, 0.4);
+}
+
+.workplace-btn.active-gold {
+    background: rgba(251, 191, 36, 0.15);
+    border-color: var(--gold-glow);
+    color: var(--gold-glow);
+    font-weight: 600;
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.2), inset 0 0 10px rgba(251, 191, 36, 0.05);
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+}
+
+.workplace-btn.active-peach {
+    background: rgba(244, 159, 117, 0.15);
+    border-color: var(--peach-glow);
+    color: var(--peach-glow);
+    font-weight: 600;
+    box-shadow: 0 0 25px rgba(244, 159, 117, 0.2), inset 0 0 10px rgba(244, 159, 117, 0.05);
+    text-shadow: 0 0 10px rgba(244, 159, 117, 0.4);
+}
+
+/* Mobile Overrides for Sub-nav (Consistent across pages) */
+@media (max-width: 800px) {
+    .sub-nav-container {
+        gap: 8px;
+        padding: 15px 10px;
+        width: 100%;
+        overflow-x: auto;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 20px;
+        /* Tighter on mobile */
+    }
+
+    .workplace-btn span {
+        display: none;
+    }
+
+    .workplace-btn {
+        padding: 12px;
+        aspect-ratio: 1/1;
+        justify-content: center;
+        border-radius: 50% !important;
+        /* Circle icons on mobile */
+    }
+
+    .workplace-btn i {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+}
+
+/* --- GLOBAL LIGHT MODE OVERRIDES --- */
+body.light-mode header,
+body.light-mode .island-nav,
+body.light-mode #shell-fixed .island-nav {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+body.light-mode .island-nav:hover,
+body.light-mode #shell-fixed .island-nav:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1), 0 0 25px rgba(244, 159, 117, 0.3);
+}
+
+body.light-mode .nav-links a,
+body.light-mode .user-icon-btn,
+body.light-mode .mobile-toggle {
+    color: #0f172a !important;
+}
+
+body.light-mode .nav-links a i {
+    color: var(--teal-glow);
+}
+
+body.light-mode .nav-btn {
+    background: linear-gradient(135deg, #8fe6df, #52cdc5) !important;
+    color: #10313d !important;
+    border: 1px solid rgba(78, 205, 196, 0.42) !important;
+    box-shadow: 0 8px 18px rgba(78, 205, 196, 0.2) !important;
+}
+
+body.light-mode .nav-btn:hover {
+    background: linear-gradient(135deg, #9bece5, #63d6cd) !important;
+    color: #0b2832 !important;
+}
+
+body.light-mode .hero-title-premium {
+    background: linear-gradient(90deg, #3fbab1 0%, #8ea98e 52%, #d48f68 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* NEW FIXES FOR LIGHT MODE REPORTED BUGS */
+/* Logo selective coloring in light mode (text only)
+           We use a stacked approach: the base logo stays peach.
+           We create an overlay showing ONLY the right side (text) 
+           and filter it to dark slate. */
+body.light-mode .nav-logo {
+    position: relative;
+    display: inline-flex;
+    /* Use flex to ensure content dictates size and prevents collapse */
+    align-items: center;
+}
+
+/* Ensure the base logo is visible and structured */
+body.light-mode .nav-logo img {
+    height: 50px !important;
+    /* Force a consistent height */
+    width: auto !important;
+    display: block !important;
+    opacity: 1 !important;
+    font-size: 0px !important;
+    /* Hide broken alt text safely without hiding img */
+}
+
+/* The pure <img> mask that sits perfectly on top of the base image in light mode */
+body.light-mode .logo-img-light-overlay {
+    /* Filter to dark slate matching menu items */
+    filter: brightness(0) invert(0.2) sepia(0.5) hue-rotate(180deg) saturate(0.8);
+    /* Crop to show the text, hiding the heart icon so peach shows through */
+    clip-path: inset(0 0 0 32%);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Hide the overlay completely when not in light mode */
+body:not(.light-mode) .logo-img-light-overlay {
+    display: none !important;
+}
+
+
+/* Feedback cards and other dark sections */
+body.light-mode .t-card,
+body.light-mode .dashboard-preview,
+body.light-mode .pulse-card,
+body.light-mode .wall-dashboard-preview,
+body.light-mode .dropdown-content,
+body.light-mode .nav-links .dropdown-content,
+body.light-mode .dropdown-submenu .dropdown-content,
+body.light-mode .mobile-nav-container,
+body.light-mode .feature-highlight,
+body.light-mode .glass-card,
+body.light-mode .glass-container,
+body.light-mode .pillar-card,
+body.light-mode .seo-mission-card,
+body.light-mode .faq-item,
+body.light-mode .soulbot-preview,
+body.light-mode .stat-card,
+body.light-mode .compliance-wrapper,
+body.light-mode .modal-content,
+body.light-mode .unified-card,
+body.light-mode .modal {
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+/* Add hover elevation and contrast to interactive cards in Light Mode */
+body.light-mode .t-card:hover,
+body.light-mode .feature-highlight:hover,
+body.light-mode .glass-card:hover,
+body.light-mode .pillar-card:hover,
+body.light-mode .stat-card:hover,
+body.light-mode .unified-card:hover,
+body.light-mode .pulse-card:hover,
+body.light-mode .glass-container:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+    border-color: rgba(78, 205, 196, 0.4) !important;
+}
+
+body.light-mode .dropdown-content a {
+    color: #334155 !important;
+}
+
+body.light-mode .dropdown-content a:hover {
+    background: rgba(0, 0, 0, 0.03) !important;
+    color: #0f172a !important;
+}
+
+body.light-mode .dashboard-preview *,
+body.light-mode .pulse-card *,
+body.light-mode .pulse-stat-label,
+body.light-mode .wall-dashboard-preview *,
+body.light-mode .feature-highlight *,
+body.light-mode .glass-card *,
+body.light-mode .glass-container *,
+body.light-mode .pillar-card *,
+body.light-mode .seo-mission-card *,
+body.light-mode .faq-item *,
+body.light-mode .soulbot-preview *,
+body.light-mode .stat-card *,
+body.light-mode .compliance-wrapper *,
+body.light-mode .modal-content *,
+body.light-mode .unified-card *,
+body.light-mode .modal * {
+    color: var(--text-body) !important;
+}
+
+body.light-mode .dashboard-preview h3,
+body.light-mode .pulse-card h3,
+body.light-mode .wall-dashboard-preview h3,
+body.light-mode .feature-highlight h3,
+body.light-mode .glass-card h3,
+body.light-mode .pillar-card h3,
+body.light-mode .seo-mission-title,
+body.light-mode .faq-question,
+body.light-mode .sb-bubble,
+body.light-mode .dashboard-preview h4,
+body.light-mode .stat-card h3,
+body.light-mode .compliance-wrapper h2,
+body.light-mode .compliance-wrapper h3,
+body.light-mode .modal-content h2,
+body.light-mode .modal-content h3,
+body.light-mode .unified-card h2,
+body.light-mode .unified-card h3,
+body.light-mode .feature-highlight h4,
+body.light-mode .footer-col h4 {
+    color: var(--text-strong) !important;
+}
+
+body.light-mode .section-title {
+    background: none !important;
+    -webkit-text-fill-color: var(--text-strong) !important;
+    color: var(--text-strong) !important;
+}
+
+body.light-mode .text-center p {
+    color: #334155 !important;
+}
+
+body.light-mode .lifeline-input {
+    background: #f8fafc !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: #0f172a !important;
+}
+
+body.light-mode .lifeline-input::placeholder {
+    color: #64748b !important;
+}
+
+/* Specific fix for stories */
+body.light-mode .story-quote,
+body.light-mode .t-card p {
+    color: #334155 !important;
+    text-shadow: none !important;
+}
+
+body.light-mode .story-author,
+body.light-mode .t-card h3 {
+    color: #0f172a !important;
+}
+
+/* Footer text fix */
+body.light-mode footer,
+body.light-mode .footer-content {
+    background-color: #f8fafc !important;
+    /* Force a concrete light background */
+    border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-mode .footer-col h4 {
+    color: #0f172a !important;
+    /* Override inline white style on headers */
+}
+
+body.light-mode footer p,
+body.light-mode footer a,
+body.light-mode .footer-socials a,
+body.light-mode .footer-bottom p {
+    color: #475569 !important;
+    opacity: 1 !important;
+    /* Override Dark Mode reduced opacity */
+    font-weight: 500;
+}
+
+body.light-mode .footer-links a:hover,
+body.light-mode .footer-socials a:hover {
+    color: var(--teal-glow) !important;
+}
+
+/* Fix "Get Help Now" contrast on mobile header/navs */
+body.light-mode .btn-danger.btn-outline {
+    background: rgba(239, 68, 68, 0.05) !important;
+    color: #b91c1c !important;
+    /* Darker red for contrast */
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+body.light-mode .btn-danger.btn-outline:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Ensure Aurora is visible in light mode */
+body.light-mode .aurora-blob {
+    opacity: 0.15;
+    mix-blend-mode: multiply;
+}
+
+/* --- PREMIUM LIGHT MODE REFINEMENTS (OPTION A+B SOFT) --- */
+/* 1. Base Slate-50 Background for contrast against pure white cards */
+body.light-mode {
+    background-color: #f8fafc !important;
+}
+
+/* 2. Refined White Cards with Crisp Borders and Soft Shadows */
+body.light-mode .t-card,
+body.light-mode .dashboard-preview,
+body.light-mode .pulse-card,
+body.light-mode .wall-dashboard-preview,
+body.light-mode .dropdown-content,
+body.light-mode .nav-links .dropdown-content,
+body.light-mode .dropdown-submenu .dropdown-content,
+body.light-mode .mobile-nav-container,
+body.light-mode .feature-highlight,
+body.light-mode .glass-card,
+body.light-mode .glass-container,
+body.light-mode .pillar-card,
+body.light-mode .seo-mission-card,
+body.light-mode .faq-item,
+body.light-mode .soulbot-preview,
+body.light-mode .stat-card,
+body.light-mode .compliance-wrapper,
+body.light-mode .modal-content,
+body.light-mode .unified-card,
+body.light-mode .modal {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* 3. "Safe Space" Card Overrides (Removing hardcoded dark gradient) */
+body.light-mode .safe-space-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-mode .safe-space-card span {
+    color: var(--teal-glow) !important;
+    /* Switch peach text to a cool teal for better contrast in light mode */
+}
+
+/* 4. Live News Ticker Overrides (Removing hardcoded dark inline string) */
+body.light-mode .news-ticker-container {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-top: 1px solid #e2e8f0 !important;
+}
+
+body.light-mode .news-ticker-label {
+    background: #4ECDC4 !important;
+    /* Soft Teal label */
+    color: #ffffff !important;
+    box-shadow: 10px 0 20px rgba(255, 255, 255, 1) !important;
+}
+
+body.light-mode #news-ticker,
+body.light-mode .news-ticker-content {
+    color: #334155 !important;
+}
+
+/* 5. Mobile Bottom Nav Overrides (Removing dark capsule) */
+body.light-mode .mobile-bottom-nav {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-mode .mobile-bottom-nav .nav-item span {
+    color: #475569 !important;
+}
+
+body.light-mode .mobile-bottom-nav .nav-item i {
+    opacity: 0.8 !important;
+}
+
+body.light-mode .mobile-bottom-nav .nav-item.active span {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
+
+/* 6. Form Inputs & Text Areas Global Fix */
+body.light-mode input,
+body.light-mode textarea,
+body.light-mode select {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+body.light-mode input::placeholder,
+body.light-mode textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+body.light-mode input:focus,
+body.light-mode textarea:focus {
+    border-color: #4ECDC4 !important;
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1) !important;
+    outline: none !important;
+}
+
+/* 7. Sub-Nav Buttons (.workplace-btn) Fix */
+body.light-mode .workplace-btn {
+    border: 1px solid #cbd5e1 !important;
+    color: #475569 !important;
+    background: #ffffff !important;
+}
+
+body.light-mode .workplace-btn:hover {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+
+body.light-mode .workplace-btn.active {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    border-color: #0f172a !important;
+}
+
+/* 8. Structural Dividers (<hr>) Fix */
+body.light-mode hr {
+    border-color: #e2e8f0 !important;
+    border-top: 1px solid #e2e8f0 !important;
+    opacity: 1 !important;
+}
+
+/* 9. Start-Here Resources Page Overrides */
+body.light-mode .page-wrapper {
+    background: transparent !important;
+}
+
+body.light-mode .page-header p {
+    color: #475569 !important;
+}
+
+body.light-mode .path-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-mode .path-card:hover {
+    box-shadow: 0 10px 30px rgba(78, 205, 196, 0.15) !important;
+}
+
+body.light-mode .path-card h3 {
+    color: #0f172a !important;
+}
+
+body.light-mode .path-card p {
+    color: #475569 !important;
+}
+
+body.light-mode .section-header p {
+    color: #475569 !important;
+}
+
+body.light-mode .resource-item {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-left: 4px solid #4ECDC4 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
+}
+
+body.light-mode .resource-item:hover {
+    background: #f8fafc !important;
+}
+
+body.light-mode .resource-item p {
+    color: #475569 !important;
+}
+
+body.light-mode .cta-box {
+    background: #ffffff !important;
+    border: 2px solid rgba(78, 205, 196, 0.3) !important;
+}
+
+body.light-mode .cta-box h3 {
+    color: #0f172a !important;
+}
+
+body.light-mode .cta-box p {
+    color: #475569 !important;
+}
+
+/* =========================================================================
+   MASS THEME FIX: Override Inline Hardcoded Backgrounds & Colors
+   These rules safely target elements across 600+ legacy pages that 
+   hardcoded dark theme rgba() colors directly into the HTML style attributes. 
+   ========================================================================= */
+
+body.light-mode [style*="background: rgba(15, 23, 42"],
+body.light-mode [style*="background: rgba(30, 41, 59"],
+body.light-mode [style*="background:#0f172a"],
+body.light-mode [style*="background: #0f172a"],
+body.light-mode [style*="background-color: #0f172a"],
+body.light-mode [style*="background-color:#0f172a"],
+body.light-mode [style*="background: #1e293b"],
+body.light-mode [style*="background:#1e293b"],
+body.light-mode [style*="background: #334155"],
+body.light-mode [style*="background:#334155"],
+body.light-mode [style*="background: #111827"] {
+    background: var(--bg-card) !important;
+}
+
+body.light-mode [style*="color: #cbd"],
+body.light-mode [style*="color: #f1f"],
+body.light-mode [style*="color: #94a3b8"],
+body.light-mode [style*="color:#94a3b8"],
+body.light-mode [style*="color: #fff"],
+body.light-mode [style*="color:#fff"],
+body.light-mode [style*="color: #ffffff"],
+body.light-mode [style*="color:#ffffff"],
+body.light-mode [style*="color: #e2e8f0"],
+body.light-mode [style*="color:#e2e8f0"] {
+    color: var(--text-primary) !important;
+}
+
+/* =========================================================================
+   PARTICLE ANIMATION FIX FOR LIGHT MODE
+   Ensures floating background particles use contrasting brand colors 
+   so they remain visible on white backgrounds. 
+   ========================================================================= */
+
+body.light-mode .particle {
+    background: var(--teal-glow) !important;
+    opacity: 0.4 !important;
+}
+
+body.light-mode .particle:nth-child(even) {
+    background: var(--peach-glow) !important;
+}
+
+body.light-mode .particle:nth-child(3n) {
+    background: var(--text-secondary) !important;
+}
+
+/* --- LIGHT MODE CONTRAST CONTRACT (2026-03-05) --- */
+body.light-mode {
+    background-color: var(--surface-0) !important;
+    color: var(--text-body) !important;
+}
+
+/* Reusable surface + text utilities for gradual migration */
+.surface-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border-soft);
+    box-shadow: var(--elev-1);
+}
+
+.surface-muted {
+    background: var(--surface-2);
+    border: 1px solid var(--border-soft);
+}
+
+.text-soft {
+    color: var(--text-soft);
+}
+
+body.light-mode .surface-card,
+body.light-mode .surface-muted,
+body.light-mode .t-card,
+body.light-mode .dashboard-preview,
+body.light-mode .pulse-card,
+body.light-mode .wall-dashboard-preview,
+body.light-mode .feature-highlight,
+body.light-mode .glass-card,
+body.light-mode .glass-container,
+body.light-mode .pillar-card,
+body.light-mode .seo-mission-card,
+body.light-mode .faq-item,
+body.light-mode .soulbot-preview,
+body.light-mode .stat-card,
+body.light-mode .compliance-wrapper,
+body.light-mode .modal-content,
+body.light-mode .unified-card,
+body.light-mode .resource-item,
+body.light-mode .path-card,
+body.light-mode .cta-box {
+    background: var(--surface-1) !important;
+    border: 1px solid var(--border-soft) !important;
+    box-shadow: var(--elev-1) !important;
+}
+
+body.light-mode .hero-title-premium {
+    background: linear-gradient(90deg, #3fbab1 0%, #8ea98e 52%, #d48f68 100%) !important;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: none;
+}
+
+body.light-mode .hero-subhead-premium {
+    color: #d97745 !important;
+}
+
+/* Avoid unreadable low-opacity body copy in light mode */
+body.light-mode .step-text,
+body.light-mode .sticker-desc,
+body.light-mode .resource-meta,
+body.light-mode .page-header p,
+body.light-mode .section-header p,
+body.light-mode .pillar-desc,
+body.light-mode .story-quote,
+body.light-mode .text-soft,
+body.light-mode p[style*="opacity:0.6"],
+body.light-mode p[style*="opacity: 0.6"],
+body.light-mode p[style*="opacity:0.7"],
+body.light-mode p[style*="opacity: 0.7"],
+body.light-mode p[style*="opacity:0.8"],
+body.light-mode p[style*="opacity: 0.8"],
+body.light-mode div[style*="opacity:0.6"],
+body.light-mode div[style*="opacity: 0.6"],
+body.light-mode div[style*="opacity:0.7"],
+body.light-mode div[style*="opacity: 0.7"],
+body.light-mode div[style*="opacity:0.8"],
+body.light-mode div[style*="opacity: 0.8"] {
+    color: var(--text-body) !important;
+    opacity: 0.98 !important;
+}
+
+body.light-mode .section-title {
+    color: var(--text-strong);
+}
+
+/* Narrowed legacy inline overrides: apply to content surfaces only, not entire DOM */
+body.light-mode .surface-card[style*="background: rgba(15, 23, 42"],
+body.light-mode .surface-card[style*="background: rgba(30, 41, 59"],
+body.light-mode .surface-muted[style*="background: rgba(15, 23, 42"],
+body.light-mode .surface-muted[style*="background: rgba(30, 41, 59"],
+body.light-mode .safe-space-card[style*="background:"],
+body.light-mode .sticker-cta[style*="background:"],
+body.light-mode .pillar-card[style*="background:"] {
+    background: var(--surface-1) !important;
+}
+
+/* Keep emergency CTA readable in light mode */
+body.light-mode .lifeline-btn,
+body.light-mode .btn-danger.btn-outline {
+    color: #b91c1c !important;
+    border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+/* Start Here and similar long pages keep separation from footer */
+body.light-mode main#shell-content {
+    background: transparent;
+}
+
+/* Gradient heading safety: prevent rectangular gradient patches in light mode */
+body.light-mode .hero-title-premium,
+body.light-mode .newsletter-h2 {
+    display: inline-block;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+}
+
+/* --- FINAL LIGHT-MODE SAFETY LAYER (2026-03-05) --- */
+/* Keep copy in slate tones (avoid harsh black) */
+body.light-mode p,
+body.light-mode li,
+body.light-mode small,
+body.light-mode label,
+body.light-mode .meta-text,
+body.light-mode .subtitle {
+    color: var(--text-body) !important;
+}
+
+/* Prevent "gradient rectangle patch" on non-clipped headings */
+body.light-mode .hero h1:not(.hero-title-premium):not([style*="-webkit-text-fill-color: transparent"]) {
+    background: none !important;
+    -webkit-text-fill-color: var(--text-strong) !important;
+    color: var(--text-strong) !important;
+    display: block !important;
+}
+
+/* True gradient-text headings keep clipping */
+body.light-mode .hero-title-premium,
+body.light-mode .newsletter-h2 {
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
 }

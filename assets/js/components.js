@@ -16,6 +16,43 @@
  */
 // console.log("Soulamore: Components.js loading...");
 
+// --- THEME SYSTEM INITIALIZATION ---
+function applyTheme(theme) {
+    const isLight = theme === 'light';
+    document.documentElement.classList.toggle('light-mode', isLight);
+    if (document.body) {
+        document.body.classList.toggle('light-mode', isLight);
+    }
+    const desktopIcon = document.getElementById('theme-icon-desktop');
+    const mobileIcon = document.getElementById('theme-icon-mobile');
+    if (isLight) {
+        if (desktopIcon) { desktopIcon.classList.remove('fa-sun'); desktopIcon.classList.add('fa-moon'); }
+        if (mobileIcon) { mobileIcon.classList.remove('fa-sun'); mobileIcon.classList.add('fa-moon'); }
+    } else {
+        if (desktopIcon) { desktopIcon.classList.remove('fa-moon'); desktopIcon.classList.add('fa-sun'); }
+        if (mobileIcon) { mobileIcon.classList.remove('fa-moon'); mobileIcon.classList.add('fa-sun'); }
+    }
+}
+
+function getSavedTheme() {
+    return localStorage.getItem('soulamore-theme') || 'dark';
+}
+
+(function initTheme() {
+    applyTheme(getSavedTheme());
+})();
+
+window.toggleTheme = function () {
+    const isLight = document.documentElement.classList.contains('light-mode');
+    const newTheme = isLight ? 'dark' : 'light';
+    localStorage.setItem('soulamore-theme', newTheme);
+    applyTheme(newTheme);
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    applyTheme(getSavedTheme());
+});
+
 // CRITICAL: Inject Styles Immediately
 // CRITICAL: Inject Styles Immediately
 try {
@@ -99,6 +136,11 @@ try {
             flex-grow: 0 !important;
             overflow: hidden !important; /* Isolate shimmer */
             box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important;
+        }
+        body.light-mode .lifeline-btn {
+            background: rgba(239, 68, 68, 0.08) !important;
+            color: #dc2626 !important;
+            border-color: #ef4444 !important;
         }
         .lifeline-btn:hover {
             background: #ef4444 !important;
@@ -727,8 +769,9 @@ function generateSubmenuHTML(children, rootPath) {
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
-        <div class="logo-wrapper">
-            <img src="${rootPath}assets/images/logo-premium.png" class="logo-img" alt="Soulamore">
+        <div class="logo-wrapper" style="position: relative; display: flex; align-items: center; height: 40px;">
+            <img src="${rootPath}assets/images/logo-premium.png" class="logo-img" alt="Soulamore" style="height: 100%; width: auto; display: block;">
+            <img src="${rootPath}assets/images/logo-premium.png" class="logo-img-light-overlay" alt="" aria-hidden="true" style="position: absolute; left: 0; top: 0; height: 100%; width: auto; display: block;">
         </div>
     </a>
 
@@ -756,14 +799,22 @@ const getHeaderHTML = (rootPath) => `
 
     <!-- Auth Group -->
     <div class="auth-box">
+            <button id="theme-toggle-desktop" aria-label="Toggle Theme" style="background:none; border:none; cursor:pointer; color: var(--text-primary); margin-right: 15px; transition: 0.3s; display: flex; align-items: center;" onclick="if(window.toggleTheme) window.toggleTheme();" onmouseover="this.style.color='var(--peach-glow)'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='var(--text-primary)'; this.style.transform='scale(1)';">
+                <i class="fas fa-sun" id="theme-icon-desktop" style="font-size: 1.6rem;"></i>
+            </button>
             <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> <span>Get Help Now</span></a>
             <a href="${rootPath}portal/user-dashboard.html" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
             <a href="${rootPath}portal/login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
     
-    <button class="mobile-toggle" aria-label="Toggle Navigation" onclick="if(window.toggleMobileMenu) window.toggleMobileMenu();">
-        <i class="fas fa-bars"></i>
-    </button>
+    <div style="display: flex; gap: 5px; align-items: center;">
+        <button id="theme-toggle-mobile" class="mobile-toggle" aria-label="Toggle Theme" onclick="if(window.toggleTheme) window.toggleTheme();">
+            <i class="fas fa-sun" id="theme-icon-mobile"></i>
+        </button>
+        <button class="mobile-toggle" aria-label="Toggle Navigation" onclick="if(window.toggleMobileMenu) window.toggleMobileMenu();">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
 </div>
 `;
 
@@ -774,7 +825,10 @@ const getFooterHTML = (rootPath) => `
         
         <!-- BRAND COLUMN -->
         <div class="footer-brand">
-            <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; margin-bottom: 20px;">
+            <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home" style="position: relative; display: inline-flex; align-items: center; margin-bottom: 20px; height: 50px;">
+                <img src="${rootPath}assets/images/logo-premium.png" alt="Soulamore Logo" class="logo-img" style="height: 100%; width: auto; display: block;">
+                <img src="${rootPath}assets/images/logo-premium.png" alt="" aria-hidden="true" class="logo-img-light-overlay" style="position: absolute; left: 0; top: 0; height: 100%; width: auto; display: block;">
+            </a>
             <p style="font-size:0.9rem; opacity:0.6; line-height:1.6;">
                 Your sanctuary for mental wellness. <br>
                 Tech meets empathy.
@@ -1016,12 +1070,13 @@ function injectSubnav() {
     wrapper.className = 'sub-nav-container';
     // We reuse the existing CSS class for visual style, but now it lives inside the Shell
     wrapper.style.margin = '0 auto'; // Override margin for shell context (Handled by padding now)
-    wrapper.style.pointerEvents = 'auto'; // Re-enable clicks
+    wrapper.style.pointerEvents = 'none'; // Allow clicks to pass through the container
 
     window.ShellSubnav.tabs.forEach(tab => {
         const btn = document.createElement('div');
         btn.className = `workplace-btn ${tab.id === window.ShellSubnav.active ? 'active' : ''} ${tab.extraClass || ''}`;
         btn.setAttribute('data-page', tab.id);
+        btn.style.pointerEvents = 'auto'; // Re-enable clicks for the button itself
 
         // Icon + Label
         btn.innerHTML = `<i class="fas ${tab.icon}"></i><span>${tab.label}</span>`;
@@ -1038,8 +1093,12 @@ function injectSubnav() {
             if (window.navTo) {
                 window.navTo(tab.id);
                 // Update active state visually immediately
-                document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.workplace-btn').forEach(b => {
+                    b.classList.remove('active', 'active-teal', 'active-gold', 'active-peach');
+                });
                 btn.classList.add('active');
+                if (tab.extraClass) btn.classList.add(tab.extraClass);
+
                 // Update internal state
                 window.ShellSubnav.active = tab.id;
             }
@@ -1143,9 +1202,19 @@ document.addEventListener('DOMContentLoaded', () => {
  * Correctly handles both hosted (web) and local (file://) environments.
  */
 function getRootPath() {
-    const path = window.location.pathname;
-    const isLocal = window.location.protocol === 'file:';
-    let prefix = '';
+    // Robust Path Resolution (v4.0)
+    // Always use the relative path hardcoded by the developer in the <script src="..."> tag
+    const script = document.querySelector('script[src*="components.js"]');
+    if (script) {
+        const src = script.getAttribute('src');
+        if (src) {
+            // Extracts whatever prefix precedes "assets/js/components" e.g., "../../" or "../" or ""
+            return src.split('assets/js/components')[0];
+        }
+    }
+
+    // Fallback if script tag parsing somehow fails
+    const path = window.location.pathname.toLowerCase();
 
     // 2-Levels Deep Check
     if (path.includes('/spaces/campus/') ||
@@ -1153,6 +1222,7 @@ function getRootPath() {
         path.includes('/spaces/soulamore-workplace/') ||
         path.includes('/spaces/assessments/') ||
         path.includes('/tools/confession-box/') ||
+        path.includes('/portal/admin-dashboard/') ||
         (path.includes('/our-peers/') && path.split('/our-peers/')[1]?.includes('/'))) {
         return "../../";
     }
@@ -1165,13 +1235,16 @@ function getRootPath() {
         path.includes('/our-peers/') ||
         path.includes('/our-psychologists/') ||
         path.includes('/portal/') ||
+        path.includes('/journal/') ||
+        path.includes('/auth/') ||
+        path.includes('/login/') ||
         path.includes('/join-us/') ||
         path.includes('/pages/') ||
-        path.includes('/New Pages/') || path.includes('/New%20Pages/')) {
+        path.includes('/new pages/') || path.includes('/new%20pages/')) {
         return "../";
     }
 
-    return prefix;
+    return '';
 }
 
 /**

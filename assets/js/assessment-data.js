@@ -1,5 +1,5 @@
-window.SoulamoreAssessments = {};
-window.SoulamoreCitations = {};
+window.SoulamoreAssessments = window.SoulamoreAssessments || {};
+window.SoulamoreCitations = window.SoulamoreCitations || {};
 
 window.SoulamoreAssessments["anxiety_overthinking"] = {
     "id": "anxiety_overthinking",
