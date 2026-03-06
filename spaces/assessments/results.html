@@ -662,17 +662,42 @@
         // 1. Retrieve Deterministic JSON
         const resultDataStr = sessionStorage.getItem('soulamore_assessment_result');
         if (!resultDataStr) {
-            window.location.href = "index.html"; // No data, kick out
+            window.location.href = "/spaces/assessments/index.html"; // No data, kick out
             return;
         }
 
         const data = JSON.parse(resultDataStr);
         const metrics = data.deterministic_metrics;
 
+        console.log("[RESULTS] Received assessment result:", {
+            assessment_id: data.assessment_id,
+            domain: data.domain,
+            severity_band: metrics.severity_band,
+            raw_score: metrics.raw_score
+        });
+
+        function normalizeDomainKey(assessmentId, rawDomain) {
+            const meta = (window.SoulamoreAssessments && window.SoulamoreAssessments[assessmentId]) || null;
+            const primary = (meta?.primary_domain || '').toLowerCase();
+            const raw = (rawDomain || '').toLowerCase();
+            const id = (assessmentId || '').toLowerCase();
+            const joined = `${primary} ${raw} ${id}`;
+
+            console.log("[RESULTS] Normalizing domain:", { assessmentId, rawDomain, primary, joined });
+
+            if (joined.includes('anxiety')) return 'anxiety_overthinking';
+            if (joined.includes('burnout') || joined.includes('career')) return 'burnout_career';
+            if (joined.includes('relationship') || joined.includes('attachment') || joined.includes('intimacy')) return 'relationship_patterns';
+            return 'emotional_regulation';
+        }
+
+        const normalizedDomain = normalizeDomainKey(data.assessment_id, data.domain);
+        console.log("[RESULTS] Normalized domain:", normalizedDomain);
+
         // 2. Color Coding based on Domain/Assessment type
         let themeColor = "#4ECDC4"; // default
-        if (data.assessment_id === 'emotional_regulation') themeColor = "#F49F75";
-        if (data.assessment_id === 'burnout_career') themeColor = "#fbbf24";
+        if (normalizedDomain === 'emotional_regulation') themeColor = "#F49F75";
+        if (normalizedDomain === 'burnout_career') themeColor = "#fbbf24";
         document.documentElement.style.setProperty('--engine-theme', themeColor);
 
         // 3. Populate Deterministic UI First (Layer 4)
@@ -808,7 +833,7 @@
             return paths;
         }
 
-        const paths = getRecommendedPaths(data.domain, metrics.severity_band);
+        const paths = getRecommendedPaths(normalizedDomain, metrics.severity_band);
 
         // --- NEW: ANONYMOUS ADAPTATION ---
         const isAnonymous = data.user_identity && data.user_identity.anonymous;
@@ -861,7 +886,7 @@
             leadGenBox.innerHTML = `
                     <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--engine-theme); margin-bottom: 20px;"></i>
                     <h3>Got it, <span id="userName"></span>!</h3>
-                    <p style="opacity: 0.8; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">We have your contact details. Our team is reviewing your pattern and will reach out with your personalized peer matching soon.</p>
+                    <p style="opacity: 0.8; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">If you've shared your information, our team will review your pattern and reach out with personalized matching support soon.</p>
                 `;
             document.getElementById('userName').textContent = data.user_identity.name.split(' ')[0];
         }
@@ -1002,7 +1027,14 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
 
             // Retrieve fallback based on test ID and severity band
             let fallbackHTML = "";
-            const domainResponses = fallbackResponses[data.assessment_id];
+            const domainResponses = fallbackResponses[normalizedDomain];
+
+            console.log("[RESULTS] Fallback lookup:", {
+                normalizedDomain,
+                severity_band: metrics.severity_band,
+                domainResponsesExists: !!domainResponses,
+                severityMatch: domainResponses ? !!domainResponses[metrics.severity_band] : false
+            });
 
             if (domainResponses && domainResponses[metrics.severity_band]) {
                 fallbackHTML = domainResponses[metrics.severity_band];
@@ -1010,8 +1042,8 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
                 // Ultimate generic fallback if mapping fails
                 fallbackHTML = `
                         <p>Your responses have been processed securely.</p>
-                        <p>We are currently experiencing heavy traffic and our primary interpretation engine is resting. Based on your pattern signature (<strong>${metrics.severity_band.toUpperCase()}</strong>), your nervous system is working hard to navigate your current emotional landscape.</p>
-                        <p>We encourage you to explore the carefully recommended paths below to continue your journey of exploration and care.</p>
+                        <p>We couldn't load the reflection engine right now, so we've shown your deterministic pattern summary (<strong>${metrics.severity_band.toUpperCase()}</strong>) and tailored next steps below.</p>
+                        <p>You can continue safely with the recommended paths while interpretation services reconnect.</p>
                     `;
             }
 
