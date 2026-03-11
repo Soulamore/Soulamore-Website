@@ -67,6 +67,69 @@ Stabilize light-mode readability/contrast without dark-mode regressions, then do
 2. Reduce low-opacity copy across high-traffic pages.
 3. Continue hardcoded surface migration to semantic classes (`.surface-card`, `.surface-muted`, `.text-soft`).
 
+## Shared Shell Audit Notes
+This audit is distinct from theme/contrast work.
+
+### Exclusions
+Do not normalize these pages to the shared header/footer right now:
+
+1. Under active developer implementation
+- `auth/signup.html`
+- `auth/signup-success.html`
+- `portal/admin-dashboard.html`
+- `portal/blog-editor.html`
+- `portal/logout.html`
+- `portal/peer-dashboard.html`
+- `portal/peer-setup.html`
+- `portal/psych-dashboard.html`
+- `portal/psych-dashboard-cal.html`
+- `portal/psych-setup.html`
+- `portal/signup-success.html`
+- `portal/verify-email.html`
+- `portal/video-conference.html`
+- `pages/seed-wall.html`
+- `spaces/assessments/engine.html`
+- `spaces/assessments/smart-start.html`
+- `spaces/soulamore-away/mailbox.html`
+
+2. Intentional immersive / tool surfaces that may remain without global chrome
+- `tools/breathing.html`
+- `tools/drop-it.html`
+- `tools/glossary.html`
+- `tools/soulbot-chat.html`
+- `tools/soul-rider.html`
+
+### Actionable Production Shell Gaps
+Pages still in production scope but not fully normalized to the shared shell (`components.js` + `#main-header` + `#main-footer`):
+
+1. Live auth / portal
+- `portal/login.html`
+- `portal/forgot-password.html`
+- `portal/signup.html`
+- `portal/messaging.html`
+- `portal/user-dashboard.html`
+
+2. Public high-traffic
+- `resources/start-here.html`
+- `pages/problem-wall.html`
+- `spaces/assessments/index.html`
+- `spaces/campus/index.html`
+- `our-peers/about.html`
+- `our-peers/index.html`
+- `our-psychologists/about.html`
+- `our-psychologists/psychologists.html`
+
+3. Remaining clusters
+- `company/*` residual content pages
+- `community/*` residual content pages
+- `join-us/*` residual onboarding/thank-you pages
+- `spaces/campus/*` residual content pages
+- `spaces/soulamore-away/*` residual content pages
+- `tools/*` residual non-immersive pages
+
+### Working Rule For Agents
+If a page is in the exclusion list above, skip shell normalization unless explicitly asked. Otherwise, treat missing shared shell hooks as a production consistency bug.
+
 ## Guardrails
 1. Keep page-specific fixes under `body.light-mode`.
 2. Preserve dark-mode visual identity.
