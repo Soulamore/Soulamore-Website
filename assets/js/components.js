@@ -762,7 +762,7 @@ const NAV_DATA = [
                 ]
             },
             { id: 'nav-soulbot', label: 'SoulBot AI (Beta)', href: 'tools/soulbot.html', style: 'color:#F49F75;' },
-            { id: 'nav-support-groups', label: 'Support Groups', href: 'community/support-groups.html' },
+            { id: 'nav-support-groups', label: 'Support Groups', href: 'community/support-groups/support-groups.html' },
             { id: 'nav-problem', label: 'The Problem Wall', href: 'pages/problem-wall.html' }
         ]
     },
@@ -795,7 +795,7 @@ const NAV_DATA = [
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-support-groups-community', label: 'Support Groups', href: 'community/support-groups.html' },
+            { id: 'nav-support-groups-community', label: 'Support Groups', href: 'community/support-groups/support-groups.html' },
             { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
             { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
             { id: 'nav-for-parents', label: 'For Families', href: 'company/for-parents.html' }
@@ -976,7 +976,7 @@ const getFooterHTML = (rootPath) => `
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
                 <li><a href="${rootPath}spaces/campus/campus-ambassadors.html">Campus Ambassadors</a></li>
                 <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
-                <li><a href="${rootPath}community/support-groups.html">Support Groups</a></li>
+                <li><a href="${rootPath}community/support-groups/support-groups.html">Support Groups</a></li>
                 <li><a href="${rootPath}community/forum.html">Discussion Forum</a></li>
                 <li><a href="${rootPath}company/for-parents.html">For Family (Comfort)</a></li>
                 <li><a href="${rootPath}join-us/index.html">Join the Team</a></li>
