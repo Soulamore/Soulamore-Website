@@ -425,28 +425,13 @@ try {
             color: #4ECDC4 !important;
         }
         
-        /* SPECIAL EXCEPTION: Mobile Menu & Dropdowns */
+        /* SPECIAL EXCEPTION: Mobile Menu & Dropdowns (Dark Theme Restoration) */
         @media (max-width: 1024px) {
             .nav-links.open {
                 background: rgba(15, 23, 42, 0.98) !important; /* Dark Mobile Menu */
             }
             .nav-links.open a {
                 color: #e2e8f0 !important; /* Light Text */
-            }
-            /* LIGHT MODE MOBILE MENU */
-            body.light-mode .nav-links.open {
-                background: rgba(255, 255, 255, 0.98) !important;
-                border-color: rgba(0, 0, 0, 0.1) !important;
-            }
-            body.light-mode .nav-links.open a,
-            body.light-mode .nav-links.open .dropdown-submenu a,
-            body.light-mode .nav-links.open span,
-            body.light-mode .nav-links.open i {
-                color: #0f172a !important;
-            }
-            body.light-mode .nav-links.open a:hover {
-                background: rgba(0, 0, 0, 0.05) !important;
-                color: #2a9d8f !important;
             }
         }
         /* Dropdowns on Desktop */
@@ -558,7 +543,7 @@ try {
         }
 
         .mobile-toggle {
-            z-index: 99999 !important;
+            z-index: 99999 !important; /* SAFE HIGH Z-INDEX */
             pointer-events: auto !important;
             cursor: pointer !important;
             display: flex !important;
@@ -570,95 +555,7 @@ try {
             background: rgba(255, 255, 255, 0.05) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
-
-        /* FLOATING NEWS TOGGLE PILL (Strict matched to .audio-control) */
-        .news-toggle-pill {
-            position: fixed !important;
-            bottom: 42px !important; /* Exactly between ticker and Audio Control (80px) */
-            left: 30px !important;   /* Exact X-axis alignment with Audio Control */
-            background: rgba(255, 255, 255, 0.08) !important; 
-            backdrop-filter: blur(10px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            padding: 5px 12px !important; /* Reduced padding closely matching audio */
-            border-radius: 50px !important; 
-            display: flex !important;
-            align-items: center !important;
-            gap: 8px !important; /* Tighter gap */
-            cursor: pointer !important;
-            z-index: 99999 !important;
-            transition: all 0.3s ease !important;
-            user-select: none !important;
-            box-shadow: none !important; 
-            height: 32px !important; /* Forced strict height to prevent bloat */
-            box-sizing: border-box !important;
-        }
-        .news-toggle-pill .pill-label {
-            color: #f1f5f9 !important; 
-            font-size: 0.75rem !important; /* Thinner smaller text */
-            font-weight: 400 !important; /* Dropped bold to match inherited body weight */
-            letter-spacing: normal !important;
-        }
-        .news-toggle-pill:hover {
-            background: rgba(255, 255, 255, 0.2) !important; /* Exact match hover state */
-            transform: translateY(-2px) !important; 
-        }
-        .news-toggle-pill .status-dot {
-            width: 6px !important;
-            height: 6px !important;
-            border-radius: 50% !important;
-            background: #ef4444; /* Default Red (Off) */
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5) !important;
-        }
-        .news-toggle-pill.active .status-dot {
-            background: #4ECDC4 !important; /* Teal (On) */
-            box-shadow: 0 0 12px rgba(78, 205, 196, 0.8) !important;
-            animation: pulse-teal 2s infinite !important;
-        }
-        @keyframes pulse-teal {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .news-toggle-pill .pill-label {
-            color: #e2e8f0 !important;
-            font-size: 0.85rem !important;
-            font-weight: 600 !important;
-            letter-spacing: 0.02em !important;
-        }
         
-        /* Tooltip */
-        .news-toggle-pill::after {
-            content: "Toggle Live News Feed" !important;
-            position: absolute !important;
-            bottom: 120% !important;
-            left: 50% !important;
-            transform: translateX(-50%) translateY(10px) !important;
-            background: #0f172a !important;
-            color: white !important;
-            padding: 6px 12px !important;
-            border-radius: 8px !important;
-            font-size: 0.75rem !important;
-            white-space: nowrap !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            transition: all 0.2s ease !important;
-            pointer-events: none !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4) !important;
-        }
-        .news-toggle-pill:hover::after {
-            opacity: 1 !important;
-            visibility: visible !important;
-            transform: translateX(-50%) translateY(0) !important;
-        }
-        
-        @media (max-width: 1024px) {
-            .news-toggle-pill {
-                bottom: 135px !important; /* Move above mobile bottom nav to match audio toggle */
-                left: auto !important;
-                right: 20px !important;
-            }
-        }
     `;
     document.head.appendChild(style);
     // console.log("Soulamore: Critical styles v2 injected.");
@@ -762,7 +659,6 @@ const NAV_DATA = [
                 ]
             },
             { id: 'nav-soulbot', label: 'SoulBot AI (Beta)', href: 'tools/soulbot.html', style: 'color:#F49F75;' },
-            { id: 'nav-support-groups', label: 'Support Groups', href: 'community/support-groups.html' },
             { id: 'nav-problem', label: 'The Problem Wall', href: 'pages/problem-wall.html' }
         ]
     },
@@ -795,7 +691,6 @@ const NAV_DATA = [
         href: '#',
         type: 'dropdown',
         children: [
-            { id: 'nav-support-groups-community', label: 'Support Groups', href: 'community/support-groups.html' },
             { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
             { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
             { id: 'nav-for-parents', label: 'For Families', href: 'company/for-parents.html' }
@@ -913,10 +808,10 @@ const getHeaderHTML = (rootPath) => `
     </div>
     
     <div style="display: flex; gap: 5px; align-items: center;">
-        <button id="theme-toggle-mobile" class="mobile-toggle theme-toggle-btn" aria-label="Toggle Theme" onclick="if(window.toggleTheme) window.toggleTheme();">
+        <button id="theme-toggle-mobile" class="mobile-toggle" aria-label="Toggle Theme" onclick="if(window.toggleTheme) window.toggleTheme();">
             <i class="fas fa-sun" id="theme-icon-mobile"></i>
         </button>
-        <button class="mobile-toggle mobile-menu-btn" aria-label="Toggle Navigation">
+        <button class="mobile-toggle" aria-label="Toggle Navigation" onclick="if(window.toggleMobileMenu) window.toggleMobileMenu();">
             <i class="fas fa-bars"></i>
         </button>
     </div>
@@ -976,7 +871,6 @@ const getFooterHTML = (rootPath) => `
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
                 <li><a href="${rootPath}spaces/campus/campus-ambassadors.html">Campus Ambassadors</a></li>
                 <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
-                <li><a href="${rootPath}community/support-groups.html">Support Groups</a></li>
                 <li><a href="${rootPath}community/forum.html">Discussion Forum</a></li>
                 <li><a href="${rootPath}company/for-parents.html">For Family (Comfort)</a></li>
                 <li><a href="${rootPath}join-us/index.html">Join the Team</a></li>
@@ -991,7 +885,6 @@ const getFooterHTML = (rootPath) => `
                 <li><a href="${rootPath}newsletter.html">Newsletter</a></li>
                 <li><a href="${rootPath}company/press.html">Press & Media Kit</a></li>
                 <li><a href="${rootPath}company/why-soulamore-exists.html">Why Soulamore Exists</a></li>
-                <li><a href="${rootPath}company/transparency.html">Transparency Report</a></li>
                 <li><a href="${rootPath}company/contact.html">Contact</a></li>
                 <li><a href="${rootPath}company/legal.html">Privacy & Legal</a></li>
                 <li><a href="${rootPath}get-help-now.html" style="color:var(--ember-red); font-weight:600;">Crisis Resources</a></li>
@@ -1118,49 +1011,6 @@ function injectNewsTicker() {
     `;
 
     document.body.appendChild(ticker);
-    
-    // Set initial visibility based on status
-    ticker.style.display = getSavedNewsFeedStatus() === 'on' ? 'flex' : 'none';
-}
-
-// --- NEWS FEED TOGGLE SYSTEM ---
-function applyNewsFeedStatus(status) {
-    const ticker = document.querySelector('.news-ticker-container');
-    const pill = document.querySelector('.news-toggle-pill');
-    
-    if (ticker) ticker.style.display = status === 'on' ? 'flex' : 'none';
-    if (pill) {
-        if (status === 'on') pill.classList.add('active');
-        else pill.classList.remove('active');
-    }
-}
-
-function getSavedNewsFeedStatus() {
-    return localStorage.getItem('soulamore-news-feed') || 'on';
-}
-
-window.toggleNewsFeed = function () {
-    const currentStatus = getSavedNewsFeedStatus();
-    const newStatus = currentStatus === 'on' ? 'off' : 'on';
-    localStorage.setItem('soulamore-news-feed', newStatus);
-    applyNewsFeedStatus(newStatus);
-};
-
-function injectNewsToggle() {
-    if (document.querySelector('.news-toggle-pill')) return;
-
-    const pill = document.createElement('div');
-    pill.className = 'news-toggle-pill';
-    const initialStatus = getSavedNewsFeedStatus();
-    if (initialStatus === 'on') pill.classList.add('active');
-
-    pill.innerHTML = `
-        <div class="status-dot"></div>
-        <span class="pill-label">Live News</span>
-    `;
-
-    pill.onclick = window.toggleNewsFeed;
-    document.body.appendChild(pill);
 }
 
 // --- FAVICON INJECTION ---
@@ -1334,8 +1184,6 @@ document.addEventListener('DOMContentLoaded', () => {
     injectSoulBotWidget();
     injectCookieBanner();
     injectNewsTicker(); // NEW: Injected directly to body for z-index dominance
-    injectNewsToggle(); // NEW: Floating control pill
-    applyNewsFeedStatus(getSavedNewsFeedStatus());
     ensureNewsRenderer();
 
     // 3. Animation & Features
@@ -1456,8 +1304,8 @@ function bindMobileToggle() {
     // FIX 3: Event Delegation for Hamburger
     // Handles toggling even if header is injected late
     document.addEventListener('click', (e) => {
-        // 1. Toggle Click (Ensure it's the menu button, not the theme switch)
-        const toggle = e.target.closest('.mobile-menu-btn');
+        // 1. Toggle Click
+        const toggle = e.target.closest('.mobile-toggle');
         if (toggle) {
             e.preventDefault();
             e.stopPropagation();
@@ -1498,7 +1346,7 @@ function bindMobileToggle() {
             document.body.classList.remove('no-scroll');
 
             // Reset Toggles
-            document.querySelectorAll('.mobile-menu-btn').forEach(btn => {
+            document.querySelectorAll('.mobile-toggle').forEach(btn => {
                 btn.classList.remove('active');
                 const i = btn.querySelector('i');
                 if (i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); }
@@ -1525,7 +1373,7 @@ function initializeHeaderLogic() {
                 document.body.classList.remove('no-scroll');
 
                 // Reset Icons Globally
-                document.querySelectorAll('.mobile-menu-btn').forEach(btn => {
+                document.querySelectorAll('.mobile-toggle').forEach(btn => {
                     btn.classList.remove('active');
                     const i = btn.querySelector('i');
                     if (i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); }

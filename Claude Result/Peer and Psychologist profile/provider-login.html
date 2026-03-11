@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Login | Soulamore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+    <style>
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --teal-glow: #4ECDC4;
+            --peach-glow: #F49F75;
+            --gold-glow: #fbbf24;
+            --border-glass: rgba(255,255,255,0.1);
+            --alert-red: #ef4444;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--deep-space);
+            color: var(--starlight);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        #particles { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+        .particle { position:absolute; background:white; border-radius:50%; animation: floatUp linear infinite; }
+        @keyframes floatUp { from { transform: translateY(100vh); opacity:0.3; } to { transform: translateY(-10vh); opacity:0; } }
+
+        .login-wrapper {
+            position: relative; z-index: 10;
+            width: 100%; max-width: 460px;
+            padding: 20px;
+        }
+
+        .logo-area {
+            text-align: center; margin-bottom: 40px;
+        }
+        .logo-area .brand {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem; font-weight: 700;
+            background: linear-gradient(135deg, var(--teal-glow), var(--peach-glow));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .logo-area p { opacity: 0.6; font-size: 0.9rem; margin-top: 6px; }
+
+        .card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem; font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .card-sub { opacity: 0.6; font-size: 0.9rem; margin-bottom: 30px; }
+
+        .field { margin-bottom: 20px; }
+        .field label { display:block; font-size:0.85rem; font-weight:600; opacity:0.8; margin-bottom:8px; }
+        .field input {
+            width: 100%; padding: 14px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px; color: var(--starlight);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem; outline: none;
+            transition: 0.3s;
+        }
+        .field input:focus { border-color: var(--teal-glow); background: rgba(78,205,196,0.05); }
+
+        .btn {
+            width: 100%; padding: 15px;
+            background: linear-gradient(135deg, var(--teal-glow), #2a9d8f);
+            border: none; border-radius: 12px;
+            color: #0f172a; font-weight: 700;
+            font-size: 1rem; cursor: pointer;
+            transition: 0.3s; display: flex;
+            align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(78,205,196,0.3); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .error-msg {
+            background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+            color: var(--alert-red); padding: 12px 16px; border-radius: 10px;
+            font-size: 0.85rem; margin-bottom: 20px; display: none;
+        }
+        .error-msg.show { display: block; }
+
+        .success-msg {
+            background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3);
+            color: #4ade80; padding: 12px 16px; border-radius: 10px;
+            font-size: 0.85rem; margin-bottom: 20px; display: none;
+        }
+        .success-msg.show { display: block; }
+
+        /* Password Change Panel */
+        #changePasswordPanel { display: none; }
+        #loginPanel { display: block; }
+
+        .password-strength {
+            height: 4px; border-radius: 2px;
+            background: rgba(255,255,255,0.1);
+            margin-top: 8px; overflow: hidden;
+        }
+        .password-strength-bar {
+            height: 100%; border-radius: 2px;
+            transition: 0.3s; width: 0%;
+        }
+        .strength-hint { font-size:0.75rem; opacity:0.6; margin-top:5px; }
+
+        .back-link {
+            display: block; text-align: center; margin-top: 20px;
+            color: var(--teal-glow); text-decoration: none;
+            font-size: 0.85rem; opacity: 0.8;
+        }
+        .back-link:hover { opacity: 1; }
+
+        .role-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 14px; border-radius: 50px;
+            font-size: 0.8rem; font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .role-badge.psych { background: rgba(78,205,196,0.15); color: var(--teal-glow); border: 1px solid rgba(78,205,196,0.3); }
+        .role-badge.peer { background: rgba(251,191,36,0.15); color: var(--gold-glow); border: 1px solid rgba(251,191,36,0.3); }
+    </style>
+</head>
+<body>
+
+<div id="particles"></div>
+
+<div class="login-wrapper">
+    <div class="logo-area">
+        <div class="brand">Soulamore</div>
+        <p>Provider Portal</p>
+    </div>
+
+    <div class="card">
+
+        <!-- LOGIN PANEL -->
+        <div id="loginPanel">
+            <div class="card-title">Welcome back 👋</div>
+            <p class="card-sub">Sign in with the credentials sent to you.</p>
+
+            <div id="loginError" class="error-msg"></div>
+
+            <div class="field">
+                <label>Email Address</label>
+                <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email">
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+            </div>
+
+            <button class="btn" id="loginBtn" onclick="handleLogin()">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+
+            <a class="back-link" href="../join-us/join-us-index.html">← Back to Home</a>
+        </div>
+
+        <!-- FORCE PASSWORD CHANGE PANEL -->
+        <div id="changePasswordPanel">
+            <div id="userRoleBadge" class="role-badge psych">
+                <i class="fas fa-user-md"></i> <span id="roleName">Psychologist</span>
+            </div>
+            <div class="card-title">Set Your Password 🔐</div>
+            <p class="card-sub">This is your first login. Please set a secure password to continue.</p>
+
+            <div id="changeError" class="error-msg"></div>
+            <div id="changeSuccess" class="success-msg"></div>
+
+            <div class="field">
+                <label>New Password</label>
+                <input type="password" id="newPassword" placeholder="Minimum 8 characters" oninput="checkStrength()">
+                <div class="password-strength">
+                    <div class="password-strength-bar" id="strengthBar"></div>
+                </div>
+                <div class="strength-hint" id="strengthHint">Enter a password</div>
+            </div>
+            <div class="field">
+                <label>Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Repeat your new password">
+            </div>
+
+            <button class="btn" id="changeBtn" onclick="handlePasswordChange()">
+                <i class="fas fa-lock"></i> Save Password & Continue
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, updatePassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+        authDomain: "soulamore-f0a64.firebaseapp.com",
+        projectId: "soulamore-f0a64",
+        storageBucket: "soulamore-f0a64.firebasestorage.app",
+        messagingSenderId: "649985161002",
+        appId: "1:649985161002:web:66141929d4acd4451a5053"
+    };
+
+    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+
+    // --- PARTICLES ---
+    const pc = document.getElementById('particles');
+    for (let i = 0; i < 25; i++) {
+        let p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.width = Math.random() * 3 + 1 + 'px';
+        p.style.height = p.style.width;
+        p.style.animationDuration = Math.random() * 20 + 10 + 's';
+        p.style.animationDelay = Math.random() * 10 + 's';
+        pc.appendChild(p);
+    }
+
+    // --- AUTH STATE CHECK (already logged in?) ---
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const profileData = await getProviderProfile(user.uid);
+            if (profileData && !profileData.mustChangePassword) {
+                redirectToDashboard(profileData.role);
+            }
+        }
+    });
+
+    async function getProviderProfile(uid) {
+        // Check psychologists collection first
+        const psychDoc = await getDoc(doc(db, "psychologists", uid));
+        if (psychDoc.exists()) return { ...psychDoc.data(), role: "psychologist" };
+
+        // Check peers collection
+        const peerDoc = await getDoc(doc(db, "peers", uid));
+        if (peerDoc.exists()) return { ...peerDoc.data(), role: "peer" };
+
+        return null;
+    }
+
+    function redirectToDashboard(role) {
+        if (role === "psychologist") {
+            window.location.href = "../dashboard/psych_dashboard.html";
+        } else {
+            window.location.href = "../dashboard/peer_dashboard.html";
+        }
+    }
+
+    // --- LOGIN ---
+    window.handleLogin = async function() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const btn = document.getElementById('loginBtn');
+        const errEl = document.getElementById('loginError');
+
+        if (!email || !password) {
+            showError(errEl, "Please enter your email and password.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+        errEl.classList.remove('show');
+
+        try {
+            const result = await signInWithEmailAndPassword(auth, email, password);
+            currentUser = result.user;
+
+            const profileData = await getProviderProfile(currentUser.uid);
+
+            if (!profileData) {
+                showError(errEl, "Account not found. Please contact Soulamore admin.");
+                await auth.signOut();
+                return;
+            }
+
+            if (profileData.mustChangePassword) {
+                // Show password change panel
+                document.getElementById('loginPanel').style.display = 'none';
+                document.getElementById('changePasswordPanel').style.display = 'block';
+
+                const badge = document.getElementById('userRoleBadge');
+                const roleName = document.getElementById('roleName');
+                if (profileData.role === 'peer') {
+                    badge.className = 'role-badge peer';
+                    badge.querySelector('i').className = 'fas fa-hand-holding-heart';
+                    roleName.textContent = 'Peer Counselor';
+                } else {
+                    roleName.textContent = profileData.full_name || 'Psychologist';
+                }
+            } else {
+                redirectToDashboard(profileData.role);
+            }
+
+        } catch (err) {
+            let msg = "Login failed. Please check your credentials.";
+            if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+                msg = "Incorrect email or password. Please try again.";
+            } else if (err.code === 'auth/too-many-requests') {
+                msg = "Too many failed attempts. Please wait a few minutes.";
+            }
+            showError(errEl, msg);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+        }
+    };
+
+    // --- PASSWORD CHANGE ---
+    window.handlePasswordChange = async function() {
+        const newPass = document.getElementById('newPassword').value;
+        const confirmPass = document.getElementById('confirmPassword').value;
+        const btn = document.getElementById('changeBtn');
+        const errEl = document.getElementById('changeError');
+        const sucEl = document.getElementById('changeSuccess');
+
+        errEl.classList.remove('show');
+        sucEl.classList.remove('show');
+
+        if (newPass.length < 8) {
+            showError(errEl, "Password must be at least 8 characters."); return;
+        }
+        if (newPass !== confirmPass) {
+            showError(errEl, "Passwords do not match."); return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        try {
+            // Update Firebase Auth password
+            await updatePassword(currentUser, newPass);
+
+            // Clear mustChangePassword flag in Firestore
+            const profileData = await getProviderProfile(currentUser.uid);
+            const collectionName = profileData.role === 'psychologist' ? 'psychologists' : 'peers';
+            await updateDoc(doc(db, collectionName, currentUser.uid), {
+                mustChangePassword: false
+            });
+
+            sucEl.textContent = "Password saved! Redirecting to your dashboard...";
+            sucEl.classList.add('show');
+
+            setTimeout(() => redirectToDashboard(profileData.role), 1500);
+
+        } catch (err) {
+            showError(errEl, "Failed to update password. Please try again. Error: " + err.message);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-lock"></i> Save Password & Continue';
+        }
+    };
+
+    // --- PASSWORD STRENGTH ---
+    window.checkStrength = function() {
+        const pass = document.getElementById('newPassword').value;
+        const bar = document.getElementById('strengthBar');
+        const hint = document.getElementById('strengthHint');
+
+        let score = 0;
+        if (pass.length >= 8) score++;
+        if (pass.length >= 12) score++;
+        if (/[A-Z]/.test(pass)) score++;
+        if (/[0-9]/.test(pass)) score++;
+        if (/[^A-Za-z0-9]/.test(pass)) score++;
+
+        const levels = [
+            { pct: '20%', color: '#ef4444', text: 'Very weak' },
+            { pct: '40%', color: '#f97316', text: 'Weak' },
+            { pct: '60%', color: '#fbbf24', text: 'Fair' },
+            { pct: '80%', color: '#84cc16', text: 'Good' },
+            { pct: '100%', color: '#22c55e', text: 'Strong ✓' },
+        ];
+        const lvl = levels[Math.min(score - 1, 4)] || { pct: '0%', color: 'transparent', text: 'Enter a password' };
+        bar.style.width = pass.length ? lvl.pct : '0%';
+        bar.style.background = lvl.color;
+        hint.textContent = pass.length ? lvl.text : 'Enter a password';
+    };
+
+    // --- ENTER KEY SUPPORT ---
+    document.getElementById('loginPassword').addEventListener('keydown', e => {
+        if (e.key === 'Enter') window.handleLogin();
+    });
+
+    function showError(el, msg) {
+        el.textContent = msg;
+        el.classList.add('show');
+    }
+</script>
+</body>
+</html>

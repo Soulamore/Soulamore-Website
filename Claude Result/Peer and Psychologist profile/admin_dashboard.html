@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Soulamore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+    <style>
+        :root {
+            --deep-space: #0f172a;
+            --navy: #1e293b;
+            --navy-glass: rgba(30,41,59,0.9);
+            --starlight: #f1f5f9;
+            --teal: #4ECDC4;
+            --peach: #F49F75;
+            --gold: #fbbf24;
+            --green: #22c55e;
+            --red: #ef4444;
+            --border: rgba(255,255,255,0.1);
+            --muted: rgba(241,245,249,0.5);
+        }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--deep-space); color:var(--starlight); min-height:100vh; }
+        h1,h2,h3 { font-family:'Outfit',sans-serif; }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed; top:0; left:0; width:240px; height:100vh;
+            background: var(--navy-glass); border-right: 1px solid var(--border);
+            backdrop-filter: blur(20px); padding: 30px 20px; z-index: 100;
+            display: flex; flex-direction: column;
+        }
+        .sidebar-brand {
+            font-family:'Outfit',sans-serif; font-size:1.4rem; font-weight:700;
+            background: linear-gradient(135deg, var(--teal), var(--peach));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            margin-bottom: 10px;
+        }
+        .sidebar-sub { font-size:0.75rem; opacity:0.5; margin-bottom:40px; letter-spacing:2px; text-transform:uppercase; }
+        .nav-item {
+            display:flex; align-items:center; gap:12px;
+            padding: 12px 16px; border-radius:10px; cursor:pointer;
+            font-size:0.9rem; transition:0.2s; color:var(--starlight);
+            text-decoration:none; margin-bottom:4px;
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(78,205,196,0.1); color:var(--teal); }
+        .nav-item i { width:18px; text-align:center; }
+        .nav-spacer { flex:1; }
+        .admin-badge {
+            padding: 10px 16px; border-radius:10px;
+            background: rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2);
+            font-size:0.8rem; color:var(--red);
+        }
+
+        /* MAIN */
+        .main { margin-left:240px; padding:30px; min-height:100vh; }
+
+        /* TOP BAR */
+        .topbar {
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:30px;
+        }
+        .page-title { font-size:1.8rem; font-weight:700; }
+        .page-sub { opacity:0.5; font-size:0.9rem; margin-top:4px; }
+        .logout-btn {
+            padding:8px 20px; border-radius:50px; border:1px solid var(--border);
+            background:transparent; color:var(--starlight); cursor:pointer;
+            font-size:0.85rem; transition:0.2s;
+        }
+        .logout-btn:hover { border-color:var(--red); color:var(--red); }
+
+        /* STATS ROW */
+        .stats-row {
+            display:grid; grid-template-columns:repeat(4,1fr); gap:20px;
+            margin-bottom:30px;
+        }
+        .stat-card {
+            background:var(--navy-glass); border:1px solid var(--border);
+            border-radius:16px; padding:20px;
+        }
+        .stat-num { font-size:2rem; font-weight:700; font-family:'Outfit',sans-serif; }
+        .stat-label { font-size:0.8rem; opacity:0.6; margin-top:4px; }
+        .stat-card.teal .stat-num { color:var(--teal); }
+        .stat-card.gold .stat-num { color:var(--gold); }
+        .stat-card.green .stat-num { color:var(--green); }
+        .stat-card.peach .stat-num { color:var(--peach); }
+
+        /* TABS */
+        .tabs { display:flex; gap:10px; margin-bottom:25px; }
+        .tab {
+            padding:10px 24px; border-radius:50px; cursor:pointer;
+            font-size:0.9rem; font-weight:600; transition:0.2s;
+            border:1px solid var(--border); background:transparent; color:var(--starlight);
+        }
+        .tab.active { background:var(--teal); border-color:var(--teal); color:#0f172a; }
+        .tab .count {
+            display:inline-block; background:rgba(239,68,68,0.8);
+            color:white; font-size:0.7rem; padding:1px 6px;
+            border-radius:50px; margin-left:6px;
+        }
+
+        /* APPLICATION CARD */
+        .app-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(400px,1fr)); gap:20px; }
+        .app-card {
+            background:var(--navy-glass); border:1px solid var(--border);
+            border-radius:16px; padding:24px; transition:0.3s;
+        }
+        .app-card:hover { border-color:rgba(78,205,196,0.3); }
+        .app-header { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+        .app-avatar {
+            width:48px; height:48px; border-radius:12px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.3rem; font-weight:700; flex-shrink:0;
+        }
+        .app-avatar.psych { background:rgba(78,205,196,0.15); color:var(--teal); }
+        .app-avatar.peer { background:rgba(251,191,36,0.15); color:var(--gold); }
+        .app-name { font-weight:700; font-size:1rem; }
+        .app-role { font-size:0.8rem; opacity:0.6; margin-top:2px; }
+        .app-time { font-size:0.75rem; opacity:0.4; margin-left:auto; }
+
+        .app-detail { font-size:0.85rem; opacity:0.75; line-height:1.6; margin-bottom:12px; }
+        .app-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+        .app-tag {
+            padding:3px 10px; border-radius:50px; font-size:0.75rem;
+            background:rgba(255,255,255,0.05); border:1px solid var(--border);
+        }
+
+        .app-actions { display:flex; gap:10px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
+        .btn-approve {
+            flex:1; padding:10px; border-radius:10px; border:none;
+            background:linear-gradient(135deg, var(--teal), #2a9d8f);
+            color:#0f172a; font-weight:700; cursor:pointer; font-size:0.85rem;
+            transition:0.2s;
+        }
+        .btn-approve:hover { transform:translateY(-2px); }
+        .btn-reject {
+            padding:10px 16px; border-radius:10px;
+            border:1px solid rgba(239,68,68,0.3);
+            background:rgba(239,68,68,0.05); color:var(--red);
+            cursor:pointer; font-size:0.85rem; transition:0.2s;
+        }
+        .btn-reject:hover { background:rgba(239,68,68,0.15); }
+        .btn-view {
+            padding:10px 16px; border-radius:10px;
+            border:1px solid var(--border);
+            background:transparent; color:var(--starlight);
+            cursor:pointer; font-size:0.85rem; transition:0.2s;
+        }
+
+        .status-badge {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:3px 10px; border-radius:50px; font-size:0.75rem; font-weight:600;
+        }
+        .status-badge.pending { background:rgba(251,191,36,0.15); color:var(--gold); border:1px solid rgba(251,191,36,0.3); }
+        .status-badge.approved { background:rgba(34,197,94,0.15); color:var(--green); border:1px solid rgba(34,197,94,0.3); }
+        .status-badge.rejected { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+
+        /* MODAL */
+        .modal-overlay {
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);
+            z-index:999; align-items:center; justify-content:center;
+        }
+        .modal-overlay.open { display:flex; }
+        .modal {
+            background:#1e293b; border:1px solid var(--border);
+            border-radius:20px; padding:36px; width:100%; max-width:480px;
+            position:relative;
+        }
+        .modal-title { font-size:1.3rem; font-weight:700; margin-bottom:8px; }
+        .modal-sub { opacity:0.6; font-size:0.85rem; margin-bottom:24px; }
+        .modal-field { margin-bottom:16px; }
+        .modal-field label { display:block; font-size:0.85rem; font-weight:600; opacity:0.8; margin-bottom:8px; }
+        .modal-field input, .modal-field select {
+            width:100%; padding:12px 14px;
+            background:rgba(255,255,255,0.05);
+            border:1px solid var(--border); border-radius:10px;
+            color:var(--starlight); font-family:'Plus Jakarta Sans',sans-serif;
+            font-size:0.9rem; outline:none;
+        }
+        .modal-field input:focus { border-color:var(--teal); }
+        .temp-pass-box {
+            background:rgba(78,205,196,0.1); border:1px solid rgba(78,205,196,0.3);
+            border-radius:10px; padding:16px; margin-bottom:16px;
+            font-family:monospace; font-size:1.1rem;
+            display:flex; align-items:center; justify-content:space-between;
+        }
+        .copy-btn {
+            padding:6px 12px; background:var(--teal); color:#0f172a;
+            border:none; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:700;
+        }
+        .modal-actions { display:flex; gap:10px; margin-top:20px; }
+        .modal-btn-primary {
+            flex:1; padding:12px; background:linear-gradient(135deg, var(--teal), #2a9d8f);
+            border:none; border-radius:10px; color:#0f172a;
+            font-weight:700; cursor:pointer; font-size:0.9rem;
+        }
+        .modal-btn-cancel {
+            padding:12px 20px; border:1px solid var(--border);
+            background:transparent; border-radius:10px; color:var(--starlight);
+            cursor:pointer; font-size:0.9rem;
+        }
+        .close-modal { position:absolute; top:16px; right:16px; background:none; border:none; color:var(--starlight); font-size:1.2rem; cursor:pointer; opacity:0.5; }
+        .close-modal:hover { opacity:1; }
+        .empty-state {
+            text-align:center; padding:60px 20px; opacity:0.4;
+            grid-column:1/-1;
+        }
+        .empty-state i { font-size:3rem; margin-bottom:15px; display:block; }
+
+        .toast {
+            position:fixed; bottom:30px; right:30px;
+            background:#1e293b; border:1px solid var(--border);
+            border-radius:12px; padding:14px 20px;
+            font-size:0.9rem; z-index:9999;
+            transform:translateY(100px); opacity:0;
+            transition:0.3s; display:flex; align-items:center; gap:10px;
+        }
+        .toast.show { transform:translateY(0); opacity:1; }
+        .toast.success { border-color:rgba(34,197,94,0.5); color:var(--green); }
+        .toast.error { border-color:rgba(239,68,68,0.5); color:var(--red); }
+
+        .loading { text-align:center; padding:40px; opacity:0.5; grid-column:1/-1; }
+
+        @media(max-width:900px) {
+            .sidebar { display:none; }
+            .main { margin-left:0; }
+            .stats-row { grid-template-columns:1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-brand">Soulamore</div>
+    <div class="sidebar-sub">Admin Panel</div>
+    <a class="nav-item active" onclick="showTab('psych')"><i class="fas fa-user-md"></i> Psych Applications</a>
+    <a class="nav-item" onclick="showTab('peer')"><i class="fas fa-hand-holding-heart"></i> Peer Applications</a>
+    <a class="nav-item" onclick="showTab('approved')"><i class="fas fa-check-circle"></i> Approved Providers</a>
+    <div class="nav-spacer"></div>
+    <div class="admin-badge"><i class="fas fa-shield-alt"></i> Admin Access Only</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+    <div class="topbar">
+        <div>
+            <div class="page-title" id="pageTitle">Psychologist Applications</div>
+            <div class="page-sub" id="pageSub">Review and approve incoming applications</div>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+        <div class="stat-card teal">
+            <div class="stat-num" id="statPsychPending">—</div>
+            <div class="stat-label">Psych Pending</div>
+        </div>
+        <div class="stat-card gold">
+            <div class="stat-num" id="statPeerPending">—</div>
+            <div class="stat-label">Peer Pending</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-num" id="statApprovedPsych">—</div>
+            <div class="stat-label">Active Psychologists</div>
+        </div>
+        <div class="stat-card peach">
+            <div class="stat-num" id="statApprovedPeer">—</div>
+            <div class="stat-label">Active Peers</div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab active" id="tabPsych" onclick="showTab('psych')">
+            <i class="fas fa-user-md"></i> Psychologists <span class="count" id="psychCount">0</span>
+        </button>
+        <button class="tab" id="tabPeer" onclick="showTab('peer')">
+            <i class="fas fa-hand-holding-heart"></i> Peers <span class="count" id="peerCount">0</span>
+        </button>
+        <button class="tab" id="tabApproved" onclick="showTab('approved')">
+            <i class="fas fa-check-circle"></i> Approved
+        </button>
+    </div>
+
+    <!-- APPLICATION GRID -->
+    <div class="app-grid" id="appGrid">
+        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading applications...</div>
+    </div>
+</div>
+
+<!-- APPROVE MODAL -->
+<div class="modal-overlay" id="approveModal">
+    <div class="modal">
+        <button class="close-modal" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        <div class="modal-title">✅ Approve & Create Account</div>
+        <p class="modal-sub">A Firebase Auth account will be created. Share the credentials below with the applicant.</p>
+
+        <div id="approveStep1">
+            <div class="modal-field">
+                <label>Applicant Email <span style="color:#ef4444;">*</span></label>
+                <input type="email" id="approveEmail" placeholder="Enter applicant's email">
+            </div>
+            <div class="modal-field">
+                <label>Temporary Password (auto-generated)</label>
+                <div class="temp-pass-box">
+                    <span id="tempPassDisplay">—</span>
+                    <button class="copy-btn" onclick="copyTempPass()">Copy</button>
+                </div>
+                <div style="font-size:0.78rem; opacity:0.5;">Share this with the applicant. They must change it on first login.</div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn-primary" id="approveConfirmBtn" onclick="confirmApproval()">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                <button class="modal-btn-cancel" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+
+        <div id="approveStep2" style="display:none;">
+            <div style="text-align:center; padding:20px 0;">
+                <div style="font-size:3rem; color:var(--green); margin-bottom:15px;">✓</div>
+                <div style="font-size:1.1rem; font-weight:700; margin-bottom:8px;">Account Created!</div>
+                <div style="opacity:0.6; font-size:0.85rem; margin-bottom:20px;">Send these credentials to the applicant:</div>
+                <div class="temp-pass-box" style="flex-direction:column; gap:8px; text-align:left;">
+                    <div><span style="opacity:0.5; font-size:0.8rem;">EMAIL:</span> <strong id="createdEmail">—</strong></div>
+                    <div><span style="opacity:0.5; font-size:0.8rem;">TEMP PASSWORD:</span> <strong id="createdPass">—</strong></div>
+                </div>
+                <div style="font-size:0.78rem; opacity:0.5; margin-bottom:20px;">Login URL: <strong>soulamore.com/auth/provider-login.html</strong></div>
+            </div>
+            <button class="modal-btn-primary" onclick="closeModal()" style="width:100%;">Done</button>
+        </div>
+    </div>
+</div>
+
+<!-- REJECT MODAL -->
+<div class="modal-overlay" id="rejectModal">
+    <div class="modal">
+        <button class="close-modal" onclick="closeRejectModal()"><i class="fas fa-times"></i></button>
+        <div class="modal-title">❌ Reject Application</div>
+        <p class="modal-sub">This action will mark the application as rejected.</p>
+        <div class="modal-field">
+            <label>Reason (optional - for internal records)</label>
+            <input type="text" id="rejectReason" placeholder="e.g. Incomplete credentials">
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn-primary" style="background:linear-gradient(135deg,#ef4444,#b91c1c);" onclick="confirmRejection()">
+                Confirm Rejection
+            </button>
+            <button class="modal-btn-cancel" onclick="closeRejectModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, setDoc, query, where, orderBy, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+        authDomain: "soulamore-f0a64.firebaseapp.com",
+        projectId: "soulamore-f0a64",
+        storageBucket: "soulamore-f0a64.firebasestorage.app",
+        messagingSenderId: "649985161002",
+        appId: "1:649985161002:web:66141929d4acd4451a5053"
+    };
+
+    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // State
+    let currentTab = 'psych';
+    let currentAppId = null;
+    let currentAppData = null;
+    let currentAppType = null;
+    let tempPassword = '';
+    let adminEmail = '';
+    let adminPassword = '';
+
+    // --- AUTH GUARD ---
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'admin-login.html';
+            return;
+        }
+        // Check if user is admin
+        const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+        if (!adminDoc.exists()) {
+            showToast('Access denied: Not an admin.', 'error');
+            await signOut(auth);
+            window.location.href = '../auth/provider-login.html';
+            return;
+        }
+        adminEmail = user.email;
+        loadAll();
+    });
+
+    async function loadAll() {
+        loadStats();
+        loadApplications('psych');
+    }
+
+    // --- LOAD STATS ---
+    async function loadStats() {
+        try {
+            const [psychApps, peerApps, psychs, peers] = await Promise.all([
+                getDocs(query(collection(db, 'psych_applications'), where('status','==','pending'))),
+                getDocs(query(collection(db, 'peer_applications'), where('status','==','pending'))),
+                getDocs(collection(db, 'psychologists')),
+                getDocs(collection(db, 'peers'))
+            ]);
+            document.getElementById('statPsychPending').textContent = psychApps.size;
+            document.getElementById('statPeerPending').textContent = peerApps.size;
+            document.getElementById('statApprovedPsych').textContent = psychs.size;
+            document.getElementById('statApprovedPeer').textContent = peers.size;
+            document.getElementById('psychCount').textContent = psychApps.size;
+            document.getElementById('peerCount').textContent = peerApps.size;
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    // --- LOAD APPLICATIONS ---
+    async function loadApplications(type) {
+        const grid = document.getElementById('appGrid');
+        grid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+        try {
+            let snap;
+            if (type === 'approved') {
+                const [psychs, peers] = await Promise.all([
+                    getDocs(collection(db, 'psychologists')),
+                    getDocs(collection(db, 'peers'))
+                ]);
+                renderApproved(psychs, peers);
+                return;
+            }
+
+            const collName = type === 'psych' ? 'psych_applications' : 'peer_applications';
+            snap = await getDocs(query(collection(db, collName), where('status','==','pending')));
+
+            if (snap.empty) {
+                grid.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i>No pending ${type === 'psych' ? 'psychologist' : 'peer'} applications.</div>`;
+                return;
+            }
+
+            let cards = '';
+            snap.forEach(docSnap => {
+                const d = docSnap.data();
+                const initials = (d.full_name || d.name || '?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+                const tags = (d.specializations || d.lived_experiences || '').split(',').filter(Boolean).map(t => `<span class="app-tag">${t.trim()}</span>`).join('');
+                const submitted = d.submitted_at?.toDate ? d.submitted_at.toDate().toLocaleDateString() : 'Unknown';
+
+                cards += `
+                <div class="app-card" id="card-${docSnap.id}">
+                    <div class="app-header">
+                        <div class="app-avatar ${type}">
+                            ${initials}
+                        </div>
+                        <div>
+                            <div class="app-name">${escapeHTML(d.full_name || d.name || 'Unknown')}</div>
+                            <div class="app-role">${escapeHTML(d.headline || d.role_title || (type === 'psych' ? 'Psychologist' : 'Peer Counselor'))}</div>
+                        </div>
+                        <div class="app-time">${submitted}</div>
+                    </div>
+                    <span class="status-badge pending"><i class="fas fa-clock"></i> Pending Review</span>
+                    <div class="app-detail" style="margin-top:12px;">
+                        ${escapeHTML((d.bio || d.motivation || 'No bio provided.').slice(0, 140))}${(d.bio || d.motivation || '').length > 140 ? '...' : ''}
+                    </div>
+                    ${tags ? `<div class="app-tags">${tags}</div>` : ''}
+                    ${d.years_experience ? `<div style="font-size:0.8rem; opacity:0.6;"><i class="fas fa-briefcase"></i> ${escapeHTML(d.years_experience)} years experience</div>` : ''}
+                    ${d.languages ? `<div style="font-size:0.8rem; opacity:0.6; margin-top:4px;"><i class="fas fa-language"></i> ${escapeHTML(d.languages)}</div>` : ''}
+                    <div class="app-actions">
+                        <button class="btn-approve" onclick="openApproveModal('${docSnap.id}', '${type}')">
+                            <i class="fas fa-check"></i> Approve & Create Account
+                        </button>
+                        <button class="btn-reject" onclick="openRejectModal('${docSnap.id}', '${type}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>`;
+            });
+            grid.innerHTML = cards;
+        } catch(e) {
+            grid.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i>Error loading: ${e.message}</div>`;
+        }
+    }
+
+    function renderApproved(psychsSnap, peersSnap) {
+        const grid = document.getElementById('appGrid');
+        if (psychsSnap.empty && peersSnap.empty) {
+            grid.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i>No approved providers yet.</div>';
+            return;
+        }
+
+        let cards = '';
+        psychsSnap.forEach(d => {
+            const data = d.data();
+            cards += providerCard(d.id, data, 'psych');
+        });
+        peersSnap.forEach(d => {
+            const data = d.data();
+            cards += providerCard(d.id, data, 'peer');
+        });
+        grid.innerHTML = cards;
+    }
+
+    function providerCard(id, data, type) {
+        const initials = (data.full_name || '?').charAt(0).toUpperCase();
+        return `
+        <div class="app-card">
+            <div class="app-header">
+                <div class="app-avatar ${type}">${initials}</div>
+                <div>
+                    <div class="app-name">${escapeHTML(data.full_name || 'Unknown')}</div>
+                    <div class="app-role">${escapeHTML(data.role_title || (type === 'psych' ? 'Psychologist' : 'Peer'))}</div>
+                </div>
+            </div>
+            <span class="status-badge approved"><i class="fas fa-check-circle"></i> Active</span>
+            <div style="margin-top:12px; display:flex; gap:10px;">
+                <button class="btn-view" onclick="togglePublish('${id}','${type}',${!data.is_published})">
+                    ${data.is_published ? '🌐 Unpublish' : '🚀 Publish'}
+                </button>
+                <a class="btn-view" href="../profiles/${type}-profile.html?id=${id}" target="_blank" style="text-decoration:none;">
+                    <i class="fas fa-eye"></i> View
+                </a>
+            </div>
+        </div>`;
+    }
+
+    // --- APPROVE MODAL ---
+    window.openApproveModal = function(appId, appType) {
+        currentAppId = appId;
+        currentAppType = appType;
+        tempPassword = generatePassword();
+        document.getElementById('tempPassDisplay').textContent = tempPassword;
+        document.getElementById('approveEmail').value = '';
+        document.getElementById('approveStep1').style.display = 'block';
+        document.getElementById('approveStep2').style.display = 'none';
+        document.getElementById('approveModal').classList.add('open');
+    };
+
+    window.closeModal = function() {
+        document.getElementById('approveModal').classList.remove('open');
+        loadAll();
+    };
+
+    window.copyTempPass = function() {
+        navigator.clipboard.writeText(tempPassword);
+        showToast('Password copied!', 'success');
+    };
+
+    window.confirmApproval = async function() {
+        const email = document.getElementById('approveEmail').value.trim();
+        if (!email) { showToast('Please enter the applicant email.', 'error'); return; }
+
+        const btn = document.getElementById('approveConfirmBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+        try {
+            // Fetch application data
+            const collName = currentAppType === 'psych' ? 'psych_applications' : 'peer_applications';
+            const appSnap = await getDoc(doc(db, collName, currentAppId));
+            const appData = appSnap.data();
+
+            // Create Firebase Auth account using REST API (doesn't affect admin session)
+            const apiKey = "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k";
+            const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password: tempPassword, returnSecureToken: true })
+            });
+            const authData = await res.json();
+
+            if (authData.error) {
+                throw new Error(authData.error.message);
+            }
+
+            const newUid = authData.localId;
+
+            // Create provider profile document
+            const profileCollection = currentAppType === 'psych' ? 'psychologists' : 'peers';
+
+            if (currentAppType === 'psych') {
+                await setDoc(doc(db, 'psychologists', newUid), {
+                    // Identity
+                    uid: newUid,
+                    email: email,
+                    full_name: appData.full_name || '',
+                    role_title: appData.headline || 'Counseling Psychologist',
+                    avatar_initial: (appData.full_name || 'A').charAt(0).toUpperCase(),
+                    avatar_url: '',
+                    // Service Details
+                    pricing: '',
+                    session_format: 'Online (Video/Audio)',
+                    years_of_experience: appData.years_experience || '',
+                    languages: appData.languages || 'English',
+                    accepting_new_clients: true,
+                    // Profile Content
+                    bio_quote: appData.bio || '',
+                    bio_paragraphs: [],
+                    approach_tags: (appData.specializations || '').split(',').map(t=>t.trim()).filter(Boolean),
+                    specializations: (appData.specializations || '').split(',').map(t=>t.trim()).filter(Boolean),
+                    areas_of_focus: [],
+                    wall_of_love_testimonials: [],
+                    // Media
+                    background_audio_url: '',
+                    // System
+                    is_published: false,
+                    mustChangePassword: true,
+                    application_id: currentAppId,
+                    created_at: serverTimestamp()
+                });
+            } else {
+                await setDoc(doc(db, 'peers', newUid), {
+                    uid: newUid,
+                    email: email,
+                    full_name: appData.full_name || appData.name || '',
+                    role_title: 'Peer Counselor',
+                    avatar_initial: (appData.full_name || appData.name || 'A').charAt(0).toUpperCase(),
+                    avatar_url: '',
+                    is_verified_listener: true,
+                    bio_quote: appData.bio || '',
+                    bio_paragraphs: [],
+                    lived_experiences: (appData.lived_experiences || appData.tags || '').split(',').map(t=>t.trim()).filter(Boolean),
+                    overall_rating: 0,
+                    total_reviews: 0,
+                    reviews: [],
+                    is_published: false,
+                    mustChangePassword: true,
+                    application_id: currentAppId,
+                    created_at: serverTimestamp()
+                });
+            }
+
+            // Mark application as approved
+            await updateDoc(doc(db, collName, currentAppId), {
+                status: 'approved',
+                approved_at: serverTimestamp(),
+                provider_uid: newUid,
+                provider_email: email
+            });
+
+            // Show success state
+            document.getElementById('approveStep1').style.display = 'none';
+            document.getElementById('approveStep2').style.display = 'block';
+            document.getElementById('createdEmail').textContent = email;
+            document.getElementById('createdPass').textContent = tempPassword;
+
+            loadStats();
+
+        } catch(e) {
+            showToast('Error: ' + e.message, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+        }
+    };
+
+    // --- REJECT ---
+    window.openRejectModal = function(appId, appType) {
+        currentAppId = appId;
+        currentAppType = appType;
+        document.getElementById('rejectReason').value = '';
+        document.getElementById('rejectModal').classList.add('open');
+    };
+    window.closeRejectModal = function() {
+        document.getElementById('rejectModal').classList.remove('open');
+    };
+    window.confirmRejection = async function() {
+        const reason = document.getElementById('rejectReason').value;
+        const collName = currentAppType === 'psych' ? 'psych_applications' : 'peer_applications';
+        try {
+            await updateDoc(doc(db, collName, currentAppId), {
+                status: 'rejected',
+                rejection_reason: reason,
+                rejected_at: serverTimestamp()
+            });
+            document.getElementById('rejectModal').classList.remove('open');
+            showToast('Application rejected.', 'success');
+            loadApplications(currentTab);
+        } catch(e) {
+            showToast('Error: ' + e.message, 'error');
+        }
+    };
+
+    // --- TOGGLE PUBLISH ---
+    window.togglePublish = async function(uid, type, newState) {
+        const coll = type === 'psych' ? 'psychologists' : 'peers';
+        await updateDoc(doc(db, coll, uid), { is_published: newState });
+        showToast(`Profile ${newState ? 'published' : 'unpublished'}.`, 'success');
+        loadApplications('approved');
+    };
+
+    // --- SHOW TAB ---
+    window.showTab = function(tab) {
+        currentTab = tab;
+        ['psych','peer','approved'].forEach(t => {
+            document.getElementById(`tab${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.toggle('active', t === tab);
+        });
+        const titles = { psych: ['Psychologist Applications', 'Review incoming psychologist applications'], peer: ['Peer Applications', 'Review incoming peer applications'], approved: ['Approved Providers', 'Manage active provider profiles'] };
+        document.getElementById('pageTitle').textContent = titles[tab][0];
+        document.getElementById('pageSub').textContent = titles[tab][1];
+        loadApplications(tab);
+    };
+
+    // --- LOGOUT ---
+    window.handleLogout = async function() {
+        await signOut(auth);
+        window.location.href = '../auth/admin-login.html';
+    };
+
+    // --- HELPERS ---
+    function generatePassword() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#';
+        let pass = '';
+        for (let i = 0; i < 10; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+        return pass;
+    }
+
+    function escapeHTML(str) {
+        return String(str).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `toast show ${type}`;
+        setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // Make tab function available globally
+    window.showTab = window.showTab;
+</script>
+</body>
+</html>
