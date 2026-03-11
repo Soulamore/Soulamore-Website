@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychologist Profile | Soulamore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+    <style>
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30,41,59,0.7);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --alert-red: #ef4444;
+            --alert-red-bg: rgba(239,68,68,0.05);
+            --border-glass: rgba(255,255,255,0.1);
+            --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
+        }
+        * { box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--deep-space); color:var(--starlight); line-height:1.7; overflow-x:hidden; }
+        h1,h2,h3,h4 { font-family:'Outfit',sans-serif; }
+        .container { max-width:900px; margin:0 auto; padding:0 24px; position:relative; z-index:5; }
+        #particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+        .particle { position:absolute; background:white; border-radius:50%; opacity:0.15; animation:floatUp linear infinite; }
+        @keyframes floatUp { from{transform:translateY(100vh);} to{transform:translateY(-10vh);} }
+
+        .audio-ctrl {
+            position:fixed; top:90px; right:20px; z-index:999;
+            width:44px; height:44px; border-radius:50%;
+            background:rgba(255,255,255,0.08); backdrop-filter:blur(10px);
+            border:1px solid var(--border-glass); display:flex;
+            align-items:center; justify-content:center; cursor:pointer; transition:0.3s;
+        }
+        .audio-ctrl:hover { background:rgba(78,205,196,0.2); }
+
+        .fade-in { animation:fadeIn 0.8s ease-out forwards; opacity:0; transform:translateY(20px); }
+        @keyframes fadeIn { to{opacity:1;transform:translateY(0);} }
+
+        /* PROFILE HEADER */
+        .profile-header {
+            text-align:center; padding:60px 0 40px;
+        }
+        .avatar-ring {
+            display:inline-flex; align-items:center; justify-content:center;
+            width:110px; height:110px; border-radius:50%;
+            background:var(--gradient-primary);
+            padding:3px; margin-bottom:20px;
+        }
+        .profile-avatar {
+            width:100%; height:100%; border-radius:50%;
+            background:var(--deep-space); display:flex;
+            align-items:center; justify-content:center;
+            font-size:2.5rem; font-weight:700; color:var(--teal-glow);
+            overflow:hidden;
+        }
+        .profile-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+        .profile-name { font-size:2.2rem; font-weight:700; margin-bottom:8px; }
+        .profile-role { color:var(--teal-glow); font-size:1rem; margin-bottom:20px; opacity:0.9; }
+        .stats-row { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:24px; }
+        .stat-pill {
+            padding:6px 16px; border-radius:50px;
+            background:rgba(255,255,255,0.06); border:1px solid var(--border-glass);
+            font-size:0.82rem;
+        }
+        .book-btn {
+            display:inline-flex; align-items:center; gap:10px;
+            padding:14px 36px; border-radius:50px;
+            background:var(--gradient-primary); color:#0f172a;
+            font-weight:700; text-decoration:none; font-size:0.95rem;
+            transition:0.3s;
+        }
+        .book-btn:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(78,205,196,0.3); }
+
+        /* LAYOUT */
+        .content-grid { display:grid; grid-template-columns:1fr 340px; gap:24px; padding-bottom:80px; }
+        .glass-panel {
+            background:var(--navy-glass); border:1px solid var(--border-glass);
+            border-radius:20px; padding:28px; margin-bottom:20px;
+            backdrop-filter:blur(10px);
+        }
+        .panel-title {
+            font-size:0.85rem; font-weight:700; text-transform:uppercase;
+            letter-spacing:2px; opacity:0.7; margin-bottom:20px;
+            display:flex; align-items:center; gap:10px;
+        }
+        .panel-title i { color:var(--teal-glow); }
+        .bio-text { opacity:0.85; margin-bottom:16px; line-height:1.75; }
+        .bio-text:last-child { margin-bottom:0; }
+
+        /* AREAS OF FOCUS */
+        .credential-item { display:flex; gap:16px; margin-bottom:18px; }
+        .cred-icon {
+            width:42px; height:42px; border-radius:10px; flex-shrink:0;
+            background:rgba(78,205,196,0.1); display:flex;
+            align-items:center; justify-content:center; color:var(--teal-glow);
+        }
+        .cred-details h4 { font-size:0.95rem; margin-bottom:4px; }
+        .cred-details span { font-size:0.82rem; opacity:0.6; }
+
+        /* TESTIMONIALS */
+        .testi-box {
+            padding:20px; border-radius:14px;
+            background:rgba(255,255,255,0.04); margin-bottom:14px;
+            border:1px solid var(--border-glass);
+        }
+        .testi-box:last-child { margin-bottom:0; }
+        .quote-icon { font-size:1.5rem; color:var(--peach-glow); opacity:0.4; margin-bottom:10px; display:block; }
+
+        /* SIDEBAR */
+        .info-list { list-style:none; }
+        .info-list li { padding:14px 0; border-bottom:1px solid var(--border-glass); }
+        .info-list li:last-child { border-bottom:none; }
+        .info-label { display:block; font-size:0.78rem; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:8px; }
+        .info-val { font-size:0.9rem; font-weight:600; }
+        .tag-cloud { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+        .tag {
+            padding:3px 12px; border-radius:50px; font-size:0.78rem;
+            background:rgba(78,205,196,0.1); border:1px solid rgba(78,205,196,0.2);
+            color:var(--teal-glow);
+        }
+
+        /* BACK LINK */
+        .profile-nav { padding:20px 0 10px; }
+        .back-link { color:var(--teal-glow); text-decoration:none; font-size:0.9rem; opacity:0.8; }
+        .back-link:hover { opacity:1; }
+
+        /* SKELETON / LOADING */
+        .skeleton { background:rgba(255,255,255,0.07); border-radius:8px; animation:shimmer 1.5s infinite; }
+        @keyframes shimmer { 0%,100%{opacity:0.5} 50%{opacity:1} }
+        .error-state { text-align:center; padding:80px 20px; opacity:0.5; }
+        .error-state i { font-size:3rem; margin-bottom:16px; display:block; }
+
+        @media(max-width:768px) {
+            .content-grid { grid-template-columns:1fr; }
+            .profile-name { font-size:1.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+<audio id="bgAudio" loop></audio>
+<div class="audio-ctrl" onclick="toggleAudio()"><i class="fas fa-music"></i></div>
+<div id="particles"></div>
+
+<!-- GLOBAL HEADER INJECTION SITE -->
+<header></header>
+
+<div class="container fade-in" id="profileContainer">
+    <!-- Skeleton Loading State -->
+    <div class="profile-nav">
+        <a href="../psychologists/psychologist_listing.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Psychologists</a>
+    </div>
+    <div id="loadingState" style="padding:60px 0; text-align:center; opacity:0.5;">
+        <i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:16px; display:block; color:var(--teal-glow);"></i>
+        Loading profile...
+    </div>
+    <div id="errorState" class="error-state" style="display:none;">
+        <i class="fas fa-user-slash"></i>
+        Profile not found or not yet published.
+        <div style="margin-top:16px;"><a href="../psychologists/psychologist_listing.html" class="back-link">← Browse Psychologists</a></div>
+    </div>
+    <div id="profileContent" style="display:none;"></div>
+</div>
+
+<footer></footer>
+
+<script src="../assets/js/components.js"></script>
+<script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+        authDomain: "soulamore-f0a64.firebaseapp.com",
+        projectId: "soulamore-f0a64",
+        storageBucket: "soulamore-f0a64.firebasestorage.app",
+        messagingSenderId: "649985161002",
+        appId: "1:649985161002:web:66141929d4acd4451a5053"
+    };
+
+    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    function escapeHTML(str) {
+        return String(str || '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+
+    function escapeAttr(str) { return escapeHTML(str); }
+
+    async function loadProfile() {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+
+        if (!id) { showError(); return; }
+
+        try {
+            const snap = await getDoc(doc(db, 'psychologists', id));
+            if (!snap.exists() || !snap.data().is_published) { showError(); return; }
+            renderProfile(snap.data(), id);
+        } catch(e) {
+            console.error(e);
+            showError();
+        }
+    }
+
+    function renderProfile(d, uid) {
+        document.title = `${d.full_name || 'Psychologist'} | Soulamore`;
+
+        // Audio
+        if (d.background_audio_url) {
+            const audio = document.getElementById('bgAudio');
+            audio.src = d.background_audio_url;
+        }
+
+        // Avatar HTML
+        const avatarContent = d.avatar_url
+            ? `<img src="${escapeAttr(d.avatar_url)}" alt="${escapeAttr(d.full_name)}">`
+            : `<span>${escapeHTML(d.avatar_initial || (d.full_name||'A').charAt(0).toUpperCase())}</span>`;
+
+        // Stats pills
+        const approachTags = (d.approach_tags || []).slice(0,2).map(t =>
+            `<div class="stat-pill"><i class="fas fa-certificate"></i> ${escapeHTML(t)}</div>`
+        ).join('');
+        const langPill = d.languages ? `<div class="stat-pill"><i class="fas fa-language"></i> ${escapeHTML(d.languages)}</div>` : '';
+        const formatPill = d.session_format ? `<div class="stat-pill"><i class="fas fa-video"></i> ${escapeHTML(d.session_format)}</div>` : '';
+        const pricePill = d.pricing ? `<div class="stat-pill"><i class="fas fa-wallet"></i> ${escapeHTML(d.pricing)}</div>` : '';
+
+        // Bio paragraphs
+        const bioParagraphs = (d.bio_paragraphs || []).map(p => `<p class="bio-text">${escapeHTML(p)}</p>`).join('');
+
+        // Areas of focus
+        const aofHTML = (d.areas_of_focus || []).map(a => `
+            <div class="credential-item">
+                <div class="cred-icon"><i class="${escapeAttr(a.icon || 'fas fa-heart')}"></i></div>
+                <div class="cred-details">
+                    <h4>${escapeHTML(a.title)}</h4>
+                    <span>${escapeHTML(a.subtitle)}</span>
+                </div>
+            </div>`).join('');
+
+        // Testimonials
+        const testiHTML = (d.wall_of_love_testimonials || []).map(t => `
+            <div class="testi-box">
+                <i class="fas fa-quote-left quote-icon"></i>
+                <p style="font-style:italic; opacity:0.9; margin-bottom:14px;">${escapeHTML(t.quote)}</p>
+                <div style="text-align:right; font-weight:700; color:var(--peach-glow);">- ${escapeHTML(t.author_label)}</div>
+            </div>`).join('');
+
+        // Specializations
+        const specTags = (d.specializations || []).map(s => `<span class="tag">${escapeHTML(s)}</span>`).join('');
+
+        // Availability
+        const availHTML = d.accepting_new_clients
+            ? `<span class="info-val" style="color:#4ade80;"><i class="fas fa-circle" style="font-size:0.6rem;"></i> Accepting New Clients</span>`
+            : `<span class="info-val" style="color:#f87171;"><i class="fas fa-circle" style="font-size:0.6rem;"></i> Not Accepting New Clients</span>`;
+
+        const html = `
+        <div class="profile-header">
+            <div class="avatar-ring">
+                <div class="profile-avatar">${avatarContent}</div>
+            </div>
+            <h1 class="profile-name">${escapeHTML(d.full_name)}</h1>
+            <div class="profile-role">${escapeHTML(d.role_title)}</div>
+            <div class="stats-row">
+                ${approachTags}${langPill}${formatPill}${pricePill}
+            </div>
+            <a href="#book" class="book-btn"><i class="fas fa-calendar-check"></i> Book Appointment</a>
+        </div>
+
+        <div class="content-grid">
+            <div class="left-col">
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-user"></i> About Me</div>
+                    ${d.bio_quote ? `<p class="bio-text" style="font-style:italic; font-size:1.05rem;">"${escapeHTML(d.bio_quote)}"</p>` : ''}
+                    ${bioParagraphs || '<p class="bio-text" style="opacity:0.4;">Bio coming soon.</p>'}
+                </div>
+
+                ${(d.areas_of_focus || []).length ? `
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-briefcase"></i> Areas of Focus</div>
+                    ${aofHTML}
+                </div>` : ''}
+
+                ${(d.wall_of_love_testimonials || []).length ? `
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-comments"></i> Wall of Love</div>
+                    ${testiHTML}
+                </div>` : ''}
+            </div>
+
+            <div class="right-col">
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-info-circle"></i> Service Details</div>
+                    <ul class="info-list">
+                        ${specTags ? `<li><span class="info-label">Specializations</span><div class="tag-cloud">${specTags}</div></li>` : ''}
+                        <li><span class="info-label">Availability</span>${availHTML}</li>
+                        ${d.session_format ? `<li><span class="info-label">Session Format</span><span class="info-val">${escapeHTML(d.session_format)}</span></li>` : ''}
+                        ${d.years_of_experience ? `<li><span class="info-label">Experience</span><span class="info-val">${escapeHTML(d.years_of_experience)}</span></li>` : ''}
+                        ${d.pricing ? `<li><span class="info-label">Pricing</span><span class="info-val" style="color:var(--teal-glow);">${escapeHTML(d.pricing)}</span></li>` : ''}
+                    </ul>
+                </div>
+
+                <div class="glass-panel" style="background:var(--alert-red-bg); border-color:rgba(239,68,68,0.2);">
+                    <div class="panel-title" style="color:var(--alert-red); margin-bottom:12px;">
+                        <i class="fas fa-exclamation-triangle"></i> Crisis Policy
+                    </div>
+                    <p style="font-size:0.88rem; opacity:0.8; line-height:1.6;">
+                        Not available for 24/7 emergency support. If you are in immediate danger, please contact local emergency services (112) or iCall at 9152987821.
+                    </p>
+                </div>
+            </div>
+        </div>`;
+
+        document.getElementById('loadingState').style.display = 'none';
+        const content = document.getElementById('profileContent');
+        content.innerHTML = html;
+        content.style.display = 'block';
+    }
+
+    function showError() {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('errorState').style.display = 'block';
+    }
+
+    // Particles
+    const pc = document.getElementById('particles');
+    for (let i = 0; i < 25; i++) {
+        const p = document.createElement('div'); p.className = 'particle';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.width = Math.random() * 4 + 'px'; p.style.height = p.style.width;
+        p.style.animationDuration = Math.random() * 20 + 10 + 's';
+        pc.appendChild(p);
+    }
+
+    // Audio toggle
+    let audioPlaying = false;
+    window.toggleAudio = function() {
+        const a = document.getElementById('bgAudio');
+        if (!a.src) return;
+        audioPlaying ? a.pause() : (a.volume = 0.2, a.play());
+        audioPlaying = !audioPlaying;
+    };
+
+    loadProfile();
+</script>
+</body>
+</html>

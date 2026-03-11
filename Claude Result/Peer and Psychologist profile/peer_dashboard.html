@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard | Soulamore Peer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+    <style>
+        :root {
+            --deep-space: #0f172a;
+            --navy: #1e293b;
+            --navy-glass: rgba(30,41,59,0.9);
+            --starlight: #f1f5f9;
+            --teal: #4ECDC4;
+            --peach: #F49F75;
+            --gold: #fbbf24;
+            --green: #22c55e;
+            --red: #ef4444;
+            --border: rgba(255,255,255,0.1);
+        }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--deep-space); color:var(--starlight); min-height:100vh; }
+        h1,h2,h3,h4 { font-family:'Outfit',sans-serif; }
+
+        .sidebar {
+            position:fixed; top:0; left:0; width:240px; height:100vh;
+            background:var(--navy-glass); border-right:1px solid var(--border);
+            backdrop-filter:blur(20px); padding:30px 20px;
+            z-index:100; display:flex; flex-direction:column;
+        }
+        .sidebar-brand {
+            font-family:'Outfit',sans-serif; font-size:1.3rem; font-weight:700;
+            background:linear-gradient(135deg,var(--gold),var(--peach));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            margin-bottom:4px;
+        }
+        .sidebar-role { font-size:0.72rem; opacity:0.45; margin-bottom:30px; letter-spacing:2px; text-transform:uppercase; color:var(--gold); }
+        .nav-item {
+            display:flex; align-items:center; gap:12px;
+            padding:11px 16px; border-radius:10px; cursor:pointer;
+            font-size:0.88rem; transition:0.2s; color:var(--starlight);
+            background:none; border:none; text-align:left; width:100%; margin-bottom:3px;
+        }
+        .nav-item:hover, .nav-item.active { background:rgba(251,191,36,0.1); color:var(--gold); }
+        .nav-item i { width:16px; text-align:center; }
+        .nav-spacer { flex:1; }
+
+        .main { margin-left:240px; padding:30px; max-width:900px; }
+        .topbar { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:30px; }
+        .topbar-left h1 { font-size:1.6rem; margin-bottom:4px; }
+        .topbar-left p { opacity:0.5; font-size:0.88rem; }
+        .save-btn {
+            padding:12px 28px; background:linear-gradient(135deg,var(--gold),#d97706);
+            border:none; border-radius:12px; color:#0f172a;
+            font-weight:700; font-size:0.9rem; cursor:pointer; transition:0.2s;
+            display:flex; align-items:center; gap:8px;
+        }
+        .save-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(251,191,36,0.3); }
+        .save-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+        .section { margin-bottom:26px; }
+        .panel {
+            background:var(--navy-glass); border:1px solid var(--border);
+            border-radius:18px; padding:28px;
+        }
+        .panel-header {
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid var(--border);
+        }
+        .panel-title { font-size:1.05rem; font-weight:700; display:flex; align-items:center; gap:10px; }
+        .panel-title i { color:var(--gold); }
+
+        .field { display:flex; flex-direction:column; gap:6px; margin-bottom:18px; }
+        .field label { font-size:0.82rem; font-weight:600; opacity:0.7; }
+        .field input, .field textarea, .field select {
+            padding:11px 14px; background:rgba(255,255,255,0.05);
+            border:1px solid var(--border); border-radius:10px;
+            color:var(--starlight); font-family:'Plus Jakarta Sans',sans-serif;
+            font-size:0.9rem; outline:none; transition:0.2s; resize:vertical;
+        }
+        .field input:focus, .field textarea:focus { border-color:var(--gold); }
+        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+        .toggle-row {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:14px 0; border-bottom:1px solid var(--border);
+        }
+        .toggle-row:last-child { border-bottom:none; }
+        .toggle {
+            position:relative; width:48px; height:26px;
+            background:rgba(255,255,255,0.1); border-radius:50px; cursor:pointer; transition:0.3s; flex-shrink:0;
+        }
+        .toggle.on { background:var(--gold); }
+        .toggle::after {
+            content:''; position:absolute; width:20px; height:20px;
+            background:white; border-radius:50%; top:3px; left:3px; transition:0.3s;
+        }
+        .toggle.on::after { left:25px; }
+
+        .tag-input-area {
+            border:1px solid var(--border); border-radius:10px;
+            padding:10px; background:rgba(255,255,255,0.05);
+            display:flex; flex-wrap:wrap; gap:8px; min-height:50px; cursor:text;
+        }
+        .tag-chip {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:4px 12px; background:rgba(251,191,36,0.15);
+            border:1px solid rgba(251,191,36,0.3); color:var(--gold);
+            border-radius:50px; font-size:0.8rem; font-weight:600;
+        }
+        .tag-chip .remove { cursor:pointer; opacity:0.7; }
+        .tag-chip .remove:hover { opacity:1; }
+        .tag-input {
+            border:none; background:transparent; outline:none;
+            color:var(--starlight); font-size:0.85rem; flex:1; min-width:100px;
+            font-family:'Plus Jakarta Sans',sans-serif;
+        }
+
+        /* REVIEWS */
+        .rating-bar { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+        .rating-big { font-size:3rem; font-weight:700; font-family:'Outfit',sans-serif; color:var(--gold); }
+        .stars { color:var(--gold); font-size:1.2rem; }
+        .rating-count { opacity:0.5; font-size:0.85rem; margin-top:4px; }
+        .review-item {
+            padding:18px 0; border-bottom:1px solid var(--border);
+        }
+        .review-item:last-child { border-bottom:none; }
+        .review-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+        .review-author { font-weight:700; font-size:0.9rem; }
+        .review-stars { color:var(--gold); font-size:0.8rem; }
+        .review-text { font-size:0.88rem; opacity:0.7; line-height:1.6; font-style:italic; }
+        .review-date { font-size:0.75rem; opacity:0.4; margin-top:4px; }
+
+        .verified-badge {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:4px 12px; border-radius:50px; font-size:0.78rem; font-weight:600;
+            background:rgba(78,205,196,0.15); color:var(--teal);
+            border:1px solid rgba(78,205,196,0.3);
+        }
+
+        .status-bar {
+            display:flex; align-items:center; gap:12px;
+            padding:12px 20px; border-radius:12px;
+            background:rgba(255,255,255,0.03); border:1px solid var(--border);
+            margin-bottom:25px; font-size:0.85rem;
+        }
+        .status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+        .status-dot.published { background:var(--green); box-shadow:0 0 8px var(--green); }
+        .status-dot.draft { background:var(--gold); }
+        .profile-link { margin-left:auto; color:var(--gold); text-decoration:none; font-size:0.82rem; }
+        .profile-link:hover { text-decoration:underline; }
+
+        .avatar-upload-area {
+            width:72px; height:72px; border-radius:50%;
+            background:rgba(251,191,36,0.1); border:2px dashed rgba(251,191,36,0.4);
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; transition:0.2s; font-size:1.6rem; font-weight:700;
+            color:var(--gold); flex-shrink:0; position:relative; overflow:hidden;
+        }
+        .avatar-upload-area:hover { border-color:var(--gold); }
+        .avatar-upload-area img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; border-radius:50%; }
+
+        .toast {
+            position:fixed; bottom:30px; right:30px;
+            background:#1e293b; border:1px solid var(--border);
+            border-radius:12px; padding:14px 20px;
+            font-size:0.9rem; z-index:9999;
+            transform:translateY(100px); opacity:0; transition:0.3s;
+            display:flex; align-items:center; gap:10px;
+        }
+        .toast.show { transform:translateY(0); opacity:1; }
+        .toast.success { border-color:rgba(34,197,94,0.5); }
+        .toast.error { border-color:rgba(239,68,68,0.5); color:var(--red); }
+
+        @media(max-width:768px) {
+            .sidebar { display:none; }
+            .main { margin-left:0; }
+            .form-grid { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+    <div class="sidebar-brand">Soulamore</div>
+    <div class="sidebar-role">Peer Portal</div>
+    <button class="nav-item active"><i class="fas fa-user"></i> My Profile</button>
+    <button class="nav-item" onclick="document.getElementById('sec-bio').scrollIntoView({behavior:'smooth'})"><i class="fas fa-quote-left"></i> My Story</button>
+    <button class="nav-item" onclick="document.getElementById('sec-tags').scrollIntoView({behavior:'smooth'})"><i class="fas fa-tags"></i> Experience Tags</button>
+    <button class="nav-item" onclick="document.getElementById('sec-reviews').scrollIntoView({behavior:'smooth'})"><i class="fas fa-star"></i> Reviews</button>
+    <div class="nav-spacer"></div>
+    <button class="nav-item" style="color:var(--red);" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+    <div class="topbar">
+        <div class="topbar-left">
+            <h1>My Peer Dashboard</h1>
+            <p>Manage your public profile and availability</p>
+        </div>
+        <button class="save-btn" id="saveBtn" onclick="saveAll()">
+            <i class="fas fa-save"></i> Save Changes
+        </button>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+        <div class="status-dot draft" id="statusDot"></div>
+        <span id="statusText">Profile pending review</span>
+        <a class="profile-link" id="profileLink" href="#" target="_blank" style="display:none;">
+            <i class="fas fa-external-link-alt"></i> View My Profile
+        </a>
+    </div>
+
+    <!-- IDENTITY -->
+    <div class="section">
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title"><i class="fas fa-user-circle"></i> My Identity</div>
+                <span class="verified-badge"><i class="fas fa-check-circle"></i> Verified Listener</span>
+            </div>
+            <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+                <div class="avatar-upload-area" onclick="document.getElementById('avatarInput').click()" id="avatarArea">
+                    <span id="avatarInitial">?</span>
+                    <img id="avatarImg" src="" style="display:none;">
+                </div>
+                <div>
+                    <div style="font-size:0.82rem; opacity:0.5; margin-bottom:4px;">Upload profile photo (optional)</div>
+                    <div style="font-size:0.75rem; opacity:0.4;">JPG/PNG, max 2MB</div>
+                    <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this)">
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Display Name <span style="opacity:0.4;">(first name only is fine)</span></label>
+                    <input type="text" id="full_name" placeholder="e.g. Aditya">
+                </div>
+                <div class="field">
+                    <label>Availability Status</label>
+                    <select id="availability_status">
+                        <option value="Available Now">Available Now</option>
+                        <option value="Booking Required">Booking Required</option>
+                        <option value="Weekend Only">Weekend Only</option>
+                        <option value="Not Available">Not Available</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BIO -->
+    <div class="section" id="sec-bio">
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title"><i class="fas fa-quote-left"></i> My Story</div>
+            </div>
+            <div class="field">
+                <label>Opening Quote / Bio Tagline</label>
+                <input type="text" id="bio_quote" placeholder="e.g. I understand the silence of moving abroad. Here to listen.">
+            </div>
+            <div class="field">
+                <label>About Me — Paragraph 1</label>
+                <textarea id="bio_p1" rows="3" placeholder="Who you are and what led you here..."></textarea>
+            </div>
+            <div class="field">
+                <label>About Me — Paragraph 2 <span style="opacity:0.4;">(optional)</span></label>
+                <textarea id="bio_p2" rows="3" placeholder="What you can offer as a peer..."></textarea>
+            </div>
+            <div class="field">
+                <label>About Me — Paragraph 3 <span style="opacity:0.4;">(optional)</span></label>
+                <textarea id="bio_p3" rows="3" placeholder="A note about how you listen and hold space..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXPERIENCE TAGS -->
+    <div class="section" id="sec-tags">
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title"><i class="fas fa-tags"></i> Lived Experience Tags</div>
+            </div>
+            <p style="font-size:0.85rem; opacity:0.55; margin-bottom:16px;">Tags help people find you. Add what you personally understand — not what you've studied.</p>
+            <div class="tag-input-area" id="tagArea" onclick="document.getElementById('tagInput').focus()">
+                <input class="tag-input" id="tagInput" placeholder="Type a tag and press Enter..." onkeydown="handleTagInput(event)">
+            </div>
+            <div style="font-size:0.78rem; opacity:0.4; margin-top:8px;">e.g. Anxiety, Loneliness, Expat Life, Exam Pressure, Breakups, Workplace Stress</div>
+        </div>
+    </div>
+
+    <!-- AVAILABILITY TOGGLE -->
+    <div class="section">
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title"><i class="fas fa-calendar-check"></i> Availability</div>
+            </div>
+            <div class="toggle-row">
+                <div>
+                    <div style="font-size:0.9rem; font-weight:600;">Accepting New Connections</div>
+                    <div style="font-size:0.78rem; opacity:0.5; margin-top:2px;">Turn off when you need a break</div>
+                </div>
+                <div class="toggle" id="toggleAvail" onclick="toggleAvailability(this)"></div>
+            </div>
+            <div class="toggle-row">
+                <div>
+                    <div style="font-size:0.9rem; font-weight:600;">Show on Listing Page</div>
+                    <div style="font-size:0.78rem; opacity:0.5; margin-top:2px;">Temporarily hide your profile card</div>
+                </div>
+                <div class="toggle on" id="toggleVisible" onclick="toggleVisibility(this)"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="section" id="sec-reviews">
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title"><i class="fas fa-star"></i> My Reviews</div>
+            </div>
+            <div class="rating-bar">
+                <div class="rating-big" id="ratingNum">—</div>
+                <div>
+                    <div class="stars" id="starsDisplay">—</div>
+                    <div class="rating-count" id="reviewCount">No reviews yet</div>
+                </div>
+            </div>
+            <div id="reviewsList">
+                <div style="opacity:0.4; text-align:center; padding:30px;">No reviews yet. They'll appear here as clients leave feedback.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDxHa9CR8OVpDn9MObPCzbnsYTCWcTb-9k",
+        authDomain: "soulamore-f0a64.firebaseapp.com",
+        projectId: "soulamore-f0a64",
+        storageBucket: "soulamore-f0a64.firebasestorage.app",
+        messagingSenderId: "649985161002",
+        appId: "1:649985161002:web:66141929d4acd4451a5053"
+    };
+
+    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    let currentUid = null;
+    let liveTags = [];
+    let isAvailable = true;
+    let isVisible = true;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = '../auth/provider-login.html'; return; }
+        currentUid = user.uid;
+        await loadProfile();
+    });
+
+    async function loadProfile() {
+        try {
+            const snap = await getDoc(doc(db, 'peers', currentUid));
+            if (!snap.exists()) { showToast('Profile not found.', 'error'); return; }
+            const d = snap.data();
+
+            // Status bar
+            if (d.is_published) {
+                document.getElementById('statusDot').className = 'status-dot published';
+                document.getElementById('statusText').textContent = 'Your profile is live!';
+                const link = document.getElementById('profileLink');
+                link.href = `../profiles/peer-profile.html?id=${currentUid}`;
+                link.style.display = 'inline-flex';
+            }
+
+            // Avatar
+            document.getElementById('avatarInitial').textContent = (d.full_name || 'A').charAt(0).toUpperCase();
+            if (d.avatar_url) {
+                const img = document.getElementById('avatarImg');
+                img.src = d.avatar_url; img.style.display = 'block';
+            }
+
+            // Fields
+            document.getElementById('full_name').value = d.full_name || '';
+            document.getElementById('availability_status').value = d.availability_status || 'Available Now';
+            document.getElementById('bio_quote').value = d.bio_quote || '';
+
+            const paras = d.bio_paragraphs || [];
+            document.getElementById('bio_p1').value = paras[0] || '';
+            document.getElementById('bio_p2').value = paras[1] || '';
+            document.getElementById('bio_p3').value = paras[2] || '';
+
+            // Tags
+            liveTags = d.lived_experiences || [];
+            renderTagChips();
+
+            // Toggles
+            isAvailable = d.accepting_new_clients !== false;
+            isVisible = d.show_on_listing !== false;
+            if (isAvailable) document.getElementById('toggleAvail').classList.add('on');
+            if (isVisible) document.getElementById('toggleVisible').classList.add('on');
+
+            // Reviews
+            renderReviews(d);
+        } catch(e) {
+            showToast('Error: ' + e.message, 'error');
+        }
+    }
+
+    function renderReviews(d) {
+        const rating = d.overall_rating || 0;
+        const count = d.total_reviews || 0;
+        document.getElementById('ratingNum').textContent = rating ? rating.toFixed(1) : '—';
+        document.getElementById('reviewCount').textContent = count ? `${count} Review${count !== 1 ? 's' : ''}` : 'No reviews yet';
+
+        const stars = Math.round(rating);
+        document.getElementById('starsDisplay').innerHTML = Array.from({length:5},(_,i) =>
+            `<i class="fa${i < stars ? 's' : 'r'} fa-star"></i>`
+        ).join('');
+
+        const reviews = d.reviews || [];
+        const list = document.getElementById('reviewsList');
+        if (!reviews.length) return;
+        list.innerHTML = reviews.map(r => `
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="review-author">${escapeHTML(r.author || 'Anonymous')}</div>
+                    <div class="review-stars">${Array.from({length:5},(_,i) => `<i class="fa${i<(r.rating||5)?'s':'r'} fa-star"></i>`).join('')}</div>
+                </div>
+                <div class="review-text">"${escapeHTML(r.content || '')}"</div>
+                ${r.date ? `<div class="review-date">${new Date(r.date.toDate?.() || r.date).toLocaleDateString()}</div>` : ''}
+            </div>`).join('');
+    }
+
+    window.saveAll = async function() {
+        const btn = document.getElementById('saveBtn');
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        try {
+            const bioParagraphs = [
+                document.getElementById('bio_p1').value.trim(),
+                document.getElementById('bio_p2').value.trim(),
+                document.getElementById('bio_p3').value.trim()
+            ].filter(Boolean);
+
+            await updateDoc(doc(db, 'peers', currentUid), {
+                full_name: document.getElementById('full_name').value.trim(),
+                availability_status: document.getElementById('availability_status').value,
+                bio_quote: document.getElementById('bio_quote').value.trim(),
+                bio_paragraphs: bioParagraphs,
+                lived_experiences: liveTags,
+                accepting_new_clients: isAvailable,
+                show_on_listing: isVisible,
+                avatar_initial: (document.getElementById('full_name').value.trim() || 'A').charAt(0).toUpperCase()
+            });
+            showToast('✓ Profile saved!', 'success');
+        } catch(e) {
+            showToast('Save failed: ' + e.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+        }
+    };
+
+    window.handleTagInput = function(e) {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            const input = document.getElementById('tagInput');
+            const val = input.value.replace(',','').trim();
+            if (val && !liveTags.includes(val)) { liveTags.push(val); renderTagChips(); }
+            input.value = '';
+        }
+    };
+
+    function renderTagChips() {
+        const area = document.getElementById('tagArea');
+        const input = document.getElementById('tagInput');
+        area.querySelectorAll('.tag-chip').forEach(c => c.remove());
+        liveTags.forEach((tag, i) => {
+            const chip = document.createElement('span');
+            chip.className = 'tag-chip';
+            chip.innerHTML = `${escapeHTML(tag)} <span class="remove" onclick="removeTag(${i})">×</span>`;
+            area.insertBefore(chip, input);
+        });
+    }
+
+    window.removeTag = function(i) { liveTags.splice(i,1); renderTagChips(); };
+
+    window.toggleAvailability = function(el) { isAvailable = !isAvailable; el.classList.toggle('on', isAvailable); };
+    window.toggleVisibility = function(el) { isVisible = !isVisible; el.classList.toggle('on', isVisible); };
+
+    window.handleAvatarUpload = async function(input) {
+        const file = input.files[0];
+        if (!file || file.size > 2 * 1024 * 1024) { showToast('Image too large (max 2MB)', 'error'); return; }
+        try {
+            const storageRef = ref(storage, `avatars/peers/${currentUid}`);
+            await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(storageRef);
+            await updateDoc(doc(db, 'peers', currentUid), { avatar_url: url });
+            const img = document.getElementById('avatarImg');
+            img.src = url; img.style.display = 'block';
+            showToast('✓ Photo uploaded!', 'success');
+        } catch(e) { showToast('Upload failed: ' + e.message, 'error'); }
+    };
+
+    window.handleLogout = async function() { await signOut(auth); window.location.href = '../auth/provider-login.html'; };
+
+    function escapeHTML(str) { return String(str).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+    function showToast(msg, type='success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.className = `toast show ${type}`;
+        clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+    }
+</script>
+</body>
+</html>
