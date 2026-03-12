@@ -777,16 +777,18 @@
                     <div class="dash-card" style="grid-column: span 1; padding:20px;">
                         <h3 style="margin-bottom:15px; font-size:1.2rem;">
                             Upcoming Sessions</h3>
-                        <!-- Empty State Placeholder -->
-                        <div
-                            style="text-align:center; padding:20px; background:var(--bg-deep); border-radius:12px; border:1px dashed var(--border-subtle);">
-                            <i class="fas fa-calendar-check"
-                                style="font-size:1.5rem; opacity:0.3; margin-bottom:10px;"></i>
-                            <p style="opacity:0.7; font-size:0.9rem; margin-bottom:10px;">
-                                No upcoming sessions scheduled.</p><button
-                                onclick="window.location.href='../our-peers/about.html'" class="btn-dash-primary"
-                                style="font-size:0.85rem; padding:8px 20px;">Book
-                                a Session</button>
+                        <!-- Dynamic upcoming sessions list -->
+                        <div id="user-upcoming-sessions">
+                            <div
+                                style="text-align:center; padding:20px; background:var(--bg-deep); border-radius:12px; border:1px dashed var(--border-subtle);">
+                                <i class="fas fa-calendar-check"
+                                    style="font-size:1.5rem; opacity:0.3; margin-bottom:10px;"></i>
+                                <p style="opacity:0.7; font-size:0.9rem; margin-bottom:10px;">
+                                    No upcoming sessions scheduled.</p><button
+                                    onclick="window.location.href='../our-peers/index.html'" class="btn-dash-primary"
+                                    style="font-size:0.85rem; padding:8px 20px;">Book
+                                    a Session</button>
+                            </div>
                         </div>
                     </div>
                     <!-- SIDEBAR: FIND HELP -->
@@ -1258,6 +1260,7 @@
             <script type="module">
                 import { onAuthChange } from "../assets/js/auth-service.js";
                 import { getUserProfile, createOrUpdateUserProfile } from "../assets/js/profile-handler.js";
+                import { getUserBookings } from "../assets/js/peer-booking-handler.js";
 
                 // Hydrate dashboard UI whenever auth state changes
                 onAuthChange(async (user) => {
@@ -1321,6 +1324,44 @@
 
                         const elEmail2 = document.getElementById('profile-email2');
                         if (elEmail2) elEmail2.innerText = email;
+
+                        // 4. Upcoming sessions for this user
+                        try {
+                            const bookings = await getUserBookings(user.uid);
+                            const container = document.getElementById('user-upcoming-sessions');
+                            if (container) {
+                                if (!bookings || bookings.length === 0) {
+                                    // keep default empty state
+                                } else {
+                                    container.innerHTML = bookings
+                                        .filter(b => b.status === "confirmed" || b.status === "pending_payment")
+                                        .sort((a, b) => (a.startTime || 0) - (b.startTime || 0))
+                                        .slice(0, 5)
+                                        .map(b => {
+                                            const start = b.startTime ? new Date(b.startTime) : null;
+                                            const when = start ? start.toLocaleString() : "TBD";
+                                            const label = b.planType === "per_session" ? "1:1 Session" : (b.planType || "Session");
+                                            return `
+                                                <div class="dash-card" style="margin-bottom:12px; padding:15px; background:var(--bg-deep); border-radius:12px; border:1px solid var(--border-subtle);">
+                                                    <div style="font-size:0.85rem; opacity:0.7; margin-bottom:4px;">${when}</div>
+                                                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                                                        <div>
+                                                            <div style="font-family:'Outfit'; font-size:1rem; margin-bottom:2px;">${label}</div>
+                                                            <div style="font-size:0.8rem; opacity:0.65;">with ${b.peerName || "your listener"}</div>
+                                                        </div>
+                                                        <span style="font-size:0.75rem; padding:4px 10px; border-radius:999px; border:1px solid var(--border-subtle);">
+                                                            ${b.status === "pending_payment" ? "Pending payment" : "Confirmed"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            `;
+                                        })
+                                        .join("");
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Failed to load user bookings:", e);
+                        }
 
                     } catch (error) {
                         console.error("Dashboard hydration error:", error);
