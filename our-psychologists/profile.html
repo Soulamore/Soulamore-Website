@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -295,6 +295,9 @@
                         </li>
                     </ul>
                 </div>
+
+                <!-- Booking Widget Mount Point -->
+                <div id="booking-widget-root"></div>
             </div>
         </div>
     </div>
@@ -302,6 +305,7 @@
     <!-- LOGIC -->
     <script type="module">
         import { getUserProfile } from "../assets/js/profile-handler.js";
+        import { initBookingWidget } from "../assets/js/booking-widget.js";
 
         document.addEventListener('DOMContentLoaded', async () => {
             const params = new URLSearchParams(window.location.search);
@@ -315,7 +319,7 @@
             try {
                 const p = await getUserProfile(uid);
                 if (p) {
-                    renderProfile(p);
+                    renderProfile(p, uid);
                 } else {
                     showError();
                 }
@@ -325,7 +329,7 @@
             }
         });
 
-        function renderProfile(p) {
+        function renderProfile(p, uid) {
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('profile-content').classList.remove('hidden');
 
@@ -353,6 +357,17 @@
             renderTags('d-style-tags', p.therapeuticStyle, 'style-tag');
             renderTags('d-expertise-tags', p.expertise);
             renderTags('d-values-tags', p.values);
+
+            // Initialize booking widget for this psychologist
+            try {
+                initBookingWidget({
+                    peerId: uid,
+                    rootId: "booking-widget-root",
+                    providerName: p.displayName || p.title || "Psychologist"
+                });
+            } catch (e) {
+                console.error("Failed to init booking widget:", e);
+            }
         }
 
         function renderTags(containerId, tags, extraClass = '') {
