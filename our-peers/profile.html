@@ -476,8 +476,12 @@
                 </div>
             </div>
 
+            <!-- 6. BOOKING -->
+            <div id="booking-widget-root" class="soft-card fade-in">
+                <!-- Booking widget is injected here when available -->
+            </div>
 
-            <!-- 6. BOUNDARIES -->
+            <!-- 7. BOUNDARIES -->
             <div class="boundary-box fade-in">
                 <h4 style="margin-bottom:10px; color:var(--text-main);">A gentle note on boundaries</h4>
                 <p id="pBound" style="font-size:0.95rem;">
@@ -485,7 +489,7 @@
                 </p>
             </div>
 
-            <!-- 7. CTA -->
+            <!-- 8. CTA -->
             <div class="cta-section fade-in">
                 <button class="primary-btn" onclick="startChat()">Start a Conversation</button>
                 <br>
@@ -510,6 +514,7 @@
         import { db, auth } from "../assets/js/firebase-config.js";
         import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initBookingWidget } from "../assets/js/booking-widget.js";
 
         // Global State
         let currentUser = null;
@@ -610,7 +615,7 @@
 
             // Render or Fail
             if (profile) {
-                renderProfile(profile);
+                renderProfile(profile, id);
                 document.getElementById('loadingState').style.display = 'none';
                 document.getElementById('profileContent').style.display = 'block';
             } else {
@@ -618,7 +623,7 @@
             }
         });
 
-        function renderProfile(p) {
+        function renderProfile(p, id) {
             document.getElementById('pName').innerText = p.name;
             document.getElementById('pRole').innerText = p.role;
             document.getElementById('pQuote').innerText = p.quote;
@@ -673,6 +678,17 @@
 
             // Reviews
             renderReviews(p.reviews || []);
+
+            // Initialize booking widget for this peer
+            try {
+                initBookingWidget({
+                    peerId: id,
+                    rootId: "booking-widget-root",
+                    providerName: p.name || "Peer Listener"
+                });
+            } catch (e) {
+                console.error("Failed to init booking widget (peer):", e);
+            }
         }
 
         function renderReviews(reviews) {

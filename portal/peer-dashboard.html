@@ -828,57 +828,18 @@
 
                 <!-- Upcoming Sessions Grid -->
                 <h3 style="margin-bottom:20px; opacity:0.8;">Upcoming</h3>
-                <div class="dashboard-grid"
+                <div id="peer-upcoming-sessions" class="dashboard-grid"
                     style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:25px; margin-bottom:40px; padding-right:20px;">
-
-                    <!-- SESSION CARD 1 (Active) -->
                     <div class="dash-card"
-                        style="border-left:4px solid var(--accent-theme); position:relative; overflow:hidden;">
-                        <!-- Status Badge -->
-                        <div
-                            style="position:absolute; top:20px; right:20px; background:var(--accent-theme-soft); color:var(--accent-theme); padding:4px 10px; border-radius:4px; font-size:0.75rem; font-weight:700; border:1px solid rgba(244, 159, 117, 0.2);">
-                            STARTING SOON
-                        </div>
-
-                        <div style="margin-bottom:15px;">
-                            <div style="font-size:0.85rem; opacity:0.6; margin-bottom:5px;">Today, 10:45 AM</div>
-                            <h3 style="font-family:'Outfit'; font-size:1.3rem;">Weekly Check-in</h3>
-                            <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
-                                <div
-                                    style="width:24px; height:24px; background:var(--bg-deep); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem;">
-                                    SC</div>
-                                <span style="font-size:0.9rem; opacity:0.8;">with Sarah Chen</span>
-                            </div>
-                        </div>
-
-                        <div style="display:flex; gap:10px;">
-                            <button onclick="window.open('video-conference.html', '_blank')" class="btn-dash-primary"
-                                style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px;">
-                                <i class="fas fa-video"></i> Join Now
-                            </button>
-                            <button class="btn-dash-secondary" style="padding:10px 15px;"><i
-                                    class="fas fa-calendar-alt"></i></button>
-                        </div>
+                        style="text-align:center; padding:20px; background:var(--bg-deep); border-radius:12px; border:1px dashed var(--border-subtle); grid-column:1/-1;">
+                        <i class="fas fa-calendar-check"
+                            style="font-size:1.5rem; opacity:0.3; margin-bottom:10px;"></i>
+                        <p style="opacity:0.7; font-size:0.9rem; margin-bottom:10px;">
+                            No upcoming sessions yet.
+                        </p>
+                        <p style="opacity:0.6; font-size:0.8rem;">Once users book a session with you, they will appear
+                            here.</p>
                     </div>
-
-                    <!-- SESSION CARD 2 -->
-                    <div class="dash-card">
-                        <div style="margin-bottom:15px;">
-                            <div style="font-size:0.85rem; opacity:0.6; margin-bottom:5px;">Tomorrow, 2:00 PM</div>
-                            <h3 style="font-family:'Outfit'; font-size:1.3rem;">Anxiety Management</h3>
-                            <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
-                                <div
-                                    style="width:24px; height:24px; background:var(--bg-deep); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem;">
-                                    JD</div>
-                                <span style="font-size:0.9rem; opacity:0.8;">with John Doe</span>
-                            </div>
-                        </div>
-                        <button disabled
-                            style="width:100%; background:var(--bg-subtle); border:1px solid var(--border-subtle); color:var(--text-muted); padding:10px; border-radius:8px; cursor:not-allowed;">
-                            Starts in 24h
-                        </button>
-                    </div>
-
                 </div>
             </div>
 
@@ -1584,6 +1545,57 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                 }
             });
         }
+    </script>
+    <script type="module">
+        import { auth } from "../assets/js/firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getPeerBookings } from "../assets/js/peer-booking-handler.js";
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) return;
+            try {
+                const bookings = await getPeerBookings(user.uid);
+                const container = document.getElementById('peer-upcoming-sessions');
+                if (!container) return;
+
+                if (!bookings || bookings.length === 0) {
+                    // keep default empty state
+                    return;
+                }
+
+                container.innerHTML = bookings
+                    .filter(b => b.status === "confirmed" || b.status === "pending_payment")
+                    .sort((a, b) => (a.startTime || 0) - (b.startTime || 0))
+                    .slice(0, 6)
+                    .map(b => {
+                        const start = b.startTime ? new Date(b.startTime) : null;
+                        const when = start ? start.toLocaleString() : "TBD";
+                        const label = b.planType === "per_session" ? "1:1 Session" : (b.planType || "Session");
+                        return `
+                            <div class="dash-card"
+                                style="position:relative; overflow:hidden; border-left:4px solid var(--accent-theme);">
+                                <div style="margin-bottom:15px;">
+                                    <div style="font-size:0.85rem; opacity:0.6; margin-bottom:5px;">${when}</div>
+                                    <h3 style="font-family:'Outfit'; font-size:1.1rem;">${label}</h3>
+                                    <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+                                        <div
+                                            style="width:24px; height:24px; background:var(--bg-deep); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem;">
+                                            ${(b.userName || 'User').charAt(0).toUpperCase()}
+                                        </div>
+                                        <span style="font-size:0.9rem; opacity:0.8;">with ${b.userName || 'User'}</span>
+                                    </div>
+                                </div>
+                                <span style="position:absolute; top:16px; right:16px; font-size:0.75rem; padding:4px 10px; border-radius:999px; border:1px solid var(--border-subtle);">
+                                    ${b.status === "pending_payment" ? "Pending payment" : "Confirmed"}
+                                </span>
+                            </div>
+                        `;
+                    })
+                    .join("");
+            } catch (e) {
+                console.error("Failed to load peer bookings:", e);
+            }
+        });
     </script>
 
     <!-- FLOATING TOOLS & SOULBOT -->
