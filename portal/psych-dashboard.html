@@ -985,12 +985,17 @@
 
                             <!-- Actions -->
                             <div
-                                style="display:flex; gap:15px; border-top:1px solid var(--border-subtle); padding-top:20px;">
+                                style="display:flex; flex-wrap:wrap; gap:15px; border-top:1px solid var(--border-subtle); padding-top:20px;">
                                 <button class="btn-dash-primary" style="padding:10px 25px; font-size:0.95rem;">Save
                                     Changes</button>
                                 <button class="btn-dash-secondary"
                                     style="background:transparent; border:1px solid var(--border-subtle); color:var(--text-muted); padding:10px 20px; border-radius:50px; cursor:pointer;"
                                     onclick="alert('Password reset link sent.')">Change Password</button>
+                                <a id="psych-public-profile-link"
+                                    style="background:transparent; border:1px solid var(--border-subtle); color:var(--teal-accent); padding:10px 20px; border-radius:50px; cursor:pointer; text-decoration:none; font-size:0.9rem;"
+                                    href="../our-psychologists/profile.html" target="_blank">
+                                    <i class="fas fa-external-link-alt"></i> View / Edit Public Profile
+                                </a>
                             </div>
                         </div>
 
@@ -1336,6 +1341,20 @@
             loadAvailabilityPsych();
         }
     };
+</script>
+
+<!-- Link psych dashboard to public profile -->
+<script type="module">
+    import { auth } from "../assets/js/firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) return;
+        const link = document.getElementById('psych-public-profile-link');
+        if (link) {
+            link.href = `../our-psychologists/profile.html?id=${encodeURIComponent(user.uid)}`;
+        }
+    });
 </script>
 
 <!-- VIEW: JOURNAL (Enhanced Standard) -->
