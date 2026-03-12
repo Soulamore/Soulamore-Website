@@ -41,6 +41,20 @@
         session = null;
     }
 
+    const isUserDashboard =
+        currentPath.includes('user-dashboard') || currentPath.includes('/portal/user-dashboard');
+
+    // If we are on the general user dashboard and we can see a recent
+    // Firebase/session-based login signal, allow the page to load and
+    // rely on in-page auth handling instead of hard-redirecting.
+    if (isUserDashboard) {
+        const hasSessionUser = !!sessionStorage.getItem('user');
+        if ((session && session.isLoggedIn) || hasSessionUser) {
+            console.log('✅ User dashboard: relaxed guard active (session or sessionStorage user found).');
+            return;
+        }
+    }
+
     // 2. Is Logged In Check
     // Don't hard-redirect yet; Firebase may still restore auth state asynchronously.
     if (!session || !session.isLoggedIn) {
@@ -48,7 +62,6 @@
     }
 
     // 3. Role-Based Access Control (RBAC)
-    const currentPath = window.location.pathname;
 
     // Define requirements
     // Note: Matches parts of the filename
