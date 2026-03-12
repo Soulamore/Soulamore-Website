@@ -113,6 +113,25 @@ export async function updateUserProfile(uid, updates) {
             updatedAt: serverTimestamp()
         });
         console.log('Profile updated successfully');
+
+        // Keep roles collection in sync when role changes so dashboards
+        // and guards correctly recognize peers and psychologists.
+        if (updates.role) {
+            const roleValue = (updates.role || "").toString().toLowerCase();
+            const rolesRef = doc(db, "roles", uid);
+            const roleFlags = {};
+
+            if (roleValue === "psychologist") {
+                roleFlags.psychologist = true;
+            } else if (roleValue === "peer") {
+                roleFlags.peer = true;
+            }
+
+            if (Object.keys(roleFlags).length > 0) {
+                await setDoc(rolesRef, roleFlags, { merge: true });
+            }
+        }
+
         return true;
     } catch (error) {
         console.error('Error updating profile:', error);
