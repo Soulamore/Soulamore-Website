@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dynamic psychologist profile on Soulamore.">
     <title>Psychologist Profile | Soulamore</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
@@ -11,36 +12,99 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/global.css">
     <style>
-        /* Reusing styles from bhagyavathi.html for consistency */
         :root {
             --deep-space: #0f172a;
             --navy-glass: rgba(30, 41, 59, 0.7);
+            --starlight: #f1f5f9;
             --teal-glow: #4ECDC4;
             --peach-glow: #F49F75;
+            --alert-red: #ef4444;
             --border-glass: rgba(255, 255, 255, 0.1);
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--deep-space);
-            color: #f1f5f9;
+            color: var(--starlight);
             line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 48px 24px 100px;
             position: relative;
-            z-index: 5;
+            z-index: 2;
         }
 
-        /* HEADER */
+        .hidden {
+            display: none;
+        }
+
+        .loader {
+            text-align: center;
+            padding: 120px 24px;
+            opacity: 0.75;
+        }
+
+        #particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            opacity: 0.18;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        .profile-nav {
+            padding: 16px 0 24px;
+        }
+
+        .back-link {
+            color: var(--starlight);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.72;
+            transition: 0.25s;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+            color: var(--teal-glow);
+        }
+
         .profile-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 36px;
+            position: relative;
             background: linear-gradient(180deg, rgba(30, 41, 59, 0) 0%, rgba(30, 41, 59, 0.5) 100%);
-            padding-bottom: 40px;
+            padding: 0 0 40px;
             border-bottom: 1px solid var(--border-glass);
             border-radius: 0 0 40px 40px;
         }
@@ -65,19 +129,11 @@
             font-size: 3.5rem;
             color: white;
             font-weight: 700;
-            overflow: hidden;
-        }
-
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
         }
 
         .profile-name {
-            font-family: 'Outfit', sans-serif;
             font-size: 3rem;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
 
         .profile-role {
@@ -89,13 +145,12 @@
             margin-bottom: 20px;
         }
 
-        /* STATS */
         .stats-row {
             display: flex;
             justify-content: center;
             gap: 15px;
             flex-wrap: wrap;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
 
         .stat-pill {
@@ -104,7 +159,7 @@
             padding: 8px 18px;
             border-radius: 50px;
             font-size: 0.9rem;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
         }
@@ -114,41 +169,67 @@
         }
 
         .book-btn {
-            background: var(--teal-glow);
+            background: linear-gradient(135deg, var(--teal-glow), #2a9d8f);
             color: var(--deep-space);
             padding: 14px 40px;
             border-radius: 50px;
             font-weight: 700;
             text-decoration: none;
             display: inline-block;
-            transition: 0.3s;
+            transition: 0.25s;
         }
 
         .book-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 20px rgba(78, 205, 196, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 0 24px rgba(78, 205, 196, 0.35);
         }
 
-        /* CONTENT */
+        .profile-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 0 0 32px;
+        }
+
+        .profile-tab {
+            border: 1px solid var(--border-glass);
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(241, 245, 249, 0.82);
+            border-radius: 999px;
+            padding: 10px 18px;
+            font: inherit;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .profile-tab.active,
+        .profile-tab:hover {
+            background: rgba(78, 205, 196, 0.14);
+            color: var(--starlight);
+            border-color: rgba(78, 205, 196, 0.4);
+        }
+
         .content-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 40px;
-            margin-bottom: 80px;
+            gap: 32px;
+            margin-bottom: 60px;
         }
 
         .glass-panel {
             background: var(--navy-glass);
             border: 1px solid var(--border-glass);
-            padding: 40px;
+            padding: 34px;
             border-radius: 24px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .panel-title {
-            font-family: 'Outfit';
-            font-size: 1.4rem;
-            margin-bottom: 25px;
+            font-size: 1.35rem;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -158,12 +239,21 @@
             color: var(--teal-glow);
         }
 
-        .bio-text {
-            font-size: 1.1rem;
-            opacity: 0.8;
-            margin-bottom: 20px;
+        .panel-subtitle {
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+        }
+
+        .section-intro,
+        .bio-text,
+        .notice-copy {
+            opacity: 0.84;
             line-height: 1.8;
-            white-space: pre-wrap;
+        }
+
+        .bio-text {
+            font-size: 1.06rem;
+            margin-bottom: 18px;
         }
 
         .tag-cloud {
@@ -174,27 +264,130 @@
 
         .tag {
             background: rgba(255, 255, 255, 0.05);
-            padding: 5px 12px;
-            border-radius: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
             font-size: 0.85rem;
             border: 1px solid var(--border-glass);
         }
 
-        .tag.style-tag {
-            border-color: var(--peach-glow);
+        .style-tag {
+            border-color: rgba(244, 159, 117, 0.45);
             color: var(--peach-glow);
             background: rgba(244, 159, 117, 0.1);
         }
 
-        .loader {
-            text-align: center;
-            padding: 100px;
-            font-size: 1.5rem;
-            opacity: 0.7;
+        .session-note {
+            font-size: 1rem;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            font-style: italic;
+            opacity: 0.82;
         }
 
-        .hidden {
-            display: none;
+        .credential-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .cred-icon {
+            background: rgba(78, 205, 196, 0.1);
+            color: var(--teal-glow);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .cred-details h4 {
+            margin-bottom: 2px;
+            font-size: 1rem;
+        }
+
+        .cred-details span {
+            font-size: 0.88rem;
+            opacity: 0.68;
+            display: block;
+        }
+
+        .testi-box {
+            background: linear-gradient(135deg, rgba(244, 159, 117, 0.1), rgba(0, 0, 0, 0));
+            border: 1px solid rgba(244, 159, 117, 0.4);
+            padding: 30px;
+            border-radius: 20px;
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .quote-icon {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: var(--deep-space);
+            color: var(--peach-glow);
+            padding: 0 10px;
+            font-size: 1.5rem;
+        }
+
+        .quote-text {
+            font-style: italic;
+            opacity: 0.92;
+            margin-bottom: 15px;
+        }
+
+        .quote-author {
+            text-align: right;
+            font-weight: 700;
+            color: var(--peach-glow);
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .info-list li:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            opacity: 0.56;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .info-val {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .status-success {
+            color: #4ade80;
+        }
+
+        .notice-alert {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .notice-title {
+            color: var(--alert-red);
+            margin-bottom: 14px;
+            font-size: 1.1rem;
         }
 
         @media (max-width: 900px) {
@@ -206,185 +399,59 @@
                 font-size: 2.2rem;
             }
         }
-</style>
+    </style>
     <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
 </head>
 
 <body>
+    <div id="particles"></div>
 
-    <div id="loading" class="loader"><i class="fas fa-spinner fa-spin"></i> Loading Profile...</div>
+    <div id="loading" class="loader"><i class="fas fa-spinner fa-spin"></i> Loading profile...</div>
     <div id="error-msg" class="loader hidden" style="color:var(--alert-red);">Profile not found.</div>
+    <div id="profile-content" class="container hidden"></div>
 
-    <div id="profile-content" class="container hidden" style="margin-top: 50px;">
-        <!-- NAV -->
-        <nav style="margin-bottom: 20px;">
-            <a href="psychologists.html" style="color:white; text-decoration:none; opacity:0.7;"><i
-                    class="fas fa-arrow-left"></i> Back to Psychologists</a>
-        </nav>
-
-        <!-- HEADER -->
-        <div class="profile-header">
-            <div class="avatar-ring">
-                <div class="profile-avatar" id="d-avatar"></div>
-            </div>
-            <h1 class="profile-name" id="d-name">Name</h1>
-            <div class="profile-role" id="d-role">Psychologist</div>
-
-            <div class="stats-row">
-                <div class="stat-pill" id="d-exp-pill"><i class="fas fa-user-md"></i> <span id="d-title">Title</span>
-                </div>
-                <div class="stat-pill"><i class="fas fa-language"></i> <span id="d-langs">English</span></div>
-                <div class="stat-pill"><i class="fas fa-video"></i> Online</div>
-                <div class="stat-pill"><i class="fas fa-wallet"></i> <span id="d-fee">0</span> / Session</div>
-            </div>
-
-            <a href="#book" class="book-btn">Book Appointment</a>
-        </div>
-
-        <!-- MAIN LAYOUT -->
-        <div class="content-grid">
-            <div class="left-col">
-                <!-- BIO -->
-                <div class="glass-panel">
-                    <div class="panel-title"><i class="fas fa-user"></i> About Me</div>
-                    <div class="bio-text" id="d-bio"></div>
-                </div>
-
-                <!-- STYLE & EXPECTATIONS (SWOT) -->
-                <div class="glass-panel">
-                    <div class="panel-title"><i class="fas fa-feather-alt"></i> Therapeutic Style</div>
-                    <p style="opacity:0.7; margin-bottom:15px;">How I work with clients:</p>
-                    <div class="tag-cloud" id="d-style-tags" style="margin-bottom:30px;">
-                        <!-- Injected -->
-                    </div>
-
-                    <div class="panel-title" style="font-size:1.2rem;"><i class="fas fa-door-open"></i> First Session
-                    </div>
-                    <p class="bio-text"
-                        style="font-size:1rem; padding: 15px; background:var(--bg-subtle); border-radius:10px; font-style:italic;"
-                        id="d-first-session">
-                        <!-- Injected -->
-                    </p>
-                </div>
-
-                <!-- EXPERTISE -->
-                <div class="glass-panel">
-                    <div class="panel-title"><i class="fas fa-brain"></i> Areas of Expertise</div>
-                    <div class="tag-cloud" id="d-expertise-tags">
-                        <!-- Injected -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- SIDEBAR -->
-            <div class="right-col">
-                <div class="glass-panel">
-                    <div class="panel-title"><i class="fas fa-info-circle"></i> Details</div>
-                    <ul style="list-style:none; padding:0;">
-                        <li
-                            style="margin-bottom:15px; border-bottom:1px solid var(--border-glass); padding-bottom:15px;">
-                            <span
-                                style="display:block; font-size:0.8rem; opacity:0.5; text-transform:uppercase;">License</span>
-                            <span id="d-license">--</span>
-                        </li>
-                        <li
-                            style="margin-bottom:15px; border-bottom:1px solid var(--border-glass); padding-bottom:15px;">
-                            <span
-                                style="display:block; font-size:0.8rem; opacity:0.5; text-transform:uppercase;">Values</span>
-                            <div class="tag-cloud" id="d-values-tags" style="margin-top:5px;"></div>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Booking Widget Mount Point -->
-                <div id="booking-widget-root"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- LOGIC -->
     <script type="module">
+        import { resolvePsychologistProfile, mapPsychologistRecordToProfile } from "../assets/js/profile-catalog.js";
+        import { mountPsychologistProfile } from "../assets/js/profile-renderers.js";
         import { getUserProfile } from "../assets/js/profile-handler.js";
         import { initBookingWidget } from "../assets/js/booking-widget.js";
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const params = new URLSearchParams(window.location.search);
-            const uid = params.get('id');
+        const params = new URLSearchParams(window.location.search);
+        const key = params.get('slug') || params.get('id') || 'bhagyavathi';
 
-            if (!uid) {
-                showError();
-                return;
+        const root = document.getElementById('profile-content');
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('error-msg');
+
+        async function init() {
+            let profile = resolvePsychologistProfile(key);
+
+            if (!profile && params.get('id')) {
+                const record = await getUserProfile(params.get('id'));
+                profile = mapPsychologistRecordToProfile(record, params.get('id'));
             }
 
-            try {
-                const p = await getUserProfile(uid);
-                if (p) {
-                    renderProfile(p, uid);
-                } else {
-                    showError();
-                }
-            } catch (e) {
-                console.error(e);
-                showError();
-            }
+            mountPsychologistProfile({ profile, root, loadingEl, errorEl });
+        }
+
+        init().catch((error) => {
+            console.error(error);
+            loadingEl.classList.add('hidden');
+            errorEl.classList.remove('hidden');
         });
 
-        function renderProfile(p, uid) {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('profile-content').classList.remove('hidden');
-
-            // Header
-            document.getElementById('d-name').innerText = p.displayName || 'Psychologist';
-            document.getElementById('d-role').innerText = p.title || 'Psychologist';
-            document.getElementById('d-title').innerText = p.qualification || 'Certified';
-            document.getElementById('d-langs').innerText = Array.isArray(p.languages) ? p.languages.join(', ') : (p.languages || 'English');
-            document.getElementById('d-fee').innerText = p.sessionFee ? `₹${p.sessionFee}` : 'Contract';
-
-            // Avatar
-            const avatarEl = document.getElementById('d-avatar');
-            if (p.photoURL) {
-                avatarEl.innerHTML = `<img src="${p.photoURL}" alt="${p.displayName}">`;
-            } else {
-                avatarEl.innerText = (p.displayName || 'P').charAt(0).toUpperCase();
-            }
-
-            // Main Content
-            document.getElementById('d-bio').innerText = p.bio || 'No bio available.';
-            document.getElementById('d-first-session').innerText = p.firstSessionExpectations || 'We will get to know each other.';
-            document.getElementById('d-license').innerText = p.licenseNumber || 'Verified';
-
-            // Arrays
-            renderTags('d-style-tags', p.therapeuticStyle, 'style-tag');
-            renderTags('d-expertise-tags', p.expertise);
-            renderTags('d-values-tags', p.values);
-
-            // Initialize booking widget for this psychologist
-            try {
-                initBookingWidget({
-                    peerId: uid,
-                    rootId: "booking-widget-root",
-                    providerName: p.displayName || p.title || "Psychologist"
-                });
-            } catch (e) {
-                console.error("Failed to init booking widget:", e);
-            }
-        }
-
-        function renderTags(containerId, tags, extraClass = '') {
-            const container = document.getElementById(containerId);
-            if (!tags || tags.length === 0) {
-                container.innerHTML = '<span style="opacity:0.5;">None listed</span>';
-                return;
-            }
-            container.innerHTML = tags.map(t => `<span class="tag ${extraClass}">${t}</span>`).join('');
-        }
-
-        function showError() {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('error-msg').classList.remove('hidden');
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 28; i += 1) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = `${Math.random() * 100}vw`;
+            particle.style.width = `${Math.random() * 3 + 1}px`;
+            particle.style.height = particle.style.width;
+            particle.style.animationDuration = `${Math.random() * 22 + 14}s`;
+            particle.style.animationDelay = `${Math.random() * -20}s`;
+            particleContainer.appendChild(particle);
         }
     </script>
 </body>
 
 </html>
-

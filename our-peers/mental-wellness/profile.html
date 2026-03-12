@@ -4,10 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Soulamore is a student wellness platform offering anonymous support, peer connection, and mental health resources.">
-    <title>Profile | Soulamore</title>
-    <!-- Fonts: Outfit (UI), Lora (Storytelling) -->
+    <meta name="description" content="Dynamic peer support profile on Soulamore.">
+    <title>Peer Profile | Soulamore</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Lora:ital,wght@0,400;0,500;1,400&family=Plus+Jakarta+Sans:wght@400;500&display=swap"
         rel="stylesheet">
@@ -15,31 +13,28 @@
     <link rel="stylesheet" href="../../assets/css/global.css">
 
     <style>
-        /* --- DYNAMIC THEME SYSTEM --- */
         :root {
-            /* Default: Anxiety (Sage) */
             --bg-color: #E6EFE8;
             --card-bg: #ffffff;
             --text-main: #2c3e50;
             --text-muted: #5f6c7b;
             --accent-color: #7A9E7E;
-            /* Deep Sage */
             --accent-soft: #dbece0;
-            --btn-text: #ffffff;
+            --footer-bg: #182e2b;
         }
 
-        /* Loneliness Theme (Dusty Peach) */
         body.theme-lonely {
             --bg-color: #F4E6DF;
             --accent-color: #C08B7A;
             --accent-soft: #ebdcd5;
+            --footer-bg: #2e201e;
         }
 
-        /* Low Mood Theme (Warm Amber) */
         body.theme-low {
             --bg-color: #FFF8E1;
             --accent-color: #D4A373;
             --accent-soft: #faebd7;
+            --footer-bg: #2e241b;
         }
 
         * {
@@ -54,64 +49,48 @@
             color: var(--text-main);
             line-height: 1.7;
             transition: background-color 0.8s ease;
-            /* Smooth theme switch */
         }
 
         h1,
         h2,
-        h3 {
+        h3,
+        h4 {
             font-family: 'Outfit', sans-serif;
             color: var(--text-main);
         }
 
         p {
             font-family: 'Lora', serif;
-            font-size: 1.1rem;
+            font-size: 1.08rem;
             color: var(--text-muted);
         }
 
         .container {
-            max-width: 800px;
+            max-width: 840px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 24px 80px;
             position: relative;
         }
 
-        .fade-in {
-            animation: fadeIn 1s ease-out forwards;
-            opacity: 0;
-            transform: translateY(20px);
+        .hidden {
+            display: none !important;
         }
 
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* --- NAV (Custom Profile Nav) --- */
         .profile-nav {
-            margin-bottom: 40px;
-        }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--text-main);
-            text-decoration: none;
+            padding: 20px 0;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
 
         .back-btn {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-muted);
             text-decoration: none;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             transition: 0.2s;
         }
 
@@ -119,10 +98,28 @@
             color: var(--accent-color);
         }
 
-        /* --- HERO SECTION --- */
+        .audio-pill {
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.55);
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            color: var(--text-main);
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 100px 0;
+            opacity: 0.7;
+        }
+
         .profile-hero {
             text-align: center;
-            padding: 40px 0 60px;
+            padding: 28px 0 50px;
         }
 
         .avatar-container {
@@ -133,15 +130,20 @@
             background: var(--card-bg);
             padding: 5px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            position: relative;
         }
 
-        .avatar-img {
+        .avatar-initials {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: #eee;
-            object-fit: cover;
+            background: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
         }
 
         .hero-name {
@@ -150,11 +152,20 @@
             font-weight: 600;
         }
 
+        .hero-role {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
         .hero-quote {
-            font-family: 'Lora', serif;
             font-style: italic;
             font-size: 1.2rem;
-            opacity: 0.8;
+            opacity: 0.82;
             margin-bottom: 20px;
         }
 
@@ -169,7 +180,7 @@
         .soft-badge {
             background: rgba(255, 255, 255, 0.6);
             padding: 6px 16px;
-            border-radius: 50px;
+            border-radius: 999px;
             font-size: 0.85rem;
             color: var(--text-muted);
             border: 1px solid rgba(0, 0, 0, 0.05);
@@ -180,19 +191,45 @@
             margin-right: 5px;
         }
 
-        /* --- CONTENT CARDS --- */
+        .profile-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .profile-tab {
+            background: rgba(255, 255, 255, 0.56);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            color: var(--text-muted);
+            border-radius: 999px;
+            padding: 10px 18px;
+            font: inherit;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .profile-tab.active,
+        .profile-tab:hover {
+            background: var(--accent-soft);
+            color: var(--text-main);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
         .soft-card {
             background: var(--card-bg);
-            padding: 50px;
+            padding: 42px;
             border-radius: 24px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
-            margin-bottom: 30px;
-            transition: transform 0.3s;
+            margin-bottom: 24px;
             border: 1px solid rgba(0, 0, 0, 0.02);
         }
 
         .section-title {
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             margin-bottom: 20px;
             color: var(--accent-color);
             display: flex;
@@ -200,7 +237,6 @@
             gap: 10px;
         }
 
-        /* List Styles */
         .check-list {
             list-style: none;
         }
@@ -212,7 +248,7 @@
         }
 
         .check-list li::before {
-            content: '•';
+            content: '�';
             position: absolute;
             left: 10px;
             color: var(--accent-color);
@@ -221,7 +257,6 @@
             top: 5px;
         }
 
-        /* --- STYLE CHIPS --- */
         .style-grid {
             display: flex;
             flex-wrap: wrap;
@@ -237,20 +272,41 @@
             font-weight: 500;
         }
 
-        /* --- BOUNDARY NOTE --- */
+        .review-card {
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .review-copy {
+            margin-bottom: 10px;
+        }
+
+        .review-author {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+        }
+
         .boundary-box {
             padding: 30px;
             border-radius: 16px;
             border: 1px solid rgba(0, 0, 0, 0.05);
             background: rgba(255, 255, 255, 0.4);
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 24px;
         }
 
-        /* --- CTA --- */
+        .boundary-box h4 {
+            margin-bottom: 10px;
+        }
+
         .cta-section {
             text-align: center;
-            margin-bottom: 80px;
+            margin-bottom: 40px;
         }
 
         .primary-btn {
@@ -258,20 +314,23 @@
             color: white;
             padding: 18px 40px;
             border-radius: 50px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
             text-decoration: none;
             display: inline-block;
-            transition: 0.3s;
+            transition: 0.25s;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: none;
-            cursor: pointer;
         }
 
         .primary-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-            opacity: 0.9;
+            transform: translateY(-2px);
+            opacity: 0.92;
+        }
+
+        .cta-note {
+            font-size: 0.92rem;
+            margin-top: 15px;
+            opacity: 0.72;
         }
 
         .save-btn {
@@ -280,12 +339,12 @@
             border: 1px solid var(--text-muted);
             padding: 12px 30px;
             border-radius: 50px;
-            margin-top: 15px;
+            margin-top: 16px;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.2s;
             font-size: 0.9rem;
         }
 
@@ -295,47 +354,7 @@
             background: white;
         }
 
-        .save-btn i {
-            transition: 0.2s;
-        }
-
-        .save-btn:hover i {
-            transform: scale(1.2);
-        }
-
-        /* --- FOOTER --- */
-        .footer-micro {
-            text-align: center;
-            font-size: 0.9rem;
-            opacity: 0.6;
-            margin-bottom: 40px;
-            font-family: 'Outfit';
-        }
-
-        /* --- THEME TOGGLE (For Demo) --- */
-        .theme-switcher {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 10px;
-            border-radius: 50px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            display: flex;
-            gap: 10px;
-            z-index: 100;
-        }
-
-        .color-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-        }
-
-        @media(max-width: 600px) {
+        @media (max-width: 600px) {
             .hero-name {
                 font-size: 2rem;
             }
@@ -343,268 +362,74 @@
             .soft-card {
                 padding: 30px 20px;
             }
-        }
 
-        /* --- DYNAMIC FOOTER THEMES --- */
-        /* Default fallback */
-        :root {
-            --footer-bg: #0f172a;
-        }
-
-        /* Theme overrides for footer */
-        .theme-anxiety {
-            --footer-bg: #182e2b;
-        }
-
-        /* Deep Sage */
-        .theme-low {
-            --footer-bg: #2e241b;
-        }
-
-        /* Deep Amber */
-        .theme-lonely {
-            --footer-bg: #2e201e;
-        }
-
-        /* Deep Peach */
-
-        footer {
-            background-color: var(--footer-bg) !important;
-            transition: background-color 0.5s ease;
-            position: relative;
-            /* Reset Fonts for Footer to match Global Site */
-            font-family: 'Inter', sans-serif;
-            text-align: center;
-        }
-
-        footer h3 {
-            font-family: 'Outfit', sans-serif !important;
-            color: #dbece0 !important;
-            /* Use a light color compatible with dark themes */
-        }
-
-        footer p {
-            font-family: 'Inter', sans-serif !important;
-            /* Override Lora */
-            color: rgba(255, 255, 255, 0.7) !important;
-            /* Override text-muted */
-            font-size: 0.9rem !important;
-        }
-
-        footer a {
-            font-family: 'Inter', sans-serif !important;
-        }
-
-        /* Overlay effect: Add a gradient for depth */
-        footer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
-            pointer-events: none;
+            .profile-nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
     <link rel="icon" href="../../assets/images/favicon_symbol.png" type="image/x-icon">
 </head>
 
-<body class="theme-anxiety"> <!-- Default Class -->
-
-    <!-- Theme Switcher for Demo -->
-    <div class="theme-switcher">
-        <div class="color-dot" style="background:#7A9E7E;" onclick="setTheme('theme-anxiety')" title="Anxiety (Sage)">
-        </div>
-        <div class="color-dot" style="background:#D4A373;" onclick="setTheme('theme-low')" title="Low Mood (Amber)">
-        </div>
-        <div class="color-dot" style="background:#C08B7A;" onclick="setTheme('theme-lonely')"
-            title="Loneliness (Peach)"></div>
-    </div>
-
+<body class="theme-anxiety">
     <div class="container">
-
-        <!-- NAV -->
-        <!-- CUSTOM PROFILE NAV -->
-        <div class="profile-nav"
-            style="padding: 20px 0; display:flex; justify-content:space-between; align-items:center;">
-            <a href="../../index.html" class="back-btn"
-                style="font-size:1rem; font-weight:600; color:var(--text-main); display:flex; align-items:center; gap:8px;">
-                <i class="fas fa-arrow-left"></i> Back to Peers
-            </a>
-
-            <div class="audio-control-pill" onclick="toggleProfileAudio()"
-                style="cursor:pointer; background:rgba(255,255,255,0.5); padding:8px 16px; border-radius:50px; font-size:0.9rem; display:flex; align-items:center; gap:8px; border:1px solid rgba(0,0,0,0.05);">
-                <i class="fas fa-music"></i> <span id="audioLabel">Play Ambience</span>
-            </div>
+        <div class="profile-nav">
+            <a href="../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Peers</a>
+            <button class="audio-pill" type="button" id="audioToggle"><i class="fas fa-music"></i> <span id="audioLabel">Play Ambience</span></button>
         </div>
 
-        <!-- HIDDEN AUDIO -->
         <audio id="profileAudio" loop>
             <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
         </audio>
 
-        <!-- HERO -->
-        <section class="profile-hero fade-in">
-            <div class="avatar-container">
-                <!-- Placeholder Avatar -->
-                <div
-                    style="width:100%; height:100%; border-radius:50%; background:#ddd; display:flex; align-items:center; justify-content:center; font-size:2rem; color:white;">
-                    A</div>
-            </div>
-            <h1 class="hero-name">Aditya</h1>
-            <p class="hero-quote">"You don’t have to know what to say here. We can just sit with it."</p>
-
-            <div class="badge-row">
-                <span class="soft-badge"><i class="fas fa-certificate"></i> Trained Peer</span>
-                <span class="soft-badge"><i class="fas fa-comment"></i> Chat</span>
-                <span class="soft-badge"><i class="fas fa-phone"></i> Call</span>
-                <span class="soft-badge">English, Hindi</span>
-            </div>
-        </section>
-
-        <!-- 1. ABOUT ME -->
-        <div class="soft-card fade-in">
-            <div class="section-title"><i class="far fa-user"></i> A little about me</div>
-            <p>
-                I’m here for conversations that feel tangled, slow, or unfinished. I know what it’s like when thoughts
-                don’t stop looping, and when explaining yourself feels harder than just staying quiet.
-                <br><br>
-                You don’t need to arrive with clarity. We can find it together, or simply sit with what is. I’ve
-                navigated my own path through academic pressure and burnout, and I understand the weight of
-                expectations.
-            </p>
+        <div id="loadingState" class="loading-state">
+            <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--accent-color);"></i>
+            <p style="margin-top:20px;">Finding space...</p>
         </div>
 
-        <!-- 2. IS THIS RIGHT FOR YOU? -->
-        <div class="soft-card fade-in">
-            <div class="section-title"><i class="far fa-check-circle"></i> This space may feel right if...</div>
-            <ul class="check-list">
-                <li>You're overthinking small things that don’t feel small.</li>
-                <li>You feel emotionally tired but aren't sure why.</li>
-                <li>You're carrying things you haven’t said out loud yet.</li>
-                <li>You want a calm listener, not a problem-solver.</li>
-                <li>You aren't ready for therapy, but don't want to be alone.</li>
-            </ul>
+        <div id="errorState" class="loading-state hidden">
+            <p>Peer profile not found.</p>
         </div>
 
-        <!-- 3. STYLE -->
-        <div class="soft-card fade-in">
-            <div class="section-title"><i class="far fa-comments"></i> How I show up</div>
-            <div class="style-grid">
-                <span class="style-chip">Slow-paced</span>
-                <span class="style-chip">Gentle questions</span>
-                <span class="style-chip">Comfortable with silence</span>
-                <span class="style-chip">Reflective</span>
-                <span class="style-chip">Patient</span>
-            </div>
-        </div>
-
-        <!-- 4. WHAT TO EXPECT -->
-        <div class="soft-card fade-in">
-            <div class="section-title"><i class="far fa-clock"></i> What our conversation looks like</div>
-            <ul class="check-list">
-                <li>We start wherever you are (no agenda).</li>
-                <li>You can talk, type, or take breaks.</li>
-                <li>I won’t interrupt or rush you.</li>
-                <li>There’s no “right” outcome expected.</li>
-            </ul>
-        </div>
-
-        <!-- 5. BOUNDARIES -->
-        <div class="boundary-box fade-in">
-            <h4 style="margin-bottom:10px; color:var(--text-main);">A gentle note on boundaries</h4>
-            <p style="font-size:0.95rem;">
-                Peers at Soulamore don’t diagnose or treat mental health conditions.
-                If you’re feeling unsafe or in crisis, I’ll help you find immediate professional support.
-                This space is about being heard, not being fixed.
-            </p>
-        </div>
-
-        <!-- 6. CTA -->
-        <div class="cta-section fade-in">
-            <button class="primary-btn" onclick="startChat()">Start a Conversation</button>
-            <br>
-            <p style="font-size:0.9rem; margin-top:15px; opacity:0.7;">You can begin with a single sentence. Or none at
-                all.</p>
-
-            <button class="save-btn" onclick="toggleSave(this)">
-                <i class="far fa-heart"></i> Not sure yet? Save this peer
-            </button>
-        </div>
-
-        <!-- FOOTER COPY -->
-
-
+        <div id="profileContent" class="hidden"></div>
     </div>
 
+    <script type="module">
+        import { resolvePeerProfile } from "../../assets/js/profile-catalog.js";
+        import { mountPeerProfile } from "../../assets/js/profile-renderers.js";
 
+        const params = new URLSearchParams(window.location.search);
+        const key = params.get('slug') || params.get('id') || 'aditya-mental-wellness';
 
+        const root = document.getElementById('profileContent');
+        const loadingEl = document.getElementById('loadingState');
+        const errorEl = document.getElementById('errorState');
+        const profile = resolvePeerProfile(key);
 
+        mountPeerProfile({ profile, root, loadingEl, errorEl });
 
-    <!-- STANDARDIZED FOOTER -->
-    <footer></footer>
+        const audio = document.getElementById('profileAudio');
+        const toggle = document.getElementById('audioToggle');
+        const label = document.getElementById('audioLabel');
+        let playing = false;
 
-    <script src="../../assets/js/components.js"></script>
-    <script src="../../assets/js/main.js"></script>
-    <script>
-        // --- AUDIO LOGIC ---
-        const pAudio = document.getElementById('profileAudio');
-        let pPlaying = false;
-        function toggleProfileAudio() {
-            const label = document.getElementById('audioLabel');
-            if (pPlaying) {
-                pAudio.pause();
-                label.innerText = "Play Ambience";
-            } else {
-                pAudio.volume = 0.2;
-                pAudio.play();
-                label.innerText = "Pause Music";
-            }
-            pPlaying = !pPlaying;
-        }
-
-        // --- THEME SWITCHER LOGIC ---
-        function setTheme(themeName) {
-            document.body.className = themeName;
-        }
-
-        // --- SAVE INTERACTION ---
-        function toggleSave(btn) {
-            const icon = btn.querySelector('i');
-            if (icon.classList.contains('far')) {
-                icon.classList.replace('far', 'fas');
-                icon.style.color = '#ef4444';
-                btn.style.color = '#ef4444';
-                btn.style.borderColor = '#ef4444';
-                btn.innerHTML = '<i class="fas fa-heart" style="color:var(--alert-red);"></i> Saved';
-            } else {
-                icon.classList.replace('fas', 'far');
-                icon.style.color = '';
-                btn.style.color = '';
-                btn.style.borderColor = '';
-                btn.innerHTML = '<i class="far fa-heart"></i> Not sure yet? Save this peer';
-            }
-        }
-
-        // --- CHAT START ---
-        function startChat() {
-            // Wix Velo Integration: Open Lightbox or Chat App
-            alert("Opening secure chat with Aditya...");
-        }
-
-        // --- FADE IN ---
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = 1;
-                    entry.target.style.transform = "translateY(0)";
+        toggle.addEventListener('click', async () => {
+            try {
+                if (playing) {
+                    audio.pause();
+                    label.textContent = 'Play Ambience';
+                } else {
+                    audio.volume = 0.2;
+                    await audio.play();
+                    label.textContent = 'Pause Ambience';
                 }
-            });
+                playing = !playing;
+            } catch (error) {
+                console.error(error);
+            }
         });
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     </script>
-    <script src="../../assets/js/soulbot-beta.js"></script>
 </body>
 
 </html>
