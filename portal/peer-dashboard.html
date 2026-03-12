@@ -876,7 +876,7 @@
                             Profile</h1>
                         <p style="opacity:0.7;">Manage how you appear to the community.</p>
                     </div>
-                    <button class="btn-dash-secondary" onclick="window.open('../our-peers/profile.html', '_blank')">
+                    <button id="peer-public-profile-btn" class="btn-dash-secondary">
                         <i class="fas fa-external-link-alt"></i> View Public Page
                     </button>
                 </div>
@@ -2182,6 +2182,21 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
 
     <!-- Journal Editor Module -->
     <script type="module" src="../assets/js/journal-editor.js"></script>
+<script type="module">
+    import { auth } from "../assets/js/firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) return;
+        const btn = document.getElementById('peer-public-profile-btn');
+        if (btn) {
+            btn.onclick = () => {
+                window.open(`../our-peers/profile.html?id=${encodeURIComponent(user.uid)}`, '_blank');
+            };
+        }
+    });
+</script>
+
 </body>
 
 </html>
