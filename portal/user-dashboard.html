@@ -1418,11 +1418,42 @@
 
             <!-- AVAILABILITY MANAGEMENT SCRIPT -->
             <script type="module">
-                import { auth } from "../assets/js/firebase-config.js";
-                import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-                import { setPeerAvailability, getPeerAvailability } from "../assets/js/peer-booking-handler.js";
+                import { auth, db } from "../assets/js/firebase-config.js";
+                import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
                 let currentAvailabilityUser = [];
+
+                // Get Peer Availability
+                async function getPeerAvailability(peerId) {
+                    try {
+                        const docRef = doc(db, "peer_availability", peerId);
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            return { id: docSnap.id, ...docSnap.data() };
+                        }
+                        return null;
+                    } catch (error) {
+                        console.error("Error getting availability:", error);
+                        return null;
+                    }
+                }
+
+                // Set Peer Availability
+                async function setPeerAvailability(peerId, availability) {
+                    try {
+                        const docRef = doc(db, "peer_availability", peerId);
+                        await setDoc(docRef, {
+                            peerId: peerId,
+                            availability: availability,
+                            timezone: "Asia/Kolkata",
+                            updatedAt: new Date().toISOString()
+                        }, { merge: true });
+                        return true;
+                    } catch (error) {
+                        console.error("Error setting availability:", error);
+                        return false;
+                    }
+                }
 
                 // Initialize availability management
                 window.saveAvailabilityUser = async function() {
@@ -1437,6 +1468,7 @@
                     const text = document.getElementById('save-availability-text-user');
 
                     try {
+                        console.log('Saving availability:', currentAvailabilityUser);
                         btn.disabled = true;
                         spinner.style.display = 'inline-block';
                         text.textContent = 'Saving...';
@@ -1453,7 +1485,7 @@
                         }
                     } catch (error) {
                         console.error('Error saving availability:', error);
-                        alert('Failed to save availability. Please try again.');
+                        alert('Failed to save availability: ' + error.message);
                         btn.disabled = false;
                         spinner.style.display = 'none';
                         text.textContent = 'Save Schedule';
@@ -1464,25 +1496,25 @@
                 window.loadAvailabilityUser = async function() {
                     const user = auth.currentUser;
                     if (!user) {
-                        console.log('No user logged in');
+                        console.log('❌ No user logged in');
                         return;
                     }
 
                     const container = document.getElementById('availability-schedule-list-user');
                     if (!container) {
-                        console.log('Container not found');
+                        console.log('❌ Container not found');
                         return;
                     }
 
                     try {
-                        console.log('Loading availability for user:', user.uid);
+                        console.log('🔄 Loading availability for user:', user.uid);
                         const availability = await getPeerAvailability(user.uid);
                         
                         if (availability && availability.availability) {
-                            console.log('Found availability:', availability.availability);
+                            console.log('✅ Found availability:', availability.availability);
                             currentAvailabilityUser = availability.availability;
                         } else {
-                            console.log('No availability found, using defaults');
+                            console.log('⚠️ No availability found, using defaults');
                             // Default availability (Mon-Fri, 9-5)
                             currentAvailabilityUser = [
                                 { day: 'monday', startTime: '09:00', endTime: '17:00' },
@@ -1493,18 +1525,21 @@
                             ];
                         }
 
-                        console.log('Rendering availability with:', currentAvailabilityUser);
+                        console.log('📝 Rendering availability with:', currentAvailabilityUser);
                         renderAvailabilityUser();
-                        console.log('Render complete');
+                        console.log('✅ Render complete');
                     } catch (error) {
-                        console.error('Error loading availability:', error);
-                        container.innerHTML = '<div style="color:red; padding:20px;">Error loading schedule. Please refresh the page.</div>';
+                        console.error('❌ Error loading availability:', error);
+                        container.innerHTML = '<div style="color:red; padding:20px;">Error loading schedule: ' + error.message + '<br/><button onclick="window.loadAvailabilityUser()" style="margin-top:10px; padding:8px 16px; cursor:pointer;">Retry</button></div>';
                     }
                 };
 
                 function renderAvailabilityUser() {
                     const container = document.getElementById('availability-schedule-list-user');
-                    if (!container) return;
+                    if (!container) {
+                        console.log('❌ Container not found for rendering');
+                        return;
+                    }
 
                     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
                     const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -1523,14 +1558,14 @@
                                 </div>
                                 ${hasSlots ? daySlots.map((slot, slotIndex) => `
                                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; padding:8px; background:var(--bg-subtle); border-radius:8px;">
-                                        <input type="time" value="${slot.startTime}" 
+                                        <input type="time" value="${slot.startTime}"
                                             onchange="updateSlotTimeUser('${day}', ${slotIndex}, 'start', this.value)"
                                             style="background:var(--bg-card); border:1px solid var(--border-subtle); color:var(--text-main); padding:5px; border-radius:6px; font-size:0.85rem;">
                                         <span style="opacity:0.5;">to</span>
-                                        <input type="time" value="${slot.endTime}" 
+                                        <input type="time" value="${slot.endTime}"
                                             onchange="updateSlotTimeUser('${day}', ${slotIndex}, 'end', this.value)"
                                             style="background:var(--bg-card); border:1px solid var(--border-subtle); color:var(--text-main); padding:5px; border-radius:6px; font-size:0.85rem;">
-                                        <button onclick="removeSlotUser('${day}', ${slotIndex})" 
+                                        <button onclick="removeSlotUser('${day}', ${slotIndex})"
                                             style="background:transparent; border:none; color:#ef4444; cursor:pointer; font-size:0.9rem; margin-left:auto;">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -1539,9 +1574,12 @@
                             </div>
                         `;
                     }).join('');
+                    
+                    console.log('✅ Schedule rendered successfully');
                 }
 
                 window.addSlotUser = function(day) {
+                    console.log('Adding slot for', day);
                     const newSlot = { day: day, startTime: '09:00', endTime: '17:00' };
                     currentAvailabilityUser.push(newSlot);
                     renderAvailabilityUser();
@@ -1574,7 +1612,7 @@
                     if (originalSwitchView) originalSwitchView(viewName, element);
 
                     if (viewName === 'availability') {
-                        console.log('Availability view opened, loading...');
+                        console.log('📅 Availability view opened, loading...');
                         setTimeout(() => {
                             window.loadAvailabilityUser();
                         }, 100);
@@ -1582,32 +1620,48 @@
                 };
                 
                 // Auto-load availability on page load for peers/psychologists
-                setTimeout(async () => {
+                (async () => {
                     try {
-                        const { getUserRole } = await import("../assets/js/role-helper.js");
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        
                         const user = auth.currentUser;
                         if (!user) return;
                         
-                        const roleInfo = await getUserRole(user.uid);
-                        const userProfile = await getUserProfile(user.uid);
+                        // Check users collection for role
+                        const userProfileDoc = await getDoc(doc(db, "users", user.uid));
+                        const userProfile = userProfileDoc.data();
                         const usersCollectionRole = (userProfile?.role || '').toLowerCase();
                         
-                        const isPeerOrPsych = roleInfo?.isPeer || roleInfo?.isPsychologist || 
-                                             usersCollectionRole === 'peer' || usersCollectionRole === 'psychologist';
+                        // Check roles collection
+                        let isPeerOrPsych = false;
+                        try {
+                            const roleDoc = await getDoc(doc(db, "roles", user.uid));
+                            if (roleDoc.exists()) {
+                                const roleData = roleDoc.data();
+                                isPeerOrPsych = roleData.peer === true || roleData.psychologist === true;
+                            }
+                        } catch (e) {
+                            console.warn('Could not check roles collection:', e);
+                        }
+                        
+                        isPeerOrPsych = isPeerOrPsych || usersCollectionRole === 'peer' || usersCollectionRole === 'psychologist';
                         
                         if (isPeerOrPsych) {
-                            console.log('User is peer/psychologist, pre-loading availability...');
-                            // Pre-load but don't render until view is shown
+                            console.log('✅ User is peer/psychologist, pre-loading availability...');
                             const availability = await getPeerAvailability(user.uid);
                             if (availability && availability.availability) {
                                 currentAvailabilityUser = availability.availability;
-                                console.log('Availability pre-loaded:', currentAvailabilityUser);
+                                console.log('✅ Availability pre-loaded:', currentAvailabilityUser);
+                            } else {
+                                console.log('⚠️ No saved availability found');
                             }
+                        } else {
+                            console.log('ℹ️ User is not a peer/psychologist');
                         }
                     } catch (e) {
-                        console.error('Error pre-loading availability:', e);
+                        console.error('❌ Error pre-loading availability:', e);
                     }
-                }, 1000);
+                })();
             </script>
 
 
