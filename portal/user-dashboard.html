@@ -278,7 +278,10 @@
                         Journal</span></a><a href="#" class="side-link" onclick="switchView('bookings', this)"
                     data-view="bookings"><i class="fas fa-calendar-alt"></i><span>My Sessions</span></a><a href="#"
                     class="side-link" onclick="switchView('peer-guidelines', this)" data-view="peer-guidelines"><i
-                        class="fas fa-hands-helping"></i><span>Peer Guidelines</span></a><a href="#" class="side-link"
+                        class="fas fa-hands-helping"></i><span>Peer Guidelines</span></a><a href="#"
+                    id="nav-availability-link" style="display:none;" class="side-link"
+                    onclick="switchView('availability', this)" data-view="availability"><i
+                        class="fas fa-calendar-check"></i><span>My Availability</span></a><a href="#" class="side-link"
                     onclick="switchView('soulbot', this)" data-view="soulbot"><i class="fas fa-robot"></i><span>SoulBot
                         AI</span></a><a href="#" onclick="switchView('messages', this)" data-view="messages"
                     class="side-link"><i class="fas fa-envelope"></i><span>Messages</span></a><a href="#"
@@ -669,6 +672,58 @@
                         <button class="btn-dash-primary" onclick="window.location.href='../our-peers/profile.html'">Book
                             a
                             Session</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: AVAILABILITY (For Peers/Psychologists) -->
+            <div id="view-availability" class="view-section" style="display:none;">
+                <div class="workspace-header">
+                    <div style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">My Availability</h2>
+                        <div style="font-size:0.8rem; opacity:0.7;">Manage your available time slots for sessions</div>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:30px; flex:1; overflow-y:auto; padding-bottom:20px;">
+                    <!-- Weekly Schedule -->
+                    <div class="dash-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                            <h3 style="color:var(--teal-accent);">Weekly Schedule</h3>
+                            <div style="font-size:0.8rem; background:rgba(45, 212, 191, 0.1); color:var(--teal-accent); padding:5px 10px; border-radius:20px;">
+                                <i class="fas fa-globe"></i> GMT+05:30 (IST)
+                            </div>
+                        </div>
+                        <div class="schedule-list" id="availability-schedule-list-user">
+                            <div style="padding:20px; text-align:center; opacity:0.5;">Loading schedule...</div>
+                        </div>
+                        <div style="margin-top:25px; text-align:right;">
+                            <button class="btn-dash-primary" id="save-availability-btn-user" onclick="saveAvailabilityUser()">
+                                <i class="fas fa-spinner fa-spin" id="save-availability-spinner-user" style="display:none;"></i>
+                                <span id="save-availability-text-user">Save Schedule</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div style="display:flex; flex-direction:column; gap:25px;">
+                        <div class="dash-card" style="background:linear-gradient(145deg, rgba(30,41,59,0.7), rgba(15,23,42,0.9)); border:1px solid var(--teal-accent);">
+                            <h3 style="margin-bottom:15px; display:flex; align-items:center; gap:10px;">
+                                <i class="fas fa-info-circle" style="color:var(--teal-accent);"></i> How It Works
+                            </h3>
+                            <p style="font-size:0.85rem; opacity:0.7; line-height:1.6;">
+                                Set your weekly availability so others can see when you're free for sessions. Users can book slots during your available times.
+                            </p>
+                            <ul style="font-size:0.85rem; opacity:0.7; line-height:1.8; margin-top:15px; padding-left:20px;">
+                                <li>Add time slots for each day</li>
+                                <li>Multiple slots per day supported</li>
+                                <li>Booked slots are automatically blocked</li>
+                                <li>Update anytime as your schedule changes</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1313,10 +1368,178 @@
                             console.error("Failed to load user bookings:", e);
                         }
 
+                        // 5. Check if user is peer/psychologist and show availability link
+                        try {
+                            const { getUserRole } = await import("../assets/js/role-helper.js");
+                            const roleInfo = await getUserRole(user.uid);
+                            
+                            const availabilityLink = document.getElementById('nav-availability-link');
+                            if (availabilityLink && (roleInfo?.isPeer || roleInfo?.isPsychologist)) {
+                                availabilityLink.style.display = 'flex';
+                                console.log('Showing availability link for peer/psychologist');
+                            }
+                        } catch (e) {
+                            console.error("Failed to check user role:", e);
+                        }
+
                     } catch (error) {
                         console.error("Dashboard hydration error:", error);
                     }
                 });
+            </script>
+
+            <!-- AVAILABILITY MANAGEMENT SCRIPT -->
+            <script type="module">
+                import { auth } from "../assets/js/firebase-config.js";
+                import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+                import { setPeerAvailability, getPeerAvailability } from "../assets/js/peer-booking-handler.js";
+
+                let currentAvailabilityUser = [];
+
+                // Initialize availability management
+                window.saveAvailabilityUser = async function() {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('Please log in to save availability');
+                        return;
+                    }
+
+                    const btn = document.getElementById('save-availability-btn-user');
+                    const spinner = document.getElementById('save-availability-spinner-user');
+                    const text = document.getElementById('save-availability-text-user');
+
+                    try {
+                        btn.disabled = true;
+                        spinner.style.display = 'inline-block';
+                        text.textContent = 'Saving...';
+
+                        const success = await setPeerAvailability(user.uid, currentAvailabilityUser);
+
+                        if (success) {
+                            alert('✅ Availability saved successfully!');
+                            btn.disabled = false;
+                            spinner.style.display = 'none';
+                            text.textContent = 'Save Schedule';
+                        } else {
+                            throw new Error('Failed to save availability');
+                        }
+                    } catch (error) {
+                        console.error('Error saving availability:', error);
+                        alert('Failed to save availability. Please try again.');
+                        btn.disabled = false;
+                        spinner.style.display = 'none';
+                        text.textContent = 'Save Schedule';
+                    }
+                };
+
+                // Load availability when view is shown
+                window.loadAvailabilityUser = async function() {
+                    const user = auth.currentUser;
+                    if (!user) return;
+
+                    try {
+                        const availability = await getPeerAvailability(user.uid);
+                        const container = document.getElementById('availability-schedule-list-user');
+                        
+                        if (!container) return;
+
+                        if (availability && availability.availability) {
+                            currentAvailabilityUser = availability.availability;
+                        } else {
+                            // Default availability (Mon-Fri, 9-5)
+                            currentAvailabilityUser = [
+                                { day: 'monday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'tuesday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'wednesday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'thursday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'friday', startTime: '09:00', endTime: '17:00' }
+                            ];
+                        }
+
+                        renderAvailabilityUser();
+                    } catch (error) {
+                        console.error('Error loading availability:', error);
+                        container.innerHTML = '<div style="color:red; padding:20px;">Error loading schedule.</div>';
+                    }
+                };
+
+                function renderAvailabilityUser() {
+                    const container = document.getElementById('availability-schedule-list-user');
+                    if (!container) return;
+
+                    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                    const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+                    container.innerHTML = days.map((day, index) => {
+                        const daySlots = currentAvailabilityUser.filter(slot => slot.day.toLowerCase() === day);
+                        const hasSlots = daySlots.length > 0;
+
+                        return `
+                            <div style="padding:15px; border:1px solid var(--border-subtle); border-radius:12px; margin-bottom:12px; background:var(--bg-deep);">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                    <div style="font-weight:600; color:var(--text-main);">${dayLabels[index]}</div>
+                                    <button onclick="addSlotUser('${day}')" style="background:var(--teal-accent); color:var(--bg-main); border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600;">
+                                        <i class="fas fa-plus"></i> Add Slot
+                                    </button>
+                                </div>
+                                ${hasSlots ? daySlots.map((slot, slotIndex) => `
+                                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; padding:8px; background:var(--bg-subtle); border-radius:8px;">
+                                        <input type="time" value="${slot.startTime}" 
+                                            onchange="updateSlotTimeUser('${day}', ${slotIndex}, 'start', this.value)"
+                                            style="background:var(--bg-card); border:1px solid var(--border-subtle); color:var(--text-main); padding:5px; border-radius:6px; font-size:0.85rem;">
+                                        <span style="opacity:0.5;">to</span>
+                                        <input type="time" value="${slot.endTime}" 
+                                            onchange="updateSlotTimeUser('${day}', ${slotIndex}, 'end', this.value)"
+                                            style="background:var(--bg-card); border:1px solid var(--border-subtle); color:var(--text-main); padding:5px; border-radius:6px; font-size:0.85rem;">
+                                        <button onclick="removeSlotUser('${day}', ${slotIndex})" 
+                                            style="background:transparent; border:none; color:#ef4444; cursor:pointer; font-size:0.9rem; margin-left:auto;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                `).join('') : '<div style="opacity:0.5; font-size:0.85rem; padding:8px 0;">No slots added</div>'}
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                window.addSlotUser = function(day) {
+                    const newSlot = { day: day, startTime: '09:00', endTime: '17:00' };
+                    currentAvailabilityUser.push(newSlot);
+                    renderAvailabilityUser();
+                };
+
+                window.removeSlotUser = function(day, index) {
+                    const daySlots = currentAvailabilityUser.filter(slot => slot.day.toLowerCase() === day);
+                    if (index >= 0 && index < daySlots.length) {
+                        const slotToRemove = daySlots[index];
+                        const slotIndex = currentAvailabilityUser.indexOf(slotToRemove);
+                        if (slotIndex !== -1) {
+                            currentAvailabilityUser.splice(slotIndex, 1);
+                            renderAvailabilityUser();
+                        }
+                    }
+                };
+
+                window.updateSlotTimeUser = function(day, index, type, value) {
+                    const daySlots = currentAvailabilityUser.filter(slot => slot.day.toLowerCase() === day);
+                    if (index >= 0 && index < daySlots.length) {
+                        const slot = daySlots[index];
+                        if (type === 'start') slot.startTime = value;
+                        if (type === 'end') slot.endTime = value;
+                    }
+                };
+
+                // Hook into view switcher to load availability when shown
+                const originalSwitchView = window.switchView;
+                window.switchView = function(viewName, element) {
+                    if (originalSwitchView) originalSwitchView(viewName, element);
+                    
+                    if (viewName === 'availability') {
+                        setTimeout(() => {
+                            window.loadAvailabilityUser();
+                        }, 100);
+                    }
+                };
             </script>
 
 
