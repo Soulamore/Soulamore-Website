@@ -188,7 +188,10 @@
                 <div class="profile-header">
                     <img id="profileAvatar" src="" alt="Profile" class="profile-avatar" style="display: none;">
                     <div class="profile-info">
-                        <h2 id="profileName">Loading...</h2>
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                            <h2 id="profileName" style="margin:0;">Loading...</h2>
+                            <div id="profileRoleBadge"></div>
+                        </div>
                         <p id="profileEmail"></p>
                         <p style="font-size: 0.9rem; opacity: 0.6;" id="memberSince"></p>
                     </div>
@@ -237,6 +240,17 @@
                     <div class="form-card">
                         <h3>About You</h3>
 
+                        <!-- Role Status Indicator -->
+                        <div id="roleStatusBox" style="background:rgba(78, 205, 196, 0.1); border:1px solid rgba(78, 205, 196, 0.3); padding:15px; border-radius:12px; margin-bottom:20px; display:none;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <i class="fas fa-shield-check" style="color:var(--teal-glow); font-size:1.2rem;"></i>
+                                <div>
+                                    <div id="roleStatusText" style="font-weight:600; color:var(--teal-glow);">Verified Peer</div>
+                                    <div id="roleStatusSubtext" style="font-size:0.85rem; opacity:0.7;">You can set availability and accept sessions</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="input-group">
                             <label class="input-label">Bio</label>
                             <textarea name="bio" class="input-box" placeholder="Tell us about yourself..."
@@ -247,14 +261,17 @@
                         <div class="input-group">
                             <label class="input-label">Role / Status</label>
                             <select name="role" class="input-box" style="background:var(--bg-main);">
-                                <option value="">Select...</option>
+                                <option value="">Select your role...</option>
                                 <option value="Student">Student</option>
                                 <option value="Working Professional">Working Professional</option>
                                 <option value="Psychology Graduate">Psychology Graduate</option>
-                                <option value="Peer">Peer</option>
-                                <option value="Psychologist">Psychologist</option>
+                                <option value="Peer">Peer - Provide emotional support to others</option>
+                                <option value="Psychologist">Psychologist - Licensed mental health professional</option>
                                 <option value="Other">Other</option>
                             </select>
+                            <small style="opacity: 0.6; font-size: 0.85rem; margin-top: 8px; display: block;">
+                                <i class="fas fa-info-circle"></i> Selecting "Peer" or "Psychologist" will require verification. You'll get access to provider dashboard and can set your availability for sessions.
+                            </small>
                         </div>
 
                         <div class="input-group">
@@ -284,7 +301,8 @@
     <script type="module">
         import { auth } from "./assets/js/firebase-config.js";
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getUserProfile, updateUserProfile } from "./assets/js/profile-handler.js";
+        import { getUserProfile, updateUserProfile, createOrUpdateUserProfile } from "./assets/js/profile-handler.js";
+        import { getUserRole } from "./assets/js/role-helper.js";
 
         let currentUser = null;
         let userProfile = null;
@@ -304,8 +322,14 @@
         // Load user profile
         async function loadProfile() {
             try {
+                // First ensure profile exists in Firestore
+                const profileResult = await createOrUpdateUserProfile(currentUser);
+                
                 // Load from Firestore
                 userProfile = await getUserProfile(currentUser.uid);
+                
+                // Get role from roles collection
+                const roleInfo = await getUserRole(currentUser.uid);
 
                 // Populate form
                 const form = document.getElementById('profileForm');
@@ -313,24 +337,78 @@
                 const nameEl = document.getElementById('profileName');
                 const emailEl = document.getElementById('profileEmail');
                 const memberSinceEl = document.getElementById('memberSince');
+                const roleBadgeEl = document.getElementById('profileRoleBadge');
 
                 // Set header info
                 if (currentUser.photoURL) {
                     avatar.src = currentUser.photoURL;
                     avatar.style.display = 'block';
+                } else {
+                    avatar.style.display = 'none';
                 }
-                nameEl.textContent = currentUser.displayName || 'User';
+                
+                const displayName = userProfile?.displayName || currentUser.displayName || 'User';
+                nameEl.textContent = displayName;
                 emailEl.textContent = currentUser.email || '';
+                
+                // Add role badge and status
+                const roleDisplay = roleInfo?.role || userProfile?.role || 'Member';
+                
+                if (roleBadgeEl) {
+                    roleBadgeEl.innerHTML = `<span style="background:var(--teal-glow); color:var(--deep-space); padding:4px 12px; border-radius:12px; font-size:0.85rem; font-weight:600;">${roleDisplay}</span>`;
+                }
+                
+                // Show role status box
+                const roleStatusBox = document.getElementById('roleStatusBox');
+                const roleStatusText = document.getElementById('roleStatusText');
+                const roleStatusSubtext = document.getElementById('roleStatusSubtext');
+                
+                if (roleStatusBox && roleInfo) {
+                    roleStatusBox.style.display = 'block';
+                    
+                    if (roleInfo.isPsychologist) {
+                        roleStatusText.textContent = '✅ Verified Psychologist';
+                        roleStatusSubtext.textContent = 'You can set availability and accept therapy sessions';
+                        roleStatusBox.style.background = 'rgba(78, 205, 196, 0.15)';
+                        roleStatusBox.style.borderColor = 'rgba(78, 205, 196, 0.4)';
+                    } else if (roleInfo.isPeer) {
+                        roleStatusText.textContent = '✅ Verified Peer';
+                        roleStatusSubtext.textContent = 'You can set availability and accept support sessions';
+                        roleStatusBox.style.background = 'rgba(244, 159, 117, 0.15)';
+                        roleStatusBox.style.borderColor = 'rgba(244, 159, 117, 0.4)';
+                    } else {
+                        // Pending or regular user
+                        const selectedRole = (userProfile?.role || '').toLowerCase();
+                        if (selectedRole === 'peer' || selectedRole === 'psychologist') {
+                            roleStatusText.textContent = '⏳ Verification Pending';
+                            roleStatusText.style.color = '#fbbf24';
+                            roleStatusSubtext.textContent = 'Your provider status is being reviewed by our team';
+                            roleStatusBox.style.background = 'rgba(251, 191, 36, 0.15)';
+                            roleStatusBox.style.borderColor = 'rgba(251, 191, 36, 0.4)';
+                        } else {
+                            roleStatusBox.style.display = 'none';
+                        }
+                    }
+                }
 
-                // Set form values
-                form.querySelector('input[name="displayName"]').value = userProfile?.displayName || currentUser.displayName || '';
-                form.querySelector('input[name="email"]').value = currentUser.email || '';
-                form.querySelector('input[name="phone"]').value = userProfile?.phone || '';
-                form.querySelector('input[name="dateOfBirth"]').value = userProfile?.dateOfBirth || '';
-                form.querySelector('input[name="location"]').value = userProfile?.location || '';
-                form.querySelector('textarea[name="bio"]').value = userProfile?.bio || '';
-                form.querySelector('select[name="role"]').value = userProfile?.role || '';
-                form.querySelector('input[name="interests"]').value = userProfile?.interests?.join(', ') || '';
+                // Set form values - ensure they're properly populated
+                const displayNameInput = form.querySelector('input[name="displayName"]');
+                const emailInput = form.querySelector('input[name="email"]');
+                const phoneInput = form.querySelector('input[name="phone"]');
+                const dobInput = form.querySelector('input[name="dateOfBirth"]');
+                const locationInput = form.querySelector('input[name="location"]');
+                const bioInput = form.querySelector('textarea[name="bio"]');
+                const roleSelect = form.querySelector('select[name="role"]');
+                const interestsInput = form.querySelector('input[name="interests"]');
+                
+                if (displayNameInput) displayNameInput.value = displayName;
+                if (emailInput) emailInput.value = currentUser.email || '';
+                if (phoneInput) phoneInput.value = userProfile?.phone || currentUser.phoneNumber || '';
+                if (dobInput) dobInput.value = userProfile?.dateOfBirth || '';
+                if (locationInput) locationInput.value = userProfile?.location || '';
+                if (bioInput) bioInput.value = userProfile?.bio || '';
+                if (roleSelect) roleSelect.value = userProfile?.role || roleInfo?.role || '';
+                if (interestsInput) interestsInput.value = userProfile?.interests?.join(', ') || '';
 
                 // Set member since date
                 if (userProfile?.createdAt) {
@@ -343,6 +421,8 @@
                 } else {
                     memberSinceEl.textContent = 'New member';
                 }
+                
+                console.log('Profile loaded successfully:', { userProfile, roleInfo });
             } catch (error) {
                 console.error('Error loading profile:', error);
                 showError('Failed to load profile. Please refresh the page.');
@@ -376,13 +456,34 @@
                     interests: interests
                 };
 
+                // Check if role changed to Peer or Psychologist
+                const selectedRole = (formData.get('role') || '').toLowerCase();
+                const wasRoleChanged = selectedRole === 'peer' || selectedRole === 'psychologist';
+
                 // Update profile in Firestore
                 const success = await updateUserProfile(currentUser.uid, updates);
 
                 if (success) {
                     showSuccess();
-                    // Reload profile to show updated data
-                    await loadProfile();
+                    
+                    // If role changed to Peer or Psychologist, show verification note
+                    if (wasRoleChanged) {
+                        const roleName = selectedRole === 'peer' ? 'Peer' : 'Psychologist';
+                        const dashboardLink = selectedRole === 'peer' ? 'portal/peer-dashboard.html' : 'portal/psych-dashboard.html';
+                        
+                        // Show verification alert
+                        setTimeout(() => {
+                            alert(`🎉 Thank you for selecting ${roleName}!\n\nNote: Your ${roleName} status needs to be verified by our team. Once verified, you'll have full access to the ${roleName} dashboard.\n\nYou can continue using the platform while verification is pending.`);
+                            
+                            // Ask if they want to go to dashboard
+                            if (confirm(`Would you like to go to the ${roleName} Dashboard now?`)) {
+                                window.location.href = dashboardLink;
+                            }
+                        }, 500);
+                    } else {
+                        // Reload profile to show updated data
+                        await loadProfile();
+                    }
                 } else {
                     showError('Failed to save profile. Please try again.');
                 }

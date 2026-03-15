@@ -114,25 +114,34 @@ export async function updateUserProfile(uid, updates) {
         });
         console.log('Profile updated successfully');
 
-        // Try to keep roles collection in sync when role changes, but do not
-        // fail the whole save if security rules block this client write.
+        // Update roles collection when role changes to Peer or Psychologist
         if (updates.role) {
             try {
                 const roleValue = (updates.role || "").toString().toLowerCase();
                 const rolesRef = doc(db, "roles", uid);
-                const roleFlags = {};
+                const roleFlags = {
+                    updatedAt: serverTimestamp()
+                };
 
+                // Set role flags based on selected role
                 if (roleValue === "psychologist") {
                     roleFlags.psychologist = true;
+                    roleFlags.peer = false;
                 } else if (roleValue === "peer") {
                     roleFlags.peer = true;
+                    roleFlags.psychologist = false;
+                } else {
+                    // For other roles, clear peer/psychologist flags
+                    roleFlags.peer = false;
+                    roleFlags.psychologist = false;
                 }
 
-                if (Object.keys(roleFlags).length > 0) {
-                    await setDoc(rolesRef, roleFlags, { merge: true });
-                }
+                // Use setDoc with merge to create or update the roles document
+                await setDoc(rolesRef, roleFlags, { merge: true });
+                console.log('Roles collection updated:', roleFlags);
             } catch (e) {
-                console.warn('Role sync skipped (likely Firestore rules):', e);
+                console.error('Role sync failed:', e);
+                // Don't fail the whole update if role sync fails
             }
         }
 

@@ -908,7 +908,8 @@ const getHeaderHTML = (rootPath) => `
                 <i class="fas fa-sun" id="theme-icon-desktop" style="font-size: 1.6rem;"></i>
             </button>
             <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> <span>Get Help Now</span></a>
-            <a href="${rootPath}portal/user-dashboard.html" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
+            <a href="${rootPath}portal/user-dashboard.html" class="user-icon-btn" title="Dashboard"><i class="fas fa-ghost"></i></a>
+            <a href="${rootPath}profile.html" class="nav-btn" style="padding:10px 20px; font-size:0.9rem;" title="My Profile"><i class="fas fa-user-circle"></i> <span style="margin-left:5px;">Profile</span></a>
             <a href="${rootPath}portal/login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
     
