@@ -1,6 +1,5 @@
 /**
  * Peer Availability Management
- * Handles loading, rendering, and saving peer availability schedules
  */
 
 import { setPeerAvailability, getPeerAvailability } from "../assets/js/peer-booking-handler.js";
@@ -11,110 +10,47 @@ const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'
 const DAY_LABELS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 let currentAvailabilityPeer = [];
 
-// Initialize when DOM is ready
+// Stub functions (replaced on DOMContentLoaded)
+window.loadAvailabilityPeer = async () => console.log('⏳ Loading...');
+window.renderAvailabilityPeer = () => console.log('⏳ Render...');
+
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🔧 Peer Availability module loaded');
+    console.log('🔧 Peer Availability initializing...');
     
-    // Add event listener for save button
+    // Replace stubs with real implementations
+    window.loadAvailabilityPeer = loadAvailability;
+    window.renderAvailabilityPeer = renderAvailability;
+    
+    // Setup event listeners
     const saveBtn = document.getElementById('save-availability-btn-peer');
-    if (saveBtn) {
-        saveBtn.addEventListener('click', handleSaveClick);
-    }
+    if (saveBtn) saveBtn.addEventListener('click', saveAvailability);
     
-    // Add event delegation for dynamic buttons
     const container = document.getElementById('availability-schedule-list-peer');
     if (container) {
         container.addEventListener('click', handleContainerClick);
         container.addEventListener('change', handleContainerChange);
     }
+    
+    // Auto-load if view active
+    const view = document.getElementById('view-availability');
+    if (view && view.classList.contains('active')) {
+        setTimeout(() => window.loadAvailabilityPeer(), 200);
+    }
+    
+    console.log('✅ Peer Availability ready');
 });
 
-// Handle save button click
-async function handleSaveClick() {
+async function loadAvailability() {
+    console.log('🔄 Loading availability...');
     const user = auth.currentUser;
-    if (!user) {
-        alert('Please log in to save availability');
-        return;
-    }
-
-    const btn = document.getElementById('save-availability-btn-peer');
-    const spinner = document.getElementById('save-availability-spinner-peer');
-    const text = document.getElementById('save-availability-text-peer');
+    if (!user) return;
 
     try {
-        console.log('💾 Saving availability:', currentAvailabilityPeer);
-        btn.disabled = true;
-        if (spinner) spinner.style.display = 'inline-block';
-        if (text) text.textContent = 'Saving...';
-
-        const success = await setPeerAvailability(user.uid, currentAvailabilityPeer);
-
-        if (success) {
-            alert('✅ Availability saved successfully!');
-        } else {
-            throw new Error('Failed to save availability');
-        }
-    } catch (error) {
-        console.error('❌ Error saving availability:', error);
-        alert('Failed to save: ' + error.message);
-    } finally {
-        btn.disabled = false;
-        if (spinner) spinner.style.display = 'none';
-        if (text) text.textContent = 'Save Schedule';
-    }
-}
-
-// Handle container clicks (add/remove buttons)
-function handleContainerClick(e) {
-    const addBtn = e.target.closest('button[data-action="add"]');
-    const removeBtn = e.target.closest('button[data-action="remove"]');
-    
-    if (addBtn) {
-        const day = addBtn.dataset.day;
-        addTimeSlot(day);
-    }
-    if (removeBtn) {
-        const day = removeBtn.dataset.day;
-        const index = parseInt(removeBtn.dataset.index);
-        removeTimeSlot(day, index);
-    }
-}
-
-// Handle time input changes
-function handleContainerChange(e) {
-    const timeInput = e.target.closest('input[type="time"]');
-    if (timeInput) {
-        const day = timeInput.dataset.day;
-        const index = parseInt(timeInput.dataset.slot);
-        const field = timeInput.dataset.field;
-        const value = timeInput.value;
-        updateTimeSlot(day, index, field, value);
-    }
-}
-
-// Load availability - exposed to window
-window.loadAvailabilityPeer = async function() {
-    console.log('🔄 Loading peer availability...');
-    const user = auth.currentUser;
-    if (!user) {
-        console.log('❌ No user logged in');
-        return;
-    }
-
-    try {
-        const userIsPeer = await isPeer(user.uid);
-        if (!userIsPeer) {
-            console.warn('⚠️ User is not a verified peer');
-        }
-
         const availability = await getPeerAvailability(user.uid);
-        console.log('Availability from Firestore:', availability);
-        
         if (availability && availability.availability) {
             currentAvailabilityPeer = availability.availability;
-            console.log('✅ Loaded availability:', currentAvailabilityPeer);
+            console.log('✅ Loaded:', currentAvailabilityPeer);
         } else {
-            console.log('⚠️ No availability found, using defaults');
             currentAvailabilityPeer = [
                 { day: 'monday', startTime: '18:00', endTime: '21:00' },
                 { day: 'tuesday', startTime: '18:00', endTime: '21:00' },
@@ -124,109 +60,94 @@ window.loadAvailabilityPeer = async function() {
             ];
         }
         renderAvailability();
-        console.log('✅ Render complete');
     } catch (error) {
-        console.error('❌ Error loading availability:', error);
+        console.error('❌ Error:', error);
         const container = document.getElementById('availability-schedule-list-peer');
         if (container) {
-            container.innerHTML = '<div style="color:red; padding:20px; text-align:center;">Error loading schedule: ' + error.message + '<br/><button onclick="window.loadAvailabilityPeer()" style="margin-top:10px; padding:8px 16px; cursor:pointer; background:var(--accent-theme); border:none; border-radius:6px; color:var(--bg-main);">Retry</button></div>';
+            container.innerHTML = '<div style="color:red; padding:20px;">Error: ' + error.message + '<br/><button onclick="window.loadAvailabilityPeer()" style="margin-top:10px; padding:8px 16px; cursor:pointer;">Retry</button></div>';
         }
     }
-};
+}
 
-// Render availability UI
-window.renderAvailabilityPeer = function() {
+function renderAvailability() {
     const container = document.getElementById('availability-schedule-list-peer');
-    if (!container) {
-        console.log('❌ Container not found');
-        return;
-    }
+    if (!container) return;
 
-    container.innerHTML = DAYS.map((day, index) => {
-        const daySlots = currentAvailabilityPeer.filter(slot => slot.day.toLowerCase() === day);
-        const dayLabel = DAY_LABELS[index];
-
-        if (daySlots.length === 0) {
-            return `
-                <div class="schedule-row" data-day="${day}"
-                    style="display:flex; border-bottom:1px solid var(--border-subtle); padding:15px 0; align-items:center; opacity:0.5;">
-                    <div style="width:100px; font-weight:600;">${dayLabel}</div>
-                    <div style="flex:1; font-style:italic;">Unavailable</div>
-                    <button data-action="add" data-day="${day}"
-                        style="background:none; border:none; color:var(--accent-theme); cursor:pointer;">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            `;
+    container.innerHTML = DAYS.map((day, i) => {
+        const slots = currentAvailabilityPeer.filter(s => s.day.toLowerCase() === day);
+        if (slots.length === 0) {
+            return `<div style="display:flex; border-bottom:1px solid var(--border-subtle); padding:15px 0; align-items:center;">
+                <div style="width:100px; font-weight:600;">${DAY_LABELS[i]}</div>
+                <div style="flex:1; opacity:0.5;">Unavailable</div>
+                <button data-action="add" data-day="${day}" style="background:none; border:none; color:var(--accent-theme); cursor:pointer;"><i class="fas fa-plus"></i></button>
+            </div>`;
         }
-
-        return `
-            <div class="schedule-row" data-day="${day}"
-                style="display:flex; border-bottom:1px solid var(--border-subtle); padding:15px 0; align-items:flex-start;">
-                <div style="width:100px; font-weight:600; padding-top:8px;">${dayLabel}</div>
-                <div style="flex:1;">
-                    ${daySlots.map((slot, slotIndex) => `
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                            <input type="time" value="${slot.startTime}"
-                                data-day="${day}" data-slot="${slotIndex}" data-field="startTime"
-                                style="background:var(--bg-subtle); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;">
-                            <span>-</span>
-                            <input type="time" value="${slot.endTime}"
-                                data-day="${day}" data-slot="${slotIndex}" data-field="endTime"
-                                style="background:var(--bg-subtle); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;">
-                            <button data-action="remove" data-day="${day}" data-index="${slotIndex}"
-                                style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:5px;">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `).join('')}
-                </div>
-                <button data-action="add" data-day="${day}"
-                    style="background:none; border:none; color:var(--accent-theme); cursor:pointer; padding:5px;">
-                    <i class="fas fa-plus"></i>
-                </button>
+        return `<div style="display:flex; border-bottom:1px solid var(--border-subtle); padding:15px 0; align-items:flex-start;">
+            <div style="width:100px; font-weight:600; padding-top:8px;">${DAY_LABELS[i]}</div>
+            <div style="flex:1;">
+                ${slots.map((slot, idx) => `<div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                    <input type="time" value="${slot.startTime}" data-day="${day}" data-slot="${idx}" data-field="startTime" style="background:var(--bg-subtle); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;">
+                    <span>-</span>
+                    <input type="time" value="${slot.endTime}" data-day="${day}" data-slot="${idx}" data-field="endTime" style="background:var(--bg-subtle); border:1px solid var(--border-subtle); color:var(--text-main); padding:8px; border-radius:6px;">
+                    <button data-action="remove" data-day="${day}" data-index="${idx}" style="background:none; border:none; color:#ef4444; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                </div>`).join('')}
             </div>
-        `;
+            <button data-action="add" data-day="${day}" style="background:none; border:none; color:var(--accent-theme); cursor:pointer;"><i class="fas fa-plus"></i></button>
+        </div>`;
     }).join('');
-    
-    console.log('✅ Schedule rendered');
-};
+}
 
-// Add time slot
-function addTimeSlot(day) {
-    console.log('➕ Adding slot for', day);
-    const newSlot = { day: day.toLowerCase(), startTime: '18:00', endTime: '21:00' };
-    currentAvailabilityPeer.push(newSlot);
+function handleContainerClick(e) {
+    const addBtn = e.target.closest('button[data-action="add"]');
+    const removeBtn = e.target.closest('button[data-action="remove"]');
+    if (addBtn) addSlot(addBtn.dataset.day);
+    if (removeBtn) removeSlot(removeBtn.dataset.day, parseInt(removeBtn.dataset.index));
+}
+
+function handleContainerChange(e) {
+    const input = e.target.closest('input[type="time"]');
+    if (input) updateSlot(input.dataset.day, parseInt(input.dataset.slot), input.dataset.field, input.value);
+}
+
+async function saveAvailability() {
+    const user = auth.currentUser;
+    if (!user) { alert('Please log in'); return; }
+
+    const btn = document.getElementById('save-availability-btn-peer');
+    const spinner = document.getElementById('save-availability-spinner-peer');
+    const text = document.getElementById('save-availability-text-peer');
+
+    try {
+        btn.disabled = true;
+        if (spinner) spinner.style.display = 'inline-block';
+        if (text) text.textContent = 'Saving...';
+
+        const success = await setPeerAvailability(user.uid, currentAvailabilityPeer);
+        if (success) alert('✅ Saved!');
+        else throw new Error('Failed to save');
+    } catch (error) {
+        alert('Error: ' + error.message);
+    } finally {
+        btn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (text) text.textContent = 'Save Schedule';
+    }
+}
+
+function addSlot(day) {
+    currentAvailabilityPeer.push({ day: day.toLowerCase(), startTime: '18:00', endTime: '21:00' });
     renderAvailability();
 }
 
-// Remove time slot
-function removeTimeSlot(day, slotIndex) {
-    console.log('🗑️ Removing slot for', day, 'index', slotIndex);
-    const daySlots = currentAvailabilityPeer.filter(slot => slot.day.toLowerCase() === day);
-    if (slotIndex >= 0 && slotIndex < daySlots.length) {
-        const slotToRemove = daySlots[slotIndex];
-        const index = currentAvailabilityPeer.indexOf(slotToRemove);
-        if (index !== -1) {
-            currentAvailabilityPeer.splice(index, 1);
-            renderAvailability();
-        }
+function removeSlot(day, index) {
+    const slots = currentAvailabilityPeer.filter(s => s.day.toLowerCase() === day);
+    if (index >= 0 && index < slots.length) {
+        const i = currentAvailabilityPeer.indexOf(slots[index]);
+        if (i !== -1) { currentAvailabilityPeer.splice(i, 1); renderAvailability(); }
     }
 }
 
-// Update time slot
-function updateTimeSlot(day, slotIndex, field, value) {
-    const daySlots = currentAvailabilityPeer.filter(slot => slot.day.toLowerCase() === day);
-    if (slotIndex >= 0 && slotIndex < daySlots.length) {
-        const slot = daySlots[slotIndex];
-        slot[field] = value;
-        console.log('✏️ Updated slot:', day, slotIndex, field, value);
-    }
-}
-
-// Helper function to render (alias for window function)
-function renderAvailability() {
-    if (window.renderAvailabilityPeer) {
-        window.renderAvailabilityPeer();
-    }
+function updateSlot(day, index, field, value) {
+    const slots = currentAvailabilityPeer.filter(s => s.day.toLowerCase() === day);
+    if (index >= 0 && index < slots.length) slots[index][field] = value;
 }

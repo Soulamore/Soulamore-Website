@@ -1981,7 +1981,27 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
 
             // Sidebar Hook: Availability
             if (viewName === 'availability') {
-                window.loadAvailabilityPeer();
+                console.log('📅 Switching to availability view...');
+                // Wait for module to load if needed
+                setTimeout(() => {
+                    if (typeof window.loadAvailabilityPeer === 'function') {
+                        window.loadAvailabilityPeer();
+                    } else {
+                        console.warn('⚠️ loadAvailabilityPeer not loaded yet, will retry...');
+                        // Retry after 500ms
+                        setTimeout(() => {
+                            if (typeof window.loadAvailabilityPeer === 'function') {
+                                window.loadAvailabilityPeer();
+                            } else {
+                                console.error('❌ loadAvailabilityPeer still not available');
+                                const container = document.getElementById('availability-schedule-list-peer');
+                                if (container) {
+                                    container.innerHTML = '<div style="color:red; padding:20px; text-align:center;">Error loading availability module.<br/><button onclick="location.reload()" style="margin-top:10px; padding:8px 16px; cursor:pointer;">Refresh Page</button></div>';
+                                }
+                            }
+                        }, 500);
+                    }
+                }, 100);
             }
         };
     </script>
