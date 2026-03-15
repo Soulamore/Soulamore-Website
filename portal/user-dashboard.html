@@ -1373,10 +1373,29 @@
                             const { getUserRole } = await import("../assets/js/role-helper.js");
                             const roleInfo = await getUserRole(user.uid);
                             
+                            // Also check users collection directly as fallback
+                            const { getUserProfile } = await import("../assets/js/profile-handler.js");
+                            const userProfile = await getUserProfile(user.uid);
+                            const usersCollectionRole = (userProfile?.role || '').toLowerCase();
+                            
                             const availabilityLink = document.getElementById('nav-availability-link');
-                            if (availabilityLink && (roleInfo?.isPeer || roleInfo?.isPsychologist)) {
-                                availabilityLink.style.display = 'flex';
-                                console.log('Showing availability link for peer/psychologist');
+                            if (availabilityLink) {
+                                const isPeerOrPsych = roleInfo?.isPeer || roleInfo?.isPsychologist || 
+                                                     usersCollectionRole === 'peer' || usersCollectionRole === 'psychologist';
+                                
+                                console.log('Role check:', { 
+                                    roleInfo, 
+                                    usersCollectionRole, 
+                                    shouldShow: isPeerOrPsych 
+                                });
+                                
+                                if (isPeerOrPsych) {
+                                    availabilityLink.style.display = 'flex';
+                                    console.log('✅ Showing availability link for peer/psychologist');
+                                } else {
+                                    availabilityLink.style.display = 'none';
+                                    console.log('❌ Hiding availability link - not a peer/psychologist');
+                                }
                             }
                         } catch (e) {
                             console.error("Failed to check user role:", e);
