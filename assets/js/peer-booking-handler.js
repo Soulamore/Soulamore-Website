@@ -4,7 +4,8 @@
  * Works for both peers and psychologists
  */
 
-import { db, collection, addDoc, doc, getDoc, setDoc, updateDoc, getDocs, query, where, serverTimestamp, Timestamp } from "./firebase-config.js";
+import { db, collection, addDoc, doc, getDoc, setDoc, updateDoc, getDocs, query, where, serverTimestamp } from "./firebase-config.js";
+import { Timestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { isProfessional, getUserRole } from "./role-helper.js";
 
 const PEER_BOOKINGS_COLLECTION = "peer_bookings";
