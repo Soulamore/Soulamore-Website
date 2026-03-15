@@ -2,13 +2,42 @@
  * Peer Availability Management - IMMEDIATE LOAD
  */
 
-import { setPeerAvailability, getPeerAvailability } from "../assets/js/peer-booking-handler.js";
-import { auth } from "../assets/js/firebase-config.js";
+import { db, auth } from "../assets/js/firebase-config.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { isPeer } from "../assets/js/role-helper.js";
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 const DAY_LABELS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 let currentAvailabilityPeer = [];
+
+// Inline functions (no dependency on peer-booking-handler)
+async function getPeerAvailability(peerId) {
+    try {
+        const docRef = doc(db, "peer_availability", peerId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) return { id: docSnap.id, ...docSnap.data() };
+        return null;
+    } catch (error) {
+        console.error("Error getting availability:", error);
+        return null;
+    }
+}
+
+async function setPeerAvailability(peerId, availability) {
+    try {
+        const docRef = doc(db, "peer_availability", peerId);
+        await setDoc(docRef, {
+            peerId: peerId,
+            availability: availability,
+            timezone: "Asia/Kolkata",
+            updatedAt: new Date().toISOString()
+        }, { merge: true });
+        return true;
+    } catch (error) {
+        console.error("Error setting availability:", error);
+        return false;
+    }
+}
 let isInitialized = false;
 
 // IMMEDIATELY expose functions to window
