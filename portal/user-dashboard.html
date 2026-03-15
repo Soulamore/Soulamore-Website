@@ -693,12 +693,21 @@
                     <div class="dash-card">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
                             <h3 style="color:var(--teal-accent);">Weekly Schedule</h3>
-                            <div style="font-size:0.8rem; background:rgba(45, 212, 191, 0.1); color:var(--teal-accent); padding:5px 10px; border-radius:20px;">
-                                <i class="fas fa-globe"></i> GMT+05:30 (IST)
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <button onclick="window.loadAvailabilityUser()" style="background:transparent; border:1px solid var(--border-subtle); color:var(--text-muted); padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.8rem;" title="Refresh">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                                <div style="font-size:0.8rem; background:rgba(45, 212, 191, 0.1); color:var(--teal-accent); padding:5px 10px; border-radius:20px;">
+                                    <i class="fas fa-globe"></i> GMT+05:30 (IST)
+                                </div>
                             </div>
                         </div>
                         <div class="schedule-list" id="availability-schedule-list-user">
-                            <div style="padding:20px; text-align:center; opacity:0.5;">Loading schedule...</div>
+                            <div style="padding:20px; text-align:center; opacity:0.5;">
+                                <i class="fas fa-circle-notch fa-spin" style="font-size:1.5rem; margin-bottom:10px; display:block;"></i>
+                                Loading schedule...
+                                <div style="font-size:0.85rem; margin-top:10px; opacity:0.7;">If this takes too long, click Refresh</div>
+                            </div>
                         </div>
                         <div style="margin-top:25px; text-align:right;">
                             <button class="btn-dash-primary" id="save-availability-btn-user" onclick="saveAvailabilityUser()">
@@ -1454,17 +1463,26 @@
                 // Load availability when view is shown
                 window.loadAvailabilityUser = async function() {
                     const user = auth.currentUser;
-                    if (!user) return;
+                    if (!user) {
+                        console.log('No user logged in');
+                        return;
+                    }
+
+                    const container = document.getElementById('availability-schedule-list-user');
+                    if (!container) {
+                        console.log('Container not found');
+                        return;
+                    }
 
                     try {
+                        console.log('Loading availability for user:', user.uid);
                         const availability = await getPeerAvailability(user.uid);
-                        const container = document.getElementById('availability-schedule-list-user');
                         
-                        if (!container) return;
-
                         if (availability && availability.availability) {
+                            console.log('Found availability:', availability.availability);
                             currentAvailabilityUser = availability.availability;
                         } else {
+                            console.log('No availability found, using defaults');
                             // Default availability (Mon-Fri, 9-5)
                             currentAvailabilityUser = [
                                 { day: 'monday', startTime: '09:00', endTime: '17:00' },
@@ -1475,10 +1493,12 @@
                             ];
                         }
 
+                        console.log('Rendering availability with:', currentAvailabilityUser);
                         renderAvailabilityUser();
+                        console.log('Render complete');
                     } catch (error) {
                         console.error('Error loading availability:', error);
-                        container.innerHTML = '<div style="color:red; padding:20px;">Error loading schedule.</div>';
+                        container.innerHTML = '<div style="color:red; padding:20px;">Error loading schedule. Please refresh the page.</div>';
                     }
                 };
 
@@ -1552,13 +1572,42 @@
                 const originalSwitchView = window.switchView;
                 window.switchView = function(viewName, element) {
                     if (originalSwitchView) originalSwitchView(viewName, element);
-                    
+
                     if (viewName === 'availability') {
+                        console.log('Availability view opened, loading...');
                         setTimeout(() => {
                             window.loadAvailabilityUser();
                         }, 100);
                     }
                 };
+                
+                // Auto-load availability on page load for peers/psychologists
+                setTimeout(async () => {
+                    try {
+                        const { getUserRole } = await import("../assets/js/role-helper.js");
+                        const user = auth.currentUser;
+                        if (!user) return;
+                        
+                        const roleInfo = await getUserRole(user.uid);
+                        const userProfile = await getUserProfile(user.uid);
+                        const usersCollectionRole = (userProfile?.role || '').toLowerCase();
+                        
+                        const isPeerOrPsych = roleInfo?.isPeer || roleInfo?.isPsychologist || 
+                                             usersCollectionRole === 'peer' || usersCollectionRole === 'psychologist';
+                        
+                        if (isPeerOrPsych) {
+                            console.log('User is peer/psychologist, pre-loading availability...');
+                            // Pre-load but don't render until view is shown
+                            const availability = await getPeerAvailability(user.uid);
+                            if (availability && availability.availability) {
+                                currentAvailabilityUser = availability.availability;
+                                console.log('Availability pre-loaded:', currentAvailabilityUser);
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Error pre-loading availability:', e);
+                    }
+                }, 1000);
             </script>
 
 
