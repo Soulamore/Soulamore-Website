@@ -42,7 +42,7 @@ async function initNewsFeed(containerId, limit = 6) {
     // 2. Fetch Fresh Data
     try {
         const rootPath = getRootPath();
-        const response = await fetch(`${rootPath}assets/data/news-feed.json?t=${now}`);
+        const response = await fetch(`${rootPath}assets/data/news-feed.json`);
         if (!response.ok) throw new Error('Unavailable');
 
         let articles = await response.json();
@@ -75,7 +75,7 @@ async function initGlobalTicker() {
 
     try {
         const rootPath = getRootPath();
-        const response = await fetch(`${rootPath}assets/data/news-feed.json?t=${now}`);
+        const response = await fetch(`${rootPath}assets/data/news-feed.json`);
         if (!response.ok) throw new Error('Unavailable');
         let articles = await response.json();
 

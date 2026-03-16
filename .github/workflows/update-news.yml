@@ -5,11 +5,11 @@ permissions:
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # Every 30 minutes
+    - cron: '0 */12 * * *' # Every 12 hours
   push:
     branches:
       - aditya
-  workflow_dispatch: # Allows manual trigger
+  workflow_dispatch:
 
 jobs:
   update-news:
@@ -30,15 +30,15 @@ jobs:
 
       - name: Run News Sync Script
         run: python smart_news_rituals.py
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Commit and Push Changes
         run: |
           git config --global user.name "Soulamore Bot"
           git config --global user.email "bot@soulamore.com"
-          # Stage files only if they exist
           git add assets/data/news-feed.json || true
           git add assets/data/rituals.json || true
-          # Add any existing archive JSONs
           find "knowledge source/news sourced" -name "*.json" | xargs -r git add || true
           git commit -m "chore: dynamic news update [skip ci]" || echo "No changes to commit"
           git push
