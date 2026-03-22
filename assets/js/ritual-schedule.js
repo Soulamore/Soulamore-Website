@@ -451,7 +451,7 @@ window.renderRitualWidget = function (containerId, isDarkTheme = false) {
     else if (nameLower.includes("iran") || nameLower.includes("solidarity")) icon = "🕯️";
 
     const descriptionHtml = nextRitual.description
-        ? `<div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-top: 4px; margin-left: 32px;">${nextRitual.description}</div>`
+        ? `<div class="ritual-desc" style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-top: 4px; margin-left: 32px;">${nextRitual.description}</div>`
         : '';
 
     container.innerHTML = `

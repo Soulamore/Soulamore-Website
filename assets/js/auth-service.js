@@ -2,7 +2,40 @@
  * Auth Service
  * Handles Google Login, Email/Pass Login, and User Session.
  */
-import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, linkWithCredential, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, EmailAuthProvider } from "./firebase-config.js";
+import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, linkWithCredential, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, EmailAuthProvider, db, doc, setDoc, getDoc, serverTimestamp } from "./firebase-config.js";
+
+/**
+ * Create a basic user profile in Firestore
+ */
+async function createUserProfile(user, additionalData = {}) {
+    try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+            await setDoc(userRef, {
+                uid: user.uid,
+                displayName: user.displayName || user.email?.split('@')[0] || 'User',
+                email: user.email || '',
+                role: 'Member',
+                location: '',
+                phone: '',
+                bio: '',
+                photoURL: user.photoURL || '',
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+                authProviders: user.providerData?.map(p => p.providerId) || ['password'],
+                ...additionalData
+            });
+            console.log("✅ User profile created in Firestore:", user.uid);
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error("❌ Error creating user profile:", error);
+        return false;
+    }
+}
 
 /**
  * Sign Up with Email/Password
@@ -11,8 +44,11 @@ export async function signUpWithEmail(email, password, name) {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        // Ideally updateProfile here (but requires another import 'updateProfile')
-        // For MVP we just return user
+
+        await createUserProfile(user, {
+            displayName: name || email.split('@')[0]
+        });
+
         console.log("Registered:", user.uid);
         return { success: true, user: user };
     } catch (error) {
@@ -46,10 +82,13 @@ export async function loginWithGoogle() {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
         console.log("Google Login Success:", user.displayName);
+
+        // Create Firestore profile if it doesn't exist
+        await createUserProfile(user);
+
         return { success: true, user: user };
     } catch (error) {
         console.error("Google Login Error:", error);
-        // Return error code for better debugging
         const errorCode = error.code || error.message;
         const errorMessage = error.message || 'Unknown error occurred';
         return { success: false, error: errorMessage, code: errorCode };
