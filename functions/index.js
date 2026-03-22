@@ -34,19 +34,25 @@ const cors = require('cors')({
   }
 });
 
+// admin.initializeApp() is called once at the top level
 admin.initializeApp();
 
-// Initialize Razorpay with Key ID and Secret from environment variables
-const razorpay = new Razorpay({
-  key_id: functions.config().razorpay.key_id || process.env.RAZORPAY_KEY_ID,
-  key_secret: functions.config().razorpay.key_secret || process.env.RAZORPAY_KEY_SECRET
-});
+// Lazy initialization function for Razorpay
+// This ensures credentials are only required when the function is actually called
+const getRazorpay = () => {
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID || '',
+    key_secret: process.env.RAZORPAY_KEY_SECRET || ''
+  });
+};
 
 /**
  * Verify Razorpay payment signature
  * This should be called after payment to verify authenticity
  */
-exports.verifyPayment = functions.https.onRequest((req, res) => {
+exports.verifyPayment = functions
+  .runWith({ secrets: ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET'] })
+  .https.onRequest((req, res) => {
   return cors(req, res, async () => {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
@@ -63,7 +69,7 @@ exports.verifyPayment = functions.https.onRequest((req, res) => {
       const crypto = require('crypto');
       const text = razorpay_order_id + '|' + razorpay_payment_id;
       const generatedSignature = crypto
-        .createHmac('sha256', functions.config().razorpay.key_secret || process.env.RAZORPAY_KEY_SECRET)
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || '')
         .update(text)
         .digest('hex');
 
@@ -73,7 +79,8 @@ exports.verifyPayment = functions.https.onRequest((req, res) => {
       }
 
       // Get payment details from Razorpay
-      const payment = await razorpay.payments.fetch(razorpay_payment_id);
+      const rzp = getRazorpay();
+      const payment = await rzp.payments.fetch(razorpay_payment_id);
 
       if (payment.status !== 'captured') {
         return res.status(400).json({ error: 'Payment not captured' });
@@ -152,7 +159,9 @@ exports.verifyPayment = functions.https.onRequest((req, res) => {
  * Create Razorpay order (optional - for pre-creating orders)
  * This can be used if you want to create orders server-side
  */
-exports.createRazorpayOrder = functions.https.onRequest((req, res) => {
+exports.createRazorpayOrder = functions
+  .runWith({ secrets: ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET'] })
+  .https.onRequest((req, res) => {
   return cors(req, res, async () => {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
@@ -172,7 +181,8 @@ exports.createRazorpayOrder = functions.https.onRequest((req, res) => {
         notes: notes || {}
       };
 
-      const order = await razorpay.orders.create(options);
+      const rzp = getRazorpay();
+      const order = await rzp.orders.create(options);
 
       return res.status(200).json({
         success: true,
@@ -193,21 +203,25 @@ exports.createRazorpayOrder = functions.https.onRequest((req, res) => {
 
 const nodemailer = require('nodemailer');
 
-// Configure the email transport using ZeptoMail SMTP
-const mailTransport = nodemailer.createTransport({
-  host: "smtp.zeptomail.eu",
-  port: 587,
-  auth: {
-    user: functions.config().zeptomail?.user || process.env.ZEPTOMAIL_USER || "emailapikey",
-    pass: functions.config().zeptomail?.password || process.env.ZEPTOMAIL_PASSWORD || "yA6KbHtS7w/0lzkCRhRo1MCI9ohk//1q2n+15CDmeMIlLoGzh6E51kFpKtq7dTfeiI7W5f1SP48WJ9uwuIwKKpJnY9AHLJTGTuv4P2uV48xh8ciEYNYigZisALkRFKBJcBknDy83RPMmWA=="
-  }
-});
+// Lazy initialization for email transport
+const getMailTransport = () => {
+  return nodemailer.createTransport({
+    host: "smtp.zeptomail.eu",
+    port: 587,
+    auth: {
+      user: process.env.ZEPTOMAIL_USER || "emailapikey",
+      pass: process.env.ZEPTOMAIL_PASSWORD || ""
+    }
+  });
+};
 
 /**
  * Sends an email notification whenever a new assessment lead is submitted.
  * Triggers on document creation in the 'assessment_leads' collection.
  */
-exports.sendLeadNotificationEmail = functions.firestore
+exports.sendLeadNotificationEmail = functions
+  .runWith({ secrets: ['ZEPTOMAIL_PASSWORD', 'ZEPTOMAIL_USER'] })
+  .firestore
   .document('assessment_leads/{leadId}')
   .onCreate(async (snap, context) => {
     const lead = snap.data();
@@ -250,6 +264,7 @@ exports.sendLeadNotificationEmail = functions.firestore
     };
 
     try {
+      const mailTransport = getMailTransport();
       await mailTransport.sendMail(mailOptions);
       console.log('Lead notification email dispatched to contact.soulamore@gmail.com');
       return null;
