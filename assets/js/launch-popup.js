@@ -24,9 +24,9 @@
     const isDesktop = window.innerWidth > 900;
     // RESTORED IFRAME for "Live Site" preview
     // Removed pointer-events: none to allow scrolling/interaction inside the preview
-    // Added timestamp to force refresh and bypass cache for the sticker fix
+    // Keep the preview cacheable so the popup does not force a full homepage reload.
     const iframeHTML = isDesktop
-        ? `<iframe src="./index.html?v=${new Date().getTime()}" class="site-iframe" title="App Preview"></iframe>`
+        ? `<iframe src="./index.html" class="site-iframe" title="App Preview"></iframe>`
         : `<!-- Phone View Hidden on Mobile -->`;
 
     // 1. Create the Popup HTML Structure

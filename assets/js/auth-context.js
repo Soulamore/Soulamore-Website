@@ -56,40 +56,57 @@ export async function handleRoleRouting(user, intent, isNewUser = false) {
         }
     }
 
-    // 1. ADMIN (Simple Check for MVP)
-    if (intent === 'admin') {
+    // 1. HARDCODED BYPASSES (Emergency Override)
+    const normalizedEmail = (user.email || '').toLowerCase();
+    
+    // Admin Override
+    if (normalizedEmail === 'admin@soulamore.com') {
+        console.log('[AuthContext] Hardcoded Admin detected.');
+        sessionStorage.setItem('userRole', 'admin');
         finalizeSession('admin', 'portal/admin-dashboard.html');
         return;
     }
 
-    // 2. USER (Default)
-    if (intent === 'user') {
-        finalizeSession('user', 'portal/user-dashboard.html');
+    // Peer Test (Sonika)
+    if (normalizedEmail === 'sonikakundal2002@gmail.com') {
+        console.log('[AuthContext] Hardcoded Peer (Sonika) detected.');
+        sessionStorage.setItem('userRole', 'peer');
+        finalizeSession('peer', 'portal/peer-dashboard.html');
         return;
     }
 
-    // 3. PEER & PSYCHOLOGIST (Firestore Verification)
     try {
+        // 2. FIRESTORE ROLE VERIFICATION (Primary Source of Truth)
         const db = getFirestore();
         const roleDocRef = doc(db, 'roles', user.uid);
         const roleDoc = await getDoc(roleDocRef);
+        const roleData = roleDoc.exists() ? roleDoc.data() : {};
 
-        if (intent === 'peer') {
-            const isVerifiedPeer = roleDoc.exists() && roleDoc.data().peer === true;
-            if (isVerifiedPeer) {
+        // A. SYSTEM ADMIN FLAG
+        if (roleData.admin === true || intent === 'admin') {
+            sessionStorage.setItem('userRole', 'admin');
+            finalizeSession('admin', 'portal/admin-dashboard.html');
+            return;
+        }
+
+        // B. PEER ROLE FLAG (or intent with existing flag)
+        if (roleData.peer === true || intent === 'peer') {
+            if (roleData.peer === true) {
+                sessionStorage.setItem('userRole', 'peer');
                 finalizeSession('peer', 'portal/peer-dashboard.html');
-            } else {
+            } else if (intent === 'peer') {
                 alert("Status: Application Pending. You are not yet verified as a Peer. Redirecting to User Dashboard.");
                 finalizeSession('user', 'portal/user-dashboard.html');
             }
             return;
         }
 
-        if (intent === 'psychologist') {
-            const isVerifiedPsych = roleDoc.exists() && roleDoc.data().psychologist === true;
-            if (isVerifiedPsych) {
+        // C. PSYCHOLOGIST ROLE FLAG
+        if (roleData.psychologist === true || intent === 'psychologist') {
+            if (roleData.psychologist === true) {
+                sessionStorage.setItem('userRole', 'psychologist');
                 finalizeSession('psychologist', 'portal/psych-dashboard.html');
-            } else {
+            } else if (intent === 'psychologist') {
                 alert("Status: Not Verified. Professional access restricted. Redirecting to User Dashboard.");
                 finalizeSession('user', 'portal/user-dashboard.html');
             }
@@ -98,7 +115,8 @@ export async function handleRoleRouting(user, intent, isNewUser = false) {
 
     } catch (error) {
         console.error('[AuthContext] Role verification error:', error);
-        alert("Unable to verify professional status. Redirecting to User Dashboard.");
-        finalizeSession('user', 'portal/user-dashboard.html');
     }
+
+    // 3. DEFAULT: USER DASHBOARD
+    finalizeSession('user', 'portal/user-dashboard.html');
 }

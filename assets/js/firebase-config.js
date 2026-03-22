@@ -5,8 +5,10 @@
 
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, startAfter } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, linkWithCredential, EmailAuthProvider, updatePassword, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
 // Note: enableIndexedDbPersistence was removed in Firebase v10. Offline persistence is now enabled by default.
 
 // ... (existing code for firebaseConfig, initializeApp, etc. remains unchanged) ...
@@ -35,6 +37,14 @@ try {
     console.log("Firebase app initialized");
 }
 
+// --- APP CHECK INITIALIZATION ---
+// This provides automatic bot protection for Firestore and Cloud Functions.
+const appCheck = initializeAppCheck(app, {
+    provider: new ReCaptchaEnterpriseProvider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
+    isTokenAutoRefreshEnabled: true
+});
+console.log("✅ App Check initialized with reCAPTCHA Enterprise");
+
 let analytics = null;
 // Load Analytics dynamically so adblockers don't crash the entire ES6 module
 import("https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js").then((module) => {
@@ -49,6 +59,7 @@ const db = getFirestore(app);
 // Initialize Firebase Authentication
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
+const functionsInstance = getFunctions(app);
 
 // Enable Auth persistence (session stays across page refreshes)
 setPersistence(auth, browserLocalPersistence)
@@ -91,6 +102,6 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // Export for use in other modules
-export { db, collection, addDoc, serverTimestamp, auth, googleProvider, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, linkWithCredential, EmailAuthProvider, signInAnonymously };
+export { db, collection, addDoc, serverTimestamp, auth, googleProvider, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, startAfter, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, linkWithCredential, EmailAuthProvider, signInAnonymously, functionsInstance, httpsCallable };
 
 console.log("Firebase initialized.");

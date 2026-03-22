@@ -14,15 +14,21 @@
     --gradient-primary: linear-gradient(135deg, var(--teal-glow) 0%, #2a9d8f 100%);
 }
 
-body.auth {
+body.auth-body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     background-color: var(--deep-space);
+    background: radial-gradient(circle at top left, #1e293b, #0f172a) !important;
     color: var(--starlight);
     line-height: 1.6;
     margin: 0;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+}
+
+body.light-mode.auth-body {
+    background: radial-gradient(circle at top left, #f8fafc, #e2e8f0) !important;
+    color: #1e293b !important;
 }
 
 /* 3. The Scene Grid (Horizontal split, full height minus header) */
@@ -116,7 +122,7 @@ body.auth {
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(15, 23, 42, 0.3);
+    background: transparent !important; /* REMOVED GREY BOX */
     position: relative;
 }
 
@@ -200,15 +206,28 @@ body.auth {
 }
 
 .role-pill.active {
-    color: var(--deep-space);
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    /* Fallback */
-    background: var(--peach-glow);
-    border-color: var(--peach-glow);
+    color: #0f172a !important; /* Force deep dark for text */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    font-weight: 800;
+}
+
+/* Role Specific Colors - DARK MODE DEFAULT */
+.role-pill:nth-child(1).active { 
+    background: #ffffff !important; 
+    border-color: #ffffff !important; 
+}
+.role-pill:nth-child(2).active { 
+    background: var(--peach-glow) !important; 
+    border-color: var(--peach-glow) !important; 
+}
+.role-pill:nth-child(3).active { 
+    background: var(--teal-glow) !important; 
+    border-color: var(--teal-glow) !important; 
 }
 
 .role-pill.active i {
     opacity: 1;
+    color: #0f172a !important; /* Force deep dark for icons too */
 }
 
 /* FORM STYLES (Compact) */
@@ -291,8 +310,8 @@ body.auth {
 }
 
 .divider span {
-    background: #151e2e;
-    padding: 0 8px;
+    background: var(--navy-glass); /* MATCH DARK CARD */
+    padding: 0 10px;
     position: absolute;
     top: -10px;
     left: 50%;
@@ -499,4 +518,174 @@ body.light-mode .particle:nth-child(even) {
 
 body.light-mode .particle:nth-child(3n) {
     background: var(--text-secondary) !important;
+}
+
+/* === LIGHT MODE RITUAL REFINEMENTS === */
+body.light-mode .ritual-widget {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-mode .auth-left {
+    background: transparent !important; /* Allow body gradient to show */
+}
+
+body.light-mode .auth-left h1,
+body.light-mode .hero-title-premium,
+body.light-mode .auth-left .auth-context h1 {
+    background: linear-gradient(90deg, #3fbab1 0%, #8ea98e 52%, #d48f68 100%) !important;
+    background-clip: text !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+}
+
+body.light-mode .auth-left p,
+body.light-mode .auth-left .feature-item span {
+    color: #475569 !important; /* Force Dark Slate for body text */
+}
+
+/* CALMER ANIMATIONS - DISABLED INFINITE FLOAT */
+.login-card, .social-btn, .ritual-widget {
+    animation-iteration-count: 1 !important; /* Only run once (for fadeIn) */
+    transform: none !important; /* Prevent floating */
+}
+
+/* Allow the actual fadeIn to work */
+.login-card.fade-in {
+    opacity: 1 !important;
+}
+
+.fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+body.light-mode .ritual-text {
+    color: #1e293b !important; /* Dark Slate for readability */
+}
+
+body.light-mode .ritual-highlight {
+    color: #0891b2 !important; /* Darker teal */
+}
+
+body.light-mode .ritual-timer {
+    color: #c2410c !important; /* Darker peach/orange */
+}
+
+/* Ensure sub-elements like pills are also readable */
+body.light-mode .ritual-pill {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #1e293b !important;
+}
+
+body.light-mode .ritual-desc {
+    color: #475569 !important;
+}
+
+/* === GENERAL LIGHT MODE AUTH FIXES === */
+body.light-mode .login-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-mode .card-title {
+    color: #0f172a !important;
+}
+
+body.light-mode .card-subtitle {
+    color: #475569 !important;
+}
+
+body.light-mode .role-pill {
+    background: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+    color: #475569 !important;
+}
+
+body.light-mode .role-pill i {
+    color: #64748b !important;
+}
+
+/* Role Specific Colors - LIGHT MODE OVERRIDES */
+body.light-mode .role-pill.active {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1) !important;
+    color: #ffffff !important;
+}
+
+body.light-mode .role-pill:nth-child(1).active { 
+    background: #475569 !important; /* Soft Slate */
+    border-color: #475569 !important; 
+}
+body.light-mode .role-pill:nth-child(2).active { 
+    background: var(--peach-glow) !important; 
+    border-color: var(--peach-glow) !important; 
+}
+body.light-mode .role-pill:nth-child(3).active { 
+    background: var(--teal-glow) !important; 
+    border-color: var(--teal-glow) !important; 
+}
+
+body.light-mode .role-pill.active i {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+body.light-mode .form-label {
+    color: #1e293b !important;
+    font-weight: 600 !important;
+}
+
+body.light-mode .form-input {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+body.light-mode .remember-me {
+    color: #1e293b !important;
+}
+
+body.light-mode .developer-link {
+    color: #64748b !important; /* Make visible grey instead of white */
+    opacity: 0.8 !important;
+}
+
+body.light-mode .developer-link:hover {
+    color: var(--teal-glow) !important;
+    opacity: 1 !important;
+}
+
+body.light-mode .card-footer-text {
+    color: #64748b !important;
+}
+
+body.light-mode .social-btn {
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #475569 !important;
+}
+
+body.light-mode .divider span {
+    background: #ffffff !important; /* MATCH LIGHT CARD */
+    color: #475569 !important; /* Darker Slate for OR */
+}
+
+/* Forgot Password contrast */
+body.light-mode a[href*="forgot-password"] {
+    color: #0891b2 !important; /* Darker teal */
+    font-weight: 600 !important;
+}
+
+/* Logo Overlay Logic (Bridged from Global) */
+body.light-mode .logo-img-light-overlay {
+    filter: brightness(0) invert(0.2) sepia(0.5) hue-rotate(180deg) saturate(0.8) !important;
+    clip-path: inset(0 0 0 32%) !important;
 }

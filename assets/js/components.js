@@ -184,18 +184,32 @@ try {
             }
             .nav-links > a, .nav-logo { border: none !important; } /* GLOBAL: Remove any vertical borders */
             .nav-links::-webkit-scrollbar { display: none !important; }
-            .auth-box {
-                display: flex !important; /* Force Auth Box Visible */
-                align-items: center !important;
-                gap: 12px !important; /* Slightly reduced gap */
-            }
             .main-nav {
-                /* Grid layout defined in global.css */
+                display: flex !important;
+                justify-content: space-between !important;
                 align-items: center !important;
-                padding: 0 !important; /* Let header handle padding */
+                padding: 0 !important;
                 width: 100% !important;
-                max-width: none !important; /* Remove inner max-width constraint */
+                max-width: none !important;
                 margin: 0 !important;
+                gap: 20px !important;
+            }
+            .nav-links {
+                display: flex !important; /* Force Desktop Flex Row */
+                gap: 20px !important;
+            }
+            .auth-box {
+                display: flex !important;
+                align-items: center !important;
+                gap: 12px !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* Theme toggle & Ghost icon color harmony in light mode */
+            body.light-mode #theme-icon-desktop,
+            body.light-mode .user-icon-btn i,
+            body.light-mode #theme-icon-mobile {
+                color: #475569 !important; /* Soft Slate instead of harsh black */
             }
             /* HEADER CONTAINER OVERRIDE - LAYOUT PHYSICS FIX */
             html body header.island-nav {
@@ -909,8 +923,7 @@ const getHeaderHTML = (rootPath) => `
             </button>
             <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> <span>Get Help Now</span></a>
             <a href="${rootPath}portal/user-dashboard.html" class="user-icon-btn" title="Dashboard"><i class="fas fa-ghost"></i></a>
-            <a href="${rootPath}profile.html" class="nav-btn" style="padding:10px 20px; font-size:0.9rem;" title="My Profile"><i class="fas fa-user-circle"></i> <span style="margin-left:5px;">Profile</span></a>
-            <a href="${rootPath}portal/login.html" class="nav-btn">Log In / Sign Up</a>
+            <a href="${rootPath}portal/login.html" class="nav-btn" id="nav-auth-btn">Log In / Sign Up</a>
     </div>
     
     <div style="display: flex; gap: 5px; align-items: center;">
@@ -1017,9 +1030,10 @@ const getFooterHTML = (rootPath) => `
 
 function injectHeader() {
     // 0. Safety Guard: Do not inject on Admin/Portal Dashboards that have their own sidebar
-    const isAuthPage = ['login.html', 'signup.html', 'forgot-password.html', 'signup-success.html', 'logout.html'].some(page => window.location.pathname.includes(page));
+    const path = window.location.pathname.toLowerCase();
+    const isAuthPage = ['login', 'signup', 'forgot', 'reset', 'logout'].some(term => path.includes(term));
 
-    if (window.location.pathname.includes('/portal/') && !isAuthPage) {
+    if (path.includes('/portal/') && !isAuthPage) {
         // Allow Auth pages to have headers, but not main dashboards
         return;
     }
