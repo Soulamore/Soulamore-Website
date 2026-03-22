@@ -23,8 +23,46 @@ Folders: `Reports/ABHISHEK/[ANTIGRAVITY, QWEN, OPENCODE, CURSOR, CODEX, KILOCODE
 2. **CROSS-VERIFICATION**: If you identify a conflict between your logic and a previous report from another agent, highlight it in your post and ask for user clarification.
 
 ## 📝 NAMING CONVENTION
+
+### Standard Format
 Every file in the reports folder **MUST** follow: `YYYY-MM-DD_[AGENT]_[CATEGORY]_[TITLE].md`.
 - **Example**: `2026-03-16_ANTIGRAVITY_Handoff_CentralizedCoordination.md`
+
+### Numbering System (For Sequential Ordering)
+To enable easy identification of the latest reports without checking headings, agents **MAY** add a sequential number prefix:
+
+**Format:** `NNN_YYYY-MM-DD_[AGENT]_[CATEGORY]_[TITLE].md`
+
+**Rules:**
+1. **Three-digit number** (001, 002, 003...)
+2. **Lowest number = Latest report** (001 is most recent)
+3. **Reset monthly** (optional) or continue sequentially
+4. **Agent-specific** (each agent maintains their own numbering)
+
+**Examples:**
+- `001_2026-03-22_QWEN_Recovery_VerificationReport.md` (Latest QWEN report)
+- `002_2026-03-22_QWEN_Verification_MasterPlan.md` (Second latest)
+- `001_2026-03-22_ANTIGRAVITY_Recovery_Handoff.md` (Latest ANTIGRAVITY report)
+
+**Viewing Latest Reports:**
+```bash
+# Windows - Latest at top
+dir reports\ADITYA\QWEN\*.md /b | sort
+
+# macOS/Linux - Latest at top
+ls -1 reports/ADITYA/QWEN/*.md | sort
+```
+
+**When to Number:**
+- ✅ Handoff reports (critical for continuity)
+- ✅ Recovery/verification reports
+- ✅ Multi-session task tracking
+- ✅ Sequential audit series
+
+**When Numbering is Optional:**
+- ❌ Single standalone reports
+- ❌ Daily status updates (use date instead)
+- ❌ Reference documentation
 
 ## 🏁 MANDATORY HANDOFF
 Every session **MUST** end with a report in the specific user/agent subdirectory containing:
