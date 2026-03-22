@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Soulamore Smart Start - Find your emotional direction.">
+    <title>Smart Start | Soulamore</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+
+    <style>
+        :root {
+            --deep-space: #0f172a;
+            --starlight: #f1f5f9;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --engine-theme: #4ECDC4;
+            --bot-bubble-bg: rgba(255, 255, 255, 0.05);
+            --user-bubble-bg: rgba(78, 205, 196, 0.1);
+            --user-bubble-border: rgba(78, 205, 196, 0.3);
+        }
+
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+        }
+
+        /* --- BREATHING BACKGROUND --- */
+        .ambient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 50%, rgba(78, 205, 196, 0.05) 0%, transparent 60%);
+            animation: breathe 8s infinite alternate ease-in-out;
+            z-index: 0;
+        }
+
+        @keyframes breathe {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        /* --- EXIT BUTTON --- */
+        .exit-btn {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            z-index: 20;
+            transition: 0.3s;
+        }
+
+        .exit-btn:hover {
+            color: var(--starlight);
+            transform: scale(1.1);
+        }
+
+        /* --- MAIN CHAT CONTAINER --- */
+        .chat-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: clamp(600px, 90vw, 800px);
+            margin: 0 auto;
+            padding: 80px 20px 20px;
+        }
+
+        .chat-history {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding-bottom: 20px;
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .chat-history::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Chrome */
+
+        /* --- BUBBLES --- */
+        .message-row {
+            display: flex;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: popIn 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-row.bot {
+            justify-content: flex-start;
+        }
+
+        .message-row.user {
+            justify-content: flex-end;
+        }
+
+        .bubble {
+            max-width: clamp(250px, 80vw, 65ch);
+            padding: 16px 20px;
+            border-radius: 20px;
+            font-size: clamp(1rem, 2vw, 1.1rem);
+            line-height: var(--line-height-body, 1.6);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
+        }
+
+        .bubble.bot {
+            background: var(--bot-bubble-bg);
+            border: 1px solid var(--border-glass);
+            border-bottom-left-radius: 4px;
+        }
+
+        .bubble.user {
+            background: var(--user-bubble-bg);
+            border: 1px solid var(--user-bubble-border);
+            color: var(--engine-theme);
+            border-bottom-right-radius: 4px;
+            text-align: right;
+        }
+
+        /* --- INPUT AREA --- */
+        .input-area {
+            position: relative;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            border-top: 1px solid var(--border-glass);
+            display: none;
+            /* toggled by JS based on stage */
+        }
+
+        .open-text-form {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 50px;
+            padding: 15px 25px;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--engine-theme);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .send-btn {
+            background: var(--engine-theme);
+            color: var(--deep-space);
+            border: none;
+            border-radius: 50px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: 0.3s;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.4);
+        }
+
+        /* --- CHOICE CHIPS --- */
+        .choices-area {
+            display: none;
+            /* toggled by JS */
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-end;
+            /* Align to user side */
+            margin-top: 10px;
+        }
+
+        .choice-chip {
+            background: transparent;
+            border: 1px solid var(--border-glass);
+            color: var(--starlight);
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .choice-chip:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--starlight);
+        }
+
+        /* --- ID CAPTURE MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            /* starts visible */
+            transition: opacity 0.4s;
+        }
+
+        .id-modal {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .id-modal h2 {
+            margin-top: 0;
+            font-family: 'Outfit';
+            font-weight: 300;
+            font-size: 1.8rem;
+        }
+
+        .id-modal p {
+            opacity: 0.7;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        .id-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .id-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 15px 20px;
+            color: white;
+            font-family: 'Outfit';
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .id-input:focus {
+            outline: none;
+            border-color: var(--engine-theme);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .modal-btn {
+            background: var(--engine-theme);
+            color: var(--deep-space);
+            border: none;
+            padding: 15px;
+            border-radius: 50px;
+            font-family: 'Outfit';
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .skip-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: underline;
+            margin-top: 15px;
+            cursor: pointer;
+            font-family: 'Outfit';
+            transition: 0.3s;
+        }
+
+        .skip-btn:hover {
+            color: white;
+        }
+
+        /* --- TYPING INDICATOR --- */
+        .typing {
+            display: inline-block;
+            width: 40px;
+        }
+
+        .typing span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: var(--engine-theme);
+            border-radius: 50%;
+            margin-right: 4px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* --- RECOMMENDED ASSESSMENTS CARDS --- */
+        .recs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 10px;
+            padding-bottom: 40px;
+        }
+
+        .rec-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: left;
+            text-decoration: none;
+            color: white;
+            transition: 0.3s;
+            display: block;
+        }
+
+        .rec-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--engine-theme);
+            transform: translateX(5px);
+        }
+
+        .rec-card h4 {
+            margin: 0 0 8px 0;
+            font-family: 'Outfit';
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--engine-theme);
+        }
+
+        .rec-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        @media(max-width: 600px) {
+            .bubble {
+                max-width: 90%;
+                font-size: 1rem;
+            }
+
+            .chat-container {
+                padding-top: 70px;
+            }
+
+            .exit-btn {
+                top: 20px;
+                left: 20px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ambient-bg"></div>
+    <a href="index.html" class="exit-btn"><i class="fas fa-times"></i></a>
+
+    <!-- Initial ID Modal -->
+    <div class="modal-overlay" id="id-modal-overlay">
+        <div class="id-modal">
+            <h2>Start with Soulamore</h2>
+            <p>If you'd like your reflection history saved, let us know who you are. Otherwise, stay totally anonymous.
+                Your data is yours.</p>
+            <form class="id-form" id="smart-start-form">
+                <input type="text" id="userName" class="id-input" placeholder="First Name (Optional)">
+                <input type="email" id="userEmail" class="id-input" placeholder="Email (Optional)">
+                <button type="submit" class="modal-btn">Begin Journey</button>
+            </form>
+            <button class="skip-btn" id="btn-skip-id">I prefer to stay anonymous</button>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <h1 class="sr-only"
+            style="position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0;">
+            Soulamore Smart Start Emotional Assessment</h1>
+        <div class="chat-history" id="chat-history">
+            <!-- Messages inserted here via JS -->
+        </div>
+
+        <div class="input-area" id="input-area">
+            <!-- Open text form for stage 1 -->
+            <form class="open-text-form" id="text-input-form">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Type your answer here..."
+                    autocomplete="off">
+                <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+            </form>
+            <!-- Choices chips for later stages -->
+            <div class="choices-area" id="choices-area">
+                <!-- Chips inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- REQUIRED SDKS & DATA -->
+    <script type="module" src="../../assets/js/firebase-config.js"></script>
+    <script src="../../assets/js/assessment-data.js"></script>
+    <script src="../../assets/js/smart-start-logic.js"></script>
+
+</body>
+
+</html>

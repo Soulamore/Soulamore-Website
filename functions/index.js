@@ -12,6 +12,7 @@ const Razorpay = require('razorpay');
 const allowedOrigins = [
   'https://soulamore-f0a64.web.app',
   'https://soulamore-f0a64.firebaseapp.com',
+  'https://soulamore.com',
   'https://www.soulamore.com', // Assuming custom domain
   'http://localhost:5000',     // Local testing
   'http://127.0.0.1:5500'      // VS Code Live Server
@@ -33,19 +34,25 @@ const cors = require('cors')({
   }
 });
 
+// admin.initializeApp() is called once at the top level
 admin.initializeApp();
 
-// Initialize Razorpay with Key ID and Secret from environment variables
-const razorpay = new Razorpay({
-  key_id: functions.config().razorpay.key_id || process.env.RAZORPAY_KEY_ID,
-  key_secret: functions.config().razorpay.key_secret || process.env.RAZORPAY_KEY_SECRET
-});
+// Lazy initialization function for Razorpay
+// This ensures credentials are only required when the function is actually called
+const getRazorpay = () => {
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID || '',
+    key_secret: process.env.RAZORPAY_KEY_SECRET || ''
+  });
+};
 
 /**
  * Verify Razorpay payment signature
  * This should be called after payment to verify authenticity
  */
-exports.verifyPayment = functions.https.onRequest((req, res) => {
+exports.verifyPayment = functions
+  .runWith({ secrets: ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET'] })
+  .https.onRequest((req, res) => {
   return cors(req, res, async () => {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
@@ -62,7 +69,7 @@ exports.verifyPayment = functions.https.onRequest((req, res) => {
       const crypto = require('crypto');
       const text = razorpay_order_id + '|' + razorpay_payment_id;
       const generatedSignature = crypto
-        .createHmac('sha256', functions.config().razorpay.key_secret || process.env.RAZORPAY_KEY_SECRET)
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || '')
         .update(text)
         .digest('hex');
 
@@ -72,7 +79,8 @@ exports.verifyPayment = functions.https.onRequest((req, res) => {
       }
 
       // Get payment details from Razorpay
-      const payment = await razorpay.payments.fetch(razorpay_payment_id);
+      const rzp = getRazorpay();
+      const payment = await rzp.payments.fetch(razorpay_payment_id);
 
       if (payment.status !== 'captured') {
         return res.status(400).json({ error: 'Payment not captured' });
@@ -151,7 +159,9 @@ exports.verifyPayment = functions.https.onRequest((req, res) => {
  * Create Razorpay order (optional - for pre-creating orders)
  * This can be used if you want to create orders server-side
  */
-exports.createRazorpayOrder = functions.https.onRequest((req, res) => {
+exports.createRazorpayOrder = functions
+  .runWith({ secrets: ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET'] })
+  .https.onRequest((req, res) => {
   return cors(req, res, async () => {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
@@ -171,7 +181,8 @@ exports.createRazorpayOrder = functions.https.onRequest((req, res) => {
         notes: notes || {}
       };
 
-      const order = await razorpay.orders.create(options);
+      const rzp = getRazorpay();
+      const order = await rzp.orders.create(options);
 
       return res.status(200).json({
         success: true,
@@ -190,5 +201,75 @@ exports.createRazorpayOrder = functions.https.onRequest((req, res) => {
   });
 });
 
+const nodemailer = require('nodemailer');
 
+// Lazy initialization for email transport
+const getMailTransport = () => {
+  return nodemailer.createTransport({
+    host: "smtp.zeptomail.eu",
+    port: 587,
+    auth: {
+      user: process.env.ZEPTOMAIL_USER || "emailapikey",
+      pass: process.env.ZEPTOMAIL_PASSWORD || ""
+    }
+  });
+};
 
+/**
+ * Sends an email notification whenever a new assessment lead is submitted.
+ * Triggers on document creation in the 'assessment_leads' collection.
+ */
+exports.sendLeadNotificationEmail = functions
+  .runWith({ secrets: ['ZEPTOMAIL_PASSWORD', 'ZEPTOMAIL_USER'] })
+  .firestore
+  .document('assessment_leads/{leadId}')
+  .onCreate(async (snap, context) => {
+    const lead = snap.data();
+
+    if (!lead) return null;
+
+    const isUrgent = lead.escalation_required === true;
+    const subjectPrefix = isUrgent ? '[URGENT: CRISIS ESCALATION] ' : '[New Assessment Lead] ';
+
+    // Build the email content
+    const mailOptions = {
+      from: `"Soulamore Engine" <contact.soulamore@gmail.com>`,
+      to: 'contact.soulamore@gmail.com', // Sending specifically to the central email
+      subject: `${subjectPrefix}Lead: ${lead.name || 'Anonymous'} - ${lead.assessment_domain || 'Unknown Domain'}`,
+      html: `
+        <div style="font-family: sans-serif; color: #e2e8f0; background-color: #0f172a; padding: 40px; border-radius: 8px;">
+          <h2 style="color: ${isUrgent ? '#ef4444' : '#4ECDC4'}; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+            ${isUrgent ? 'URGENT: CRISIS ESCALATION' : 'New Recommended Match Request'}
+          </h2>
+          <p style="font-size: 1.1rem; opacity: 0.9;">A user has just completed an assessment and requested an outreach from a Peer or Psychologist.</p>
+          
+          <table style="width: 100%; border-collapse: collapse; margin: 30px 0; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
+            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Name:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">${lead.name || 'Anonymous'}</td></tr>
+            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Email:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">${lead.email || 'Not Provided'}</td></tr>
+            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Phone:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">${lead.phone || 'Not Provided'}</td></tr>
+            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Assessment Domain:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); text-transform: capitalize;">${(lead.assessment_domain || 'N/A').replace('_', ' ')}</td></tr>
+            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Severity Band:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>${(lead.severity_band || 'N/A').toUpperCase()}</strong></td></tr>
+            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Raw Score:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">${lead.raw_score || '0'}</td></tr>
+            <tr><td style="padding: 15px;"><strong>Escalation Required:</strong></td><td style="padding: 15px; ${isUrgent ? 'color: #ef4444; font-weight: bold;' : ''}">${isUrgent ? 'Yes (Immediate Action Required)' : 'No'}</td></tr>
+          </table>
+
+          <h3 style="margin-top: 30px; font-weight: 500; opacity: 0.8;">Risk Flags (Functional Impairment):</h3>
+          <p style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 6px; font-family: monospace;">${lead.risk_flags === true ? 'Present - High functional impairment detected in cognitive/behavioral responses.' : (lead.risk_flags || 'None Detected')}</p>
+
+          <p style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            This email was securely and automatically generated by the Soulamore Assessment Clinical Engine.
+          </p>
+        </div>
+      `
+    };
+
+    try {
+      const mailTransport = getMailTransport();
+      await mailTransport.sendMail(mailOptions);
+      console.log('Lead notification email dispatched to contact.soulamore@gmail.com');
+      return null;
+    } catch (error) {
+      console.error('Error dispatching notification email:', error);
+      return null;
+    }
+  });

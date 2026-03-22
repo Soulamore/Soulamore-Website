@@ -33,6 +33,18 @@ onAuthStateChanged(auth, async (user) => {
 
 // Update UI based on auth state
 function updateAuthUI(user) {
+    // Keep navigation links correct from any subdirectory by
+    // deriving the same root prefix used by components.js.
+    function getRootPath() {
+        const script = document.querySelector('script[src*="components.js"]');
+        if (script) {
+            const src = script.getAttribute('src');
+            if (src) return src.split('assets/js/components')[0];
+        }
+        // Fallback: assume we're at site root
+        return '';
+    }
+
     // Wait a bit for header to be rendered
     setTimeout(() => {
         // Update login/signup button
@@ -57,8 +69,8 @@ function updateAuthUI(user) {
                 } else {
                     userIconBtn.innerHTML = '<i class="fas fa-user-circle"></i>';
                 }
-                // Make icon clickable to go to profile
-                userIconBtn.href = 'profile.html';
+                // Signed-in avatar should open the dashboard (not profile)
+                userIconBtn.href = `${getRootPath()}portal/user-dashboard.html`;
                 userIconBtn.onclick = null;
             }
         } else {

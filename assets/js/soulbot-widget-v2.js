@@ -25,7 +25,7 @@
             /* Scoped Styles for SoulBot Widget */
             #soulbot-widget-container {
                 position: fixed;
-                bottom: 100px;
+                bottom: 80px; /* Matched with Play Audio button to avoid ticker overlap comfortably */
                 right: 30px;
                 z-index: 10000; /* High Z-index */
                 font-family: 'Plus Jakarta Sans', sans-serif;
@@ -90,10 +90,11 @@
             .sb-msg-bot { background: rgba(255,255,255,0.05); align-self: flex-start; color: #e2e8f0; }
             .sb-msg-user { background: #2dd4bf; align-self: flex-end; color: #0f172a; }
 
-            /* MOBILE TWEAKS */
-            @media (max-width: 768px) {
-                #soulbot-widget-container { bottom: 100px !important; right: 20px; }
-                #sb-window { width: 90vw; right: 5vw; bottom: 120px; height: 60vh; }
+            /* MOBILE TWEAKS (Aligned with components.js) */
+            @media (max-width: 1024px) {
+                #soulbot-widget-container { display: none !important; visibility: hidden !important; }
+                #soulbot-widget-fab { display: none !important; visibility: hidden !important; pointer-events: none !important; }
+                #sb-window { display: none !important; }
             }
         </style>
         

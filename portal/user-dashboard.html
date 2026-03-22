@@ -165,38 +165,46 @@
             }
         }
 
-        /* VIEW SECTION: Absolute Layering */
+        /* VIEW SECTION: Relative Flow */
         .view-section {
-            position: absolute !important;
-            /* Respect parent padding area by using inset or padding on self */
-            top: 110px !important;
-            bottom: 90px !important;
-            left: 40px !important;
-            right: 40px !important;
-
-            display: none !important;
-            /* Hidden by default */
-            flex-direction: column !important;
+            position: relative;
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px;
+            pointer-events: none;
+            /* FIX 4: Prevent phantom clicks */
+            border: none;
             background: transparent;
-            /* or var(--bg-deep) if needed */
-            padding-top: 0 !important;
-            border: none !important;
+        }
+
+        /* CONTAINMENT FIX */
+        .main-content {
+            margin-left: 280px !important;
+            /* FIX 2 */
+            width: calc(100% - 280px) !important;
+            /* FIX 2 */
+            position: relative;
+            z-index: 1;
+            /* FIX 2 */
+            min-height: 100vh;
             height: auto !important;
-            /* Let top/bottom define height */
-        }
-
-        /* ACTIVE VIEW: The only one that exists / scrolls */
-        .view-section.active {
-            display: flex !important;
             overflow-y: auto !important;
-            /* Internal scroll */
-            z-index: 10;
         }
 
-        /* SCROLL FIX: Ensure content is accessible */
+        /* ACTIVE VIEW */
+        .view-section.active {
+            display: flex;
+            z-index: 10;
+            pointer-events: auto;
+            /* FIX 4 */
+        }
+
+        /* SCROLL FIX */
         body {
             overflow: hidden !important;
-            /* No body scroll */
+            /* Keep body fixed, main scrolls */
         }
     </style>
 </head>
@@ -222,20 +230,20 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px;">
                 <!-- Vent Box -->
                 <div class="dash-card link-hover" onclick="window.location.href='../tools/vent-box.html'"
-                    style="margin:0; text-align:center; padding:25px; cursor:pointer; background:rgba(239, 68, 68, 0.1); border-color:rgba(239, 68, 68, 0.2);">
-                    <i class="fas fa-fire" style="font-size:2rem; color:#ef4444; margin-bottom:10px;"></i>
+                    style="margin:0; text-align:center; padding:25px; cursor:pointer; background:var(--alert-red-bg); border-color:var(--alert-red-bg);">
+                    <i class="fas fa-fire" style="font-size:2rem; color:var(--alert-red); margin-bottom:10px;"></i>
                     <div style="font-weight:700;">Vent Box</div>
                 </div>
                 <!-- Confessing -->
                 <div class="dash-card link-hover" onclick="window.location.href='../tools/confession-box/index.html'"
-                    style="margin:0; text-align:center; padding:25px; cursor:pointer; background:rgba(255, 255, 255, 0.05);">
+                    style="margin:0; text-align:center; padding:25px; cursor:pointer; background:var(--bg-subtle);">
                     <i class="fas fa-ghost" style="font-size:2rem; color:#e2e8f0; margin-bottom:10px;"></i>
                     <div style="font-weight:700;">Confessing</div>
                 </div>
                 <!-- Drop It -->
                 <div class="dash-card link-hover" onclick="window.location.href='../tools/drop-it.html'"
-                    style="margin:0; text-align:center; padding:25px; cursor:pointer; background:rgba(56, 189, 248, 0.1); border-color:rgba(56, 189, 248, 0.2);">
-                    <i class="fas fa-hand-holding-water" style="font-size:2rem; color:#38bdf8; margin-bottom:10px;"></i>
+                    style="margin:0; text-align:center; padding:25px; cursor:pointer; background:var(--info-blue-bg); border-color:rgba(56, 189, 248, 0.2);">
+                    <i class="fas fa-hand-holding-water" style="font-size:2rem; color:var(--info-blue); margin-bottom:10px;"></i>
                     <div style="font-weight:700;">Drop It</div>
                 </div>
                 <!-- Play -->
@@ -251,8 +259,8 @@
 
     <!-- SoulBot FAB -->
     <button onclick="openTool('../tools/soulbot-chat.html', 'SoulBot AI Support')"
-        style="position:fixed; bottom:30px; right:30px; width:56px; height:56px; border-radius:50%; background:#2dd4bf; border:none; cursor:pointer; box-shadow:0 0 25px #2dd4bf, 0 0 45px rgba(45, 212, 191, 0.6); display:flex; align-items:center; justify-content:center; z-index:900; transition:all 0.3s ease; animation: pulse-glow 2s infinite;">
-        <i class="fas fa-robot" style="font-size:1.4rem; color:#0f172a;"></i>
+        style="position:fixed; bottom:30px; right:30px; width:56px; height:56px; border-radius:50%; background:var(--accent-teal); border:none; cursor:pointer; box-shadow:0 0 25px #2dd4bf, 0 0 45px rgba(45, 212, 191, 0.6); display:flex; align-items:center; justify-content:center; z-index:900; transition:all 0.3s ease; animation: pulse-glow 2s infinite;">
+        <i class="fas fa-robot" style="font-size:1.4rem; color:var(--bg-main);"></i>
     </button>
     <div class="dashboard-layout">
         <!-- SIDEBAR -->
@@ -270,13 +278,18 @@
                         Journal</span></a><a href="#" class="side-link" onclick="switchView('bookings', this)"
                     data-view="bookings"><i class="fas fa-calendar-alt"></i><span>My Sessions</span></a><a href="#"
                     class="side-link" onclick="switchView('peer-guidelines', this)" data-view="peer-guidelines"><i
-                        class="fas fa-hands-helping"></i><span>Peer Guidelines</span></a><a href="#" class="side-link"
+                        class="fas fa-hands-helping"></i><span>Peer Guidelines</span></a><a href="#"
+                    id="nav-availability-link" style="display:none;" class="side-link"
+                    onclick="switchView('availability', this)" data-view="availability"><i
+                        class="fas fa-calendar-check"></i><span>My Availability</span></a><a href="#" class="side-link"
                     onclick="switchView('soulbot', this)" data-view="soulbot"><i class="fas fa-robot"></i><span>SoulBot
                         AI</span></a><a href="#" onclick="switchView('messages', this)" data-view="messages"
                     class="side-link"><i class="fas fa-envelope"></i><span>Messages</span></a><a href="#"
                     onclick="switchView('saved', this)" class="side-link"><i
-                        class="fas fa-bookmark"></i><span>Saved</span></a>
-                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:10px 0;"><a href="#"
+                        class="fas fa-bookmark"></i><span>Saved</span></a><a href="#" class="side-link"
+                    onclick="switchView('wallet', this)" data-view="wallet"><i class="fas fa-wallet"></i><span>My
+                        Wallet</span></a>
+                <hr style="border:0; border-top:1px solid var(--bg-subtle); margin:10px 0;"><a href="#"
                     class="side-link" onclick="switchView('profile', this)" data-view="profile"><i
                         class="fas fa-user-circle"></i><span>My Profile</span></a><a href="#" class="side-link"
                     onclick="switchView('settings', this)" data-view="settings"><i
@@ -289,13 +302,11 @@
         <main class="main-content">
             <!-- VIEW: SETTINGS (Appearance & Preferences) -->
             <!-- VIEW: SETTINGS (Appearance & Preferences) -->
-            <div id="view-settings" class="view-section" style="display:none; padding-top:0;">
-                <!-- Header matching SoulBot style -->
+            <div id="view-settings" class="view-section no-scroll" style="display:none;">
                 <!-- Standardized Header -->
-                <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
+                <div class="workspace-header">
                     <div
-                        style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                        style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-cog"></i>
                     </div>
                     <div>
@@ -372,7 +383,7 @@
                                         style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:8px;">Login
                                         Method</label>
                                     <div
-                                        style="display:flex; align-items:center; gap:10px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-soft); border-radius:10px;">
+                                        style="display:flex; align-items:center; gap:10px; padding:12px; background:var(--bg-subtle); border:1px solid var(--border-soft); border-radius:10px;">
                                         <i class="fab fa-google" style="color:var(--text-secondary);"></i><span
                                             id="profile-email"
                                             style="flex:1; color:var(--text-secondary); opacity:0.8;">loading...</span><span
@@ -393,12 +404,11 @@
                 </div>
             </div>
             <!-- VIEW: PROFILE -->
-            <div id="view-profile" class="view-section" style="display:none; padding-top:0;">
+            <div id="view-profile" class="view-section no-scroll" style="display:none;">
                 <!-- Standardized Header -->
-                <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
+                <div class="workspace-header">
                     <div
-                        style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                        style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-user-circle"></i>
                     </div>
                     <div>
@@ -453,89 +463,26 @@
                 </div>
             </div>
 
-            <!-- VIEW: SOULBOT CHAT -->
-            <div id="view-soulbot" class="view-section" style="display:none;">
-                <!-- Standardized Header -->
-                <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
-                    <div
-                        style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+            <!-- VIEW: SOULBOT CHAT (embedded working soulbot-chat) -->
+            <div id="view-soulbot" class="view-section no-scroll" style="display:none; flex:1; min-height:0; flex-direction:column;">
+                <div class="workspace-header" style="flex-shrink:0;">
+                    <div style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-robot"></i>
                     </div>
                     <div>
-                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">SoulBot AI
-                        </h2>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">SoulBot AI</h2>
                         <div style="font-size:0.8rem; opacity:0.7;">Your 24/7 empathetic companion</div>
                     </div>
                 </div>
-                <div class="soulbot-layout"
-                    style="display:grid; grid-template-columns: 1fr 300px; gap:20px; height:calc(100vh - 250px);">
-                    <!-- CHAT AREA -->
-                    <div class="dash-card link-hover"
-                        style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
-                        <!-- Header -->
-                        <div
-                            style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2);">
-                            <div style="display:flex; gap:15px; align-items:center;">
-                                <div
-                                    style="width:40px; height:40px; background:var(--teal-glow); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#0f172a; font-size:1.2rem;">
-                                    <i class="fas fa-robot"></i>
-                                </div>
-                                <div>
-                                    <div style="font-family:'Outfit'; font-weight:700; font-size:1.1rem;">
-                                        SoulBot AI </div>
-                                    <div
-                                        style="font-size:0.8rem; opacity:0.7; color:#22c55e; display:flex; align-items:center; gap:6px;">
-                                        <i class="fas fa-circle" style="font-size:0.5rem;"></i>
-                                        <span>Online & Ready to Listen</span>
-                                    </div>
-                                </div>
-                            </div><button onclick="clearChat()"
-                                style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem; cursor:pointer; opacity:0.7;"><i
-                                    class="fas fa-trash-alt"></i>Clear Chat </button>
+                <!-- COMING SOON PLACEHOLDER -->
+                <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:40px;">
+                    <div style="text-align:center; max-width:420px;">
+                        <div style="width:80px; height:80px; background:rgba(45,212,191,0.08); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; border:1px solid rgba(45,212,191,0.2);">
+                            <i class="fas fa-robot" style="font-size:2rem; color:var(--teal-accent);"></i>
                         </div>
-                        <!-- Messages -->
-                        <div id="soulbot-messages"
-                            style="flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:15px;">
-                            <!-- Welcome Msg -->
-                            <div class="chat-bubble bot">Hi there. I'm SoulBot. I' m
-                                not a therapist,
-                                but I'm here to listen without judgment.
-                                What's on your mind today?
-                            </div>
-                        </div>
-                        <!-- Input -->
-                        <div
-                            style="padding:20px; background:rgba(0,0,0,0.2); border-top:1px solid rgba(255,255,255,0.05); display:flex; gap:10px;">
-                            <input type="text" id="soulbot-input" placeholder="Type your message..."
-                                style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:12px 15px; border-radius:12px; color:white; outline:none;"><button
-                                onclick="sendMessage()"
-                                style="background:var(--teal-glow); color:#0f172a; border:none; width:45px; height:45px; border-radius:12px; font-size:1.1rem; cursor:pointer;"><i
-                                    class="fas fa-paper-plane"></i></button>
-                        </div>
-                    </div>
-                    <!-- HISTORY SIDEBAR -->
-                    <div style="display:flex; flex-direction:column; gap:20px;">
-                        <div class="dash-card" style="flex:1; display:flex; flex-direction:column;">
-                            <h3 style="margin-bottom:15px; font-size:1.1rem;">Past
-                                Conversations</h3>
-                            <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
-                                <div
-                                    style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; cursor:pointer; border-left:2px solid var(--teal-glow);">
-                                    <div style="font-size:0.9rem; font-weight:600;">Anxiety
-                                        about exams</div>
-                                    <div style="font-size:0.8rem; opacity:0.6;">Yesterday
-                                    </div>
-                                </div>
-                                <div
-                                    style="padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.05); border-radius:8px; cursor:pointer; opacity:0.7;">
-                                    <div style="font-size:0.9rem; font-weight:600;">Feeling
-                                        lonely</div>
-                                    <div style="font-size:0.8rem; opacity:0.6;">3 days ago
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <div style="display:inline-block; background:rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.25); color:var(--teal-accent); padding:4px 16px; border-radius:50px; font-size:0.72rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:18px;">Coming Soon</div>
+                        <h2 style="font-family:'Outfit'; font-size:1.8rem; color:var(--text-main); margin-bottom:12px; font-weight:700;">SoulBot AI</h2>
+                        <p style="color:var(--text-muted); opacity:0.7; line-height:1.7; font-size:0.95rem;">We're training SoulBot to be your 24/7 empathetic companion. It will listen, reflect, and guide you — without judgment.</p>
                     </div>
                 </div>
             </div>
@@ -543,9 +490,9 @@
             <div id="view-peer-guidelines" class="view-section" style="display:none; height:100%;">
                 <!-- Standardized Header (OUTSIDE CARD) -->
                 <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left; flex-shrink: 0;">
+                    style="padding:20px 0; border-bottom:1px solid var(--bg-subtle); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left; flex-shrink: 0;">
                     <div
-                        style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                        style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-hands-helping"></i>
                     </div>
                     <div>
@@ -611,7 +558,7 @@
                 <div style="flex:1; overflow-y:auto; padding-right:10px;">
                     <!-- 1. Confidentiality -->
                     <div
-                        style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
+                        style="background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
                         <h3
                             style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
                             Confidentiality</h3>
@@ -624,7 +571,7 @@
 
                     <!-- 2. Active Participation -->
                     <div
-                        style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
+                        style="background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
                         <h3
                             style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
                             Active Participation</h3>
@@ -635,7 +582,7 @@
 
                     <!-- 3. Respectful Communication -->
                     <div
-                        style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
+                        style="background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
                         <h3
                             style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
                             Respectful Communication</h3>
@@ -646,7 +593,7 @@
 
                     <!-- 4. Boundaries -->
                     <div
-                        style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
+                        style="background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
                         <h3
                             style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
                             Boundaries</h3>
@@ -658,7 +605,7 @@
 
                     <!-- 5. Non-Judgmental Attitude -->
                     <div
-                        style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
+                        style="background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
                         <h3
                             style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
                             Non-Judgmental</h3>
@@ -669,7 +616,7 @@
 
                     <!-- 6. Mutual Support -->
                     <div
-                        style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
+                        style="background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
                         <h3
                             style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
                             Mutual Support</h3>
@@ -680,7 +627,7 @@
 
                     <!-- 7. Self-Care -->
                     <div
-                        style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
+                        style="background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
                         <h3
                             style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
                             Self-Care</h3>
@@ -692,7 +639,7 @@
 
                     <!-- 8. Respect for Diversity -->
                     <div
-                        style="background:rgba(255, 255, 255, 0.03); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
+                        style="background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:25px;">
                         <h3
                             style="color:var(--teal-accent); font-family:'Outfit'; margin-bottom:10px; font-size:1.2rem;">
                             Respect for Diversity</h3>
@@ -729,13 +676,73 @@
                 </div>
             </div>
 
+            <!-- VIEW: AVAILABILITY (For Peers/Psychologists) -->
+            <div id="view-availability" class="view-section" style="display:none;">
+                <div class="workspace-header">
+                    <div style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">My Availability</h2>
+                        <div style="font-size:0.8rem; opacity:0.7;">Manage your available time slots for sessions</div>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:30px; flex:1; overflow-y:auto; padding-bottom:20px;">
+                    <!-- Weekly Schedule -->
+                    <div class="dash-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                            <h3 style="color:var(--teal-accent);">Weekly Schedule</h3>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <button onclick="window.loadAvailabilityUser()" style="background:transparent; border:1px solid var(--border-subtle); color:var(--text-muted); padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.8rem;" title="Refresh">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                                <div style="font-size:0.8rem; background:rgba(45, 212, 191, 0.1); color:var(--teal-accent); padding:5px 10px; border-radius:20px;">
+                                    <i class="fas fa-globe"></i> GMT+05:30 (IST)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="schedule-list" id="availability-schedule-list-user">
+                            <div style="padding:20px; text-align:center; opacity:0.5;">
+                                <i class="fas fa-circle-notch fa-spin" style="font-size:1.5rem; margin-bottom:10px; display:block;"></i>
+                                Loading schedule...
+                                <div style="font-size:0.85rem; margin-top:10px; opacity:0.7;">If this takes too long, click Refresh</div>
+                            </div>
+                        </div>
+                        <div style="margin-top:25px; text-align:right;">
+                            <button class="btn-dash-primary" id="save-availability-btn-user" onclick="saveAvailabilityUser()">
+                                <i class="fas fa-spinner fa-spin" id="save-availability-spinner-user" style="display:none;"></i>
+                                <span id="save-availability-text-user">Save Schedule</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div style="display:flex; flex-direction:column; gap:25px;">
+                        <div class="dash-card" style="background:linear-gradient(145deg, rgba(30,41,59,0.7), rgba(15,23,42,0.9)); border:1px solid var(--teal-accent);">
+                            <h3 style="margin-bottom:15px; display:flex; align-items:center; gap:10px;">
+                                <i class="fas fa-info-circle" style="color:var(--teal-accent);"></i> How It Works
+                            </h3>
+                            <p style="font-size:0.85rem; opacity:0.7; line-height:1.6;">
+                                Set your weekly availability so others can see when you're free for sessions. Users can book slots during your available times.
+                            </p>
+                            <ul style="font-size:0.85rem; opacity:0.7; line-height:1.8; margin-top:15px; padding-left:20px;">
+                                <li>Add time slots for each day</li>
+                                <li>Multiple slots per day supported</li>
+                                <li>Booked slots are automatically blocked</li>
+                                <li>Update anytime as your schedule changes</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- VIEW: HOME (Default) -->
             <div id="view-home" class="view-section active">
                 <!-- Standardized Header -->
-                <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left; flex-shrink: 0;">
+                <div class="workspace-header">
                     <div
-                        style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                        style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-home"></i>
                     </div>
                     <div>
@@ -745,12 +752,12 @@
                 </div>
 
                 <!-- Scrollable Content -->
-                <div style="flex:1; overflow-y:auto; padding-right:10px;">
+                <div style="flex:1; overflow-y:auto; padding-right:10px; padding-bottom: 40px;">
                     <!-- LAYER 1: GROUNDING & PRIMARY ACTION -->
                     <div style="text-align:center; padding:10px 0 20px;">
                         <!-- 1. SOULBOT HERO (Compact) -->
                         <div class="dash-card soulbot-hero"
-                            style="background:var(--bg-card); border:1px solid var(--border-subtle); padding:30px 20px !important; text-align:center; max-width:800px; margin:0 auto 20px; min-height:auto;">
+                            style="background:var(--bg-card); border:1px solid var(--border-subtle); padding:30px 20px !important; text-align:center; margin:0 0 20px 0; min-height:auto;">
                             <i class="fas fa-robot"
                                 style="font-size:3rem; color:var(--teal-accent); margin-bottom:15px; filter:drop-shadow(0 0 15px var(--teal-dim));"></i>
                             <h2
@@ -765,7 +772,7 @@
                         </div>
                         <!-- 2. YOUR JOURNAL (Compact Strip) -->
                         <div class="dash-card"
-                            style="display:flex; justify-content:space-between; align-items:center; padding:20px 30px; max-width:800px; margin:0 auto 20px;">
+                            style="display:flex; justify-content:space-between; align-items:center; padding:20px 30px; margin:0 0 20px 0;">
                             <div style="text-align:left;">
                                 <h3 style="font-size:1.1rem; margin-bottom:4px; color:var(--text-main);">
                                     Your Journal</h3>
@@ -779,8 +786,7 @@
                         <div
                             style="margin-top:20px; margin-bottom:15px; text-align:center; opacity:0.5; font-size:0.75rem; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">
                             When you want to talk to someone </div>
-                        <div class="dashboard-grid"
-                            style="grid-template-columns: 1fr 1fr; gap:15px; max-width:800px; margin:0 auto;">
+                        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap:15px; margin:0 auto;">
                             <!-- PEER TALK -->
                             <div class="dash-card link-hover" onclick="window.location.href='../our-peers/profile.html'"
                                 style="text-align:center; padding:20px 15px; cursor:pointer; min-height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--peach-bg); border:1px solid var(--peach-border); border-radius:16px; transition:all 0.3s ease;">
@@ -813,7 +819,7 @@
             <div id="view-bookings" class="view-section" style="display:none; padding-top:0;">
                 <!-- Header matching SoulBot style -->
                 <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px;">
+                    style="padding:20px; border-bottom:1px solid var(--bg-subtle); display:flex; align-items:center; gap:15px; margin-bottom:20px;">
                     <div
                         style="width:40px; height:40px; background:var(--teal-dim); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--teal-accent);">
                         <i class="fas fa-calendar-alt"></i>
@@ -839,16 +845,18 @@
                     <div class="dash-card" style="grid-column: span 1; padding:20px;">
                         <h3 style="margin-bottom:15px; font-size:1.2rem;">
                             Upcoming Sessions</h3>
-                        <!-- Empty State Placeholder -->
-                        <div
-                            style="text-align:center; padding:20px; background:var(--bg-deep); border-radius:12px; border:1px dashed var(--border-subtle);">
-                            <i class="fas fa-calendar-check"
-                                style="font-size:1.5rem; opacity:0.3; margin-bottom:10px;"></i>
-                            <p style="opacity:0.7; font-size:0.9rem; margin-bottom:10px;">
-                                No upcoming sessions scheduled.</p><button
-                                onclick="window.location.href='../our-peers/about.html'" class="btn-dash-primary"
-                                style="font-size:0.85rem; padding:8px 20px;">Book
-                                a Session</button>
+                        <!-- Dynamic upcoming sessions list -->
+                        <div id="user-upcoming-sessions">
+                            <div
+                                style="text-align:center; padding:20px; background:var(--bg-deep); border-radius:12px; border:1px dashed var(--border-subtle);">
+                                <i class="fas fa-calendar-check"
+                                    style="font-size:1.5rem; opacity:0.3; margin-bottom:10px;"></i>
+                                <p style="opacity:0.7; font-size:0.9rem; margin-bottom:10px;">
+                                    No upcoming sessions scheduled.</p><button
+                                    onclick="window.location.href='../our-peers/index.html'" class="btn-dash-primary"
+                                    style="font-size:0.85rem; padding:8px 20px;">Book
+                                    a Session</button>
+                            </div>
                         </div>
                     </div>
                     <!-- SIDEBAR: FIND HELP -->
@@ -877,7 +885,7 @@
                             </div>
                             <div onclick="window.open('https://www.supersaas.com/', '_blank')" class="action-row">
                                 <div
-                                    style="width:30px; height:30px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                    style="width:30px; height:30px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center;">
                                     <i class="fas fa-calendar-alt" style="font-size:0.9rem;"></i>
                                 </div>
                                 <div style="font-size:0.85rem;">
@@ -898,115 +906,62 @@
                     </div>
                 </div>
             </div>
-            <!-- VIEW: JOURNAL (Enhanced) -->
-            <div id="view-journal" class="view-section" style="display:none;">
+            <!-- VIEW: JOURNAL -->
+            <div id="view-journal" class="view-section no-scroll" style="display:none;">
                 <!-- Standardized Header -->
-                <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
+                <div class="workspace-header">
                     <div
-                        style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                        style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-book"></i>
                     </div>
                     <div>
-                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">My
-                            Journal
-                        </h2>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">My Journal</h2>
                         <div style="font-size:0.8rem; opacity:0.7;">Your personal space for reflection</div>
                     </div>
                 </div>
-                <div style="display:grid; grid-template-columns: 240px 1fr; gap:20px; height:calc(100vh - 120px);">
-                    <!-- Maximized Height -->
-                    <!-- Sidebar -->
-                    <div class="dash-card" style="padding:15px; display:flex; flex-direction:column;">
-                        <button
-                            style="width:100%; padding:10px; background:var(--teal-accent); color:#0f172a; border:none; border-radius:8px; font-weight:700; cursor:pointer; margin-bottom:15px; font-size:0.9rem;"><i
-                                class="fas fa-plus"></i>New Entry</button>
-                        <div
-                            style="font-size:0.75rem; opacity:0.6; text-transform:uppercase; margin-bottom:10px; font-weight:700;">
-                            Recent</div>
-                        <!-- DYNAMIC LIST CONTAINER -->
-                        <div id="journal-list"
-                            style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:3px;">
-                            <!-- Injected via JS -->
+                <!-- COMING SOON PLACEHOLDER -->
+                <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:40px;">
+                    <div style="text-align:center; max-width:420px;">
+                        <div style="width:80px; height:80px; background:rgba(251,146,60,0.08); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; border:1px solid rgba(251,146,60,0.2);">
+                            <i class="fas fa-pen-fancy" style="font-size:2rem; color:var(--peach-glow);"></i>
                         </div>
-                        <!-- EMPTY STATE -->
-                        <div id="journal-empty" style="text-align:center; padding:20px; opacity:0.6; display:none;">
-                            <i class="fas fa-pen-fancy" style="margin-bottom:10px;"></i>
-                            <div style="font-size:0.8rem;">No
-                                entries yet.</div>
-                        </div>
-                    </div>
-                    <!-- Editor -->
-                    <div class="dash-card" style="display:flex; flex-direction:column; padding:25px;">
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                            <input type="text" value="Morning Thoughts"
-                                style="background:transparent; border:none; font-size:1.4rem; font-family:var(--font-head); color:var(--text-main); flex:1; outline:none;">
-                            <div style="opacity:0.5; font-size:0.85rem; white-space:nowrap; margin-left:15px;">
-                                Saved</div>
-                        </div><textarea
-                            style="flex:1; background:transparent; border:none; resize:none; font-family:var(--font-body); font-size:1rem; line-height:1.6; color:var(--text-muted); outline:none;"
-                            placeholder="Start writing..."></textarea>
+                        <div style="display:inline-block; background:rgba(251,146,60,0.1); border:1px solid rgba(251,146,60,0.25); color:var(--peach-glow); padding:4px 16px; border-radius:50px; font-size:0.72rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:18px;">Coming Soon</div>
+                        <h2 style="font-family:'Outfit'; font-size:1.8rem; color:var(--text-main); margin-bottom:12px; font-weight:700;">My Journal</h2>
+                        <p style="color:var(--text-muted); opacity:0.7; line-height:1.7; font-size:0.95rem;">A safe, private space for your thoughts, reflections, and growth. Encrypted journaling is on its way.</p>
                     </div>
                 </div>
             </div>
-            <!-- VIEW: SAVED CONTENT -->
-            <div id="view-saved" class="view-section" style="display:none; padding-top:0;">
-                <!-- Header matching SoulBot style -->
-                <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-                    <div
-                        style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+            <!-- VIEW: SAVED BLOGS -->
+            <div id="view-saved" class="view-section no-scroll" style="display:none;">
+                <div class="workspace-header">
+                    <div style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-bookmark"></i>
                     </div>
                     <div>
-                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">Saved for
-                            Later
-                        </h2>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.1rem; margin:0;">Saved for Later</h2>
                         <div style="font-size:0.8rem; opacity:0.7;">Your bookmarked content</div>
                     </div>
                 </div>
-                <div class="dash-card">
-                    <div style="display:flex; gap:10px; margin-bottom:20px;">
-                        <button
-                            style="padding:8px 15px; background:white; color:#0f172a; border-radius:30px; border:none; font-weight:700;">All</button><button
-                            style="padding:8px 15px; background:rgba(255,255,255,0.05); color:white; border-radius:30px; border:none;">Articles</button><button
-                            style="padding:8px 15px; background:rgba(255,255,255,0.05); color:white; border-radius:30px; border:none;">Forum
-                            Posts</button>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:15px;">
-                        <div
-                            style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <div style="font-weight:700; margin-bottom:5px;">
-                                    Understanding Anxiety Triggers</div>
-                                <div style="font-size:0.8rem; opacity:0.6;">
-                                    Saved 2 days ago • Blog</div>
-                            </div><button
-                                style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:white; padding:5px 15px; border-radius:4px;">Read</button>
+                <!-- COMING SOON PLACEHOLDER -->
+                <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:40px;">
+                    <div style="text-align:center; max-width:420px;">
+                        <div style="width:80px; height:80px; background:rgba(139,92,246,0.08); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; border:1px solid rgba(139,92,246,0.2);">
+                            <i class="fas fa-bookmark" style="font-size:2rem; color:#8b5cf6;"></i>
                         </div>
-                        <div
-                            style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <div style="font-weight:700; margin-bottom:5px;">
-                                    "How do you handle exam stress?" </div>
-                                <div style="font-size:0.8rem; opacity:0.6;">
-                                    Saved 5 hours ago • Forum • 12 new replies
-                                </div>
-                            </div><button
-                                style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:white; padding:5px 15px; border-radius:4px;">View
-                                Thread</button>
-                        </div>
+                        <div style="display:inline-block; background:rgba(139,92,246,0.1); border:1px solid rgba(139,92,246,0.25); color:#8b5cf6; padding:4px 16px; border-radius:50px; font-size:0.72rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:18px;">Coming Soon</div>
+                        <h2 style="font-family:'Outfit'; font-size:1.8rem; color:var(--text-main); margin-bottom:12px; font-weight:700;">Saved for Later</h2>
+                        <p style="color:var(--text-muted); opacity:0.7; line-height:1.7; font-size:0.95rem;">Bookmark articles, peer stories, and forum threads to revisit whenever you need them. Your reading list is coming soon.</p>
                     </div>
                 </div>
             </div>
+
             <!-- VIEW: MESSAGES (Integrated) -->
             <div id="view-messages" class="view-section" style="display:none; height:100%; padding-top:0;">
                 <!-- Standardized Header -->
                 <div
-                    style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
+                    style="padding:20px 0; border-bottom:1px solid var(--bg-subtle); display:flex; align-items:center; gap:15px; margin-bottom:20px; text-align:left;">
                     <div
-                        style="width:40px; height:40px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                        style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
                         <i class="fas fa-envelope"></i>
                     </div>
                     <div>
@@ -1025,9 +980,9 @@
                             style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; opacity:0.6; font-weight:700;">
                             Active Threads</div>
                         <div class="thread-item active"
-                            style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); border-left:3px solid var(--teal-accent);">
+                            style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; gap:10px; cursor:pointer; background:var(--bg-subtle); border-left:3px solid var(--teal-accent);">
                             <div
-                                style="width:40px; height:40px; background:var(--teal-accent); border-radius:50%; color:#0f172a; display:flex; align-items:center; justify-content:center;">
+                                style="width:40px; height:40px; background:var(--teal-accent); border-radius:50%; color:var(--bg-main); display:flex; align-items:center; justify-content:center;">
                                 <i class="fas fa-user-md"></i>
                             </div>
                             <div style="flex:1;">
@@ -1036,9 +991,9 @@
                             </div>
                         </div>
                         <div class="thread-item"
-                            style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); border-left:3px solid var(--peach-glow); opacity:0.85;">
+                            style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; gap:10px; cursor:pointer; background:var(--bg-subtle); border-left:3px solid var(--peach-glow); opacity:0.85;">
                             <div
-                                style="width:40px; height:40px; background:var(--peach-glow); border-radius:50%; color:#0f172a; display:flex; align-items:center; justify-content:center;">
+                                style="width:40px; height:40px; background:var(--peach-glow); border-radius:50%; color:var(--bg-main); display:flex; align-items:center; justify-content:center;">
                                 <i class="fas fa-hands-helping"></i>
                             </div>
                             <div style="flex:1;">
@@ -1053,7 +1008,7 @@
                             style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
                             <div style="display:flex; gap:10px; align-items:center;">
                                 <div
-                                    style="width:35px; height:35px; background:var(--teal-accent); color:#0f172a; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                    style="width:35px; height:35px; background:var(--teal-accent); color:var(--bg-main); border-radius:50%; display:flex; align-items:center; justify-content:center;">
                                     <i class="fas fa-user-md"></i>
                                 </div>
                                 <div>
@@ -1066,7 +1021,7 @@
                         <div
                             style="flex:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; min-height:0;">
                             <div class="chat-bubble received"
-                                style="background:rgba(255,255,255,0.05); align-self:flex-start; max-width:75%; padding:12px; border-radius:12px; border-bottom-left-radius:2px;">
+                                style="background:var(--bg-subtle); align-self:flex-start; max-width:75%; padding:12px; border-radius:12px; border-bottom-left-radius:2px;">
                                 Hi there. Following up on our session yesterday. Here is the reflection
                                 task. <div
                                     style="margin-top:10px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; border:1px solid var(--teal-accent);">
@@ -1085,14 +1040,52 @@
                         <div style="padding:15px; border-top:1px solid var(--border-subtle); display:flex; gap:10px;">
                             <input type="text" placeholder="Type a message..."
                                 style="flex:1; background:rgba(0,0,0,0.2); border:1px solid var(--border-subtle); color:white; padding:10px; border-radius:8px;"><button
-                                style="background:var(--teal-accent); color:#0f172a; width:40px; border-radius:8px; border:none; cursor:pointer;"><i
+                                style="background:var(--teal-accent); color:var(--bg-main); width:40px; border-radius:8px; border:none; cursor:pointer;"><i
                                     class="fas fa-paper-plane"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- VIEW: WALLET -->
+            <div id="view-wallet" class="view-section" style="display:none; padding-top:0;">
+                <div style="padding:20px; border-bottom:1px solid var(--bg-subtle); margin-bottom:20px;">
+                    <h1 style="margin:0; font-size:1.8rem;">My Wallet</h1>
+                    <p style="margin:5px 0 0; opacity:0.6; font-size:0.9rem;">Manage funds and payment methods.</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Balance Card -->
+                    <div class="dash-card"
+                        style="background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), var(--bg-overlay)); border:1px solid var(--teal-accent);">
+                        <h4 style="margin-bottom:10px; opacity:0.8;">Current Balance</h4>
+                        <div style="font-size:3.5rem; font-weight:700; color:var(--teal-accent); font-family:'Outfit';"
+                            id="wallet-balance">$0.00</div>
+                        <div style="margin-top:20px; display:flex; gap:10px;">
+                            <button class="btn-dash-primary" onclick="triggerAddFunds()">+ Add Funds</button>
+                        </div>
+                    </div>
+
+                    <!-- Payment Methods (Placeholder) -->
+                    <div class="dash-card">
+                        <h4 style="margin-bottom:15px; opacity:0.8;">Payment Methods</h4>
+                        <div
+                            style="padding:15px; background:var(--bg-subtle); border-radius:10px; display:flex; align-items:center; gap:15px; margin-bottom:10px;">
+                            <i class="fab fa-cc-visa" style="font-size:1.5rem; color:#fff;"></i>
+                            <div style="flex:1;">
+                                <div style="font-weight:600;">Visa ending in 4242</div>
+                                <div style="font-size:0.8rem; opacity:0.6;">Expires 12/28</div>
+                            </div>
+                            <span
+                                style="font-size:0.7rem; background:rgba(45,212,191,0.2); color:var(--accent-teal); padding:3px 8px; border-radius:4px;">Default</span>
+                        </div>
+                        <button class="btn-action-sm"
+                            style="width:100%; border:1px dashed var(--border-strong); padding:10px;">+ Add Payment
+                            Method</button>
+                    </div>
+                </div>
+            </div>
             <!-- SCRIPTS -->
-            <script src="../assets/js/components.js?v=3"
+            <script src="../assets/js/components.js?v=3.3"
                 onerror="console.error('Failed to load components.js')"></script>
             <script>function toggleSidebar() {
                     document.getElementById('sidebar').classList.toggle('open');
@@ -1105,33 +1098,8 @@
                 }
 
                 // --- VIEW SWITCHING ---
-                function switchView(viewName, clickedLink) {
-                    // Hide all view sections (Class Toggling)
-                    document.querySelectorAll('.view-section').forEach(el => {
-                        el.classList.remove('active');
-                    });
+                // Replaced by Module Import below
 
-                    // Show the target view section
-                    const target = document.getElementById('view-' + viewName);
-                    if (target) {
-                        target.classList.add('active');
-                    } else {
-                        console.error("View not found:", viewName);
-                    }
-
-                    // Update Sidebar Active State
-                    document.querySelectorAll('.sidebar-nav .side-link').forEach(l => l.classList.remove('active'));
-
-                    if (clickedLink) {
-                        clickedLink.classList.add('active');
-                    }
-
-                    else {
-                        // Fallback if clickedLink is not passed (e.g., initial load)
-                        const defaultLink = document.querySelector(`.sidebar-nav .side-link[data-view="${viewName}"]`);
-                        if (defaultLink) defaultLink.classList.add('active');
-                    }
-                }
 
                 // Initial view load function to check URL parameters or default
                 document.addEventListener('DOMContentLoaded', () => {
@@ -1174,15 +1142,7 @@
                 });
 
 
-                /* SOULBOT CHAT LOGIC - Deprecated (Handled by Module below) */
-                // kept empty to avoid reference errors if any onclicks linger, 
-                // though module overwrites window.sendMessage.
-
-
-                // Allow Enter Key
-                document.getElementById("soulbot-input").addEventListener("keypress", function (e) {
-                    if (e.key === "Enter") sendMessage();
-                });
+                /* SoulBot chat now embedded via iframe (soulbot-chat.html) */
 
                 // Initialize View with Deep Linking
                 document.addEventListener('DOMContentLoaded', () => {
@@ -1309,200 +1269,406 @@
                 initThemes();
 
             </script>
-            <script type="module">import {
-                    createConversation,
-                    addMessageToConversation,
-                    subscribeToConversation
-                }
-
-                    from "../assets/js/soulbot-handler.js";
-
-                let currentConversationId = localStorage.getItem('soulbot_conversation_id');
-                let unsubscribe = null;
-                const msgContainer = document.getElementById('soulbot-messages');
-                const inputField = document.getElementById('soulbot-input');
-
-                // --- INITIALIZATION ---
-                async function initSoulBotChat() {
-                    if (!currentConversationId) {
-                        // Create new conversation
-                        // TODO: Pass actual userId if logged in
-                        currentConversationId = await createConversation("anonymous_user");
-
-                        if (currentConversationId) {
-                            localStorage.setItem('soulbot_conversation_id', currentConversationId);
-                        }
-                    }
-
-                    // Subscribe to updates
-                    if (currentConversationId) {
-                        if (unsubscribe) unsubscribe(); // Clear old sub if any
-                        unsubscribe = subscribeToConversation(currentConversationId, renderMessages);
-                    }
-                }
-
-                // --- RENDER LOGIC ---
-                function renderMessages(conversationData) {
-                    if (!conversationData || !conversationData.messages) return;
-
-                    // Clear current (simple re-render for MVP)
-                    msgContainer.innerHTML = '';
-
-                    // Add Welcome Message Always
-                    if (conversationData.messages.length === 0) {
-                        msgContainer.innerHTML = ` <div class="chat-bubble bot">Hi there. I'm SoulBot. I' m not a therapist,
-                but I'm here to listen without judgment.
- What's on your mind today?
- </div>`;
-                    }
-
-                    conversationData.messages.forEach(msg => {
-                        const div = document.createElement('div');
-
-                        div.className = `chat-bubble ${msg.role === 'user' ? 'user' : 'bot'
-                            }
-
-                    `;
-                        // Simple text rendering (could add markdown support later)
-                        div.innerText = msg.text;
-                        msgContainer.appendChild(div);
-                    });
-
-                    // Scroll to bottom
-                    msgContainer.scrollTop = msgContainer.scrollHeight;
-                }
-
-                // --- GLOBAL ACTIONS (Expose to window for onclick) ---
-                window.sendMessage = async function () {
-                    const text = inputField.value.trim();
-                    if (!text) return;
-
-                    // UI: Clear immediately for responsiveness
-                    inputField.value = '';
-
-                    // Core: Send to Backend
-                    if (currentConversationId) {
-                        await addMessageToConversation(currentConversationId, 'user', text);
-
-                        // Mock Bot Reply (Temporary until Cloud Function/Backend Service is active)
-                        // In a real app, a Cloud Function triggers on Firestore write.
-                        // Here we simulate it locally for demonstration if needed, 
-                        // BUT the robust way is backend. 
-                        // For now, let's let the user know if no backend is responding.
-                        // setTimeout(() => addMessageToConversation(currentConversationId, 'bot', "I hear you. (AI Backend Integration required for full reply)"), 1000);
-                    }
-                }
-
-                    ;
-
-                window.clearChat = function () {
-                    if (confirm("Start a new conversation?")) {
-                        localStorage.removeItem('soulbot_conversation_id');
-                        currentConversationId = null;
-                        initSoulBotChat();
-                    }
-                }
-
-                    ;
-
-                // Start
-                initSoulBotChat();
-
-            </script>
+            <!-- SoulBot in dashboard now uses iframe to soulbot-chat.html (same working implementation) -->
             <!-- DASHBOARD HYDRATION SCRIPT -->
-            <script type="module">import {
-                    onAuthChange
-                }
+            <script type="module">
+                import { onAuthChange } from "../assets/js/auth-service.js";
+                import { getUserProfile, createOrUpdateUserProfile } from "../assets/js/profile-handler.js";
+                import { getUserBookings } from "../assets/js/peer-booking-handler.js";
 
-                    from "../assets/js/auth-service.js";
+                // Hydrate dashboard UI whenever auth state changes
+                onAuthChange(async (user) => {
+                    if (!user) {
+                        console.log("Dashboard: no authenticated user.");
+                        return;
+                    }
 
-                import {
+                    try {
+                        console.log("Dashboard: user detected", user.uid);
 
-                    getUserProfile,
-                    createOrUpdateUserProfile
-                }
+                        // 1. Get Profile
+                        let profile = await getUserProfile(user.uid);
 
-                    from "../assets/js/profile-handler.js";
+                        // 2. If no profile, try to create one (recovery)
+                        if (!profile) {
+                            console.info("Profile missing in dashboard, attempting recovery...");
+                            await createOrUpdateUserProfile(user);
+                            profile = await getUserProfile(user.uid);
+                        }
 
-                document.addEventListener('DOMContentLoaded', () => {
-                    onAuthChange(async (user) => {
-                        if (user) {
-                            // 1. Get Profile
-                            let profile = await getUserProfile(user.uid);
+                        if (!profile) {
+                            console.warn("Dashboard: profile still missing after recovery.");
+                            return;
+                        }
 
-                            // 2. If no profile, try to create one (recovery)
-                            if (!profile) {
-                                console.info("Profile missing in dashboard, attempting recovery...");
-                                await createOrUpdateUserProfile(user);
-                                profile = await getUserProfile(user.uid);
-                            }
+                        // 3. Compute display values
+                        const name = profile.displayName || user.displayName || 'Friend';
+                        const email = profile.email || user.email || '';
+                        const phone = profile.phone || user.phoneNumber || '';
 
-                            if (profile) {
-                                // 3. Update UI
-                                const name = profile.displayName || user.displayName || 'Friend';
-                                const email = profile.email || user.email;
-                                const phone = profile.phone || '';
+                        // Personal Greeting
+                        const greetingEl = document.getElementById('welcome-greeting');
+                        if (greetingEl) {
+                            greetingEl.innerHTML = `Welcome back, <span style="color:var(--teal-accent);">${name}</span>.`;
+                        }
 
-                                // Personal Greeting
-                                const greetingEl = document.getElementById('welcome-greeting');
+                        // Sidebar
+                        const sbName = document.getElementById('sidebar-name');
+                        if (sbName) sbName.innerText = name;
 
-                                if (greetingEl) greetingEl.innerHTML = `Welcome back, <span style="color:var(--teal-accent);" >${name
-                                    }
+                        const sbRole = document.getElementById('sidebar-role');
+                        if (sbRole) sbRole.innerText = (profile.role || 'Member');
 
-                                </span>.`;
+                        // Primary profile card
+                        const inName = document.getElementById('profile-name');
+                        if (inName) inName.value = name;
 
-                                // URL Masking (Client-Side Routing Feel) - Makes it look personalized
-                                // Only change if not already clean (avoids loop)
-                                if (window.history && window.history.replaceState) {
-                                    // Use replaceState to change URL bar without reload
-                                    // From: /portal/user-dashboard.html
-                                    // To:   /portal/my-space
-                                    const cleanUrl = window.location.href.replace('user-dashboard.html', 'my-space');
-                                    // window.history.replaceState({}, document.title, cleanUrl);
-                                    // CAUTION: Only do this if we are confident user won't 404 on refresh.
-                                    // Since we don't control server rewrites yet, let's stick to a safe query param or hash for now to be safe?
-                                    // User explicitly asked for "redirected to HIS page". 
-                                    // Let's settle for a visual hash for now which is 100% safe: #/my-space/aditya
-                                    // OR just update the greeting as the main "Personal" indicator as per my plan.
+                        const inPhone = document.getElementById('profile-phone');
+                        if (inPhone) inPhone.value = phone;
 
-                                    // Let's go with the greeting update as the primary "Personalization" proof.
-                                    // And maybe add a hash:
-                                    // window.location.hash = `/space/${user.uid}`;
+                        const elEmail = document.getElementById('profile-email');
+                        if (elEmail) elEmail.innerText = email;
+
+                        // Secondary "Profile" view (detailed tab)
+                        const inName2 = document.getElementById('profile-name2');
+                        if (inName2) inName2.value = name;
+
+                        const inPhone2 = document.getElementById('profile-phone2');
+                        if (inPhone2) inPhone2.value = phone;
+
+                        const elEmail2 = document.getElementById('profile-email2');
+                        if (elEmail2) elEmail2.innerText = email;
+
+                        // 4. Upcoming sessions for this user
+                        try {
+                            const bookings = await getUserBookings(user.uid);
+                            const container = document.getElementById('user-upcoming-sessions');
+                            if (container) {
+                                if (!bookings || bookings.length === 0) {
+                                    // keep default empty state
+                                } else {
+                                    container.innerHTML = bookings
+                                        .filter(b => b.status === "confirmed" || b.status === "pending_payment")
+                                        .sort((a, b) => (a.startTime || 0) - (b.startTime || 0))
+                                        .slice(0, 5)
+                                        .map(b => {
+                                            const start = b.startTime ? new Date(b.startTime) : null;
+                                            const when = start ? start.toLocaleString() : "TBD";
+                                            const label = b.planType === "per_session" ? "1:1 Session" : (b.planType || "Session");
+                                            return `
+                                                <div class="dash-card" style="margin-bottom:12px; padding:15px; background:var(--bg-deep); border-radius:12px; border:1px solid var(--border-subtle);">
+                                                    <div style="font-size:0.85rem; opacity:0.7; margin-bottom:4px;">${when}</div>
+                                                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                                                        <div>
+                                                            <div style="font-family:'Outfit'; font-size:1rem; margin-bottom:2px;">${label}</div>
+                                                            <div style="font-size:0.8rem; opacity:0.65;">with ${b.peerName || "your listener"}</div>
+                                                        </div>
+                                                        <span style="font-size:0.75rem; padding:4px 10px; border-radius:999px; border:1px solid var(--border-subtle);">
+                                                            ${b.status === "pending_payment" ? "Pending payment" : "Confirmed"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            `;
+                                        })
+                                        .join("");
                                 }
-
-                                // Sidebar
-                                const sbName = document.getElementById('sidebar-name');
-                                if (sbName) sbName.innerText = name;
-
-                                const sbRole = document.getElementById('sidebar-role');
-                                if (sbRole) sbRole.innerText = (profile.role || 'Member');
-
-                                // Settings inputs
-                                const inName = document.getElementById('profile-name');
-                                if (inName) inName.value = name;
-
-                                const inPhone = document.getElementById('profile-phone');
-                                if (inPhone) inPhone.value = phone;
-
-                                const elEmail = document.getElementById('profile-email');
-                                if (elEmail) elEmail.innerText = email;
-
                             }
+                        } catch (e) {
+                            console.error("Failed to load user bookings:", e);
                         }
 
-                        else {
-                            console.log("No user found in dashboard.");
+                        // 5. Check if user is peer/psychologist and show availability link
+                        try {
+                            const { getUserRole } = await import("../assets/js/role-helper.js");
+                            const roleInfo = await getUserRole(user.uid);
+                            
+                            // Also check users collection directly as fallback
+                            const { getUserProfile } = await import("../assets/js/profile-handler.js");
+                            const userProfile = await getUserProfile(user.uid);
+                            const usersCollectionRole = (userProfile?.role || '').toLowerCase();
+                            
+                            const availabilityLink = document.getElementById('nav-availability-link');
+                            if (availabilityLink) {
+                                const isPeerOrPsych = roleInfo?.isPeer || roleInfo?.isPsychologist || 
+                                                     usersCollectionRole === 'peer' || usersCollectionRole === 'psychologist';
+                                
+                                console.log('Role check:', { 
+                                    roleInfo, 
+                                    usersCollectionRole, 
+                                    shouldShow: isPeerOrPsych 
+                                });
+                                
+                                if (isPeerOrPsych) {
+                                    availabilityLink.style.display = 'flex';
+                                    console.log('✅ Showing availability link for peer/psychologist');
+                                } else {
+                                    availabilityLink.style.display = 'none';
+                                    console.log('❌ Hiding availability link - not a peer/psychologist');
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Failed to check user role:", e);
                         }
-                    });
+
+                    } catch (error) {
+                        console.error("Dashboard hydration error:", error);
+                    }
                 });
+            </script>
 
+            <!-- AVAILABILITY MANAGEMENT SCRIPT -->
+            <script type="module">
+                import { auth, db } from "../assets/js/firebase-config.js";
+                import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+                let currentAvailabilityUser = [];
+
+                // Get Peer Availability
+                async function getPeerAvailability(peerId) {
+                    try {
+                        const docRef = doc(db, "peer_availability", peerId);
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            return { id: docSnap.id, ...docSnap.data() };
+                        }
+                        return null;
+                    } catch (error) {
+                        console.error("Error getting availability:", error);
+                        return null;
+                    }
+                }
+
+                // Set Peer Availability
+                async function setPeerAvailability(peerId, availability) {
+                    try {
+                        const docRef = doc(db, "peer_availability", peerId);
+                        await setDoc(docRef, {
+                            peerId: peerId,
+                            availability: availability,
+                            timezone: "Asia/Kolkata",
+                            updatedAt: new Date().toISOString()
+                        }, { merge: true });
+                        return true;
+                    } catch (error) {
+                        console.error("Error setting availability:", error);
+                        return false;
+                    }
+                }
+
+                // Initialize availability management
+                window.saveAvailabilityUser = async function() {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('Please log in to save availability');
+                        return;
+                    }
+
+                    const btn = document.getElementById('save-availability-btn-user');
+                    const spinner = document.getElementById('save-availability-spinner-user');
+                    const text = document.getElementById('save-availability-text-user');
+
+                    try {
+                        console.log('Saving availability:', currentAvailabilityUser);
+                        btn.disabled = true;
+                        spinner.style.display = 'inline-block';
+                        text.textContent = 'Saving...';
+
+                        const success = await setPeerAvailability(user.uid, currentAvailabilityUser);
+
+                        if (success) {
+                            alert('✅ Availability saved successfully!');
+                            btn.disabled = false;
+                            spinner.style.display = 'none';
+                            text.textContent = 'Save Schedule';
+                        } else {
+                            throw new Error('Failed to save availability');
+                        }
+                    } catch (error) {
+                        console.error('Error saving availability:', error);
+                        alert('Failed to save availability: ' + error.message);
+                        btn.disabled = false;
+                        spinner.style.display = 'none';
+                        text.textContent = 'Save Schedule';
+                    }
+                };
+
+                // Load availability when view is shown
+                window.loadAvailabilityUser = async function() {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        console.log('❌ No user logged in');
+                        return;
+                    }
+
+                    const container = document.getElementById('availability-schedule-list-user');
+                    if (!container) {
+                        console.log('❌ Container not found');
+                        return;
+                    }
+
+                    try {
+                        console.log('🔄 Loading availability for user:', user.uid);
+                        const availability = await getPeerAvailability(user.uid);
+                        
+                        if (availability && availability.availability) {
+                            console.log('✅ Found availability:', availability.availability);
+                            currentAvailabilityUser = availability.availability;
+                        } else {
+                            console.log('⚠️ No availability found, using defaults');
+                            // Default availability (Mon-Fri, 9-5)
+                            currentAvailabilityUser = [
+                                { day: 'monday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'tuesday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'wednesday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'thursday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'friday', startTime: '09:00', endTime: '17:00' }
+                            ];
+                        }
+
+                        console.log('📝 Rendering availability with:', currentAvailabilityUser);
+                        renderAvailabilityUser();
+                        console.log('✅ Render complete');
+                    } catch (error) {
+                        console.error('❌ Error loading availability:', error);
+                        container.innerHTML = '<div style="color:red; padding:20px;">Error loading schedule: ' + error.message + '<br/><button onclick="window.loadAvailabilityUser()" style="margin-top:10px; padding:8px 16px; cursor:pointer;">Retry</button></div>';
+                    }
+                };
+
+                function renderAvailabilityUser() {
+                    const container = document.getElementById('availability-schedule-list-user');
+                    if (!container) {
+                        console.log('❌ Container not found for rendering');
+                        return;
+                    }
+
+                    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                    const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+                    container.innerHTML = days.map((day, index) => {
+                        const daySlots = currentAvailabilityUser.filter(slot => slot.day.toLowerCase() === day);
+                        const hasSlots = daySlots.length > 0;
+
+                        return `
+                            <div style="padding:15px; border:1px solid var(--border-subtle); border-radius:12px; margin-bottom:12px; background:var(--bg-deep);">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                    <div style="font-weight:600; color:var(--text-main);">${dayLabels[index]}</div>
+                                    <button onclick="addSlotUser('${day}')" style="background:var(--teal-accent); color:var(--bg-main); border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600;">
+                                        <i class="fas fa-plus"></i> Add Slot
+                                    </button>
+                                </div>
+                                ${hasSlots ? daySlots.map((slot, slotIndex) => `
+                                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; padding:8px; background:var(--bg-subtle); border-radius:8px;">
+                                        <input type="time" value="${slot.startTime}"
+                                            onchange="updateSlotTimeUser('${day}', ${slotIndex}, 'start', this.value)"
+                                            style="background:var(--bg-card); border:1px solid var(--border-subtle); color:var(--text-main); padding:5px; border-radius:6px; font-size:0.85rem;">
+                                        <span style="opacity:0.5;">to</span>
+                                        <input type="time" value="${slot.endTime}"
+                                            onchange="updateSlotTimeUser('${day}', ${slotIndex}, 'end', this.value)"
+                                            style="background:var(--bg-card); border:1px solid var(--border-subtle); color:var(--text-main); padding:5px; border-radius:6px; font-size:0.85rem;">
+                                        <button onclick="removeSlotUser('${day}', ${slotIndex})"
+                                            style="background:transparent; border:none; color:#ef4444; cursor:pointer; font-size:0.9rem; margin-left:auto;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                `).join('') : '<div style="opacity:0.5; font-size:0.85rem; padding:8px 0;">No slots added</div>'}
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    console.log('✅ Schedule rendered successfully');
+                }
+
+                window.addSlotUser = function(day) {
+                    console.log('Adding slot for', day);
+                    const newSlot = { day: day, startTime: '09:00', endTime: '17:00' };
+                    currentAvailabilityUser.push(newSlot);
+                    renderAvailabilityUser();
+                };
+
+                window.removeSlotUser = function(day, index) {
+                    const daySlots = currentAvailabilityUser.filter(slot => slot.day.toLowerCase() === day);
+                    if (index >= 0 && index < daySlots.length) {
+                        const slotToRemove = daySlots[index];
+                        const slotIndex = currentAvailabilityUser.indexOf(slotToRemove);
+                        if (slotIndex !== -1) {
+                            currentAvailabilityUser.splice(slotIndex, 1);
+                            renderAvailabilityUser();
+                        }
+                    }
+                };
+
+                window.updateSlotTimeUser = function(day, index, type, value) {
+                    const daySlots = currentAvailabilityUser.filter(slot => slot.day.toLowerCase() === day);
+                    if (index >= 0 && index < daySlots.length) {
+                        const slot = daySlots[index];
+                        if (type === 'start') slot.startTime = value;
+                        if (type === 'end') slot.endTime = value;
+                    }
+                };
+
+                // Hook into view switcher to load availability when shown
+                const originalSwitchView = window.switchView;
+                window.switchView = function(viewName, element) {
+                    if (originalSwitchView) originalSwitchView(viewName, element);
+
+                    if (viewName === 'availability') {
+                        console.log('📅 Availability view opened, loading...');
+                        setTimeout(() => {
+                            window.loadAvailabilityUser();
+                        }, 100);
+                    }
+                };
+                
+                // Auto-load availability on page load for peers/psychologists
+                (async () => {
+                    try {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        
+                        const user = auth.currentUser;
+                        if (!user) return;
+                        
+                        // Check users collection for role
+                        const userProfileDoc = await getDoc(doc(db, "users", user.uid));
+                        const userProfile = userProfileDoc.data();
+                        const usersCollectionRole = (userProfile?.role || '').toLowerCase();
+                        
+                        // Check roles collection
+                        let isPeerOrPsych = false;
+                        try {
+                            const roleDoc = await getDoc(doc(db, "roles", user.uid));
+                            if (roleDoc.exists()) {
+                                const roleData = roleDoc.data();
+                                isPeerOrPsych = roleData.peer === true || roleData.psychologist === true;
+                            }
+                        } catch (e) {
+                            console.warn('Could not check roles collection:', e);
+                        }
+                        
+                        isPeerOrPsych = isPeerOrPsych || usersCollectionRole === 'peer' || usersCollectionRole === 'psychologist';
+                        
+                        if (isPeerOrPsych) {
+                            console.log('✅ User is peer/psychologist, pre-loading availability...');
+                            const availability = await getPeerAvailability(user.uid);
+                            if (availability && availability.availability) {
+                                currentAvailabilityUser = availability.availability;
+                                console.log('✅ Availability pre-loaded:', currentAvailabilityUser);
+                            } else {
+                                console.log('⚠️ No saved availability found');
+                            }
+                        } else {
+                            console.log('ℹ️ User is not a peer/psychologist');
+                        }
+                    } catch (e) {
+                        console.error('❌ Error pre-loading availability:', e);
+                    }
+                })();
             </script>
 
 
             <!-- FLOATING TOOLS BUTTON & MENU -->
             <button id="tools-fab" onclick="toggleToolsMenu()"
                 style="position:fixed; bottom:30px; right:30px; width:56px; height:56px; border-radius:50%; background:var(--peach-glow); border:none; cursor:pointer; box-shadow:0 4px 12px rgba(244,159,117,0.4); display:flex; align-items:center; justify-content:center; z-index:1000; transition:all 0.3s ease;">
-                <i class="fas fa-toolbox" style="font-size:1.4rem; color:#0f172a;"></i>
+                <i class="fas fa-toolbox" style="font-size:1.4rem; color:var(--bg-main);"></i>
             </button>
 
             <!-- TOOLS SLIDE-OUT MENU -->
@@ -1525,14 +1691,14 @@
                 <div style="flex:1; overflow-y:auto; padding:15px;">
                     <!-- Vent Box -->
                     <div onclick="window.open('../tools/vent-box.html', '_blank')" class="tool-item"
-                        style="padding:15px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all 0.2s;">
+                        style="padding:15px; background:var(--alert-red-bg); border:1px solid rgba(239,68,68,0.3); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all 0.2s;">
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div
-                                style="width:40px; height:40px; background:rgba(239,68,68,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                                <i class="fas fa-fire" style="color:#ef4444; font-size:1.1rem;"></i>
+                                style="width:40px; height:40px; background:var(--alert-red-bg); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-fire" style="color:var(--alert-red); font-size:1.1rem;"></i>
                             </div>
                             <div style="flex:1;">
-                                <h4 style="margin:0; font-size:1rem; color:#ef4444;">Vent Box</h4>
+                                <h4 style="margin:0; font-size:1rem; color:var(--alert-red);">Vent Box</h4>
                                 <p style="margin:3px 0 0 0; font-size:0.75rem; opacity:0.7;">Release frustration safely
                                 </p>
                             </div>
@@ -1558,14 +1724,14 @@
 
                     <!-- Drop It -->
                     <div onclick="window.open('../tools/drop-it.html', '_blank')" class="tool-item"
-                        style="padding:15px; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all 0.2s;">
+                        style="padding:15px; background:var(--info-blue-bg); border:1px solid rgba(56,189,248,0.3); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all 0.2s;">
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div
                                 style="width:40px; height:40px; background:rgba(56,189,248,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                                <i class="fas fa-hand-holding-water" style="color:#38bdf8; font-size:1.1rem;"></i>
+                                <i class="fas fa-hand-holding-water" style="color:var(--info-blue); font-size:1.1rem;"></i>
                             </div>
                             <div style="flex:1;">
-                                <h4 style="margin:0; font-size:1rem; color:#38bdf8;">Drop It</h4>
+                                <h4 style="margin:0; font-size:1rem; color:var(--info-blue);">Drop It</h4>
                                 <p style="margin:3px 0 0 0; font-size:0.75rem; opacity:0.7;">Let go of worries</p>
                             </div>
                             <i class="fas fa-external-link-alt" style="opacity:0.5; font-size:0.9rem;"></i>
@@ -1590,7 +1756,7 @@
 
                     <!-- Breathing Exercise -->
                     <div onclick="window.open('../tools/breathing.html', '_blank')" class="tool-item"
-                        style="padding:15px; background:rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.3); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all 0.2s;">
+                        style="padding:15px; background:var(--accent-teal-bg); border:1px solid rgba(45,212,191,0.3); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all 0.2s;">
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div
                                 style="width:40px; height:40px; background:rgba(45,212,191,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center;">
@@ -1606,10 +1772,10 @@
 
                     <!-- Reset Tool -->
                     <div onclick="window.open('../tools/5-step-reset.html', '_blank')" class="tool-item"
-                        style="padding:15px; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all 0.2s;">
+                        style="padding:15px; background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all 0.2s;">
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div
-                                style="width:40px; height:40px; background:rgba(255,255,255,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                style="width:40px; height:40px; background:var(--border-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center;">
                                 <i class="fas fa-redo-alt" style="color:var(--text-main); font-size:1.1rem;"></i>
                             </div>
                             <div style="flex:1;">
@@ -1661,14 +1827,14 @@
 
             <!-- PHOTO UPLOAD MODAL -->
             <div id="photo-upload-modal"
-                style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.8); backdrop-filter:blur(8px); z-index:2000; align-items:center; justify-content:center;">
+                style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-overlay); backdrop-filter:blur(8px); z-index:2000; align-items:center; justify-content:center;">
                 <div class="dash-card"
                     style="max-width:550px; width:90%; animation: slideUp 0.3s ease; border:1px solid var(--border-subtle);">
 
                     <div style="text-align:center; margin-bottom:30px;">
                         <h2 style="font-family:'Outfit'; margin-bottom:15px; color:var(--text-main);">Profile Photo</h2>
                         <div
-                            style="font-size:0.95rem; line-height:1.6; color:var(--text-muted); font-style:italic; border-left:3px solid var(--teal-accent); padding-left:20px; text-align:left; margin:0 auto; max-width:400px; padding:20px; background:rgba(255,255,255,0.02); border-radius:0 12px 12px 0;">
+                            style="font-size:0.95rem; line-height:1.6; color:var(--text-muted); font-style:italic; border-left:3px solid var(--teal-accent); padding-left:20px; text-align:left; margin:0 auto; max-width:400px; padding:20px; background:var(--bg-subtle); border-radius:0 12px 12px 0;">
                             <p style="margin-bottom:10px;">Choose a photo where your face is visible and you feel like
                                 yourself.
                             </p>
@@ -1759,6 +1925,58 @@
                     }, 500); // 500ms safety delay
                 });
             </script>
+
+        </main>
+    </div>
+
+    <!-- CORE UTILITIES (Global Script) -->
+    <script src="../assets/js/dashboard-utils.js"></script>
+
+    <script type="module">
+        // No import needed. switchView is global.
+        const baseSwitchView = window.switchView;
+
+        // Global Wrapper
+        window.switchView = function (viewName, clickedLink) {
+            if (baseSwitchView) baseSwitchView(viewName, clickedLink);
+            // Link to Journal/Blog logic depending on view if needed
+        };
+    </script>
+
+    <!-- SCRIPT LOGIC -->
+    <script type="module">
+        import { initWalletListener, addFundsMock } from '../assets/js/billing-logic.js';
+        import { auth } from '../assets/js/firebase-config.js';
+
+        // Initialize Wallet on Auth
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                initWalletListener(user.uid, (data) => {
+                    const el = document.getElementById('wallet-balance');
+                    if (el) el.textContent = '$' + (data.balance || 0).toFixed(2);
+                });
+            }
+        });
+
+        window.triggerAddFunds = async function () {
+            if (confirm("Simulate adding $50 via Stripe?")) {
+                const btn = document.querySelector('#view-wallet .btn-dash-primary');
+                const originalText = btn.textContent;
+                btn.textContent = "Processing...";
+                btn.disabled = true;
+
+                try {
+                    const res = await addFundsMock(50);
+                    if (res.success) alert(res.message);
+                } catch (e) {
+                    alert("Error: " + e.message);
+                } finally {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            }
+        };
+    </script>
 </body>
 
 </html>

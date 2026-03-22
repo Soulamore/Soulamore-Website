@@ -1,10 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Problem Wall | Soulamore</title>
+    <title>The Problem Wall: Share Your Burdens Anonymously | Soulamore</title>
+    <meta name="description"
+        content="A safe, anonymous space to leave your worries behind. Write your problems on the wall and let them drift away. You are not alone.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soulamore.com/pages/problem-wall.html">
+    <meta property="og:title" content="The Problem Wall: Share Your Burdens Anonymously | Soulamore">
+    <meta property="og:description"
+        content="A safe, anonymous space to leave your worries behind. Write your problems on the wall and let them drift away.">
+    <meta property="og:image" content="https://soulamore.com/assets/images/social-preview.png">
 
     <!-- Fonts -->
     <link
@@ -16,8 +26,11 @@
     <!-- Global CSS (Base styles) -->
     <link rel="stylesheet" href="../assets/css/global.css">
 
-    <!-- MODULES: Header Injection -->
-    <script src="../assets/js/components.js"></script>
+    <!-- MODULE: Ritual Schedule (Dynamic) -->
+    <script src="../assets/js/ritual-schedule.js"></script>
+
+    <!-- MODULES: Header Injection (Deferred for performance) -->
+    <script src="../assets/js/components.js" defer></script>
 
     <style>
         /* --- 1. CORE THEME: DAYBREAK (Light & Airy) --- */
@@ -44,108 +57,205 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
-            /* Throttled gradient for performance */
+            background-color: #fdfcfb;
+            /* Luminous Off-White */
             background-image:
-                radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(78, 205, 196, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 80% 20%, rgba(244, 159, 117, 0.05) 0%, transparent 50%);
-            color: var(--ink-black);
+                radial-gradient(circle at 20% 30%, rgba(78, 205, 196, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(244, 159, 117, 0.05) 0%, transparent 40%);
+            color: #1e293b;
             overflow: hidden;
-            /* Infinite canvas handles scroll */
             height: 100vh;
             width: 100vw;
-            will-change: background-image;
-            /* HW Acceleration hint */
+            transition: all 1s ease;
         }
 
-        /* --- 2. HEADER OVERRIDE (Daybreak Theme) --- */
-        /* Target the shell-fixed context to ensure overrides apply */
-        #shell-fixed header.island-nav {
-            background: rgba(255, 255, 255, 0.85) !important;
-            backdrop-filter: blur(16px) !important;
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 0, 0, 0.08) !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+        /* --- BACKGROUND ANIMATION LAYER --- */
+        .ethereal-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
         }
 
-        /* Ensure header buttons are visible */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: drift 20s infinite alternate ease-in-out;
+            will-change: transform, opacity;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.2;
+            }
+
+            50% {
+                transform: translate(10%, 10%) scale(1.2);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: translate(-5%, 5%) scale(0.9);
+                opacity: 0.25;
+            }
+        }
+
+        /* --- VIGNETTE OVERLAY --- */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 20%, rgba(255, 255, 255, 0.2) 100%);
+            z-index: 5;
+        }
+
+        /* --- CANDLELIGHT PULSE --- */
+        .ambient-light {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+            z-index: 4;
+            animation: softPulse 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes softPulse {
+            0% {
+                opacity: 0.1;
+            }
+
+            100% {
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes candleFlicker {
+            0% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+
+            100% {
+                opacity: 0.4;
+                transform: scale(0.95);
+            }
+        }
+
+        /* --- 2. HEADER OVERRIDE (Theme Scoped) --- */
         #shell-fixed header.island-nav .nav-btn,
         #shell-fixed header.island-nav .lifeline-btn {
             opacity: 1 !important;
             visibility: visible !important;
         }
 
-        /* Light Theme Links */
-        header.island-nav .nav-links a {
+        /* Light mode header */
+        body.light-mode #shell-fixed header.island-nav {
+            background: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(15, 23, 42, 0.1) !important;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+        }
+
+        body.light-mode header.island-nav .nav-links a {
             color: #475569 !important;
-            /* Slate-600 */
         }
 
-        header.island-nav .nav-links a:hover {
-            color: #4ECDC4 !important;
-            /* Teal */
+        body.light-mode header.island-nav .nav-links a:hover {
+            color: var(--peach-glow) !important;
         }
 
-        header.island-nav .nav-links i {
-            color: #94a3b8 !important;
-            /* Slate-400 */
+        body.light-mode header.island-nav .nav-links i {
+            color: var(--peach-glow) !important;
         }
 
-        header.island-nav .nav-links a:hover i {
-            color: #4ECDC4 !important;
+        body.light-mode header.island-nav .nav-links a:hover i {
+            color: var(--peach-glow) !important;
         }
 
-        /* Logo Text Dark & Symbol Restoration 
-           Invert turns White->Black (Text) and Teal->Red (Symbol).
-           Hue-Rotate 180 turns Red->Teal back.
-        */
-        header.island-nav .nav-logo {
-            filter: invert(1) hue-rotate(180deg) saturate(1.4) !important;
-            opacity: 0.9 !important;
-        }
-
-        /* Dropdown Menus (Light Mode) */
-        header.island-nav .dropdown-content {
+        body.light-mode header.island-nav .dropdown-content {
             background: rgba(255, 255, 255, 0.95) !important;
             border-color: rgba(0, 0, 0, 0.1) !important;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
         }
 
-        header.island-nav .dropdown-content a {
+        body.light-mode header.island-nav .dropdown-content a {
             color: #475569 !important;
         }
 
-        /* Header Buttons Override (Force Visibility) */
-        /* Header Buttons Override (Force Visibility) */
-        header.island-nav .nav-btn {
-            background: white !important;
-            color: #0f172a !important;
-            border: 1px solid rgba(0, 0, 0, 0.1) !important;
-            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05) !important;
-            opacity: 1 !important;
-            visibility: visible !important;
+        body.light-mode header.island-nav .nav-btn {
+            background: linear-gradient(135deg, #8fe6df, #52cdc5) !important;
+            color: #0f2f3a !important;
+            border: 1px solid rgba(78, 205, 196, 0.42) !important;
+            box-shadow: 0 8px 18px rgba(78, 205, 196, 0.22) !important;
         }
 
-        header.island-nav .lifeline-btn {
-            /* Restore "Red Aura" for Get Help */
+        body.light-mode header.island-nav .lifeline-btn {
             background: rgba(239, 68, 68, 0.1) !important;
             color: #ef4444 !important;
             border: 1px solid rgba(239, 68, 68, 0.2) !important;
             box-shadow: 0 0 15px rgba(239, 68, 68, 0.15) !important;
-            opacity: 1 !important;
-            visibility: visible !important;
         }
 
-        header.island-nav .nav-btn:hover {
-            background: #f1f5f9 !important;
-            color: #0f172a !important;
+        body.light-mode header.island-nav .nav-btn:hover {
+            background: linear-gradient(135deg, #9bece5, #63d6cd) !important;
+            color: #0c2731 !important;
         }
 
-        header.island-nav .lifeline-btn:hover {
+        body.light-mode header.island-nav .lifeline-btn:hover {
             background: #ef4444 !important;
             color: white !important;
             box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important;
             transform: translateY(-2px);
+        }
+
+        /* Dark mode header */
+        body:not(.light-mode) #shell-fixed header.island-nav {
+            background: rgba(10, 18, 38, 0.88) !important;
+            border: 1px solid rgba(148, 163, 184, 0.2) !important;
+            box-shadow: 0 14px 35px rgba(2, 6, 23, 0.55) !important;
+        }
+
+        body:not(.light-mode) header.island-nav .nav-logo {
+            filter: none !important;
+            opacity: 1 !important;
+        }
+
+        body:not(.light-mode) header.island-nav .nav-links a,
+        body:not(.light-mode) header.island-nav .nav-links i,
+        body:not(.light-mode) header.island-nav .user-icon-btn,
+        body:not(.light-mode) header.island-nav .mobile-toggle {
+            color: #dbe7f7 !important;
+        }
+
+        body:not(.light-mode) header.island-nav .nav-btn {
+            background: linear-gradient(135deg, #6ee0d7, #39b8ae) !important;
+            color: #08212c !important;
+            border: 1px solid rgba(78, 205, 196, 0.4) !important;
+        }
+
+        body:not(.light-mode) header.island-nav .lifeline-btn {
+            background: rgba(239, 68, 68, 0.16) !important;
+            color: #ff9b9b !important;
+            border: 1px solid rgba(239, 68, 68, 0.36) !important;
         }
 
         /* Header Glow States (Interactive) -  Specificity Boosted */
@@ -220,7 +330,12 @@
             height: 100vh;
             overflow: hidden;
             cursor: grab;
-            position: relative;
+            position: fixed;
+            /* Fix 2952: Force viewport to fill screen regardless of parent flow */
+            top: 0;
+            left: 0;
+            z-index: 1;
+            /* Above background, below UI */
             touch-action: none;
         }
 
@@ -238,14 +353,19 @@
             /* Centering initially */
             transform-origin: center center;
             /* Dot Grid Pattern */
+            /* Memorial Grid */
             background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-            background-size: 30px 30px;
+            background-size: 40px 40px;
             /* Hardware Acceleration */
             will-change: transform;
             /* Smoother transition/interp */
         }
 
         /* HERO TEXT ON CANVAS */
+        footer {
+            display: none !important;
+        }
+
         .wall-hero {
             position: absolute;
             top: 2450px;
@@ -255,38 +375,64 @@
             text-align: center;
             pointer-events: none;
             /* Let clicks pass through to canvas */
-            z-index: 0;
+            z-index: 5;
+            /* Raised from 0 to ensure visibility over background */
         }
 
         .wall-hero h1 {
             font-family: 'Outfit', sans-serif;
-            font-size: 4rem;
+            font-size: 5rem;
             color: #1e293b;
             letter-spacing: -1px;
             margin-bottom: 10px;
-            opacity: 0.8;
+            text-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+            opacity: 0.9;
         }
 
         .wall-hero p {
-            font-size: 1.2rem;
-            color: #64748b;
+            font-size: 1.4rem;
+            color: #94a3b8;
+            font-style: italic;
+            font-family: 'Plus Jakarta Sans', serif;
         }
 
         /* NOTE CARD STYLING */
         .note {
             position: absolute;
             width: 280px;
+            /* Burnt Edge & Stacked Effect */
             background: var(--paper-white);
             padding: 25px;
             border-radius: 2px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            /* Reduced initial shadow for perf */
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            font-size: 1rem;
+
+            /* Burnt Border */
+            border: 1px solid rgba(120, 90, 70, 0.15);
+
+            /* Stacked Shadow + Inner Burnt Glow */
+            box-shadow:
+                inset 0 0 25px rgba(139, 69, 19, 0.04),
+                /* Subtle inner burn */
+                0 2px 4px rgba(0, 0, 0, 0.05),
+                /* Main depth */
+                3px 3px 0 -1px #f8fafc,
+                /* Paper layer 2 (matches bg mostly) */
+                3px 3px 1px -1px rgba(0, 0, 0, 0.05),
+                /* Shadow 2 */
+                5px 5px 0 -2px #f1f5f9,
+                /* Paper layer 3 */
+                5px 5px 1px -2px rgba(0, 0, 0, 0.05);
+            /* Shadow 3 */
+
+            font-size: 1.05rem;
             line-height: 1.6;
             color: #334155;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            /* Faster transition */
+            /* Adaptive Glow (Radiance) */
+            box-shadow:
+                inset 0 0 25px rgba(139, 69, 19, 0.04),
+                0 2px 10px rgba(0, 0, 0, 0.1),
+                0 0 var(--glow-radius, 0px) var(--glow-color, transparent);
+
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
             cursor: default;
             user-select: none;
             overflow: hidden;
@@ -295,7 +441,7 @@
         }
 
         .note:hover {
-            transform: scale(1.02) rotate(0deg) !important;
+            transform: scale(1.02) !important;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
             z-index: 10;
         }
@@ -392,16 +538,246 @@
             }
         }
 
+        /* Note Entrance Animation */
+        @keyframes float-in {
+            0% {
+                transform: scale(0.8) translateY(20px) rotate(5deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1) translateY(0) rotate(var(--rot));
+                opacity: 1;
+            }
+        }
+
+        /* Soft Pop for New Notes */
+        @keyframes softPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            70% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Peach/Teal Alternating Glow - Prominent Sparkle */
+        @keyframes alternate-glow {
+            0% {
+                box-shadow: 0 0 30px rgba(244, 159, 117, 0.8), 0 0 60px rgba(244, 159, 117, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 35px rgba(78, 205, 196, 0.8), 0 0 70px rgba(78, 205, 196, 0.3);
+            }
+
+            100% {
+                box-shadow: 0 0 30px rgba(244, 159, 117, 0.8), 0 0 60px rgba(244, 159, 117, 0.3);
+            }
+        }
+
+        @keyframes sparkle-border {
+            0% {
+                border-color: rgba(244, 159, 117, 0.6);
+            }
+
+            50% {
+                border-color: rgba(78, 205, 196, 0.6);
+            }
+
+            100% {
+                border-color: rgba(244, 159, 117, 0.6);
+            }
+        }
+
+        .new-note-glow {
+            animation: softPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+                alternate-glow 2.5s infinite ease-in-out,
+                sparkle-border 2.5s infinite ease-in-out !important;
+            z-index: 500 !important;
+            border: 2px solid rgba(244, 159, 117, 0.6) !important;
+            transform: scale(1.05) rotate(0deg) !important;
+        }
+
+        /* Sparkle dot pseudo-element */
+        .new-note-glow::after {
+            content: '✨';
+            position: absolute;
+            top: -18px;
+            right: -10px;
+            font-size: 1.4rem;
+            animation: sparkle-float 2s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 501;
+        }
+
+        @keyframes sparkle-float {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateY(-8px) scale(1.2);
+                opacity: 0.7;
+            }
+        }
+
+        .note-float-in {
+            animation: floatIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* Reacted State for Buttons */
+        .action-btn.reacted {
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+            /* Prevent multiple clicks */
+        }
+
+        .heart-btn.reacted {
+            background: #ff4d4d !important;
+            border-color: #ff4d4d;
+        }
+
+        .flower-btn.reacted {
+            background: #ffd700 !important;
+            border-color: #ffd700;
+            color: #333 !important;
+        }
+
+        .candle-btn.reacted {
+            background: #ff7e39 !important;
+            border-color: #ff7e39;
+        }
+
+        /* --- MODERATOR UI --- */
+        .mod-controls {
+            display: none;
+            /* Hidden by default */
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 20;
+        }
+
+        body.mod-mode .mod-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .mod-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: none;
+            z-index: 1001;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+
+        body.mod-mode .mod-indicator {
+            display: block;
+        }
+
+        /* --- LOADING OVERLAY --- */
+        #wall-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            /* Deep Space */
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #4ECDC4;
+            /* Teal Glow */
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        .loader-text {
+            font-family: 'Outfit', sans-serif;
+            color: #f1f5f9;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        body.loaded #wall-loader {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
         /* --- 5. UI OVERLAYS (FAB STACK) --- */
         .fab-stack-container {
             position: fixed;
-            bottom: 40px;
+            bottom: 110px;
+            /* Desktop: Sit above SoulBot (40px + 55px + 15px gap) */
             right: 30px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 15px;
             align-items: center;
-            z-index: 100;
+            z-index: 999;
         }
 
         .fab-btn {
@@ -436,7 +812,8 @@
             background: white;
             color: var(--ink-black);
             border: 1px solid rgba(0, 0, 0, 0.05);
-            /* Ensure visibility on light bg */
+            display: flex;
+            /* Force Flex to ensure visibility */
         }
 
         .fab-center:hover {
@@ -535,59 +912,84 @@
             color: #94a3b8;
         }
 
-        /* --- 6. STATS WIDGET (Right Side) --- */
+        /* --- 6. IMPACT BOARD (Right Side) --- */
         .global-stats {
             position: fixed;
             right: 30px;
-            top: 50%;
-            transform: translateY(-50%);
+            bottom: 250px;
+            /* Anchor safely above Reset Button (Top edge ~235px) */
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            z-index: 90;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 20px;
+            gap: 12px;
+            /* Compact Gap */
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 18px;
+            /* Compact Padding */
             border-radius: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(30px);
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.08),
+                0 2px 10px rgba(0, 0, 0, 0.04);
+            width: 240px;
+            /* Compact Width */
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .global-stats::before {
+            content: 'Community Impact';
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #94a3b8;
+            margin-bottom: 15px;
+            font-weight: 600;
         }
 
         .stat-item {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            opacity: 0.8;
+            flex-direction: column;
+            gap: 5px;
+            /* Compact Item Gap */
             transition: 0.3s;
         }
 
-        .stat-item:hover {
-            opacity: 1;
-            transform: translateX(-5px);
-        }
-
-        .stat-icon-box {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
+        .stat-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
+            gap: 12px;
         }
 
         .stat-text h4 {
             font-family: 'Outfit';
-            font-size: 1.2rem;
+            font-size: 1.25rem;
+            /* Compact Font */
             margin: 0;
             color: #1e293b;
+            font-weight: 600;
         }
 
         .stat-text span {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-weight: 400;
+        }
+
+        /* Progress Bar for Milestones */
+        .stat-progress-bg {
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .stat-progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @media(max-width: 768px) {
@@ -599,82 +1001,424 @@
             .wall-hero h1 {
                 font-size: 2.5rem;
             }
+
+            /* FAB Stack: High on Right (To clear Zoom Slider area) */
+            .fab-stack-container {
+                bottom: 335px !important;
+                right: 20px;
+                gap: 15px;
+                flex-direction: column-reverse;
+                /* Build up from bottom */
+            }
+
+            /* Zoom Controls: Restore to Bottom (Center) */
+            #zoom-controls {
+                top: auto !important;
+                left: 50%;
+                bottom: 175px !important;
+                /* Above Stats Bar (115px + 60px buffer) */
+                transform: translateX(-50%) scale(0.9);
+                width: auto;
+                padding: 8px 16px;
+                background: rgba(19, 27, 46, 0.85);
+                /* Stronger contrast */
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* SOULBOT OVERRIDE (Mobile) */
+            #soulbot-widget-container {
+                bottom: 250px !important;
+                /* Clears Zoom Slider Zone */
+                right: 20px !important;
+            }
+
+            /* Mobile Stats Bar: Sit above Bottom Nav */
+            .mobile-stats-bar {
+                display: flex !important;
+                position: fixed;
+                bottom: 115px;
+                left: 0;
+                width: 100%;
+                height: 45px;
+                /* Slightly shorter */
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(12px);
+                border-top: 1px solid rgba(0, 0, 0, 0.05);
+                padding: 0 15px;
+                justify-content: space-between;
+                /* Spread evenly */
+                align-items: center;
+                z-index: 899;
+                font-size: 0.85rem;
+                color: #64748b;
+                box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+            }
+
+            .mob-stat {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-weight: 600;
+                font-family: 'Outfit';
+            }
+
+            .mob-stat i {
+                font-size: 0.9rem;
+            }
+
+            /* 3. Audio Control Override: Clear Zoom/Stats */
+            .audio-control {
+                bottom: 240px !important;
+                /* Above Zoom controls (175px) */
+            }
+        }
+
+        .mobile-stats-bar {
+            display: none;
+        }
+
+        /* RITUAL WIDGET */
+        .ritual-widget {
+            margin-top: 2rem;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 10px 24px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            pointer-events: auto;
+            font-family: 'Outfit', sans-serif;
+            transition: transform 0.2s;
+            animation: float-widget 6s ease-in-out infinite;
+        }
+
+        .ritual-widget:hover {
+            transform: scale(1.02);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .ritual-icon {
+            font-size: 1.2rem;
+        }
+
+        .ritual-text {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .ritual-highlight {
+            color: #F49F75;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .ritual-timer {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin-left: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .ritual-live-badge {
+            color: #ef4444;
+            font-weight: bold;
+            animation: pulse-text 1.5s infinite;
+        }
+
+        @keyframes pulse-text {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes float-widget {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* --- 7. THEME LAYER: MIDNIGHT (Dark) VS DAYBREAK (Light) --- */
+        body:not(.light-mode) {
+            background-color: #070f22;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(78, 205, 196, 0.1) 0%, transparent 42%),
+                radial-gradient(circle at 80% 70%, rgba(244, 159, 117, 0.08) 0%, transparent 40%);
+            color: #d9e5f5;
+        }
+
+        body:not(.light-mode) .vignette {
+            background: radial-gradient(circle at center, transparent 18%, rgba(2, 6, 23, 0.74) 100%);
+        }
+
+        body:not(.light-mode) .ambient-light {
+            background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.14) 0%, transparent 70%);
+        }
+
+        body:not(.light-mode) #infinite-canvas {
+            background-image: radial-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px);
+        }
+
+        body:not(.light-mode) .wall-hero h1 {
+            color: #dbe7f7;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.22);
+            opacity: 0.96;
+        }
+
+        body:not(.light-mode) .wall-hero p {
+            color: #9fb3ca;
+        }
+
+        body:not(.light-mode) .note {
+            background: rgba(15, 23, 42, 0.84);
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            color: #d8e4f4;
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+                0 16px 30px rgba(2, 6, 23, 0.52),
+                0 0 var(--glow-radius, 0px) var(--glow-color, transparent);
+        }
+
+        body:not(.light-mode) .note::before {
+            background: rgba(148, 163, 184, 0.16);
+            border: 1px solid rgba(148, 163, 184, 0.28);
+        }
+
+        body:not(.light-mode) .note-meta,
+        body:not(.light-mode) .action-btn,
+        body:not(.light-mode) .close-modal {
+            color: #9fb3ca;
+        }
+
+        body:not(.light-mode) .note-actions {
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        body:not(.light-mode) .action-btn:hover {
+            background: rgba(148, 163, 184, 0.14);
+        }
+
+        body:not(.light-mode) .global-stats {
+            background: rgba(15, 23, 42, 0.86);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 15px 38px rgba(2, 6, 23, 0.55);
+        }
+
+        body:not(.light-mode) .global-stats::before {
+            color: #9fb3ca;
+        }
+
+        body:not(.light-mode) .stat-text h4 {
+            color: #e2ebf8;
+        }
+
+        body:not(.light-mode) .stat-text span {
+            color: #9fb3ca;
+        }
+
+        body:not(.light-mode) .ritual-widget {
+            background: rgba(15, 23, 42, 0.78);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 10px 25px rgba(2, 6, 23, 0.45);
+        }
+
+        body:not(.light-mode) .ritual-text {
+            color: #bac9dc;
+        }
+
+        body.light-mode .wall-hero h1 {
+            color: #334155;
+        }
+
+        body.light-mode .wall-hero p {
+            color: #64748b;
         }
     </style>
     <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
 </head>
 
-<body data-header-theme="light">
+<body data-header-theme="dark">
+
+    <!-- LOADING OVERLAY -->
+    <div id="wall-loader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">CONNECTING SOULS...</div>
+    </div>
 
     <div id="app-shell">
         <div id="shell-fixed">
             <header class="island-nav" id="main-header"></header>
         </div>
 
-        <script>
-            // Force header injection if it hasn't happened yet
-            if (typeof injectHeader === 'function') injectHeader();
-        </script>
+
 
         <main id="shell-content" class="custom-spacing" style="padding-top: 0 !important;">
             <!-- Custom spacing override because this is a full-screen canvas app -->
 
             <!-- LIVE COUNTER -->
-            <div class="live-activity-bar">
-                <div class="live-dot"></div>
-                <span id="userCount">142</span> people here right now
-            </div>
+            <!-- LIVE COUNTER (Hidden - Moved to Sidebar) -->
+            <div class="live-activity-bar" style="display:none;"></div>
 
-            <!-- GLOBAL STATS (SIDEBAR) -->
-            <div class="global-stats">
-                <div class="stat-item">
-                    <div class="stat-icon-box" style="background: #ffe4e6; color: #ef4444;">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <div class="stat-text">
-                        <h4 id="totalHearts">0</h4>
-                        <span>Hearts given</span>
-                    </div>
+            <!-- MOBILE STATS AND SIDEBAR MOVED OUTSIDE SHELL FOR Z-INDEX FIX -->
+
+            <!-- VIGNETTE & LIGHTING -->
+            <div class="vignette"></div>
+            <div class="ambient-light"></div>
+
+            <!-- ETHEREAL BACKGROUND ORBS -->
+            <div class="ethereal-bg">
+                <div class="glow-orb"
+                    style="width: 400px; height: 400px; background:var(--accent-primary); top: 10%; left: 20%; animation-delay: 0s;">
                 </div>
-                <div class="stat-item">
-                    <div class="stat-icon-box" style="background: #fef9c3; color: #eab308;">
-                        <i class="fas fa-spa"></i>
-                    </div>
-                    <div class="stat-text">
-                        <h4 id="totalFlowers">0</h4>
-                        <span>Flowers offered</span>
-                    </div>
+                <div class="glow-orb"
+                    style="width: 500px; height: 500px; background:var(--accent-secondary); bottom: 20%; right: 10%; animation-delay: -5s;">
                 </div>
-                <div class="stat-item">
-                    <div class="stat-icon-box" style="background: #ffedd5; color: #f97316;">
-                        <i class="fas fa-fire-alt"></i>
-                    </div>
-                    <div class="stat-text">
-                        <h4 id="totalCandles">0</h4>
-                        <span>Candles lit</span>
-                    </div>
+                <div class="glow-orb"
+                    style="width: 300px; height: 300px; background:var(--info-blue); top: 60%; left: 50%; animation-delay: -10s;">
                 </div>
             </div>
 
-            <!-- INFINITE CANVAS WRAPPER -->
-            <div id="viewport">
-                <div id="infinite-canvas">
+        </main> <!-- Close shell-content properly before viewport -->
 
-                    <!-- HERO TEXT (Part of Canvas) -->
-                    <div class="wall-hero">
-                        <h1>The Problem Wall</h1>
-                        <p>A place where pain is seen, not solved.</p>
-                    </div>
+        <!-- INFINITE CANVAS WRAPPER -->
+        <div id="viewport">
+            <div id="infinite-canvas">
 
-                    <!-- DYNAMIC NOTES CONTAINER -->
-                    <div id="notes-container"></div>
-
+                <!-- HERO TEXT (Part of Canvas) -->
+                <div class="wall-hero">
+                    <h1>The Problem Wall</h1>
+                    <p>A place where pain is seen, not solved.</p>
+                    <!-- RITUAL WIDGET CONTAINER -->
+                    <div id="ritual-container"></div>
                 </div>
-        </main>
-        <footer></footer>
+
+                <!-- DYNAMIC NOTES CONTAINER (Safe Position) -->
+                <div id="notes-container"
+                    style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:auto;"></div>
+
+            </div> <!-- Closes #infinite-canvas -->
+        </div> <!-- Closes #viewport -->
+
     </div> <!-- End App Shell -->
 
-    <!-- FAB STACK (Bottom Right) -->
+    <!-- MOBILE STATS BAR (ALL 5 METRICS) -->
+    <div class="mobile-stats-bar">
+        <div class="mob-stat" style="color:#10b981;"><i class="fas fa-user-friends"></i> <span
+                id="mobUserCount">...</span></div>
+        <div class="mob-stat" style="color:var(--alert-red);"><i class="fas fa-heart"></i> <span id="mobHeartCount">0</span>
+        </div>
+        <div class="mob-stat" style="color:#eab308;"><i class="fas fa-spa"></i> <span id="mobFlowerCount">0</span></div>
+        <div class="mob-stat" style="color:#f97316;"><i class="fas fa-fire-alt"></i> <span id="mobCandleCount">0</span>
+        </div>
+        <div class="mob-stat" style="color:#3b82f6;"><i class="fas fa-sticky-note"></i> <span id="mobPostCount">0</span>
+        </div>
+    </div>
+
+    <!-- IMPACT BOARD (SIDEBAR) -->
+    <div class="global-stats">
+        <div class="stat-item">
+            <div class="stat-header">
+                <div class="stat-icon-box"
+                    style="background: transparent; color: #10b981; font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <div class="stat-text">
+                    <h4 id="userCountSidebar">...</h4>
+                    <span style="display:flex; align-items:center; gap:6px;">
+                        Souls Online <div class="live-dot"
+                            style="position:static; width:8px; height:8px; background:#10b981; margin:0; animation: pulse 2s infinite;">
+                        </div>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-item">
+            <div class="stat-header">
+                <div class="stat-icon-box"
+                    style="background: transparent; color:var(--alert-red); font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="stat-text">
+                    <h4 id="totalHearts">0</h4>
+                    <span>Hearts Given</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-item">
+            <div class="stat-header">
+                <div class="stat-icon-box"
+                    style="background: transparent; color: #eab308; font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-spa"></i>
+                </div>
+                <div class="stat-text">
+                    <h4 id="totalFlowers">0</h4>
+                    <span>Flowers Offered</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-item">
+            <div class="stat-header">
+                <div class="stat-icon-box"
+                    style="background: transparent; color: #f97316; font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-fire-alt"></i>
+                </div>
+                <div class="stat-text">
+                    <h4 id="totalCandles">0</h4>
+                    <span>Candles Lit</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-item" style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.05);">
+            <div class="stat-header">
+                <div class="stat-icon-box"
+                    style="background: transparent; color: #3b82f6; font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-sticky-note"></i>
+                </div>
+                <div class="stat-text">
+                    <h4 id="totalPosts">0</h4>
+                    <span>Notes on Wall</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ZOOM SLIDER (Bottom Center) -->
+    <div id="zoom-controls" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+        background: rgba(19, 27, 46, 0.8); backdrop-filter: blur(12px); 
+        padding: 12px 24px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.08);
+        display: flex; align-items: center; gap: 16px; z-index: 900; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+
+        <button onclick="adjustZoom(-0.1)"
+            style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:18px;">-</button>
+        <input type="range" id="zoomSlider" min="0.4" max="2.0" step="0.1" value="1"
+            style="width: 150px; accent-color: #4ECDC4; cursor: pointer;">
+        <button onclick="adjustZoom(0.1)"
+            style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:18px;">+</button>
+        <span id="zoomValue"
+            style="color:rgba(255,255,255,0.4); font-size:12px; min-width:30px; text-align:center;">100%</span>
+    </div>
+
     <div class="fab-stack-container">
 
         <!-- 2. Center/Reset (Middle) -->
@@ -696,20 +1440,22 @@
             <h3 style="font-family:'Outfit'; margin-bottom:20px; font-size:1.5rem;">Leave a burden.</h3>
             <textarea class="writer-textarea" id="noteInput" placeholder="I feel..."></textarea>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:0.8rem; color:#94a3b8;"><i class="fas fa-shield-alt"></i> Anonymous &
+                <span style="font-size:0.8rem; color:var(--text-secondary);"><i class="fas fa-shield-alt"></i> Anonymous &
                     Filtered</span>
                 <button class="post-btn" onclick="postNote()">Post It</button>
             </div>
         </div>
     </div>
 
+    <!-- UI LOGIC (Standard Script - No Import/CORS issues) -->
     <script>
         // --- 1. CONFIG & STATE ---
         const CONFIG = {
             width: 5000,
             height: 5000,
-            initialNotes: 25, /* Increased count */
-            spawnRadius: 800 /* Restrict initial spawn to center area */
+            initialNotes: 45, /* Only for Fallback */
+            spawnRadius: 1200, /* Reduced from 1800 to keep them tighter */
+            bufferDistance: 380
         };
 
         const STATE = {
@@ -719,31 +1465,181 @@
             pointY: 0,
             startX: 0,
             startY: 0,
-            animationFrame: null
+            animationFrame: null,
+            firebaseNotes: new Map(),
+            grid: [],
+            notesData: [] // Bug 22 fix: initialize here to prevent race condition
+        };
+        window.STATE = STATE;
+
+        // --- DEBUG LOGGING (Console only) ---
+        window.DEBUG_LOG = [];
+        window.logDebug = function (msg) {
+            console.log('[ProblemWall]', msg);
+            window.DEBUG_LOG.push(msg);
         };
 
-        const OBSCENE_WORDS = ["fuck", "shit", "bitch", "asshole", "cunt", "dick", "pussy", "whore", "slut", "bastard"];
+
+        // STATS (Global)
+        window.totalStats = { hearts: 0, flowers: 0, candles: 0 };
 
         // --- 2. INITIALIZATION ---
         const canvas = document.getElementById('infinite-canvas');
         const viewport = document.getElementById('viewport');
         const notesContainer = document.getElementById('notes-container');
 
-        // Center the canvas on load
-        window.onload = () => {
-            // Force header injection again to be safe
-            if (window.injectHeader) window.injectHeader();
+        function initProblemWall() {
+            window.logDebug("Init Problem Wall Started");
 
-            // Calculate center position: (Viewport Width - Canvas Width) / 2
+
             STATE.pointX = (window.innerWidth - CONFIG.width) / 2;
             STATE.pointY = (window.innerHeight - CONFIG.height) / 2;
 
-            updateTransform(); // Apply initial transform
-            generateRandomNotes();
-            startFakeLiveActivity();
-        };
+            updateTransform();
 
-        // --- 3. CANVAS LOGIC (PAN & ZOOM) - OPTIMIZED ---
+            // Wall loads exclusively from Firebase.
+            // The <script type="module"> block at the bottom calls initWall()
+            // which authenticates, subscribes, and pushes notes via renderFirebaseNote.
+            window.hasRealData = false;
+            STATE.notesData = [];
+        }
+
+        // Auto-Init
+        if (document.readyState === 'complete') {
+            initProblemWall();
+        } else {
+            window.addEventListener('load', () => {
+                initProblemWall();
+            });
+        }
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Existing init calls
+            try {
+                if (window.HybridLayout && typeof window.HybridLayout.init === 'function') {
+                    window.HybridLayout.init();
+                }
+            } catch (e) { console.warn("Layout init warning:", e); }
+
+            // Safety: Remove loader after 10s if Firebase hangs
+            setTimeout(() => {
+                if (!document.body.classList.contains('loaded')) {
+                    console.warn("Loader timed out. Forcing removal.");
+                    document.body.classList.add('loaded');
+                }
+            }, 10000);
+
+            // Wait for DB Buffer
+            const waitForDB = setInterval(() => {
+                if (window.db) {
+                    clearInterval(waitForDB);
+                    initPresenceSystem();
+                }
+            }, 500);
+        });
+
+        // --- PRESENCE SYSTEM (REAL-TIME FIRESTORE) ---
+        async function initPresenceSystem() {
+            const userCountEl = document.getElementById('userCountSidebar');
+            const userCountMob = document.getElementById('mobUserCount');
+
+            if (!window.db) return; // double check
+
+            // 1. Identification
+            let uid = localStorage.getItem('soulamore_uid');
+            if (!uid) {
+                const array = new Uint32Array(3);
+                window.crypto.getRandomValues(array);
+                uid = 'anon_' + Array.from(array).map(b => b.toString(36)).join('').substr(0, 9);
+                localStorage.setItem('soulamore_uid', uid);
+            }
+
+            const db = window.db; // From module scope if available, else standard
+            if (!db) return; // Wait for init
+
+            // 2. Heartbeat Function
+            const updateHeartbeat = async () => {
+                if (!window.db || !window.doc || !window.setDoc) {
+                    // Retry logic handled by init wrapper
+                    return;
+                }
+                try {
+                    const presenceRef = window.doc(window.db, 'presence', uid);
+                    await window.setDoc(presenceRef, {
+                        lastSeen: window.serverTimestamp(),
+                        page: 'problem-wall'
+                    }, { merge: true });
+                } catch (e) {
+                    console.warn("Presence write error (likely harmless permissions):", e);
+                }
+            };
+
+            // Initial Beat & Interval
+            updateHeartbeat();
+            setInterval(updateHeartbeat, 60000); // Every minute
+
+            // Default Base Count
+            window.currentBaseCount = 1;
+
+            // Initialize Jitter Engine to make the counter feel "alive" (Runs regardless of query success)
+            if (!window.presenceJitterInterval) {
+                window.presenceJitterInterval = setInterval(() => {
+                    if (!window.currentBaseCount) return;
+
+                    // 25% chance to fluctuate by +1 or +2 playfully to indicate movement
+                    const isJittering = Math.random() < 0.25;
+                    const displayCount = isJittering
+                        ? window.currentBaseCount + Math.floor(Math.random() * 2) + 1
+                        : window.currentBaseCount;
+
+                    if (userCountEl) userCountEl.innerText = displayCount;
+                    if (userCountMob) userCountMob.innerText = displayCount;
+
+                    // Update Dot Color based on momentary activity
+                    const dots = document.querySelectorAll('.live-dot');
+                    dots.forEach(d => {
+                        d.style.background = displayCount > 1 ? '#10b981' : '#fbbf24'; // Green if others, Yellow if solo
+                        d.style.animationDuration = displayCount > 5 ? '1s' : '2s'; // Faster pulse if busy
+                    });
+                }, 5000 + Math.random() * 5000); // Random interval between 5-10s
+            }
+
+            // 3. Listen for Active Users (Last 2 minutes)
+            // Note: Requires a composite index exemption or simple query.
+            // We'll iterate client side if collection is small, or use query if index exists.
+            // For now, let's try a simple query.
+            try {
+                const twoMinsAgo = new Date(Date.now() - 2 * 60 * 1000);
+                const q = window.query(window.collection(db, 'presence'), window.where('lastSeen', '>', twoMinsAgo));
+
+                window.onSnapshot(q, (snapshot) => {
+                    window.currentBaseCount = snapshot.size || 1; // At least me
+
+                    // Trigger immediate baseline update
+                    if (userCountEl) userCountEl.innerText = window.currentBaseCount;
+                    if (userCountMob) userCountMob.innerText = window.currentBaseCount;
+
+                    // Dot updates handled mostly by jitter, but do immediate pass
+                    const dots = document.querySelectorAll('.live-dot');
+                    dots.forEach(d => {
+                        d.style.background = window.currentBaseCount > 1 ? '#10b981' : '#fbbf24';
+                        d.style.animationDuration = window.currentBaseCount > 5 ? '1s' : '2s';
+                    });
+
+                }, (error) => {
+                    // Fallback to "1" if query fails (permissions/index)
+                    console.warn("Presence query error:", error);
+                    window.currentBaseCount = 1;
+                    if (userCountEl) userCountEl.innerText = "1";
+                    if (userCountMob) userCountMob.innerText = "1";
+                });
+            } catch (e) {
+                console.error("Presence Init Error:", e);
+            }
+        }
+
+        // --- CANVAS LOGIC ---
         viewport.addEventListener('mousedown', (e) => {
             if (e.target.closest('.note') || e.target.closest('.wall-hero')) return;
             STATE.panning = true;
@@ -757,389 +1653,807 @@
             viewport.style.cursor = 'grab';
         });
 
-        // Throttled Mouse Move
         let lastFrame = 0;
         window.addEventListener('mousemove', (e) => {
             const now = Date.now();
-            if (now - lastFrame < 16) return; // Cap at ~60fps
+            if (now - lastFrame < 16) return;
             lastFrame = now;
-
-            // A. Pan Logic
             if (STATE.panning) {
                 e.preventDefault();
                 STATE.pointX = e.clientX - STATE.startX;
                 STATE.pointY = e.clientY - STATE.startY;
-                requestAnimationFrame(updateTransform); // Synced with repaint
-            }
-
-            // B. Background Gradient Logic (Only update every 3rd frame loosely)
-            if (Math.random() > 0.6) {
-                const xPercent = (e.clientX / window.innerWidth) * 100 + '%';
-                const yPercent = (e.clientY / window.innerHeight) * 100 + '%';
-                document.body.style.setProperty('--mouse-x', xPercent);
-                document.body.style.setProperty('--mouse-y', yPercent);
+                requestAnimationFrame(updateTransform);
             }
         });
 
-        // Zoom (Wheel)
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
             const xs = (e.clientX - STATE.pointX) / STATE.scale;
             const ys = (e.clientY - STATE.pointY) / STATE.scale;
             const delta = -e.deltaY;
-
             (delta > 0) ? (STATE.scale *= 1.1) : (STATE.scale /= 1.1);
-
-            // Limit Zoom limits
-            STATE.scale = Math.min(Math.max(0.4, STATE.scale), 2.5);
-
+            STATE.scale = Math.min(Math.max(0.4, STATE.scale), 2.0); // Matched slider max
             STATE.pointX = e.clientX - xs * STATE.scale;
             STATE.pointY = e.clientY - ys * STATE.scale;
-
-            requestAnimationFrame(updateTransform);
+            updateTransform();
+            updateZoomUI();
         }, { passive: false });
 
         function updateTransform() {
-            // Using 3D transform for GPU acceleration
+            if (!canvas) return; // Bug 4/5 fix: null-check in case DOM wasn't ready
             canvas.style.transform = `translate3d(${STATE.pointX}px, ${STATE.pointY}px, 0) scale(${STATE.scale})`;
         }
 
-        function resetView(focusX = null, focusY = null) {
-            // Default to center of canvas
-            const canvasCenterX = CONFIG.width / 2;
-            const canvasCenterY = CONFIG.height / 2;
+        // --- ZOOM UI LOGIC ---
+        const zoomSlider = document.getElementById('zoomSlider');
+        const zoomLabel = document.getElementById('zoomValue');
 
-            const targetPointX = focusX !== null ? focusX : canvasCenterX;
-            const targetPointY = focusY !== null ? focusY : canvasCenterY;
+        if (zoomSlider) {
+            zoomSlider.addEventListener('input', (e) => {
+                const centerScreenX = window.innerWidth / 2;
+                const centerScreenY = window.innerHeight / 2;
+                const xs = (centerScreenX - STATE.pointX) / STATE.scale;
+                const ys = (centerScreenY - STATE.pointY) / STATE.scale;
 
-            // Calculate translation to put targetPoint at viewport center
-            // Formula: Translation = (Viewport/2) - (TargetPoint * Scale)
-            // Assuming Scale = 1 for reset
-            const targetX = (window.innerWidth / 2) - targetPointX;
-            const targetY = (window.innerHeight / 2) - targetPointY;
-            const targetScale = 1;
+                STATE.scale = parseFloat(e.target.value);
 
-            canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
+                // Zoom towards center of screen
+                STATE.pointX = centerScreenX - xs * STATE.scale;
+                STATE.pointY = centerScreenY - ys * STATE.scale;
 
-            STATE.pointX = targetX;
-            STATE.pointY = targetY;
-            STATE.scale = targetScale;
-            updateTransform();
-
-            // Disable transition after animation to prevent drag lag
-            setTimeout(() => {
-                canvas.style.transition = "";
-            }, 1200);
+                updateTransform();
+                if (zoomLabel) zoomLabel.innerText = Math.round(STATE.scale * 100) + '%';
+            });
         }
 
-        // --- 4. NOTE GENERATION (FIXED) ---
-        // --- 4. NOTE GENERATION (SMARTER) ---
-        const sampleTexts = [
-            "I feel so behind everyone else.",
-            "I'm afraid I'll never be good enough.",
-            "I miss who I used to be.",
-            "Everything feels too loud today.",
-            "I just need a hug.",
-            "University is overwhelming.",
-            "I pretend I'm okay.",
-            "Is it okay to not have a plan?",
-            "I feel lonely even with friends.",
-            "I'm tired of the noise.",
-            "Does anyone else feel this lost?",
-            "I wish I could pause time.",
-            "My anxiety is winning today.",
-            "Smiling is exhausting.",
-            "I want to be heard.",
-            "Just getting by is hard enough.",
-            "I miss my childhood.",
-            "The future scares me."
-        ];
+        // --- KEYBOARD NAVIGATION (Arrow Keys) ---
+        window.addEventListener('keydown', (e) => {
+            const step = 50;
+            switch (e.key) {
+                case 'ArrowUp': STATE.pointY += step; break;
+                case 'ArrowDown': STATE.pointY -= step; break;
+                case 'ArrowLeft': STATE.pointX += step; break;
+                case 'ArrowRight': STATE.pointX -= step; break;
+                default: return; // Exit if not arrow key
+            }
+            updateTransform();
+        });
 
-        // Track placed notes for collision detection
-        const placedNotes = [];
-        // Global Logic to Track real stats
-        let globalStats = { heart: 0, flower: 0, candle: 0 };
+        // --- TOUCH EVENTS (Mobile Pan & Zoom) ---
+        let initialPinchDistance = null;
+        let initialScale = 1;
 
-        function generateRandomNotes() {
-            const centerX = CONFIG.width / 2;
-            const centerY = CONFIG.height / 2;
-            const timeOffsets = ["2m ago", "5m ago", "12m ago", "1h ago", "2h ago", "1d ago"];
+        viewport.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.note') || e.target.closest('.wall-hero')) return;
 
-            // Shuffle method to pick unique texts
-            const textPool = [...sampleTexts].sort(() => 0.5 - Math.random());
+            if (e.touches.length === 1) {
+                // Single touch: Pan
+                STATE.panning = true;
+                STATE.startX = e.touches[0].clientX - STATE.pointX;
+                STATE.startY = e.touches[0].clientY - STATE.pointY;
+            } else if (e.touches.length === 2) {
+                // Double touch: Pinch Zoom
+                STATE.panning = false;
+                initialPinchDistance = getPinchDistance(e);
+                initialScale = STATE.scale;
+            }
+        }, { passive: false });
 
-            let count = 0;
-            let attempts = 0;
+        viewport.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 1 && STATE.panning) {
+                e.preventDefault(); // Prevent scroll
+                STATE.pointX = e.touches[0].clientX - STATE.startX;
+                STATE.pointY = e.touches[0].clientY - STATE.startY;
+                requestAnimationFrame(updateTransform);
+            } else if (e.touches.length === 2 && initialPinchDistance) {
+                e.preventDefault();
+                const currentDistance = getPinchDistance(e);
+                const ratio = currentDistance / initialPinchDistance;
 
-            // Reset Global Stats on Regen
-            globalStats = { heart: 0, flower: 0, candle: 0 };
+                const newScale = initialScale * ratio;
+                STATE.scale = Math.min(Math.max(0.4, newScale), 2.0);
 
-            while (count < CONFIG.initialNotes && attempts < 2000) {
-                attempts++;
+                // Note: accurate pinch-zoom center is complex, centering on screen for now
+                updateTransform();
+                updateZoomUI();
+            }
+        }, { passive: false });
 
-                // Random position within radius
-                const offsetX = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
-                const offsetY = (Math.random() * CONFIG.spawnRadius * 2) - CONFIG.spawnRadius;
+        viewport.addEventListener('touchend', () => {
+            STATE.panning = false;
+            initialPinchDistance = null;
+        });
 
-                // 1. EXPANDED EXCLUSION ZONE (Center Text)
-                // Expanded STRICTLY for "The Problem Wall" text overlap prevention
-                // Must correspond to text width (~1200px) and height (~400px)
-                if (Math.abs(offsetX) < 650 && Math.abs(offsetY) < 350) continue;
+        function getPinchDistance(e) {
+            return Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+        }
 
-                // 2. COLLISION CHECK (Simple distance)
-                let collision = false;
-                for (let note of placedNotes) {
-                    const dx = note.x - offsetX;
-                    const dy = note.y - offsetY;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 340) { // Slight increase in buffer
-                        collision = true;
-                        break;
+        function updateZoomUI() {
+            if (zoomSlider) zoomSlider.value = STATE.scale;
+            if (zoomLabel) zoomLabel.innerText = Math.round(STATE.scale * 100) + '%';
+        }
+
+        window.adjustZoom = function (delta) {
+            const centerScreenX = window.innerWidth / 2;
+            const centerScreenY = window.innerHeight / 2;
+            const xs = (centerScreenX - STATE.pointX) / STATE.scale;
+            const ys = (centerScreenY - STATE.pointY) / STATE.scale;
+
+            STATE.scale += delta;
+            STATE.scale = Math.min(Math.max(0.4, STATE.scale), 2.0);
+
+            STATE.pointX = centerScreenX - xs * STATE.scale;
+            STATE.pointY = centerScreenY - ys * STATE.scale; // This line was missing in the provided snippet, adding for correctness.
+            updateTransform(); // This line was missing in the provided snippet, adding for correctness.
+            updateZoomUI(); // This line was missing in the provided snippet, adding for correctness.
+        };
+
+        window.zoomToNote = function (targetX, targetY) {
+            // Animate scale to 1.1 and pan to center
+            const centerScreenX = window.innerWidth / 2;
+            const centerScreenY = window.innerHeight / 2;
+
+            // Target Zoom
+            const targetScale = 1.1;
+
+            // Calculate PointX/Y to center the note
+            // formula: pointX = centerScreen - noteX * scale
+            const targetPointX = centerScreenX - targetX * targetScale;
+            const targetPointY = centerScreenY - targetY * targetScale;
+
+            // Simple Animation Loop (Lerp)
+            let frame = 0;
+            function animate() {
+                frame++;
+                STATE.scale += (targetScale - STATE.scale) * 0.05;
+                STATE.pointX += (targetPointX - STATE.pointX) * 0.05;
+                STATE.pointY += (targetPointY - STATE.pointY) * 0.05;
+
+                updateTransform();
+                updateZoomUI();
+
+                if (frame < 60) requestAnimationFrame(animate);
+            }
+            animate();
+        };
+
+
+
+        // --- HYBRID LAYOUT ENGINE (Spiral + Repulsion) ---
+        const HybridLayout = {
+            centerZone: { w: 900, h: 400 }, // No-Fly Zone (Title)
+            NOTE_W: 340,
+            NOTE_H: 200,
+
+            // Main Entry Point
+            layoutAll() {
+                // 1. Sort by creation time (Oldest = Center, Newest = Edge)
+                // If we want newest in center, invert sort. Usually oldest in center is safer for stability.
+                // Let's go Oldest -> Center.
+                STATE.notesData.sort((a, b) => {
+                    const tA = a.createdAt ? (a.createdAt.seconds || a.createdAt) : 0;
+                    const tB = b.createdAt ? (b.createdAt.seconds || b.createdAt) : 0;
+                    return tA - tB;
+                });
+
+                // Clear current DOM or position Cache?
+                // We keep DOM elements but update positions.
+                // Reset placed list for collision checks.
+                this.placedRects = [];
+
+                STATE.notesData.forEach((note, index) => {
+                    const pos = this.computePosition(index, note.id);
+                    note.x = pos.x;
+                    note.y = pos.y;
+                    this.placedRects.push({ x: pos.x, y: pos.y, w: this.NOTE_W, h: this.NOTE_H });
+
+                    // Render/Update DOM immediately
+                    window.createOrUpdateNoteElement(note);
+                });
+            },
+
+            computePosition(index, id) {
+                // Sudo-random seed based on index to rotate spiral slightly per node
+                // But mostly deterministic based on index order.
+                let theta = index * 0.5; // Spiral tightness
+                let radius = 450 + (index * 15); // Base radius + growth
+
+                // Search Loop
+                let safety = 0;
+                while (safety < 200) {
+                    const cx = CONFIG.width / 2;
+                    const cy = CONFIG.height / 2;
+
+                    const x = cx + radius * Math.cos(theta);
+                    const y = cy + radius * Math.sin(theta);
+                    const rect = { x: x - this.NOTE_W / 2, y: y - this.NOTE_H / 2, w: this.NOTE_W, h: this.NOTE_H };
+
+                    if (this.isValid(rect)) {
+                        return { x: rect.x, y: rect.y };
                     }
-                }
-                if (collision) continue;
 
-                // Success - Place Note
-                const reactions = {
-                    heart: Math.floor(Math.random() * 12),
-                    flower: Math.floor(Math.random() * 8),
-                    candle: Math.floor(Math.random() * 5)
+                    // Increment spiral
+                    theta += 0.2;
+                    radius += 2; // Slowly expand
+                    safety++;
+                }
+
+                // Fallback: Far out
+                return {
+                    x: CONFIG.width / 2 + (Math.random() - 0.5) * 4000,
+                    y: CONFIG.height / 2 + (Math.random() - 0.5) * 4000
                 };
+            },
 
-                // Add to Global Stats
-                globalStats.heart += reactions.heart;
-                globalStats.flower += reactions.flower;
-                globalStats.candle += reactions.candle;
+            isValid(rect) {
+                // 1. Center Exclusion
+                const cx = CONFIG.width / 2;
+                const cy = CONFIG.height / 2;
+                const titleRect = {
+                    x: cx - this.centerZone.w / 2,
+                    y: cy - this.centerZone.h / 2,
+                    w: this.centerZone.w,
+                    h: this.centerZone.h
+                };
+                if (this.overlapArea(rect, titleRect) > 0) return false; // Zero tolerance for title
 
-                const time = timeOffsets[Math.floor(Math.random() * timeOffsets.length)];
-
-                // Pick text from shuffled pool (clone pool if exhausted)
-                if (count >= textPool.length) {
-                    textPool.sort(() => 0.5 - Math.random());
+                // 2. Note Overlap (Zero tolerance + 10px gap)
+                for (let other of this.placedRects) {
+                    const padded = { x: other.x - 10, y: other.y - 10, w: other.w + 20, h: other.h + 20 };
+                    if (this.overlapArea(rect, padded) > 0) return false;
                 }
-                const text = textPool[count % textPool.length];
 
-                createNoteElement(
-                    text,
-                    centerX + offsetX,
-                    centerY + offsetY,
-                    time,
-                    reactions
-                );
+                return true;
+            },
 
-                placedNotes.push({ x: offsetX, y: offsetY });
-                count++;
+            overlapArea(a, b) {
+                const xOverlap = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
+                const yOverlap = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+                return xOverlap * yOverlap;
+            }
+        };
+        window.HybridLayout = HybridLayout;
+
+
+        // --- RENDERING ---
+        window.createOrUpdateNoteElement = function (data) {
+            let el = document.querySelector(`.note[data-note-id="${data.id}"]`);
+            const isNewRender = !el;
+
+            if (isNewRender) {
+                el = document.createElement('div');
+                el.className = 'note';
+                el.dataset.noteId = data.id;
+
+                // Content
+                el.textContent = data.text;
+
+                // Random Rotation (Stored or Generated?)
+                // Simple hash: sum of char codes % 12 - 6
+                let hash = 0;
+                for (let i = 0; i < data.id.length; i++) hash += data.id.charCodeAt(i);
+                const rot = (hash % 12) - 6;
+                el.style.transform = `rotate(${rot}deg)`;
+
+                // New Note Glow - prominent sparkle for user-posted notes
+                if (data.isUserPost) {
+                    el.classList.add('new-note-glow');
+                    // Auto-remove glow after 15 seconds
+                    setTimeout(() => {
+                        el.classList.remove('new-note-glow');
+                    }, 15000);
+                }
+
+                // Fallback ID check for styles
+                if (data.isSeeded) el.classList.add('fallback-note');
+
+                // Bug 5 fix: re-query at call time instead of using captured variable
+                const container = document.getElementById('notes-container');
+                if (!container) { console.warn('[ProblemWall] notes-container not found'); return; }
+                container.appendChild(el);
             }
 
-            // SET INITIAL STATDOM
-            updateStatDisplay();
+            // Update Position (Smooth transition via CSS)
+            el.style.left = data.x + 'px';
+            el.style.top = data.y + 'px';
+
+            // Update Metadata / Reactions
+            // Update Metadata / Reactions
+            const r = {
+                heart: data.hearts || (data.reactions?.heart) || 0,
+                flower: data.flowers || (data.reactions?.flower) || 0,
+                candle: data.candles || (data.reactions?.candle) || 0
+            };
+
+            if (isNewRender) {
+                // Check what user has already reacted to
+                const userReactions = JSON.parse(localStorage.getItem('soulamore_user_reactions') || '{}');
+                const noteReactions = userReactions[data.id] || [];
+
+                let timeLabel = 'Just now';
+                let createdTime = Date.now();
+                if (data.createdAt) {
+                    createdTime = (data.createdAt.seconds ? data.createdAt.seconds * 1000 : data.createdAt) || Date.now();
+                }
+                const diffMins = Math.floor((Date.now() - createdTime) / 60000);
+                if (diffMins < 1) timeLabel = 'Just now';
+                else if (diffMins < 60) timeLabel = `${diffMins}m ago`;
+                else if (diffMins < 1440) timeLabel = `${Math.floor(diffMins / 60)}h ago`;
+                else timeLabel = `${Math.floor(diffMins / 1440)}d ago`;
+
+                const uiHTML = `
+                <div class="mod-controls">
+                    <button class="delete-btn" onclick="hideNoteGlobally('${data.id}')"><i class="fas fa-trash"></i> Hide</button>
+                </div>
+                <div class="note-meta"><span style="opacity:0.6;">Anonymous</span><span style="font-size:0.75rem;">${timeLabel}</span></div>
+                <div class="note-actions">
+                    <button class="action-btn heart-btn ${noteReactions.includes('heart') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'heart', this)"><i class="fas fa-heart"></i> <span class="count">${r.heart}</span></button>
+                    <button class="action-btn flower-btn ${noteReactions.includes('flower') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'flower', this)"><i class="fas fa-spa"></i> <span class="count">${r.flower}</span></button>
+                    <button class="action-btn candle-btn ${noteReactions.includes('candle') ? 'reacted' : ''}" onclick="reactGlobally('${data.id}', 'candle', this)"><i class="fas fa-fire-alt"></i> <span class="count">${r.candle}</span></button>
+                </div>`;
+                el.insertAdjacentHTML('beforeend', uiHTML);
+            } else {
+                // Just update counts if elements exist
+                const h = el.querySelector('.heart-btn .count'); if (h) h.innerText = r.heart;
+                const f = el.querySelector('.flower-btn .count'); if (f) f.innerText = r.flower;
+                const c = el.querySelector('.candle-btn .count'); if (c) c.innerText = r.candle;
+            }
+        };
+
+        window.updateNoteUI = function (noteId, data) {
+            // Update an existing note's data in STATE and re-render partial
+            const idx = STATE.notesData.findIndex(n => n.id === noteId);
+            if (idx !== -1) {
+                // Merge new data
+                STATE.notesData[idx] = { ...STATE.notesData[idx], ...data };
+
+                // Force Re-render of Element Content (Reactions)
+                window.createOrUpdateNoteElement(STATE.notesData[idx]);
+
+                // Debug log to confirm update received
+                // window.logDebug(`Updated Note UI: ${noteId} - H:${data.hearts}, F:${data.flowers}`);
+            } else {
+                // Note might have been added recently but layout not refreshed
+                // Or it's a new note that came in as 'modified' event (rare but possible)
+                window.createOrUpdateNoteElement(data);
+            }
+        };
+
+        // --- FIREBASE RENDERER INTEGRATION ---
+
+        // Ensure STATE is initialized
+        if (!window.STATE) window.STATE = {};
+        window.STATE.notesData = [];
+
+        window.renderFirebaseNote = function (noteId, data, isFullList) {
+            // Prevent clearing if we already have data, unless it's a full reload
+            if (!window.hasRealData && isFullList) {
+                window.logDebug("Real Data Received (Bulk). Clearing Container.");
+                const container = document.getElementById('notes-container');
+                if (container) container.innerHTML = '';
+                if (window.HybridLayout && window.HybridLayout.reset) window.HybridLayout.reset(); // If reset exists
+                window.hasRealData = true;
+            } else if (!window.hasRealData && !isFullList) {
+                // First note ever (e.g. empty DB + fresh post)
+                window.logDebug("First Real Note Received (Single). Clearing Placeholder Container.");
+                const container = document.getElementById('notes-container');
+                if (container) container.innerHTML = '';
+                window.hasRealData = true;
+            }
+
+            // data can be a single note object OR an array of notes (if isFullList)
+            if (isFullList && Array.isArray(data)) {
+                window.logDebug(`Bulk Render: ${data.length} notes.`);
+                STATE.notesData = data;
+                try { HybridLayout.layoutAll(); } catch (e) { console.error("Layout Error:", e); }
+
+                // Hide Loader with fade out
+                setTimeout(() => {
+                    document.body.classList.add('loaded');
+                    // Completely remove from DOM after fade
+                    setTimeout(() => {
+                        const loader = document.getElementById('wall-loader');
+                        if (loader) loader.remove();
+                    }, 1000);
+                }, 500); // 500ms min display time for smoothness
+            } else {
+                // Single Note Update/Add
+                const existingIdx = STATE.notesData.findIndex(n => n.id === noteId);
+
+                if (existingIdx !== -1) {
+                    STATE.notesData[existingIdx] = { ...STATE.notesData[existingIdx], ...data };
+                } else {
+                    STATE.notesData.push(data);
+                }
+
+                // Re-Layout needed to fit it in spiral?
+                try {
+                    HybridLayout.layoutAll();
+                } catch (e) {
+                    console.error("Layout Error:", e);
+                    window.createOrUpdateNoteElement(data); // Fallback
+                }
+
+                // If it's the specific new note, maybe zoom to it?
+                if (!isFullList && window.zoomToNote) {
+                    const note = STATE.notesData.find(n => n.id === noteId);
+                    if (note && note.x && note.y) window.zoomToNote(note.x, note.y);
+                }
+            }
+        };
+
+        // --- RITUAL WIDGET LOGIC ---
+        const NEWS_API_KEY = 'e6ffb12e8abc4005bcedf37ed19e8161'; // NewsAPI.org
+
+        async function checkNews(query) {
+            // Check cache first to save quota (1000/day limit)
+            const cacheKey = `news_cache_${query}_${new Date().toDateString()}`;
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) return JSON.parse(cached);
+
+            try {
+                // Fetch from NewsAPI (India specific)
+                const url = `https://newsapi.org/v2/top-headlines?country=in&q=${encodeURIComponent(query)}&apiKey=${NEWS_API_KEY}`;
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (data.status === 'ok' && data.totalResults > 0) {
+                    const result = { hasNews: true, headline: data.articles[0].title, url: data.articles[0].url };
+                    localStorage.setItem(cacheKey, JSON.stringify(result));
+                    return result;
+                }
+            } catch (e) {
+                console.error("News Check Failed:", e);
+            }
+            return { hasNews: false };
         }
 
-        function updateStatDisplay() {
+        // Inline Ritual Init removed to defer to global ritual-schedule.js        // --- MODERATOR SECRET ---
+        let clickCount = 0;
+        let lastClick = 0;
+        document.addEventListener('click', (e) => {
+            if (e.clientX < 100 && e.clientY > window.innerHeight - 100) {
+                const now = Date.now();
+                if (now - lastClick < 500) clickCount++;
+                else clickCount = 1;
+
+                lastClick = now;
+
+                if (clickCount >= 5) {
+                    toggleModMode();
+                    clickCount = 0;
+                }
+            }
+        });
+
+        function toggleModMode() {
+            document.body.classList.toggle('mod-mode');
+            alert("Moderator Mode Active. You can now hide inappropriate notes.");
+        }
+
+        // --- MISSING GLOBAL FUNCTIONS (Restored) ---
+
+        // 1. RESET VIEW - Smoothly re-center the camera
+        function resetView(focusX = null, focusY = null) {
+            const canvasCenterX = CONFIG.width / 2;
+            const canvasCenterY = CONFIG.height / 2;
+            const targetPointX = focusX !== null ? focusX : canvasCenterX;
+            const targetPointY = focusY !== null ? focusY : canvasCenterY;
+            const targetX = (window.innerWidth / 2) - targetPointX;
+            const targetY = (window.innerHeight / 2) - targetPointY;
+            canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
+            STATE.pointX = targetX;
+            STATE.pointY = targetY;
+            STATE.scale = 1;
+            updateTransform();
+            updateZoomUI();
+            setTimeout(() => { canvas.style.transition = ""; }, 1200);
+        }
+        window.resetView = resetView;
+
+        // 2. WRITER MODAL
+        function openWriter() { document.getElementById('writeModal').classList.add('active'); }
+        function closeWriter() { document.getElementById('writeModal').classList.remove('active'); }
+        window.openWriter = openWriter;
+        window.closeWriter = closeWriter;
+
+        // 3. OBSCENE WORDS FILTER
+        const OBSCENE_WORDS = ["fuck", "shit", "bitch", "asshole", "cunt", "dick", "pussy", "whore", "slut", "bastard"];
+        function sanitizeText(text) {
+            let clean = text;
+            OBSCENE_WORDS.forEach(word => { clean = clean.replace(new RegExp(`\\b${word}\\b`, 'gi'), '***'); });
+            return clean;
+        }
+        window.sanitizeText = sanitizeText;
+
+        // 4. GLOBAL REACT HANDLER (Optimistic UI + Firestore via handler)
+        window.reactGlobally = function (id, type, btn) {
+            if (btn.classList.contains('reacted')) return;
+
+            // LocalStorage constraint (1 reaction per type per note)
+            const USER_REACT_KEY = 'soulamore_user_reactions';
+            let userReactions = JSON.parse(localStorage.getItem(USER_REACT_KEY) || '{}');
+            if (userReactions[id] && userReactions[id].includes(type)) return;
+
+            // Mark reacted
+            if (!userReactions[id]) userReactions[id] = [];
+            userReactions[id].push(type);
+            localStorage.setItem(USER_REACT_KEY, JSON.stringify(userReactions));
+
+            btn.classList.add('pop-active', 'reacted');
+            setTimeout(() => btn.classList.remove('pop-active'), 300);
+
+            // Optimistic count update
+            const countSpan = btn.querySelector('.count');
+            countSpan.innerText = parseInt(countSpan.innerText) + 1;
+
+            if (type === 'heart') window.totalStats.hearts++;
+            if (type === 'flower') window.totalStats.flowers++;
+            if (type === 'candle') window.totalStats.candles++;
+            updateTotalStats();
+
+            // Fire-and-forget Firestore update (handled by module script below)
+            if (window.firebaseReact) {
+                window.firebaseReact(id, type);
+            }
+        };
+
+        // 5. HIDE NOTE (Mod only)
+        window.hideNoteGlobally = function (noteId) {
+            const el = document.querySelector(`.note[data-note-id="${noteId}"]`);
+            if (el) el.remove();
+            if (window.firebaseHide) {
+                window.firebaseHide(noteId);
+            }
+        };
+
+        // 6. UPDATE TOTAL STATS
+        function updateTotalStats() {
+            // Desktop
             const h = document.getElementById('totalHearts');
             const f = document.getElementById('totalFlowers');
             const c = document.getElementById('totalCandles');
+            if (h) h.innerText = window.totalStats.hearts.toLocaleString();
+            if (f) f.innerText = window.totalStats.flowers.toLocaleString();
+            if (c) c.innerText = window.totalStats.candles.toLocaleString();
 
-            if (h) h.innerText = globalStats.heart.toLocaleString();
-            if (f) f.innerText = globalStats.flower.toLocaleString();
-            if (c) c.innerText = globalStats.candle.toLocaleString();
+            // Mobile
+            const mh = document.getElementById('mobHeartCount');
+            const mf = document.getElementById('mobFlowerCount');
+            const mc = document.getElementById('mobCandleCount');
+            if (mh) mh.innerText = window.totalStats.hearts.toLocaleString();
+            if (mf) mf.innerText = window.totalStats.flowers.toLocaleString();
+            if (mc) mc.innerText = window.totalStats.candles.toLocaleString();
         }
+        window.updateTotalStats = updateTotalStats;
 
-        function createNoteElement(text, x, y, timeLabel, reactionCounts = { heart: 0, flower: 0, candle: 0 }) {
-            const el = document.createElement('div');
-            el.className = 'note';
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
-            // Random slight rotation
-            el.style.transform = `rotate(${Math.random() * 6 - 3}deg)`;
-
-            // SAFE RENDERING: Use textContent for user input, then append UI
-            el.textContent = text;
-
-            const uiHTML = `
-                <div class="note-meta">
-                    <span style="opacity:0.6;">Anonymous</span>
-                    <span style="font-size:0.75rem;">${timeLabel}</span>
-                </div>
-                <!-- REACTION BAR -->
-                <div class="note-actions">
-                    <button class="action-btn heart-btn" onclick="react(this, 'heart')">
-                        <i class="fas fa-heart"></i> <span class="count">${reactionCounts.heart}</span>
-                    </button>
-                    <button class="action-btn flower-btn" onclick="react(this, 'flower')">
-                        <i class="fas fa-spa"></i> <span class="count">${reactionCounts.flower}</span>
-                    </button>
-                    <button class="action-btn candle-btn" onclick="react(this, 'candle')">
-                        <i class="fas fa-fire-alt"></i> <span class="count">${reactionCounts.candle}</span>
-                    </button>
-                </div>
-            `;
-
-            el.insertAdjacentHTML('beforeend', uiHTML);
-
-            notesContainer.appendChild(el);
-        }
-
-        // --- 5. INTERACTION LOGIC ---
-        function react(btn, type) {
-            // 1. Visual Pop
-            btn.classList.add('pop-active');
-            setTimeout(() => btn.classList.remove('pop-active'), 300);
-
-            // 2. Increment Note Count
-            const countSpan = btn.querySelector('.count');
-            let val = parseInt(countSpan.innerText);
-            countSpan.innerText = val + 1;
-
-            // 3. Header & Global Stat Glow/Increment
-            const header = document.querySelector('header.island-nav');
-            const note = btn.closest('.note');
-
-            // --- HEADER GLOW ---
-            if (header) {
-                if (type === 'heart') {
-                    header.classList.add('glow-red');
-                    setTimeout(() => header.classList.remove('glow-red'), 400);
-                } else if (type === 'flower') {
-                    header.classList.add('glow-yellow');
-                    setTimeout(() => header.classList.remove('glow-yellow'), 400);
-                } else if (type === 'candle') {
-                    header.classList.add('glow-orange');
-                    setTimeout(() => header.classList.remove('glow-orange'), 400);
-                }
-            }
-
-            // --- NOTE GLOW (FULL CARD) ---
-            if (note) {
-                // Clear previous glows to allow switching
-                note.classList.remove('glow-red', 'glow-yellow', 'glow-orange');
-
-                // Add strong glow class to the whole card
-                if (type === 'heart') {
-                    note.classList.add('glow-red');
-                    setTimeout(() => note.classList.remove('glow-red'), 1000); // 1s Duration
-                } else if (type === 'flower') {
-                    note.classList.add('glow-yellow');
-                    setTimeout(() => note.classList.remove('glow-yellow'), 1000);
-                } else if (type === 'candle') {
-                    note.classList.add('glow-orange');
-                    setTimeout(() => note.classList.remove('glow-orange'), 1000);
-                }
-            }
-
-            // 4. Update Global Count in Sidebar (Fake Sync)
-            let globalId = '';
-            if (type === 'heart') globalId = 'totalHearts';
-            if (type === 'flower') globalId = 'totalFlowers';
-            if (type === 'candle') globalId = 'totalCandles';
-
-            const globalEl = document.getElementById(globalId);
-            if (globalEl) {
-                // Parse commas
-                let gVal = parseInt(globalEl.innerText.replace(/,/g, ''));
-                globalEl.innerText = (gVal + 1).toLocaleString();
-            }
-        }
-
-        function openWriter() {
-            document.getElementById('writeModal').classList.add('active');
-        }
-
-        function closeWriter() {
-            document.getElementById('writeModal').classList.remove('active');
-        }
-
-        function sanitizeText(text) {
-            let clean = text;
-            OBSCENE_WORDS.forEach(word => {
-                const regex = new RegExp(`\\b${word}\\b`, 'gi');
-                clean = clean.replace(regex, '***');
-            });
-            return clean;
-        }
-
-        function resetView(focusX = null, focusY = null) {
-            // Default to center if no focus provided
-            const finalX = focusX ?? (CONFIG.width / 2);
-            const finalY = focusY ?? (CONFIG.height / 2);
-
-            // Calculate Viewport Offset to center the point
-            const targetX = (window.innerWidth / 2) - finalX;
-            const targetY = (window.innerHeight / 2) - finalY;
-            const targetScale = 1;
-
-            // Simple transition logic
-            canvas.style.transition = "transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
-
-            STATE.pointX = targetX;
-            STATE.pointY = targetY;
-            STATE.scale = targetScale;
-            updateTransform();
-
-            setTimeout(() => {
-                canvas.style.transition = "";
-            }, 1200);
-        }
-
-        // --- 4. NOTE GENERATION (FIXED) ---
-        // ... (existing code for generating random notes) ...
-
-        function postNote() {
+        // 7. POST NOTE (Global - wired to module below)
+        window.postNote = function () {
             const input = document.getElementById('noteInput');
             const text = input.value.trim();
             if (!text) return;
-
             const cleanText = sanitizeText(text);
-
-            const centerX = CONFIG.width / 2;
-            const centerY = CONFIG.height / 2;
-
-            // Randomly choose a safe spot outside the exclusion zone
-            // Exclusion is roughly 650x350 from center
-            // We'll pick a spot either well above or well below
-
-            const side = Math.random() > 0.5 ? 1 : -1;
-            const safeOffsetY = (350 + 100 + Math.random() * 200) * side; // +/- 450 to 650px vertical offset
-            const safeOffsetX = (Math.random() * 800) - 400; // Spread horizontally
-
-            const noteX = centerX + safeOffsetX;
-            const noteY = centerY + safeOffsetY;
-
-            // Create Note
-            createNoteElement(cleanText, noteX, noteY, "Just now", { heart: 0, flower: 0, candle: 0 });
-
-            // Focus View on New Note
-            resetView(noteX, noteY);
-
             closeWriter();
             input.value = '';
-        }
 
-        // --- 6. FAKE LIVE COUNTERS ---
-        function startFakeLiveActivity() {
-            setInterval(() => {
-                const count = document.getElementById('userCount');
-                let val = parseInt(count.innerText);
-                val += Math.floor(Math.random() * 3) - 1; // +1, 0, or -1
-                if (val < 120) val = 120;
-                count.innerText = val;
-            }, 5000);
+            if (window.firebasePost) {
+                window.firebasePost(cleanText);
+            } else {
+                window.logDebug("Firebase Post not ready, rendering locally.");
+                window.renderFirebaseNote('temp-' + Date.now(), {
+                    text: cleanText,
+                    hearts: 0, flowers: 0, candles: 0,
+                    createdAt: { seconds: Date.now() / 1000 },
+                    isSeeded: false
+                }, false);
+            }
+        };
 
-            // Random gloal updates
-            setInterval(() => {
-                if (Math.random() > 0.7) {
-                    const types = ['totalHearts', 'totalFlowers', 'totalCandles'];
-                    const id = types[Math.floor(Math.random() * types.length)];
-                    const el = document.getElementById(id);
-                    if (el) {
-                        let gVal = parseInt(el.innerText.replace(/,/g, ''));
-                        el.innerText = (gVal + 1).toLocaleString();
-                    }
+    </script>
+
+    <!-- FIREBASE MODULE - Direct CDN imports (bypasses handler module chain) -->
+    <script type="module">
+        // Direct CDN imports - bypassing local file issues
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, limit, doc, updateDoc, increment, setDoc, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Live Configuration (Soulamore)
+        const firebaseConfig = {
+            apiKey: "AIza" + "SyDxHa9CR8O" + "VpDn9MObPCzbnsYTCWcTb-9k",
+            authDomain: "soulamore-f0a64.firebaseapp.com",
+            projectId: "soulamore-f0a64",
+            storageBucket: "soulamore-f0a64.firebasestorage.app",
+            messagingSenderId: "649985161002",
+            appId: "1:649985161002:web:66141929d4acd4451a5053",
+            measurementId: "G-2K2Z1Q2D1W"
+        };
+
+        // Bug 6 fix: Guard against duplicate Firebase app initialization
+        // components.js may have already initialized Firebase via firebase-config.js
+        console.log("[ProblemWall] Starting Firebase Init (Inlined)...");
+        const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Expose DB for Non-Module Scripts (Presence)
+        window.db = db;
+        window.auth = auth;
+        window.collection = collection;
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.query = query;
+        window.where = where;
+        window.onSnapshot = onSnapshot;
+        window.serverTimestamp = serverTimestamp;
+
+        console.log("[ProblemWall] Firebase Initialized (Global Exposed)");
+
+        window.logDebug("Firebase Module: Starting...");
+
+        const WALL_COLLECTION = "problem-wall-notes";
+
+        window.logDebug("Firebase Module: App initialized.");
+
+        // --- Wire global functions (no auth required) ---
+        window.firebaseReact = async (noteId, type) => {
+            const map = { heart: 'hearts', flower: 'flowers', candle: 'candles' };
+            const field = map[type];
+            if (!field) return;
+            try {
+                await updateDoc(doc(db, WALL_COLLECTION, noteId), { [field]: increment(1) });
+            } catch (e) { console.error("Reaction failed:", e); }
+        };
+
+        window.firebaseHide = async (noteId) => {
+            try {
+                await updateDoc(doc(db, WALL_COLLECTION, noteId), { isHidden: true });
+            } catch (e) { console.error("Hide failed:", e); }
+        };
+
+        window.firebasePost = async (cleanText) => {
+            try {
+                const tempId = 'temp-' + Date.now();
+                const noteData = {
+                    text: cleanText, hearts: 0, flowers: 0, candles: 0,
+                    createdAt: { seconds: Date.now() / 1000 }, isSeeded: false, isHidden: false,
+                    isUserPost: true  // Flag for glow effect
+                };
+                if (window.renderFirebaseNote) {
+                    window.renderFirebaseNote(tempId, { id: tempId, ...noteData }, false);
                 }
-            }, 2000);
+
+                // Scroll viewport to the newly posted note
+                setTimeout(() => {
+                    const noteEl = document.querySelector(`.note[data-note-id="${tempId}"]`);
+                    if (noteEl && window.zoomToNote) {
+                        const x = parseFloat(noteEl.style.left) || 0;
+                        const y = parseFloat(noteEl.style.top) || 0;
+                        window.zoomToNote(x + 140, y + 100); // Center of note
+                    }
+                }, 300);
+
+                await addDoc(collection(db, WALL_COLLECTION), {
+                    text: cleanText, hearts: 0, flowers: 0, candles: 0,
+                    createdAt: serverTimestamp(), isSeeded: false, isHidden: false
+                });
+                window.logDebug("Note posted to Firestore.");
+            } catch (e) {
+                window.logDebug("Post failed: " + e.message);
+                console.error("Post failed:", e);
+            }
+        };
+
+        // --- Subscribe immediately (fully public, no auth) ---
+        subscribeToNotes();
+
+        function subscribeToNotes() {
+            window.logDebug("Subscribing to Firestore notes...");
+
+            const q = query(
+                collection(db, WALL_COLLECTION),
+                // orderBy("createdAt", "desc"), // Commenting out to check if Index is missing
+                limit(200)
+            );
+
+            let isFirstSnapshot = true;
+
+            onSnapshot(q, (snapshot) => {
+                const t0 = performance.now();
+                window.logDebug(`Snapshot: ${snapshot.size} docs, empty=${snapshot.empty}, first=${isFirstSnapshot}`);
+
+                const stats = { hearts: 0, flowers: 0, candles: 0 };
+                const allNotes = [];
+
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const noteId = docSnap.id;
+
+                    stats.hearts += (data.hearts || 0);
+                    stats.flowers += (data.flowers || 0);
+                    stats.candles += (data.candles || 0);
+
+                    if (data.isHidden || !data.text) return;
+
+                    allNotes.push({ id: noteId, ...data });
+                });
+
+                if (isFirstSnapshot) {
+                    // BULK RENDER - single layout pass for all notes
+                    window.logDebug(`Bulk rendering ${allNotes.length} notes...`);
+                    if (window.renderFirebaseNote) {
+                        window.renderFirebaseNote(null, allNotes, true);
+                    }
+                    isFirstSnapshot = false;
+                } else {
+                    // INCREMENTAL UPDATE - only update what changed
+                    snapshot.docChanges().forEach((change) => {
+                        const data = change.doc.data();
+                        const noteId = change.doc.id;
+                        if (data.isHidden || !data.text) {
+                            // Remove hidden notes from DOM
+                            const el = document.querySelector(`.note[data-note-id="${noteId}"]`);
+                            if (el) el.remove();
+                            return;
+                        }
+
+                        if (change.type === 'added') {
+                            if (window.renderFirebaseNote) {
+                                window.renderFirebaseNote(noteId, { id: noteId, ...data }, false);
+                            }
+                        } else if (change.type === 'modified') {
+                            if (window.updateNoteUI) {
+                                window.updateNoteUI(noteId, data);
+                            }
+                        } else if (change.type === 'removed') {
+                            const el = document.querySelector(`.note[data-note-id="${noteId}"]`);
+                            if (el) el.remove();
+                        }
+                    });
+                }
+
+                // Update stats
+                window.totalStats = stats;
+                if (window.updateTotalStats) window.updateTotalStats();
+
+                // Update Total Posts Count
+                const postCount = allNotes.length; // Approximate active notes
+                const postEl = document.getElementById('totalPosts');
+                const mobPostEl = document.getElementById('mobPostCount');
+                if (postEl) postEl.innerText = postCount;
+                if (mobPostEl) mobPostEl.innerText = postCount;
+
+                window.logDebug(`Render complete in ${Math.round(performance.now() - t0)}ms`);
+
+            }, (error) => {
+                window.logDebug(`Snapshot ERROR: ${error.message} (${error.code})`);
+                console.error("Firestore error:", error);
+            });
         }
 
+        window.logDebug("Firebase Module: Loaded & subscribed.");
+    </script>
+    <script>
+        // --- SELF-DEBUGGER (Health Check) ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const health = {
+                    hybridLayout: !!window.HybridLayout,
+                    renderer: !!window.createOrUpdateNoteElement,
+                    firebaseDB: !!window.db,
+                    notesCount: window.STATE?.notesData?.length || 0,
+                    heroVisible: getComputedStyle(document.querySelector('.wall-hero')).zIndex
+                };
+                console.table(health);
+                if (!health.hybridLayout) console.error("CRITICAL: HybridLayout missing!");
+                if (!health.renderer) console.error("CRITICAL: Renderer missing!");
+            }, 2000);
+        });
     </script>
 </body>
 
 </html>
+

@@ -16,12 +16,145 @@
  */
 // console.log("Soulamore: Components.js loading...");
 
+// --- THEME SYSTEM INITIALIZATION ---
+function applyTheme(theme) {
+    const isLight = theme === 'light';
+    document.documentElement.classList.toggle('light-mode', isLight);
+    if (document.body) {
+        document.body.classList.toggle('light-mode', isLight);
+    }
+    const desktopIcon = document.getElementById('theme-icon-desktop');
+    const mobileIcon = document.getElementById('theme-icon-mobile');
+    if (isLight) {
+        if (desktopIcon) { desktopIcon.classList.remove('fa-sun'); desktopIcon.classList.add('fa-moon'); }
+        if (mobileIcon) { mobileIcon.classList.remove('fa-sun'); mobileIcon.classList.add('fa-moon'); }
+    } else {
+        if (desktopIcon) { desktopIcon.classList.remove('fa-moon'); desktopIcon.classList.add('fa-sun'); }
+        if (mobileIcon) { mobileIcon.classList.remove('fa-moon'); mobileIcon.classList.add('fa-sun'); }
+    }
+}
+
+function getSavedTheme() {
+    return localStorage.getItem('soulamore-theme') || 'dark';
+}
+
+(function initTheme() {
+    applyTheme(getSavedTheme());
+})();
+
+window.toggleTheme = function () {
+    const isLight = document.documentElement.classList.contains('light-mode');
+    const newTheme = isLight ? 'dark' : 'light';
+    localStorage.setItem('soulamore-theme', newTheme);
+    applyTheme(newTheme);
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    applyTheme(getSavedTheme());
+});
+
 // CRITICAL: Inject Styles Immediately
 // CRITICAL: Inject Styles Immediately
 try {
     const style = document.createElement('style');
     style.id = 'header-styles-v2'; // Changed ID to force refresh/avoid conflicts
     style.innerHTML = `
+        /* NEWS TICKER GLOBAL ANIMATION */
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .news-ticker-content {
+            display: inline-block !important;
+            padding-left: 50px !important;
+            animation: ticker-scroll 250s linear infinite !important; /* Ultra-slow for placeholder */
+            white-space: nowrap !important;
+        }
+        .news-ticker-container:hover .news-ticker-content {
+            animation-play-state: paused !important;
+        }
+
+        /* LOGO SYSTEM (Universal Positioning) */
+        .logo-wrapper {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 48px !important;
+            width: auto !important;
+            min-width: 48px !important;
+            overflow: visible !important;
+            text-decoration: none;
+        }
+        .logo-img {
+            height: 100% !important;
+            width: auto !important;
+            object-fit: contain !important;
+            transition: transform 0.3s ease !important;
+        }
+
+        /* Button Consistency - FIXED COLORS */
+        .nav-btn, .lifeline-btn {
+            background: linear-gradient(135deg, #4ECDC4, #2a9d8f) !important; /* BRAND GRADIENT */
+            border: 1px solid rgba(78, 205, 196, 0.3) !important;
+            border-radius: 50px !important;
+            color: #0f172a !important; /* Dark text on bright background */
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2) !important;
+        }
+        .nav-btn {
+             padding: 0 14px !important;
+             height: 42px !important;
+             font-size: 0.9rem !important;
+             flex-shrink: 0 !important;
+             overflow: hidden !important;
+        }
+        .nav-btn:hover, .lifeline-btn:hover {
+            background: linear-gradient(135deg, #5eddd4, #3aad9f) !important; /* Brighter on hover */
+            color: #0f172a !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4) !important;
+        }
+        /* Specific override for Get Help to distinguish slightly if needed, or keep uniform */
+        .lifeline-btn {
+            border-color: #ef4444 !important; /* Solid Red Border */
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: #fca5a5 !important; /* Light Red Text for Contrast */
+            padding: 0 15px !important;
+            height: 42px !important;
+            font-size: 0.9rem !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            width: fit-content !important;
+            min-width: 0 !important;
+            flex-grow: 0 !important;
+            overflow: hidden !important; /* Isolate shimmer */
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important;
+        }
+        body.light-mode .lifeline-btn {
+            background: rgba(239, 68, 68, 0.08) !important;
+            color: #dc2626 !important;
+            border-color: #ef4444 !important;
+        }
+        .lifeline-btn:hover {
+            background: #ef4444 !important;
+            color: white !important;
+            border-color: #ef4444 !important;
+        }
+        .user-icon-btn i {
+            font-size: 2.2rem !important; /* FORCE LARGE SIZE */
+            display: block !important;
+            width: auto !important;
+            height: auto !important;
+            line-height: 1 !important;
+        }
+
         /* DESKTOP (Width > 1024px) */
         @media (min-width: 1025px) {
             header {
@@ -45,7 +178,6 @@ try {
                 gap: clamp(2px, 0.5vw, 6px) !important; /* TIGHTER GAP MAX */
                 align-items: center !important;
                 visibility: visible !important; /* Ensure visibility */
-                opacity: 1 !important;
                 opacity: 1 !important;
                 overflow: visible !important; /* FIX SCROLLBAR */
                 border: none !important;
@@ -73,7 +205,15 @@ try {
                 margin: 0 !important;
                 width: fit-content !important;
                 max-width: 1600px !important;
-                padding: 6px 30px !important; /* Slightly more dynamic padding */
+                padding: 6px 30px !important; 
+                top: 15px !important;
+                border-radius: 50px !important;
+                background: rgba(15, 23, 42, 0.9) !important;
+                backdrop-filter: blur(20px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+                position: fixed !important;
+                overflow: visible !important;
             }
             .nav-links i {
                 color: #F49F75 !important; /* Force Peach Glow for Icons */
@@ -83,83 +223,104 @@ try {
                 display: flex;
                 align-items: center;
                 margin-right: 10px !important; /* Add small breathing room */
+                overflow: visible !important; /* FIX: Prevent scaling clipping */
             }
-            .nav-logo img {
-                height: 40px !important;
+            .logo-wrapper { width: 180px !important; }
+            .logo-wrapper:hover .logo-img { transform: scale(1.05) !important; }
+        }
+
+        /* MOBILE (Width <= 1024px) - CONSOLIDATED & FINAL */
+        @media (max-width: 1024px) {
+            .logo-img { 
+                height: 42px !important; 
                 width: auto !important;
-                flex-shrink: 0 !important; /* Critical: Prevent logo img shrinking */
-                object-fit: contain;
+                display: block !important;
+                visibility: visible !important;
             }
-            /* Button Consistency - FIXED COLORS */
-            .nav-btn, .lifeline-btn {
-                background: linear-gradient(135deg, #4ECDC4, #2a9d8f) !important; /* BRAND GRADIENT */
-                border: 1px solid rgba(78, 205, 196, 0.3) !important;
-                border-radius: 50px !important;
-                color: #0f172a !important; /* Dark text on bright background */
-                font-weight: 600 !important;
-                transition: all 0.3s ease !important;
-                text-decoration: none !important;
-                white-space: nowrap !important;
+            .logo-wrapper { 
+                width: auto !important; 
+                min-width: 120px !important;
                 display: flex !important;
                 align-items: center !important;
-                gap: 8px !important;
-                box-sizing: border-box !important;
-                box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2) !important;
-            }
-            .nav-btn {
-                 padding: 0 14px !important;
-                 height: 42px !important;
-                 font-size: 0.9rem !important;
-                 flex-shrink: 0 !important;
-                 overflow: hidden !important;
-            }
-            .nav-btn:hover, .lifeline-btn:hover {
-                background: linear-gradient(135deg, #5eddd4, #3aad9f) !important; /* Brighter on hover */
-                color: #0f172a !important;
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4) !important;
-            }
-            /* Specific override for Get Help to distinguish slightly if needed, or keep uniform */
-            .lifeline-btn {
-                border-color: #ef4444 !important; /* Solid Red Border */
-                background: rgba(239, 68, 68, 0.15) !important;
-                color: #fca5a5 !important; /* Light Red Text for Contrast */
-                padding: 0 15px !important;
+                justify-content: flex-start !important;
                 height: 42px !important;
-                font-size: 0.9rem !important;
-                justify-content: center !important;
-                flex-shrink: 0 !important;
-                width: fit-content !important;
-                min-width: 0 !important;
-                flex-grow: 0 !important;
-                overflow: hidden !important; /* Isolate shimmer */
-                box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important;
+                visibility: visible !important;
             }
-            .lifeline-btn:hover {
-                background: #ef4444 !important;
-                color: white !important;
-                border-color: #ef4444 !important;
-            }
-            .user-icon-btn i {
-                font-size: 2.2rem !important; /* FORCE LARGE SIZE */
-                display: block !important;
-                width: auto !important;
-                height: auto !important;
-                line-height: 1 !important;
-            }
-        }
-        /* MOBILE (Width <= 1024px) */
-        @media (max-width: 1024px) {
+
             .auth-box { display: none !important; }
             .mobile-only-help { display: flex !important; margin-top: 15px; background: rgba(255,107,107,0.1); padding: 10px 20px; border-radius: 12px; color: #ff6b6b; align-items: center; gap: 10px; }
+            
             .main-nav {
                  display: flex !important;
                  justify-content: space-between !important;
                  align-items: center !important;
-                 padding: 15px 20px !important;
+                 padding: 0 10px 0 15px !important;
+                 height: 60px !important;
+                 width: 100% !important;
+                 position: relative !important;
             }
-            .nav-logo img { height: 35px !important; }
-            header { z-index: 9999 !important; position: fixed !important; width: 100% !important; top: 0 !important; }
+            .nav-logo {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex-shrink: 0 !important;
+                width: auto !important;
+                height: 100% !important;
+            }
+            header.island-nav { 
+                z-index: 99999 !important; 
+                position: fixed !important; 
+                width: 92% !important; /* SYNC WITH BOTTOM NAV */
+                max-width: 1400px !important; /* MATCH SITE CONTENT */
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                top: 15px !important;
+                border-radius: 50px !important;
+                background: rgba(15, 23, 42, 0.98) !important;
+                backdrop-filter: blur(20px) !important;
+                border: 1px solid rgba(255,255,255,0.15) !important;
+                padding: 0 !important; 
+                overflow: visible !important; /* CRITICAL FIX: Allow Menu to show */
+                opacity: 1 !important;
+                visibility: visible !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
+            }
+
+            .mobile-toggle {
+                display: flex !important;
+                background: transparent !important;
+                border: none !important;
+                color: #e2e8f0 !important;
+                font-size: 1.5rem !important;
+                cursor: pointer !important;
+                padding: 10px !important;
+                z-index: 1000 !important;
+            }
+
+            /* Fix Mobile Menu Positioning & Visibility */
+            .nav-links.open {
+                display: flex !important;
+                flex-direction: column !important;
+                position: absolute !important;
+                top: 70px !important;
+                left: 0 !important;
+                width: 100% !important;
+                background: rgba(15, 23, 42, 0.98) !important;
+                border: 1px solid rgba(255,255,255,0.1) !important;
+                border-radius: 24px !important;
+                padding: 20px !important;
+                box-shadow: 0 20px 50px rgba(0,0,0,0.8) !important;
+                z-index: 9999 !important;
+                max-height: 80vh !important;
+                overflow-y: auto !important;
+                backdrop-filter: blur(15px) !important;
+            }
+            
+            header .nav-links:not(.open) {
+                display: none !important;
+            }
+            body { padding-bottom: 90px !important; }
+            .container { padding-left: 20px !important; padding-right: 20px !important; }
         }
         /* GLOBAL FOOTER FIX */
         footer {
@@ -180,19 +341,41 @@ try {
         /* ADAPTIVE ICON MODE: 1025px - 1420px (Targeted Laptop Range) */
         /* Hides text labels ONLY when necessary on smaller screens */
         @media (min-width: 1025px) and (max-width: 1420px) {
-            header .nav-links > a, 
-            header .nav-links > .dropdown > a {
-                font-size: 0 !important; /* Hide Text */
-                gap: 0 !important;
-                padding: 0 12px !important;
-                border: none !important; /* Remove separators */
+            header.island-nav { 
+                width: 92% !important; 
+                max-width: 1200px !important; /* Pull Auth box closer to links */
+                padding: 6px 20px !important;
             }
-            header .nav-links > a::after { content: none !important; } /* Kill pseudo-elements */
+            
+            header .nav-links a span, 
+            header .nav-links .dropdown a span,
+            .lifeline-btn span {
+                display: none !important; /* ROBUST HIDE */
+            }
+            
+            header .nav-links a, 
+            header .nav-links .dropdown a {
+                gap: 0 !important;
+                padding: 0 15px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
             
             header .nav-links i {
-                font-size: 1.3rem !important; /* Bigger Icons */
+                font-size: 1.4rem !important;
+                color: #F49F75 !important;
                 margin: 0 !important;
             }
+            
+            /* COMPACT GET HELP BTN */
+            .lifeline-btn {
+                width: 45px !important;
+                height: 45px !important;
+                padding: 0 !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+            }
+            .lifeline-btn i { font-size: 1.4rem !important; margin: 0 !important; }
             /* Hide Chevron */
             header .nav-links .fa-chevron-down { display: none !important; }
             
@@ -221,13 +404,13 @@ try {
         /* FULL TEXT MODE: > 1420px (Standard Desktop) */
         /* Now possible because we unlocked max-width to 99.5vw */
         @media (min-width: 1421px) {
-            header a, footer a {
+        header a, footer a {
                 font-size: 0.85rem !important; /* Slightly Smaller for Fit */
                 letter-spacing: normal !important;
                 padding: 6px 5px !important; /* Tighter Padding */
-                color: #e2e8f0 !important;
-                text-decoration: none !important;
-                transition: color 0.3s ease;
+            color: #e2e8f0 !important;
+            text-decoration: none !important;
+            transition: color 0.3s ease;
             }
         }
         
@@ -242,13 +425,28 @@ try {
             color: #4ECDC4 !important;
         }
         
-        /* SPECIAL EXCEPTION: Mobile Menu & Dropdowns (Dark Theme Restoration) */
+        /* SPECIAL EXCEPTION: Mobile Menu & Dropdowns */
         @media (max-width: 1024px) {
             .nav-links.open {
                 background: rgba(15, 23, 42, 0.98) !important; /* Dark Mobile Menu */
             }
             .nav-links.open a {
                 color: #e2e8f0 !important; /* Light Text */
+            }
+            /* LIGHT MODE MOBILE MENU */
+            body.light-mode .nav-links.open {
+                background: rgba(255, 255, 255, 0.98) !important;
+                border-color: rgba(0, 0, 0, 0.1) !important;
+            }
+            body.light-mode .nav-links.open a,
+            body.light-mode .nav-links.open .dropdown-submenu a,
+            body.light-mode .nav-links.open span,
+            body.light-mode .nav-links.open i {
+                color: #0f172a !important;
+            }
+            body.light-mode .nav-links.open a:hover {
+                background: rgba(0, 0, 0, 0.05) !important;
+                color: #2a9d8f !important;
             }
         }
         /* Dropdowns on Desktop */
@@ -325,14 +523,6 @@ try {
                 background: rgba(0,0,0,0.001) !important; /* Ensure Toggle is ALWAYS on top */
                 z-index: 1001 !important;
             }
-.mobile-toggle {
-    z-index: 99999 !important; /* SAFE HIGH Z-INDEX */
-    pointer-events: auto !important;
-    cursor: pointer !important;
-    /* Above nuclear menu */
-    /* Must be above the menu (2050) */
-    /* Highest priority */
-}
             /* Level 3: Deep Nested */
             .dropdown-content .dropdown-content .dropdown-content {
                 left: 100% !important;
@@ -366,11 +556,108 @@ try {
                justify-content: center !important;
             }
         }
+
+        .mobile-toggle {
+            z-index: 99999 !important;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 45px !important;
+            height: 45px !important;
+            border-radius: 50% !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* FLOATING NEWS TOGGLE PILL (Strict matched to .audio-control) */
+        .news-toggle-pill {
+            position: fixed !important;
+            bottom: 42px !important; /* Exactly between ticker and Audio Control (80px) */
+            left: 30px !important;   /* Exact X-axis alignment with Audio Control */
+            background: rgba(255, 255, 255, 0.08) !important; 
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            padding: 5px 12px !important; /* Reduced padding closely matching audio */
+            border-radius: 50px !important; 
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important; /* Tighter gap */
+            cursor: pointer !important;
+            z-index: 99999 !important;
+            transition: all 0.3s ease !important;
+            user-select: none !important;
+            box-shadow: none !important; 
+            height: 32px !important; /* Forced strict height to prevent bloat */
+            box-sizing: border-box !important;
+        }
+        .news-toggle-pill .pill-label {
+            color: #f1f5f9 !important; 
+            font-size: 0.75rem !important; /* Thinner smaller text */
+            font-weight: 400 !important; /* Dropped bold to match inherited body weight */
+            letter-spacing: normal !important;
+        }
+        .news-toggle-pill:hover {
+            background: rgba(255, 255, 255, 0.2) !important; /* Exact match hover state */
+            transform: translateY(-2px) !important; 
+        }
+        .news-toggle-pill .status-dot {
+            width: 6px !important;
+            height: 6px !important;
+            border-radius: 50% !important;
+            background: #ef4444; /* Default Red (Off) */
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5) !important;
+        }
+        .news-toggle-pill.active .status-dot {
+            background: #4ECDC4 !important; /* Teal (On) */
+            box-shadow: 0 0 12px rgba(78, 205, 196, 0.8) !important;
+            animation: pulse-teal 2s infinite !important;
+        }
+        @keyframes pulse-teal {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .news-toggle-pill .pill-label {
+            color: #e2e8f0 !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.02em !important;
+        }
         
-        /* MOBILE GLOBAL FIXES */
-        @media (max-width: 768px) {
-            body { padding-bottom: 80px !important; } /* Space for FAB/Nav */
-            .container { padding-left: 20px !important; padding-right: 20px !important; }
+        /* Tooltip */
+        .news-toggle-pill::after {
+            content: "Toggle Live News Feed" !important;
+            position: absolute !important;
+            bottom: 120% !important;
+            left: 50% !important;
+            transform: translateX(-50%) translateY(10px) !important;
+            background: #0f172a !important;
+            color: white !important;
+            padding: 6px 12px !important;
+            border-radius: 8px !important;
+            font-size: 0.75rem !important;
+            white-space: nowrap !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transition: all 0.2s ease !important;
+            pointer-events: none !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4) !important;
+        }
+        .news-toggle-pill:hover::after {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateX(-50%) translateY(0) !important;
+        }
+        
+        @media (max-width: 1024px) {
+            .news-toggle-pill {
+                bottom: 135px !important; /* Move above mobile bottom nav to match audio toggle */
+                left: auto !important;
+                right: 20px !important;
+            }
         }
     `;
     document.head.appendChild(style);
@@ -379,54 +666,17 @@ try {
     console.error("Soulamore: Style injection failed", e);
 }
 
-// --- FAVICON MANAGER (Peach Branding) ---
-function setupFavicon(rootPath) {
-    let link = document.querySelector("link[rel~='icon']");
-    if (!link) {
-        link = document.createElement('link');
-        link.rel = 'icon';
-        document.head.appendChild(link);
-    }
 
-    const PEACH = '%23F49F75'; // #F49F75 encoded
-    const path = window.location.pathname;
-
-    // Default Logo (Use Symbol to avoid squeezing)
-    let iconHref = rootPath + 'assets/images/favicon_symbol.png';
-
-    // Special Pages (SVG Data URIs)
-    if (path.includes('vent-box')) {
-        // Fire Icon
-        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M200.3 66.8c12.3-15.8 35.1-15.9 47.6-.2l13.9 17.5c18.5 23.3 54 26.3 76.2 6.5l8.7-7.8c16.3-14.5 41.8-10.7 53.6 7.9 23.3 36.6 63 94.7 44.8 169.3-18.4 75.3-69.8 126.8-132.8 135-66.2 8.6-130.6-32.9-158.7-98.3-25.1-58.4-14.8-119.3 12.3-162.7 10.3-16.5 23-32.1 35.3-48.4zm-14.9 378.6c59.9 8.6 117.9-20.9 146-69.5 26.6-45.9 22.9-106.3-8.8-149.7-8.1-11.1-12.7-22.3-13.6-33.1-6.1 4.5-12.6 8.5-19.4 11.7-29.3 13.7-65 4.9-88.7-19.8-5-5.2-9.6-10.8-13.8-16.9-15.6 27.6-26.6 57.1-32.3 87.7-6.1 33.1.6 66.9 17.5 95.8 19.3 33 55.4 69.4 113.1 93.8z'/></svg>`;
-    } else if (path.includes('confession-box')) {
-        // Ghost Icon
-        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M256 96c31.1 0 61.2 6.7 88.5 19.1 27.3 12.4 51.6 29.8 70.8 50.8 19.2 21 33.5 45.4 42.1 72.1 8.6 26.7 10.6 55 6.1 82.8-5.3 32.8-21.6 62.7-45.1 85.5-23.5 22.7-53.9 36.3-86.3 38.3-1.6.1-3.2.1-4.8.1-18.4 0-36.2-3.8-52.6-10.7-16.3 6.9-34.1 10.7-52.6 10.7-1.6 0-3.3 0-4.9-.1-32.4-1.9-62.8-15.6-86.3-38.3-23.5-22.7-39.8-52.7-45.1-85.5-4.5-27.8-2.5-56.1 6.1-82.8 8.6-26.7 22.9-51.1 42.1-72.1 19.2-21 43.5-38.4 70.8-50.8C194.8 102.7 224.9 96 256 96zm0-32C114.6 64 0 178.6 0 320c0 36.6 7.7 71.3 21.7 103.3C38.4 461.3 75.2 489 119.5 491.5c1.6.1 3.3.1 4.9.1 14.9 0 29.2-2.5 42.8-7.2 4.1-1.4 8.1-3 12-4.8 1.9-2.8 4-5.5 6.3-8.1 18.2-20.7 41.6-35.9 67-43.8 1.1-.3 2.3-.6 3.4-1 25.4 7.9 48.9 23.1 67 43.8 2.3 2.6 4.4 5.3 6.3 8.1 4 1.8 8 3.4 12 4.8 13.6 4.7 27.9 7.2 42.8 7.2 1.6 0 3.3-.1 4.9-.1 44.3-2.5 81-30.2 97.8-68.2C407.5 401.7 416 391.3 416 320 416 178.6 301.4 64 160 64c-32.5 0-63.5 6.1-92.4 17.1-19.1 7.2-36.1 17.6-50.4 30.7z'/></svg>`;
-    } else if (path.includes('renu-dogra')) {
-        // Lotus/Om
-        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M256 160c-52.9 0-96 43.1-96 96s43.1 96 96 96 96-43.1 96-96-43.1-96-96-96zm-17.7-93.5C227.8 77.4 212 96 198.8 113.8c-28.9 39.1-38.3 42.8-49 53.5-32 32-58.3 12.8-58.3 12.8-21.5-13.6-54.8 10-63.2 24.3-9.5 16.2.7 34.6 2.3 37.4 39.4 66.8 95.7 66.8 95.7 66.8 15.6 0 34.4 3.7 34.4 19.3v.1c0 15.6-18.8 19.3-34.4 19.3 0 0-56.3 0-95.7-66.8-1.7-2.8-11.8-21.2-2.3-37.4 8.5-14.3 41.7-37.9 63.2-24.3 0 0 26.3 19.2 58.3-12.8 10.7-10.7 20.1-14.4 49-53.5 13.2-17.8 29-36.4 39.5-47.3 3.9-4.1 10.6-4.1 14.5 0 10.5 10.9 26.3 29.5 39.5 47.3 28.9 39.1 38.3 42.8 49 53.5 32 32 58.3 12.8 58.3 12.8 21.5-13.6 54.8 10 63.2 24.3 9.5 16.2-.7 34.6-2.3 37.4-39.4-66.8-95.7-66.8-95.7-66.8-15.6 0-34.4-3.7-34.4-19.3v-.1c0-15.6 18.8-19.3 34.4-19.3 0 0 56.3 0 95.7 66.8 1.7 2.8 11.8 21.2 2.3 37.4-8.5 14.3-41.7 37.9-63.2 24.3 0 0-26.3 19.2-58.3 12.8-10.7 10.7-20.1 14.4-49 53.5-13.2 17.8-29 36.4-39.5 47.3-3.9 4.1-10.6 4.1-14.5 0z'/></svg>`;
-    } else if (path.includes('5-step-reset')) {
-        // Leaf Icon
-        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M440.5 88.5C397.9 45.3 340.5 24 286 24c-92.6 0-176.4 56.5-212 141.5-17.8 42.5-19.3 90.7-4.1 134.4 15.2 43.7 45.4 79.9 85.3 102.4C195.1 425 242.9 432 288 432c6.2 0 12.5-.2 18.7-.5 47.8-2.6 88-29.4 116.6-66.4 28.6-37 43.1-83.3 40.8-132.8l-.2-3.8c7.8-20.1 13.9-40.8 18.3-62.2 4.4-21.4 6.7 43.2-6.7 43.2 13.4 0 26.8-5.2 37-15.6l9.6 9.6c20.5 20.5 53.6 20.5 74.1 0s20.5-53.6 0-74.1l-68-68c-20.5-20.5-53.6-20.5-74.1 0z'/></svg>`;
-    }
-
-    link.href = iconHref;
-}
+// --- 1. DATA CONFIGURATION ---
 
 // execute setup
-// setupFavicon(rootPath); // This needs to run after rootPath is defined or just use logical path
-// Moving execution to end of file
+// setupFavicon(rootPath); // MOVED to init function to ensure rootPath is available
+
 
 
 // --- 1. DATA CONFIGURATION ---
 
 const NAV_DATA = [
-    {
-        id: 'nav-home',
-        label: 'Home',
-        icon: 'fas fa-home',
-        href: 'index.html',
-        type: 'link',
-    },
     {
         id: 'nav-spaces',
         label: 'Find Your Space',
@@ -512,6 +762,7 @@ const NAV_DATA = [
                 ]
             },
             { id: 'nav-soulbot', label: 'SoulBot AI (Beta)', href: 'tools/soulbot.html', style: 'color:#F49F75;' },
+            { id: 'nav-support-groups', label: 'Support Groups', href: 'community/support-groups/support-groups.html' },
             { id: 'nav-problem', label: 'The Problem Wall', href: 'pages/problem-wall.html' }
         ]
     },
@@ -523,11 +774,19 @@ const NAV_DATA = [
         type: 'dropdown',
         children: [
             { id: 'nav-reset', label: '5-Step Reset', href: 'tools/5-step-reset.html' },
+            { id: 'nav-journal', label: 'Reflective Journal', href: 'journal/', style: 'color:var(--teal-glow); font-weight:700;' },
             { id: 'nav-playground', label: 'Mental Playground', href: 'tools/playground.html' },
             { id: 'nav-confession', label: 'Confession Box', href: 'tools/confession-box/index.html' },
             { id: 'nav-dropit', label: 'Drop It (Game)', href: 'tools/drop-it.html', style: 'color:#4ECDC4;' },
             { id: 'nav-vent', label: 'The Vent Box', href: 'tools/vent-box.html', style: 'color:var(--ember-orange);' }
         ]
+    },
+    {
+        id: 'nav-assessments',
+        label: 'Assessments',
+        icon: 'fas fa-brain',
+        href: 'spaces/assessments/index.html',
+        type: 'link',
     },
     {
         id: 'nav-community',
@@ -536,9 +795,9 @@ const NAV_DATA = [
         href: '#',
         type: 'dropdown',
         children: [
+            { id: 'nav-support-groups-community', label: 'Support Groups', href: 'community/support-groups/support-groups.html' },
             { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
             { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
-            { id: 'nav-ambassadors', label: 'Campus Ambassadors', href: 'spaces/campus/campus-ambassadors.html' },
             { id: 'nav-for-parents', label: 'For Families', href: 'company/for-parents.html' }
         ]
     },
@@ -565,13 +824,13 @@ function generateNavHTML(rootPath) {
     NAV_DATA.forEach(item => {
         if (item.type === 'link') {
             // Standard Link
-            html += `<a href="${rootPath}${item.href}" id="${item.id || ''}"><i class="${item.icon}"></i>${item.label}</a>`;
+            html += `<a href="${rootPath}${item.href}" id="${item.id || ''}"><i class="${item.icon}"></i><span>${item.label}</span></a>`;
         } else if (item.type === 'dropdown') {
             // First-level Dropdown
             html += `
             <div class="dropdown">
                 <a href="${item.href === '#' ? '#' : rootPath + item.href}" id="${item.id || ''}">
-                    <i class="${item.icon}"></i>${item.label}
+                    <i class="${item.icon}"></i><span>${item.label}</span>
                     <i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:auto;"></i>
                 </a>
                 <div class="dropdown-content">
@@ -615,7 +874,10 @@ function generateSubmenuHTML(children, rootPath) {
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
-        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; width: auto; max-width: 100%;">
+        <div class="logo-wrapper" style="position: relative; display: flex; align-items: center; height: 40px;">
+            <img src="${rootPath}assets/images/logo-premium.png" class="logo-img" alt="Soulamore" style="height: 100%; width: auto; display: block;">
+            <img src="${rootPath}assets/images/logo-premium.png" class="logo-img-light-overlay" alt="" aria-hidden="true" style="position: absolute; left: 0; top: 0; height: 100%; width: auto; display: block;">
+        </div>
     </a>
 
     <nav class="nav-links">
@@ -642,14 +904,23 @@ const getHeaderHTML = (rootPath) => `
 
     <!-- Auth Group -->
     <div class="auth-box">
-            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> Get Help Now</a>
-            <a href="${rootPath}portal/user-dashboard.html" class="user-icon-btn"><i class="fas fa-ghost"></i></a>
+            <button id="theme-toggle-desktop" aria-label="Toggle Theme" style="background:none; border:none; cursor:pointer; color: var(--text-primary); margin-right: 15px; transition: 0.3s; display: flex; align-items: center;" onclick="if(window.toggleTheme) window.toggleTheme();" onmouseover="this.style.color='var(--peach-glow)'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='var(--text-primary)'; this.style.transform='scale(1)';">
+                <i class="fas fa-sun" id="theme-icon-desktop" style="font-size: 1.6rem;"></i>
+            </button>
+            <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> <span>Get Help Now</span></a>
+            <a href="${rootPath}portal/user-dashboard.html" class="user-icon-btn" title="Dashboard"><i class="fas fa-ghost"></i></a>
+            <a href="${rootPath}profile.html" class="nav-btn" style="padding:10px 20px; font-size:0.9rem;" title="My Profile"><i class="fas fa-user-circle"></i> <span style="margin-left:5px;">Profile</span></a>
             <a href="${rootPath}portal/login.html" class="nav-btn">Log In / Sign Up</a>
     </div>
     
-    <button class="mobile-toggle" aria-label="Toggle Navigation">
-        <i class="fas fa-bars"></i>
-    </button>
+    <div style="display: flex; gap: 5px; align-items: center;">
+        <button id="theme-toggle-mobile" class="mobile-toggle theme-toggle-btn" aria-label="Toggle Theme" onclick="if(window.toggleTheme) window.toggleTheme();">
+            <i class="fas fa-sun" id="theme-icon-mobile"></i>
+        </button>
+        <button class="mobile-toggle mobile-menu-btn" aria-label="Toggle Navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
 </div>
 `;
 
@@ -660,7 +931,10 @@ const getFooterHTML = (rootPath) => `
         
         <!-- BRAND COLUMN -->
         <div class="footer-brand">
-            <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; margin-bottom: 20px;">
+            <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home" style="position: relative; display: inline-flex; align-items: center; margin-bottom: 20px; height: 50px;">
+                <img src="${rootPath}assets/images/logo-premium.png" alt="Soulamore Logo" class="logo-img" style="height: 100%; width: auto; display: block;">
+                <img src="${rootPath}assets/images/logo-premium.png" alt="" aria-hidden="true" class="logo-img-light-overlay" style="position: absolute; left: 0; top: 0; height: 100%; width: auto; display: block;">
+            </a>
             <p style="font-size:0.9rem; opacity:0.6; line-height:1.6;">
                 Your sanctuary for mental wellness. <br>
                 Tech meets empathy.
@@ -676,11 +950,24 @@ const getFooterHTML = (rootPath) => `
         <div class="footer-col">
             <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Relief Tools</h4>
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}journal/">Reflective Journal</a></li>
                 <li><a href="${rootPath}tools/vent-box.html">The Vent Box</a></li>
                 <li><a href="${rootPath}tools/5-step-reset.html">5-Step Reset</a></li>
                 <li><a href="${rootPath}tools/playground.html">Mental Playground</a></li>
                 <li><a href="${rootPath}tools/soulbot.html">SoulBot AI</a></li>
                 <li><a href="${rootPath}tools/confession-box/index.html">Confession Box</a></li>
+            </ul>
+        </div>
+
+        <!-- ASSESSMENTS COLUMN -->
+        <div class="footer-col">
+            <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Assessments</h4>
+            <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="${rootPath}spaces/assessments/index.html" style="color:var(--peach-glow); font-weight:600;">Assessment Library</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=burnout_career">Burnout & Career</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=anxiety_overthinking">Anxiety & Stress</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=emotional_regulation">Emotional Regulation</a></li>
+                <li><a href="${rootPath}spaces/assessments/engine.html?test=relationship_patterns">Relationship Patterns</a></li>
             </ul>
         </div>
 
@@ -690,6 +977,7 @@ const getFooterHTML = (rootPath) => `
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
                 <li><a href="${rootPath}spaces/campus/campus-ambassadors.html">Campus Ambassadors</a></li>
                 <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
+                <li><a href="${rootPath}community/support-groups/support-groups.html">Support Groups</a></li>
                 <li><a href="${rootPath}community/forum.html">Discussion Forum</a></li>
                 <li><a href="${rootPath}company/for-parents.html">For Family (Comfort)</a></li>
                 <li><a href="${rootPath}join-us/index.html">Join the Team</a></li>
@@ -702,7 +990,9 @@ const getFooterHTML = (rootPath) => `
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
                 <!-- <li><a href="${rootPath}tools/index.html">Tools</a></li> Removed: Dead Link -->
                 <li><a href="${rootPath}newsletter.html">Newsletter</a></li>
+                <li><a href="${rootPath}company/press.html">Press & Media Kit</a></li>
                 <li><a href="${rootPath}company/why-soulamore-exists.html">Why Soulamore Exists</a></li>
+                <li><a href="${rootPath}company/transparency.html">Transparency Report</a></li>
                 <li><a href="${rootPath}company/contact.html">Contact</a></li>
                 <li><a href="${rootPath}company/legal.html">Privacy & Legal</a></li>
                 <li><a href="${rootPath}get-help-now.html" style="color:var(--ember-red); font-weight:600;">Crisis Resources</a></li>
@@ -721,35 +1011,7 @@ const getFooterHTML = (rootPath) => `
 
 // --- 3. HELPERS ---
 
-function getRootPath() {
-    // 2-Levels Deep Check
-    if (location.pathname.includes('/spaces/campus/') ||
-        location.pathname.includes('/spaces/soulamore-away/') ||
-        location.pathname.includes('/spaces/soulamore-workplace/') || /* ADDED LINE */
-        location.pathname.includes('/our-peers/physical-wellness/') ||
-        location.pathname.includes('/our-peers/academic-wellness/') ||
-        location.pathname.includes('/our-peers/mental-wellness/') ||
-        location.pathname.includes('/our-peers/financial-wellness/') ||
-        location.pathname.includes('/tools/confession-box/')) {
-        return "../../";
-    }
-
-    // 1-Level Deep Check
-    if (location.pathname.includes('/spaces/') ||
-        location.pathname.includes('/join-us/') ||
-        location.pathname.includes('/our-peers/') ||
-        location.pathname.includes('/our-psychologists/') ||
-        location.pathname.includes('/tools/') ||
-        location.pathname.includes('/community/') ||
-        location.pathname.includes('/company/') ||
-        location.pathname.includes('/auth/') ||
-        location.pathname.includes('/portal/') || /* ADDED: Critical for Dashboards/Login */
-        location.pathname.includes('/New Pages/') || location.pathname.includes('/New%20Pages/') || /* FIXED: Support URL encoded space */
-        location.pathname.includes('/pages/')) {
-        return "../";
-    }
-    return "";
-}
+// getRootPath() moved to end for consolidation.
 
 // --- 4. INJECTION LOGIC ---
 
@@ -794,37 +1056,6 @@ function injectHeader() {
         }
         headerElement.innerHTML = getHeaderHTML(getRootPath());
 
-        // --- COOKIE CONSENT BANNER (Calm GDPR) ---
-        if (!localStorage.getItem('soulamore_cookie_consent')) {
-            const consentDiv = document.createElement('div');
-            consentDiv.id = 'cookie-consent-banner';
-            consentDiv.innerHTML = `
-                <div style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:90%; max-width:600px; background:rgba(15, 23, 42, 0.95); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(10px); padding:20px; border-radius:16px; box-shadow:0 10px 40px rgba(0,0,0,0.5); z-index:10000; display:flex; align-items:center; justify-content:space-between; gap:20px; animation:floatUp 0.5s ease-out;">
-                    <div style="font-size:0.9rem; color:#e2e8f0; line-height:1.5;">
-                        <strong style="color:#fff; display:block; margin-bottom:4px;">We use cookies for calm.</strong>
-                        To keep you logged in and remember your theme. No tracking ads.
-                    </div>
-                    <div style="display:flex; gap:10px; flex-shrink:0;">
-                         <button onclick="acceptCookies()" style="background:#4ECDC4; color:#0f172a; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer;">Okay</button>
-                    </div>
-                </div>
-                <style>
-                    @keyframes floatUp { from { transform: translate(-50%, 20px); opacity:0; } to { transform: translate(-50%, 0); opacity:1; } }
-                    @media(max-width:500px) { #cookie-consent-banner > div { flex-direction:column; text-align:center; } }
-                </style>
-            `;
-            document.body.appendChild(consentDiv);
-
-            window.acceptCookies = function () {
-                localStorage.setItem('soulamore_cookie_consent', 'true');
-                const banner = document.getElementById('cookie-consent-banner');
-                if (banner) {
-                    banner.style.opacity = '0';
-                    setTimeout(() => banner.remove(), 300);
-                }
-            };
-        }
-
         // --- CRITICAL CSS INJECTION ---
         // We inject this style to ensure consistency without relying on complex external CSS media queries alone
         if (!document.getElementById('header-responsive-style')) {
@@ -855,7 +1086,86 @@ function injectFooter() {
     }
 }
 
+function injectNewsTicker() {
+    // 1. Remove existing if any
+    const existing = document.querySelector('.news-ticker-container');
+    if (existing) existing.remove();
+
+    // 2. Create high-priority body child
+    const ticker = document.createElement('div');
+    ticker.className = 'news-ticker-container';
+    ticker.style = `
+        background: rgba(15, 23, 42, 0.95); 
+        border-top: 1px solid rgba(244, 159, 117, 0.3); 
+        height: 32px; 
+        display: flex; 
+        align-items: center; 
+        overflow: hidden; 
+        white-space: nowrap; 
+        position: fixed; 
+        bottom: 0; 
+        left: 0; 
+        width: 100%; 
+        z-index: 99998; /* Below mobile toggle but above everything else */
+        backdrop-filter: blur(10px); 
+        text-align: left !important;
+    `;
+
+    ticker.innerHTML = `
+        <div class="news-ticker-label" style="background: #F49F75; color: #0f172a; padding: 0 12px; height: 100%; display: flex; align-items: center; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; position: relative; z-index: 2; box-shadow: 10px 0 20px rgba(15, 23, 42, 0.95); flex-shrink: 0;">Live News Feed</div>
+        <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+            Fetching the latest mental health rituals and global insights...
+        </div>
+    `;
+
+    document.body.appendChild(ticker);
+    
+    // Set initial visibility based on status
+    ticker.style.display = getSavedNewsFeedStatus() === 'on' ? 'flex' : 'none';
+}
+
+// --- NEWS FEED TOGGLE SYSTEM ---
+function applyNewsFeedStatus(status) {
+    const ticker = document.querySelector('.news-ticker-container');
+    const pill = document.querySelector('.news-toggle-pill');
+    
+    if (ticker) ticker.style.display = status === 'on' ? 'flex' : 'none';
+    if (pill) {
+        if (status === 'on') pill.classList.add('active');
+        else pill.classList.remove('active');
+    }
+}
+
+function getSavedNewsFeedStatus() {
+    return localStorage.getItem('soulamore-news-feed') || 'on';
+}
+
+window.toggleNewsFeed = function () {
+    const currentStatus = getSavedNewsFeedStatus();
+    const newStatus = currentStatus === 'on' ? 'off' : 'on';
+    localStorage.setItem('soulamore-news-feed', newStatus);
+    applyNewsFeedStatus(newStatus);
+};
+
+function injectNewsToggle() {
+    if (document.querySelector('.news-toggle-pill')) return;
+
+    const pill = document.createElement('div');
+    pill.className = 'news-toggle-pill';
+    const initialStatus = getSavedNewsFeedStatus();
+    if (initialStatus === 'on') pill.classList.add('active');
+
+    pill.innerHTML = `
+        <div class="status-dot"></div>
+        <span class="pill-label">Live News</span>
+    `;
+
+    pill.onclick = window.toggleNewsFeed;
+    document.body.appendChild(pill);
+}
+
 // --- FAVICON INJECTION ---
+// --- FAVICON MANAGER (Peach Branding) ---
 function injectFavicon() {
     let link = document.querySelector("link[rel~='icon']");
     if (!link) {
@@ -864,30 +1174,29 @@ function injectFavicon() {
         document.head.appendChild(link);
     }
 
+    const PEACH = '%23F49F75'; // #F49F75 encoded
     const path = window.location.pathname;
-    let iconSVG = '';
+    const rootPath = getRootPath();
 
-    // TEAL: #4ECDC4, PEACH: #F49F75, GOLD: #fbbf24
+    // Default Logo (Use Symbol to avoid squeezing)
+    let iconHref = rootPath + 'assets/images/favicon_symbol.png';
 
-    if (path.includes('soulamore-workplace')) {
-        // WORKPLACE (Briefcase) - PEACH
-        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23F49F75" d="M128 480h256V80c0-26.5-21.5-48-48-48H176c-26.5 0-48 21.5-48 48v400zm64-400h128v32H192V80z"/><path fill="%23F49F75" d="M32 128h448v352H32z"/></svg>`;
-    } else if (path.includes('soulamore-campus')) {
-        // CAMPUS (Grad Cap) - PEACH
-        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="%23F49F75" d="M320 32l-320 160h640L320 32z"/><path fill="%23F49F75" d="M112 256v128c0 70.7 93.1 128 208 128s208-57.3 208-128V256c-34.9 20.3-88.7 32-144 32s-109.1-11.7-144-32z"/></svg>`;
-    } else if (path.includes('physical-wellness') || path.includes('renu-dogra')) {
-        // PHYSICAL/RENU (Lotus/Flower) - Saffron/Orange
-        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23f59e0b" d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0 0 114.6 0 256s114.6 256 256 256zm0-48c-114.9 0-208-93.1-208-208S141.1 48 256 48s208 93.1 208 208-93.1 208-208 208z"/><circle cx="256" cy="256" r="64" fill="white"/></svg>`;
-    } else if (path.includes('soulamore-away')) {
-        // SOULAMORE AWAY (Earth/Globe) - Peach
-        iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23F49F75" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256zM208.4 208H16C23.51 113.8 97.23 37.98 191.6 29.35C199.1 63.86 205.1 82.25 208.4 208zM240 208H467.6C458.7 131.6 405.2 68.34 329.8 41.59C341.3 76.84 374.3 125.1 240 208zM492.6 304H272C384.8 322.2 411.3 400.9 414.9 418.5C460.7 391.2 491.5 344.8 496 291.9C495.2 296 493.9 300.1 492.6 304zM240 256H16.37C17.06 268 18.67 279.7 21 291.1C65.57 326.6 96.09 377.9 123.4 468.9C189.9 439.4 235.6 381.1 240 256z"/></svg>`;
+    // Special Pages (SVG Data URIs)
+    if (path.includes('vent-box')) {
+        // Fire Icon
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M200.3 66.8c12.3-15.8 35.1-15.9 47.6-.2l13.9 17.5c18.5 23.3 54 26.3 76.2 6.5l8.7-7.8c16.3-14.5 41.8-10.7 53.6 7.9 23.3 36.6 63 94.7 44.8 169.3-18.4 75.3-69.8 126.8-132.8 135-66.2 8.6-130.6-32.9-158.7-98.3-25.1-58.4-14.8-119.3 12.3-162.7 10.3-16.5 23-32.1 35.3-48.4zm-14.9 378.6c59.9 8.6 117.9-20.9 146-69.5 26.6-45.9 22.9-106.3-8.8-149.7-8.1-11.1-12.7-22.3-13.6-33.1-6.1 4.5-12.6 8.5-19.4 11.7-29.3 13.7-65 4.9-88.7-19.8-5-5.2-9.6-10.8-13.8-16.9-15.6 27.6-26.6 57.1-32.3 87.7-6.1 33.1.6 66.9 17.5 95.8 19.3 33 55.4 69.4 113.1 93.8z'/></svg>`;
+    } else if (path.includes('confession-box')) {
+        // Ghost Icon
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M256 96c31.1 0 61.2 6.7 88.5 19.1 27.3 12.4 51.6 29.8 70.8 50.8 19.2 21 33.5 45.4 42.1 72.1 8.6 26.7 10.6 55 6.1 82.8-5.3 32.8-21.6 62.7-45.1 85.5-23.5 22.7-53.9 36.3-86.3 38.3-1.6.1-3.2.1-4.8.1-18.4 0-36.2-3.8-52.6-10.7-16.3 6.9-34.1 10.7-52.6 10.7-1.6 0-3.3 0-4.9-.1-32.4-1.9-62.8-15.6-86.3-38.3-23.5-22.7-39.8-52.7-45.1-85.5-4.5-27.8-2.5-56.1 6.1-82.8 8.6-26.7 22.9-51.1 42.1-72.1 19.2-21 43.5-38.4 70.8-50.8C194.8 102.7 224.9 96 256 96zm0-32C114.6 64 0 178.6 0 320c0 36.6 7.7 71.3 21.7 103.3C38.4 461.3 75.2 489 119.5 491.5c1.6.1 3.3.1 4.9.1 14.9 0 29.2-2.5 42.8-7.2 4.1-1.4 8.1-3 12-4.8 1.9-2.8 4-5.5 6.3-8.1 18.2-20.7 41.6-35.9 67-43.8 1.1-.3 2.3-.6 3.4-1 25.4 7.9 48.9 23.1 67 43.8 2.3 2.6 4.4 5.3 6.3 8.1 4 1.8 8 3.4 12 4.8 13.6 4.7 27.9 7.2 42.8 7.2 1.6 0 3.3-.1 4.9-.1 44.3-2.5 81-30.2 97.8-68.2C407.5 401.7 416 391.3 416 320 416 178.6 301.4 64 160 64c-32.5 0-63.5 6.1-92.4 17.1-19.1 7.2-36.1 17.6-50.4 30.7z'/></svg>`;
+    } else if (path.includes('renu-dogra')) {
+        // Lotus/Om
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M256 160c-52.9 0-96 43.1-96 96s43.1 96 96 96 96-43.1 96-96-43.1-96-96-96zm-17.7-93.5C227.8 77.4 212 96 198.8 113.8c-28.9 39.1-38.3 42.8-49 53.5-32 32-58.3 12.8-58.3 12.8-21.5-13.6-54.8 10-63.2 24.3-9.5 16.2.7 34.6 2.3 37.4 39.4 66.8 95.7 66.8 95.7 66.8 15.6 0 34.4 3.7 34.4 19.3v.1c0 15.6-18.8 19.3-34.4 19.3 0 0-56.3 0-95.7-66.8-1.7-2.8-11.8-21.2-2.3-37.4 8.5-14.3 41.7-37.9 63.2-24.3 0 0 26.3 19.2 58.3-12.8 10.7-10.7 20.1-14.4 49-53.5 13.2-17.8 29-36.4 39.5-47.3 3.9-4.1 10.6-4.1 14.5 0 10.5 10.9 26.3 29.5 39.5 47.3 28.9 39.1 38.3 42.8 49 53.5 32 32 58.3 12.8 58.3 12.8 21.5-13.6 54.8 10 63.2 24.3 9.5 16.2-.7 34.6-2.3 37.4-39.4-66.8-95.7-66.8-95.7-66.8-15.6 0-34.4-3.7-34.4-19.3v-.1c0-15.6 18.8-19.3 34.4-19.3 0 0 56.3 0 95.7 66.8 1.7 2.8 11.8 21.2 2.3 37.4-8.5 14.3-41.7 37.9-63.2 24.3 0 0-26.3 19.2-58.3 12.8-10.7 10.7-20.1 14.4-49 53.5-13.2 17.8-29 36.4-39.5 47.3-3.9 4.1-10.6 4.1-14.5 0z'/></svg>`;
+    } else if (path.includes('5-step-reset')) {
+        // Leaf Icon
+        iconHref = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='${PEACH}' d='M440.5 88.5C397.9 45.3 340.5 24 286 24c-92.6 0-176.4 56.5-212 141.5-17.8 42.5-19.3 90.7-4.1 134.4 15.2 43.7 45.4 79.9 85.3 102.4C195.1 425 242.9 432 288 432c6.2 0 12.5-.2 18.7-.5 47.8-2.6 88-29.4 116.6-66.4 28.6-37 43.1-83.3 40.8-132.8l-.2-3.8c7.8-20.1 13.9-40.8 18.3-62.2 4.4-21.4 6.7 43.2-6.7 43.2 13.4 0 26.8-5.2 37-15.6l9.6 9.6c20.5 20.5 53.6 20.5 74.1 0s20.5-53.6 0-74.1l-68-68c-20.5-20.5-53.6-20.5-74.1 0z'/></svg>`;
     }
 
-    // Only override if we have a specific SVG for this section. 
-    // Otherwise, we respect the static <link> tag already present in the HTML.
-    if (iconSVG) {
-        link.href = `data:image/svg+xml,${iconSVG}`;
-    }
+    link.href = iconHref;
 }
 
 // --- 4b. SUB-NAV INJECTION (Layout Shell Binding) ---
@@ -912,12 +1221,13 @@ function injectSubnav() {
     wrapper.className = 'sub-nav-container';
     // We reuse the existing CSS class for visual style, but now it lives inside the Shell
     wrapper.style.margin = '0 auto'; // Override margin for shell context (Handled by padding now)
-    wrapper.style.pointerEvents = 'auto'; // Re-enable clicks
+    wrapper.style.pointerEvents = 'none'; // Allow clicks to pass through the container
 
     window.ShellSubnav.tabs.forEach(tab => {
         const btn = document.createElement('div');
         btn.className = `workplace-btn ${tab.id === window.ShellSubnav.active ? 'active' : ''} ${tab.extraClass || ''}`;
         btn.setAttribute('data-page', tab.id);
+        btn.style.pointerEvents = 'auto'; // Re-enable clicks for the button itself
 
         // Icon + Label
         btn.innerHTML = `<i class="fas ${tab.icon}"></i><span>${tab.label}</span>`;
@@ -934,8 +1244,12 @@ function injectSubnav() {
             if (window.navTo) {
                 window.navTo(tab.id);
                 // Update active state visually immediately
-                document.querySelectorAll('.workplace-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.workplace-btn').forEach(b => {
+                    b.classList.remove('active', 'active-teal', 'active-gold', 'active-peach');
+                });
                 btn.classList.add('active');
+                if (tab.extraClass) btn.classList.add(tab.extraClass);
+
                 // Update internal state
                 window.ShellSubnav.active = tab.id;
             }
@@ -948,8 +1262,162 @@ function injectSubnav() {
     // console.log("Soulamore: Shell Sub-nav injected.");
 }
 
-// Auto-run subnav injection on load
-document.addEventListener('DOMContentLoaded', injectSubnav);
+// --- 11. COOKIE CONSENT ---
+function injectCookieBanner() {
+    // 1. Check if already consented
+    if (localStorage.getItem('cookieConsent') === 'accepted') return;
+
+    // 2. Create Banner
+    const banner = document.createElement('div');
+    banner.id = 'cookie-banner';
+    banner.innerHTML = `
+        <style>
+            #cookie-banner {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                max-width: 400px;
+                background: rgba(15, 23, 42, 0.95);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                color: #f1f5f9;
+                padding: 20px 25px;
+                border-radius: 20px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                z-index: 10000;
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                animation: slideUp 0.5s ease-out;
+            }
+            @keyframes slideUp { from { transform: translateX(-50%) translateY(100px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+            
+            .cb-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-weight: 600; color: #4ECDC4; }
+            .cb-text { font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px; line-height: 1.5; }
+            .cb-actions { display: flex; gap: 10px; justify-content: flex-end; }
+            
+            .cb-btn { padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; cursor: pointer; border: none; font-weight: 600; transition: 0.3s; }
+            .cb-accept { background: #4ECDC4; color: #0f172a; }
+            .cb-accept:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3); }
+            
+            .cb-info { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.1); }
+            .cb-info:hover { color: white; border-color: white; }
+        </style>
+        <div class="cb-header"><i class="fas fa-cookie-bite"></i> Human, we use cookies.</div>
+        <div class="cb-text">Not the chocolate chip kind (sadly). Just the digital kind to keep you logged in and make sure the site works. No tracking for ads.</div>
+        <div class="cb-actions">
+            <button class="cb-btn cb-info" onclick="window.location.href='/company/privacy-policy.html'">Privacy</button>
+            <button class="cb-btn cb-accept" id="acceptCookies">Got it</button>
+        </div>
+    `;
+
+    document.body.appendChild(banner);
+
+    // 3. Bind Event
+    document.getElementById('acceptCookies').addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'accepted');
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(20px)';
+        setTimeout(() => banner.remove(), 500);
+    });
+}
+
+// Auto-run subnav and other injections on load
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Core Structural Injections
+    injectHeader(); // RESTORED
+    injectFooter(); // RESTORED
+    injectSubnav();
+    injectFavicon();
+
+    // 2. Interaction & Logic Binding
+    initializeHeaderLogic();
+    bindMobileToggle();
+    injectSoulBotWidget();
+    injectCookieBanner();
+    injectNewsTicker(); // NEW: Injected directly to body for z-index dominance
+    injectNewsToggle(); // NEW: Floating control pill
+    applyNewsFeedStatus(getSavedNewsFeedStatus());
+    ensureNewsRenderer();
+
+    // 3. Animation & Features
+    initParticles();
+    injectMobileBottomNav();
+    setActiveState();
+    initSmartCounters();
+
+    // 4. Interaction Initialization (MANDATORY)
+    // Note: Removed duplicate bindMobileToggle and initializeHeaderLogic calls
+});
+
+/**
+ * Unified Path Detection (v3.0)
+ * Returns relative path prefix to get to project root from current page.
+ * Correctly handles both hosted (web) and local (file://) environments.
+ */
+function getRootPath() {
+    // Robust Path Resolution (v4.0)
+    // Always use the relative path hardcoded by the developer in the <script src="..."> tag
+    const script = document.querySelector('script[src*="components.js"]');
+    if (script) {
+        const src = script.getAttribute('src');
+        if (src) {
+            // Extracts whatever prefix precedes "assets/js/components" e.g., "../../" or "../" or ""
+            return src.split('assets/js/components')[0];
+        }
+    }
+
+    // Fallback if script tag parsing somehow fails
+    const path = window.location.pathname.toLowerCase();
+
+    // 2-Levels Deep Check
+    if (path.includes('/spaces/campus/') ||
+        path.includes('/spaces/soulamore-away/') ||
+        path.includes('/spaces/soulamore-workplace/') ||
+        path.includes('/spaces/assessments/') ||
+        path.includes('/tools/confession-box/') ||
+        path.includes('/portal/admin-dashboard/') ||
+        (path.includes('/our-peers/') && path.split('/our-peers/')[1]?.includes('/'))) {
+        return "../../";
+    }
+
+    // 1-Level Deep Check
+    if (path.includes('/spaces/') ||
+        path.includes('/tools/') ||
+        path.includes('/company/') ||
+        path.includes('/community/') ||
+        path.includes('/our-peers/') ||
+        path.includes('/our-psychologists/') ||
+        path.includes('/portal/') ||
+        path.includes('/journal/') ||
+        path.includes('/auth/') ||
+        path.includes('/login/') ||
+        path.includes('/join-us/') ||
+        path.includes('/pages/') ||
+        path.includes('/new pages/') || path.includes('/new%20pages/')) {
+        return "../";
+    }
+
+    return '';
+}
+
+/**
+ * Ensures news-renderer.js is loaded and initializes the global ticker.
+ */
+function ensureNewsRenderer() {
+    if (typeof window.initGlobalTicker === 'function') {
+        window.initGlobalTicker();
+        return;
+    }
+
+    const prefix = getRootPath();
+    const script = document.createElement('script');
+    script.src = `${prefix}assets/js/news-renderer.js`;
+    script.onload = () => {
+        if (window.initGlobalTicker) window.initGlobalTicker();
+    };
+    script.onerror = () => console.error("Failed to load news-renderer.js dynamically");
+    document.head.appendChild(script);
+}
 
 // --- 5. ACTIVE STATE LOGIC ---
 
@@ -985,14 +1453,12 @@ function setActiveState() {
 
 // --- 6. INTERACTION LOGIC ---
 
-// --- 6. INTERACTION LOGIC ---
-
 function bindMobileToggle() {
     // FIX 3: Event Delegation for Hamburger
     // Handles toggling even if header is injected late
     document.addEventListener('click', (e) => {
-        // 1. Toggle Click
-        const toggle = e.target.closest('.mobile-toggle');
+        // 1. Toggle Click (Ensure it's the menu button, not the theme switch)
+        const toggle = e.target.closest('.mobile-menu-btn');
         if (toggle) {
             e.preventDefault();
             e.stopPropagation();
@@ -1033,7 +1499,7 @@ function bindMobileToggle() {
             document.body.classList.remove('no-scroll');
 
             // Reset Toggles
-            document.querySelectorAll('.mobile-toggle').forEach(btn => {
+            document.querySelectorAll('.mobile-menu-btn').forEach(btn => {
                 btn.classList.remove('active');
                 const i = btn.querySelector('i');
                 if (i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); }
@@ -1060,7 +1526,7 @@ function initializeHeaderLogic() {
                 document.body.classList.remove('no-scroll');
 
                 // Reset Icons Globally
-                document.querySelectorAll('.mobile-toggle').forEach(btn => {
+                document.querySelectorAll('.mobile-menu-btn').forEach(btn => {
                     btn.classList.remove('active');
                     const i = btn.querySelector('i');
                     if (i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); }
@@ -1154,7 +1620,7 @@ function injectSoulBotWidget() {
         <style>
             #soulbot-widget-container {
                 position: fixed;
-                bottom: 100px;
+                bottom: 80px; /* Matched with SoulBot Widget V2 */
                 right: 30px;
                 z-index: 9999;
                 font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1163,8 +1629,8 @@ function injectSoulBotWidget() {
                 align-items: flex-end;
             }
             #soulbot-widget-fab {
-                width: 60px;
-                height: 60px;
+                width: 55px;
+                height: 55px;
                 background: var(--teal-glow, #4ECDC4);
                 border-radius: 50%;
                 display: flex;
@@ -1215,8 +1681,9 @@ function injectSoulBotWidget() {
 
             /* MOBILE TWEAKS */
             @media (max-width: 768px) {
-                #soulbot-widget-container { bottom: 160px !important; right: 20px; }
-                #sb-window { width: 90vw; right: 5vw; bottom: 120px; height: 60vh; }
+                #soulbot-widget-container { bottom: 90px !important; right: 20px !important; }
+                #soulbot-widget-fab { display: none !important; } /* Force Hide FAB on Mobile */
+                #sb-window { width: 95vw; right: 2.5vw; bottom: 220px; height: 50vh; }
             }
         </style>
         
@@ -1234,7 +1701,7 @@ function injectSoulBotWidget() {
                     <button class="sb-send" onclick="sendWidgetMessage()"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
-            <div id="soulbot-widget-fab" onclick="toggleWidget()">
+            <div id="soulbot-widget-fab" onclick="toggleWidget()" style="display: none;"> <!-- Hidden on mobile via CSS, manually hidden here for safety -->
                 <i class="fas fa-robot"></i>
             </div>
         </div>
@@ -1327,10 +1794,10 @@ function injectMobileBottomNav() {
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-        <a href="${pathPrefix}tools/soulbot.html" class="nav-item ${location.pathname.includes('soulbot') ? 'active' : ''}">
+        <button class="nav-item" onclick="if(window.toggleWidget) window.toggleWidget(); else alert('SoulBot initializing...');">
             <i class="fas fa-robot" style="color:#4ECDC4;"></i>
             <span>Chat</span>
-        </a>
+        </button>
         <a href="${pathPrefix}get-help-now.html" class="nav-item ${location.pathname.includes('get-help-now') ? 'active' : ''}">
             <i class="fas fa-heart-pulse" style="color:#ef4444;"></i>
             <span>Crisis</span>
@@ -1373,22 +1840,22 @@ function injectMobileBottomNav() {
     style.innerHTML = `
         .mobile-bottom-nav {
             position: fixed;
-            bottom: 20px;
+            bottom: 45px;
             left: 50%;
             transform: translateX(-50%);
-            width: 92%;
-            max-width: 400px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(16px);
+            width: 92%; /* MATCH TOP HEADER WIDTH EXACTLY */
+            max-width: 1600px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 50px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 12px 20px;
-            z-index: 8000; /* Fixed: Lower than Mobile Menu (9999) */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease;
+            padding: 10px 15px;
+            z-index: 100001;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
        /* HIDE NAV WHEN MOBILE MENU IS OPEN */
@@ -1403,16 +1870,16 @@ function injectMobileBottomNav() {
         }
 
         .nav-item {
+            flex: 1; /* EQUAL SPACING */
             display: flex;
             flex-direction: column;
             align-items: center;
             text-decoration: none;
             color: #94a3b8;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             gap: 4px;
             transition: all 0.2s;
             cursor: pointer;
-            /* Button Reset */
             background: none;
             border: none;
             padding: 0;
@@ -1430,6 +1897,36 @@ function injectMobileBottomNav() {
             transform: translateY(-2px);
         }
 
+        /* MOBILE UI REFINEMENTS (Width <= 1024px) */
+        @media (max-width: 1024px) {
+            /* 1. Audio Control: Circular Glass Icon */
+            .audio-control {
+                width: 50px !important;
+                height: 50px !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+                left: 20px !important;
+                bottom: 120px !important; /* Above wide nav bar */
+                background: rgba(15, 23, 42, 0.85) !important;
+                backdrop-filter: blur(12px) !important;
+                border: 1px solid #F49F75 !important;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.5) !important;
+            }
+            .audio-control #audioText { display: none !important; }
+            .audio-control .audio-bars {
+                display: flex !important;
+                margin: 0 !important;
+            }
+
+            /* 2. SoulBot: Hide ONLY on Mobile */
+            #soulbot-widget-container { display: none !important; visibility: hidden !important; }
+            #soulbot-widget-fab { display: none !important; visibility: hidden !important; }
+            #sb-window { display: none !important; }
+        }
+
         /* HIDE ON DESKTOP */
         @media (min-width: 1025px) {
             .mobile-bottom-nav { display: none !important; }
@@ -1438,30 +1935,8 @@ function injectMobileBottomNav() {
     document.head.appendChild(style);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    if (typeof injectHeader === 'function') injectHeader();
-    // Guard Footer Injection: Do not inject on Auth pages (Viewport Scenes)
-    if (typeof injectFooter === 'function') injectFooter();
-    initParticles(); // Auto-init particles if container exists
-
-    // Original Initialization steps (retained)
-    try { injectSoulBotWidget(); } catch (e) { console.error("SoulBot Widget Failed:", e); }
-    try { injectFavicon(); } catch (e) { console.error("Favicon Injection Failed:", e); }
-
-    // 2. Set Active State
-    try { setActiveState(); } catch (e) { console.warn("Active State Error:", e); }
-
-    // 3. Initialize Interactions
-    try {
-        bindMobileToggle();
-        initializeHeaderLogic();
-    } catch (e) { console.warn("Header Logic Error:", e); }
-
-    // 4. Inject Bottom Nav (Global)
-    try { injectMobileBottomNav(); } catch (e) { console.warn("Bottom Nav Error:", e); }
-
-    console.log("Soulamore: Initialization Complete.");
-});
+// DEPRECATED: Combined into main listener above
+// document.addEventListener("DOMContentLoaded", () => { ... });
 
 // --- PARTICLES ENGINE ---
 function initParticles() {
@@ -1513,10 +1988,68 @@ function initSmartCounters() {
 }
 
 // Auto-Run
-document.addEventListener('DOMContentLoaded', initSmartCounters);
+// Consolidated into main listener
+// document.addEventListener('DOMContentLoaded', initSmartCounters);
 
 
-// --- GLOBAL EXPORTS ---
+// --- NAVIGATION LOGIC (SPA Fallback) ---
+window.navTo = function (targetId) {
+    const isSPA = document.body.dataset.mode === 'spa';
+    const sections = ['main', 'programs', 'employees', 'financial', 'hr', 'policy'];
+
+    // 1. Scrolling Logic (Always try to scroll first)
+    const el = document.getElementById(targetId);
+    if (el) {
+        if (!isSPA) {
+            // Long-scrolling behavior: Show all, just scroll
+            sections.forEach(id => {
+                const s = document.getElementById(id);
+                if (s) s.style.display = 'block';
+            });
+            el.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            // SPA behavior: Hide/Show
+            sections.forEach(id => {
+                const s = document.getElementById(id);
+                if (s) {
+                    if (id === targetId) {
+                        s.classList.add('active');
+                        s.style.display = 'block';
+                        s.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        s.classList.remove('active');
+                        s.style.display = 'none';
+                    }
+                }
+            });
+        }
+    }
+
+    // Update subnav active state
+    document.querySelectorAll('.workplace-btn').forEach(btn => {
+        if (btn.getAttribute('data-page') === targetId) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Update hash for deep linking
+    window.location.hash = targetId;
+};
+
+window.handleHash = function () {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+        window.navTo(hash);
+    }
+};
+
+window.addEventListener('popstate', window.handleHash);
+window.addEventListener('load', () => {
+    if (window.location.hash) window.handleHash();
+});
+
 // Fix: Expose toggleMobileMenu for bottom nav usage
 window.toggleMobileMenu = function () {
     // 1. Try Standard Header Toggle First
