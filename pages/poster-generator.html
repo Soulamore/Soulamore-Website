@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Group Poster Generator | Soulamore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <style>
+        :root { --deep-space: #0f172a; --teal-glow: #4ECDC4; --peach-glow: #F49F75; --gold-glow: #fbbf24; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--deep-space); color: white; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-family: 'Outfit', sans-serif; font-size: 3rem; text-align: center; margin-bottom: 40px; background: linear-gradient(135deg, var(--teal-glow), var(--peach-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .generator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+        .controls { background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: var(--teal-glow); font-weight: 600; }
+        input, select { width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: white; font-family: inherit; font-size: 1rem; }
+        input:focus, select:focus { outline: none; border-color: var(--teal-glow); }
+        .btn { background: linear-gradient(135deg, var(--teal-glow), var(--peach-glow)); color: #0f172a; border: none; padding: 14px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; width: 100%; margin-bottom: 10px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4); }
+        .poster-preview { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); }
+        #posterCanvas { width: 100%; height: auto; }
+        .size-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .size-btn { flex: 1; padding: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: white; cursor: pointer; text-align: center; }
+        .size-btn.active { background: var(--teal-glow); color: #0f172a; }
+        @media (max-width: 768px) { .generator-grid { grid-template-columns: 1fr; } h1 { font-size: 2rem; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-poster"></i> Support Group Poster Generator</h1>
+        <div class="generator-grid">
+            <div class="controls">
+                <div class="form-group"><label><i class="fas fa-users"></i> Support Group Name</label><input type="text" id="groupName" placeholder="e.g., Anxiety Support Group" value="Anxiety Support Group"></div>
+                <div class="form-group"><label><i class="fas fa-user-md"></i> Facilitator Name</label><input type="text" id="facilitatorName" placeholder="e.g., Dr. Jane Smith" value="Dr. Jane Smith"></div>
+                <div class="form-group"><label><i class="fas fa-graduation-cap"></i> Credentials</label><input type="text" id="credentials" placeholder="e.g., PhD, Clinical Psychology" value="PhD, Clinical Psychology"></div>
+                <div class="form-group"><label><i class="far fa-calendar"></i> Date</label><input type="date" id="eventDate"></div>
+                <div class="form-group"><label><i class="far fa-clock"></i> Time</label><input type="time" id="eventTime" value="19:00"></div>
+                <div class="form-group"><label><i class="fas fa-map-marker-alt"></i> Location/Platform</label><input type="text" id="location" placeholder="e.g., Online via Google Meet" value="Online via Google Meet"></div>
+                <div class="form-group"><label><i class="fas fa-qrcode"></i> Join Link URL</label><input type="url" id="joinUrl" placeholder="https://soulamore.com/join-group" value="https://soulamore.com/community/support-groups"></div>
+                <div class="size-selector"><div class="size-btn active" onclick="setSize('A4')">A4</div><div class="size-btn" onclick="setSize('A3')">A3</div><div class="size-btn" onclick="setSize('Instagram')">Instagram</div></div>
+                <button class="btn" onclick="generatePoster()"><i class="fas fa-magic"></i> Generate Poster</button>
+                <button class="btn" onclick="downloadPDF()"><i class="fas fa-download"></i> Download PDF</button>
+                <button class="btn" onclick="downloadPNG()"><i class="fas fa-image"></i> Download PNG</button>
+                <button class="btn" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+            </div>
+            <div class="poster-preview"><canvas id="posterCanvas" width="2480" height="3508"></canvas></div>
+        </div>
+    </div>
+    <script>
+        const nextWeek = new Date(); nextWeek.setDate(nextWeek.getDate() + 7); document.getElementById('eventDate').valueAsDate = nextWeek;
+        let currentSize = 'A4';
+        const sizes = { 'A4': { width: 2480, height: 3508 }, 'A3': { width: 3508, height: 4960 }, 'Instagram': { width: 1080, height: 1080 } };
+        function setSize(size) { currentSize = size; document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active'); const canvas = document.getElementById('posterCanvas'); canvas.width = sizes[size].width; canvas.height = sizes[size].height; generatePoster(); }
+        function generatePoster() {
+            const canvas = document.getElementById('posterCanvas'); const ctx = canvas.getContext('2d'); const width = canvas.width; const height = canvas.height;
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
+            const gradient = ctx.createLinearGradient(0, 0, width, height * 0.3); gradient.addColorStop(0, '#4ECDC4'); gradient.addColorStop(1, '#F49F75');
+            ctx.fillStyle = gradient; ctx.fillRect(0, 0, width, height * 0.25);
+            ctx.fillStyle = 'white'; ctx.font = `bold ${width * 0.08}px Outfit`; ctx.textAlign = 'center'; ctx.fillText('SOULAMORE', width / 2, height * 0.1);
+            ctx.font = `${width * 0.03}px Plus Jakarta Sans`; ctx.fillText('Support Groups', width / 2, height * 0.15);
+            const startY = height * 0.3; const centerX = width / 2;
+            ctx.fillStyle = '#0f172a'; ctx.font = `bold ${width * 0.05}px Outfit`; ctx.textAlign = 'center';
+            const groupName = document.getElementById('groupName').value; wrapText(ctx, groupName, centerX, startY, width * 0.8, width * 0.035);
+            ctx.fillStyle = '#4ECDC4'; ctx.font = `${width * 0.03}px Plus Jakarta Sans`;
+            const facilitator = document.getElementById('facilitatorName').value; const credentials = document.getElementById('credentials').value;
+            ctx.fillText(`Led by ${facilitator}`, centerX, startY + width * 0.035 * 2);
+            ctx.fillStyle = '#64748b'; ctx.font = `${width * 0.025}px Plus Jakarta Sans`; ctx.fillText(credentials, centerX, startY + width * 0.035 * 2.5);
+            const detailsY = startY + width * 0.035 * 4; ctx.fillStyle = '#0f172a'; ctx.font = `bold ${width * 0.04}px Outfit`; ctx.textAlign = 'left';
+            const detailsX = width * 0.15; const lineHeight = width * 0.035 * 1.5;
+            ctx.fillText('📅 Date:', detailsX, detailsY); ctx.font = `${width * 0.03}px Plus Jakarta Sans`;
+            const dateValue = document.getElementById('eventDate').value; const formattedDate = new Date(dateValue).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            ctx.fillText(formattedDate, detailsX + width * 0.15, detailsY);
+            ctx.font = `bold ${width * 0.04}px Outfit`; ctx.fillText('🕐 Time:', detailsX, detailsY + lineHeight); ctx.font = `${width * 0.03}px Plus Jakarta Sans`;
+            const timeValue = document.getElementById('eventTime').value; const [hours, minutes] = timeValue.split(':'); const hour = parseInt(hours); const ampm = hour >= 12 ? 'PM' : 'AM'; const displayHour = hour % 12 || 12;
+            ctx.fillText(`${displayHour}:${minutes} ${ampm}`, detailsX + width * 0.15, detailsY + lineHeight);
+            ctx.font = `bold ${width * 0.04}px Outfit`; ctx.fillText('📍 Location:', detailsX, detailsY + lineHeight * 2); ctx.font = `${width * 0.03}px Plus Jakarta Sans`;
+            const location = document.getElementById('location').value; ctx.fillText(location, detailsX + width * 0.15, detailsY + lineHeight * 2);
+            const qrSize = width * 0.2; const qrX = width - width * 0.25; const qrY = detailsY + lineHeight * 3;
+            ctx.fillStyle = '#000000'; ctx.fillRect(qrX, qrY, qrSize, qrSize); ctx.fillStyle = 'white'; ctx.font = `${width * 0.015}px Plus Jakarta Sans`; ctx.textAlign = 'center'; ctx.fillText('SCAN TO JOIN', qrX + qrSize / 2, qrY + qrSize / 2);
+            const footerY = height * 0.85; ctx.fillStyle = '#4ECDC4'; ctx.font = `bold ${width * 0.035}px Outfit`; ctx.textAlign = 'center'; ctx.fillText('Free • Confidential • Supportive', width / 2, footerY);
+            ctx.fillStyle = '#64748b'; ctx.font = `${width * 0.025}px Plus Jakarta Sans`; ctx.fillText('soulamore.com/support-groups', width / 2, footerY + lineHeight);
+            ctx.fillText('contact.soulamore@gmail.com', width / 2, footerY + lineHeight * 2);
+            drawBadge(ctx, width * 0.1, height * 0.85, 'FREE', width); drawBadge(ctx, width * 0.1, height * 0.85 + lineHeight * 1.5, 'CONFIDENTIAL', width);
+        }
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) { const words = text.split(' '); let line = ''; let currentY = y; for (let n = 0; n < words.length; n++) { const testLine = line + words[n] + ' '; const metrics = ctx.measureText(testLine); const testWidth = metrics.width; if (testWidth > maxWidth && n > 0) { ctx.fillText(line, x, currentY); line = words[n] + ' '; currentY += lineHeight; } else { line = testLine; } } ctx.fillText(line, x, currentY); }
+        function drawBadge(ctx, x, y, text, canvasWidth) { const badgeWidth = canvasWidth * 0.15; const badgeHeight = canvasWidth * 0.04; ctx.fillStyle = '#F49F75'; ctx.fillRect(x, y, badgeWidth, badgeHeight); ctx.fillStyle = 'white'; ctx.font = `bold ${canvasWidth * 0.015}px Plus Jakarta Sans`; ctx.textAlign = 'center'; ctx.fillText(text, x + badgeWidth / 2, y + badgeHeight * 0.7); }
+        function downloadPDF() { const canvas = document.getElementById('posterCanvas'); const link = document.createElement('a'); link.download = `soulamore-poster-${currentSize}.pdf`; link.href = canvas.toDataURL('image/png', 1.0); link.click(); if (window.notify) { window.notify('Poster downloaded! Ready to print.', 'success'); } }
+        function downloadPNG() { const canvas = document.getElementById('posterCanvas'); const link = document.createElement('a'); link.download = `soulamore-poster-${currentSize}.png`; link.href = canvas.toDataURL('image/png', 1.0); link.click(); if (window.notify) { window.notify('Poster downloaded as PNG!', 'success'); } }
+        window.addEventListener('load', generatePoster);
+        document.querySelectorAll('input').forEach(input => { input.addEventListener('input', generatePoster); });
+    </script>
+</body>
+</html>
