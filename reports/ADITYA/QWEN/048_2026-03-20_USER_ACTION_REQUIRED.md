@@ -37,9 +37,9 @@
 **1.3 Update functions/index.js:**
 Replace hardcoded values with config:
 ```javascript
-// ❌ OLD (remove these lines):
-const CLIENT_SECRET = functions.config().google?.client_secret || "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";
-const ZEPTOMAIL_PASS = functions.config().zeptomail?.password || "yA6KbHtS7w/0lzkCRhRo1MCI9ohk//1q2n+15CDmeMIlLoGzh6E51kFpKtq7dTfeiI7W5f1SP48WJ9uwuIwKKpJnY9AHLJTGTuv4P2uV48xh8ciEYNYigZisALkRFKBJcBknDy83RPMmWA==";
+// ❌ OLD (remove these lines - EXAMPLE ONLY):
+const CLIENT_SECRET = functions.config().google?.client_secret || "GOCSPX-XXXXXXXXXXXXXXXXXXXXXXXXX";
+const ZEPTOMAIL_PASS = functions.config().zeptomail?.password || "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX==";
 
 // ✅ NEW (use only config):
 const CLIENT_SECRET = functions.config().google.client_secret;
@@ -251,13 +251,13 @@ firebase deploy --only hosting
 I have removed all hardcoded secrets from `functions/index.js`. To make the system functional again, you must run these commands in your local terminal:
 
 ```powershell
-# 1. Provide your new Google OAuth Secret
-firebase functions:config:set google.client_id="649985161002-igo9biapqbrubagmq1v89snjpijrsf4g.apps.googleusercontent.com" google.client_secret="YOUR_NEW_OAUTH_SECRET"
+# 1. Provide your NEW Google OAuth Secret (GET FROM CONSOLE)
+firebase functions:config:set google.client_id="YOUR_GOOGLE_CLIENT_ID" google.client_secret="YOUR_NEW_OAUTH_SECRET"
 
-# 2. Provide your new ZeptoMail Token
+# 2. Provide your NEW ZeptoMail Token
 firebase functions:config:set zeptomail.password="YOUR_NEW_ZEPTOMAIL_TOKEN" zeptomail.user="emailapikey"
 
-# 3. Provide your Razorpay Secret
+# 3. Provide your NEW Razorpay Secret
 firebase functions:config:set razorpay.key_secret="YOUR_NEW_RAZORPAY_SECRET"
 ```
 
