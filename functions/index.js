@@ -69,9 +69,9 @@ async function verifyAuthToken(req) {
 }
 
 // 1. Initialize Google OAuth 2.0 Client
-// Use hardcoded values as fallback if environment variables are missing
-const CLIENT_ID = functions.config().google?.client_id || process.env.GOOGLE_CLIENT_ID;
-const CLIENT_SECRET = functions.config().google?.client_secret || process.env.GOOGLE_CLIENT_SECRET;
+// Secrets managed via Firebase Console (firebase functions:config:set)
+const CLIENT_ID = functions.config().google?.client_id;
+const CLIENT_SECRET = functions.config().google?.client_secret;
 // Note: Production redirect must be updated once permanent domain is confirmed for the portal callback
 const REDIRECT_URL = "https://soulamore.com/portal/google-callback.html";
 
@@ -85,8 +85,8 @@ const mailTransport = nodemailer.createTransport({
   host: "smtp.zeptomail.eu",
   port: 587,
   auth: {
-    user: functions.config().zeptomail?.user || process.env.ZEPTOMAIL_USER || "emailapikey",
-    pass: functions.config().zeptomail?.password || process.env.ZEPTOMAIL_PASSWORD
+    user: functions.config().zeptomail?.user || "emailapikey",
+    pass: functions.config().zeptomail?.password
   }
 });
 
