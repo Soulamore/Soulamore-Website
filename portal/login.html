@@ -889,13 +889,11 @@
         setRole(0);
 
         // --- 2. DEV BYPASS ---
-        // --- 2. DEV BYPASS ---
         function handleDevBypass(event) {
             if (event) event.preventDefault(); // FIX: Prevent form submission/reload
 
             const intent = sessionStorage.getItem('loginIntent') || 'user';
-            const btn = document.querySelector('button[onclick="handleDevBypass()"]'); // This selector might fail if not exact match in DOM
-            // Better: use event.target if available
+            const btn = event.target; // FIX: Use event.target instead of querySelector
             if (btn) btn.innerHTML = 'Entered Dev Mode...';
 
             // Mock Data based on Role
@@ -906,12 +904,14 @@
                 isDev: true
             };
 
-            // NEW: Create valid session compatible with auth-guard.js
+            // FIXED: Create valid session compatible with auth-guard.js (added name and photoURL with absolute path)
             const session = {
                 isLoggedIn: true,
                 userId: 'dev-' + intent,
                 role: intent,
-                email: intent + '@soulamore.dev'
+                email: intent + '@soulamore.dev',
+                name: 'Dev ' + intent.charAt(0).toUpperCase() + intent.slice(1),
+                photoURL: '/assets/images/default-avatar.png'  // FIXED: Absolute path
             };
 
             localStorage.setItem('soulamore_session', JSON.stringify(session));

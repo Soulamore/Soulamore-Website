@@ -722,9 +722,9 @@ html.light-mode {
     --text-main: #0f172a;      /* 16.1:1 contrast */
     --text-primary: #0f172a;   /* 16.1:1 contrast */
     --text-secondary: #334155; /* 7.6:1 contrast (was #475569) */
-    --text-soft: #64748b;      /* 5.0:1 contrast (was #64748b - OK) */
-    --text-muted: #475569;     /* 6.0:1 contrast (was #64748b) */
-    --border-subtle: #94a3b8;  /* 6.0:1 contrast (was #cbd5e1) */
+    --text-soft: #64748b;      /* 5.0:1 contrast */
+    --text-muted: #475569;     /* 6.0:1 contrast */
+    --border-subtle: #94a3b8;  /* 6.0:1 contrast */
     --border-strong: #64748b;  /* 10.5:1 contrast */
     --teal-dim: rgba(45, 212, 191, 0.2);
     /* Override Gradient */
@@ -749,15 +749,18 @@ body.light-mode .dash-card:hover {
     transform: translateY(-2px);
 }
 
-/* Light Mode Sidebar Enhancement */
+/* Light Mode Sidebar Enhancement - FIXED TEXT CONTRAST (C1) */
 body.light-mode .sidebar {
     background: #ffffff !important;
     border-right: 1px solid #e2e8f0 !important;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05) !important;
 }
 
-body.light-mode .side-link {
-    color: #334155 !important;
+body.light-mode .sidebar .user-info-text .name,
+body.light-mode .sidebar .user-info-text .role,
+body.light-mode .sidebar .nav-link,
+body.light-mode .sidebar .side-link {
+    color: #1e293b !important;  /* 10.8:1 contrast - FIXED */
 }
 
 body.light-mode .side-link:hover {
@@ -822,14 +825,19 @@ body.light-mode a:hover {
     text-decoration-thickness: 2px !important;
 }
 
-/* Mobile Enhancements for Light Mode */
+/* Mobile Enhancements for Light Mode - FIXED TOUCH TARGETS (C8) */
 @media (max-width: 768px) {
     body.light-mode .btn-dash-primary,
     body.light-mode .btn-primary,
-    body.light-mode button {
-        min-height: 48px !important;
-        min-width: 44px !important;
+    body.light-mode button,
+    body.light-mode .nav-icon-btn,
+    body.light-mode .mobile-toggle,
+    body.light-mode .side-link,
+    body.light-mode .action-row {
+        min-height: 48px !important;  /* WCAG 48px minimum */
+        min-width: 44px !important;   /* WCAG 44px minimum */
         padding: 14px 20px !important;
+        font-size: 16px !important;   /* Prevents iOS zoom */
     }
 
     body.light-mode .nav-icon-btn,
@@ -842,6 +850,14 @@ body.light-mode a:hover {
     body.light-mode .side-link {
         padding: 16px 20px !important;
         font-size: 1rem !important;
+    }
+
+    /* Ensure all clickable elements meet WCAG requirements */
+    body.light-mode a,
+    body.light-mode [role="button"] {
+        min-height: 44px !important;
+        display: inline-flex;
+        align-items: center;
     }
 }
 
