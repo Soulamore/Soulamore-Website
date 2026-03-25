@@ -329,10 +329,13 @@ export async function confirmBooking(bookingId, paymentId, paymentData) {
             updatedAt: serverTimestamp()
         });
 
-        // Also create payment record
+        // Also create payment record with explicit ownership for security rules
+        const bData = bookingSnap.data();
         await addDoc(collection(db, PAYMENTS_COLLECTION), {
             bookingId: bookingId,
             paymentId: paymentId,
+            userId: bData.userId || null,
+            peerId: bData.peerId || null,
             amount: paymentData.amount,
             currency: paymentData.currency || "INR",
             gateway: paymentData.gateway || "razorpay",

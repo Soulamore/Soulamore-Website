@@ -6,24 +6,70 @@
 import { db, doc, getDoc } from "./firebase-config.js";
 import { getUserProfile } from "./profile-handler.js";
 
+const HARDCODED_ROLE_OVERRIDES = {
+    'admin@soulamore.com': 'admin'
+};
+
+function normalizeRoleValue(role) {
+    const normalized = (role || '').toString().trim().toLowerCase();
+
+    if (normalized === 'member' || normalized === 'user') {
+        return 'user';
+    }
+
+    if (normalized === 'peer' || normalized === 'psychologist' || normalized === 'admin') {
+        return normalized;
+    }
+
+    return '';
+}
+
 /**
  * Get user role - checks both roles collection and users collection
  * @param {string} userId - User ID
+ * @param {string} userEmail - User email, used for centralized overrides
  * @returns {Promise<{role: string, isPeer: boolean, isPsychologist: boolean, isUser: boolean}>}
  */
-export async function getUserRole(userId) {
+export async function getUserRole(userId, userEmail = '') {
+    let isPeer = false;
+    let isPsychologist = false;
+    let displayRole = 'Member';
+
+    const emailOverride = HARDCODED_ROLE_OVERRIDES[(userEmail || '').toLowerCase()];
+    if (emailOverride) {
+        console.warn('Applying centralized role override:', { email: userEmail, role: emailOverride });
+        return {
+            role: emailOverride,
+            displayRole: emailOverride === 'admin' ? 'Admin' : emailOverride,
+            isPeer: emailOverride === 'peer',
+            isPsychologist: emailOverride === 'psychologist',
+            isUser: emailOverride === 'user',
+            verified: true
+        };
+    }
+
     try {
-        // Check roles collection for verification flags
-        const roleDocRef = doc(db, 'roles', userId);
-        const roleDoc = await getDoc(roleDocRef);
-        
-        const rolesData = roleDoc.exists() ? roleDoc.data() : {};
-        const isPeer = rolesData.peer === true;
-        const isPsychologist = rolesData.psychologist === true;
-        
-        // Check users collection for display role
-        const userProfile = await getUserProfile(userId);
-        const displayRole = userProfile?.role || 'Member';
+        // 1. Try checking roles collection for verification flags
+        try {
+            const roleDocRef = doc(db, 'roles', userId);
+            const roleDoc = await getDoc(roleDocRef);
+            if (roleDoc.exists()) {
+                const rolesData = roleDoc.data();
+                isPeer = rolesData.peer === true;
+                isPsychologist = rolesData.psychologist === true;
+            }
+        } catch (roleError) {
+            console.warn('Role collection read failed (likely permissions):', roleError.message);
+            // Non-fatal, continue to user profile
+        }
+
+        // 2. Try checking users collection for display role
+        try {
+            const userProfile = await getUserProfile(userId);
+            displayRole = userProfile?.role || 'Member';
+        } catch (profileError) {
+            console.warn('User profile read failed:', profileError.message);
+        }
         
         // Determine primary role
         let primaryRole = 'user';
@@ -31,9 +77,11 @@ export async function getUserRole(userId) {
             primaryRole = 'psychologist';
         } else if (isPeer) {
             primaryRole = 'peer';
-        } else if (displayRole && displayRole.toLowerCase() !== 'member') {
-            // Use display role if it's set and not just 'Member'
-            primaryRole = displayRole.toLowerCase();
+        } else {
+            const normalizedDisplayRole = normalizeRoleValue(displayRole);
+            if (normalizedDisplayRole) {
+                primaryRole = normalizedDisplayRole;
+            }
         }
         
         return {
@@ -44,9 +92,9 @@ export async function getUserRole(userId) {
             isUser: !isPeer && !isPsychologist,
             verified: isPeer || isPsychologist
         };
-    } catch (error) {
-        console.error('Error getting user role:', error);
-        // Default to user if error
+    } catch (criticalError) {
+        console.error('Critical error in getUserRole:', criticalError);
+        // Absolute fallback
         return {
             role: 'user',
             displayRole: 'Member',

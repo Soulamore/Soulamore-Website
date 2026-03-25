@@ -589,12 +589,12 @@ try {
         .news-toggle-pill {
             position: fixed !important;
             bottom: 42px !important; /* Exactly between ticker and Audio Control (80px) */
-            left: 30px !important;   /* Exact X-axis alignment with Audio Control */
-            background: rgba(255, 255, 255, 0.08) !important; 
+            right: 30px !important;   /* Right side to avoid sidebar conflict */
+            background: rgba(255, 255, 255, 0.08) !important;
             backdrop-filter: blur(10px) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             padding: 5px 12px !important; /* Reduced padding closely matching audio */
-            border-radius: 50px !important; 
+            border-radius: 50px !important;
             display: flex !important;
             align-items: center !important;
             gap: 8px !important; /* Tighter gap */
@@ -602,7 +602,7 @@ try {
             z-index: 99999 !important;
             transition: all 0.3s ease !important;
             user-select: none !important;
-            box-shadow: none !important; 
+            box-shadow: none !important;
             height: 32px !important; /* Forced strict height to prevent bloat */
             box-sizing: border-box !important;
         }
@@ -672,6 +672,12 @@ try {
                 left: auto !important;
                 right: 20px !important;
             }
+        }
+
+        /* Hide news toggle pill on portal/dashboard pages */
+        body.portal-page .news-toggle-pill,
+        body.dashboard-page .news-toggle-pill {
+            display: none !important;
         }
     `;
     document.head.appendChild(style);
@@ -1029,6 +1035,11 @@ const getFooterHTML = (rootPath) => `
 // --- 4. INJECTION LOGIC ---
 
 function injectHeader() {
+    // Performance: Check if already injected
+    if (document.querySelector('header.island-nav .nav-links')) {
+        return; // Already injected, skip
+    }
+
     // 0. Safety Guard: Do not inject on Admin/Portal Dashboards that have their own sidebar
     const path = window.location.pathname.toLowerCase();
     const isAuthPage = ['login', 'signup', 'forgot', 'reset', 'logout'].some(term => path.includes(term));
@@ -1042,7 +1053,6 @@ function injectHeader() {
 
     // 1. Auto-Create Header if Missing (Robustness)
     if (!headerElement) {
-        console.log("Soulamore: No <header> found, creating one...");
         headerElement = document.createElement('header');
         document.body.prepend(headerElement);
     } else {
@@ -1077,10 +1087,10 @@ function injectHeader() {
             style.id = 'header-responsive-style';
             style.innerHTML = `
                 @media (min-width: 1025px) {
-                    .mobile-profile-card, 
+                    .mobile-profile-card,
                     .mobile-toggle,
-                    .mobile-only-help { 
-                        display: none !important; 
+                    .mobile-only-help {
+                        display: none !important;
                     }
                 }
                 @media (max-width: 1024px) {
@@ -1089,6 +1099,16 @@ function injectHeader() {
                 }
             `;
             document.head.appendChild(style);
+        }
+
+        // Performance: Log injection time
+        if (window.performance && performance.mark) {
+            performance.mark('header-injected');
+            performance.measure('header-injection', 'navigationStart', 'header-injected');
+            const measure = performance.getEntriesByName('header-injection')[0];
+            if (measure && measure.duration > 100) {
+                console.warn(`⚠️ Slow header injection: ${measure.duration.toFixed(2)}ms`);
+            }
         }
     }
 }
@@ -1163,6 +1183,13 @@ window.toggleNewsFeed = function () {
 
 function injectNewsToggle() {
     if (document.querySelector('.news-toggle-pill')) return;
+
+    // Skip news toggle on portal/dashboard pages
+    if (document.body.classList.contains('portal-page') ||
+        document.body.classList.contains('dashboard-page') ||
+        window.location.pathname.includes('/portal/')) {
+        return;
+    }
 
     const pill = document.createElement('div');
     pill.className = 'news-toggle-pill';
@@ -1337,30 +1364,40 @@ function injectCookieBanner() {
 
 // Auto-run subnav and other injections on load
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Core Structural Injections
-    injectHeader(); // RESTORED
-    injectFooter(); // RESTORED
-    injectSubnav();
-    injectFavicon();
+    void (async () => {
+        try {
+            const { redirectIfMaintenanceActive } = await import('./maintenance-mode.js');
+            const redirected = await redirectIfMaintenanceActive({ role: 'guest' });
+            if (redirected) return;
+        } catch (error) {
+            console.warn("Maintenance check skipped in components shell:", error.message);
+        }
 
-    // 2. Interaction & Logic Binding
-    initializeHeaderLogic();
-    bindMobileToggle();
-    injectSoulBotWidget();
-    injectCookieBanner();
-    injectNewsTicker(); // NEW: Injected directly to body for z-index dominance
-    injectNewsToggle(); // NEW: Floating control pill
-    applyNewsFeedStatus(getSavedNewsFeedStatus());
-    ensureNewsRenderer();
+        // 1. Core Structural Injections
+        injectHeader(); // RESTORED
+        injectFooter(); // RESTORED
+        injectSubnav();
+        injectFavicon();
 
-    // 3. Animation & Features
-    initParticles();
-    injectMobileBottomNav();
-    setActiveState();
-    initSmartCounters();
+        // 2. Interaction & Logic Binding
+        initializeHeaderLogic();
+        bindMobileToggle();
+        injectSoulBotWidget();
+        injectCookieBanner();
+        injectNewsTicker(); // NEW: Injected directly to body for z-index dominance
+        injectNewsToggle(); // NEW: Floating control pill
+        applyNewsFeedStatus(getSavedNewsFeedStatus());
+        ensureNewsRenderer();
 
-    // 4. Interaction Initialization (MANDATORY)
-    // Note: Removed duplicate bindMobileToggle and initializeHeaderLogic calls
+        // 3. Animation & Features
+        initParticles();
+        injectMobileBottomNav();
+        setActiveState();
+        initSmartCounters();
+
+        // 4. Interaction Initialization (MANDATORY)
+        // Note: Removed duplicate bindMobileToggle and initializeHeaderLogic calls
+    })();
 });
 
 /**

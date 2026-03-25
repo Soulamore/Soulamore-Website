@@ -2,121 +2,101 @@
 /**
  * auth-context.js
  * Handles role verification and routing after successful Firebase Auth.
+ * Uses RoleHelper as source of truth.
  */
 
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db, doc, getDoc } from "./firebase-config.js";
+import { getUserRole } from "./role-helper.js";
 
 export async function handleRoleRouting(user, intent, isNewUser = false) {
-    // Role routing after successful authentication
+    console.log('[AuthContext] handleRoleRouting called');
+    console.log('[AuthContext] User:', user.email, user.uid);
+    console.log('[AuthContext] Intent:', intent);
 
-    // --- NEW: Persistent Session Logic (Admin Request Jan 18) ---
+    // --- Persistent Session Logic ---
     const session = {
         isLoggedIn: true,
         userId: user.uid,
-        role: intent, // Default role, verified below
+        role: 'user', // Will be updated from RoleHelper
         email: user.email
     };
 
     // Helper to commit session and redirect
     const finalizeSession = (role, dashboardFile) => {
         session.role = role;
+
+        // Ensure name and photo are in session for the UI
+        session.name = user.displayName || user.email?.split('@')[0] || 'User';
+        session.photoURL = user.photoURL || '../assets/images/default-avatar.png';
+
         localStorage.setItem("soulamore_session", JSON.stringify(session));
 
-        // FIX: Handle Relative Paths (Root vs Portal)
+        // Use absolute path from root to avoid 404
         let finalPath = dashboardFile;
-        const isInPortal = window.location.pathname.includes('/portal/');
-
-        if (isInPortal) {
-            // If already in portal, remove 'portal/' prefix if present
-            finalPath = dashboardFile.replace('portal/', '');
-        } else {
-            // If at root, ensure 'portal/' prefix is present
-            if (!finalPath.startsWith('portal/')) {
-                finalPath = 'portal/' + finalPath;
-            }
+        if (!finalPath.startsWith('/')) {
+            finalPath = '/' + finalPath;
+        }
+        if (!finalPath.startsWith('/portal/')) {
+            finalPath = '/portal' + finalPath.replace(/^\//, '');
         }
 
         console.log(`✅ Session Created for [${role}]. Redirecting to ${finalPath}...`);
-        window.location.href = finalPath;
+        window.location.replace(finalPath);
     };
 
     // 0. NEW USER ONBOARDING (First time login)
     if (isNewUser && intent === 'user') {
         const confirmMsg = "Welcome to Soulamore! Would you like to complete your profile now?";
         if (confirm(confirmMsg)) {
-            // Redirect to Profile for completion
-            // Assuming profile.html handles it, or pass a query param ?mode=edit
-            // Using same path logic as finalizeSession but different target
-            let profilePath = 'portal/user-dashboard.html?showProfile=true'; // Sending to dashboard but triggering profile view
-            if (window.location.pathname.includes('/portal/')) {
-                profilePath = 'user-dashboard.html?showProfile=true';
-            }
-            finalizeSession('user', profilePath);
+            finalizeSession('user', '/portal/user-dashboard.html?showProfile=true');
             return;
         }
     }
 
-    // 1. HARDCODED BYPASSES (Emergency Override)
-    const normalizedEmail = (user.email || '').toLowerCase();
-    
-    // Admin Override
-    if (normalizedEmail === 'admin@soulamore.com') {
-        console.log('[AuthContext] Hardcoded Admin detected.');
-        sessionStorage.setItem('userRole', 'admin');
-        finalizeSession('admin', 'portal/admin-dashboard.html');
-        return;
-    }
-
-    // Peer Test (Sonika)
-    if (normalizedEmail === 'sonikakundal2002@gmail.com') {
-        console.log('[AuthContext] Hardcoded Peer (Sonika) detected.');
-        sessionStorage.setItem('userRole', 'peer');
-        finalizeSession('peer', 'portal/peer-dashboard.html');
-        return;
-    }
-
     try {
-        // 2. FIRESTORE ROLE VERIFICATION (Primary Source of Truth)
-        const db = getFirestore();
-        const roleDocRef = doc(db, 'roles', user.uid);
-        const roleDoc = await getDoc(roleDocRef);
-        const roleData = roleDoc.exists() ? roleDoc.data() : {};
+        // 2. ROBUST ROLE VERIFICATION - Use RoleHelper
+        console.log('[AuthContext] Fetching robust role via RoleHelper...');
+        const roleInfo = await getUserRole(user.uid, user.email);
+        const role = roleInfo.role;
+        const displayRole = roleInfo.displayRole;
 
-        // A. SYSTEM ADMIN FLAG
-        if (roleData.admin === true || intent === 'admin') {
-            sessionStorage.setItem('userRole', 'admin');
+        console.log('[AuthContext] Role detected:', role, '| Display:', displayRole);
+
+        // Fetch user doc for setup status
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        const userData = userDoc.exists() ? userDoc.data() : {};
+
+        // Route based on role
+        if (role === 'admin') {
             finalizeSession('admin', 'portal/admin-dashboard.html');
             return;
         }
 
-        // B. PEER ROLE FLAG (or intent with existing flag)
-        if (roleData.peer === true || intent === 'peer') {
-            if (roleData.peer === true) {
-                sessionStorage.setItem('userRole', 'peer');
+        if (role === 'peer') {
+            if (userData.isSetupComplete) {
                 finalizeSession('peer', 'portal/peer-dashboard.html');
-            } else if (intent === 'peer') {
-                alert("Status: Application Pending. You are not yet verified as a Peer. Redirecting to User Dashboard.");
-                finalizeSession('user', 'portal/user-dashboard.html');
+            } else {
+                finalizeSession('peer', 'portal/peer-setup.html');
             }
             return;
         }
 
-        // C. PSYCHOLOGIST ROLE FLAG
-        if (roleData.psychologist === true || intent === 'psychologist') {
-            if (roleData.psychologist === true) {
-                sessionStorage.setItem('userRole', 'psychologist');
+        if (role === 'psychologist') {
+            if (userData.isSetupComplete) {
                 finalizeSession('psychologist', 'portal/psych-dashboard.html');
-            } else if (intent === 'psychologist') {
-                alert("Status: Not Verified. Professional access restricted. Redirecting to User Dashboard.");
-                finalizeSession('user', 'portal/user-dashboard.html');
+            } else {
+                finalizeSession('psychologist', 'portal/psych-setup.html');
             }
             return;
         }
+
+        // Default: user dashboard
+        finalizeSession('user', 'portal/user-dashboard.html');
 
     } catch (error) {
-        console.error('[AuthContext] Role verification error:', error);
+        console.error('[AuthContext] Routing Error:', error);
+        // Fallback to user dashboard on error
+        finalizeSession('user', 'portal/user-dashboard.html');
     }
-
-    // 3. DEFAULT: USER DASHBOARD
-    finalizeSession('user', 'portal/user-dashboard.html');
 }

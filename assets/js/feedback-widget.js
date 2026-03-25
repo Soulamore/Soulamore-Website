@@ -3,7 +3,8 @@
  * Floating feedback button with modal for user feedback
  */
 
-import { db, collection, addDoc } from '../assets/js/firebase-config.js';
+import { db } from './firebase-config.js';
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Widget state
 let isWidgetInitialized = false;

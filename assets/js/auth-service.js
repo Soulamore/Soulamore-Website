@@ -3,6 +3,7 @@
  * Handles Google Login, Email/Pass Login, and User Session.
  */
 import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, linkWithCredential, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, EmailAuthProvider, db, doc, setDoc, getDoc, serverTimestamp } from "./firebase-config.js";
+import { getUserRole as getCanonicalUserRole } from "./role-helper.js";
 
 /**
  * Create a basic user profile in Firestore
@@ -34,6 +35,22 @@ async function createUserProfile(user, additionalData = {}) {
     } catch (error) {
         console.error("❌ Error creating user profile:", error);
         return false;
+    }
+}
+
+/**
+ * Get User Role
+ * Abstracts the Firestore read for role checking.
+ * Phase 3 will modify this to check Custom Claims instead of Firestore.
+ */
+export async function getUserRole(uid, email = '') {
+    if (!uid) return 'user';
+    try {
+        const roleInfo = await getCanonicalUserRole(uid, email);
+        return roleInfo.role || 'user';
+    } catch (error) {
+        console.error("❌ Error fetching user role:", error);
+        return 'user';
     }
 }
 
@@ -102,8 +119,31 @@ export async function logoutUser() {
     try {
         await signOut(auth);
         // localStorage.removeItem('user_role'); // Legacy
-        localStorage.removeItem('soulamore_session'); // Core Session
-        sessionStorage.clear(); // Clear all temp data
+        // Clear authentication data
+        localStorage.removeItem('soulamore_session');
+        localStorage.removeItem('user_role');
+        localStorage.removeItem('authToken');
+        sessionStorage.clear();
+
+        // Force Firebase to clear auth state (Legacy/Persistent keys)
+        const firebaseKeysToRemove = [
+            'firebase:authUser',
+            'firebase:authToken',
+            'firebase:authExpiration'
+        ];
+
+        Object.keys(localStorage).forEach(key => {
+            if (firebaseKeysToRemove.some(fk => key.includes(fk))) {
+                localStorage.removeItem(key);
+            }
+        });
+
+        console.log('✅ Auth cache cleared');
+
+        // Redirect immediately to logout confirmation page
+        const isPortal = window.location.pathname.includes('/portal/');
+        window.location.href = isPortal ? 'logged-out.html' : 'portal/logged-out.html';
+
         return { success: true };
     } catch (error) {
         console.error("Logout Error:", error);

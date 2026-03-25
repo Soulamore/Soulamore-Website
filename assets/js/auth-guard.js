@@ -10,31 +10,23 @@
     const currentPath = window.location.pathname.toLowerCase();
     const LOGIN_URL = '../portal/login.html';
 
-    // Dashboard role requirements
+    // Dashboard role requirements - STRICT ENFORCEMENT
     const ROLE_RULES = {
-        'user-dashboard': ['user', 'member', 'peer', 'psychologist', 'admin'],
+        'user-dashboard': ['user', 'member'],
         'peer-dashboard': ['peer'],
         'psych-dashboard': ['psychologist'],
         'admin-dashboard': ['admin']
     };
 
-    // Get user's role from Firestore
-    async function getUserRole(uid) {
+    // Get user's role via RoleHelper (Standardized)
+    async function getUserRole(uid, email) {
         try {
-            const { getFirestore, doc, getDoc } = await import('./firebase-config.js');
-            const db = getFirestore();
-            const userDoc = await getDoc(doc(db, 'users', uid));
-
-            if (userDoc.exists()) {
-                const role = userDoc.data().role?.toLowerCase() || 'user';
-                console.log('✅ User role loaded:', role);
-                return role;
-            }
-
-            console.warn('⚠️ No user profile found');
-            return 'user';
+            const { getUserRole: getRobustRole } = await import('./role-helper.js');
+            const roleInfo = await getRobustRole(uid, email);
+            console.log('✅ User role loaded via RoleHelper:', roleInfo.role);
+            return roleInfo.role;
         } catch (err) {
-            console.error('❌ Error loading role:', err);
+            console.error('❌ Error loading role via RoleHelper:', err);
             return 'user';
         }
     }
@@ -43,30 +35,32 @@
     function redirectToDashboard(role) {
         const roleLower = role.toLowerCase();
 
-        // Map roles to dashboard URLs
+        // Map roles to dashboard URLs (absolute paths)
         const dashboardMap = {
-            'admin': '../portal/admin-dashboard.html',
-            'psychologist': '../portal/psych-dashboard.html',
-            'peer': '../portal/peer-dashboard.html',
-            'user': '../portal/user-dashboard.html',
-            'member': '../portal/user-dashboard.html'
+            'admin': '/portal/admin-dashboard.html',
+            'psychologist': '/portal/psych-dashboard.html',
+            'peer': '/portal/peer-dashboard.html',
+            'user': '/portal/user-dashboard.html',
+            'member': '/portal/user-dashboard.html'
         };
 
         const targetDashboard = dashboardMap[roleLower] || dashboardMap['user'];
-        const currentDashboard = window.location.pathname;
+
+        // Compare by filename to avoid relative vs absolute path mismatches
+        const currentFile = window.location.pathname.split('/').pop();
+        const targetFile = targetDashboard.split('/').pop();
 
         // Only redirect if not already on correct dashboard
-        if (!currentDashboard.includes(targetDashboard)) {
+        if (currentFile !== targetFile) {
             console.log('🔄 Redirecting to', roleLower, 'dashboard:', targetDashboard);
-            window.location.href = targetDashboard;
+            window.location.replace(targetDashboard);
         }
     }
 
     // Main auth check
     async function runAuthCheck() {
         try {
-            const { getAuth, onAuthStateChanged } = await import('./firebase-config.js');
-            const auth = getAuth();
+            const { auth, onAuthStateChanged } = await import('./firebase-config.js');
 
             onAuthStateChanged(auth, async (user) => {
                 if (!user) {
@@ -78,21 +72,37 @@
                 console.log('✅ User authenticated:', user.email);
 
                 // Get user's role from Firestore
-                const role = await getUserRole(user.uid);
+                const role = await getUserRole(user.uid, user.email);
 
-                // Store role in session storage for quick access
-                sessionStorage.setItem('userRole', role);
+                // Store role in localStorage for quick access (single source of truth)
+                const session = JSON.parse(localStorage.getItem('soulamore_session') || '{}');
+                if (session.role !== role) {
+                    session.role = role;
+                    localStorage.setItem('soulamore_session', JSON.stringify(session));
+                }
 
-                // Check if user is on the correct dashboard for their role
+                try {
+                    const { redirectIfMaintenanceActive } = await import('./maintenance-mode.js');
+                    const redirectedForMaintenance = await redirectIfMaintenanceActive({ role });
+                    if (redirectedForMaintenance) {
+                        console.warn('Maintenance mode active. Redirecting non-admin user.');
+                        return;
+                    }
+                } catch (maintenanceError) {
+                    console.warn('Maintenance check failed inside auth guard:', maintenanceError.message);
+                }
+
+                // 🔄 IMMEDIATE REDIRECT: Check if user is on correct dashboard
                 let currentPage = '';
                 for (const [pageKey, allowedRoles] of Object.entries(ROLE_RULES)) {
                     if (currentPath.includes(pageKey)) {
                         currentPage = pageKey;
 
-                        // Check if user's role is allowed on this page
+                        // Check if user's role matches this dashboard
                         if (!allowedRoles.includes(role.toLowerCase())) {
-                            console.warn('⛔ Role', role, 'not allowed on', pageKey);
+                            console.warn('⛔ Role', role, 'not allowed on', pageKey, '- Redirecting to', role, 'dashboard');
                             redirectToDashboard(role);
+                            return; // Exit immediately
                         } else {
                             console.log('✅ Access granted to', pageKey, 'for role:', role);
                         }

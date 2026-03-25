@@ -55,7 +55,7 @@ You should see `soulamore-f0a64` in the list.
 
 ## After Installation: Execute the 5 Steps
 
-Once Node.js and Firebase CLI are installed, follow the steps in `docs/SETUP_STATUS.md` or run:
+Once Node.js and Firebase CLI are installed, follow the steps in `reports/ADITYA/QWEN/113_2026-03-25_SETUP_STATUS_REPORT.md` or run:
 
 ```bash
 # Step 1: Install dependencies

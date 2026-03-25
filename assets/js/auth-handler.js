@@ -4,7 +4,8 @@
  */
 
 import { auth } from "./firebase-config.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { onAuthStateChanged, signOut } from "./firebase-config.js";
+import { logoutUser } from "./auth-service.js";
 import { createOrUpdateUserProfile } from "./profile-handler.js";
 
 // Initialize auth state
@@ -33,23 +34,19 @@ onAuthStateChanged(auth, async (user) => {
 
 // Update UI based on auth state
 function updateAuthUI(user) {
-    // Keep navigation links correct from any subdirectory by
-    // deriving the same root prefix used by components.js.
+    // Keep navigation links correct from any subdirectory
     function getRootPath() {
         const script = document.querySelector('script[src*="components.js"]');
         if (script) {
             const src = script.getAttribute('src');
             if (src) return src.split('assets/js/components')[0];
         }
-        // Fallback: assume we're at site root
         return '';
     }
 
-    // Wait a bit for header to be rendered
-    setTimeout(() => {
-        // Update login/signup button
-        const loginBtn = document.querySelector('.nav-btn, a[href*="login.html"]');
-        const userIconBtn = document.querySelector('.user-icon-btn');
+    // IMMEDIATE UPDATE (No setTimeout)
+    const loginBtn = document.querySelector('.nav-btn, a[href*="login.html"]');
+    const userIconBtn = document.querySelector('.user-icon-btn');
 
         if (user) {
             // User is logged in
@@ -87,7 +84,6 @@ function updateAuthUI(user) {
                 userIconBtn.innerHTML = '<i class="fas fa-ghost"></i>';
             }
         }
-    }, 100);
 }
 
 // Show user menu dropdown
@@ -157,9 +153,8 @@ function showUserMenu(user) {
     // Handle logout
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
-            await signOut(auth);
+            await logoutUser();
             menu.remove();
-            window.location.reload();
         } catch (error) {
             console.error('Error signing out:', error);
             alert('Failed to sign out: ' + error.message);
