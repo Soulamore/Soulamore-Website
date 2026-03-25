@@ -4,33 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; 
-                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com; 
-                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; 
-                 font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; 
-                 img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com; 
-                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/; 
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com;
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+                 font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+                 img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
+                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://analytics.google.com https://www.google-analytics.com https://region1.google-analytics.com;
                  frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
-    <!-- AUTH GUARD: Protects this page (Using permissive guard to prevent flicker) -->
+    <!-- AUTH GUARD: Protects this page -->
+    <script src="../assets/js/portal-utils.js"></script>
     <script src="../assets/js/auth-guard.js"></script>
-    <script>
-        // Pre-initialized Global logout function
-        window.handleLogout = async function() {
-            if (!confirm('Are you sure you want to log out?')) return;
-            console.log('🚪 Logging out...');
-            try {
-                sessionStorage.clear();
-                localStorage.removeItem('soulamore_session');
-                const { getAuth } = await import('../assets/js/firebase-config.js');
-                const auth = getAuth();
-                await auth.signOut();
-                window.location.href = 'login.html';
-            } catch (error) {
-                console.error('❌ Logout error:', error);
-                window.location.href = 'login.html';
-            }
-        };
-    </script>
     <script>
         /* --- TOOL MODAL LOGIC (Global) --- */
         function openTool(url, title) {
@@ -65,6 +48,7 @@
     <link rel="stylesheet" href="../assets/css/dashboard-sidebar.css">
     <link rel="stylesheet" href="../assets/css/dashboard-themes.css">
     <link rel="stylesheet" href="../assets/css/portal-shared.css">
+    <link rel="stylesheet" href="../assets/css/dashboard-loading.css">
     <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
     <!-- FORCE COLOR OVERRIDE: Resolve Black Screen Issue -->
     <!-- DYNAMIC COLOR FIX (Handled by portal-shared.css and global.css) -->
@@ -78,6 +62,42 @@
 </head>
 
 <body>
+    <!-- USER LOADING SCREEN (Safe Earth Theme) -->
+    <div id="user-loading-screen" class="dashboard-loading user-theme">
+        <div class="loading-particles">
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+        </div>
+        <div class="loading-breath-circle">
+            <span style="font-size:2rem;">🌿</span>
+        </div>
+        <div class="loading-text-container">
+            <div class="loading-title" id="user-loading-title">Welcome Back</div>
+            <div class="loading-subtitle" id="user-loading-subtitle">Preparing your safe space...</div>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar" id="user-loading-progress"></div>
+        </div>
+        <div class="loading-tips">
+            <div class="loading-tip-icon" id="user-loading-tip-icon">🌿</div>
+            <div class="loading-tip-text" id="user-loading-tip-text">Your safe space is being prepared...</div>
+        </div>
+    </div>
+    <script>
+        // Auto-hide loading screen after content loads (with 10s safety timeout)
+        window.hideUserLoader = function() {
+            const screen = document.getElementById('user-loading-screen');
+            if (screen) {
+                console.log('🌿 Hiding user loader...');
+                screen.classList.add('hidden');
+                setTimeout(() => screen.style.display = 'none', 500);
+            }
+        };
+    </script>
+
     <!-- TOOL FRAME MODAL (Existing) -->
     <div id="toolModal" class="tool-modal-overlay">
         <div class="tool-modal-content">
@@ -133,7 +153,7 @@
                 <div class="user-avatar-lg"><i class="fas fa-user-astronaut"></i></div>
                 <div class="user-info-text">
                     <div class="name" id="sidebar-name">Loading...</div>
-                    <div class="role" id="sidebar-role">Member</div>
+                    <div class="role" id="sidebar-role" data-hardcoded-role="Member">Member</div>
                 </div>
             </div>
             <div class="sidebar-nav"><a href="#" class="side-link active" onclick="switchView('home', this)"
@@ -1023,25 +1043,22 @@
 
                     ];
 
-                    // To test empty state, uncomment:
-                    // const entries = [];
-
                     // Get elements safely
-                    const list = document.getElementById('journal-list');
-                    const empty = document.getElementById('journal-empty');
+                    const journalList = document.getElementById('journal-list');
+                    const journalEmpty = document.getElementById('journal-empty');
 
-                    if (!list || !empty) {
+                    if (!journalList || !journalEmpty) {
                         console.warn('⚠️ Journal sidebar elements not found');
                         return;
                     }
 
                     if (!entries || entries.length === 0) {
-                        list.style.display = 'none';
-                        empty.style.display = 'block';
+                        journalList.style.display = 'none';
+                        journalEmpty.style.display = 'block';
                     } else {
-                        list.style.display = 'flex';
-                        empty.style.display = 'none';
-                        list.innerHTML = '';
+                        journalList.style.display = 'flex';
+                        journalEmpty.style.display = 'none';
+                        journalList.innerHTML = '';
 
                         entries.forEach(e => {
                             const div = document.createElement('div');
@@ -1215,8 +1232,9 @@
                         const sbName = document.getElementById('sidebar-name');
                         if (sbName) sbName.innerText = name;
 
-                        const sbRole = document.getElementById('sidebar-role');
-                        if (sbRole) sbRole.innerText = (profile.role || 'Member');
+                        // Sidebar role is HARDCODED in HTML - do not overwrite from Firestore
+                        // const sbRole = document.getElementById('sidebar-role');
+                        // if (sbRole) sbRole.innerText = (profile.role || 'Member');
 
                         // Primary profile card
                         const inName = document.getElementById('profile-name');
@@ -1746,13 +1764,21 @@
             // Load sidebar name and role
             await loadUserProfile(user.uid);
 
-            // Load dynamic data
-            loadUserStats(user.uid);
-            loadUserConfessions(user.uid);
-            loadUserSavedItems(user.uid);
-            loadUserSessions(user.uid);
-            loadUserWallet(user.uid);
-            loadUpcomingSessions(user.uid);
+            // Load sidebar name and role
+            await loadUserProfile(user.uid);
+
+            // Load dynamic data in parallel
+            await Promise.allSettled([
+                loadUserStats(user.uid),
+                loadUserConfessions(user.uid),
+                loadUserSavedItems(user.uid),
+                loadUserSessions(user.uid),
+                loadUserWallet(user.uid),
+                loadUpcomingSessions(user.uid)
+            ]);
+
+            // Final hide loader
+            if (typeof window.hideUserLoader === 'function') window.hideUserLoader();
         });
 
         async function loadUserProfile(uid) {
@@ -1767,16 +1793,14 @@
                 if (userDoc.exists()) {
                     const data = userDoc.data();
                     const displayName = data.displayName || data.email?.split('@')[0] || 'User';
-                    const userRole = data.role || 'Member';
 
-                    // Update sidebar IMMEDIATELY with correct role
+                    // Update sidebar name only - role is HARDCODED in HTML
                     if (nameEl) nameEl.textContent = displayName;
+
+                    // Enforce hardcoded role from data attribute (Option 3)
                     if (roleEl) {
-                        roleEl.textContent = userRole;
-                        // Also update all role displays on the page
-                        document.querySelectorAll('[data-user-role]').forEach(el => {
-                            el.textContent = userRole;
-                        });
+                        const hardcodedRole = roleEl.getAttribute('data-hardcoded-role') || 'Member';
+                        roleEl.textContent = hardcodedRole;
                     }
 
                     // Update profile form fields
@@ -1795,11 +1819,17 @@
                         if (el && data.phone) el.value = data.phone;
                     });
 
-                    console.log('✅ User profile loaded:', displayName, '| Role:', userRole);
+                    console.log('✅ User profile loaded:', displayName);
                 } else {
                     console.warn('⚠️ No user profile found in Firestore');
-                    if (nameEl) nameEl.textContent = user.email?.split('@')[0] || 'User';
-                    if (roleEl) roleEl.textContent = 'Member';
+                    // user is defined in the outer scope from onAuthStateChanged
+                    const userEmail = user?.email || 'user@soulamore.com';
+                    if (nameEl) nameEl.textContent = userEmail.split('@')[0] || 'User';
+                    // Enforce hardcoded role
+                    if (roleEl) {
+                        const hardcodedRole = roleEl.getAttribute('data-hardcoded-role') || 'Member';
+                        roleEl.textContent = hardcodedRole;
+                    }
                 }
             } catch (err) {
                 console.error('❌ Error loading user profile:', err);

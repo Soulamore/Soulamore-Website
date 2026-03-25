@@ -212,26 +212,16 @@ window.handleLogout = async function() {
     console.log('🚪 Logging out...');
 
     try {
-        const { getAuth, signOut } = await import('./firebase-config.js');
-        const auth = getAuth();
-
-        // Sign out from Firebase
-        await signOut(auth);
-
-        // Clear all session data
-        sessionStorage.clear();
-        localStorage.removeItem('soulamore_session');
-
+        const { logoutUser } = await import('./auth-service.js');
+        await logoutUser();
         console.log('✅ Logout successful');
-        window.location.href = '../login.html';
     } catch (err) {
         console.error('❌ Logout error:', err);
-        // Fallback: clear storage and redirect anyway
-        sessionStorage.clear();
+        // Emergency Fallback
         localStorage.removeItem('soulamore_session');
-        window.location.href = '../login.html';
+        sessionStorage.clear();
+        window.location.href = 'logged-out.html';
     }
 };
 
 console.log('✅ Portal Utilities Loaded (with global handleLogout)');
-

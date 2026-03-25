@@ -68,6 +68,7 @@ export function getCommissionLevel(rating) {
 
 /**
  * Save public profile data to the professionals collection
+ * Also syncs profileName to the users collection (NOT displayName to preserve role suffix)
  * @param {string} userId - User ID
  * @param {object} profileData - { name, quote, bio, tags, languages, rate, etc. }
  * @returns {Promise<boolean>}
@@ -79,11 +80,31 @@ export async function savePublicProfile(userId, profileData) {
             ...profileData,
             lastProfileUpdate: serverTimestamp()
         });
+
+        // Sync profileName to users collection (NOT displayName to preserve role suffix)
+        // displayName is reserved for role-suffixed names like "Aditya Peer"
+        if (profileData.name) {
+            const userRef = doc(db, "users", userId);
+            await updateDoc(userRef, {
+                profileName: profileData.name,        // Display name from profile
+                lastProfileUpdate: serverTimestamp()
+            });
+        }
+
         console.log("Public profile updated for user:", userId);
         return true;
     } catch (error) {
+        console.error("Initial save attempt failed:", error.code, error.message);
+
         // If doc doesn't exist, we might need setDoc (for newly approved peers)
-        if (error.code === 'not-found') {
+        // Check for various "not found" error codes
+        const isNotFound = error.code === 'NOT_FOUND' ||
+                          error.code === 'not-found' ||
+                          error.code === 'missing' ||
+                          (error.message && error.message.toLowerCase().includes('no document'));
+
+        if (isNotFound) {
+            console.log("Document not found, creating new profile...");
             try {
                 const profRef = doc(db, "professionals", userId);
                 await setDoc(profRef, {
@@ -91,13 +112,24 @@ export async function savePublicProfile(userId, profileData) {
                     isVerified: true,
                     joinedAt: serverTimestamp()
                 }, { merge: true });
+
+                // Also create/update users collection entry with profileName
+                if (profileData.name) {
+                    const userRef = doc(db, "users", userId);
+                    await setDoc(userRef, {
+                        profileName: profileData.name,
+                        lastProfileUpdate: serverTimestamp()
+                    }, { merge: true });
+                }
+
+                console.log("New public profile created for user:", userId);
                 return true;
             } catch (innerError) {
-                console.error("Error creating public profile:", innerError);
+                console.error("Error creating public profile:", innerError.code, innerError.message);
                 return false;
             }
         }
-        console.error("Error saving public profile:", error);
+        console.error("Error saving public profile:", error.code, error.message);
         return false;
     }
 }

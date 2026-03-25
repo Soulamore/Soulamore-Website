@@ -38,12 +38,28 @@ try {
 }
 
 // --- APP CHECK INITIALIZATION ---
-// This provides automatic bot protection for Firestore and Cloud Functions.
-const appCheck = initializeAppCheck(app, {
-    provider: new ReCaptchaEnterpriseProvider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
-    isTokenAutoRefreshEnabled: true
-});
-console.log("✅ App Check initialized with reCAPTCHA Enterprise");
+// App Check with reCAPTCHA Enterprise
+let appCheck = null;
+
+// TEMPORARILY DISABLED FOR LOCAL DEVELOPMENT
+// Uncomment below and register debug token in Firebase Console for production
+/*
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+    console.log("🔧 Firebase App Check Debug Mode enabled. Check console for Debug Token!");
+}
+*/
+
+try {
+    // App Check disabled for local dev - enable in production
+    // appCheck = initializeAppCheck(app, {
+    //     provider: new ReCaptchaEnterpriseProvider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
+    //     isTokenAutoRefreshEnabled: true
+    // });
+    console.log("ℹ️ App Check disabled for local development");
+} catch (err) {
+    console.warn("⚠️ App Check initialization failed:", err.message);
+}
 
 let analytics = null;
 // Load Analytics dynamically so adblockers don't crash the entire ES6 module

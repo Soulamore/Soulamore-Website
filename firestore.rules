@@ -2,227 +2,196 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // --- USER PROFILES ---
+    // ==================== GLOBAL FUNCTIONS ====================
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isSelf(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    function hasCurrentUserProfile() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    function isAdmin() {
+      return hasCurrentUserProfile() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    function isPublishedStatus(status) {
+      return status in ['published', 'approved', 'public'];
+    }
+
+    // ==================== CORE USER & ROLE MANAGEMENT ====================
+
+    // Users collection - Central profile data
     match /users/{userId} {
-      allow read: if request.auth != null; // Any authenticated user can read
-      allow create: if request.auth != null && request.auth.uid == userId; // Users can create their own profile
-      allow update, delete: if request.auth != null && request.auth.uid == userId; // Users can only update/delete their own profile
-    }
-    
-    // --- ACTIVE FEATURES (Backend Connected) ---
-
-    // Peer Application Forms
-    match /peers/{document=**} {
-      allow read: if request.auth != null;
-      allow create: if true; // Public submission
-      allow update, delete: if request.auth != null;
+      allow read: if isSelf(userId) || isAdmin();
+      allow create: if isSelf(userId);
+      allow update: if isSelf(userId) 
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])
+                    || isAdmin();
     }
 
-    // Psychologist Application Forms
-    match /psychologists/{document=**} {
-      allow read: if request.auth != null;
-      allow create: if true; // Public submission
-      allow update, delete: if request.auth != null;
+    // Role verification flags (Verified Status)
+    match /roles/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+      allow create, update: if isSelf(userId) || isAdmin();
+      allow delete: if false;
     }
 
-    // Contact Forms (Company Page)
-    match /contacts/{document=**} {
-      allow read: if request.auth != null;
-      allow create: if true; // Public submission
-      allow update, delete: if request.auth != null;
+    // Practitioner metadata (Private settings/UPI)
+    match /practitioner_metadata/{userId} {
+      allow read, write: if isSelf(userId) || isAdmin();
     }
 
-    // Confession Box (Tools & Topics)
-    match /confessions/{document=**} {
-      allow read: if request.auth != null;
-      allow create: if true; // Anonymous submission
-      allow update, delete: if request.auth != null;
+    // Professional Public Profiles
+    match /professionals/{userId} {
+      allow read: if true; // Public listings
+      allow write: if isSelf(userId) || isAdmin();
     }
 
-    // Newsletter Subscriptions
-    match /newsletters/{document=**} {
-      allow read: if request.auth != null;
-      allow create: if true; // Public subscription
-      allow update, delete: if request.auth != null;
+    // ==================== CONTENT COLLECTIONS ====================
+
+    // Blog Posts
+    match /blog_posts/{blogId} {
+      allow read: if isPublishedStatus(resource.data.status) 
+                  || isAdmin() 
+                  || (isSignedIn() && resource.data.authorId == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.authorId == request.auth.uid);
     }
 
-    // Soulamore Away (Postcards)
-    match /postcards/{document=**} {
-      allow read: if true; // Public read (Gallery)
-      allow create: if true; // Public send
-      allow update, delete: if request.auth != null;
+    // Peer Stories
+    match /peer_stories/{storyId} {
+      allow read: if isPublishedStatus(resource.data.status) || isAdmin() || (isSignedIn() && (resource.data.authorId == request.auth.uid || resource.data.userId == request.auth.uid));
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
     }
 
-    // Problem Wall (Public Anonymous Notes)
-    match /problem-wall-notes/{document=**} {
-       allow read: if true;
-       allow create: if true; // Anonymous posts allowed
-       allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hearts', 'flowers', 'candles', 'isHidden']);
-       allow delete: if false; // Mods only
+    // Confessions (Anonymous & Private)
+    match /confessions/{confId} {
+      allow read: if isSignedIn();
+      allow create: if true; // Anonymous posting allowed
+      allow update, delete: if isAdmin();
     }
 
-    // --- NEWLY REQUESTED FEATURES (Connecting Now) ---
+    // ==================== FINANCIAL & BOOKING ====================
 
-    // Vent Box
-    match /vents/{document=**} {
-      allow read: if request.auth != null;
-      allow create: if true;
-      allow update, delete: if request.auth != null;
-    }
-
-    // Echo Space (Loneliness Page)
-    match /echoes/{document=**} {
-      allow read: if true; // Public read allowed for potential "Wall of Echoes"
-      allow create: if true;
-      allow update, delete: if request.auth != null;
-    }
-
-    // --- FUTURE / PLACEHOLDER FEATURES ---
-    
-    // Worry Shredder & Later Box
-    match /shreds/{document=**} {
-      allow read: if request.auth != null;
-      allow create: if true;
-      allow update, delete: if request.auth != null;
-    }
-    match /worries/{document=**} {
-      allow read: if request.auth != null;
-      allow create: if true;
-      allow update, delete: if request.auth != null;
-    }
-
-    // 5-Step Reset (Gratitude/Inputs)
-    match /resets/{document=**} {
-      allow read: if request.auth != null;
-      allow create: if true;
-      allow update, delete: if request.auth != null;
-    }
-
-    // Legacy/Fallback Collection
-    match /applications/{document=**} {
-      allow read: if request.auth != null;
-      allow create: if true;
-      allow update, delete: if request.auth != null;
-    }
-
-    // Presence System (Live User Count)
-    match /active_souls/{document=**} {
-      allow read: if true; 
-      allow create: if true;
-      allow update: if true; // Temporary open until presence refactored.
-      // S2 FIX: Prevent arbitrary collection deletion
-      allow delete: if false; 
-    }
-
-    // SoulBot Conversations
-    match /soulbot_conversations/{conversationId} {
-      // Allow read: authenticated users can read their own conversations, or anyone can read anonymous conversations
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid 
-                  || resource.data.userId == null 
-                  || resource.data.userId == 'anonymous';
-      
-      // Allow create: anyone can create a conversation (anonymous or authenticated)
-      allow create: if true;
-      
-      // Allow update:
-      // - If conversation has userId == null or 'anonymous' (anonymous user), allow updates from anyone
-      // - If conversation has userId (authenticated), only allow updates from that user
-      allow update: if resource.data.userId == null 
-                    || resource.data.userId == 'anonymous'
-                    || (request.auth != null && resource.data.userId == request.auth.uid);
-      
-      // Allow delete: only authenticated users can delete their own conversations
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
-    }
-
-    // Therapists Collection (for therapist recommendations)
-    match /therapists/{document=**} {
-      allow read: if true; // Public read for therapist listings
-      allow create, update, delete: if request.auth != null; // Only authenticated admins can modify
-    }
-
-    // SoulBot Usage Tracking (for rate limiting)
-    match /soulbot_usage/{usageId} {
-      // Allow read: users can read their own usage stats
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid 
-                  || resource.data.userId == null;
-      
-      // S2 FIX: Prevent anonymous users from arbitrarily overwriting usage profiles
-      allow create, update: if request.resource.data.keys().hasAll(['count']);
-      
-      // Allow delete: only authenticated users can delete their own usage
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
-    }
+    // Wallets (Plural, Singular, and Legacy support)
+    match /user_wallets/{userId} { allow read, write: if isSelf(userId) || isAdmin(); }
+    match /user_wallet/{userId} { allow read, write: if isSelf(userId) || isAdmin(); }
+    match /wallets/{userId} { allow read, write: if isSelf(userId) || isAdmin(); }
 
     // Peer Bookings
     match /peer_bookings/{bookingId} {
-      // Allow read: users can read their own bookings, peers can read bookings for them
-      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid);
-      
-      // Allow create: authenticated users can create booking requests
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      
-      // Allow update: users can update their own pending bookings, peers can confirm/cancel their bookings
-      allow update: if request.auth != null && (
-        (resource.data.userId == request.auth.uid && resource.data.status == 'pending_payment') ||
-        (resource.data.peerId == request.auth.uid && resource.data.status in ['pending_payment', 'confirmed'])
-      );
-      
-      // Allow delete: only users can delete their own pending bookings
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid && resource.data.status == 'pending_payment';
+      allow read: if isAdmin() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid));
+      allow create: if isSignedIn();
+      allow update: if isAdmin() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid));
+      allow delete: if isAdmin();
     }
 
-    // Peer/Psychologist Availability Schedules
-    match /peer_availability/{peerId} {
-      // Allow read: public read for checking availability
-      allow read: if true;
-      
-      // Allow create/update: peers and psychologists can manage their own availability
-      allow create, update: if request.auth != null && request.auth.uid == peerId;
-      
-      // Allow delete: peers and psychologists can delete their own availability
-      allow delete: if request.auth != null && request.auth.uid == peerId;
-    }
-
-    // Roles Collection (for peer/psychologist verification)
-    match /roles/{userId} {
-      // Allow read: authenticated users can read their own role
-      allow read: if request.auth != null && request.auth.uid == userId;
-
-      // Allow users to set their own role as peer/psychologist (requires admin verification later)
-      // But prevent them from assigning admin or other privileged roles
-      allow create, update: if request.auth != null && request.auth.uid == userId &&
-        (!request.resource.data.keys().hasAny(['admin']) || request.resource.data.admin == false);
-
-      allow delete: if false;
-    }
-
-    // Peer Pricing Plans
-    match /peer_plans/{planId} {
-      // Allow read: public read for pricing plans
-      allow read: if true;
-      
-      // S2 FIX: Restrict creating or editing marketplace peer plans
-      allow create, update: if request.auth != null && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == 'admin';
-      
-      allow delete: if request.auth != null && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == 'admin';
-    }
-
-    // Payment Records
+    // Payments
     match /payments/{paymentId} {
-      // Allow read: users can read their own payment records
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      
-      // Allow create: system can create payment records (after successful payment)
-      allow create: if request.auth != null;
-      
-      // Allow update: only admins or system can update payment records
-      allow update: if request.auth != null;
-      
-      // Allow delete: no one can delete payment records (audit trail)
-      allow delete: if false;
+      allow read: if isAdmin() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid));
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // Peer Financials - earnings, bonuses, penalties
+    match /peer_financials/{peerId} {
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == peerId);
+      allow write: if isAdmin() || (isSignedIn() && request.auth.uid == peerId);
+    }
+
+    // Peer Reviews & Ratings
+    match /peer_reviews/{reviewId} {
+      allow read: if true; // Public read for transparency
+      allow create: if isSignedIn(); // Any authenticated user can review
+      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.reviewedBy == request.auth.uid);
+    }
+
+    // Availability Schedules
+    match /peer_availability/{peerId} {
+      allow read: if true; 
+      allow write: if isSelf(peerId) || isAdmin();
+    }
+
+    // Clinical Notes (Private to Psychologist)
+    match /clinical_notes/{noteId} {
+      allow read, write: if isSignedIn() && (
+        (resource != null && resource.data.psychId == request.auth.uid) ||
+        (resource == null && request.resource.data.psychId == request.auth.uid) ||
+        isAdmin()
+      );
+    }
+
+    // Saved Items
+    match /saved_items/{itemId} {
+      allow read, write: if isSignedIn() && (
+        (resource != null && resource.data.userId == request.auth.uid) ||
+        (resource == null && request.resource.data.userId == request.auth.uid)
+      );
+    }
+    match /user_saved_items/{itemId} {
+      allow read, write: if isSignedIn() && (
+        (resource != null && resource.data.userId == request.auth.uid) ||
+        (resource == null && request.resource.data.userId == request.auth.uid)
+      );
+    }
+
+    // Journal Entries (Private)
+    match /journals/{userId} {
+      allow read, write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    }
+
+    match /journal_entries/{entryId} {
+      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
     
+    match /mood_entries/{entryId} {
+      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // ==================== TOOLS & ENGAGEMENT ====================
+
+    match /problem-wall-notes/{document=**} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true; // Reaction updates
+    }
+
+    match /active_souls/{userId} {
+      allow read, write: if true; // Presence system
+    }
+
+    match /public_runtime/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Tool collections
+    match /vents/{id} { allow read, write: if isSignedIn(); }
+    match /shreds/{id} { allow read, write: if isSignedIn(); }
+    match /worries/{id} { allow read, write: if isSignedIn(); }
+    match /echoes/{id} { allow read, write: if isSignedIn(); }
+    match /resets/{id} { allow read, write: if isSignedIn(); }
+    
+    // Maintenance & Announcements
+    match /maintenance_settings/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /announcements/{id} { allow read: if true; allow write: if isAdmin(); }
+
+    // Forms
+    match /peers/{id} { allow read: if isSignedIn(); allow create, update, delete: if true; }
+    match /psychologists/{id} { allow read: if isSignedIn(); allow create, update, delete: if true; }
+    match /contacts/{id} { allow read, write: if true; }
+    match /newsletters/{id} { allow read, write: if true; }
+
+    // ==================== SYSTEM & OTHERS ====================
+
+    match /soulbot_conversations/{id} {
+      allow read, write: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid) || true;
+    }
+    
+    match /therapists/{id} { allow read: if true; allow write: if isAdmin(); }
+
     // Default: Deny all other access
     match /{document=**} {
       allow read, write: if false;

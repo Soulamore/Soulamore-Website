@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peer Setup | Soulamore</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -152,20 +152,8 @@
 
     <!-- FIREBASE & LOGIC -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { auth, db, doc, setDoc, onAuthStateChanged } from "../assets/js/firebase-config.js";
         import { updateUserPassword, linkGoogleAccount } from "../assets/js/auth-service.js";
-
-        // Initialize Firebase
-        const firebaseConfig = {
-            apiKey: "AIza" + "SyDxHa9CR8O" + "VpDn9MObPCzbnsYTCWcTb-9k",
-            authDomain: "soulamore-f0a64.firebaseapp.com",
-            projectId: "soulamore-f0a64"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
 
         // State Check
         onAuthStateChanged(auth, (user) => {
@@ -226,8 +214,7 @@
         window.finishSetup = async function () {
             const user = auth.currentUser;
             await setDoc(doc(db, "users", user.uid), {
-                isSetupComplete: true,
-                role: 'peer' // Ensure role is stamped
+                isSetupComplete: true
             }, { merge: true });
 
             document.getElementById('step-2').style.display = 'none';
