@@ -8,7 +8,7 @@ import { doc, setDoc, getDoc, collection, addDoc, onSnapshot, serverTimestamp, i
 
 export async function initWalletListener(userId, callback) {
     if (!userId) return;
-    const walletRef = doc(db, "wallets", userId);
+    const walletRef = doc(db, "user_wallets", userId);
 
     // Listen for realtime updates
     return onSnapshot(walletRef, (docSnap) => {

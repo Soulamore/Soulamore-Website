@@ -4,7 +4,7 @@
  * Works for both peers and psychologists
  */
 
-import { db, collection, addDoc, doc, getDoc, setDoc, updateDoc, getDocs, query, where, serverTimestamp } from "./firebase-config.js";
+import { db, collection, addDoc, doc, getDoc, setDoc, updateDoc, getDocs, query, where, serverTimestamp, functionsInstance, httpsCallable } from "./firebase-config.js";
 import { Timestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { isProfessional, getUserRole } from "./role-helper.js";
 
@@ -210,6 +210,27 @@ export async function getAvailableSlots(peerId, date) {
 }
 
 /**
+ * Helper to calculate dynamic commission based on rating
+ * @param {number} rating - Practitioner's rating (0-5)
+ * @returns {number} Commission percentage (e.g. 0.20 for 20%)
+ */
+export function calculateCommission(rating) {
+    if (rating >= 4.8) return 0.10; // Level 3: 10%
+    if (rating >= 4.5) return 0.20; // Level 2: 20%
+    return 0.50; // Level 1 (New): 50%
+}
+
+/**
+ * Generate a randomized SL-ID (SL-YYYY-XXXX)
+ * @returns {string}
+ */
+export function generateSLID() {
+    const year = new Date().getFullYear();
+    const random = Math.floor(1000 + Math.random() * 9000);
+    return `SL-${year}-${random}`;
+}
+
+/**
  * Create a booking (before payment)
  * @param {string} userId - User making the booking
  * @param {string} peerId - Peer being booked
@@ -229,26 +250,57 @@ export async function createBookingRequest(userId, peerId, planType, startTime, 
             throw new Error("Time slot is no longer available");
         }
 
+        // Get peer details for commission calculation
+        let practitionerRating = 0;
+        let pRole = "PEER";
+        try {
+            const peerDoc = await getDoc(doc(db, "users", peerId));
+            if (peerDoc.exists()) {
+                const pData = peerDoc.data();
+                practitionerRating = pData.rating || 0;
+                pRole = (pData.role || "PEER").toUpperCase();
+            }
+        } catch (err) {
+            console.warn("Could not fetch peer details, defaulting to 50% commission", err);
+        }
+
+        const commissionRate = calculateCommission(practitionerRating);
+        const slId = generateSLID();
+
+        // Calculate financial split
+        const totalAmount = plan.price;
+        const soulamoreCut = totalAmount * commissionRate;
+        const practitionerShare = totalAmount - soulamoreCut;
+
         // Create booking document
         const bookingRef = await addDoc(collection(db, PEER_BOOKINGS_COLLECTION), {
+            slId: slId,
+            tag: pRole,
             userId: userId,
             peerId: peerId,
             planType: planType,
             startTime: Timestamp.fromDate(new Date(startTime)),
             endTime: Timestamp.fromDate(new Date(endTime)),
-            amount: plan.price,
+            amount: totalAmount,
+            financials: {
+                soulamoreCut: soulamoreCut,
+                practitionerShare: practitionerShare,
+                commissionRate: commissionRate,
+                payoutStatus: "pending" // pending -> processing -> released
+            },
             sessions: plan.sessions,
-            status: "pending_payment", // pending_payment -> confirmed -> completed -> cancelled
+            status: "pending_payment", 
             paymentId: null,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
         });
 
-        console.log("Booking request created:", bookingRef.id);
+        console.log("Booking request created with SL-ID:", slId);
 
         return {
             bookingId: bookingRef.id,
-            amount: plan.price,
+            slId: slId,
+            amount: totalAmount,
             plan: plan
         };
     } catch (error) {
@@ -277,10 +329,13 @@ export async function confirmBooking(bookingId, paymentId, paymentData) {
             updatedAt: serverTimestamp()
         });
 
-        // Also create payment record
+        // Also create payment record with explicit ownership for security rules
+        const bData = bookingSnap.data();
         await addDoc(collection(db, PAYMENTS_COLLECTION), {
             bookingId: bookingId,
             paymentId: paymentId,
+            userId: bData.userId || null,
+            peerId: bData.peerId || null,
             amount: paymentData.amount,
             currency: paymentData.currency || "INR",
             gateway: paymentData.gateway || "razorpay",
@@ -326,7 +381,8 @@ export async function confirmBooking(bookingId, paymentId, paymentData) {
                                 peerName: peerName,
                                 date: bData.startTime ? bData.startTime.toDate().toLocaleString() : "TBD",
                                 meetingLink: meetingLink,
-                                calendarLink: calendarLink
+                                calendarLink: calendarLink,
+                                bookingId: bData.slId || bookingId
                             }
                         );
                         console.log("Booking success email triggered for:", userEmail);

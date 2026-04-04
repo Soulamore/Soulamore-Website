@@ -54,7 +54,7 @@ You asked: **"Should I store Razorpay Key Secret in GitHub Secrets?"**
 
 ### For Production (Before Launch)
 
-1. **Set up Firebase Functions** (see `docs/FIREBASE_FUNCTIONS_SETUP.md`)
+1. **Set up Firebase Functions** (see `reports/ADITYA/QWEN/111_2026-03-25_EXECUTE_SETUP_GUIDE.md`)
 2. **Store Key Secret in Firebase Functions config**:
    ```bash
    firebase functions:config:set razorpay.key_secret="YOUR_KEY_SECRET"
@@ -126,7 +126,7 @@ You asked: **"Should I store Razorpay Key Secret in GitHub Secrets?"**
 
 1. **`functions/index.js`** - Firebase Functions for payment verification
 2. **`functions/package.json`** - Dependencies
-3. **`docs/FIREBASE_FUNCTIONS_SETUP.md`** - Setup instructions
+3. **`reports/ADITYA/QWEN/111_2026-03-25_EXECUTE_SETUP_GUIDE.md`** - Setup instructions
 4. **`docs/SECRET_MANAGEMENT.md`** - This file
 
 ---
@@ -139,7 +139,7 @@ You asked: **"Should I store Razorpay Key Secret in GitHub Secrets?"**
    - Store Key Secret securely
    - Update payment handler with Function URL
 
-See `docs/FIREBASE_FUNCTIONS_SETUP.md` for detailed instructions.
+See `reports/ADITYA/QWEN/111_2026-03-25_EXECUTE_SETUP_GUIDE.md` for detailed instructions.
 
 
 

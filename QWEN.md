@@ -1,0 +1,2 @@
+## Qwen Added Memories
+- Soulamore-Website project uses role-based dashboard routing: admin→admin-dashboard.html, peer→peer-dashboard.html, psychologist→psych-dashboard.html, user/member→user-dashboard.html. Sidebar roles must be hardcoded (not dynamic from Firestore): "Member", "Admin", "Peer", "Psychologist". Auth flow: login.html → handleRoleRouting() → saves role to localStorage → redirects to dashboard. All dashboards should have blocking role-check loader before content renders.

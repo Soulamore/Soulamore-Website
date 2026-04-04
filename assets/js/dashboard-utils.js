@@ -34,6 +34,10 @@ function switchView(viewId, linkElement) {
     if (linkElement) {
         linkElement.classList.add('active');
     }
+
+    // Trigger an event for data-loading based on view
+    const event = new CustomEvent('viewChanged', { detail: { viewId } });
+    window.dispatchEvent(event);
 };
 
 function initDashboard() {

@@ -184,18 +184,32 @@ try {
             }
             .nav-links > a, .nav-logo { border: none !important; } /* GLOBAL: Remove any vertical borders */
             .nav-links::-webkit-scrollbar { display: none !important; }
-            .auth-box {
-                display: flex !important; /* Force Auth Box Visible */
-                align-items: center !important;
-                gap: 12px !important; /* Slightly reduced gap */
-            }
             .main-nav {
-                /* Grid layout defined in global.css */
+                display: flex !important;
+                justify-content: space-between !important;
                 align-items: center !important;
-                padding: 0 !important; /* Let header handle padding */
+                padding: 0 !important;
                 width: 100% !important;
-                max-width: none !important; /* Remove inner max-width constraint */
+                max-width: none !important;
                 margin: 0 !important;
+                gap: 20px !important;
+            }
+            .nav-links {
+                display: flex !important; /* Force Desktop Flex Row */
+                gap: 20px !important;
+            }
+            .auth-box {
+                display: flex !important;
+                align-items: center !important;
+                gap: 12px !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* Theme toggle & Ghost icon color harmony in light mode */
+            body.light-mode #theme-icon-desktop,
+            body.light-mode .user-icon-btn i,
+            body.light-mode #theme-icon-mobile {
+                color: #475569 !important; /* Soft Slate instead of harsh black */
             }
             /* HEADER CONTAINER OVERRIDE - LAYOUT PHYSICS FIX */
             html body header.island-nav {
@@ -575,12 +589,12 @@ try {
         .news-toggle-pill {
             position: fixed !important;
             bottom: 42px !important; /* Exactly between ticker and Audio Control (80px) */
-            left: 30px !important;   /* Exact X-axis alignment with Audio Control */
-            background: rgba(255, 255, 255, 0.08) !important; 
+            right: 30px !important;   /* Right side to avoid sidebar conflict */
+            background: rgba(255, 255, 255, 0.08) !important;
             backdrop-filter: blur(10px) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             padding: 5px 12px !important; /* Reduced padding closely matching audio */
-            border-radius: 50px !important; 
+            border-radius: 50px !important;
             display: flex !important;
             align-items: center !important;
             gap: 8px !important; /* Tighter gap */
@@ -588,7 +602,7 @@ try {
             z-index: 99999 !important;
             transition: all 0.3s ease !important;
             user-select: none !important;
-            box-shadow: none !important; 
+            box-shadow: none !important;
             height: 32px !important; /* Forced strict height to prevent bloat */
             box-sizing: border-box !important;
         }
@@ -658,6 +672,12 @@ try {
                 left: auto !important;
                 right: 20px !important;
             }
+        }
+
+        /* Hide news toggle pill on portal/dashboard pages */
+        body.portal-page .news-toggle-pill,
+        body.dashboard-page .news-toggle-pill {
+            display: none !important;
         }
     `;
     document.head.appendChild(style);
@@ -909,8 +929,7 @@ const getHeaderHTML = (rootPath) => `
             </button>
             <a href="${rootPath}get-help-now.html" id="nav-crisis" class="lifeline-btn"><i class="fas fa-life-ring"></i> <span>Get Help Now</span></a>
             <a href="${rootPath}portal/user-dashboard.html" class="user-icon-btn" title="Dashboard"><i class="fas fa-ghost"></i></a>
-            <a href="${rootPath}profile.html" class="nav-btn" style="padding:10px 20px; font-size:0.9rem;" title="My Profile"><i class="fas fa-user-circle"></i> <span style="margin-left:5px;">Profile</span></a>
-            <a href="${rootPath}portal/login.html" class="nav-btn">Log In / Sign Up</a>
+            <a href="${rootPath}portal/login.html" class="nav-btn" id="nav-auth-btn">Log In / Sign Up</a>
     </div>
     
     <div style="display: flex; gap: 5px; align-items: center;">
@@ -1016,10 +1035,16 @@ const getFooterHTML = (rootPath) => `
 // --- 4. INJECTION LOGIC ---
 
 function injectHeader() {
-    // 0. Safety Guard: Do not inject on Admin/Portal Dashboards that have their own sidebar
-    const isAuthPage = ['login.html', 'signup.html', 'forgot-password.html', 'signup-success.html', 'logout.html'].some(page => window.location.pathname.includes(page));
+    // Performance: Check if already injected
+    if (document.querySelector('header.island-nav .nav-links')) {
+        return; // Already injected, skip
+    }
 
-    if (window.location.pathname.includes('/portal/') && !isAuthPage) {
+    // 0. Safety Guard: Do not inject on Admin/Portal Dashboards that have their own sidebar
+    const path = window.location.pathname.toLowerCase();
+    const isAuthPage = ['login', 'signup', 'forgot', 'reset', 'logout'].some(term => path.includes(term));
+
+    if (path.includes('/portal/') && !isAuthPage) {
         // Allow Auth pages to have headers, but not main dashboards
         return;
     }
@@ -1028,7 +1053,6 @@ function injectHeader() {
 
     // 1. Auto-Create Header if Missing (Robustness)
     if (!headerElement) {
-        console.log("Soulamore: No <header> found, creating one...");
         headerElement = document.createElement('header');
         document.body.prepend(headerElement);
     } else {
@@ -1063,10 +1087,10 @@ function injectHeader() {
             style.id = 'header-responsive-style';
             style.innerHTML = `
                 @media (min-width: 1025px) {
-                    .mobile-profile-card, 
+                    .mobile-profile-card,
                     .mobile-toggle,
-                    .mobile-only-help { 
-                        display: none !important; 
+                    .mobile-only-help {
+                        display: none !important;
                     }
                 }
                 @media (max-width: 1024px) {
@@ -1075,6 +1099,16 @@ function injectHeader() {
                 }
             `;
             document.head.appendChild(style);
+        }
+
+        // Performance: Log injection time
+        if (window.performance && performance.mark) {
+            performance.mark('header-injected');
+            performance.measure('header-injection', 'navigationStart', 'header-injected');
+            const measure = performance.getEntriesByName('header-injection')[0];
+            if (measure && measure.duration > 100) {
+                console.warn(`⚠️ Slow header injection: ${measure.duration.toFixed(2)}ms`);
+            }
         }
     }
 }
@@ -1149,6 +1183,13 @@ window.toggleNewsFeed = function () {
 
 function injectNewsToggle() {
     if (document.querySelector('.news-toggle-pill')) return;
+
+    // Skip news toggle on portal/dashboard pages
+    if (document.body.classList.contains('portal-page') ||
+        document.body.classList.contains('dashboard-page') ||
+        window.location.pathname.includes('/portal/')) {
+        return;
+    }
 
     const pill = document.createElement('div');
     pill.className = 'news-toggle-pill';
@@ -1323,30 +1364,40 @@ function injectCookieBanner() {
 
 // Auto-run subnav and other injections on load
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Core Structural Injections
-    injectHeader(); // RESTORED
-    injectFooter(); // RESTORED
-    injectSubnav();
-    injectFavicon();
+    void (async () => {
+        try {
+            const { redirectIfMaintenanceActive } = await import('./maintenance-mode.js');
+            const redirected = await redirectIfMaintenanceActive({ role: 'guest' });
+            if (redirected) return;
+        } catch (error) {
+            console.warn("Maintenance check skipped in components shell:", error.message);
+        }
 
-    // 2. Interaction & Logic Binding
-    initializeHeaderLogic();
-    bindMobileToggle();
-    injectSoulBotWidget();
-    injectCookieBanner();
-    injectNewsTicker(); // NEW: Injected directly to body for z-index dominance
-    injectNewsToggle(); // NEW: Floating control pill
-    applyNewsFeedStatus(getSavedNewsFeedStatus());
-    ensureNewsRenderer();
+        // 1. Core Structural Injections
+        injectHeader(); // RESTORED
+        injectFooter(); // RESTORED
+        injectSubnav();
+        injectFavicon();
 
-    // 3. Animation & Features
-    initParticles();
-    injectMobileBottomNav();
-    setActiveState();
-    initSmartCounters();
+        // 2. Interaction & Logic Binding
+        initializeHeaderLogic();
+        bindMobileToggle();
+        injectSoulBotWidget();
+        injectCookieBanner();
+        injectNewsTicker(); // NEW: Injected directly to body for z-index dominance
+        injectNewsToggle(); // NEW: Floating control pill
+        applyNewsFeedStatus(getSavedNewsFeedStatus());
+        ensureNewsRenderer();
 
-    // 4. Interaction Initialization (MANDATORY)
-    // Note: Removed duplicate bindMobileToggle and initializeHeaderLogic calls
+        // 3. Animation & Features
+        initParticles();
+        injectMobileBottomNav();
+        setActiveState();
+        initSmartCounters();
+
+        // 4. Interaction Initialization (MANDATORY)
+        // Note: Removed duplicate bindMobileToggle and initializeHeaderLogic calls
+    })();
 });
 
 /**

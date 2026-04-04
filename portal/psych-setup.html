@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professional Setup | Soulamore</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -35,8 +35,8 @@
         }
 
         .step-dot.active {
-            background: #a855f7;
-            box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+            background: #4ECDC4;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
         }
 
         .form-input {
@@ -52,8 +52,8 @@
         .btn-primary {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #a855f7, #7c3aed);
-            color: white;
+            background: linear-gradient(135deg, #4ECDC4, #45b7af);
+            color: #0f172a;
             border: none;
             border-radius: 8px;
             font-weight: 700;
@@ -63,7 +63,7 @@
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(168, 85, 247, 0.3);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
         }
 
         .btn-social {
@@ -99,7 +99,7 @@
 
     <div class="setup-card">
         <div style="text-align:center; margin-bottom:30px;">
-            <i class="fas fa-stethoscope" style="font-size:3rem; color:#a855f7; margin-bottom:15px;"></i>
+            <i class="fas fa-stethoscope" style="font-size:3rem; color:#4ECDC4; margin-bottom:15px;"></i>
             <h1 style="font-size:2rem; margin-bottom:10px;">Practice Setup</h1>
             <p style="opacity:0.7;">Secure your professional account.</p>
         </div>
@@ -155,7 +155,8 @@
                 <i class="fas fa-phone" style="color:var(--success-green);"></i> Link Phone Number
             </button>
 
-            <div style="margin-top:20px; text-align:right;">
+            <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
+                <a href="#" onclick="finishSetup()" style="color:var(--text-muted); font-size:0.85rem; text-decoration:none; opacity:0.6; transition:0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">I'll do this later (Skip)</a>
                 <button onclick="finishSetup()" class="btn-primary" style="width:auto; padding:10px 30px;">Continue <i
                         class="fas fa-arrow-right"></i></button>
             </div>
@@ -175,20 +176,9 @@
 
     <!-- FIREBASE & LOGIC -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, FacebookAuthProvider, OAuthProvider, PhoneAuthProvider, linkWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { auth, db, doc, setDoc, onAuthStateChanged } from "../assets/js/firebase-config.js";
+        import { FacebookAuthProvider, linkWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { updateUserPassword, linkGoogleAccount } from "../assets/js/auth-service.js";
-
-        // Initialize Firebase
-        const firebaseConfig = {
-            apiKey: "AIza" + "SyDxHa9CR8O" + "VpDn9MObPCzbnsYTCWcTb-9k",
-            authDomain: "soulamore-f0a64.firebaseapp.com",
-            projectId: "soulamore-f0a64"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
 
         // State Check
         onAuthStateChanged(auth, (user) => {
@@ -268,8 +258,7 @@
         window.finishSetup = async function () {
             const user = auth.currentUser;
             await setDoc(doc(db, "users", user.uid), {
-                isSetupComplete: true,
-                role: 'psychologist' // Ensure role
+                isSetupComplete: true
             }, { merge: true });
 
             document.getElementById('step-2').style.display = 'none';
