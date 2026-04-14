@@ -1,4 +1,16 @@
-User-agent: *
+# Soulamore — Google-only indexing (polite crawlers).
+# Malicious scrapers often ignore robots.txt and spoof Googlebot; use Cloudflare WAF + rate limits (see docs/FIREBASE_AND_CLOUDFLARE_EGRESS_CONTROLS.md).
+
+# --- Google crawlers used for Search, Search Console, Ads, etc. ---
+User-agent: Googlebot
+User-agent: Googlebot-Image
+User-agent: Googlebot-News
+User-agent: Googlebot-Video
+User-agent: Google-InspectionTool
+User-agent: AdsBot-Google
+User-agent: Mediapartners-Google
+User-agent: APIs-Google
+User-agent: FeedFetcher-Google
 Allow: /
 Disallow: /backend/
 Disallow: /scripts/
@@ -19,14 +31,8 @@ Disallow: /launch-preview.html
 Disallow: /service-page/
 Allow: /portal/login.html
 
-# Specific block for aggressive AI training/scrapers if needed
-User-agent: Applebot-Extended
-Disallow: /
-
-User-agent: ClaudeBot
-Disallow: /
-
-User-agent: GPTBot
+# --- Everyone else (polite crawlers): do not crawl ---
+User-agent: *
 Disallow: /
 
 Sitemap: https://soulamore.com/sitemap.xml
