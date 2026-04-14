@@ -4,7 +4,31 @@ const path = require('path');
 // CONFIG
 const BASE_URL = 'https://soulamore.com';
 const ROOT_DIR = path.resolve(__dirname, '../');
-const EXCLUDES = ['_BACKUPS', 'node_modules', '.git', 'scripts', 'backend', 'functions'];
+const EXCLUDES = [
+    '_BACKUPS', 
+    'node_modules', 
+    '.git', 
+    '.github',
+    '.agent',
+    '.qoder',
+    '.vscode',
+    'scripts', 
+    'backend', 
+    'functions',
+    'tmp',
+    'tmp_clones_firebase',
+    'Claude Result',
+    'knowledge source',
+    'reports',
+    'Git Tools Open Source',
+    'Press and Media Kit',
+    'trademark filing',
+    'soulbot',
+    'claude_handoff_profiles',
+    'docs',
+    'roadmap',
+    'design-system'
+];
 
 // IMPORT DYNAMIC DATA (Simulated for Node environment)
 function getDynamicUrls() {
