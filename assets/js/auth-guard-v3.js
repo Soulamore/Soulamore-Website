@@ -98,9 +98,10 @@
         try {
             // Step 1: Check stored session (fast path)
             const session = getStoredSession();
+            let hasValidLocalSession = false;
             
             if (session?.isLoggedIn && session?.userId && session?.role) {
-                log('INFO', '✅ Valid stored session found', { 
+                log('INFO', '✅ Valid stored session found, bypassing flicker while revalidating...', { 
                     userId: session.userId, 
                     role: session.role 
                 });
@@ -108,21 +109,22 @@
                 guardState.currentUser = { uid: session.userId, role: session.role };
                 guardState.currentRole = session.role;
                 guardState.isComplete = true;
-                
-                return guardState;
+                hasValidLocalSession = true;
             }
 
-            log('DEBUG', 'No valid stored session, checking Firebase...');
+            log('DEBUG', 'Checking Firebase to secure/revalidate session...');
 
-            // Step 2: Check Firebase Auth (slow path)
+            // Step 2: Check Firebase Auth (slow path or background check)
             const { auth, onAuthStateChanged } = await import('./firebase-config.js');
             
-            return new Promise((resolve) => {
+            const firebasePromise = new Promise((resolve) => {
                 const timeout = setTimeout(() => {
                     log('WARN', 'Firebase auth timeout');
                     guardState.error = 'Auth timeout';
-                    guardState.isComplete = true;
-                    resolve(guardState);
+                    if (!hasValidLocalSession) {
+                        guardState.isComplete = true;
+                        resolve(guardState);
+                    }
                 }, CONFIG.INIT_TIMEOUT);
 
                 const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -153,27 +155,49 @@
                                 email: user.email
                             }));
                             
-                            log('INFO', '✅ Auth check complete', { role });
+                            log('INFO', '✅ Auth validation complete', { role });
                         } catch (error) {
                             log('ERROR', 'Failed to fetch user role', error);
                             guardState.currentRole = 'user';
                         }
                     } else {
-                        log('INFO', '❌ No Firebase user');
+                        log('INFO', '❌ No Firebase user. Revoking auth access.');
                         guardState.error = 'Not authenticated';
+                        localStorage.removeItem(CONFIG.STORAGE_KEY);
+                        if (hasValidLocalSession) {
+                            log('WARN', '🚫 Stored session invalid/expired. Forcing redirect to login.');
+                            window.location.href = CONFIG.LOGIN_URL;
+                        }
                     }
                     
                     guardState.isComplete = true;
+                    // Note: We don't unsubscribe() immediately if we want to monitor continuous logout events, but to keep existing logic we unsubscribe 
+                    // unless we want to act as a persistent listener. We will leave unsubscribe() to prevent memory leaks for this check.
                     unsubscribe();
-                    resolve(guardState);
+                    
+                    if (!hasValidLocalSession) {
+                        resolve(guardState);
+                    }
                 }, (error) => {
                     log('ERROR', 'Firebase auth error', error);
                     guardState.error = error.message;
-                    guardState.isComplete = true;
-                    unsubscribe();
-                    resolve(guardState);
+                    localStorage.removeItem(CONFIG.STORAGE_KEY);
+                    if (hasValidLocalSession) {
+                        window.location.href = CONFIG.LOGIN_URL;
+                    } else {
+                        guardState.isComplete = true;
+                        resolve(guardState);
+                    }
                 });
             });
+
+            if (hasValidLocalSession) {
+                // Instantly return the local state to unblock UI render without waiting for Firebase
+                return guardState;
+            }
+
+            // Await Firebase resolution if we have no local cache
+            return firebasePromise;
         } catch (error) {
             log('ERROR', 'Auth check failed', error);
             guardState.error = error.message;

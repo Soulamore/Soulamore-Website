@@ -10,6 +10,7 @@
 
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import { generateSoulamoreEmail, sendEmail } from '../emailService';
 
 /**
  * Trigger: Automatically assign default role when new user signs up
@@ -50,7 +51,19 @@ export const onUserCreate = functions.auth.user().onCreate(async (user): Promise
     await db.collection('users').doc(user.uid).set(userProfile);
     functions.logger.info(`✅ User profile created in Firestore for ${user.uid}`);
 
-    // 3. Log user creation (optional - for audit trail)
+    // 2.5 Send Welcome Email
+    if (user.email) {
+        try {
+            const { subject, html } = generateSoulamoreEmail('signup_welcome', { 
+                name: user.displayName || user.email?.split('@')[0] || 'Friend' 
+            });
+            await sendEmail({ email: user.email }, subject, html);
+        } catch (emailErr) {
+            functions.logger.error('Welcome email failed:', emailErr);
+        }
+    }
+
+    // 3. Log user creation
     await db.collection('user_creation_logs').add({
       uid: user.uid,
       email: user.email,

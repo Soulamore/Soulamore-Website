@@ -18,6 +18,9 @@ export * from './roles';
 // Export auth triggers
 export * from './triggers/on-user-create';
 
+// Export email triggers
+export * from './triggers/emailTriggers';
+
 // Health check function
 export const healthCheck = functions.https.onCall(() => {
   return {
