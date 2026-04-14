@@ -121,14 +121,14 @@ export const approveApplication = functions.https.onCall(
         userId: userId,
         role: newRole
       };
-    } catch (error) {
+    } catch (error: any) {
       functions.logger.error('Error approving application:', error);
       
-      if (error.code === 'not-found') {
-        throw error; // Already a HttpsError
+      if (error instanceof functions.https.HttpsError) {
+        throw error;
       }
       
-      throw new functions.https.HttpsError('internal', `Unable to approve application: ${error.message}`);
+      throw new functions.https.HttpsError('internal', `Unable to approve application: ${error.message || 'Unknown error'}`);
     }
   }
 );

@@ -3,6 +3,8 @@ const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 const cors = require('cors')({ origin: true });
+const fs = require('fs');
+const path = require('path');
 
 admin.initializeApp();
 
@@ -89,6 +91,55 @@ const mailTransport = nodemailer.createTransport({
     pass: functions.config().zeptomail?.password
   }
 });
+
+/**
+ * Helper: Read and Parse HTML Templates
+ * Replaces {{VARIABLE}} placeholders with actual data
+ */
+const getTemplate = (folder, fileName, replacements = {}) => {
+    try {
+        const filePath = path.join(__dirname, 'src', 'templates', folder, fileName);
+        let content = fs.readFileSync(filePath, 'utf8');
+        
+        // Dynamic replacements
+        Object.keys(replacements).forEach(key => {
+            const regex = new RegExp(`{{${key}}}`, 'g');
+            content = content.replace(regex, replacements[key]);
+        });
+
+        // Add Year placeholder globally if it exists
+        content = content.replace(/{{YEAR}}/g, new Date().getFullYear());
+
+        return content;
+    } catch (error) {
+        console.error(`Template read failed: ${folder}/${fileName}`, error);
+        return null;
+    }
+};
+
+/**
+ * Unified Email Dispatcher
+ */
+const sendTemplatedEmail = async (to, subject, folder, fileName, replacements = {}, cc = null) => {
+    const html = getTemplate(folder, fileName, replacements);
+    if (!html) return;
+
+    const mailOptions = {
+        from: '"Soulamore Engine" <contact.soulamore@gmail.com>',
+        to,
+        subject,
+        html
+    };
+
+    if (cc) mailOptions.cc = cc;
+
+    try {
+        await mailTransport.sendMail(mailOptions);
+        console.log(`Email [${fileName}] dispatched to ${to}`);
+    } catch (error) {
+      console.error(`Email [${fileName}] failed:`, error);
+    }
+};
 
 // 2. Generate Auth URL for Practitioners
 exports.getGoogleAuthUrl = functions.https.onCall((data, context) => {
@@ -439,52 +490,43 @@ exports.sendLeadNotificationEmail = functions.firestore
   .document('assessment_leads/{leadId}')
   .onCreate(async (snap, context) => {
     const lead = snap.data();
-
     if (!lead) return null;
 
-    const isUrgent = lead.escalation_required === true;
-    const subjectPrefix = isUrgent ? '[URGENT: CRISIS ESCALATION] ' : '[New Assessment Lead] ';
-
-    // Build the email content
-    const mailOptions = {
-      from: `"Soulamore Engine" <contact.soulamore@gmail.com>`,
-      to: 'contact.soulamore@gmail.com', // Sending specifically to the central email
-      subject: `${subjectPrefix}Lead: ${lead.name || 'Anonymous'} - ${lead.assessment_domain || 'Unknown Domain'}`,
-      html: `
-        <div style="font-family: sans-serif; color: #e2e8f0; background-color: #0f172a; padding: 40px; border-radius: 8px;">
-          <h2 style="color: ${isUrgent ? '#ef4444' : '#4ECDC4'}; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-            ${isUrgent ? 'URGENT: CRISIS ESCALATION' : 'New Recommended Match Request'}
-          </h2>
-          <p style="font-size: 1.1rem; opacity: 0.9;">A user has just completed an assessment and requested an outreach from a Peer or Psychologist.</p>
-          
-          <table style="width: 100%; border-collapse: collapse; margin: 30px 0; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
-            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Name:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">${lead.name || 'Anonymous'}</td></tr>
-            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Email:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">${lead.email || 'Not Provided'}</td></tr>
-            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Phone:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">${lead.phone || 'Not Provided'}</td></tr>
-            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Assessment Domain:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); text-transform: capitalize;">${(lead.assessment_domain || 'N/A').replace('_', ' ')}</td></tr>
-            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Severity Band:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>${(lead.severity_band || 'N/A').toUpperCase()}</strong></td></tr>
-            <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Raw Score:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">${lead.raw_score || '0'}</td></tr>
-            <tr><td style="padding: 15px;"><strong>Escalation Required:</strong></td><td style="padding: 15px; ${isUrgent ? 'color: #ef4444; font-weight: bold;' : ''}">${isUrgent ? 'Yes (Immediate Action Required)' : 'No'}</td></tr>
-          </table>
-
-          <h3 style="margin-top: 30px; font-weight: 500; opacity: 0.8;">Risk Flags (Functional Impairment):</h3>
-          <p style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 6px; font-family: monospace;">${lead.risk_flags === true ? 'Present - High functional impairment detected in cognitive/behavioral responses.' : (lead.risk_flags || 'None Detected')}</p>
-
-          <p style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-            This email was securely and automatically generated by the Soulamore Assessment Clinical Engine.
-          </p>
-        </div>
-      `
-    };
-
-    try {
-      await mailTransport.sendMail(mailOptions);
-      console.log('Lead notification email dispatched to contact.soulamore@gmail.com');
-      return null;
-    } catch (error) {
-      console.error('Error dispatching notification email:', error);
-      return null;
+    const isUrgent = lead.escalation_required === true || lead.severity_band === 'severe';
+    
+    if (isUrgent) {
+        // Dispatch High Risk Admin Alert
+        await sendTemplatedEmail(
+            'contact.soulamore@gmail.com', // Admin notification
+            `[CRITICAL: HIGH RISK] ${lead.name || 'Anonymous User'}`,
+            'admin',
+            'high_risk_lifeline_alert.html',
+            {
+                CASE_ID: context.params.leadId,
+                TIMESTAMP: new Date().toLocaleString(),
+                USER_UID: lead.uid || 'Anonymous',
+                QUERY_EXCERPT: lead.content ? lead.content.substring(0, 150) + '...' : 'No content summary'
+            }
+        );
     }
+
+    // Send the User their Clinical Results (even if urgent)
+    if (lead.email) {
+        await sendTemplatedEmail(
+            lead.email,
+            `Your Assessment: ${lead.assessment_domain || 'Results'} - Soulamore`,
+            'assessments',
+            'assessment_report_clinical.html',
+            {
+                ASSESSMENT_NAME: (lead.assessment_domain || 'Clinical Screen').replace('_', ' ').toUpperCase(),
+                SCORE_CATEGORY: (lead.severity_band || 'Review Required').toUpperCase(),
+                INTERPRETATION: lead.recommendation || 'Our clinical engine has processed your results. Please review them with a counselor.',
+                RECOMMENDATION: isUrgent ? 'Immediate clinical outreach recommended.' : 'Schedule a follow-up with a Peer to discuss these insights.'
+            }
+        );
+    }
+
+    return null;
   });
 
 /**
@@ -526,58 +568,34 @@ exports.sendBookingReminders = functions.pubsub.schedule('every 15 minutes').onR
               // If timeDiff is way less (e.g., booking was just created for a session 3 days away, 
               // it skips the 1Month and 1Week notifications entirely by marking them true but not emailing)
               if (timeDiff >= threshold.value - marginOfError) {
-                 try {
-                   const userDoc = await admin.firestore().collection('users').doc(booking.userId).get();
-                   const peerDoc = await admin.firestore().collection('users').doc(booking.peerId).get();
-                   
-                   const userData = userDoc.exists ? userDoc.data() : {};
-                   const peerData = peerDoc.exists ? peerDoc.data() : {};
-                   
-                   const formattedDate = new Intl.DateTimeFormat('en-IN', {
-                     dateStyle: 'full', timeStyle: 'short', timeZone: 'Asia/Kolkata'
-                   }).format(startTime);
-                   
-                   const mailOptions = {
-                     from: '"Soulamore Sessions" <contact.soulamore@gmail.com>',
-                     subject: `Reminder: Upcoming Session in ${threshold.label}`,
-                     html: `
-                       <div style="font-family: sans-serif; color: #e2e8f0; background-color: #0f172a; padding: 40px; border-radius: 8px;">
-                         <h2 style="color: #4ECDC4; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-                           Session Reminder (${threshold.label})
-                         </h2>
-                         <p style="font-size: 1.1rem; opacity: 0.9;">Hello!</p>
-                         <p style="font-size: 1.1rem; opacity: 0.9;">This is a friendly reminder that a session is scheduled for exactly <strong>${threshold.label}</strong> from now.</p>
-                         
-                         <table style="width: 100%; border-collapse: collapse; margin: 30px 0; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
-                           <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Booking ID:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">${booking.slId || doc.id}</td></tr>
-                           <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Scheduled Time:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">${formattedDate} (IST)</td></tr>
-                           <tr><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);"><strong>Plan:</strong></td><td style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">${booking.planType || 'Per Session'}</td></tr>
-                         </table>
-                         
-                         <p style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                           This email was securely and automatically generated by Soulamore.
-                         </p>
-                       </div>
-                     `
-                   };
-                   
-                   // Determine recipients
-                   if (userData.email) mailOptions.to = userData.email;
-                   if (peerData.email) mailOptions.cc = peerData.email;
-                   
-                   // Fallback if no primary user email
-                   if (!mailOptions.to && mailOptions.cc) {
-                       mailOptions.to = mailOptions.cc;
-                       delete mailOptions.cc;
-                   }
-
-                   if (mailOptions.to) {
-                       await mailTransport.sendMail(mailOptions);
-                       console.log(`Reminder (${threshold.key}) sent for booking ${doc.id}`);
-                   }
-                 } catch (emailError) {
-                     console.error(`Failed to send ${threshold.key} reminder for booking ${doc.id}:`, emailError);
-                 }
+                  try {
+                    const userDoc = await admin.firestore().collection('users').doc(booking.userId).get();
+                    const peerDoc = await admin.firestore().collection('users').doc(booking.peerId).get();
+                    
+                    const userData = userDoc.exists ? userDoc.data() : {};
+                    const peerData = peerDoc.exists ? peerDoc.data() : {};
+                    
+                    const formattedDate = new Intl.DateTimeFormat('en-IN', {
+                      dateStyle: 'full', timeStyle: 'short', timeZone: 'Asia/Kolkata'
+                    }).format(startTime);
+                    
+                    if (userData.email) {
+                        await sendTemplatedEmail(
+                            userData.email,
+                            `Soon, we listen: Your session in ${threshold.label}`,
+                            'bookings',
+                            'booking_reminder.html',
+                            {
+                                BOOKING_TIME: formattedDate + ' (IST)',
+                                PEER_NAME: peerData.name || 'Your Peer Listener',
+                                VIDEO_LINK: booking.meetLink || 'https://soulamore.com/portal/dashboard.html'
+                            },
+                            peerData.email || null // CC the peer
+                        );
+                    }
+                  } catch (emailError) {
+                      console.error(`Failed to send ${threshold.key} reminder for booking ${doc.id}:`, emailError);
+                  }
               }
               
               // Mark this reminder threshold as processed so it isn't checked/sent again
@@ -658,3 +676,158 @@ exports.releasePayout = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('internal', 'Payout release operation failed.');
   }
 });
+
+/**
+ * Admin: Dynamic News Campaign Hub (SAGA-Style)
+ * High-power broadcast for global messages
+ */
+exports.triggerCustomCampaign = functions.https.onCall(async (data, context) => {
+    // 1. Mandatory Admin Check
+    if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Admin login required.');
+    
+    const adminDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+    if (!adminDoc.exists || adminDoc.data().role !== 'admin') {
+        throw new functions.https.HttpsError('permission-denied', 'Only admins can trigger campaigns.');
+    }
+
+    const { targetGroup, campaignData } = data;
+    if (!targetGroup || !campaignData.title || !campaignData.content) {
+        throw new functions.https.HttpsError('invalid-argument', 'Missing targetGroup or campaign data.');
+    }
+
+    // 2. Resolve Recipients
+    let recipients = [];
+    if (targetGroup === 'newsletters' || targetGroup === 'all') {
+        const snap = await admin.firestore().collection('newsletters').get();
+        snap.forEach(doc => recipients.push(doc.data().email));
+    }
+    if (targetGroup === 'peers' || targetGroup === 'all') {
+        const snap = await admin.firestore().collection('users').where('role', '==', 'peer').get();
+        snap.forEach(doc => {
+            if (doc.data().email && !recipients.includes(doc.data().email)) {
+                recipients.push(doc.data().email);
+            }
+        });
+    }
+    if (targetGroup === 'psychologists' || targetGroup === 'all') {
+        const snap = await admin.firestore().collection('users').where('role', '==', 'psychologist').get();
+        snap.forEach(doc => {
+            if (doc.data().email && !recipients.includes(doc.data().email)) {
+                recipients.push(doc.data().email);
+            }
+        });
+    }
+
+    console.log(`Starting campaign [${campaignData.title}] to ${recipients.length} targets.`);
+
+    // 3. Dispatch Emails (Batching would be better for massive lists, but this works for current scale)
+    const sendPromises = recipients.map(email => {
+        return sendTemplatedEmail(
+            email,
+            campaignData.title,
+            'admin',
+            'news_campaign.html',
+            {
+                CAMPAIGN_TITLE: campaignData.title,
+                CAMPAIGN_CONTENT: campaignData.content,
+                CAMPAIGN_IMAGE_URL: campaignData.imageUrl || '',
+                CTA_TEXT: campaignData.ctaText || 'Learn More',
+                CTA_LINK: campaignData.ctaLink || 'https://soulamore.com'
+            }
+        );
+    });
+
+    await Promise.allSettled(sendPromises);
+
+    return { 
+        success: true, 
+        delivered: recipients.length, 
+        campaign: campaignData.title 
+    };
+});
+
+// === BEHAVIORAL TRIGGERS (ULTRA-DEEP AUDIT) ===
+
+/**
+ * Trigger: New Peer/Psych Review
+ */
+exports.onReviewCreated = functions.firestore
+    .document('reviews/{reviewId}')
+    .onCreate(async (snap, context) => {
+        const review = snap.data();
+        if (!review) return null;
+
+        // 1. Thank the User
+        if (review.userEmail) {
+            await sendTemplatedEmail(
+                review.userEmail,
+                "Your voice matters - Thank you for your feedback",
+                'reviews',
+                'review_thank_you_user.html'
+            );
+        }
+
+        // 2. Alert the Peer/Psych (Morale Boost)
+        const peerDoc = await admin.firestore().collection('users').doc(review.peerId).get();
+        if (peerDoc.exists && peerDoc.data().email) {
+            await sendTemplatedEmail(
+                peerDoc.data().email,
+                "Felt & Acknowledged: You have a new review!",
+                'reviews',
+                'peer_new_review_alert.html'
+            );
+        }
+
+        return null;
+    });
+
+/**
+ * Trigger: Booking Cancelled (The Recovery Loop)
+ */
+exports.onBookingDeleted = functions.firestore
+    .document('peer_bookings/{bookingId}')
+    .onDelete(async (snap, context) => {
+        const booking = snap.data();
+        if (!booking || booking.status !== 'confirmed') return null;
+
+        const userDoc = await admin.firestore().collection('users').doc(booking.userId).get();
+        if (userDoc.exists && userDoc.data().email) {
+            const formattedDate = new Intl.DateTimeFormat('en-IN', {
+                dateStyle: 'full', timeStyle: 'short', timeZone: 'Asia/Kolkata'
+            }).format(booking.startTime.toDate());
+
+            await sendTemplatedEmail(
+                userDoc.data().email,
+                "It's okay: Your session has been cancelled",
+                'bookings',
+                'booking_cancelled.html',
+                {
+                    BOOKING_TIME: formattedDate + ' (IST)'
+                }
+            );
+        }
+        return null;
+    });
+
+/**
+ * Trigger: Soulamore Away Postcard (The Kindness Loop)
+ */
+exports.onPostcardCreated = functions.firestore
+    .document('postcards/{cardId}')
+    .onCreate(async (snap, context) => {
+        const card = snap.data();
+        if (!card || !card.senderEmail) return null;
+
+        // Confirm to Sender
+        await sendTemplatedEmail(
+            card.senderEmail,
+            "Vibe Delivered: Your postcard is in transit",
+            'soulamore-away',
+            'postcard_sender_confirmation.html',
+            {
+                RECIPIENT_CITY: card.toCity || 'a foreign heart',
+                TIMESTAMP: new Date().toLocaleString()
+            }
+        );
+        return null;
+    });

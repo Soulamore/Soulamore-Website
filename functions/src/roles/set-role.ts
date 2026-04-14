@@ -87,14 +87,14 @@ export const setRole = functions.https.onCall(
         uid: targetUid,
         role: newRole
       };
-    } catch (error) {
+    } catch (error: any) {
       functions.logger.error('Error assigning role:', error);
       
       if (error.code === 'auth/user-not-found') {
         throw new functions.https.HttpsError('not-found', 'User not found');
       }
       
-      throw new functions.https.HttpsError('internal', `Unable to assign role: ${error.message}`);
+      throw new functions.https.HttpsError('internal', `Unable to assign role: ${error.message || 'Unknown error'}`);
     }
   }
 );

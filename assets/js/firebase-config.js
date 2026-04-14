@@ -5,7 +5,7 @@
 
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, startAfter } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, startAfter, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, linkWithCredential, EmailAuthProvider, updatePassword, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js";
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
@@ -118,6 +118,6 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // Export for use in other modules
-export { db, collection, addDoc, serverTimestamp, auth, googleProvider, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, startAfter, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, linkWithCredential, EmailAuthProvider, signInAnonymously, functionsInstance, httpsCallable };
+export { db, collection, addDoc, serverTimestamp, auth, googleProvider, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, startAfter, writeBatch, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, linkWithCredential, EmailAuthProvider, signInAnonymously, functionsInstance, httpsCallable };
 
 console.log("Firebase initialized.");

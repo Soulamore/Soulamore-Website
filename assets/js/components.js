@@ -1365,6 +1365,11 @@ function injectCookieBanner() {
 // Auto-run subnav and other injections on load
 document.addEventListener('DOMContentLoaded', () => {
     void (async () => {
+        // 1. Core Structural Injections - IMMEDIATELY (Before async checks)
+        injectHeader(); 
+        injectFavicon();
+        injectSubnav();
+
         try {
             const { redirectIfMaintenanceActive } = await import('./maintenance-mode.js');
             const redirected = await redirectIfMaintenanceActive({ role: 'guest' });
@@ -1373,11 +1378,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn("Maintenance check skipped in components shell:", error.message);
         }
 
-        // 1. Core Structural Injections
-        injectHeader(); // RESTORED
-        injectFooter(); // RESTORED
-        injectSubnav();
-        injectFavicon();
+        // 2. Secondary Structural Injections
+        injectFooter(); 
 
         // 2. Interaction & Logic Binding
         initializeHeaderLogic();

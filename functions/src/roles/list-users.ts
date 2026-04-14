@@ -18,11 +18,11 @@ interface ListUsersRequest {
 
 interface UserData {
   uid: string;
-  email: string | null;
-  displayName: string | null;
-  photoURL: string | null;
+  email?: string | null;
+  displayName?: string | null;
+  photoURL?: string | null;
   role: string;
-  phoneNumber: string | null;
+  phoneNumber?: string | null;
   disabled: boolean;
   createdAt: string;
   lastSignInTime: string;
