@@ -329,8 +329,26 @@ export async function confirmBooking(bookingId, paymentId, paymentData) {
             updatedAt: serverTimestamp()
         });
 
-        // Also create payment record with explicit ownership for security rules
+        // CREATE IN-APP NOTIFICATION FOR PROVIDER
         const bData = bookingSnap.data();
+        if (bData.peerId) {
+            try {
+                await addDoc(collection(db, 'notifications'), {
+                    userId: bData.peerId,
+                    type: 'booking_confirmed',
+                    title: 'New Session Booked',
+                    message: `A new session has been confirmed for ${bData.startTime?.toDate?.()?.toLocaleString() || 'your next slot'}.`,
+                    bookingId: bookingId,
+                    status: 'unread',
+                    createdAt: serverTimestamp()
+                });
+                console.log("In-app notification created for peer:", bData.peerId);
+            } catch (notifErr) {
+                console.warn("Failed to create in-app notification:", notifErr);
+            }
+        }
+
+        // Also create payment record with explicit ownership for security rules
         await addDoc(collection(db, PAYMENTS_COLLECTION), {
             bookingId: bookingId,
             paymentId: paymentId,

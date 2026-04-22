@@ -39,9 +39,7 @@ window.switchView = function(viewId, linkElement) {
     // Handle Mobile: Close sidebar after selection
     const sidebar = document.getElementById('sidebar');
     if (sidebar && sidebar.classList.contains('active')) {
-        sidebar.classList.remove('active');
-        const toggle = document.getElementById('mobileToggleButton');
-        if (toggle) toggle.classList.remove('active');
+        window.toggleSidebar();
     }
 };
 
@@ -49,8 +47,11 @@ window.switchView = function(viewId, linkElement) {
 window.toggleSidebar = function() {
     const sidebar = document.getElementById('sidebar');
     const toggle = document.getElementById('mobileToggleButton');
+    const overlay = document.getElementById('sidebar-overlay');
+    
     if (sidebar) sidebar.classList.toggle('active');
     if (toggle) toggle.classList.toggle('active');
+    if (overlay) overlay.classList.toggle('active');
 };
 
 // 3. Tool Modal Hooks

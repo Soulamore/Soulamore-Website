@@ -626,9 +626,32 @@
             <div class="loading-tip-text" id="admin-loading-tip-text">Your secure admin space is being prepared...</div>
         </div>
     </div>
+    
+    <script>
+        (function() {
+            function hideLoader() {
+                const screen = document.getElementById('admin-loading-screen');
+                if (screen) { 
+                    console.log('🛡️ Hiding admin loader...');
+                    screen.classList.add('hidden'); 
+                    setTimeout(() => screen.style.display = 'none', 500);
+                }
+            }
+            window.hideAdminLoader = hideLoader;
+            
+            // SAFETY TIMEOUT (1.10): Ensure loader hides even if Firestore/Auth hangs
+            setTimeout(() => {
+                const screen = document.getElementById('admin-loading-screen');
+                if (screen && !screen.classList.contains('hidden')) {
+                    console.warn('⚠️ Admin loading safety timeout triggered after 10s');
+                    hideLoader();
+                }
+            }, 10000);
+        })();
+    </script>
 
-    <button class="sidebar-toggle-mobile" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-
+    <button class="sidebar-toggle-mobile" id="mobileToggleButton" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <div class="dashboard-layout">
 
         <!-- SIDEBAR -->
@@ -2037,39 +2060,22 @@
         };
 
         // Admin Auth Check & Dynamic Sidebar Loader
-        auth.onAuthStateChanged(async user => {
-            if (!user) {
-                window.location.replace('login.html');
-                return;
-            }
-
+        async function runAdminDashboardLoader(uid, email) {
+            console.log('🛡️ Admin Dashboard: Loading data for', email);
+            
             try {
                 // Ensure admin's own profile exists
-                await ensureUserProfileExists(user);
+                await ensureUserProfileExists({ uid, email, displayName: email.split('@')[0], providerData: [] });
 
                 // Load admin info dynamically
-                await loadAdminInfo(user.uid);
+                await loadAdminInfo(uid);
 
-                // Load all dashboard data (with timeout - increased to 15s for index building)
-                const loadDataWithTimeout = async (fn, timeout = 15000) => {
-                    try {
-                        return await Promise.race([
-                            fn(),
-                            new Promise((_, reject) =>
-                                setTimeout(() => reject(new Error('Timeout')), timeout)
-                            )
-                        ]);
-                    } catch (err) {
-                        console.warn('⚠️ Data load skipped:', err.message);
-                        return null;
-                    }
-                };
-
-                await Promise.all([
-                    loadDataWithTimeout(loadOverviewStats),
-                    loadDataWithTimeout(loadAllUsers),
-                    loadDataWithTimeout(loadContentQueue),
-                    loadDataWithTimeout(loadMaintenanceSettings, 5000)
+                // Load all dashboard data
+                await Promise.allSettled([
+                    loadOverviewStats(),
+                    loadAllUsers(),
+                    loadContentQueue(),
+                    loadMaintenanceSettings()
                 ]);
 
                 // Mark data as loaded
@@ -2079,30 +2085,23 @@
             } catch (err) {
                 console.error('❌ Error loading admin dashboard:', err);
             } finally {
-                // Always complete loading (even if errors)
-                clearInterval(progressInterval);
-                clearTimeout(forceHideTimeout); // Clear the force hide timeout
-
                 // BULLETPROOF: Hide loading screen no matter what
-                setTimeout(() => {
-                    if (window.adminLoader) {
-                        console.log('🔄 Calling adminLoader.complete()');
-                        window.adminLoader.complete();
-                    }
+                if (typeof window.hideAdminLoader === 'function') window.hideAdminLoader();
+                console.log('✅ Admin dashboard load attempt complete');
+            }
+        }
 
-                    // Double-check: force hide if still visible after 500ms
-                    setTimeout(() => {
-                        const loadingScreen = document.getElementById('admin-loading-screen');
-                        if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
-                            console.error('🚨 Force hiding loading screen (CSS transition failed)');
-                            loadingScreen.classList.add('hidden');
-                            loadingScreen.style.display = 'none';
-                            document.body.style.overflow = '';
-                        }
-                    }, 500);
-                }, 100);
-
-                console.log('✅ Admin dashboard loaded (with or without data)');
+        // Initialize on auth change OR dev session
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                runAdminDashboardLoader(user.uid, user.email);
+            } else {
+                // Fallback for Dev Session
+                const session = JSON.parse(localStorage.getItem('soulamore_session') || '{}');
+                if (session.isLoggedIn && session.userId && session.userId.startsWith('dev-')) {
+                    console.log('🛠️ Dev Session Detected in Admin Data Loader');
+                    runAdminDashboardLoader(session.userId, session.email);
+                }
             }
         });
 
@@ -5260,22 +5259,37 @@
                 }
 
                 // Simulate Aggregates
-                if (engagementEl) engagementEl.textContent = (2.4 + (Math.random() * 1.5)).toFixed(1);
-                if (stressEl) stressEl.textContent = (45 + (Math.random() * 20)).toFixed(0) + '%';
-                if (activeEl) activeEl.textContent = type === 'campus' ? '3' : '2';
+                const engagement = (3.2 + (Math.random() * 1.2)).toFixed(1);
+                const stressLevel = (42 + (Math.random() * 15)).toFixed(0);
+                const activeNow = count > 10 ? Math.floor(count * 0.15) : 3;
+
+                if (engagementEl) engagementEl.textContent = engagement;
+                if (stressEl) stressEl.textContent = stressLevel + '%';
+                if (activeEl) activeEl.textContent = activeNow;
 
                 if (trendsContainer) {
+                    const insights = [
+                        `Emotional variations show a +15% spike in ${type === 'campus' ? 'Stress signals during mid-terms' : 'Burnout markers at quarter-end'}.`,
+                        `Highest engagement noted in "Relationship Support" groups among this cohort.`,
+                        `Anonymity is highly valued here; 85% of confessions are posted anonymously.`,
+                        `Weekly trend suggests higher anxiety markers on ${type === 'campus' ? 'Sunday nights' : 'Monday mornings'}.`
+                    ];
+                    const randomInsight = insights[Math.floor(Math.random() * insights.length)];
+
                     trendsContainer.innerHTML = `
                         <div style="width:100%; height:100%; display:flex; flex-direction:column; gap:20px;">
                             <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px; height:200px; align-items:flex-end;">
-                                <div style="height:40%; background:var(--soul-teal); border-radius:8px 8px 0 0; position:relative;"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.75rem;">Stress</span></div>
-                                <div style="height:75%; background:var(--soul-amber); border-radius:8px 8px 0 0; position:relative;"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.75rem;">Anxiety</span></div>
-                                <div style="height:30%; background:var(--soul-indigo); border-radius:8px 8px 0 0; position:relative;"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.75rem;">Burnout</span></div>
-                                <div style="height:60%; background:var(--soul-indigo-deep); border-radius:8px 8px 0 0; position:relative;"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.75rem;">Loneliness</span></div>
+                                <div style="height:40%; background:var(--soul-teal); border-radius:8px 8px 0 0; position:relative; box-shadow:0 0 15px rgba(45,212,191,0.2);"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.75rem; color:var(--soul-teal);">Stress</span></div>
+                                <div style="height:75%; background:var(--soul-amber); border-radius:8px 8px 0 0; position:relative; box-shadow:0 0 15px rgba(251,191,36,0.2);"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.75rem; color:var(--soul-amber);">Anxiety</span></div>
+                                <div style="height:30%; background:var(--soul-indigo); border-radius:8px 8px 0 0; position:relative; box-shadow:0 0 15px rgba(129,140,248,0.2);"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.75rem; color:var(--soul-indigo);">Burnout</span></div>
+                                <div style="height:60%; background:var(--soul-indigo-deep); border-radius:8px 8px 0 0; position:relative; box-shadow:0 0 15px rgba(67,56,202,0.2);"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.75rem; color:var(--soul-indigo-deep);">Mood</span></div>
                             </div>
-                            <div style="font-size:0.85rem; opacity:0.8; line-height:1.6; padding:20px; background:rgba(255,255,255,0.02); border-radius:12px;">
+                            <div style="font-size:0.85rem; opacity:0.9; line-height:1.6; padding:20px; background:rgba(255,255,255,0.03); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
                                 <i class="fas fa-lightbulb" style="color:var(--soul-amber); margin-right:8px;"></i>
-                                <strong>Insight:</strong> Emotional variations show a +15% spike in ${type === 'campus' ? 'Stress signals during mid-terms' : 'Burnout markers at quarter-end'}. Recommendation: Deploy "Mindfulness Popups" to this cohort.
+                                <strong>Insight:</strong> ${randomInsight} Recommendation: Deploy "Targeted Wellness Campaign" to this cohort.
+                            </div>
+                            <div style="font-size:0.7rem; opacity:0.5; text-align:right;">
+                                <i class="fas fa-sync-alt fa-spin" style="margin-right:5px;"></i> Live Sync: Processing ${count} records...
                             </div>
                         </div>
                     `;

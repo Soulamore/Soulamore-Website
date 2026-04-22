@@ -58,6 +58,30 @@ export async function triggerEmail(to, subject, templateId, templateData = {}) {
     }
 }
 
+// --- HELPER: LOG SAFETY INCIDENT ---
+async function logSafetyIncident(triggerData, sourceColl, sourceText, userId = null) {
+    try {
+        const now = new Date();
+        const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+        await addDoc(collection(db, "safety_reports"), {
+            type: triggerData.category,
+            severity: triggerData.category === 'crisis' ? 'critical' : 'high',
+            trigger_text: sourceText,
+            trigger_matches: [triggerData.triggerWord],
+            source_coll: sourceColl,
+            source_id: "blocked_at_source",
+            user_id: userId || "anonymous",
+            status: "pending",
+            reporting_month: month,
+            created_at: serverTimestamp()
+        });
+        console.log("⚠️ Safety incident logged for admin review.");
+    } catch (e) {
+        console.error("Failed to log safety incident:", e);
+    }
+}
+
 // --- 1. VENT BOX (Anonymous) ---
 export async function handleVentSubmission(text, type = "burn") {
     try {
@@ -93,6 +117,16 @@ export async function handleEcho(text) {
     }
 }
 
+// --- HELPER: UID HASHING FOR ANONYMITY ---
+async function hashUID(uid) {
+    if (!uid) return null;
+    const salt = "soulamore_soul_salt_2024";
+    const msgUint8 = new TextEncoder().encode(uid + salt);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 // --- 2. CONFESSION BOX ---
 export async function handleConfession(text, email = null, phone = null) {
     if (!text || text.trim() === '') return false;
@@ -101,6 +135,9 @@ export async function handleConfession(text, email = null, phone = null) {
     const safetyCheck = validateSubmission(text);
 
     if (!safetyCheck.isValid) {
+        // Log to Admin Safety Hub
+        logSafetyIncident(safetyCheck, "confessions", text);
+
         if (safetyCheck.isCrisis) {
             alert("We noticed you mentioned something about causing harm or ending your life. Please let us help you. Redirecting to our Crisis Resources.");
             window.location.href = "../get-help-now.html";
@@ -112,14 +149,26 @@ export async function handleConfession(text, email = null, phone = null) {
     }
 
     try {
-        const cleanText = sanitizeInput(text); // ADDED: Sanitization
+        const cleanText = sanitizeInput(text);
         const cleanEmail = sanitizeInput(email);
         const cleanPhone = sanitizeInput(phone);
+
+        // Optional: Hash the UID if user is logged in
+        let userHash = null;
+        try {
+            const { auth } = await import("./firebase-config.js");
+            if (auth.currentUser) {
+                userHash = await hashUID(auth.currentUser.uid);
+            }
+        } catch (e) {
+            console.warn("Auth not available for hashing:", e.message);
+        }
 
         await addDoc(collection(db, "confessions"), {
             content: cleanText,
             email: cleanEmail,
             phone: cleanPhone,
+            userHash: userHash,
             status: "pending",
             timestamp: serverTimestamp()
         });
@@ -234,6 +283,9 @@ export async function handlePostcard(payload, city = "Unknown", friendEmail = nu
     const safetyCheck = validateSubmission(payload);
 
     if (!safetyCheck.isValid) {
+        // Log to Admin Safety Hub
+        logSafetyIncident(safetyCheck, "postcards", payload);
+
         if (safetyCheck.isCrisis) {
             alert("We noticed you mentioned something about causing harm or ending your life. Please let us help you. Redirecting to our Crisis Resources.");
             window.location.href = "../get-help-now.html";

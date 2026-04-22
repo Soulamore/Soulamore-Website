@@ -63,19 +63,22 @@
             const { auth, onAuthStateChanged } = await import('./firebase-config.js');
 
             onAuthStateChanged(auth, async (user) => {
-                if (!user) {
+                // --- DEV BYPASS CHECK ---
+                const session = JSON.parse(localStorage.getItem('soulamore_session') || '{}');
+                const isDevSession = session.isLoggedIn && session.userId && session.userId.startsWith('dev-');
+
+                if (!user && !isDevSession) {
                     console.log('⚠️ No user logged in, redirecting to login');
                     window.location.href = LOGIN_URL;
                     return;
                 }
 
-                console.log('✅ User authenticated:', user.email);
+                console.log('✅ User authenticated:', user ? user.email : 'Dev Session');
 
-                // Get user's role from Firestore
-                const role = await getUserRole(user.uid, user.email);
+                // Get user's role
+                let role = isDevSession ? session.role : await getUserRole(user.uid, user.email);
 
-                // Store role in localStorage for quick access (single source of truth)
-                const session = JSON.parse(localStorage.getItem('soulamore_session') || '{}');
+                // Update role in session if needed
                 if (session.role !== role) {
                     session.role = role;
                     localStorage.setItem('soulamore_session', JSON.stringify(session));
