@@ -1121,15 +1121,13 @@ function injectFooter() {
 }
 
 function injectNewsTicker() {
-    // 1. Remove existing if any
     const existing = document.querySelector('.news-ticker-container');
     if (existing) existing.remove();
 
-    // 2. Create high-priority body child
     const ticker = document.createElement('div');
     ticker.className = 'news-ticker-container';
     
-    // Initial style to avoid flash
+    // Core physical containment
     ticker.style.position = 'fixed';
     ticker.style.bottom = '0';
     ticker.style.left = '0';
@@ -1147,20 +1145,7 @@ function injectNewsTicker() {
                 align-items: center; 
                 backdrop-filter: blur(10px); 
                 transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-                width: 100%;
-            }
-    ticker.innerHTML = `
-        <style>
-            @keyframes tickerDotPulse { 0% { opacity: 0.5; } 50% { opacity: 1; box-shadow: 0 0 8px #fff; } 100% { opacity: 0.5; } }
-            .news-ticker-container { 
-                background: rgba(15, 23, 42, 0.95); 
-                border-top: 1px solid rgba(244, 159, 117, 0.3); 
-                height: 32px; 
-                display: flex; 
-                align-items: center; 
-                backdrop-filter: blur(10px); 
-                transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-                width: 100%;
+                width: 0;
                 pointer-events: auto;
             }
             .news-ticker-label { 
