@@ -1128,24 +1128,15 @@ function injectNewsTicker() {
     // 2. Create high-priority body child
     const ticker = document.createElement('div');
     ticker.className = 'news-ticker-container';
-    ticker.style = `
-        background: rgba(15, 23, 42, 0.95); 
-        border-top: 1px solid rgba(244, 159, 117, 0.3); 
-        height: 32px; 
-        display: flex; 
-        align-items: center; 
-        overflow: visible; 
-        white-space: nowrap; 
-        position: fixed; 
-        bottom: 0; 
-        left: 0; 
-        width: 100%; 
-        z-index: 1000; /* Fixed z-index to stay below floating buttons */
-        backdrop-filter: blur(10px); 
-        text-align: left !important;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    `;
+    
+    // Initial style to avoid flash
+    ticker.style.position = 'fixed';
+    ticker.style.bottom = '0';
+    ticker.style.left = '0';
+    ticker.style.zIndex = '1000';
+    ticker.style.overflow = 'hidden';
 
+    ticker.innerHTML = `
         <style>
             @keyframes tickerDotPulse { 0% { opacity: 0.5; } 50% { opacity: 1; box-shadow: 0 0 8px #fff; } 100% { opacity: 0.5; } }
             .news-ticker-container { 
@@ -1154,13 +1145,9 @@ function injectNewsTicker() {
                 height: 32px; 
                 display: flex; 
                 align-items: center; 
-                position: fixed; 
-                bottom: 0; 
-                left: 0; 
-                z-index: 1000; 
                 backdrop-filter: blur(10px); 
                 transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-                overflow: hidden;
+                width: 100%;
             }
             .news-ticker-label { 
                 cursor: pointer; background: #F49F75; color: #0f172a; padding: 0 12px; height: 100%; 
