@@ -1134,16 +1134,16 @@ function injectNewsTicker() {
         height: 32px; 
         display: flex; 
         align-items: center; 
-        overflow: hidden; 
+        overflow: visible; 
         white-space: nowrap; 
         position: fixed; 
         bottom: 0; 
         left: 0; 
         width: 100%; 
-        z-index: 99998; /* Below mobile toggle but above everything else */
+        z-index: 1000; /* Fixed z-index to stay below floating buttons */
         backdrop-filter: blur(10px); 
         text-align: left !important;
-        transition: width 0.3s ease;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     `;
 
     ticker.innerHTML = `
@@ -1166,23 +1166,23 @@ function injectNewsTicker() {
 // --- NEWS FEED TOGGLE SYSTEM ---
 function applyNewsFeedStatus(status) {
     const ticker = document.querySelector('.news-ticker-container');
-    const content = document.getElementById('news-ticker');
     const label = document.querySelector('.news-ticker-label');
     const dot = document.getElementById('news-ticker-dot');
     
-    if (ticker && content && label) {
+    if (ticker && label) {
         if (status === 'on') {
-            ticker.style.width = '100%';
-            content.style.display = 'inline-block';
+            ticker.style.transform = 'translateX(0)';
             label.style.background = '#4ECDC4'; // Green
             if (dot) dot.style.display = 'block';
         } else {
-            ticker.style.width = 'fit-content';
-            content.style.display = 'none';
+            // Slide exactly to hide everything except the label
+            ticker.style.transform = 'translateX(-100%)';
+            label.style.transform = 'translateX(100%)'; // Push label back into view
             label.style.background = '#F49F75'; // Orange
             if (dot) dot.style.display = 'none';
         }
     }
+}
 }
 
 function getSavedNewsFeedStatus() {
