@@ -1147,19 +1147,26 @@ function injectNewsTicker() {
     `;
 
     ticker.innerHTML = `
-        <style>@keyframes tickerDotPulse { 0% { opacity: 0.5; } 50% { opacity: 1; box-shadow: 0 0 8px #fff; } 100% { opacity: 0.5; } }</style>
-        <div class="news-ticker-label" onclick="window.toggleNewsFeed()" title="Toggle Live News" style="cursor: pointer; background: #F49F75; color: #0f172a; padding: 0 12px; height: 100%; display: flex; align-items: center; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; position: relative; z-index: 2; box-shadow: 10px 0 20px rgba(15, 23, 42, 0.95); flex-shrink: 0; transition: background 0.3s ease;">
+        <style>
+            @keyframes tickerDotPulse { 0% { opacity: 0.5; } 50% { opacity: 1; box-shadow: 0 0 8px #fff; } 100% { opacity: 0.5; } }
+            .news-ticker-container { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+            .news-ticker-label { 
+                cursor: pointer; background: #F49F75; color: #0f172a; padding: 0 12px; height: 100%; 
+                display: flex; align-items: center; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; 
+                position: absolute; right: 0; top: 0; z-index: 10; box-shadow: -10px 0 20px rgba(15, 23, 42, 0.95); 
+                transition: background 0.3s ease; 
+            }
+        </style>
+        <div class="news-ticker-label" onclick="window.toggleNewsFeed()" title="Toggle Live News">
             <div id="news-ticker-dot" style="width:6px; height:6px; border-radius:50%; background:#fff; margin-right:6px; display:none; animation: tickerDotPulse 1.5s infinite ease-in-out;"></div>
             Live News
         </div>
-        <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+        <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif; padding-right: 100px;">
             Fetching the latest mental health rituals and global insights...
         </div>
     `;
 
     document.body.appendChild(ticker);
-    
-    // Set initial visibility based on status
     applyNewsFeedStatus(getSavedNewsFeedStatus());
 }
 
@@ -1175,14 +1182,13 @@ function applyNewsFeedStatus(status) {
             label.style.background = '#4ECDC4'; // Green
             if (dot) dot.style.display = 'block';
         } else {
-            // Slide exactly to hide everything except the label
-            ticker.style.transform = 'translateX(-100%)';
-            label.style.transform = 'translateX(100%)'; // Push label back into view
+            // Slide left so only the label (which is on the absolute right of the container) is visible
+            const labelWidth = label.offsetWidth || 85;
+            ticker.style.transform = `translateX(calc(-100% + ${labelWidth}px))`;
             label.style.background = '#F49F75'; // Orange
             if (dot) dot.style.display = 'none';
         }
     }
-}
 }
 
 function getSavedNewsFeedStatus() {
