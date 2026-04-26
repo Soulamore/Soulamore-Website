@@ -1128,40 +1128,43 @@ function injectNewsTicker() {
     // 2. Create high-priority body child
     const ticker = document.createElement('div');
     ticker.className = 'news-ticker-container';
-    ticker.style = `
-        background: rgba(15, 23, 42, 0.95); 
-        border-top: 1px solid rgba(244, 159, 117, 0.3); 
-        height: 32px; 
-        display: flex; 
-        align-items: center; 
-        overflow: visible; 
-        white-space: nowrap; 
-        position: fixed; 
-        bottom: 0; 
-        left: 0; 
-        width: 100%; 
-        z-index: 1000; /* Fixed z-index to stay below floating buttons */
-        backdrop-filter: blur(10px); 
-        text-align: left !important;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    `;
+    
+    // Initial style to avoid flash
+    ticker.style.position = 'fixed';
+    ticker.style.bottom = '0';
+    ticker.style.left = '0';
+    ticker.style.zIndex = '1000';
+    ticker.style.overflow = 'hidden';
 
     ticker.innerHTML = `
         <style>
             @keyframes tickerDotPulse { 0% { opacity: 0.5; } 50% { opacity: 1; box-shadow: 0 0 8px #fff; } 100% { opacity: 0.5; } }
-            .news-ticker-container { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+            .news-ticker-container { 
+                background: rgba(15, 23, 42, 0.95); 
+                border-top: 1px solid rgba(244, 159, 117, 0.3); 
+                height: 32px; 
+                display: flex; 
+                align-items: center; 
+                backdrop-filter: blur(10px); 
+                transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+                width: 100%;
+            }
             .news-ticker-label { 
                 cursor: pointer; background: #F49F75; color: #0f172a; padding: 0 12px; height: 100%; 
                 display: flex; align-items: center; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; 
-                position: absolute; right: 0; top: 0; z-index: 10; box-shadow: -10px 0 20px rgba(15, 23, 42, 0.95); 
-                transition: background 0.3s ease; 
+                flex-shrink: 0; transition: background 0.3s ease; 
+            }
+            .news-ticker-content {
+                display: inline-block; color: #e2e8f0; font-size: 0.85rem; 
+                font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap;
+                transition: opacity 0.3s ease;
             }
         </style>
         <div class="news-ticker-label" onclick="window.toggleNewsFeed()" title="Toggle Live News">
             <div id="news-ticker-dot" style="width:6px; height:6px; border-radius:50%; background:#fff; margin-right:6px; display:none; animation: tickerDotPulse 1.5s infinite ease-in-out;"></div>
             Live News
         </div>
-        <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif; padding-right: 100px;">
+        <div id="news-ticker" class="news-ticker-content">
             Fetching the latest mental health rituals and global insights...
         </div>
     `;
@@ -1173,18 +1176,20 @@ function injectNewsTicker() {
 // --- NEWS FEED TOGGLE SYSTEM ---
 function applyNewsFeedStatus(status) {
     const ticker = document.querySelector('.news-ticker-container');
+    const content = document.getElementById('news-ticker');
     const label = document.querySelector('.news-ticker-label');
     const dot = document.getElementById('news-ticker-dot');
     
-    if (ticker && label) {
+    if (ticker && label && content) {
         if (status === 'on') {
-            ticker.style.transform = 'translateX(0)';
+            ticker.style.width = '100%';
+            content.style.opacity = '1';
             label.style.background = '#4ECDC4'; // Green
             if (dot) dot.style.display = 'block';
         } else {
-            // Slide left so only the label (which is on the absolute right of the container) is visible
-            const labelWidth = label.offsetWidth || 85;
-            ticker.style.transform = `translateX(calc(-100% + ${labelWidth}px))`;
+            // Shrink the bar to exactly the width of the label
+            ticker.style.width = label.offsetWidth + 'px';
+            content.style.opacity = '0';
             label.style.background = '#F49F75'; // Orange
             if (dot) dot.style.display = 'none';
         }
