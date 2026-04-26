@@ -1143,10 +1143,15 @@ function injectNewsTicker() {
         z-index: 99998; /* Below mobile toggle but above everything else */
         backdrop-filter: blur(10px); 
         text-align: left !important;
+        transition: width 0.3s ease;
     `;
 
     ticker.innerHTML = `
-        <div class="news-ticker-label" style="background: #F49F75; color: #0f172a; padding: 0 12px; height: 100%; display: flex; align-items: center; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; position: relative; z-index: 2; box-shadow: 10px 0 20px rgba(15, 23, 42, 0.95); flex-shrink: 0;">Live News Feed</div>
+        <style>@keyframes tickerDotPulse { 0% { opacity: 0.5; } 50% { opacity: 1; box-shadow: 0 0 8px #fff; } 100% { opacity: 0.5; } }</style>
+        <div class="news-ticker-label" onclick="window.toggleNewsFeed()" title="Toggle Live News" style="cursor: pointer; background: #F49F75; color: #0f172a; padding: 0 12px; height: 100%; display: flex; align-items: center; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; position: relative; z-index: 2; box-shadow: 10px 0 20px rgba(15, 23, 42, 0.95); flex-shrink: 0; transition: background 0.3s ease;">
+            <div id="news-ticker-dot" style="width:6px; height:6px; border-radius:50%; background:#fff; margin-right:6px; display:none; animation: tickerDotPulse 1.5s infinite ease-in-out;"></div>
+            Live News
+        </div>
         <div id="news-ticker" class="news-ticker-content" style="display: inline-block; color: #e2e8f0; font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif;">
             Fetching the latest mental health rituals and global insights...
         </div>
@@ -1155,18 +1160,28 @@ function injectNewsTicker() {
     document.body.appendChild(ticker);
     
     // Set initial visibility based on status
-    ticker.style.display = getSavedNewsFeedStatus() === 'on' ? 'flex' : 'none';
+    applyNewsFeedStatus(getSavedNewsFeedStatus());
 }
 
 // --- NEWS FEED TOGGLE SYSTEM ---
 function applyNewsFeedStatus(status) {
     const ticker = document.querySelector('.news-ticker-container');
-    const pill = document.querySelector('.news-toggle-pill');
+    const content = document.getElementById('news-ticker');
+    const label = document.querySelector('.news-ticker-label');
+    const dot = document.getElementById('news-ticker-dot');
     
-    if (ticker) ticker.style.display = status === 'on' ? 'flex' : 'none';
-    if (pill) {
-        if (status === 'on') pill.classList.add('active');
-        else pill.classList.remove('active');
+    if (ticker && content && label) {
+        if (status === 'on') {
+            ticker.style.width = '100%';
+            content.style.display = 'inline-block';
+            label.style.background = '#4ECDC4'; // Green
+            if (dot) dot.style.display = 'block';
+        } else {
+            ticker.style.width = 'fit-content';
+            content.style.display = 'none';
+            label.style.background = '#F49F75'; // Orange
+            if (dot) dot.style.display = 'none';
+        }
     }
 }
 
@@ -1182,27 +1197,9 @@ window.toggleNewsFeed = function () {
 };
 
 function injectNewsToggle() {
-    if (document.querySelector('.news-toggle-pill')) return;
+    // Disabled to prevent floating pill overlapping issues. 
+    // The Live News label in the ticker now acts as the toggle.
 
-    // Skip news toggle on portal/dashboard pages
-    if (document.body.classList.contains('portal-page') ||
-        document.body.classList.contains('dashboard-page') ||
-        window.location.pathname.includes('/portal/')) {
-        return;
-    }
-
-    const pill = document.createElement('div');
-    pill.className = 'news-toggle-pill';
-    const initialStatus = getSavedNewsFeedStatus();
-    if (initialStatus === 'on') pill.classList.add('active');
-
-    pill.innerHTML = `
-        <div class="status-dot"></div>
-        <span class="pill-label">Live News</span>
-    `;
-
-    pill.onclick = window.toggleNewsFeed;
-    document.body.appendChild(pill);
 }
 
 // --- FAVICON INJECTION ---
