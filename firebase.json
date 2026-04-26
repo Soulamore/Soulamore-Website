@@ -48,24 +48,63 @@
       "audit_shell.js",
       "audit_site.js"
     ],
+    "rewrites": [
+      {
+        "source": "/portal/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/dashboard/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/app/**",
+        "destination": "/index.html"
+      }
+    ],
     "cleanUrls": true,
     "trailingSlash": false,
     "headers": [
+      {
+        "source": "/portal/**",
+        "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow"}]
+      },
+      {
+        "source": "/dashboard/**",
+        "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow"}]
+      },
+      {
+        "source": "/app/**",
+        "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow"}]
+      },
+      {
+        "source": "/spaces/**",
+        "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow"}]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|png|gif|svg|webp)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public,max-age=31536000,immutable"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(css|js|mjs|woff|woff2|ttf|eot)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public,max-age=31536000,immutable"
+          }
+        ]
+      },
       {
         "source": "**/*.html",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "public, max-age=3600, must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "**/*.@(css|js|mjs|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=31536000, immutable"
+            "value": "public,max-age=300,s-maxage=600"
           }
         ]
       },
