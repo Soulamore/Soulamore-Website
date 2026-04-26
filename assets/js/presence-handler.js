@@ -6,7 +6,7 @@
 import { db, collection, addDoc, doc, onSnapshot, updateDoc, deleteDoc, serverTimestamp, query, where, getDocs } from "./firebase-config.js";
 
 const PRESENCE_COLLECTION = "active_souls";
-const HEARTBEAT_INTERVAL = 30000; // 30 seconds
+const HEARTBEAT_INTERVAL = 60000; // 60 seconds
 
 // Generate a session ID for this tab
 // Generate a secure session ID for this tab
