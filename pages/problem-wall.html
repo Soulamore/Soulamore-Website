@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -1534,12 +1534,21 @@
             const waitForDB = setInterval(() => {
                 if (window.db) {
                     clearInterval(waitForDB);
-                    initPresenceSystem();
+                    gatePresenceInit();
                 }
             }, 500);
         });
 
         // --- PRESENCE SYSTEM (REAL-TIME FIRESTORE) ---
+        function gatePresenceInit() {
+            const triggers = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+            const init = () => {
+                initPresenceSystem();
+                triggers.forEach(t => window.removeEventListener(t, init));
+            };
+            triggers.forEach(t => window.addEventListener(t, init, { passive: true }));
+        }
+
         async function initPresenceSystem() {
             const userCountEl = document.getElementById('userCountSidebar');
             const userCountMob = document.getElementById('mobUserCount');

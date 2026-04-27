@@ -58,27 +58,32 @@ const SEEDED_NOTES = [
  * Handles Auth, Seeding, and Subscribing
  */
 export function initWall(renderCallback, updateUICallback, statsCallback) {
-    log("initWall: Waiting for Auth...");
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            log(`Auth State: Signed In (${user.uid})`);
-            // Seed first, but always setup listeners regardless of seed result
-            seedDatabase()
-                .catch(e => log(`Seeding skipped: ${e.message}`))
-                .finally(() => {
-                    setupWallListeners(renderCallback, updateUICallback, statsCallback);
-                    setupFormListener(); // Call the form listener setup here
+    log("initWall: Waiting for Interaction...");
+
+    const triggers = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    const startInit = () => {
+        triggers.forEach(t => window.removeEventListener(t, startInit));
+        log("initWall: Starting Auth/Listeners...");
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                log(`Auth State: Signed In (${user.uid})`);
+                seedDatabase()
+                    .catch(e => log(`Seeding skipped: ${e.message}`))
+                    .finally(() => {
+                        setupWallListeners(renderCallback, updateUICallback, statsCallback);
+                        setupFormListener();
+                    });
+            } else {
+                log("Auth State: Signed Out. Attempting Anon Sign-In...");
+                signInAnonymously(auth).catch(e => {
+                    log(`Auth Failed: ${e.message}`);
+                    console.error("Auth Failed:", e);
                 });
-        } else {
-            log("Auth State: Signed Out. Attempting Anon Sign-In...");
-            signInAnonymously(auth).then(() => {
-                // onAuthStateChanged will fire again with user
-            }).catch(e => {
-                log(`Auth Failed: ${e.message}`);
-                console.error("Auth Failed:", e);
-            });
-        }
-    });
+            }
+        });
+    };
+
+    triggers.forEach(t => window.addEventListener(t, startInit, { passive: true }));
 }
 
 /**

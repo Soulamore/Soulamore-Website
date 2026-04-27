@@ -504,41 +504,46 @@ export function updatePulseStats() {
 
     const fallbackTimeout = setTimeout(setFallback, 2000);
 
-    try {
-        // Match the Problem Wall logic exactly (limit 200)
-        // using dynamic import to prevent any dependency loop crashes
-        import("./firebase-config.js").then(({ db, collection, query, limit, onSnapshot }) => {
-            const q = query(collection(db, "problem-wall-notes"), limit(200));
-            onSnapshot(q, (snapshot) => {
-                clearTimeout(fallbackTimeout);
-                let hearts = 0, flowers = 0, candles = 0;
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if (data.isHidden !== true) {
-                        hearts += (data.hearts || 0);
-                        flowers += (data.flowers || 0);
-                        candles += (data.candles || 0);
-                    }
+    // INTERACTION GATE: Only start real-time listener on interaction
+    const triggers = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    const startListener = () => {
+        triggers.forEach(t => window.removeEventListener(t, startListener));
+        try {
+            // Match the Problem Wall logic exactly (limit 200)
+            import("./firebase-config.js").then(({ db, collection, query, limit, onSnapshot }) => {
+                const q = query(collection(db, "problem-wall-notes"), limit(200));
+                onSnapshot(q, (snapshot) => {
+                    clearTimeout(fallbackTimeout);
+                    let hearts = 0, flowers = 0, candles = 0;
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        if (data.isHidden !== true) {
+                            hearts += (data.hearts || 0);
+                            flowers += (data.flowers || 0);
+                            candles += (data.candles || 0);
+                        }
+                    });
+
+                    if (h) h.innerText = hearts.toLocaleString();
+                    if (f) f.innerText = flowers.toLocaleString();
+                    if (c) c.innerText = candles.toLocaleString();
+
+                    window.SoulPulseData = { hearts, flowers, candles };
+                }, (error) => {
+                    console.error("Pulse Stats Error:", error);
+                    setFallback();
                 });
-
-                if (h) h.innerText = hearts.toLocaleString();
-                if (f) f.innerText = flowers.toLocaleString();
-                if (c) c.innerText = candles.toLocaleString();
-
-                // Sync to any other listeners if needed
-                window.SoulPulseData = { hearts, flowers, candles };
-            }, (error) => {
-                console.error("Pulse Stats Error:", error);
+            }).catch((e) => {
+                console.error("Firebase dynamic import error:", e);
                 setFallback();
             });
-        }).catch((e) => {
-            console.error("Firebase dynamic import error:", e);
+        } catch (e) {
+            console.error("Firebase Init Error:", e);
             setFallback();
-        });
-    } catch (e) {
-        console.error("Firebase Init Error:", e);
-        setFallback();
-    }
+        }
+    };
+
+    triggers.forEach(t => window.addEventListener(t, startListener, { passive: true }));
 }
 
 // Make globally available for inline HTML onclicks (via a bridge helper if needed)
