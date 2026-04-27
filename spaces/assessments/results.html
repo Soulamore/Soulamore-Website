@@ -3,6 +3,27 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            // 1. Redirect Firebase Traffic
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            // 2. Canonical Injection
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Soulamore Emotional Assessment Results">
     <title>Your Emotional Signature | Soulamore</title>
@@ -652,7 +673,6 @@
 <!-- REQUIRED SDKS & DATA -->
 <script type="module" src="../../assets/js/firebase-config.js"></script>
 <script src="../../assets/js/components.js"></script>
-<script src="../../assets/js/assessment-data.js"></script>
 <script type="module">
     import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
@@ -668,20 +688,25 @@
 
         const data = JSON.parse(resultDataStr);
         const metrics = data.deterministic_metrics;
+        const assessmentId = data.assessment_id;
 
-        console.log("[RESULTS] Received assessment result:", {
-            assessment_id: data.assessment_id,
-            domain: data.domain,
-            severity_band: metrics.severity_band,
-            raw_score: metrics.raw_score
-        });
+        // Tier 4: Fetch Assessment Metadata & Citations for this specific result
+        let assessmentMeta = null;
+        try {
+            const [metaRes, citRes] = await Promise.all([
+                fetch(`../../assets/data/assessments/${assessmentId}.json`),
+                fetch('../../assets/data/citations.json')
+            ]);
+            if (metaRes.ok) assessmentMeta = await metaRes.json();
+            if (citRes.ok) window.SoulamoreCitations = await citRes.json();
+        } catch (e) { console.error("Failed to load metadata/citations:", e); }
 
-        function normalizeDomainKey(assessmentId, rawDomain) {
-            const meta = (window.SoulamoreAssessments && window.SoulamoreAssessments[assessmentId]) || null;
+        function normalizeDomainKey(targetId, rawDomain) {
+            const meta = assessmentMeta;
             const primary = (meta?.primary_domain || '').toLowerCase();
             const raw = (rawDomain || '').toLowerCase();
-            const id = (assessmentId || '').toLowerCase();
-            const joined = `${primary} ${raw} ${id}`;
+            const currentId = (targetId || '').toLowerCase();
+            const joined = `${primary} ${raw} ${currentId}`;
 
             console.log("[RESULTS] Normalizing domain:", { assessmentId, rawDomain, primary, joined });
 

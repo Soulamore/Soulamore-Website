@@ -92,7 +92,7 @@ export async function openRazorpayCheckout(bookingId, amount, userId, userName, 
                 currency: orderData.currency,
                 name: "Soulamore",
                 description: `Booking: ${metadata.planName || 'Peer Session'}`,
-                image: "/assets/images/logo.png", // Your logo
+                image: "/assets/images/logo.webp", // Your logo
                 order_id: orderData.id || null, // If order was pre-created on backend
                 prefill: {
                     name: userName || "",

@@ -1,0 +1,185 @@
+{
+  "id": "mood_exhaustion",
+  "title": "Functional Exhaustion",
+  "version": "1.0",
+  "description": "Distinguish between 'Busy Boredom' and 'Clinical Fatigue'. Map your internal drive against your physical capacity.",
+  "primary_domain": "Mood & Depression",
+  "context_tags": [
+    "Workplace",
+    "Performance",
+    "Somatic"
+  ],
+  "theme_color": "#475569",
+  "questions": [
+    {
+      "id": "me_q1",
+      "text": "My energy level after a full night's sleep is...",
+      "domain": "mood_exhaustion",
+      "subdomain": "restorative_capacity",
+      "options": [
+        {
+          "text": "Refreshed and ready.",
+          "severity_weight": 0
+        },
+        {
+          "text": "Okay, but it fades fast.",
+          "severity_weight": 1
+        },
+        {
+          "text": "Like I haven't slept at all.",
+          "severity_weight": 2
+        },
+        {
+          "text": "Deeply, marrow-level tired.",
+          "severity_weight": 3,
+          "functional_impairment": true
+        }
+      ]
+    },
+    {
+      "id": "me_q2",
+      "text": "The thought of social plans or 'fun' activities feels...",
+      "domain": "mood_exhaustion",
+      "subdomain": "social_energy_cost",
+      "options": [
+        {
+          "text": "Invigorating.",
+          "severity_weight": 0
+        },
+        {
+          "text": "A bit demanding.",
+          "severity_weight": 1
+        },
+        {
+          "text": "Like a heavy mountain I have to climb.",
+          "severity_weight": 2
+        },
+        {
+          "text": "Physically impossible to even consider.",
+          "severity_weight": 3
+        }
+      ]
+    },
+    {
+      "id": "me_q3",
+      "text": "I feel most productive when...",
+      "domain": "mood_exhaustion",
+      "subdomain": "diurnal_pattern",
+      "options": [
+        {
+          "text": "I have a healthy daily rhythm.",
+          "severity_weight": 0
+        },
+        {
+          "text": "I push myself with caffeine/willpower.",
+          "severity_weight": 1
+        },
+        {
+          "text": "I barely scrape by.",
+          "severity_weight": 2
+        },
+        {
+          "text": "I'm never productive; I'm just surviving.",
+          "severity_weight": 3
+        }
+      ],
+      "insight_cloud": {
+        "type": "clinical",
+        "title": "Avolition",
+        "text": "Avolition is the clinical loss of 'will' or 'drive'. It's not laziness; it's a shutdown of the brain's goal-seeking mechanism often seen in deep mood valleys.",
+        "source_name": "Functional Fatigue Research"
+      }
+    },
+    {
+      "id": "me_q4",
+      "text": "My interest in self-care (showering, dressing well) is...",
+      "domain": "mood_exhaustion",
+      "subdomain": "daily_functioning",
+      "options": [
+        {
+          "text": "High and consistent.",
+          "severity_weight": 0
+        },
+        {
+          "text": "Slipping a bit.",
+          "severity_weight": 1
+        },
+        {
+          "text": "A struggle to maintain.",
+          "severity_weight": 2
+        },
+        {
+          "text": "Non-existent; I've stopped caring.",
+          "severity_weight": 3,
+          "functional_impairment": true
+        }
+      ]
+    },
+    {
+      "id": "me_q5",
+      "text": "Do you feel like even your thoughts are 'heavy' to think?",
+      "domain": "mood_exhaustion",
+      "subdomain": "cognitive_burden",
+      "risk_flag": true,
+      "options": [
+        {
+          "text": "No.",
+          "severity_weight": 0
+        },
+        {
+          "text": "Rarely.",
+          "severity_weight": 1
+        },
+        {
+          "text": "Frequently.",
+          "severity_weight": 2,
+          "risk_weight": 1
+        },
+        {
+          "text": "Almost constantly.",
+          "severity_weight": 3,
+          "risk_weight": 2
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "max_possible": 15,
+    "bands": [
+      {
+        "range": [
+          0,
+          3
+        ],
+        "label": "resilient",
+        "risk_category": "low"
+      },
+      {
+        "range": [
+          4,
+          7
+        ],
+        "label": "tired",
+        "risk_category": "low"
+      },
+      {
+        "range": [
+          8,
+          11
+        ],
+        "label": "depleted",
+        "risk_category": "medium"
+      },
+      {
+        "range": [
+          12,
+          15
+        ],
+        "label": "shut down",
+        "risk_category": "high",
+        "escalation_required": true
+      }
+    ],
+    "risk_threshold": 3
+  }
+}

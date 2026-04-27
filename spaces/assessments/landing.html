@@ -3,6 +3,27 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            // 1. Redirect Firebase Traffic
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            // 2. Canonical Injection
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta id="meta-description" name="description"
         content="Take the Soulamore Assessment to understand your emotional landscape.">
@@ -302,18 +323,37 @@
 
     <script src="../../assets/js/components.js"></script>
 
-    <script src="../../assets/js/assessment-data.js"></script>
     <script src="../../assets/js/expert-bios.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             if (typeof injectHeader === 'function') injectHeader();
             if (typeof injectFooter === 'function') injectFooter();
-
+    
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
             const loader = document.getElementById('loader');
 
-            if (!id || !window.SoulamoreAssessments[id]) {
+            // Tier 4: Fetch only what's needed
+            let data = null;
+            let citations = null;
+
+            try {
+                if (id) {
+                    const [testRes, citRes] = await Promise.all([
+                        fetch(`../../assets/data/assessments/${id}.json`),
+                        fetch('../../assets/data/citations.json')
+                    ]);
+                    if (testRes.ok) data = await testRes.json();
+                    if (citRes.ok) {
+                        const citData = await citRes.json();
+                        citations = citData[id];
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to load assessment data:", e);
+            }
+
+            if (!id || !data) {
                 // FALLBACK: Show a selection state rather than a silent redirect
                 document.getElementById('assessment-title').innerText = "Select Your Journey";
                 document.getElementById('assessment-desc').innerText = "Explore our library of 110+ clinical assessments designed for your well-being.";
@@ -328,8 +368,8 @@
                 return;
             }
 
-            const data = window.SoulamoreAssessments[id];
-            const citations = window.SoulamoreCitations[id];
+            // const data = window.SoulamoreAssessments[id]; // Already fetched
+            // const citations = window.SoulamoreCitations[id]; // Already fetched
 
             // Update DOM
             document.getElementById('page-title').innerText = `${data.title} | Soulamore`;

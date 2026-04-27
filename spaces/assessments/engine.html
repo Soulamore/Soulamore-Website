@@ -3,6 +3,27 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            // 1. Redirect Firebase Traffic
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            // 2. Canonical Injection
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Soulamore Emotional Assessment Engine">
     <title>Assessment | Soulamore</title>
@@ -583,7 +604,7 @@
             color: var(--starlight);
         }
     </style>
-    <link rel="icon" href="../../assets/images/favicon_symbol.png" type="image/x-icon">
+    <link rel="icon" href="../../assets/images/favicon_symbol.webp" type="image/x-icon">
     <script>
         (function () {
             if (localStorage.getItem('soulamore-theme') === 'light') {
@@ -665,7 +686,6 @@
 
     <!-- REQUIRED SDKS & DATA -->
     <script type="module" src="../../assets/js/firebase-config.js"></script>
-    <script src="../../assets/js/assessment-data.js"></script>
     <script>
         // --- ENGINE STATE ---
         let assessmentData = null;
@@ -683,11 +703,22 @@
             const testId = urlParams.get('id') || urlParams.get('test') || 'emotional_regulation'; // fallback
 
             try {
-                // Load Pre-Compiled JSON Schema from Memory
-                if (!window.SoulamoreAssessments || !window.SoulamoreAssessments[testId]) {
-                    throw new Error("Assessment data not found across local scopes.");
+                // Tier 4 Optimization: Lazy-load specific Assessment Data from JSON
+                // First load citations (directory-wide) and then specific assessment
+                const [citRes, testRes] = await Promise.all([
+                    fetch('../../assets/data/citations.json'),
+                    fetch(`../../assets/data/assessments/${testId}.json`)
+                ]);
+                
+                if (!citRes.ok || !testRes.ok) throw new Error("Failed to load assessment data.");
+                
+                window.SoulamoreCitations = await citRes.json();
+                assessmentData = await testRes.json();
+                window.SoulamoreAssessments = { [testId]: assessmentData }; // For compatibility with existing logic
+
+                if (!assessmentData) {
+                    throw new Error("Specific assessment data not found.");
                 }
-                assessmentData = window.SoulamoreAssessments[testId];
 
                 // Set Custom Theme
                 const themeColor = assessmentData.theme_color || '#4ECDC4';

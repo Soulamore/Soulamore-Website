@@ -3,6 +3,27 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            // 1. Redirect Firebase Traffic
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            // 2. Canonical Injection
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         /* Import modern typography and cursive font */
@@ -326,7 +347,7 @@
 
         <div class="container">
             <a href="https://soulamore.com" target="_blank">
-                <img src="https://soulamore.com/assets/images/logo.png" alt="Soulamore" class="logo-img">
+                <img src="https://soulamore.com/assets/images/logo.webp" alt="Soulamore" class="logo-img">
             </a>
             <div style="text-align: center;">
                 <h2 class="title-cursive">Soulamore Away</h2>

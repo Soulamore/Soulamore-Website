@@ -3,6 +3,27 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            // 1. Redirect Firebase Traffic
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            // 2. Canonical Injection
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
                  script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com;
@@ -49,7 +70,7 @@
     <link rel="stylesheet" href="../assets/css/dashboard-themes.css">
     <link rel="stylesheet" href="../assets/css/portal-shared.css">
     <link rel="stylesheet" href="../assets/css/dashboard-loading.css">
-    <link rel="icon" href="../assets/images/favicon_symbol.png" type="image/x-icon">
+    <link rel="icon" href="../assets/images/favicon_symbol.webp" type="image/x-icon">
     <!-- FORCE COLOR OVERRIDE: Resolve Black Screen Issue -->
     <!-- DYNAMIC COLOR FIX (Handled by portal-shared.css and global.css) -->
     <style>

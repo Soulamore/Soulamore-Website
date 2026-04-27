@@ -3,12 +3,29 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- DOMAIN ROUTER & CANONICAL -->
     <script>
-        if (location.hostname.endsWith(".web.app") || location.hostname.endsWith(".firebaseapp.com")) {
-            location.replace("https://www.soulamore.com");
-        }
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            // 1. Redirect Firebase Traffic
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            // 2. Canonical Injection
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
     </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
                  script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://www.gstatic.com https://accounts.google.com https://apis.google.com https://www.googletagmanager.com https://esm.run https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/;
@@ -42,7 +59,7 @@
         content="Is your mind loud at night? Soulamore is your safe space to vent, connect with understanding peers, and find calm. No judgment.">
     <meta name="twitter:image" content="https://soulamore.com/assets/images/social-preview.png">
 
-    <link rel="canonical" href="https://soulamore.com/">
+    
 
     <!-- JSON-LD Schema (Organization) -->
     <script type="application/ld+json">
@@ -51,7 +68,7 @@
       "@type": "Organization",
       "name": "Soulamore",
       "url": "https://soulamore.com",
-      "logo": "https://soulamore.com/assets/images/logo.png",
+      "logo": "https://soulamore.com/assets/images/logo.webp",
       "sameAs": [
         "https://www.instagram.com/soulamore_/",
         "https://www.linkedin.com/company/soulamore/",
@@ -136,7 +153,7 @@
     <link rel="stylesheet" href="assets/css/global.css?v=3.2">
 
     <!-- Favicon -->
-    <link rel="icon" href="./assets/images/favicon_symbol.png" type="image/x-icon">
+    <link rel="icon" href="./assets/images/favicon_symbol.webp" type="image/x-icon">
 
     <style>
         /* --- DESIGN SYSTEM: VEGITO (The Ultimate Fusion) --- */
@@ -3020,7 +3037,17 @@
             }
         }
     </style>
-    <script src="assets/js/soulbot-widget-v2.js"></script>
+    <script>
+        // Lazy load SoulBot widget to improve initial performance
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const script = document.createElement('script');
+                script.src = "assets/js/soulbot-widget-v2.js";
+                script.defer = true;
+                document.body.appendChild(script);
+            }, 3000); // 3 second delay
+        });
+    </script>
 </body>
 
 </html>

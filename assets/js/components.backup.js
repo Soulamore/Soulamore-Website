@@ -360,7 +360,7 @@ function generateSubmenuHTML(children, rootPath) {
 
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
-    <a href="${rootPath}index.html" class="nav-logo"><img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo"></a>
+    <a href="${rootPath}index.html" class="nav-logo"><img src="${rootPath}assets/images/logo.webp" alt="Soulamore Logo"></a>
 
     <nav class="nav-links">
         
@@ -399,7 +399,7 @@ const getFooterHTML = (rootPath) => `
         
         <!-- BRAND COLUMN -->
         <div class="footer-brand">
-            <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; margin-bottom: 20px;">
+            <img src="${rootPath}assets/images/logo.webp" alt="Soulamore Logo" style="height: 50px; margin-bottom: 20px;">
             <p style="font-size:0.9rem; opacity:0.6; line-height:1.6;">
                 Your sanctuary for mental wellness. <br>
                 Tech meets empathy.
