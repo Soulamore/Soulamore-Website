@@ -895,8 +895,8 @@ const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
         <div class="logo-wrapper" style="position: relative; display: flex; align-items: center; height: 40px;">
-            <img src="${rootPath}assets/images/logo-premium.png" class="logo-img" alt="Soulamore" style="height: 100%; width: auto; display: block;">
-            <img src="${rootPath}assets/images/logo-premium.png" class="logo-img-light-overlay" alt="" aria-hidden="true" style="position: absolute; left: 0; top: 0; height: 100%; width: auto; display: block;">
+            <img src="${rootPath}assets/images/logo-premium.webp" class="logo-img" alt="Soulamore" style="height: 100%; width: auto; display: block;">
+            <img src="${rootPath}assets/images/logo-premium.webp" class="logo-img-light-overlay" alt="" aria-hidden="true" style="position: absolute; left: 0; top: 0; height: 100%; width: auto; display: block;">
         </div>
     </a>
 
@@ -951,8 +951,8 @@ const getFooterHTML = (rootPath) => `
         <!-- BRAND COLUMN -->
         <div class="footer-brand">
             <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home" style="position: relative; display: inline-flex; align-items: center; margin-bottom: 20px; height: 50px;">
-                <img src="${rootPath}assets/images/logo-premium.png" alt="Soulamore Logo" class="logo-img" style="height: 100%; width: auto; display: block;">
-                <img src="${rootPath}assets/images/logo-premium.png" alt="" aria-hidden="true" class="logo-img-light-overlay" style="position: absolute; left: 0; top: 0; height: 100%; width: auto; display: block;">
+                <img src="${rootPath}assets/images/logo-premium.webp" alt="Soulamore Logo" class="logo-img" style="height: 100%; width: auto; display: block;">
+                <img src="${rootPath}assets/images/logo-premium.webp" alt="" aria-hidden="true" class="logo-img-light-overlay" style="position: absolute; left: 0; top: 0; height: 100%; width: auto; display: block;">
             </a>
             <p style="font-size:0.9rem; opacity:0.6; line-height:1.6;">
                 Your sanctuary for mental wellness. <br>
@@ -1239,7 +1239,7 @@ function injectFavicon() {
     const rootPath = getRootPath();
 
     // Default Logo (Use Symbol to avoid squeezing)
-    let iconHref = rootPath + 'assets/images/favicon_symbol.png';
+    let iconHref = rootPath + 'assets/images/favicon_symbol.webp';
 
     // Special Pages (SVG Data URIs)
     if (path.includes('vent-box')) {

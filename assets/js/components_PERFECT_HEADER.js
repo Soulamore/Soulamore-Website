@@ -295,7 +295,7 @@ function setupFavicon(rootPath) {
     const path = window.location.pathname;
 
     // Default Logo (Use Symbol to avoid squeezing)
-    let iconHref = rootPath + 'assets/images/favicon_symbol.png';
+    let iconHref = rootPath + 'assets/images/favicon_symbol.webp';
 
     // Special Pages (SVG Data URIs)
     if (path.includes('vent-box')) {
@@ -487,7 +487,7 @@ function generateSubmenuHTML(children, rootPath) {
 const getHeaderHTML = (rootPath) => `
 <div class="main-nav">
     <a href="${rootPath}index.html" class="nav-logo" aria-label="Soulamore Home">
-        <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; width: auto; max-width: 100%;">
+        <img src="${rootPath}assets/images/logo.webp" alt="Soulamore Logo" style="height: 50px; width: auto; max-width: 100%;">
     </a>
 
     <nav class="nav-links">
@@ -527,7 +527,7 @@ const getFooterHTML = (rootPath) => `
         
         <!-- BRAND COLUMN -->
         <div class="footer-brand">
-            <img src="${rootPath}assets/images/logo.png" alt="Soulamore Logo" style="height: 50px; margin-bottom: 20px;">
+            <img src="${rootPath}assets/images/logo.webp" alt="Soulamore Logo" style="height: 50px; margin-bottom: 20px;">
             <p style="font-size:0.9rem; opacity:0.6; line-height:1.6;">
                 Your sanctuary for mental wellness. <br>
                 Tech meets empathy.

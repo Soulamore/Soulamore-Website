@@ -302,18 +302,37 @@
 
     <script src="../../assets/js/components.js"></script>
 
-    <script src="../../assets/js/assessment-data.js"></script>
     <script src="../../assets/js/expert-bios.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             if (typeof injectHeader === 'function') injectHeader();
             if (typeof injectFooter === 'function') injectFooter();
-
+    
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
             const loader = document.getElementById('loader');
 
-            if (!id || !window.SoulamoreAssessments[id]) {
+            // Tier 4: Fetch only what's needed
+            let data = null;
+            let citations = null;
+
+            try {
+                if (id) {
+                    const [testRes, citRes] = await Promise.all([
+                        fetch(`../../assets/data/assessments/${id}.json`),
+                        fetch('../../assets/data/citations.json')
+                    ]);
+                    if (testRes.ok) data = await testRes.json();
+                    if (citRes.ok) {
+                        const citData = await citRes.json();
+                        citations = citData[id];
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to load assessment data:", e);
+            }
+
+            if (!id || !data) {
                 // FALLBACK: Show a selection state rather than a silent redirect
                 document.getElementById('assessment-title').innerText = "Select Your Journey";
                 document.getElementById('assessment-desc').innerText = "Explore our library of 110+ clinical assessments designed for your well-being.";
@@ -328,8 +347,8 @@
                 return;
             }
 
-            const data = window.SoulamoreAssessments[id];
-            const citations = window.SoulamoreCitations[id];
+            // const data = window.SoulamoreAssessments[id]; // Already fetched
+            // const citations = window.SoulamoreCitations[id]; // Already fetched
 
             // Update DOM
             document.getElementById('page-title').innerText = `${data.title} | Soulamore`;

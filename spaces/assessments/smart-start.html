@@ -486,7 +486,15 @@
 
     <!-- REQUIRED SDKS & DATA -->
     <script type="module" src="../../assets/js/firebase-config.js"></script>
-    <script src="../../assets/js/assessment-data.js"></script>
+    <script>
+        // Tier 4: Lazy-load Directory for recommendations
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('../../assets/data/assessments-directory.json');
+                window.SoulamoreAssessments = await response.json();
+            } catch (e) { console.error("Failed to load assessments directory:", e); }
+        });
+    </script>
     <script src="../../assets/js/smart-start-logic.js"></script>
 
 </body>

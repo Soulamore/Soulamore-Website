@@ -1188,7 +1188,7 @@
             backdrop-filter: none;
         }
 </style>
-    <link rel="icon" href="../../assets/images/favicon_symbol.png" type="image/x-icon">
+    <link rel="icon" href="../../assets/images/favicon_symbol.webp" type="image/x-icon">
 </head>
 
 <body>
@@ -1386,7 +1386,6 @@
     <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
     <script type="module" src="../../assets/js/firebase-config.js"></script>
     <script src="../../assets/js/components.js?v=3.3"></script>
-    <script src="../../assets/js/assessment-data.js"></script>
 
     <script>
         // --- PARTICLES (STARS & NEURAL THREADS) ---
@@ -1432,25 +1431,41 @@
         setInterval(createWord, 6000);
 
         // --- DYNAMIC GRID & FILTERING LOGIC ---
-        window.addEventListener('load', () => {
+        let ALL_TESTS = []; // Initialized via fetch
+        
+        window.addEventListener('load', async () => {
             const gridEl = document.getElementById('assessments-grid');
 
-            // --- HARD DEFENSIVE GUARD ---
-            if (!window.SoulamoreAssessments || Object.keys(window.SoulamoreAssessments).length === 0) {
-                console.error('[Soulamore] Assessment data failed to initialize.');
+            try {
+                // Tier 4 Optimization: Lazy-load Directory & Citations
+                const [dirRes, citRes] = await Promise.all([
+                    fetch('../../assets/data/assessments-directory.json'),
+                    fetch('../../assets/data/citations.json')
+                ]);
+                
+                if (!dirRes.ok || !citRes.ok) throw new Error("Failed to load assessments database.");
+                
+                window.SoulamoreAssessments = await dirRes.json();
+                window.SoulamoreCitations = await citRes.json();
+                
+                ALL_TESTS = Object.values(window.SoulamoreAssessments);
+                console.log('[Soulamore] Loaded Directory:', ALL_TESTS.length);
+                
+                // Continue with existing initialization
+                initializeEngine();
+                
+            } catch (error) {
+                console.error('[Soulamore] Assessment data failed to initialize:', error);
                 if (gridEl) gridEl.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-secondary);"><i class="fas fa-circle-exclamation" style="font-size:2rem;margin-bottom:15px;display:block;color:var(--peach-glow)"></i><p>Assessment data failed to load. Please refresh the page.</p></div>';
-                return;
             }
-
-            let ALL_TESTS = Object.values(window.SoulamoreAssessments);
-            console.log('[Soulamore] Loaded Tests:', ALL_TESTS.length);
+        });
 
             let filteredTests = [];
             let currentPage = 0;
             const BATCH_SIZE = 6;
             let activeDomains = new Set();   // empty = All
             let activeContexts = new Set();
-
+            
             const primaryFilterBar = document.getElementById('primary-filters');
             const contextFilterBar = document.getElementById('context-filters');
             const pagers = document.querySelectorAll('.pager-container');
