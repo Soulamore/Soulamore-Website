@@ -22,7 +22,7 @@ export function initFeedbackWidget() {
     button.innerHTML = '<i class="fas fa-comment-dots"></i> Feedback';
     button.style.cssText = `
         position: fixed;
-        bottom: 20px;
+        bottom: 52px;
         right: 20px;
         z-index: 9998;
         background: linear-gradient(135deg, #4ECDC4, #F49F75);

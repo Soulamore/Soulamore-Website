@@ -148,10 +148,20 @@ function updateWidget(type, count, extraLabel = "") {
     }
 }
 
-// Auto-start
+// --- INTERACTION GATE ---
+function gatePresence() {
+    const triggers = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    const init = () => {
+        startPresence();
+        triggers.forEach(t => window.removeEventListener(t, init));
+    };
+    triggers.forEach(t => window.addEventListener(t, init, { passive: true }));
+}
+
+// Auto-start via Gate
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startPresence);
+    document.addEventListener('DOMContentLoaded', gatePresence);
 } else {
-    startPresence();
+    gatePresence();
 }
 
