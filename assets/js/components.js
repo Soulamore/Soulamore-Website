@@ -14,6 +14,28 @@
  * 
  * NOTE: Backup for this file exists as `components.backup.js`.
  */
+// --- DOMAIN ROUTER & CANONICAL FALLBACK ---
+(function() {
+    var host = window.location.hostname;
+    var path = window.location.pathname;
+    var search = window.location.search;
+    var targetDomain = 'soulamore.com';
+    
+    // 1. Redirect Firebase Traffic
+    if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+        window.location.replace('https://' + targetDomain + path + search);
+    }
+    
+    // 2. Canonical Verification/Injection
+    // If head script missed it or it's a dynamic page
+    if (!document.querySelector('link[rel="canonical"]')) {
+        var link = document.createElement('link');
+        link.rel = 'canonical';
+        link.href = 'https://' + targetDomain + path;
+        document.head.appendChild(link);
+    }
+})();
+
 // console.log("Soulamore: Components.js loading...");
 
 // --- THEME SYSTEM INITIALIZATION ---
