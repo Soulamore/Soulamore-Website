@@ -723,6 +723,9 @@
                 <a href="#" class="side-link" data-view="reports" onclick="switchView('reports', this)">
                     <i class="fas fa-flag"></i> <span>Safety Reports</span>
                 </a>
+                <a href="#" class="side-link" data-view="deep-listening" onclick="switchView('deep-listening', this)">
+                    <i class="fas fa-ear-listen"></i> <span>Deep Listening</span>
+                </a>
                 <a href="#" class="side-link" data-view="institutional" onclick="switchView('institutional', this)">
                     <i class="fas fa-university"></i> <span>Institutional Hub</span>
                 </a>
@@ -865,6 +868,9 @@
                                 verifications, and permissions</div>
                         </div>
                     </div>
+                    <button class="btn-dash-primary" onclick="openAddPractitionerModal()" style="padding: 10px 20px; border: none; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-user-plus"></i> Add Practitioner
+                    </button>
                 </div>
                 <div class="workspace-body">
                     <!-- Role Filter Tabs - ADDITIVE MODULE 1 -->
@@ -1348,6 +1354,58 @@
                             <div>Loading safety reports...</div>
                         </div>
                     </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: DEEP LISTENING (INTERACTION ANALYTICS) -->
+            <div id="view-deep-listening" class="view-section" style="display:none;">
+                <div class="workspace-header">
+                    <div style="display:flex; align-items:center; gap:16px; flex:1;">
+                        <div
+                            style="width:45px; height:45px; background:var(--admin-accent-soft); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--admin-accent); border:1px solid var(--admin-accent-glow);">
+                            <i class="fas fa-ear-listen" style="font-size:1.2rem;"></i>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.6rem; margin:0; letter-spacing:-0.5px;">Deep Listening Hub</h2>
+                            <div style="font-size:0.85rem; opacity:0.6; font-weight:500;">Monitor anonymous vents, echoes, and release patterns</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <button onclick="loadDeepListeningHub()" class="btn-s btn-rounded btn-h42 btn-indigo">
+                            <i class="fas fa-sync-alt"></i> Refresh Interactions
+                        </button>
+                    </div>
+                </div>
+                <div class="workspace-body">
+                    <div style="display:flex; gap:10px; margin-bottom:20px;">
+                        <button class="listen-filter-btn btn-p btn-rounded btn-h42" id="filter-listen-all" onclick="filterListeningHub('all')">All Release</button>
+                        <button class="listen-filter-btn btn-g btn-rounded btn-h42" id="filter-listen-burn" onclick="filterListeningHub('burn')">Burn It</button>
+                        <button class="listen-filter-btn btn-g btn-rounded btn-h42" id="filter-listen-echo" onclick="filterListeningHub('echo')">Void Echoes</button>
+                    </div>
+
+                    <div class="dash-card" style="padding:0; overflow:hidden;">
+                        <div style="overflow-x:auto;">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Category</th>
+                                        <th>Device</th>
+                                        <th>Content Preview</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="deep-listening-tbody">
+                                    <tr>
+                                        <td colspan="5" style="padding:40px; text-align:center; opacity:0.5;">
+                                            <i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:15px;"></i>
+                                            <div>Listening to the void...</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -2221,6 +2279,7 @@
             if (viewId === 'faq-manager') loadFAQManager();
             if (viewId === 'spotlight-manager') loadSpotlightManager();
             if (viewId === 'maintenance-panel') loadMaintenancePanel();
+            if (viewId === 'deep-listening') loadDeepListeningHub();
         };
 
         // ✅ FIX: Trigger Overview view immediately after switchView is defined
@@ -3577,6 +3636,14 @@
                                         ${isUrgent ? '<span style="background:#ef4444; color:white; padding:2px 8px; border-radius:12px; font-size:0.7rem; margin-left:10px; font-weight:700;">URGENT</span>' : ''}
                                     </div>
                                     <div style="font-size:0.95rem; line-height:1.6; color:var(--text-main);">${conf.content || 'No content'}</div>
+                                    ${(conf.email || conf.phone) ? `
+                                        <div style="margin-top:10px; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; font-size:0.85rem;">
+                                            <i class="fas fa-id-card" style="margin-right:8px; opacity:0.6; font-size: 0.8rem;"></i>
+                                            <strong style="opacity: 0.8;">Contact Info:</strong> 
+                                            ${conf.email ? `<span style="color:var(--admin-accent); margin-right:15px; font-weight: 600;">${conf.email}</span>` : ''}
+                                            ${conf.phone ? `<span style="color:var(--admin-accent); font-weight: 600;">${conf.phone}</span>` : ''}
+                                        </div>
+                                    ` : '<div style="margin-top:10px; font-size:0.8rem; opacity:0.4; font-style:italic;"><i class="fas fa-user-secret" style="margin-right:5px;"></i> Post is 100% Anonymous</div>'}
                                 </div>
                                 <div style="display:flex; gap:10px; margin-left:15px;">
                                     <button onclick="approveConfession('${conf.id}')" class="btn-dash-secondary" style="padding:6px 12px; font-size:0.75rem; background:#22c55e; color:white; border:none;">
@@ -5439,6 +5506,201 @@
             </form>
         </div>
     </div>
+    <!-- PRACTITIONER MODAL -->
+    <div id="practitioner-modal" class="dashboard-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
+        <div class="modal-content" style="background:#111827; width:90%; max-width:500px; border-radius:24px; border:1px solid rgba(255,255,255,0.1); overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+            <div style="padding:24px; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="margin:0; font-family:'Outfit';">Add New Practitioner</h3>
+                <button onclick="closePractitionerModal()" style="background:none; border:none; color:white; opacity:0.5; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="padding:24px;">
+                <form id="add-practitioner-form" onsubmit="handleManualPractitionerAdd(event)">
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; font-size:0.8rem; margin-bottom:8px; opacity:0.6;">Role</label>
+                        <select id="prac-role" required style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:white;">
+                            <option value="peer">Peer Listener</option>
+                            <option value="psychologist">Psychologist</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; font-size:0.8rem; margin-bottom:8px; opacity:0.6;">Full Name</label>
+                        <input type="text" id="prac-name" required placeholder="Dr. Jane Doe" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:white;">
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; font-size:0.8rem; margin-bottom:8px; opacity:0.6;">Email Address</label>
+                        <input type="email" id="prac-email" required placeholder="jane@example.com" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:white;">
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block; font-size:0.8rem; margin-bottom:8px; opacity:0.6;">Bio / Specialty</label>
+                        <textarea id="prac-bio" required rows="3" placeholder="Specializes in trauma-informed care..." style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:white;"></textarea>
+                    </div>
+                    <button type="submit" class="btn-dash-primary" style="width:100%; padding:14px; border:none; border-radius:12px; font-weight:700;">CREATE ENTRY</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, collection, getDocs, query, orderBy, limit, where } from "../assets/js/firebase-config.js";
+
+        // === DEEP LISTENING HUB LOGIC ===
+        window.listeningHubData = [];
+        window.currentListenFilter = 'all';
+
+        window.loadDeepListeningHub = async function() {
+            const tbody = document.getElementById('deep-listening-tbody');
+            if (!tbody) return;
+
+            try {
+                // Fetch from vents (burn/shred/void)
+                const ventsQ = query(collection(db, "vents"), orderBy("timestamp", "desc"), limit(100));
+                const ventsSnap = await getDocs(ventsQ);
+
+                // Fetch from echoes (void)
+                const echoesQ = query(collection(db, "echoes"), orderBy("timestamp", "desc"), limit(100));
+                const echoesSnap = await getDocs(echoesQ);
+
+                window.listeningHubData = [];
+
+                ventsSnap.forEach(doc => {
+                    const data = doc.data();
+                    window.listeningHubData.push({
+                        id: doc.id,
+                        type: 'burn',
+                        action: data.action || 'burn',
+                        device: data.device || 'N/A',
+                        content: data.content,
+                        timestamp: data.timestamp
+                    });
+                });
+
+                echoesSnap.forEach(doc => {
+                    const data = doc.data();
+                    window.listeningHubData.push({
+                        id: doc.id,
+                        type: 'echo',
+                        action: 'void',
+                        device: 'N/A',
+                        content: data.content,
+                        timestamp: data.timestamp
+                    });
+                });
+
+                // Sort combined
+                window.listeningHubData.sort((a, b) => {
+                    const aTime = a.timestamp?.toDate ? a.timestamp.toDate() : 0;
+                    const bTime = b.timestamp?.toDate ? b.timestamp.toDate() : 0;
+                    return bTime - aTime;
+                });
+
+                renderListeningHub(window.listeningHubData);
+            } catch (err) {
+                console.error("Error loading Deep Listening data:", err);
+                tbody.innerHTML = `<tr><td colspan="5" style="padding:40px; text-align:center; color:#ef4444;">Error loading interaction data.</td></tr>`;
+            }
+        };
+
+        function renderListeningHub(items) {
+            const tbody = document.getElementById('deep-listening-tbody');
+            if (!tbody) return;
+
+            const filtered = window.currentListenFilter === 'all' 
+                ? items 
+                : items.filter(i => i.type === window.currentListenFilter);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="padding:40px; text-align:center; opacity:0.5;">No interactions found matching your filter.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => {
+                const date = item.timestamp?.toDate ? item.timestamp.toDate().toLocaleString() : 'N/A';
+                const actionLabel = item.action.toUpperCase();
+                const color = item.type === 'burn' ? '#f97316' : '#a78bfa';
+                
+                return `
+                    <tr>
+                        <td style="white-space:nowrap; opacity:0.6; font-size:0.8rem;">${date}</td>
+                        <td>
+                            <span style="background:${color}20; color:${color}; padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:700;">
+                                ${item.type.toUpperCase()}
+                            </span>
+                        </td>
+                        <td style="opacity:0.7;">${item.device}</td>
+                        <td style="max-width:400px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity:0.9;">
+                            ${item.content}
+                        </td>
+                        <td class="actions-cell">
+                            <button class="btn-s btn-rounded btn-view" onclick="viewFullInteraction('${item.id}')">View</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.filterListeningHub = function(filter) {
+            window.currentListenFilter = filter;
+            
+            document.querySelectorAll('.listen-filter-btn').forEach(btn => {
+                const isActive = btn.id === `filter-listen-${filter}`;
+                btn.classList.toggle('btn-p', isActive);
+                btn.classList.toggle('btn-g', !isActive);
+            });
+
+            renderListeningHub(window.listeningHubData);
+        };
+
+        window.viewFullInteraction = function(id) {
+            const item = window.listeningHubData.find(i => i.id === id);
+            if (!item) return;
+            alert(`Interaction Details:\n\nType: ${item.type}\nAction: ${item.action}\nContent:\n\n${item.content}`);
+        };
+
+        // Manual Practitioner Management
+        window.openAddPractitionerModal = () => {
+            document.getElementById('practitioner-modal').style.display = 'flex';
+        };
+        window.closePractitionerModal = () => {
+            document.getElementById('practitioner-modal').style.display = 'none';
+        };
+        window.handleManualPractitionerAdd = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+            
+            const role = document.getElementById('prac-role').value;
+            const name = document.getElementById('prac-name').value;
+            const email = document.getElementById('prac-email').value;
+            const bio = document.getElementById('prac-bio').value;
+
+            try {
+                const { db, collection, addDoc, serverTimestamp } = await import("../assets/js/firebase-config.js");
+                
+                const collectionName = role === 'peer' ? 'peers' : 'psychologists';
+                await addDoc(collection(db, collectionName), {
+                    name,
+                    email,
+                    bio,
+                    verified: true,
+                    status: 'active',
+                    manual_entry: true,
+                    createdAt: serverTimestamp()
+                });
+
+                alert(`${role.charAt(0).toUpperCase() + role.slice(1)} added successfully!`);
+                closePractitionerModal();
+                e.target.reset();
+            } catch (err) {
+                console.error("Error adding practitioner:", err);
+                alert("Failed to add practitioner: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        };
+    </script>
 </body>
 
 </html>

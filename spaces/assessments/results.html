@@ -982,7 +982,9 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
             }
 
             const cleanedResponse = responseText.replace(/```html|```/g, '').trim();
-            document.getElementById('reflectionContent').innerHTML = sanitizeHTML(cleanedResponse);
+            const finalReflection = sanitizeHTML(cleanedResponse);
+            document.getElementById('reflectionContent').innerHTML = finalReflection;
+            sessionStorage.setItem('soulamore_ai_reflection', finalReflection);
 
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('resultsUI').style.display = 'block';
@@ -1076,6 +1078,7 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
             document.getElementById('resultsUI').style.display = 'block';
             // Fallback is hardcoded trustable HTML
             document.getElementById('reflectionContent').innerHTML = fallbackHTML;
+            sessionStorage.setItem('soulamore_ai_reflection', fallbackHTML);
         }
 
         // --- LEAD GENERATION SUBMISSION (REUSABLE LOGIC) ---
@@ -1107,6 +1110,7 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
                 raw_score: metrics.raw_score,
                 risk_flags: metrics.functional_impairment,
                 escalation_required: metrics.escalation_required,
+                ai_reflection: sessionStorage.getItem('soulamore_ai_reflection') || null,
                 assessment_result_id: sessionStorage.getItem('soulamore_last_assessment_id') || null,
                 submittedAt: new Date().toISOString()
             };
