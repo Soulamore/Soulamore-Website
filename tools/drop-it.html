@@ -1898,6 +1898,18 @@
                 // Generate preview only first
                 generateImage(randColor, randQuote, true);
             }
+
+            // 0. Save to Backend (Hardened Logging)
+            if (window.SoulBackend && window.SoulBackend.submitVent) {
+                // Log the journey summary
+                window.SoulBackend.submitVent(`Journey completed. Distance: ${Math.floor(distance)} LY. Thoughts crushed: ${droppedWords.length}`, 'drop_it_summary');
+                
+                // Log individual crushed thoughts if any (limited to avoid spam, but capturing the core)
+                const uniqueDrops = [...new Set(droppedWords)];
+                uniqueDrops.forEach(word => {
+                    window.SoulBackend.submitVent(word, 'drop_it_crush');
+                });
+            }
         }
 
         // New Independent Functions

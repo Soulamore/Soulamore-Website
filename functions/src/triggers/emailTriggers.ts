@@ -131,7 +131,8 @@ export const onLeadCreated = functions.firestore
         const isUrgent = lead.escalation_required === true;
         const subjectPrefix = isUrgent ? '[URGENT: CRISIS ESCALATION] ' : '[New Assessment Lead] ';
         
-        const html = `
+        // 1. Internal Notification (Admin)
+        const adminHtml = `
             <div style="font-family: 'Inter', sans-serif; color: #1A1A1A; padding: 40px; border-radius: 8px;">
                 <h2 style="color: ${isUrgent ? '#ef4444' : '#8E44AD'};">
                     ${isUrgent ? 'URGENT: CRISIS ESCALATION' : 'New Recommended Match Request'}
@@ -147,11 +148,36 @@ export const onLeadCreated = functions.firestore
             </div>
         `;
 
-        return await sendEmail(
+        await sendEmail(
             { email: 'contact.soulamore@gmail.com' }, 
             `${subjectPrefix}Lead: ${lead.name || 'Anonymous'}`, 
-            html
+            adminHtml
         );
+
+        // 2. Automated User Report Delivery
+        if (lead.email) {
+            try {
+                const { subject, html: reportHtml } = generateSoulamoreEmail('assessment_report', {
+                    name: lead.name || 'Friend',
+                    assessment_name: (lead.assessment_domain || 'Analysis').replace(/_/g, ' ').toUpperCase(),
+                    score_category: (lead.severity_band || 'Inconclusive').toUpperCase(),
+                    interpretation: lead.ai_reflection || '<p>Your pattern has been captured securely. We are processing your full blueprint.</p>',
+                    recommendation: isUrgent 
+                        ? 'Due to the intensity of your current pattern, we strongly recommend immediate human connection. Visit our "Get Help Now" page.' 
+                        : 'We recommend exploring our curated tools like the "5-Step Reset" to begin your grounding journey.'
+                });
+
+                return await sendEmail(
+                    { email: lead.email, name: lead.name },
+                    subject,
+                    reportHtml
+                );
+            } catch (err) {
+                functions.logger.error("Failed to send assessment report email to user:", err);
+            }
+        }
+
+        return null;
     });
 
 /**

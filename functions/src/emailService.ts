@@ -24,7 +24,8 @@ export type TemplateType =
   | 'booking_confirmed'
   | 'booking_reminder'
   | 'password_reset'
-  | 'password_changed';
+  | 'password_changed'
+  | 'assessment_report';
 
 /**
  * Template Path Mapping
@@ -37,7 +38,8 @@ const TEMPLATE_MAP: Record<TemplateType, string> = {
   'booking_confirmed': 'bookings/booking_confirmed',
   'booking_reminder': 'bookings/booking_reminder',
   'password_reset': 'account/password_reset',
-  'password_changed': 'account/password_changed'
+  'password_changed': 'account/password_changed',
+  'assessment_report': 'assessments/assessment_report_clinical'
 };
 
 /**
@@ -150,6 +152,7 @@ export function generateSoulamoreEmail(type: TemplateType, data: any) {
     case 'booking_reminder': subject = "Reminder: Your Soul Session Starts Soon"; break;
     case 'password_reset': subject = "Reset Your Soulamore Password"; break;
     case 'password_changed': subject = "Your Soulamore Password was Changed"; break;
+    case 'assessment_report': subject = `Your Emotional Blueprint: ${data.domain || 'Analysis'}`; break;
     default: subject = "Message from Soulamore";
   }
 

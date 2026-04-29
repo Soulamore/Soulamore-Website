@@ -1615,6 +1615,10 @@
                 }, 16);
 
                 b.onclick = (e) => {
+                    const thoughtText = e.target.innerText;
+                    if (window.SoulBackend && window.SoulBackend.submitVent) {
+                        window.SoulBackend.submitVent(thoughtText, 'bubble_pop');
+                    }
                     e.target.style.transform = "scale(1.5)";
                     e.target.style.opacity = "0";
                     setTimeout(() => e.target.remove(), 200);
@@ -1654,6 +1658,12 @@
 
         function releaseBalloon() {
             clearInterval(inflateInt);
+            
+            // Save to Backend
+            if (window.SoulBackend && window.SoulBackend.submitVent) {
+                window.SoulBackend.submitVent(`Balloon released after inflation to ${scale.toFixed(2)}x`, 'balloon_release');
+            }
+
             balloon.style.transition = "all 3s ease-in";
             balloon.style.transform = `translateY(-120vh) scale(${scale})`;
             balloon.style.opacity = 0;
