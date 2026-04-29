@@ -726,6 +726,7 @@ const NAV_DATA = [
         href: '#',
         type: 'dropdown',
         children: [
+/* 
             {
                 id: 'nav-students',
                 label: 'For Students',
@@ -761,6 +762,7 @@ const NAV_DATA = [
                     { label: 'Guidelines', href: 'spaces/soulamore-workplace/guidelines.html' }
                 ]
             },
+            */
             {
                 id: 'nav-global',
                 label: 'For Global/Expats',
@@ -787,11 +789,12 @@ const NAV_DATA = [
                 href: '#',
                 type: 'submenu',
                 children: [
-                    { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'New Pages/Peer Landing.html' },
+                    { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'our-peers/about.html' },
                     { id: 'nav-meet-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
                     { id: 'nav-join-peer', label: 'Join as Peer', href: 'join-us/peer.html' }
                 ]
             },
+/* 
             {
                 id: 'nav-psych-group',
                 label: 'Talk to a Psychologist <i class="fas fa-fire" style="color:var(--teal-glow); text-shadow:0 0 12px var(--teal-glow); margin-left:4px; font-size:0.8em;"></i>',
@@ -803,6 +806,7 @@ const NAV_DATA = [
                     { id: 'nav-join-psych', label: 'Join as Psychologist', href: 'join-us/psychologist.html' }
                 ]
             },
+            */
             { id: 'nav-soulbot', label: 'SoulBot AI (Beta)', href: 'tools/soulbot.html', style: 'color:#F49F75;' },
             { id: 'nav-support-groups', label: 'Support Groups', href: 'community/support-groups/support-groups.html' },
             { id: 'nav-problem', label: 'The Problem Wall', href: 'pages/problem-wall.html' }
@@ -1016,7 +1020,7 @@ const getFooterHTML = (rootPath) => `
         <div class="footer-col">
             <h4 style="font-size:1rem; font-weight:700; color:white; margin-bottom:20px;">Community</h4>
             <ul style="opacity:0.8; font-size:0.9rem; display:flex; flex-direction:column; gap:10px;">
-                <li><a href="${rootPath}spaces/campus/campus-ambassadors.html">Campus Ambassadors</a></li>
+                <!-- <li><a href="${rootPath}spaces/campus/campus-ambassadors.html">Campus Ambassadors</a></li> -->
                 <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
                 <li><a href="${rootPath}community/support-groups/support-groups.html">Support Groups</a></li>
                 <li><a href="${rootPath}community/forum.html">Discussion Forum</a></li>
