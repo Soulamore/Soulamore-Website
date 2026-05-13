@@ -1,17 +1,17 @@
 import * as functions from 'firebase-functions/v1';
 import * as fs from 'fs';
 import * as path from 'path';
-import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
+import * as sib from '@getbrevo/brevo';
 
 /**
  * Soulamore Brevo Service
  * Official API Integration for High-Performance Delivery (v3.0 Brevo)
  */
 
-const apiInstance = new TransactionalEmailsApi();
+const apiInstance = new sib.TransactionalEmailsApi();
 // Initialize API Key from environment or fallback to the one provided in CORE_INTELLIGENCE
-const BREVO_KEY = (process.env.BREVO_API_KEY || (functions as any).config().brevo?.key)?.trim();
-apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
+const BREVO_KEY = process.env.BREVO_API_KEY?.trim() || 'uninitialized';
+apiInstance.setApiKey(sib.TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
 
 const SENDER_EMAIL = "care@soulamore.com"; 
 const SENDER_NAME = "Soulamore Care";
