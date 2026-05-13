@@ -30,7 +30,8 @@ export type TemplateType =
   | 'booking_reminder'
   | 'password_reset'
   | 'password_changed'
-  | 'assessment_report';
+  | 'assessment_report'
+  | 'broadcast';
 
 /**
  * Template Path Mapping
@@ -51,9 +52,10 @@ const TEMPLATE_MAP: Record<TemplateType, string> = {
  * Helper: Load and Compile Template
  * Robust Fallback: Returns basic text if template is missing.
  */
-function compileTemplate(templateName: TemplateType, data: Record<string, any>): string {
+export function compileTemplate(recipient: EmailRecipient, subject: string, body: string, templateName?: TemplateType): string {
   try {
-    const relativePath = TEMPLATE_MAP[templateName] || templateName;
+    const data: Record<string, any> = { name: recipient.name, email: recipient.email, subject };
+    const relativePath = templateName ? TEMPLATE_MAP[templateName] : null;
     const templatePath = path.join(__dirname, 'templates', `${relativePath}.html`);
     
     // Soulful Header & Footer (CSS for breathing animation)
@@ -92,8 +94,10 @@ function compileTemplate(templateName: TemplateType, data: Record<string, any>):
       </div>
     `;
 
-    if (!fs.existsSync(templatePath)) {
-      functions.logger.warn(`Template not found at ${templatePath}. Using fallback.`);
+    if (!relativePath || !fs.existsSync(templatePath)) {
+      if (templateName && templateName !== 'broadcast') {
+          functions.logger.warn(`Template not found at ${templatePath}. Using fallback.`);
+      }
       return `
         ${SOUL_STYLE}
         <div class="soul-container">
@@ -102,10 +106,7 @@ function compileTemplate(templateName: TemplateType, data: Record<string, any>):
           </div>
           <div class="soul-body">
             <p>Hi ${data.name || 'dear soul'},</p>
-            <p>We are reaching out to you with warmth and presence. This is an update regarding your journey with us.</p>
-            <p style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
-              ${templateName.replace(/_/g, ' ').toUpperCase()} Update
-            </p>
+            ${body}
           </div>
           ${SOUL_FOOTER}
         </div>

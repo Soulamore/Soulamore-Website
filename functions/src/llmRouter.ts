@@ -6,7 +6,7 @@ let llmApp: admin.app.App;
 try {
   llmApp = admin.app('llm-router');
 } catch (e) {
-  // Service account data from CORE_INTELLIGENCE
+  // Service account data for the LLM Router project (cross-account bridge)
   const serviceAccount = {
     "type": "service_account",
     "project_id": "llm-router-870c5",
@@ -22,6 +22,10 @@ try {
 }
 
 const llmDb = llmApp.firestore();
+
+// Soulamore Router Key (Cross-account identification)
+const SOULAMORE_ROUTER_KEY = "router_svpkARCYUuTATB_3e8gKpNLQ8G2hoSL4";
+const ROUTER_BASE_URL = "https://llm-router-870c5.web.app/v1";
 
 /**
  * LLM Router Function
@@ -42,25 +46,27 @@ export const llmChat = functions.runWith({
   }
 
   try {
-    // 2. Fetch Isolated Key from Router
-    const keyDoc = await llmDb.collection('keys').doc(appId).get();
-    if (!keyDoc.exists) {
-      // Fallback to default if specifically allowed, or error out
-      throw new functions.https.HttpsError('not-found', `No LLM configuration found for AppID: ${appId}`);
+    let apiKey: string;
+    let baseURL: string;
+
+    // 2. Resolve Key (Direct for Soulamore, Firestore for others)
+    if (appId === 'soulamore' || appId === 'soulbot') {
+      apiKey = SOULAMORE_ROUTER_KEY;
+      baseURL = ROUTER_BASE_URL;
+    } else {
+      const keyDoc = await llmDb.collection('keys').doc(appId).get();
+      if (!keyDoc.exists) {
+        throw new functions.https.HttpsError('not-found', `No LLM configuration found for AppID: ${appId}`);
+      }
+      const config = keyDoc.data()!;
+      if (config.status !== 'active') {
+        throw new functions.https.HttpsError('unavailable', 'AI Service is currently disabled for this module.');
+      }
+      apiKey = config.key;
+      baseURL = config.baseURL || 'https://api.openai.com/v1';
     }
 
-    const config = keyDoc.data()!;
-    if (config.status !== 'active') {
-      throw new functions.https.HttpsError('unavailable', 'AI Service is currently disabled for this module.');
-    }
-
-    // 3. Dispatch to Provider (OpenAI Compatible or Gemini)
-    const provider = config.provider || 'openai_compatible';
-    const apiKey = config.key;
-    const baseURL = config.baseURL || 'https://api.openai.com/v1'; // Standard fallback
-    
-    // For demonstration/standardization, we use a generic fetch approach 
-    // to support the "OpenAI Compatible" pattern used in Hashlilly Hubs.
+    // 3. Dispatch to Router/Provider
     const response = await fetch(`${baseURL}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -69,14 +75,14 @@ export const llmChat = functions.runWith({
         'x-app-id': appId // Pass identification through
       },
       body: JSON.stringify({
-        model: model || config.model || 'gpt-4o',
+        model: model || 'gpt-4o',
         messages: messages,
         temperature: temperature || 0.7
       })
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json() as any;
       throw new Error(errorData.error?.message || 'Upstream LLM Error');
     }
 
@@ -88,3 +94,4 @@ export const llmChat = functions.runWith({
     throw new functions.https.HttpsError('internal', error.message || 'LLM Routing Failed');
   }
 });
+
