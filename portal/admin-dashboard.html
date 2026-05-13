@@ -1764,8 +1764,23 @@
                     <button onclick="document.getElementById('saga-campaign-modal').remove()" style="position: absolute; top: 30px; right: 30px; background: none; border: none; font-size: 2rem; cursor: pointer; color: #94a3b8;">&times;</button>
                     
                     <div style="text-align: center; margin-bottom: 40px;">
-                        <h2 style="font-family: 'Outfit'; font-weight: 700; font-size: 2.2rem; color: #0f172a; margin-bottom: 10px;">SAGA Campaign Engine</h2>
-                        <p style="color: #64748b;">Draft your narrative for the Soulamore ecosystem.</p>
+                        <h2 style="font-family: 'Outfit'; font-weight: 700; font-size: 2.2rem; color: #0f172a; margin-bottom: 10px;">Soulamore News Engine</h2>
+                        <p style="color: #64748b;">Share soulful updates and empathetic connections with the collective.</p>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; justify-content: center;">
+                        <button onclick="loadSoulamoreTemplate('feature')" style="padding: 10px 15px; background: rgba(142, 68, 173, 0.1); color: #8E44AD; border: 1px solid rgba(142, 68, 173, 0.2); border-radius: 50px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.3s;">
+                            <i class="fas fa-sparkles"></i> New Feature
+                        </button>
+                        <button onclick="loadSoulamoreTemplate('confession')" style="padding: 10px 15px; background: rgba(142, 68, 173, 0.1); color: #8E44AD; border: 1px solid rgba(142, 68, 173, 0.2); border-radius: 50px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.3s;">
+                            <i class="fas fa-comment-dots"></i> Confession Box
+                        </button>
+                        <button onclick="loadSoulamoreTemplate('reminder')" style="padding: 10px 15px; background: rgba(142, 68, 173, 0.1); color: #8E44AD; border: 1px solid rgba(142, 68, 173, 0.2); border-radius: 50px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.3s;">
+                            <i class="fas fa-heart"></i> Gentle Reminder
+                        </button>
+                        <button onclick="loadSoulamoreTemplate('postcard')" style="padding: 10px 15px; background: rgba(142, 68, 173, 0.1); color: #8E44AD; border: 1px solid rgba(142, 68, 173, 0.2); border-radius: 50px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.3s;">
+                            <i class="fas fa-envelope-open-text"></i> Soulful Postcard
+                        </button>
                     </div>
 
                     <div style="display: flex; flex-direction: column; gap: 25px;">
@@ -1805,56 +1820,141 @@
                             </div>
                         </div>
 
-                        <button id="btn-saga-broadcast" onclick="launchSagaCampaign()" style="width: 100%; padding: 22px; background: #0A0F1A; color: #fff; border: none; border-radius: 50px; font-weight: 700; font-family: 'Outfit'; text-transform: uppercase; letter-spacing: 2px; margin-top: 20px; cursor: pointer;">
-                            <i class="fas fa-paper-plane"></i> ORCHESTRATE BROADCAST
-                        </button>
+                        <div id="campaign-preview-container" style="display: none; margin-top: 20px;">
+                            <label style="display: block; font-weight: 700; font-size: 0.85rem; color: #0f172a; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Live Preview</label>
+                            <div style="width: 100%; height: 300px; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #f8fafc;">
+                                <iframe id="campaign-preview-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 10px;">
+                            <button onclick="previewSoulBroadcast()" style="background: white; color: #0f172a; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s;">
+                                <i class="fas fa-eye"></i> PREVIEW
+                            </button>
+                            <button onclick="triggerSoulBroadcast(true)" style="background: #8E44AD; color: white; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(142, 68, 173, 0.2);">
+                                <i class="fas fa-vial"></i> TEST ON ME
+                            </button>
+                            <button id="btn-soul-broadcast" onclick="triggerSoulBroadcast(false)" style="background: #0f172a; color: white; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer; box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2); transition: 0.3s;">
+                                <i class="fas fa-paper-plane"></i> BROADCAST ALL
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
             document.body.appendChild(modal);
         };
 
-        window.launchSagaCampaign = async function() {
+        window.loadSoulamoreTemplate = function(type) {
+            const titleInput = document.getElementById('campaign-title');
+            const contentInput = document.getElementById('campaign-content');
+            
+            switch(type) {
+                case 'feature':
+                    titleInput.value = "A new way to reflect together: Introducing [Feature Name]";
+                    contentInput.value = "Hello {{NAME}},\n\nWe've been listening to the collective heartbeat, and we heard a need for more ways to connect with your inner self. Today, we're introducing [Feature Name].\n\nThis new tool is designed to help you [benefit]. We hope it brings you a moment of peace today.\n\nStay soulful,\nThe Soulamore Team";
+                    break;
+                case 'confession':
+                    titleInput.value = "The Confession Box is open: Release your burdens";
+                    contentInput.value = "Hi {{NAME}},\n\nSometimes, the weight of our unspoken thoughts becomes too heavy to carry alone. The Soulamore Confession Box is a safe, anonymous space where you can release what's on your mind.\n\nNo judgment. No storage of identity. Just the relief of letting go.\n\n[Link to Confession Box]\n\nWarmly,\nSoulamore Care";
+                    break;
+                case 'reminder':
+                    titleInput.value = "A gentle reminder: Return to yourself";
+                    contentInput.value = "Dear {{NAME}},\n\nIn the noise of the day, it's easy to lose track of your own presence. This is just a gentle nudge to take a deep breath, right now.\n\nYou are enough. Your peace is a priority.\n\nWhenever you're ready, we're here for a reflection session.\n\nWith love,\nThe Soulamore Collective";
+                    break;
+                case 'postcard':
+                    titleInput.value = "A Soulful Postcard from the Collective";
+                    contentInput.value = "Hello {{NAME}},\n\nWe sent this postcard just to say: we're thinking of you. The collective is stronger with your presence.\n\nHere's a small thought for your journey today:\n'[Insert Soulful Quote]'\n\nBreathe deep today.\n\nStay Soulful,\nSoulamore";
+                    break;
+            }
+        };
+
+        window.previewSoulBroadcast = async function() {
+            const campaignData = {
+                title: document.getElementById('campaign-title').value,
+                content: document.getElementById('campaign-content').value
+            };
+
+            if (!campaignData.title || !campaignData.content) {
+                alert('Please provide a title and content for the preview.');
+                return;
+            }
+
+            const iframe = document.getElementById('campaign-preview-iframe');
+            const container = document.getElementById('campaign-preview-container');
+            
+            try {
+                container.style.display = 'block';
+                iframe.srcdoc = '<div style="padding: 20px; font-family: sans-serif; opacity: 0.5;">Compiling soulful preview...</div>';
+                
+                const previewCallable = httpsCallable(functionsInstance, 'adminPreviewEmail');
+                const result = await previewCallable({ campaignData });
+                
+                if (result.data && result.data.html) {
+                    iframe.srcdoc = result.data.html;
+                }
+            } catch (err) {
+                console.error("Preview Error:", err);
+                iframe.srcdoc = '<div style="padding: 20px; font-family: sans-serif; color: #ef4444;">Preview failed: ' + err.message + '</div>';
+            }
+        };
+
+        window.triggerSoulBroadcast = async function(isTest = false) {
             const targetGroup = document.getElementById('campaign-target').value;
             const campaignData = {
                 title: document.getElementById('campaign-title').value,
                 content: document.getElementById('campaign-content').value,
-                imageUrl: document.getElementById('campaign-image').value,
+                image: document.getElementById('campaign-image').value,
                 ctaText: document.getElementById('campaign-cta-text').value,
-                ctaLink: document.getElementById('campaign-cta-link').value
+                ctaUrl: document.getElementById('campaign-cta-link').value
             };
 
             if (!campaignData.title || !campaignData.content) {
-                alert('Title and Content are required.');
+                alert('Please provide a soulful title and content.');
                 return;
             }
 
-            if (!confirm(`This will broadcast to [${targetGroup.toUpperCase()}]. Proceed with global campaign?`)) return;
+            const confirmMsg = isTest 
+                ? "Send a test outreach to your admin email?" 
+                : `This will broadcast to [${targetGroup.toUpperCase()}]. Proceed with collective outreach?`;
 
-            const btn = document.getElementById('btn-saga-broadcast');
+            if (!confirm(confirmMsg)) return;
+
+            const btn = document.getElementById('btn-soul-broadcast');
             const originalHtml = btn.innerHTML;
 
             try {
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> BROADCASTING...';
+                if (!isTest) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-heart fa-beat"></i> REACHING OUT...';
+                }
                 
+                const payload = { 
+                    targetGroup, 
+                    campaignData,
+                    testEmail: isTest ? auth.currentUser.email : null 
+                };
+
                 const customCampaignCallable = httpsCallable(functionsInstance, 'triggerCustomCampaign');
-                const result = await customCampaignCallable({ targetGroup, campaignData });
+                const result = await customCampaignCallable(payload);
                 
                 if (result.data.success) {
-                    alert(`✅ SAGA BROADCAST SUCCESSFUL!\n\nDelivered to ${result.data.delivered} hearts.`);
-                    document.getElementById('saga-campaign-modal').remove();
+                    const successMsg = isTest 
+                        ? `✅ Test email sent to ${auth.currentUser.email}`
+                        : `✅ SOULAMORE BROADCAST SUCCESSFUL!\n\nConnected with ${result.data.delivered} hearts.`;
+                    alert(successMsg);
+                    if (!isTest) document.getElementById('saga-campaign-modal').remove();
                 } else {
                     alert('❌ Broadcast incomplete.');
                 }
             } catch (err) {
-                console.error("SAGA Error:", err);
-                alert('SAGA ENGINE ERROR: ' + err.message);
+                console.error("Broadcast Error:", err);
+                alert('SOULAMORE ENGINE ERROR: ' + err.message);
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
+                if (!isTest) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
             }
-        };
         };
 
         window.loadGroupsManagement = async function() {
@@ -6028,8 +6128,7 @@
                 loadApiHealth();
             }
         };
-
-
+    </script>
 </body>
 
 </html>

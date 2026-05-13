@@ -957,8 +957,6 @@
 
     <!-- LOGIC -->
     <script type="module">
-        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-
         // Import Firestore functions with error handling
         let createConversation, addMessageToConversation, updateConversationDuration, recommendTherapist, getConversation;
         let checkRateLimit, validateMessageLength, getRateLimitInfo;
@@ -980,11 +978,10 @@
 
                 const firebaseConfig = await import("../assets/js/firebase-config.js");
                 auth = firebaseConfig.auth;
+                const functionsInstance = firebaseConfig.functionsInstance;
+                const httpsCallable = firebaseConfig.httpsCallable;
 
-                const firebaseAuth = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
-                onAuthStateChanged = firebaseAuth.onAuthStateChanged;
-
-                console.log("Firestore modules loaded successfully");
+                console.log("Firestore & Functions modules loaded successfully");
 
                 // Now initialize conversation after imports complete
                 if (auth) {
@@ -1015,16 +1012,8 @@
             }
         })();
 
-        // CONFIG (Same as soulbot.html)
-        // CONFIG (Same as soulbot.html)
-        // IMPORTANT: API key is injected during CI/CD build from environment variable
-        // For local development, run: GEMINI_API_KEY=your_key ./scripts/inject-api-key.sh
-        const API_KEY = "YOUR_GEMINI_API_KEY_HERE"; // Placeholder - replaced during build/development
-        const genAI = new GoogleGenerativeAI(API_KEY);
-        // Use gemini-2.5-flash (latest stable model from official docs: https://ai.google.dev/gemini-api/docs#javascript)
-        // This is the recommended model according to Google's documentation
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
+        // LLM Router Configuration
+        const LLM_APP_ID = "soulbot";
         const SYSTEM_INSTRUCTION = `
             You are SoulBot, a calm, emotionally intelligent reflection companion by Soulamore.
             TONE: Calm, friend at 2 AM, short gentle responses (2-3 sentences).
@@ -1279,16 +1268,27 @@
                         return;
                     }
 
-                    const chat = model.startChat({
-                        history: [
-                            { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
-                            { role: "model", parts: [{ text: "Understood." }] },
-                            ...chatHistory
-                        ]
+                    // Call LLM Router via Cloud Function
+                    const llmChatCallable = httpsCallable(functionsInstance, 'llmChat');
+                    
+                    // Format history for the router (OpenAI compatible messages array)
+                    const formattedHistory = [
+                        { role: "system", content: SYSTEM_INSTRUCTION },
+                        ...chatHistory.map(m => ({
+                            role: m.role === 'user' ? 'user' : 'assistant',
+                            content: m.parts[0].text
+                        })),
+                        { role: "user", content: text }
+                    ];
+
+                    const result = await llmChatCallable({
+                        appId: LLM_APP_ID,
+                        messages: formattedHistory,
+                        model: "gpt-4o", // Default to GPT-4o for premium quality
+                        temperature: 0.7
                     });
 
-                    const result = await chat.sendMessage(text);
-                    const response = result.response.text();
+                    const response = result.data.choices[0].message.content;
 
                     removeThinking(thinkingId);
 

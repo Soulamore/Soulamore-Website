@@ -1,12 +1,12 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { sendEmail } from './emailService';
+import { sendEmail, compileTemplate } from './emailService';
 
 /**
- * Admin: Universal Broadcast Campaign (Soulamore Collective)
+ * Admin: Trigger Custom Campaign (Soulamore Collective)
  * High-power broadcast for global messages and community outreach.
  */
-export const adminBroadcastCampaign = functions.runWith({
+export const triggerCustomCampaign = functions.runWith({
   timeoutSeconds: 540,
   memory: '512MB'
 }).https.onCall(async (data, context) => {
@@ -18,9 +18,14 @@ export const adminBroadcastCampaign = functions.runWith({
         throw new functions.https.HttpsError('permission-denied', 'Only admins can trigger campaigns.');
     }
 
-    const { subject, body, testEmail, externalRecipients } = data;
-    if (!subject || !body) {
-        throw new functions.https.HttpsError('invalid-argument', 'Missing subject or body.');
+    const { targetGroup, campaignData, subject, body, testEmail, externalRecipients } = data;
+    
+    // Support both direct subject/body and campaignData object from dashboard
+    const finalSubject = subject || campaignData?.title;
+    const finalBody = body || campaignData?.content;
+
+    if (!finalSubject || !finalBody) {
+        throw new functions.https.HttpsError('invalid-argument', 'Missing subject/title or body/content.');
     }
 
     // 2. Resolve Recipients
@@ -31,36 +36,47 @@ export const adminBroadcastCampaign = functions.runWith({
     } else if (externalRecipients && Array.isArray(externalRecipients)) {
         recipients = externalRecipients;
     } else {
-        // Default: Broadcast to all active users and newsletter subscribers
-        const usersSnap = await admin.firestore().collection('users').get();
-        usersSnap.forEach(doc => {
-            const u = doc.data();
-            if (u.email) recipients.push({ email: u.email, name: u.name });
-        });
+        // Filter by targetGroup
+        if (!targetGroup || targetGroup === 'all' || targetGroup === 'peers' || targetGroup === 'psychologists' || targetGroup === 'practitioners') {
+            const usersRef = admin.firestore().collection('users');
+            let query: any = usersRef;
+            
+            if (targetGroup === 'peers') query = usersRef.where('role', '==', 'peer');
+            if (targetGroup === 'psychologists' || targetGroup === 'practitioners') query = usersRef.where('role', '==', 'practitioner');
 
-        const newsSnap = await admin.firestore().collection('newsletters').get();
-        newsSnap.forEach(doc => {
-            const n = doc.data();
-            if (n.email && !recipients.some(r => r.email === n.email)) {
-                recipients.push({ email: n.email });
-            }
-        });
+            const usersSnap = await query.get();
+            usersSnap.forEach((doc: any) => {
+                const u = doc.data();
+                if (u.email) recipients.push({ email: u.email, name: u.firstName || u.name });
+            });
+        }
+
+        if (!targetGroup || targetGroup === 'all' || targetGroup === 'newsletters') {
+            const newsSnap = await admin.firestore().collection('newsletters').get();
+            newsSnap.forEach((doc: any) => {
+                const n = doc.data();
+                if (n.email && !recipients.some(r => r.email === n.email)) {
+                    recipients.push({ email: n.email });
+                }
+            });
+        }
     }
 
-    console.log(`🚀 Starting campaign [${subject}] to ${recipients.length} targets.`);
+    console.log(`🚀 Starting campaign [${finalSubject}] to ${recipients.length} targets.`);
 
-    // 3. Dispatch Emails in batches of 50 to avoid timeout/rate limits
+    // 3. Dispatch Emails
     const BATCH_SIZE = 50;
     let delivered = 0;
     let failed = 0;
 
     for (let i = 0; i < recipients.length; i += BATCH_SIZE) {
         const batch = recipients.slice(i, i + BATCH_SIZE);
-        const promises = batch.map(recipient => 
-            sendEmail(recipient, subject, body)
+        const promises = batch.map(recipient => {
+            const wrappedHtml = compileTemplate(recipient, finalSubject, finalBody, 'broadcast');
+            return sendEmail(recipient, finalSubject, wrappedHtml)
                 .then(res => { if(res.success) delivered++; else failed++; })
-                .catch(() => failed++)
-        );
+                .catch(() => failed++);
+        });
         await Promise.allSettled(promises);
     }
 
@@ -71,4 +87,28 @@ export const adminBroadcastCampaign = functions.runWith({
         failed,
         total: recipients.length
     };
+});
+
+/**
+ * Admin: Preview Email
+ * Returns the compiled HTML for a campaign message.
+ */
+export const adminPreviewEmail = functions.https.onCall(async (data, context) => {
+    if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Auth required');
+    
+    const userDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+    if (!userDoc.exists || userDoc.data()?.role !== 'admin') {
+        throw new functions.https.HttpsError('permission-denied', 'Admin role required');
+    }
+
+    const { subject, body, campaignData } = data;
+    const finalSubject = subject || campaignData?.title || "Preview Subject";
+    const finalBody = body || campaignData?.content || "Preview Content";
+
+    // Use our standardized email service to compile the empathetic template
+    // We pass a dummy recipient to get the full HTML
+    const { compileTemplate } = require('./emailService');
+    const html = compileTemplate({ email: 'preview@soulamore.com', name: 'Alex Designer' }, finalSubject, finalBody);
+
+    return { subject: finalSubject, html };
 });
