@@ -641,7 +641,13 @@
                                 <ul class="group-list">
                                     ${(data.features || []).map(f => `<li>${f}</li>`).join('') || '<li>Safe Haven</li><li>Peer Support</li>'}
                                 </ul>
-                                <a href="${data.link || '#'}" class="cta-btn" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 15px; text-align: center;">Explore Circle</a>
+                                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                    <a href="${data.link || '#'}" class="cta-btn" style="flex: 1; padding: 10px; font-size: 0.8rem; text-align: center; border-radius: 10px; text-decoration: none;">Explore Circle</a>
+                                    ${data.whatsappLink ? `
+                                    <a href="${data.whatsappLink}" target="_blank" class="cta-btn" style="width: 44px; padding: 10px; font-size: 1rem; text-align: center; border-radius: 10px; background: rgba(37, 211, 102, 0.1); color: #25D366; border: 1px solid rgba(37, 211, 102, 0.2); text-decoration: none;" title="Join Community">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>` : ''}
+                                </div>
                             `;
                             container.appendChild(card);
                         });
@@ -704,8 +710,9 @@
                         const c = (cat || '').toLowerCase();
                         if (c.includes('relat')) return 'cat-rel';
                         if (c.includes('neuro') || c.includes('divers')) return 'cat-neur';
-                        if (c.includes('habits') || c.includes('life')) return 'cat-life';
-                        if (c.includes('emot') || c.includes('health')) return 'cat-men';
+                        if (c.includes('habit') || c.includes('addict') || c.includes('compuls')) return 'cat-add';
+                        if (c.includes('emot') || c.includes('health') || c.includes('men')) return 'cat-men';
+                        if (c.includes('life') || c.includes('expat') || c.includes('women') || c.includes('student')) return 'cat-life';
                         if (c.includes('work')) return 'cat-work';
                         return 'cat-life';
                     }

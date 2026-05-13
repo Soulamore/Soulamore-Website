@@ -1,17 +1,17 @@
 import * as functions from 'firebase-functions/v1';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as sib from '@getbrevo/brevo';
+import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 
 /**
  * Soulamore Brevo Service
  * Official API Integration for High-Performance Delivery (v3.0 Brevo)
  */
 
-const apiInstance = new sib.TransactionalEmailsApi();
+const apiInstance = new TransactionalEmailsApi();
 // Initialize API Key from environment or fallback to the one provided in CORE_INTELLIGENCE
 const BREVO_KEY = (process.env.BREVO_API_KEY || (functions as any).config().brevo?.key)?.trim();
-apiInstance.setApiKey(sib.TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
+apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
 
 const SENDER_EMAIL = "care@soulamore.com"; 
 const SENDER_NAME = "Soulamore Care";
@@ -45,7 +45,8 @@ const TEMPLATE_MAP: Record<TemplateType, string> = {
   'booking_reminder': 'bookings/booking_reminder',
   'password_reset': 'account/password_reset',
   'password_changed': 'account/password_changed',
-  'assessment_report': 'assessments/assessment_report_clinical'
+  'assessment_report': 'assessments/assessment_report_clinical',
+  'broadcast': 'campaigns/broadcast'
 };
 
 /**
@@ -145,15 +146,15 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
  */
 export async function sendEmail(recipient: EmailRecipient, subject: string, htmlContent: string) {
   try {
-    const sendSmtpEmail = new sib.SendSmtpEmail();
-    
-    sendSmtpEmail.subject = subject;
-    sendSmtpEmail.htmlContent = htmlContent;
-    sendSmtpEmail.sender = { name: SENDER_NAME, email: SENDER_EMAIL };
-    sendSmtpEmail.to = [{ email: recipient.email, name: recipient.name || "Soul" }];
-    sendSmtpEmail.replyTo = { email: SENDER_EMAIL, name: SENDER_NAME };
+    const sendSmtpEmail = {
+      subject: subject,
+      htmlContent: htmlContent,
+      sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+      to: [{ email: recipient.email, name: recipient.name || "Soul" }],
+      replyTo: { email: SENDER_EMAIL, name: SENDER_NAME }
+    };
 
-    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail as any);
     
     functions.logger.info(`✅ Successfully sent soulful update to ${recipient.email}`);
     return { success: true, messageId: data.body.messageId };
@@ -182,7 +183,7 @@ export function generateSoulamoreEmail(type: TemplateType, data: any) {
     default: subject = "A soulful update from Soulamore";
   }
 
-  const html = compileTemplate(type, data);
+  const html = compileTemplate({ email: 'broadcast@soulamore.com' }, subject, '', type);
   return { subject, html };
 }
 
