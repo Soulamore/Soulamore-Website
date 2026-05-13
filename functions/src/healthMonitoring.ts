@@ -48,10 +48,21 @@ export const getApiHealth = functions.https.onCall(async (data, context) => {
     const llmDb = llmApp.firestore();
     const keysSnap = await llmDb.collection('keys').get();
     
+    const keys = keysSnap.docs.map(doc => {
+      const d = doc.data();
+      return {
+        id: doc.id,
+        name: d.name || doc.id,
+        status: d.status || 'unknown',
+        provider: d.provider || 'custom'
+      };
+    });
+
     results.services.llmRouter = {
       status: 'operational',
-      activeKeys: keysSnap.docs.filter(d => d.data().status === 'active').length,
-      totalKeys: keysSnap.size
+      activeKeys: keys.filter(k => k.status === 'active').length,
+      totalKeys: keys.length,
+      keys: keys // Detailed telemetry for the dashboard
     };
   } catch (err: any) {
     results.services.llmRouter = {
