@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
+import * as sib from '@getbrevo/brevo';
 
 // ✅ FIX: Import the already-initialized llmDb from llmRouter.
 // llmRouter.ts initializes the 'llm-router' secondary app at module load time.
@@ -46,8 +46,8 @@ export const getApiHealth = functions.runWith({
     const BREVO_KEY = process.env.BREVO_API_KEY?.trim();
     if (!BREVO_KEY) throw new Error("BREVO_API_KEY secret is not set in the function environment.");
 
-    const apiInstance = new TransactionalEmailsApi();
-    apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
+    const apiInstance = new sib.TransactionalEmailsApi();
+    apiInstance.setApiKey(sib.TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
 
     results.services.brevo = {
       status: 'operational',
