@@ -61,20 +61,14 @@ export const getApiHealth = functions.runWith({
       try {
         llmApp = admin.app('llm-router');
       } catch (e) {
-        console.log("🔄 [getApiHealth] Initializing llm-router app bridge...");
-        // Re-use the same logic from llmRouter.ts but safely
-        const serviceAccount = {
-          "project_id": "llm-router-870c5",
-          "private_key": process.env.LLM_ROUTER_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-          "client_email": "firebase-adminsdk-fbsvc@llm-router-870c5.iam.gserviceaccount.com"
-        };
-        
-        // If the key is missing from env, it might be in config or we fallback to the hardcoded one in llmRouter.ts 
-        // For simplicity and to avoid duplication, we'll try to use the existing one if possible
-        // But for getApiHealth, we just want to see if the app is reachable.
-        
-        // If we can't initialize it here because we lack the key, we'll just report it.
-        throw new Error("llm-router app not initialized. Ensure llmRouter.ts is loaded.");
+        console.log("🔄 [getApiHealth] Initializing llm-router via IAM/ProjectID...");
+        try {
+          llmApp = admin.initializeApp({
+            projectId: 'llm-router-870c5'
+          }, 'llm-router');
+        } catch (initErr: any) {
+          throw new Error(`Failed to initialize llm-router bridge: ${initErr.message}`);
+        }
       }
 
       const llmDb = llmApp.firestore();
@@ -122,6 +116,13 @@ export const getApiHealth = functions.runWith({
 
   } catch (globalErr: any) {
     console.error("🔥 [getApiHealth] CRITICAL INTERNAL ERROR:", globalErr);
-    throw new functions.https.HttpsError('internal', globalErr.message);
+    // Return a safe object instead of throwing, so the UI can show the error in the logs
+    return {
+      timestamp: new Date().toISOString(),
+      error: globalErr.message,
+      services: {
+        system: { status: 'error', message: globalErr.message }
+      }
+    };
   }
 });
