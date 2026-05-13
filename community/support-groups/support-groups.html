@@ -598,17 +598,15 @@
                             const snap = await getDocs(q);
 
                             if (snap.empty) {
-                                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; opacity: 0.7;">No active circles at this moment. CHECK BACK SOON.</div>';
+                                console.warn("Firestore support_groups empty. Using hardcoded fallback.");
+                                renderGroups(getHardcodedGroups());
                                 return;
                             }
 
                             container.innerHTML = '';
-
-                            // Convert to array and sort by displayOrder
                             const groups = [];
                             snap.forEach(doc => {
                                 const data = doc.data();
-                                // Skip if explicitly not listed
                                 if (data.isListed === false) return;
                                 groups.push({
                                     id: doc.id,
@@ -617,33 +615,89 @@
                                 });
                             });
 
-                            // Sort by displayOrder (ascending)
                             groups.sort((a, b) => a.displayOrder - b.displayOrder);
-
-                            groups.forEach(({ data }) => {
-                                const card = document.createElement('div');
-                                // Map category to CSS class
-                                const catClass = mapCategoryToClass(data.category);
-                                card.className = `cat-card ${catClass} fade-in`;
-                                card.style.opacity = '1';
-                                card.style.transform = 'translateY(0)';
-
-                                card.innerHTML = `
-                                    <i class="fas ${data.icon || 'fa-users'} cat-icon"></i>
-                                    <div class="cat-title">${data.title || data.name || 'Support Circle'}</div>
-                                    <div class="cat-desc">${data.description || 'A safe space for shared healing.'}</div>
-                                    <ul class="group-list">
-                                        ${(data.features || []).map(f => `<li>${f}</li>`).join('') || '<li>Safe Haven</li><li>Peer Support</li>'}
-                                    </ul>
-                                    <a href="${data.link || '#'}" class="cta-btn" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 15px; text-align: center;">Explore Circle</a>
-                                `;
-                                container.appendChild(card);
-                            });
+                            renderGroups(groups.map(g => g.data));
 
                         } catch (err) {
                             console.error("Error loading support groups:", err);
-                            container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--peach-glow);">Unable to sync with live circles. Please try refreshing.</div>';
+                            renderGroups(getHardcodedGroups());
                         }
+                    }
+
+                    function renderGroups(groupsData) {
+                        const container = document.getElementById('dynamic-groups-container');
+                        container.innerHTML = '';
+                        groupsData.forEach((data) => {
+                            const card = document.createElement('div');
+                            const catClass = mapCategoryToClass(data.category);
+                            card.className = `cat-card ${catClass} fade-in`;
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+
+                            card.innerHTML = `
+                                <i class="fas ${data.icon || 'fa-users'} cat-icon"></i>
+                                <div class="cat-title">${data.title || data.name || 'Support Circle'}</div>
+                                <div class="cat-desc">${data.description || 'A safe space for shared healing.'}</div>
+                                <ul class="group-list">
+                                    ${(data.features || []).map(f => `<li>${f}</li>`).join('') || '<li>Safe Haven</li><li>Peer Support</li>'}
+                                </ul>
+                                <a href="${data.link || '#'}" class="cta-btn" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 15px; text-align: center;">Explore Circle</a>
+                            `;
+                            container.appendChild(card);
+                        });
+                    }
+
+                    function getHardcodedGroups() {
+                        return [
+                            {
+                                title: "Relationships",
+                                description: "For love, attachment, conflict, and boundaries.",
+                                icon: "fa-heart-broken",
+                                category: "Relationships",
+                                features: ["Healing Circles", "Dating Fatigue", "Breakup Support", "Conscious Communication"],
+                                link: "https://chat.whatsapp.com/LRoFCws0rHG2KSwnYIH3kW"
+                            },
+                            {
+                                title: "Neurodivergence",
+                                description: "Understanding your mind without labeling yourself broken.",
+                                icon: "fa-brain",
+                                category: "Neurodivergence",
+                                features: ["Adult ADHD Circles", "Autism Spectrum", "Emotional Regulation", "Sensory Overload"],
+                                link: "https://chat.whatsapp.com/LL39jGibqf3DFYcfekBuqg"
+                            },
+                            {
+                                title: "Habits & Compulsions",
+                                description: "Compassion-first recovery, without shame.",
+                                icon: "fa-sync-alt",
+                                category: "Habits",
+                                features: ["Digital Addiction", "Nicotine Support", "Habit Reset", "Accountability Circles"],
+                                link: "https://chat.whatsapp.com/CmqGzHKzpblHBFGFojAtfB"
+                            },
+                            {
+                                title: "Expats in Germany",
+                                description: "A shared space for home-sickness and integration.",
+                                icon: "fa-plane-arrival",
+                                category: "Life",
+                                features: ["Expat Stress", "Home-sickness", "Integration Circles", "Community Support"],
+                                link: "https://chat.whatsapp.com/I7fFRL5Z69iDgIwuMXmdGV"
+                            },
+                            {
+                                title: "Women's Circles",
+                                description: "A sacred space for women to connect and grow.",
+                                icon: "fa-venus",
+                                category: "Life",
+                                features: ["Sisterhood", "Self-Love", "Safe Sharing", "Empowerment"],
+                                link: "https://chat.whatsapp.com/LKTLKt6uRPgBJhOBY7AKoO"
+                            },
+                            {
+                                title: "Students in India",
+                                description: "Navigating academic stress and career confusion.",
+                                icon: "fa-graduation-cap",
+                                category: "Life",
+                                features: ["Exam Anxiety", "Career Pressure", "Peer Support", "Life Skills"],
+                                link: "https://chat.whatsapp.com/Gnd9R7S5RCJ5XjD3E5fmWH"
+                            }
+                        ];
                     }
 
                     function mapCategoryToClass(cat) {
