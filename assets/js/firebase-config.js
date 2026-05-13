@@ -116,4 +116,7 @@ onAuthStateChanged(auth, (user) => {
 // Export for use in other modules
 export { db, collection, addDoc, serverTimestamp, auth, googleProvider, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, startAfter, writeBatch, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, linkWithCredential, EmailAuthProvider, signInAnonymously, functionsInstance, httpsCallable };
 
+// Global Bridge for non-module scripts (like widgets)
+window.SoulFirebase = { functionsInstance, httpsCallable, auth, db };
+
 console.log("Firebase initialized.");

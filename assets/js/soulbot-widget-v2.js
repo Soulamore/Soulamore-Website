@@ -150,7 +150,7 @@
         if (e.key === 'Enter') sendWidgetMessage();
     };
 
-    window.sendWidgetMessage = function () {
+    window.sendWidgetMessage = async function () {
         const input = document.getElementById('sb-input');
         const text = input.value.trim();
         if (!text) return;
@@ -159,17 +159,39 @@
         appendWidgetMsg(text, 'user');
         input.value = '';
 
-        // Simulate Bot Response
-        setTimeout(() => {
-            appendWidgetMsg("I'm listening. This is a secure space.", 'bot');
+        // Typing Indicator
+        const body = document.getElementById('sb-chat-body');
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'sb-msg sb-msg-bot';
+        typingDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Channelling...';
+        body.appendChild(typingDiv);
+        body.scrollTop = body.scrollHeight;
 
-            // Optional: Upsell full experience periodically
-            if (Math.random() > 0.7) {
-                setTimeout(() => {
-                    appendWidgetMsg("For a deeper conversation, try the full SoulBot page.", 'bot');
-                }, 1500);
+        try {
+            if (!window.SoulFirebase) {
+                throw new Error("Intelligence link not ready.");
             }
-        }, 800);
+
+            const { functionsInstance, httpsCallable } = window.SoulFirebase;
+            const llmFn = httpsCallable(functionsInstance, 'llmChat');
+            
+            const result = await llmFn({
+                appId: 'soulbot',
+                messages: [
+                    { role: 'system', content: 'You are SoulBot, a gentle and empathetic AI companion for Soulamore. Your purpose is to listen, provide comfort, and help users untangle their thoughts. You are NOT a therapist, but a supportive friend. Keep responses concise and soulful.' },
+                    { role: 'user', content: text }
+                ],
+                temperature: 0.8
+            });
+
+            const reply = result.data.choices[0].message.content;
+            typingDiv.remove();
+            appendWidgetMsg(reply, 'bot');
+
+        } catch (err) {
+            console.error('SoulBot Error:', err);
+            typingDiv.innerHTML = "I'm having trouble connecting to the collective right now. Please breathe and try again shortly.";
+        }
     };
 
     function appendWidgetMsg(text, sender) {

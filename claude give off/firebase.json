@@ -1,0 +1,123 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "functions": {
+    "source": "functions"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "**/.*",
+      "**/node_modules/**",
+      ".git/**",
+      ".firebase/**",
+      ".github/**",
+      ".agent/**",
+      ".qoder/**",
+      ".vscode/**",
+      "_BACKUPS/**",
+      "functions/**",
+      "docs/**",
+      "reports/**",
+      "scripts/**",
+      "roadmap/**",
+      "design-system/**",
+      "tmp/**",
+      "claude_handoff_profiles/**",
+      "Git Tools Open Source/**",
+      "Press and Media Kit/**",
+      "trademark filing/**",
+      "soulbot/**",
+      "Claude Result/**",
+      "knowledge source/**",
+      "New Pages/**",
+      "**/desktop.ini",
+      "**/*.md",
+      "**/*.py",
+      "**/*.sh",
+      "**/*.bat",
+      "package.json",
+      "package-lock.json",
+      "firestore.rules",
+      "audit_results.txt",
+      "cleanup_script.py",
+      "fix_links.py",
+      "audit_shell.js",
+      "audit_site.js"
+    ],
+    "rewrites": [
+      {
+        "source": "/portal/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/dashboard/**",
+        "destination": "/index.html"
+      }
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "headers": [
+      {
+        "source": "/portal/**",
+        "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow"}]
+      },
+      {
+        "source": "/dashboard/**",
+        "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow"}]
+      },
+      {
+        "source": "/spaces/**",
+        "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow"}]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|png|gif|svg|webp)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public,max-age=31536000,immutable"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(css|js|mjs|woff|woff2|ttf|eot)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public,max-age=31536000,immutable"
+          }
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public,max-age=300,s-maxage=600"
+          }
+        ]
+      },
+      {
+        "source": "**/*.json",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=300"
+          }
+        ]
+      },
+      {
+        "source": "/@(robots.txt|sitemap.xml)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600, s-maxage=14400"
+          }
+        ]
+      }
+    ]
+  }
+}
