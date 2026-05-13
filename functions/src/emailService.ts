@@ -1,15 +1,20 @@
 import * as functions from 'firebase-functions/v1';
 import * as fs from 'fs';
 import * as path from 'path';
-const { SendMailClient } = require("zeptomail");
+import * as sib from '@getbrevo/brevo';
 
 /**
- * Soulamore ZeptoMail Service
- * Official API Integration for High-Performance Delivery (v2.2 Superior)
+ * Soulamore Brevo Service
+ * Official API Integration for High-Performance Delivery (v3.0 Brevo)
  */
 
-const ZEPTOMAIL_URL = "https://api.zeptomail.eu/";
-const SENDER_EMAIL = "hello@soulamore.com"; // Branded Soulamore Sender Address
+const apiInstance = new sib.TransactionalEmailsApi();
+// Initialize API Key from environment or fallback to the one provided in CORE_INTELLIGENCE
+const BREVO_KEY = (process.env.BREVO_API_KEY || (functions as any).config().brevo?.key)?.trim();
+apiInstance.setApiKey(sib.TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
+
+const SENDER_EMAIL = "care@soulamore.com"; 
+const SENDER_NAME = "Soulamore Care";
 
 export interface EmailRecipient {
   email: string;
@@ -51,20 +56,68 @@ function compileTemplate(templateName: TemplateType, data: Record<string, any>):
     const relativePath = TEMPLATE_MAP[templateName] || templateName;
     const templatePath = path.join(__dirname, 'templates', `${relativePath}.html`);
     
+    // Soulful Header & Footer (CSS for breathing animation)
+    const SOUL_STYLE = `
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Lora:italic,wght@0,400;1,400&display=swap');
+        .soul-container { font-family: 'Outfit', sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; }
+        .soul-header { padding: 40px 0; text-align: center; }
+        .soul-body { padding: 0 20px; font-size: 1.05rem; }
+        .soul-footer { padding: 60px 20px; text-align: center; border-top: 1px solid #f1f5f9; margin-top: 40px; }
+        .breathing-prompt { 
+          display: inline-block;
+          padding: 20px;
+          border-radius: 50%;
+          background: rgba(142, 68, 173, 0.05);
+          border: 1px solid rgba(142, 68, 173, 0.1);
+          margin: 20px 0;
+          animation: breath 8s ease-in-out infinite;
+        }
+        @keyframes breath {
+          0%, 100% { transform: scale(1); opacity: 0.6; }
+          50% { transform: scale(1.1); opacity: 1; }
+        }
+        .quote { font-family: 'Lora', serif; font-style: italic; color: #64748b; margin: 20px 0; }
+      </style>
+    `;
+
+    const SOUL_FOOTER = `
+      <div class="soul-footer">
+        <div class="breathing-prompt">
+          <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #8E44AD;">Breathe</div>
+          <div style="font-size: 0.6rem; opacity: 0.6;">Inhale ... Exhale</div>
+        </div>
+        <p class="quote">"Deep breaths are like little love notes to your soul."</p>
+        <p style="font-size: 0.85rem; opacity: 0.5;">Stay Soulful,<br/>The Soulamore Collective</p>
+      </div>
+    `;
+
     if (!fs.existsSync(templatePath)) {
       functions.logger.warn(`Template not found at ${templatePath}. Using fallback.`);
       return `
-        <div style="font-family: 'Lora', serif; padding: 20px; color: #0f172a;">
-          <h2 style="color: #8E44AD;">Soulamore</h2>
-          <p>Hello ${data.name || 'Friend'},</p>
-          <p>This is an automated update regarding your Soulamore experience (${templateName}).</p>
-          <hr/>
-          <p>Stay Soulful,<br/>The Soulamore Team</p>
+        ${SOUL_STYLE}
+        <div class="soul-container">
+          <div class="soul-header">
+            <h1 style="color: #8E44AD; font-family: 'Outfit'; font-weight: 700;">Soulamore</h1>
+          </div>
+          <div class="soul-body">
+            <p>Hi ${data.name || 'dear soul'},</p>
+            <p>We are reaching out to you with warmth and presence. This is an update regarding your journey with us.</p>
+            <p style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+              ${templateName.replace(/_/g, ' ').toUpperCase()} Update
+            </p>
+          </div>
+          ${SOUL_FOOTER}
         </div>
       `;
     }
 
     let html = fs.readFileSync(templatePath, 'utf8');
+
+    // Inject Soulful Elements if not present
+    if (!html.includes('soul-container')) {
+      html = `${SOUL_STYLE}<div class="soul-container">${html}${SOUL_FOOTER}</div>`;
+    }
 
     Object.keys(data).forEach(key => {
       const value = data[key] !== undefined && data[key] !== null ? String(data[key]) : '';
@@ -76,67 +129,39 @@ function compileTemplate(templateName: TemplateType, data: Record<string, any>):
     html = html.replace(/{{WEBSITE_URL}}/g, 'https://soulamore.com');
     html = html.replace(/{{ACCENT_COLOR}}/g, '#8E44AD');
     
-    // Global Fallback for Name if not already replaced
-    html = html.replace(/{{NAME}}/g, data.name || 'Friend');
+    // Global Fallback for Name
+    html = html.replace(/{{NAME}}/g, data.name || 'dear soul');
 
     return html;
   } catch (error) {
     functions.logger.error(`Error loading template ${templateName}:`, error);
-    return `<p>Soulamore Message: ${templateName} processed.</p>`;
+    return `<p>A soulful message from Soulamore is on its way.</p>`;
   }
 }
 
 /**
  * Core Delivery Function
  */
-export async function sendEmail(recipient: EmailRecipient, subject: string, html: string) {
+export async function sendEmail(recipient: EmailRecipient, subject: string, htmlContent: string) {
   try {
-    // Standard V2.2 Secrets Check
-    const rawToken = (process.env.ZEPTOMAIL_SEND_TOKEN || (functions as any).config().zeptomail?.token)?.trim();
+    const sendSmtpEmail = new sib.SendSmtpEmail();
     
-    if (!rawToken) {
-      functions.logger.error('CRITICAL: ZEPTOMAIL_SEND_TOKEN is missing from environment/config.');
-      return { success: false, error: 'Missing Token' };
-    }
+    sendSmtpEmail.subject = subject;
+    sendSmtpEmail.htmlContent = htmlContent;
+    sendSmtpEmail.sender = { name: SENDER_NAME, email: SENDER_EMAIL };
+    sendSmtpEmail.to = [{ email: recipient.email, name: recipient.name || "Soul" }];
+    sendSmtpEmail.replyTo = { email: SENDER_EMAIL, name: SENDER_NAME };
 
-    const authHeaderToken = rawToken.startsWith('Zoho-enczapikey') ? rawToken : `Zoho-enczapikey ${rawToken}`;
-
-    const client = new SendMailClient({
-      url: ZEPTOMAIL_URL,
-      token: authHeaderToken
-    });
-
-    const payload = {
-      from: {
-        address: SENDER_EMAIL,
-        name: "Soulamore"
-      },
-      to: [
-        {
-          email_address: {
-            address: recipient.email,
-            name: recipient.name || "Friend"
-          }
-        }
-      ],
-      subject: subject,
-      htmlbody: html
-    };
-
-    const response = await client.sendMail(payload);
-
-    if (response && (response.message === 'OK' || response.message === 'success')) {
-      functions.logger.info(`✅ Successfully sent "${subject}" to ${recipient.email}`);
-      return { success: true, data: response };
-    } else {
-      functions.logger.error('❌ ZeptoMail delivery failure:', JSON.stringify(response));
-      return { success: false, error: 'Delivery Failed', details: response };
-    }
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    
+    functions.logger.info(`✅ Successfully sent soulful update to ${recipient.email}`);
+    return { success: true, messageId: data.body.messageId };
   } catch (error: any) {
-    functions.logger.error('💥 Execution error in sendEmail:', error.message);
+    functions.logger.error('💥 Execution error in sendEmail (Brevo):', error.message);
     return { success: false, error: error.message };
   }
 }
+
 
 /**
  * Template Engine
@@ -145,17 +170,18 @@ export function generateSoulamoreEmail(type: TemplateType, data: any) {
   let subject = '';
   
   switch (type) {
-    case 'newsletter_welcome': subject = "Welcome to the Soulamore Universe"; break;
-    case 'lifeline_receipt': subject = "We Hear You - Soulamore Lifeline"; break;
-    case 'application_received': subject = "Application Received: Join the Soulamore Collective"; break;
-    case 'booking_confirmed': subject = "Your Soulamore Session is Confirmed"; break;
-    case 'booking_reminder': subject = "Reminder: Your Soul Session Starts Soon"; break;
-    case 'password_reset': subject = "Reset Your Soulamore Password"; break;
-    case 'password_changed': subject = "Your Soulamore Password was Changed"; break;
-    case 'assessment_report': subject = `Your Emotional Blueprint: ${data.domain || 'Analysis'}`; break;
-    default: subject = "Message from Soulamore";
+    case 'newsletter_welcome': subject = "Welcome to the Soulamore Collective"; break;
+    case 'lifeline_receipt': subject = "We hear you, and we're here for you"; break;
+    case 'application_received': subject = "Your journey towards the Collective begins"; break;
+    case 'booking_confirmed': subject = "Your space is held. Session confirmed."; break;
+    case 'booking_reminder': subject = "A gentle reminder for your upcoming session"; break;
+    case 'password_reset': subject = "Secure your Soulamore account"; break;
+    case 'password_changed': subject = "Your account security has been updated"; break;
+    case 'assessment_report': subject = "Your Emotional Reflection is ready"; break;
+    default: subject = "A soulful update from Soulamore";
   }
 
   const html = compileTemplate(type, data);
   return { subject, html };
 }
+

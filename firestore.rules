@@ -167,27 +167,27 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Tool collections
-    match /vents/{id} { allow read, write: if isSignedIn(); }
-    match /shreds/{id} { allow read, write: if isSignedIn(); }
-    match /worries/{id} { allow read, write: if isSignedIn(); }
-    match /echoes/{id} { allow read, write: if isSignedIn(); }
-    match /resets/{id} { allow read, write: if isSignedIn(); }
+    // Tool collections - allow posting but prevent unauthorized modification/deletion
+    match /vents/{id} { allow read: if isSignedIn(); allow create: if isSignedIn(); allow update, delete: if isAdmin(); }
+    match /shreds/{id} { allow read: if isSignedIn(); allow create: if isSignedIn(); allow update, delete: if isAdmin(); }
+    match /worries/{id} { allow read: if isSignedIn(); allow create: if isSignedIn(); allow update, delete: if isAdmin(); }
+    match /echoes/{id} { allow read: if isSignedIn(); allow create: if isSignedIn(); allow update, delete: if isAdmin(); }
+    match /resets/{id} { allow read: if isSignedIn(); allow create: if isSignedIn(); allow update, delete: if isAdmin(); }
     
     // Maintenance & Announcements
     match /maintenance_settings/{id} { allow read: if true; allow write: if isAdmin(); }
     match /announcements/{id} { allow read: if true; allow write: if isAdmin(); }
 
-    // Forms
-    match /peers/{id} { allow read: if isSignedIn(); allow create, update, delete: if true; }
-    match /psychologists/{id} { allow read: if isSignedIn(); allow create, update, delete: if true; }
-    match /contacts/{id} { allow read, write: if true; }
-    match /newsletters/{id} { allow read, write: if true; }
+    // Forms - allow anyone to submit (create) but restrict management to Admins
+    match /peers/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isAdmin(); }
+    match /psychologists/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isAdmin(); }
+    match /contacts/{id} { allow read: if isAdmin(); allow create: if true; allow update, delete: if isAdmin(); }
+    match /newsletters/{id} { allow read: if isAdmin(); allow create: if true; allow update, delete: if isAdmin(); }
 
     // ==================== SYSTEM & OTHERS ====================
 
     match /soulbot_conversations/{id} {
-      allow read, write: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid) || true;
+      allow read, write: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
     
     match /therapists/{id} { allow read: if true; allow write: if isAdmin(); }

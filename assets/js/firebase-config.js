@@ -41,22 +41,18 @@ try {
 // App Check with reCAPTCHA Enterprise
 let appCheck = null;
 
-// TEMPORARILY DISABLED FOR LOCAL DEVELOPMENT
-// Uncomment below and register debug token in Firebase Console for production
-/*
+// Debug mode for localhost, reCAPTCHA Enterprise for production
 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
     console.log("🔧 Firebase App Check Debug Mode enabled. Check console for Debug Token!");
 }
-*/
 
 try {
-    // App Check disabled for local dev - enable in production
-    // appCheck = initializeAppCheck(app, {
-    //     provider: new ReCaptchaEnterpriseProvider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
-    //     isTokenAutoRefreshEnabled: true
-    // });
-    console.log("ℹ️ App Check disabled for local development");
+    appCheck = initializeAppCheck(app, {
+        provider: new ReCaptchaEnterpriseProvider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
+        isTokenAutoRefreshEnabled: true
+    });
+    console.log("✅ Firebase App Check initialized");
 } catch (err) {
     console.warn("⚠️ App Check initialization failed:", err.message);
 }
