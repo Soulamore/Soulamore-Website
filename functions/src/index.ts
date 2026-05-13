@@ -21,8 +21,15 @@ export * from './triggers/on-user-create';
 // Export email triggers
 export * from './triggers/emailTriggers';
 
+// Export new core services
+export * from './llmRouter';
+export * from './healthMonitoring';
+export * from './campaigns';
+export * from './emailService';
+
 // Health check function
 export const healthCheck = functions.https.onCall(() => {
+
   return {
     status: 'ok',
     timestamp: new Date().toISOString(),

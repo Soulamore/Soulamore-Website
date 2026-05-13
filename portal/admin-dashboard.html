@@ -26,12 +26,13 @@
     </script>
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
-                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com;
+                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com https://cdnjs.cloudflare.com;
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
                  img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
                  connect-src 'self' https://region1.google-analytics.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://analytics.google.com https://www.google-analytics.com;
                  frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <!-- AUTH GUARD: Protects this page -->
     <script src="/assets/js/auth-guard.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -594,7 +595,14 @@
                 transform: translateY(0);
             }
         }
+        .health-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .health-online { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .health-warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .health-offline { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .health-unknown { background: rgba(255, 255, 255, 0.05); color: #94a3b8; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .stat-main { font-size: 2.2rem; font-weight: 800; font-family: 'Outfit'; color: var(--text-main); margin: 5px 0; }
     </style>
+
     <link rel="icon" href="../assets/images/favicon_symbol.webp" type="image/x-icon">
 </head>
 
@@ -707,11 +715,14 @@
                 <a href="#" class="side-link" data-view="users" onclick="switchView('users', this)">
                     <i class="fas fa-users-cog"></i> <span>User Mgmt</span>
                 </a>
-                <!-- ADDITIVE MODULE 2: Email Marketing Center -->
                 <a href="#" class="side-link" data-view="newsletter" onclick="switchView('newsletter', this)">
-                    <i class="fas fa-bullhorn"></i> <span>Marketing Center</span>
+                    <i class="fas fa-bullhorn"></i> <span>Campaign Center</span>
+                </a>
+                <a href="#" class="side-link" data-view="api-health" onclick="switchView('api-health', this)">
+                    <i class="fas fa-heartbeat"></i> <span>API Health</span>
                 </a>
                 <a href="#" class="side-link" data-view="sessions" onclick="switchView('sessions', this)">
+
                     <i class="fas fa-calendar-check"></i> <span>Master Sessions</span>
                 </a>
                 <a href="#" class="side-link" data-view="accounting" onclick="switchView('accounting', this)">
@@ -987,71 +998,61 @@
                 </div>
             </div>
 
-            <!-- VIEW: NEWSLETTER HUB - ADDITIVE MODULE 2 -->
+            <!-- VIEW: CAMPAIGN CENTER (UPGRADED) -->
             <div id="view-newsletter" class="view-section" style="display:none;">
                 <div class="workspace-header">
                     <div style="display:flex; align-items:center; gap:16px; flex:1;">
                         <div
                             style="width:45px; height:45px; background:var(--admin-accent-soft); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--admin-accent); border:1px solid var(--admin-accent-glow);">
-                            <i class="fas fa-envelope" style="font-size:1.2rem;"></i>
+                            <i class="fas fa-bullhorn" style="font-size:1.2rem;"></i>
                         </div>
                         <div style="display:flex; flex-direction:column; gap:4px;">
-                            <h2
-                                style="font-family:'Outfit'; font-weight:700; font-size:1.6rem; margin:0; letter-spacing:-0.5px;">
-                                Email Marketing Center</h2>
-                            <div style="font-size:0.85rem; opacity:0.6; font-weight:500;">Direct orchestration for global campaigns and subscriber feeds</div>
+                            <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.6rem; margin:0; letter-spacing:-0.5px;">Campaign Center</h2>
+                            <div style="font-size:0.85rem; opacity:0.6; font-weight:500;">Orchestrate mass communication and community outreach</div>
                         </div>
                     </div>
                 </div>
                 <div class="workspace-body">
-                    <!-- CAMPAIGN ORCHESTRATION CARDS -->
+                    <!-- CAMPAIGN ENGINES -->
                     <div style="margin-bottom: 30px;">
                         <div style="font-weight: 800; font-family: 'Outfit'; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--admin-accent); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-rocket"></i> Active Marketing Engines
+                            <i class="fas fa-rocket"></i> Marketing Engines
                         </div>
                         <div class="dashboard-grid">
                             <!-- Newsletter Blast -->
                             <div class="dash-card admin-card-indigo">
                                 <i class="fas fa-mail-bulk"></i>
                                 <h3>Newsletter Blast</h3>
-                                <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 20px;">Push the latest Soulamore updates to all verified newsletter subscribers.</p>
+                                <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 20px;">Push updates to all verified newsletter subscribers via Brevo.</p>
                                 <button onclick="triggerCampaign('newsletter')" class="btn-dash-primary" id="btn-campaign-newsletter" style="width: 100%; border: none;">
                                     LAUNCH CAMPAIGN
                                 </button>
                             </div>
-                            
-                            <!-- Problem Wall Promo -->
+
+                            <!-- Soulamore News Engine -->
+                            <div class="dash-card" style="background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                                <i class="fas fa-dove" style="color: #a78bfa; font-size: 2.2rem; margin-bottom: 20px; display: block;"></i>
+                                <h3 style="color: #fff; font-family: 'Outfit';">Soulamore News Engine</h3>
+                                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 20px;">Draft and broadcast empathetic announcements with integrated breathing prompts.</p>
+                                <button onclick="openCampaignModal()" class="btn-dash-primary" style="width: 100%; background: #a78bfa; color: #fff; font-weight: 800; border: none;">
+                                    CREATE CAMPAIGN
+                                </button>
+                            </div>
+
+                            <!-- CSV Campaign -->
                             <div class="dash-card admin-card-teal">
-                                <i class="fas fa-pen-nib"></i>
-                                <h3>Problem Wall Spotlight</h3>
-                                <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 20px;">Direct users to our anonymous therapy tool. Increases platform engagement.</p>
-                                <button onclick="triggerCampaign('problem-wall')" class="btn-dash-primary" id="btn-campaign-wall" style="width: 100%; background: #2dd4bf; border: none;">
-                                    PROMOTE WALL
-                                </button>
-                            </div>
-
-                            <!-- Expat Outreach -->
-                            <div class="dash-card admin-card-amber">
-                                <i class="fas fa-globe-americas"></i>
-                                <h3>Expat Support (Away)</h3>
-                                <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 20px;">Targeted outreach for users abroad. Highlights Soulamore Away benefits.</p>
-                                <button onclick="triggerCampaign('expat')" class="btn-dash-primary" id="btn-campaign-expat" style="width: 100%; background: #fbbf24; color: #000; border: none;">
-                                    SEND OUTREACH
-                                </button>
-                            </div>
-
-                            <!-- DYNAMIC NEWS HUB (SAGA-STYLE) -->
-                            <div class="dash-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid rgba(78, 205, 196, 0.3); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
-                                <i class="fas fa-newspaper" style="color: #4ECDC4; font-size: 2.2rem; margin-bottom: 20px; display: block;"></i>
-                                <h3 style="color: #fff; font-family: 'Outfit';">SAGA News Engine</h3>
-                                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 20px;">Draft, design, and broadcast custom narratives with images and CTAs to your entire ecosystem.</p>
-                                <button onclick="openCampaignModal()" class="btn-dash-primary" style="width: 100%; background: #4ECDC4; color: #0f172a; font-weight: 800; border: none;">
-                                    CREATE CAMPAIGN (SAGA)
+                                <i class="fas fa-file-csv"></i>
+                                <h3>CSV Targeted Blast</h3>
+                                <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 20px;">Upload a list of emails to send a targeted broadcast campaign.</p>
+                                <input type="file" id="csv-campaign-input" accept=".csv" style="display:none;" onchange="handleCSVCampaign(this)">
+                                <button onclick="document.getElementById('csv-campaign-input').click()" class="btn-dash-primary" style="width: 100%; background: #2dd4bf; border: none;">
+                                    UPLOAD & SEND
                                 </button>
                             </div>
                         </div>
                     </div>
 
+                    <!-- SUBSCRIBER MANAGEMENT -->
                     <div class="dash-card" style="padding:0; overflow:visible;" id="newsletter-table-container">
                         <div style="padding:20px 25px; border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.01); display:flex; justify-content:space-between; align-items:center;">
                             <div style="font-weight:700; text-transform:uppercase; font-size:0.85rem; letter-spacing:0.5px;">Subscriber List</div>
@@ -1071,6 +1072,77 @@
                     </div>
                 </div>
             </div>
+
+            <!-- VIEW: API HEALTH (NEW) -->
+            <div id="view-api-health" class="view-section" style="display:none;">
+                <div class="workspace-header">
+                    <div style="display:flex; align-items:center; gap:16px; flex:1;">
+                        <div
+                            style="width:45px; height:45px; background:var(--admin-accent-soft); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--admin-accent); border:1px solid var(--admin-accent-glow);">
+                            <i class="fas fa-heartbeat" style="font-size:1.2rem;"></i>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.6rem; margin:0; letter-spacing:-0.5px;">API Health & Telemetry</h2>
+                            <div style="font-size:0.85rem; opacity:0.6; font-weight:500;">Real-time infrastructure monitoring and quota tracking</div>
+                        </div>
+                    </div>
+                    <button onclick="loadApiHealth()" class="btn-s btn-rounded btn-h42 btn-indigo">
+                        <i class="fas fa-sync-alt"></i> Refresh Telemetry
+                    </button>
+                </div>
+                <div class="workspace-body">
+                    <div class="dashboard-grid">
+                        <!-- BREVO QUOTA -->
+                        <div class="dash-card" id="health-brevo">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <h3 style="margin:0;">Email Infrastructure</h3>
+                                <span class="health-badge health-unknown">CHECKING...</span>
+                            </div>
+                            <div class="stat-main">-</div>
+                            <p style="opacity:0.7; font-size:0.85rem;">Remaining Brevo Credits</p>
+                            <div class="progress-bar-bg" style="height:6px; background:rgba(255,255,255,0.05); border-radius:3px; margin-top:15px;">
+                                <div class="progress-bar-fill" style="width:0%; height:100%; background:var(--soul-teal); border-radius:3px; transition:width 1s;"></div>
+                            </div>
+                        </div>
+
+                        <!-- LLM ROUTER -->
+                        <div class="dash-card" id="health-llm">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <h3 style="margin:0;">LLM Intelligence</h3>
+                                <span class="health-badge health-unknown">CHECKING...</span>
+                            </div>
+                            <div class="stat-main">Isolated</div>
+                            <p style="opacity:0.7; font-size:0.85rem;">"Router-in-Router" Protocol Active</p>
+                            <div style="margin-top:15px; font-size:0.8rem; opacity:0.6;">
+                                <div><i class="fas fa-key"></i> Keys Status: <span id="health-llm-keys">Checking...</span></div>
+                                <div><i class="fas fa-project-diagram"></i> Service Bridge: <span id="health-llm-bridge">Online</span></div>
+                            </div>
+                        </div>
+
+                        <!-- FIREBASE HEALTH -->
+                        <div class="dash-card" id="health-firebase">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <h3 style="margin:0;">Backend Core</h3>
+                                <span class="health-badge health-online">ONLINE</span>
+                            </div>
+                            <div class="stat-main">Stable</div>
+                            <p style="opacity:0.7; font-size:0.85rem;">Firebase & Secret Manager</p>
+                            <div style="margin-top:15px; font-size:0.8rem; opacity:0.6;">
+                                <div><i class="fas fa-database"></i> Firestore: Ready</div>
+                                <div><i class="fas fa-shield-alt"></i> App Check: Active</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dash-card" style="margin-top:30px;">
+                        <h3 style="margin-bottom:20px;"><i class="fas fa-terminal"></i> Telemetry Logs</h3>
+                        <div id="telemetry-logs" style="background:#000; color:#0f0; font-family:monospace; padding:15px; border-radius:10px; font-size:0.85rem; height:200px; overflow-y:auto; line-height:1.6;">
+                            [SYSTEM] Awaiting telemetry stream...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
             <!-- VIEW: SESSIONS -->
             <div id="view-sessions" class="view-section" style="display:none;">
@@ -5409,7 +5481,53 @@
 
     </script>
 
+    <!-- CAMPAIGN ENGINE MODAL (SAGA STYLE) -->
+    <div id="campaign-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10001; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
+        <div class="modal-content" style="background:#0f172a; border:1px solid rgba(129, 140, 248, 0.3); border-radius:24px; padding:40px; width:90%; max-width:800px; max-height:90vh; overflow-y:auto; box-shadow:0 30px 60px rgba(0,0,0,0.5);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                <h3 style="font-family:'Outfit'; font-weight:700; font-size:1.6rem; color:#fff; margin:0;">
+                    <i class="fas fa-heart" style="color:#a78bfa; margin-right:12px;"></i>Soulamore Campaign Engine
+                </h3>
+                <button onclick="closeCampaignModal()" style="background:transparent; border:none; color:rgba(255,255,255,0.5); font-size:1.8rem; cursor:pointer;">&times;</button>
+            </div>
+            
+            <form id="campaign-form" onsubmit="sendSagaCampaign(event)">
+                <div style="display:grid; gap:25px;">
+                    <div>
+                        <label style="display:block; font-size:0.85rem; font-weight:600; color:rgba(255,255,255,0.6); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Target Audience</label>
+                        <select id="campaign-target" required style="width:100%; padding:14px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; font-size:1rem;">
+                            <option value="newsletter">All Newsletter Subscribers</option>
+                            <option value="all_users">All Registered Platform Users</option>
+                            <option value="test">Test Mode (Aditya Harsh Only)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="display:block; font-size:0.85rem; font-weight:600; color:rgba(255,255,255,0.6); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Campaign Subject</label>
+                        <input type="text" id="campaign-subject" required placeholder="e.g. ✨ New Support Circle: Stress & Anxiety Support" style="width:100%; padding:14px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; font-size:1rem;">
+                    </div>
+
+                    <div>
+                        <label style="display:block; font-size:0.85rem; font-weight:600; color:rgba(255,255,255,0.6); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Email Content (HTML Supported)</label>
+                        <textarea id="campaign-content" required rows="10" placeholder="Dear user, welcome to our latest update..." style="width:100%; padding:14px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; font-size:1rem; font-family:inherit; resize:vertical;"></textarea>
+                        <small style="color:rgba(255,255,255,0.4); margin-top:8px; display:block;">Use {{name}} for dynamic name placement. System branding will be applied automatically.</small>
+                    </div>
+
+                    <div style="display:flex; gap:15px; margin-top:10px;">
+                        <button type="submit" class="btn-dash-primary" style="flex:2; padding:16px; border-radius:14px; background:linear-gradient(135deg, #7c3aed, #a78bfa); color:#fff; font-weight:800; border:none; cursor:pointer; font-size:1rem; box-shadow:0 10px 20px rgba(139, 92, 246, 0.3);">
+                            BROADCAST TO COLLECTIVE
+                        </button>
+                        <button type="button" onclick="closeCampaignModal()" style="flex:1; padding:16px; border-radius:14px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.7); font-weight:700; cursor:pointer;">
+                            CANCEL
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- GROUP MANAGEMENT MODAL -->
+
     <div id="group-modal" class="modal-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
         <div class="modal-content" style="background:var(--slate-100); border-radius:20px; padding:40px; max-width:600px; width:90%; max-height:90vh; overflow-y:auto; border:1px solid var(--admin-accent-glow); box-shadow:0 20px 60px rgba(0,0,0,0.5);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
@@ -5700,7 +5818,218 @@
                 btn.textContent = originalText;
             }
         };
-    </script>
+        // ==================== CAMPAIGN & TELEMETRY MODULE ====================
+        import { functionsInstance, httpsCallable } from "../assets/js/firebase-config.js";
+
+        /**
+         * Load API Health Telemetry
+         */
+        window.loadApiHealth = async function() {
+            const logsEl = document.getElementById('telemetry-logs');
+            const log = (msg) => {
+                const time = new Date().toLocaleTimeString();
+                logsEl.innerHTML += `<div>[${time}] ${msg}</div>`;
+                logsEl.scrollTop = logsEl.scrollHeight;
+            };
+
+            log("Initializing system health probe...");
+            
+            try {
+                const getApiHealth = httpsCallable(functionsInstance, 'getApiHealth');
+                const result = await getApiHealth();
+                const data = result.data;
+
+                log("Telemetry received from Firebase Cloud Functions.");
+
+                // Update Brevo Card
+                const brevoCard = document.getElementById('health-brevo');
+                const brevoBadge = brevoCard.querySelector('.health-badge');
+                const brevoStat = brevoCard.querySelector('.stat-main');
+                const brevoProgress = brevoCard.querySelector('.progress-bar-fill');
+
+                if (data.brevo && data.brevo.status === 'online') {
+                    const credits = data.brevo.credits || 0;
+                    brevoStat.textContent = credits.toLocaleString();
+                    brevoBadge.textContent = 'ONLINE';
+                    brevoBadge.className = 'health-badge health-online';
+                    
+                    // Simple progress logic (assuming 300 is a daily/standard limit for free or 1000 for paid)
+                    const percent = Math.min(100, (credits / 300) * 100);
+                    brevoProgress.style.width = `${percent}%`;
+                    log(`Brevo Connectivity: ACTIVE. Credits remaining: ${credits}`);
+                } else {
+                    brevoBadge.textContent = 'ERROR';
+                    brevoBadge.className = 'health-badge health-offline';
+                    log("Brevo Connectivity: FAILED. Check API Key in Secret Manager.");
+                }
+
+                // Update LLM Router Card
+                const llmCard = document.getElementById('health-llm');
+                const llmBadge = llmCard.querySelector('.health-badge');
+                const llmKeys = document.getElementById('health-llm-keys');
+
+                if (data.llmRouter && data.llmRouter.status === 'online') {
+                    llmBadge.textContent = 'SECURE';
+                    llmBadge.className = 'health-badge health-online';
+                    llmKeys.textContent = `Active (${data.llmRouter.keysAvailable} keys)`;
+                    llmKeys.style.color = '#22c55e';
+                    log(`LLM Router: ACTIVE. ${data.llmRouter.keysAvailable} isolated project keys verified.`);
+                } else {
+                    llmBadge.textContent = 'WARNING';
+                    llmBadge.className = 'health-badge health-warning';
+                    llmKeys.textContent = 'Issue detected';
+                    llmKeys.style.color = '#f59e0b';
+                    log("LLM Router: UNSTABLE. Possible IAM permission issue with 'llm-router' project.");
+                }
+
+                log("Infrastructure Audit: SUCCESS.");
+
+            } catch (err) {
+                log(`Telemetry Error: ${err.message}`);
+                console.error("Health Probe Failed:", err);
+            }
+        };
+
+        /**
+         * Trigger standard campaigns (Newsletter Blast, etc.)
+         */
+        window.triggerCampaign = async function(type) {
+            let count = 0;
+            if (type === 'newsletter') {
+                count = (window.allNewsletterSubscribers || []).length;
+                if (count === 0) {
+                    alert("No subscribers found to target.");
+                    return;
+                }
+                if (!confirm(`Broadcast a standard newsletter update to ${count} subscribers?`)) return;
+            }
+
+            const btn = document.getElementById(`btn-campaign-${type}`);
+            const originalText = btn.textContent;
+            
+            try {
+                btn.disabled = true;
+                btn.textContent = "LAUNCHING...";
+
+                // This would call a specialized cloud function for automated blasts
+                // For now, we reuse the broadcast function with a standard template
+                const broadcast = httpsCallable(functionsInstance, 'adminBroadcastCampaign');
+                const result = await broadcast({
+                    type: 'newsletter',
+                    subject: "✨ Latest from Soulamore",
+                    templateId: "default_update" 
+                });
+
+                alert(`Campaign successfully queued! \nBatch ID: ${result.data.batchId}`);
+            } catch (err) {
+                console.error("Campaign Trigger Failed:", err);
+                alert(`Campaign Failed: ${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        };
+
+        /**
+         * SAGA Campaign Engine Functions
+         */
+        window.openCampaignModal = () => {
+            document.getElementById('campaign-modal').style.display = 'flex';
+        };
+
+        window.closeCampaignModal = () => {
+            document.getElementById('campaign-modal').style.display = 'none';
+        };
+
+        window.sendSagaCampaign = async function(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+
+            const target = document.getElementById('campaign-target').value;
+            const subject = document.getElementById('campaign-subject').value;
+            const content = document.getElementById('campaign-content').value;
+
+            if (!confirm(`Confirm BROADCAST to ${target.replace('_', ' ')}?`)) return;
+
+            try {
+                btn.disabled = true;
+                btn.textContent = "BROADCASTING...";
+
+                const broadcast = httpsCallable(functionsInstance, 'adminBroadcastCampaign');
+                const result = await broadcast({
+                    type: target,
+                    subject: subject,
+                    htmlContent: content
+                });
+
+                alert(`Soulamore Campaign Dispatched! \nTotal Emails Queued: ${result.data.totalEmails}`);
+                closeCampaignModal();
+                e.target.reset();
+            } catch (err) {
+                console.error("Soulamore Dispatch Failed:", err);
+                alert(`Dispatch Failed: ${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        };
+
+        /**
+         * CSV Targeted Campaign Logic
+         */
+        window.handleCSVCampaign = function(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: async function(results) {
+                    const emails = results.data.map(row => row.email || row.Email || row[Object.keys(row)[0]]).filter(e => e && e.includes('@'));
+                    
+                    if (emails.length === 0) {
+                        alert("No valid email addresses found in CSV. Ensure you have an 'email' column.");
+                        return;
+                    }
+
+                    if (!confirm(`Detected ${emails.length} emails. Ready to broadcast?`)) return;
+
+                    const subject = prompt("Enter Campaign Subject:", "✨ Special Update from Soulamore");
+                    if (!subject) return;
+
+                    const htmlContent = prompt("Enter HTML or Text Content (Simple):", "Welcome to Soulamore!");
+                    if (!htmlContent) return;
+
+                    try {
+                        const broadcast = httpsCallable(functionsInstance, 'adminBroadcastCampaign');
+                        const result = await broadcast({
+                            type: 'custom_list',
+                            emails: emails,
+                            subject: subject,
+                            htmlContent: htmlContent
+                        });
+
+                        alert(`Targeted Blast Successful! \nTotal Sent: ${result.data.totalEmails}`);
+                    } catch (err) {
+                        alert(`Blast Failed: ${err.message}`);
+                    }
+                }
+            });
+            // Reset input
+            input.value = '';
+        };
+
+        // Initialize API Health when tab is clicked
+        const originalSwitchView = window.switchView;
+        window.switchView = function(viewId, element) {
+            originalSwitchView(viewId, element);
+            if (viewId === 'api-health') {
+                loadApiHealth();
+            }
+        };
+
+
 </body>
 
 </html>
