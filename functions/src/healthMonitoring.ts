@@ -6,80 +6,122 @@ import * as sib from '@getbrevo/brevo';
  * API Health Telemetry
  * Provides system-wide health status for integrated services.
  */
-export const getApiHealth = functions.https.onCall(async (data, context) => {
+export const getApiHealth = functions.runWith({
+  timeoutSeconds: 60,
+  memory: '512MB'
+}).https.onCall(async (data, context) => {
+  console.log("🚀 [getApiHealth] Probe Started");
+
   // 1. Admin Auth Guard
   if (!context.auth) {
+    console.warn("❌ [getApiHealth] Unauthenticated access attempt");
     throw new functions.https.HttpsError('unauthenticated', 'Login required.');
   }
 
-  // Check if user is admin
-  const userDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
-  if (!userDoc.exists || userDoc.data()?.role !== 'admin') {
-    throw new functions.https.HttpsError('permission-denied', 'Only admins can view system health.');
-  }
-
-  const results: any = {
-    timestamp: new Date().toISOString(),
-    services: {}
-  };
-
-  // 2. Check Brevo Health
   try {
-    const BREVO_KEY = (process.env.BREVO_API_KEY || (functions as any).config().brevo?.key)?.trim();
-    const apiInstance = new sib.AccountApi();
-    apiInstance.setApiKey(sib.AccountApiApiKeys.apiKey, BREVO_KEY);
-    
-    const accountInfo = await apiInstance.getAccount();
-    results.services.brevo = {
-      status: 'operational',
-      plan: accountInfo.body.plan,
-      credits: accountInfo.body.plan.find(p => p.type === 'credits')?.credits || 0
-    };
-  } catch (err: any) {
-    results.services.brevo = {
-      status: 'error',
-      message: err.message
-    };
-  }
+    const userDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+    if (!userDoc.exists || userDoc.data()?.role !== 'admin') {
+      console.warn(`❌ [getApiHealth] Unauthorized role: ${userDoc.data()?.role} for UID: ${context.auth.uid}`);
+      throw new functions.https.HttpsError('permission-denied', 'Only admins can view system health.');
+    }
 
-  // 3. Check LLM Router Health
-  try {
-    const llmApp = admin.app('llm-router');
-    const llmDb = llmApp.firestore();
-    const keysSnap = await llmDb.collection('keys').get();
-    
-    const keys = keysSnap.docs.map(doc => {
-      const d = doc.data();
-      return {
-        id: doc.id,
-        name: d.name || doc.id,
-        status: d.status || 'unknown',
-        provider: d.provider || 'custom'
+    const results: any = {
+      timestamp: new Date().toISOString(),
+      services: {}
+    };
+
+    // 2. Check Brevo Health
+    console.log("📡 [getApiHealth] Checking Brevo...");
+    try {
+      const BREVO_KEY = (process.env.BREVO_API_KEY || (functions as any).config().brevo?.key)?.trim();
+      if (!BREVO_KEY) throw new Error("Missing BREVO_API_KEY");
+      
+      const apiInstance = new sib.AccountApi();
+      apiInstance.setApiKey(sib.AccountApiApiKeys.apiKey, BREVO_KEY);
+      
+      const accountInfo = await apiInstance.getAccount();
+      results.services.brevo = {
+        status: 'operational',
+        plan: accountInfo.body.plan,
+        credits: accountInfo.body.plan.find(p => p.type === 'credits')?.credits || 0
       };
-    });
+      console.log("✅ [getApiHealth] Brevo Operational");
+    } catch (err: any) {
+      console.error("❌ [getApiHealth] Brevo Error:", err.message);
+      results.services.brevo = {
+        status: 'error',
+        message: err.message
+      };
+    }
 
-    results.services.llmRouter = {
-      status: 'operational',
-      activeKeys: keys.filter(k => k.status === 'active').length,
-      totalKeys: keys.length,
-      keys: keys // Detailed telemetry for the dashboard
-    };
-  } catch (err: any) {
-    results.services.llmRouter = {
-      status: 'error',
-      message: err.message
-    };
+    // 3. Check LLM Router Health
+    console.log("📡 [getApiHealth] Checking LLM Router...");
+    try {
+      let llmApp: admin.app.App;
+      try {
+        llmApp = admin.app('llm-router');
+      } catch (e) {
+        console.log("🔄 [getApiHealth] Initializing llm-router app bridge...");
+        // Re-use the same logic from llmRouter.ts but safely
+        const serviceAccount = {
+          "project_id": "llm-router-870c5",
+          "private_key": process.env.LLM_ROUTER_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+          "client_email": "firebase-adminsdk-fbsvc@llm-router-870c5.iam.gserviceaccount.com"
+        };
+        
+        // If the key is missing from env, it might be in config or we fallback to the hardcoded one in llmRouter.ts 
+        // For simplicity and to avoid duplication, we'll try to use the existing one if possible
+        // But for getApiHealth, we just want to see if the app is reachable.
+        
+        // If we can't initialize it here because we lack the key, we'll just report it.
+        throw new Error("llm-router app not initialized. Ensure llmRouter.ts is loaded.");
+      }
+
+      const llmDb = llmApp.firestore();
+      const keysSnap = await llmDb.collection('keys').get();
+      
+      const keys = keysSnap.docs.map(doc => {
+        const d = doc.data();
+        return {
+          id: doc.id,
+          name: d.name || doc.id,
+          status: d.status || 'unknown',
+          provider: d.provider || 'custom'
+        };
+      });
+
+      results.services.llmRouter = {
+        status: 'operational',
+        activeKeys: keys.filter(k => k.status === 'active').length,
+        totalKeys: keys.length,
+        keys: keys 
+      };
+      console.log("✅ [getApiHealth] LLM Router Operational");
+    } catch (err: any) {
+      console.error("❌ [getApiHealth] LLM Router Error:", err.message);
+      results.services.llmRouter = {
+        status: 'error',
+        message: err.message
+      };
+    }
+
+    // 4. Check Firestore/Auth (Native)
+    console.log("📡 [getApiHealth] Checking Firestore...");
+    try {
+      await admin.firestore().collection('_health_check').doc('ping').set({
+        last_check: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      results.services.firebase = { status: 'operational' };
+      console.log("✅ [getApiHealth] Firestore Operational");
+    } catch (err: any) {
+      console.error("❌ [getApiHealth] Firestore Error:", err.message);
+      results.services.firebase = { status: 'error', message: err.message };
+    }
+
+    return results;
+
+  } catch (globalErr: any) {
+    console.error("🔥 [getApiHealth] CRITICAL INTERNAL ERROR:", globalErr);
+    throw new functions.https.HttpsError('internal', globalErr.message);
   }
-
-  // 4. Check Firestore/Auth (Native)
-  try {
-    await admin.firestore().collection('_health_check').doc('ping').set({
-      last_check: admin.firestore.FieldValue.serverTimestamp()
-    });
-    results.services.firebase = { status: 'operational' };
-  } catch (err: any) {
-    results.services.firebase = { status: 'error', message: err.message };
-  }
-
-  return results;
 });
