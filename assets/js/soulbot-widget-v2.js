@@ -172,19 +172,34 @@
                 throw new Error("Intelligence link not ready.");
             }
 
-            const { functionsInstance, httpsCallable } = window.SoulFirebase;
-            const llmFn = httpsCallable(functionsInstance, 'llmChat');
+            const { auth } = window.SoulFirebase;
             
-            const result = await llmFn({
-                appId: 'soulbot',
-                messages: [
-                    { role: 'system', content: 'You are SoulBot, a gentle and empathetic AI companion for Soulamore. Your purpose is to listen, provide comfort, and help users untangle their thoughts. You are NOT a therapist, but a supportive friend. Keep responses concise and soulful.' },
-                    { role: 'user', content: text }
-                ],
-                temperature: 0.8
+            // Get current ID token
+            let idToken = "";
+            if (auth.currentUser) {
+                idToken = await auth.currentUser.getIdToken();
+            }
+
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${idToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    appId: 'soulbot',
+                    messages: [
+                        { role: 'system', content: 'You are SoulBot, a gentle and empathetic AI companion for Soulamore. Your purpose is to listen, provide comfort, and help users untangle their thoughts. You are NOT a therapist, but a supportive friend. Keep responses concise and soulful.' },
+                        { role: 'user', content: text }
+                    ],
+                    temperature: 0.8
+                })
             });
 
-            const reply = result.data.choices[0].message.content;
+            if (!response.ok) throw new Error(await response.text());
+            const result = await response.json();
+            const reply = result.choices[0].message.content;
+
             typingDiv.remove();
             appendWidgetMsg(reply, 'bot');
 

@@ -32,6 +32,59 @@ const SOULAMORE_ROUTER_KEY = "router_svpkARCYUuTATB_3e8gKpNLQ8G2hoSL4";
 const ROUTER_BASE_URL = "https://llm-router-870c5.web.app/v1";
 
 /**
+ * Core Logic for LLM Routing
+ * Can be called by onCall or by Express onRequest (via apiRouter)
+ */
+export async function handleLlmRequest(data: any, auth: any) {
+  const { appId, messages, model, temperature } = data;
+  if (!appId || !messages) {
+    throw new Error('Missing appId or messages.');
+  }
+
+  let apiKey: string;
+  let baseURL: string;
+
+  // 1. Resolve Key (Direct for Soulamore, Firestore for others)
+  if (appId === 'soulamore' || appId === 'soulbot') {
+    apiKey = SOULAMORE_ROUTER_KEY;
+    baseURL = ROUTER_BASE_URL;
+  } else {
+    const keyDoc = await llmDb.collection('keys').doc(appId).get();
+    if (!keyDoc.exists) {
+      throw new Error(`No LLM configuration found for AppID: ${appId}`);
+    }
+    const config = keyDoc.data()!;
+    if (config.status !== 'active') {
+      throw new Error('AI Service is currently disabled for this module.');
+    }
+    apiKey = config.key;
+    baseURL = config.baseURL || 'https://api.openai.com/v1';
+  }
+
+  // 2. Dispatch to Router/Provider
+  const response = await fetch(`${baseURL}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+      'x-app-id': appId
+    },
+    body: JSON.stringify({
+      model: model || 'gpt-4o',
+      messages: messages,
+      temperature: temperature || 0.7
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json() as any;
+    throw new Error(errorData.error?.message || 'Upstream LLM Error');
+  }
+
+  return await response.json();
+}
+
+/**
  * LLM Router Function
  * Securely fetches keys from the central router and dispatches chat requests.
  */
@@ -44,57 +97,10 @@ export const llmChat = functions.runWith({
     throw new functions.https.HttpsError('unauthenticated', 'User must be logged in.');
   }
 
-  const { appId, messages, model, temperature } = data;
-  if (!appId || !messages) {
-    throw new functions.https.HttpsError('invalid-argument', 'Missing appId or messages.');
-  }
-
   try {
-    let apiKey: string;
-    let baseURL: string;
-
-    // 2. Resolve Key (Direct for Soulamore, Firestore for others)
-    if (appId === 'soulamore' || appId === 'soulbot') {
-      apiKey = SOULAMORE_ROUTER_KEY;
-      baseURL = ROUTER_BASE_URL;
-    } else {
-      const keyDoc = await llmDb.collection('keys').doc(appId).get();
-      if (!keyDoc.exists) {
-        throw new functions.https.HttpsError('not-found', `No LLM configuration found for AppID: ${appId}`);
-      }
-      const config = keyDoc.data()!;
-      if (config.status !== 'active') {
-        throw new functions.https.HttpsError('unavailable', 'AI Service is currently disabled for this module.');
-      }
-      apiKey = config.key;
-      baseURL = config.baseURL || 'https://api.openai.com/v1';
-    }
-
-    // 3. Dispatch to Router/Provider
-    const response = await fetch(`${baseURL}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'x-app-id': appId
-      },
-      body: JSON.stringify({
-        model: model || 'gpt-4o',
-        messages: messages,
-        temperature: temperature || 0.7
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json() as any;
-      throw new Error(errorData.error?.message || 'Upstream LLM Error');
-    }
-
-    const result = await response.json();
-    return result;
-
+    return await handleLlmRequest(data, context.auth);
   } catch (error: any) {
-    console.error(`LLM Router Error [${appId}]:`, error);
+    console.error(`LLM Router Error [${data.appId}]:`, error);
     throw new functions.https.HttpsError('internal', error.message || 'LLM Routing Failed');
   }
 });
