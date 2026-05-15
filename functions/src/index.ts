@@ -26,6 +26,8 @@ export * from './llmRouter';
 export * from './healthMonitoring'; // Exports getApiHealth
 export * from './campaigns';
 export * from './emailService';
+export * from './googleAuth';
+export * from './apiRouter';
 
 // Health check function
 export const healthCheckV2 = onCall({ cors: true }, () => {

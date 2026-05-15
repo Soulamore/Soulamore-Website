@@ -5948,8 +5948,6 @@
                 btn.disabled = true;
                 statusEl.style.display = 'flex';
                 
-                const llmCallable = httpsCallable(functionsInstance, 'llmChat');
-                
                 const systemPrompt = `You are the Soulamore AI Newsletter writer. Your tone is premium, empathetic, soulful, and professional. 
                 Write a newsletter campaign based on the user's prompt. 
                 Return a JSON object with: 
@@ -5960,16 +5958,26 @@
                 
                 Keep the tone consistent with the "SAGA" branding (premium, soulful).`;
 
-                const result = await llmCallable({
-                    appId: 'soulamore',
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: prompt }
-                    ],
-                    model: 'gpt-4o'
+                const idToken = await auth.currentUser.getIdToken();
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        appId: 'soulamore',
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: prompt }
+                        ],
+                        model: 'gpt-4o'
+                    })
                 });
 
-                const aiResponse = JSON.parse(result.data.choices[0].message.content);
+                if (!response.ok) throw new Error(await response.text());
+                const result = await response.json();
+                const aiResponse = JSON.parse(result.choices[0].message.content);
                 
                 // Populate the form
                 document.getElementById('campaign-title').value = aiResponse.subject || '';
@@ -6009,9 +6017,13 @@
             log("Initializing secure health probe...", 'info');
             
             try {
-                const getApiHealth = httpsCallable(functionsInstance, 'getApiHealth');
-                const result = await getApiHealth();
-                const data = result.data;
+                const idToken = await auth.currentUser.getIdToken();
+                const response = await fetch('/api/health', {
+                    headers: { 'Authorization': `Bearer ${idToken}` }
+                });
+
+                if (!response.ok) throw new Error(await response.text());
+                const data = await response.json();
 
                 // 1. Brevo Stats
                 const brevoCard = document.getElementById('health-brevo');
