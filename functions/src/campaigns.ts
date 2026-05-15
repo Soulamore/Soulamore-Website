@@ -6,35 +6,34 @@ import { sendEmail, compileTemplate } from './emailService';
  * Admin: Trigger Custom Campaign (Soulamore Collective)
  * High-power broadcast for global messages and community outreach.
  */
-export const triggerCustomCampaign = functions.runWith({
-  timeoutSeconds: 540,
-  memory: '512MB'
-}).https.onCall(async (data, context) => {
+/**
+ * Core Logic: Trigger Custom Campaign
+ */
+export async function handleCampaignTrigger(data: any, auth: any) {
     // 1. Mandatory Admin Check
-    if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Admin login required.');
-    
-    const userDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
-    if (!userDoc.exists || userDoc.data()?.role !== 'admin') {
-        throw new functions.https.HttpsError('permission-denied', 'Only admins can trigger campaigns.');
+    const userDoc = await admin.firestore().collection('users').doc(auth.uid).get();
+    if (!userDoc.exists || (userDoc.data()?.role !== 'admin' && !userDoc.data()?.admin)) {
+        throw new Error('Only admins can trigger campaigns.');
     }
 
-    const { targetGroup, campaignData, subject, body, testEmail, externalRecipients } = data;
+    // Alignment with dashboard payload: templateData contains title/content
+    const { targetGroup, templateData, campaignData, isTest, customEmails, testEmail } = data;
     
-    // Support both direct subject/body and campaignData object from dashboard
-    const finalSubject = subject || campaignData?.title;
-    const finalBody = body || campaignData?.content;
+    const finalSubject = templateData?.title || campaignData?.title || data.subject;
+    const finalBody = templateData?.content || campaignData?.content || data.body;
+    const finalIsTest = isTest || testEmail;
 
     if (!finalSubject || !finalBody) {
-        throw new functions.https.HttpsError('invalid-argument', 'Missing subject/title or body/content.');
+        throw new Error('Missing subject/title or body/content.');
     }
 
     // 2. Resolve Recipients
     let recipients: { email: string; name?: string }[] = [];
 
-    if (testEmail) {
-        recipients = [{ email: testEmail, name: 'Admin Tester' }];
-    } else if (externalRecipients && Array.isArray(externalRecipients)) {
-        recipients = externalRecipients;
+    if (finalIsTest) {
+        recipients = [{ email: auth.email || 'contact.adityaharsh@gmail.com', name: 'Admin Tester' }];
+    } else if (customEmails && Array.isArray(customEmails)) {
+        recipients = customEmails.map((e: string) => ({ email: e }));
     } else {
         // Filter by targetGroup
         if (!targetGroup || targetGroup === 'all' || targetGroup === 'peers' || targetGroup === 'psychologists' || targetGroup === 'practitioners') {
@@ -87,28 +86,43 @@ export const triggerCustomCampaign = functions.runWith({
         failed,
         total: recipients.length
     };
+}
+
+export const triggerCustomCampaign = functions.runWith({
+  timeoutSeconds: 540,
+  memory: '512MB'
+}).https.onCall(async (data, context) => {
+    if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Admin login required.');
+    try {
+        return await handleCampaignTrigger(data, context.auth);
+    } catch (error: any) {
+        throw new functions.https.HttpsError('internal', error.message);
+    }
 });
 
 /**
- * Admin: Preview Email
- * Returns the compiled HTML for a campaign message.
+ * Core Logic: Preview Email
  */
-export const adminPreviewEmail = functions.https.onCall(async (data, context) => {
-    if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Auth required');
-    
-    const userDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
-    if (!userDoc.exists || userDoc.data()?.role !== 'admin') {
-        throw new functions.https.HttpsError('permission-denied', 'Admin role required');
+export async function handleCampaignPreview(data: any, auth: any) {
+    const userDoc = await admin.firestore().collection('users').doc(auth.uid).get();
+    if (!userDoc.exists || (userDoc.data()?.role !== 'admin' && !userDoc.data()?.admin)) {
+        throw new Error('Admin role required');
     }
 
-    const { subject, body, campaignData } = data;
-    const finalSubject = subject || campaignData?.title || "Preview Subject";
-    const finalBody = body || campaignData?.content || "Preview Content";
+    const { subject, body, campaignData, templateData } = data;
+    const finalSubject = subject || templateData?.title || campaignData?.title || "Preview Subject";
+    const finalBody = body || templateData?.content || campaignData?.content || "Preview Content";
 
-    // Use our standardized email service to compile the empathetic template
-    // We pass a dummy recipient to get the full HTML
-    const { compileTemplate } = require('./emailService');
-    const html = compileTemplate({ email: 'preview@soulamore.com', name: 'Alex Designer' }, finalSubject, finalBody);
+    const html = compileTemplate({ email: auth.email || 'preview@soulamore.com', name: 'Alex Designer' }, finalSubject, finalBody, 'broadcast');
 
     return { subject: finalSubject, html };
+}
+
+export const adminPreviewEmail = functions.https.onCall(async (data, context) => {
+    if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Auth required');
+    try {
+        return await handleCampaignPreview(data, context.auth);
+    } catch (error: any) {
+        throw new functions.https.HttpsError('internal', error.message);
+    }
 });
