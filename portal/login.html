@@ -251,6 +251,14 @@
 
                 const urlParams = new URLSearchParams(window.location.search);
                 const isFreshLogin = urlParams.get('fresh') === 'true';
+                const isForced = urlParams.get('force') === 'true';
+
+                if (isForced) {
+                    console.log("[AutoRedirect] Force parameter detected. Staying on login page.");
+                    // Optional: Sign out immediately if forced
+                    // await auth.signOut();
+                    return;
+                }
 
                 // LOOP PREVENTION: Check if we just came from a dashboard (meaning auth failed there)
                 const fromDashboard = document.referrer && document.referrer.includes('dashboard');
@@ -461,21 +469,22 @@
 
         window.handleGoogleLogin = async () => {
             window.__loginInProgress = true; // Prevent onAuthStateChanged race
-            const gBtn = document.getElementById('googleSignInBtn');
+            const gBtn = document.querySelector('.social-btn i.fa-google')?.parentElement;
             const intent = sessionStorage.getItem('loginIntent') || 'user';
+            const rememberMe = document.getElementById('rememberMe')?.checked || false;
 
             try {
                 if (gBtn) {
                     gBtn.disabled = true;
                     gBtn.style.opacity = '0.6';
                     gBtn.style.cursor = 'not-allowed';
-                    gBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+                    gBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 }
 
                 const globalLoader = document.getElementById('login-global-loader');
                 if (globalLoader) globalLoader.style.display = 'flex';
 
-                const result = await loginWithGoogle();
+                const result = await loginWithGoogle(rememberMe);
 
                 console.log('Google login result:', result);
 
@@ -570,7 +579,7 @@
                 const globalLoader = document.getElementById('login-global-loader');
                 if (globalLoader) globalLoader.style.display = 'flex';
 
-                const result = await loginWithEmail(email, pass);
+                const result = await loginWithEmail(email, pass, rememberMe);
                 console.log('Email login result:', result);
 
                 if (result.success) {

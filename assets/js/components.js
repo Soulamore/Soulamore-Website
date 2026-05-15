@@ -2177,3 +2177,73 @@ window.toggleMobileMenu = function () {
         console.warn('Soulamore: Nav links not found.');
     }
 };
+
+/**
+ * Header Auth Sync
+ * Dynamically updates navigation based on Firebase Auth state.
+ */
+(function() {
+    async function initAuthSync() {
+        try {
+            // Wait for Firebase config to be available (it exports globally as SoulFirebase)
+            if (!window.SoulFirebase) {
+                // If not available yet, wait a bit
+                setTimeout(initAuthSync, 500);
+                return;
+            }
+
+            const { auth, onAuthStateChanged } = window.SoulFirebase;
+            
+            onAuthStateChanged(auth, (user) => {
+                const navAuthBtn = document.getElementById('nav-auth-btn');
+                const mobileProfileBtn = document.querySelector('.mp-btn');
+                const userIconBtn = document.querySelector('.user-icon-btn');
+                
+                if (user) {
+                    // User is logged in
+                    if (navAuthBtn) {
+                        navAuthBtn.textContent = 'Dashboard';
+                        navAuthBtn.href = window.SoulFirebase.rootPath + 'portal/user-dashboard.html';
+                        navAuthBtn.classList.add('nav-btn-active');
+                    }
+                    if (mobileProfileBtn) {
+                        mobileProfileBtn.textContent = 'Dashboard';
+                        mobileProfileBtn.href = window.SoulFirebase.rootPath + 'portal/user-dashboard.html';
+                    }
+                    if (userIconBtn) {
+                        userIconBtn.style.display = 'flex';
+                        userIconBtn.style.color = 'var(--peach-glow)';
+                    }
+                    
+                    // Update mobile profile info if available
+                    const mpName = document.querySelector('.mp-name');
+                    if (mpName) mpName.textContent = user.displayName || user.email.split('@')[0];
+                } else {
+                    // User is logged out
+                    if (navAuthBtn) {
+                        navAuthBtn.textContent = 'Log In / Sign Up';
+                        navAuthBtn.href = window.SoulFirebase.rootPath + 'portal/login.html';
+                        navAuthBtn.classList.remove('nav-btn-active');
+                    }
+                    if (mobileProfileBtn) {
+                        mobileProfileBtn.textContent = 'Log In';
+                        mobileProfileBtn.href = window.SoulFirebase.rootPath + 'portal/login.html';
+                    }
+                    if (userIconBtn) {
+                        userIconBtn.style.display = 'none';
+                    }
+                }
+            });
+        } catch (e) {
+            console.warn("HeaderAuthSync initialization skipped:", e.message);
+        }
+    }
+
+    // Run after DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAuthSync);
+    } else {
+        initAuthSync();
+    }
+})();
+

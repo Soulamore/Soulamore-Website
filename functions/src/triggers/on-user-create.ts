@@ -8,20 +8,12 @@
  * @date March 20, 2026
  */
 
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
 import { generateSoulamoreEmail, sendEmail } from '../emailService';
 
-/**
- * Trigger: Automatically assign default role when new user signs up
- * 
- * This function:
- * 1. Sets custom claims with 'user' role
- * 2. Creates user profile in Firestore
- * 
- * @param user - The newly created user record
- */
-export const onUserCreate = functions.auth.user().onCreate(async (user): Promise<void> => {
+export const onUserCreate = functions.auth.user().onCreate(async (user) => {
+
   const customClaims = {
     role: 'user', // Default role for all new users
     createdAt: new Date().toISOString()

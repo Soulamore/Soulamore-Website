@@ -2,7 +2,7 @@
  * Auth Service
  * Handles Google Login, Email/Pass Login, and User Session.
  */
-import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, linkWithCredential, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, EmailAuthProvider, db, doc, setDoc, getDoc, serverTimestamp } from "./firebase-config.js";
+import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, linkWithCredential, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, EmailAuthProvider, db, doc, setDoc, getDoc, serverTimestamp, setPersistence, browserLocalPersistence, browserSessionPersistence } from "./firebase-config.js";
 import { getUserRole as getCanonicalUserRole } from "./role-helper.js";
 
 /**
@@ -77,8 +77,12 @@ export async function signUpWithEmail(email, password, name) {
 /**
  * Sign In with Email/Password
  */
-export async function loginWithEmail(email, password) {
+export async function loginWithEmail(email, password, rememberMe = false) {
     try {
+        // Set persistence based on "Remember Me"
+        const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+        await setPersistence(auth, persistence);
+        
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         console.log("Email login success:", userCredential.user.email);
         return { success: true, user: userCredential.user };
@@ -94,8 +98,11 @@ export async function loginWithEmail(email, password) {
 /**
  * Sign In with Google
  */
-export async function loginWithGoogle() {
+export async function loginWithGoogle(rememberMe = false) {
     try {
+        const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+        await setPersistence(auth, persistence);
+        
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
         console.log("Google Login Success:", user.displayName);
@@ -117,28 +124,44 @@ export async function loginWithGoogle() {
  */
 export async function logoutUser() {
     try {
+        // 1. Firebase Sign Out
         await signOut(auth);
-        // localStorage.removeItem('user_role'); // Legacy
-        // Clear authentication data
+        
+        // 2. Clear Session Cookies/Tokens
         localStorage.removeItem('soulamore_session');
         localStorage.removeItem('user_role');
         localStorage.removeItem('authToken');
         sessionStorage.clear();
 
-        // Force Firebase to clear auth state (Legacy/Persistent keys)
-        const firebaseKeysToRemove = [
-            'firebase:authUser',
-            'firebase:authToken',
-            'firebase:authExpiration'
-        ];
-
+        // 3. HARD PURGE: Firebase internal keys
+        // These keys are used by the SDK to restore sessions from IndexedDB/LocalCache
+        const prefixes = ['firebase:authUser', 'firebase:authToken', 'firebase:authExpiration'];
+        
+        // Clear Local Storage
         Object.keys(localStorage).forEach(key => {
-            if (firebaseKeysToRemove.some(fk => key.includes(fk))) {
+            if (prefixes.some(p => key.includes(p))) {
                 localStorage.removeItem(key);
             }
         });
 
-        console.log('✅ Auth cache cleared');
+        // Clear Session Storage
+        Object.keys(sessionStorage).forEach(key => {
+            if (prefixes.some(p => key.includes(p))) {
+                sessionStorage.removeItem(key);
+            }
+        });
+
+        // 4. IndexedDB Purge (Optional but thorough)
+        if (window.indexedDB) {
+            try {
+                // We don't delete the whole DB as other things might use it, 
+                // but we clear the auth-related stores if possible.
+                // Firebase uses 'firebaseLocalStorageDb'
+                window.indexedDB.deleteDatabase('firebaseLocalStorageDb');
+            } catch (e) { console.warn("IndexedDB clear failed", e); }
+        }
+
+        console.log('✅ Auth cache and persistence purged');
 
         // Redirect immediately to logout confirmation page
         const isPortal = window.location.pathname.includes('/portal/');
