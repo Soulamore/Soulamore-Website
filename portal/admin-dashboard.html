@@ -2581,7 +2581,7 @@
                 if (link) link.classList.add('active');
             }
 
-            // Load data when switching to specific views
+            // --- DATA LOADERS FOR VIEWS ---
             if (viewId === 'sessions') loadMasterSessions();
             if (viewId === 'accounting') loadAccounting();
             if (viewId === 'support-groups') loadSupportGroups();
@@ -2590,16 +2590,15 @@
             if (viewId === 'users') loadAllUsers();
             if (viewId === 'approvals') loadContentQueue();
             if (viewId === 'overview') loadOverviewStats();
-            if (viewId === 'newsletter') loadNewsletterSubscribers();  // ADDITIVE MODULE 2
-            // PHASE 5: MODERATION & CRISIS
+            if (viewId === 'newsletter') loadNewsletterSubscribers();
             if (viewId === 'confessions-moderation') loadConfessionsModeration();
             if (viewId === 'lifeline-queue') loadLifelineQueue();
-            // PHASE 6: DYNAMIC CONTENT
             if (viewId === 'testimonials-manager') loadTestimonialsManager();
             if (viewId === 'faq-manager') loadFAQManager();
             if (viewId === 'spotlight-manager') loadSpotlightManager();
             if (viewId === 'maintenance-panel') loadMaintenancePanel();
             if (viewId === 'deep-listening') loadDeepListeningHub();
+            if (viewId === 'api-health') loadApiHealth();
         };
 
         // ✅ FIX: Trigger Overview view immediately after switchView is defined
@@ -5839,21 +5838,32 @@
             const iframe = document.getElementById('campaign-preview-iframe');
             
             container.style.display = 'block';
-            iframe.srcdoc = '<div style="padding: 20px; font-family: sans-serif; text-align: center;">Generating preview...</div>';
+            iframe.srcdoc = '<div style="padding: 20px; font-family: sans-serif; text-align: center; color: #94a3b8;"><i class="fas fa-circle-notch fa-spin"></i> Channelling Preview...</div>';
 
             try {
-                const previewFn = httpsCallable(functionsInstance, 'adminPreviewEmail');
-                const result = await previewFn({
-                    title: document.getElementById('campaign-title').value,
-                    content: document.getElementById('campaign-content').value,
-                    ctaText: document.getElementById('campaign-cta-text').value,
-                    ctaLink: document.getElementById('campaign-cta-link').value,
-                    imageUrl: document.getElementById('campaign-image').value
+                const idToken = await auth.currentUser.getIdToken();
+                const response = await fetch('/api/campaign/preview', {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        templateData: {
+                            title: document.getElementById('campaign-title').value,
+                            content: document.getElementById('campaign-content').value,
+                            ctaText: document.getElementById('campaign-cta-text').value,
+                            ctaLink: document.getElementById('campaign-cta-link').value,
+                            imageUrl: document.getElementById('campaign-image').value
+                        }
+                    })
                 });
-                
-                iframe.srcdoc = result.data.html;
+
+                if (!response.ok) throw new Error(await response.text());
+                const result = await response.json();
+                iframe.srcdoc = result.html;
             } catch (err) {
-                iframe.srcdoc = `<div style="color: red; padding: 20px;">Preview Failed: ${err.message}</div>`;
+                iframe.srcdoc = `<div style="color: #ef4444; padding: 20px; font-family: sans-serif; text-align: center;">Preview Failed: ${err.message}</div>`;
             }
         };
 
@@ -5906,21 +5916,31 @@
                 btn.disabled = true;
                 btn.textContent = "DISPATCHING...";
 
-                const broadcastFn = httpsCallable(functionsInstance, 'triggerCustomCampaign');
-                const result = await broadcastFn({
-                    isTest,
-                    targetGroup: target,
-                    customEmails: recipients,
-                    templateData: {
-                        title,
-                        content,
-                        ctaText: document.getElementById('campaign-cta-text').value,
-                        ctaLink: document.getElementById('campaign-cta-link').value,
-                        imageUrl: document.getElementById('campaign-image').value
-                    }
+                const idToken = await auth.currentUser.getIdToken();
+                const response = await fetch('/api/campaign/trigger', {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        isTest,
+                        targetGroup: target,
+                        customEmails: recipients,
+                        templateData: {
+                            title,
+                            content,
+                            ctaText: document.getElementById('campaign-cta-text').value,
+                            ctaLink: document.getElementById('campaign-cta-link').value,
+                            imageUrl: document.getElementById('campaign-image').value
+                        }
+                    })
                 });
 
-                alert(`Campaign Success!\n\n${result.data.message}`);
+                if (!response.ok) throw new Error(await response.text());
+                const result = await response.json();
+
+                alert(`Campaign Success!\n\n${result.message}`);
                 if (!isTest) document.getElementById('saga-campaign-modal').remove();
             } catch (err) {
                 alert(`Broadcast Failed: ${err.message}`);
@@ -6081,13 +6101,8 @@
         };
 
         // Initialize API Health when tab is clicked
-        const originalSwitchView = window.switchView;
-        window.switchView = function(viewId, element) {
-            if (originalSwitchView) originalSwitchView(viewId, element);
-            if (viewId === 'api-health') {
-                loadApiHealth();
-            }
-        };
+        // Final initialization cleanup
+        console.log('✅ Admin Dashboard: API Migration & Unified Navigation Stabilized');
     </script>
 </body>
 

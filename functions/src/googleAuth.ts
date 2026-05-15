@@ -1,5 +1,4 @@
 import * as functions from 'firebase-functions/v1';
-import { google } from 'googleapis';
 
 /**
  * Google Auth Handler
@@ -25,6 +24,7 @@ export const getGoogleAuthUrl = functions.https.onCall(async (data, context) => 
             throw new Error("Google Calendar integration is currently being configured. Please try again later.");
         }
 
+        const { google } = require('googleapis');
         const oauth2Client = new google.auth.OAuth2(
             CLIENT_ID,
             CLIENT_SECRET,

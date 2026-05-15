@@ -23,19 +23,22 @@ const validateFirebaseIdToken = async (req: express.Request, res: express.Respon
     }
 };
 
-// --- ENDPOINTS ---
+// --- ROUTES ---
+const router = express.Router();
 
 // 1. Health Probe (Telemetry)
-app.get('/health', validateFirebaseIdToken, async (req, res) => {
+router.get('/health', validateFirebaseIdToken, async (req, res) => {
     // Only allow admins to check API health
-    const user = (req as any).user;
-    if (user.role !== 'admin' && !user.admin) {
-        res.status(403).json({ error: 'Admin access required' });
-        return;
-    }
-
     try {
-        // Reuse logic from healthMonitoring.ts
+        const user = (req as any).user;
+        const userDoc = await admin.firestore().collection('users').doc(user.uid).get();
+        const userData = userDoc.data();
+        
+        if (!userDoc.exists || (userData?.role !== 'admin' && !userData?.admin)) {
+            res.status(403).json({ error: 'Admin access required' });
+            return;
+        }
+
         const { probeAllServices } = require('./healthMonitoring');
         const results = await probeAllServices();
         res.json(results);
@@ -45,10 +48,9 @@ app.get('/health', validateFirebaseIdToken, async (req, res) => {
 });
 
 // 2. LLM Chat (SoulBot)
-app.post('/chat', validateFirebaseIdToken, async (req, res) => {
+router.post('/chat', validateFirebaseIdToken, async (req, res) => {
     try {
         const { appId, messages, model, temperature } = req.body;
-        // Reuse logic from llmRouter.ts
         const { handleLlmRequest } = require('./llmRouter');
         const result = await handleLlmRequest({ appId, messages, model, temperature }, (req as any).user);
         res.json(result);
@@ -56,6 +58,31 @@ app.post('/chat', validateFirebaseIdToken, async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// 3. Campaign Preview
+router.post('/campaign/preview', validateFirebaseIdToken, async (req, res) => {
+    try {
+        const { handleCampaignPreview } = require('./campaigns');
+        const result = await handleCampaignPreview(req.body, (req as any).user);
+        res.json(result);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 4. Campaign Trigger
+router.post('/campaign/trigger', validateFirebaseIdToken, async (req, res) => {
+    try {
+        const { handleCampaignTrigger } = require('./campaigns');
+        const result = await handleCampaignTrigger(req.body, (req as any).user);
+        res.json(result);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Mount router under /api
+app.use('/api', router);
 
 // Export the Express App as a v2 Cloud Function
 export const api = onRequest({ 

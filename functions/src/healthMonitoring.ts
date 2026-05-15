@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
-import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 import { llmDb } from './llmRouter';
 
 /**
@@ -23,6 +22,7 @@ export async function probeAllServices() {
     const BREVO_KEY = process.env.BREVO_API_KEY?.trim();
     if (!BREVO_KEY) throw new Error("BREVO_API_KEY secret is not set in the function environment.");
 
+    const { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } = require('@getbrevo/brevo');
     const apiInstance = new TransactionalEmailsApi();
     apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
 
