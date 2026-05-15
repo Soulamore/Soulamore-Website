@@ -1,31 +1,24 @@
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
-import * as sib from '@getbrevo/brevo';
-
-// ✅ FIX: Import the already-initialized llmDb from llmRouter.
-// llmRouter.ts initializes the 'llm-router' secondary app at module load time.
-// Attempting to re-initialize it here causes an "app already exists" crash.
+import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 import { llmDb } from './llmRouter';
 
 /**
- * API Health Telemetry
+ * API Health Telemetry (Standard v1 Pattern)
  * Provides system-wide health status for integrated services.
  */
 export const getApiHealth = functions.runWith({
   timeoutSeconds: 60,
   memory: '512MB'
-}).https.onCall(async (data, context) => {
+}).https.onCall(async (data: any, context: functions.https.CallableContext) => {
   console.log("🚀 [getApiHealth] Probe Started");
 
-  // 1. Admin Auth Guard (must be OUTSIDE try/catch so HttpsErrors propagate correctly)
+  // 1. Admin Auth Guard (OUTSIDE try/catch for proper HttpsError propagation)
   if (!context.auth) {
     console.warn("❌ [getApiHealth] Unauthenticated access attempt");
     throw new functions.https.HttpsError('unauthenticated', 'Login required.');
   }
 
-  // ✅ FIX: Admin role check also moved outside the main try/catch.
-  // HttpsError thrown inside a catch block gets swallowed and re-thrown
-  // as a generic 'internal' error. Keep auth guards at the top level.
   const userDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
   if (!userDoc.exists || userDoc.data()?.role !== 'admin') {
     console.warn(`❌ [getApiHealth] Unauthorized role: ${userDoc.data()?.role} for UID: ${context.auth.uid}`);
@@ -40,14 +33,11 @@ export const getApiHealth = functions.runWith({
   // 2. Check Brevo Health
   console.log("📡 [getApiHealth] Checking Brevo...");
   try {
-    // ✅ FIX: Removed the legacy functions.config() fallback. In Gen 1/Gen 2
-    // functions deployed with Secret Manager or env vars, functions.config()
-    // can throw or return undefined, crashing this line. Use only process.env.
     const BREVO_KEY = process.env.BREVO_API_KEY?.trim();
     if (!BREVO_KEY) throw new Error("BREVO_API_KEY secret is not set in the function environment.");
 
-    const apiInstance = new sib.TransactionalEmailsApi();
-    apiInstance.setApiKey(sib.TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
+    const apiInstance = new TransactionalEmailsApi();
+    apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
 
     results.services.brevo = {
       status: 'operational',
@@ -64,12 +54,10 @@ export const getApiHealth = functions.runWith({
   }
 
   // 3. Check LLM Router Health
-  // ✅ FIX: No initialization logic here at all. llmDb is imported directly
-  // from llmRouter.ts which handles the singleton initialization safely.
   console.log("📡 [getApiHealth] Checking LLM Router...");
   try {
     const keysSnap = await llmDb.collection('keys').get();
-
+    
     const keys = keysSnap.docs.map(doc => {
       const d = doc.data();
       return {

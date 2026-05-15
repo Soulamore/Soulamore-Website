@@ -7,7 +7,7 @@
  */
 
 import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
+import { onCall } from 'firebase-functions/v2/https';
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
@@ -23,13 +23,12 @@ export * from './triggers/emailTriggers';
 
 // Export new core services
 export * from './llmRouter';
-export * from './healthMonitoring';
+export * from './healthMonitoring'; // Exports getApiHealth
 export * from './campaigns';
 export * from './emailService';
 
 // Health check function
-export const healthCheck = functions.https.onCall(() => {
-
+export const healthCheckV2 = onCall({ cors: true }, () => {
   return {
     status: 'ok',
     timestamp: new Date().toISOString(),

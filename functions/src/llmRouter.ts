@@ -1,4 +1,4 @@
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
 
 // Initialize a secondary app for the LLM Router if it doesn't already exist.
@@ -25,6 +25,7 @@ try {
 // ✅ Export llmDb so other modules (healthMonitoring.ts) can import it
 // directly without attempting a second initialization of 'llm-router'.
 export const llmDb = llmApp.firestore();
+
 
 // Soulamore Router Key (Cross-account identification)
 const SOULAMORE_ROUTER_KEY = "router_svpkARCYUuTATB_3e8gKpNLQ8G2hoSL4";

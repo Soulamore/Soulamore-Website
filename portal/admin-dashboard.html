@@ -30,7 +30,7 @@
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
                  img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
-                 connect-src 'self' https://*.cloudfunctions.net https://region1.google-analytics.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://analytics.google.com https://www.google-analytics.com;
+                 connect-src 'self' https://us-central1-soulamore-f0a64.cloudfunctions.net https://*.cloudfunctions.net https://region1.google-analytics.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://analytics.google.com https://www.google-analytics.com;
                  frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <!-- AUTH GUARD: Protects this page -->
@@ -1087,24 +1087,31 @@
                                 <h3 style="margin:0;">Email Infrastructure</h3>
                                 <span class="health-badge health-unknown">CHECKING...</span>
                             </div>
-                            <div class="stat-main">-</div>
-                            <p style="opacity:0.7; font-size:0.85rem;">Remaining Brevo Credits</p>
-                            <div class="progress-bar-bg" style="height:6px; background:rgba(255,255,255,0.05); border-radius:3px; margin-top:15px;">
-                                <div class="progress-bar-fill" style="width:0%; height:100%; background:var(--soul-teal); border-radius:3px; transition:width 1s;"></div>
-                            </div>
+                            <div class="stat-main">Brevo</div>
+                            <p style="opacity:0.7; font-size:0.85rem;">SMTP Relay & Campaign API</p>
                         </div>
 
                         <!-- LLM ROUTER -->
                         <div class="dash-card" id="health-llm">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                                 <h3 style="margin:0;">LLM Intelligence</h3>
-                                <span class="health-badge health-unknown">CHECKING...</span>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <button onclick="loadApiHealth()" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem;" title="Refresh Health">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                    <span class="health-badge health-unknown">CHECKING...</span>
+                                </div>
                             </div>
-                            <div class="stat-main">Isolated</div>
-                            <p style="opacity:0.7; font-size:0.85rem;">"Router-in-Router" Protocol Active</p>
-                            <div style="margin-top:15px; font-size:0.8rem; opacity:0.6;">
-                                <div><i class="fas fa-key"></i> Keys Status: <span id="health-llm-keys">Checking...</span></div>
+                            
+                            <div id="llm-keys-list" style="margin-top:10px; max-height:180px; overflow-y:auto; padding-right:5px; scrollbar-width: thin;">
+                                <div style="padding:20px; text-align:center; opacity:0.5; font-size:0.8rem;">
+                                    <i class="fas fa-key fa-spin"></i> Awaiting Keys...
+                                </div>
+                            </div>
+
+                            <div style="margin-top:15px; font-size:0.8rem; opacity:0.6; display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.05); padding-top:10px;">
                                 <div><i class="fas fa-project-diagram"></i> Service Bridge: <span id="health-llm-bridge">Online</span></div>
+                                <div><i class="fas fa-check-circle"></i> <span id="health-llm-keys">0 Active</span></div>
                             </div>
                         </div>
 
@@ -6025,8 +6032,19 @@
                     
                     document.getElementById('health-llm-keys').textContent = `${l.activeKeys} / ${l.totalKeys} Active`;
                     
-                    // Render specific keys in the logs
-                    if (l.keys) {
+                    // Render specific keys in the scrollable list
+                    const keysList = document.getElementById('llm-keys-list');
+                    if (keysList && l.keys) {
+                        keysList.innerHTML = l.keys.map(k => `
+                            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:rgba(255,255,255,0.03); border-radius:8px; margin-bottom:6px; border:1px solid rgba(255,255,255,0.05);">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:8px; height:8px; border-radius:50%; background:${k.status === 'active' ? '#22c55e' : '#94a3b8'}; box-shadow: 0 0 8px ${k.status === 'active' ? '#22c55e' : 'transparent'};"></div>
+                                    <div style="font-size:0.85rem; font-weight:600; color:var(--text-main);">${k.name}</div>
+                                </div>
+                                <div style="font-size:0.7rem; opacity:0.6; text-transform:uppercase; letter-spacing:0.5px;">${k.provider}</div>
+                            </div>
+                        `).join('');
+                        
                         log("--- LLM Key Inventory ---");
                         l.keys.forEach(k => {
                             log(`> ${k.name} [${k.provider}]: ${k.status.toUpperCase()}`, k.status === 'active' ? 'success' : 'info');
@@ -6038,6 +6056,15 @@
 
             } catch (err) {
                 log(`Health Probe Failed: ${err.message}`, 'error');
+                
+                // Show error state on cards
+                const brevoCard = document.getElementById('health-brevo');
+                const llmCard = document.getElementById('health-llm');
+                
+                if (brevoCard) brevoCard.querySelector('.health-badge').textContent = 'ERROR';
+                if (llmCard) llmCard.querySelector('.health-badge').textContent = 'ERROR';
+                
+                console.error("Telemetry Error:", err);
             }
         };
 

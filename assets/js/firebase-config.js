@@ -8,7 +8,7 @@ import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.7.1
 import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, startAfter, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, linkWithCredential, EmailAuthProvider, updatePassword, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js";
-import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
 // Note: enableIndexedDbPersistence was removed in Firebase v10. Offline persistence is now enabled by default.
 
 // ... (existing code for firebaseConfig, initializeApp, etc. remains unchanged) ...
@@ -49,10 +49,10 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
 
 try {
     appCheck = initializeAppCheck(app, {
-        provider: new ReCaptchaEnterpriseProvider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
+        provider: new ReCaptchaV3Provider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
         isTokenAutoRefreshEnabled: true
     });
-    console.log("✅ Firebase App Check initialized");
+    console.log("✅ Firebase App Check initialized (v3)");
 } catch (err) {
     console.warn("⚠️ App Check initialization failed:", err.message);
 }
@@ -71,16 +71,18 @@ const db = getFirestore(app);
 // Initialize Firebase Authentication
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
-const functionsInstance = getFunctions(app);
+const functionsInstance = getFunctions(app, 'us-central1');
 
-// Enable Auth persistence (session stays across page refreshes)
-setPersistence(auth, browserLocalPersistence)
-    .then(() => {
-        console.log("Auth persistence enabled");
-    })
-    .catch((error) => {
-        console.error("Auth persistence error:", error);
-    });
+// Export for use in other modules
+export { 
+    db, collection, addDoc, serverTimestamp, auth, googleProvider, doc, setDoc, getDoc, updateDoc, getDocs, 
+    query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, 
+    startAfter, writeBatch, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+    signOut, onAuthStateChanged, updatePassword, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, 
+    isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, linkWithCredential, 
+    EmailAuthProvider, signInAnonymously, functionsInstance, httpsCallable,
+    setPersistence, browserLocalPersistence, browserSessionPersistence
+};
 
 // Firestore offline persistence is enabled by default in Firebase v10+.
 
@@ -113,10 +115,10 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Export for use in other modules
-export { db, collection, addDoc, serverTimestamp, auth, googleProvider, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, startAfter, writeBatch, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, linkWithCredential, EmailAuthProvider, signInAnonymously, functionsInstance, httpsCallable };
+// Calculate rootPath for global usage
+const rootPath = window.location.pathname.includes('/portal/') || window.location.pathname.includes('/spaces/') ? '../' : './';
 
 // Global Bridge for non-module scripts (like widgets)
-window.SoulFirebase = { functionsInstance, httpsCallable, auth, db };
+window.SoulFirebase = { functionsInstance, httpsCallable, auth, db, onAuthStateChanged, rootPath };
 
 console.log("Firebase initialized.");
