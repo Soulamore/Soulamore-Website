@@ -560,5 +560,6 @@ window.SoulBackend = {
     subscribeToShredCount: subscribeToShredCount,
     subscribeToNewsletterCount: subscribeToNewsletterCount,
     updatePulseStats: updatePulseStats,
-    triggerEmail: triggerEmail
+    triggerEmail: triggerEmail,
+    checkSafety: validateSubmission
 };
