@@ -504,6 +504,44 @@
             }
         }
 
+        /* --- SAFETY MORPHING (Silent Guardian) --- */
+        .morph-crisis {
+            background-image: radial-gradient(circle at 50% 10%, rgba(78, 205, 196, 0.2), rgba(15, 23, 42, 1) 70%) !important;
+            transition: background-image 2s ease;
+        }
+
+        .morph-btn-crisis {
+            background: linear-gradient(135deg, #F49F75 0%, #ef4444 100%) !important;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4) !important;
+        }
+
+        .silent-guardian-badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: #0f172a;
+            border: 1px solid var(--teal-glow);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--teal-glow);
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.5s ease-out;
+            z-index: 10;
+        }
+
+        .silent-guardian-badge i {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         /* --- SUCCESS OVERLAY --- */
         .success-overlay {
             position: absolute;
@@ -768,8 +806,13 @@
                     <div class="form-panel">
                         <div id="formContent">
                             <form id="confessionForm" onsubmit="event.preventDefault(); submitConfession();">
-                                <textarea id="confessionText" class="typing-area"
-                                    placeholder="Start typing here... No one knows it's you." required></textarea>
+                                <div style="position: relative;">
+                                    <div id="silentGuardianBadge" class="silent-guardian-badge">
+                                        <i class="fas fa-shield-heart"></i> Silent Guardian Active
+                                    </div>
+                                    <textarea id="confessionText" class="typing-area"
+                                        placeholder="Start typing here... No one knows it's you." required></textarea>
+                                </div>
 
                                 <div
                                     style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
@@ -912,12 +955,67 @@
         <script type="module" src="../../assets/js/data-handler.js"></script>
 
         <script>
+            // --- SILENT GUARDIAN LOGIC ---
+            const textarea = document.getElementById('confessionText');
+            const badge = document.getElementById('silentGuardianBadge');
+            const submitBtn = document.getElementById('confessionSubmitBtn');
+            const body = document.body;
+            let morphingActive = false;
+
+            textarea.addEventListener('input', debounce((e) => {
+                const text = e.target.value.toLowerCase();
+                
+                if (window.SoulBackend && window.SoulBackend.checkSafety) {
+                    const safety = window.SoulBackend.checkSafety(text);
+                    const hasCrisis = safety.isCrisis;
+
+                    if (hasCrisis && !morphingActive) {
+                        triggerSafetyMorph(true);
+                    } else if (!hasCrisis && morphingActive) {
+                        triggerSafetyMorph(false);
+                    }
+                }
+            }, 500));
+
+            function triggerSafetyMorph(active) {
+                morphingActive = active;
+                if (active) {
+                    body.classList.add('morph-crisis');
+                    submitBtn.classList.add('morph-btn-crisis');
+                    submitBtn.innerHTML = 'Get Immediate Support <i class="fas fa-heart-pulse"></i>';
+                    badge.style.display = 'flex';
+                } else {
+                    body.classList.remove('morph-crisis');
+                    submitBtn.classList.remove('morph-btn-crisis');
+                    submitBtn.innerHTML = 'Release to the Universe <i class="fas fa-paper-plane"></i>';
+                    badge.style.display = 'none';
+                }
+            }
+
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
             // --- CONFESSION SUBMISSION ---
             function submitConfession() {
                 const text = document.getElementById('confessionText').value;
                 const email = document.getElementById('confessionEmail').value;
                 const phone = document.getElementById('confessionPhone').value;
                 const btn = document.getElementById('confessionSubmitBtn');
+
+                // Handle Silent Guardian Intervention
+                if (morphingActive) {
+                    window.location.href = '../../get-help-now.html?source=silent_guardian';
+                    return;
+                }
 
                 if (text.length < 5) return;
 

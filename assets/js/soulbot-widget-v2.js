@@ -132,8 +132,9 @@
     document.body.appendChild(widget);
 
     // 5. Global Functions (window scoped)
+    let greetingFetched = false;
 
-    window.toggleWidget = function () {
+    window.toggleWidget = async function () {
         const win = document.getElementById('sb-window');
         const fab = document.getElementById('soulbot-widget-fab');
         if (win.style.display === 'flex') {
@@ -143,8 +144,79 @@
             win.style.display = 'flex';
             fab.innerHTML = '<i class="fas fa-times"></i>';
             document.getElementById('sb-input').focus();
+
+            if (!greetingFetched) {
+                fetchDynamicGreeting();
+            }
         }
     };
+
+    async function fetchDynamicGreeting() {
+        const chatBody = document.getElementById('sb-chat-body');
+        if (!chatBody) return;
+
+        const greetingDiv = chatBody.querySelector('.sb-msg-bot');
+        if (!greetingDiv) return;
+
+        const originalText = greetingDiv.innerText;
+        greetingDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Channelling...';
+
+        try {
+            if (!window.SoulFirebase) {
+                // Wait for Firebase bridge
+                let retries = 0;
+                while (!window.SoulFirebase && retries < 10) {
+                    await new Promise(r => setTimeout(r, 500));
+                    retries++;
+                }
+            }
+
+            if (!window.SoulFirebase) throw new Error("Intelligence link timeout.");
+
+            const { auth } = window.SoulFirebase;
+
+            // Ensure Auth (Anonymous Fallback)
+            if (!auth.currentUser) {
+                try {
+                    const { signInAnonymously } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
+                    await signInAnonymously(auth);
+                } catch (authErr) {
+                    console.warn("Anonymous auth failed, attempting fallback greeting.", authErr);
+                }
+            }
+
+            let idToken = "";
+            if (auth.currentUser) {
+                idToken = await auth.currentUser.getIdToken();
+            }
+
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${idToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    appId: 'soulbot',
+                    messages: [
+                        { role: 'system', content: 'You are SoulBot. Generate a single, short, extremely gentle and empathetic greeting for a user who just opened the chat. Max 15 words. Keep it soulful.' }
+                    ],
+                    temperature: 0.9
+                })
+            });
+
+            if (!response.ok) throw new Error(await response.text());
+            const result = await response.json();
+            const reply = result.choices[0].message.content;
+
+            greetingDiv.innerText = reply;
+            greetingFetched = true;
+
+        } catch (err) {
+            console.error('SoulBot Greeting Error:', err);
+            greetingDiv.innerText = originalText;
+        }
+    }
 
     window.handleWidgetEnter = function (e) {
         if (e.key === 'Enter') sendWidgetMessage();
