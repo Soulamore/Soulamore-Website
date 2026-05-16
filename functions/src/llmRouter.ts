@@ -32,8 +32,8 @@ const SOULAMORE_ROUTER_KEY = "router_svpkARCYUuTATB_3e8gKpNLQ8G2hoSL4";
 const ROUTER_BASE_URL = "https://llm-router-870c5.web.app/v1";
 
 /**
- * Core Logic for LLM Routing
- * Can be called by onCall or by Express onRequest (via apiRouter)
+ * Core Logic for LLM Routing with Fallback
+ * Tries multiple keys in order of priority (High-end first)
  */
 export async function handleLlmRequest(data: any, auth: any) {
   const { appId, messages, model, temperature } = data;
@@ -41,47 +41,77 @@ export async function handleLlmRequest(data: any, auth: any) {
     throw new Error('Missing appId or messages.');
   }
 
-  let apiKey: string;
-  let baseURL: string;
+  // 1. Fetch all active keys from the central router
+  const keysSnap = await llmDb.collection('keys').where('status', '==', 'active').get();
+  let availableConfigs = keysSnap.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  } as any));
 
-  // 1. Resolve Key (Direct for Soulamore, Firestore for others)
-  if (appId === 'soulamore' || appId === 'soulbot') {
-    apiKey = SOULAMORE_ROUTER_KEY;
-    baseURL = ROUTER_BASE_URL;
-  } else {
-    const keyDoc = await llmDb.collection('keys').doc(appId).get();
-    if (!keyDoc.exists) {
-      throw new Error(`No LLM configuration found for AppID: ${appId}`);
-    }
-    const config = keyDoc.data()!;
-    if (config.status !== 'active') {
-      throw new Error('AI Service is currently disabled for this module.');
-    }
-    apiKey = config.key;
-    baseURL = config.baseURL || 'https://api.openai.com/v1';
+  if (availableConfigs.length === 0) {
+    throw new Error('No active LLM configurations available in the router.');
   }
 
-  // 2. Dispatch to Router/Provider
-  const response = await fetch(`${baseURL}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-      'x-app-id': appId
-    },
-    body: JSON.stringify({
-      model: model || 'gpt-4o',
-      messages: messages,
-      temperature: temperature || 0.7
-    })
-  });
+  // 2. Define Priority (Latest/High-end models first)
+  // Higher rank = Higher priority
+  const getPriority = (config: any) => {
+    const name = (config.name || '').toLowerCase();
+    const modelStr = (config.model || '').toLowerCase();
+    
+    if (name.includes('gpt-5') || name.includes('gpt-4o') || modelStr.includes('gpt-4o')) return 100;
+    if (name.includes('opus') || name.includes('claude-3-5')) return 95;
+    if (name.includes('gpt-4') || modelStr.includes('gpt-4')) return 80;
+    if (name.includes('sonnet') || name.includes('claude-3')) return 70;
+    if (name.includes('gpt-3.5') || modelStr.includes('gpt-3.5')) return 50;
+    return 10; // Default low priority
+  };
 
-  if (!response.ok) {
-    const errorData = await response.json() as any;
-    throw new Error(errorData.error?.message || 'Upstream LLM Error');
+  availableConfigs.sort((a, b) => getPriority(b) - getPriority(a));
+
+  // 3. Attempt requests with fallback
+  let lastError = null;
+  for (const config of availableConfigs) {
+    try {
+      console.log(`🤖 [llmRouter] Attempting request with key: ${config.name} (${config.provider})`);
+      
+      const apiKey = config.key;
+      const baseURL = config.baseURL || 'https://api.openai.com/v1';
+      const targetModel = model || config.model || 'gpt-4o';
+
+      const response = await fetch(`${baseURL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'x-app-id': appId
+        },
+        body: JSON.stringify({
+          model: targetModel,
+          messages: messages,
+          temperature: temperature || 0.7
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json() as any;
+        const msg = errorData.error?.message || `HTTP ${response.status}`;
+        console.warn(`⚠️ [llmRouter] Key ${config.name} failed: ${msg}. Trying next...`);
+        lastError = new Error(msg);
+        continue; // Try next key
+      }
+
+      const result = await response.json();
+      console.log(`✅ [llmRouter] Request successful with key: ${config.name}`);
+      return result;
+
+    } catch (err: any) {
+      console.error(`❌ [llmRouter] Network/Fetch error with key ${config.name}:`, err.message);
+      lastError = err;
+      continue; // Try next key
+    }
   }
 
-  return await response.json();
+  throw lastError || new Error('All LLM keys failed to process the request.');
 }
 
 /**
