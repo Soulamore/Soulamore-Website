@@ -668,14 +668,14 @@
             }
             window.hideAdminLoader = hideLoader;
             
-            // SAFETY TIMEOUT (1.10): Ensure loader hides even if Firestore/Auth hangs
+            // Unified Safety Timeout: Ensure loader hides even if Firestore/Auth hangs
             setTimeout(() => {
                 const screen = document.getElementById('admin-loading-screen');
                 if (screen && !screen.classList.contains('hidden')) {
-                    console.warn('⚠️ Admin loading safety timeout triggered after 10s');
+                    console.warn('⚠️ Admin loading safety timeout triggered after 15s');
                     hideLoader();
                 }
-            }, 10000);
+            }, 15000);
         })();
     </script>
 
@@ -2265,22 +2265,7 @@
         initAdminLoader();
         adminLoader.show();
 
-        // BULLETPROOF: Force hide loading screen after 20 seconds (ALWAYS runs)
-        const forceHideTimeout = setTimeout(() => {
-            console.warn('⚠️ BULLETPROOF: Forcing loading screen hide after 20s timeout');
-            if (adminLoader) adminLoader.complete();
-        }, 20000);
-
-        // ALSO: Ultimate fallback at 30 seconds (nuclear option)
-        setTimeout(() => {
-            const loadingScreen = document.getElementById('admin-loading-screen');
-            if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
-                console.error('🚨 ULTIMATE FALLBACK: Loading screen stuck for 30s - forcing hide');
-                loadingScreen.classList.add('hidden');
-                loadingScreen.style.display = 'none';
-                document.body.style.overflow = '';
-            }
-        }, 30000);
+        // Redundant timeouts removed. Using unified safety timeout above.
 
         // Set time-based title and subtitle
         const timeMessage = getTimeBasedMessage();
@@ -6047,12 +6032,19 @@
 
                 // 1. Brevo Stats
                 const brevoCard = document.getElementById('health-brevo');
-                if (brevoCard && data.services.brevo) {
-                    const b = data.services.brevo;
-                    brevoCard.querySelector('.health-badge').textContent = b.status === 'operational' ? 'ONLINE' : 'OFFLINE';
-                    brevoCard.querySelector('.health-badge').className = `health-badge health-${b.status === 'operational' ? 'online' : 'offline'}`;
-                    brevoCard.querySelector('.stat-main').textContent = b.credits || '0';
-                    log(`Brevo: ${b.status.toUpperCase()} (${b.credits} credits)`, b.status === 'operational' ? 'success' : 'error');
+                if (brevoCard) {
+                    if (data.services.brevo && data.services.brevo.status === 'operational') {
+                        const b = data.services.brevo;
+                        brevoCard.style.display = 'block';
+                        brevoCard.querySelector('.health-badge').textContent = 'ONLINE';
+                        brevoCard.querySelector('.health-badge').className = 'health-badge health-online';
+                        brevoCard.querySelector('.stat-main').textContent = b.credits || 'Managed';
+                        log(`Brevo: ONLINE (${b.credits || 'Managed'})`, 'success');
+                    } else {
+                        // Hide Brevo if not operational or keys missing per user request
+                        brevoCard.style.display = 'none';
+                        log("Brevo Infrastructure: Skipping (Keys missing or offline)", 'info');
+                    }
                 }
 
                 // 2. LLM Router Keys
