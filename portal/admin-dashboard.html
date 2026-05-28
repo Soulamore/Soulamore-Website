@@ -1664,6 +1664,11 @@
         import { auth, db, collection, query, where, getDocs, orderBy, updateDoc, doc, limit, addDoc, serverTimestamp, getDoc, setDoc, deleteDoc, writeBatch, functionsInstance, httpsCallable } from "../assets/js/firebase-config.js";
         import { getPractitionerMetadata } from "../assets/js/practitioner-handler.js";
 
+        // Dynamic API Base URL for local development/emulator testing
+        const apiBase = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? 'https://us-central1-soulamore-f0a64.cloudfunctions.net/api'
+            : '';
+
         // === LOADING SCREEN MANAGEMENT ===
         let adminLoader = null;
         let dataLoaded = false;
@@ -5827,7 +5832,7 @@
 
             try {
                 const idToken = await auth.currentUser.getIdToken();
-                const response = await fetch('/api/campaign/preview', {
+                const response = await fetch(`${apiBase}/api/campaign/preview`, {
                     method: 'POST',
                     headers: { 
                         'Authorization': `Bearer ${idToken}`,
@@ -5902,7 +5907,7 @@
                 btn.textContent = "DISPATCHING...";
 
                 const idToken = await auth.currentUser.getIdToken();
-                const response = await fetch('/api/campaign/trigger', {
+                const response = await fetch(`${apiBase}/api/campaign/trigger`, {
                     method: 'POST',
                     headers: { 
                         'Authorization': `Bearer ${idToken}`,
@@ -5964,7 +5969,7 @@
                 Keep the tone consistent with the "SAGA" branding (premium, soulful).`;
 
                 const idToken = await auth.currentUser.getIdToken();
-                const response = await fetch('/api/chat', {
+                const response = await fetch(`${apiBase}/api/chat`, {
                     method: 'POST',
                     headers: { 
                         'Authorization': `Bearer ${idToken}`,
@@ -6023,7 +6028,7 @@
             
             try {
                 const idToken = await auth.currentUser.getIdToken();
-                const response = await fetch('/api/health', {
+                const response = await fetch(`${apiBase}/api/health`, {
                     headers: { 'Authorization': `Bearer ${idToken}` }
                 });
 

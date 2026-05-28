@@ -6,6 +6,11 @@
 (function () {
     console.log("SoulBot Widget V2: Initializing...");
 
+    // Dynamic API Base URL for local development/emulator testing
+    const apiBase = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'https://us-central1-soulamore-f0a64.cloudfunctions.net/api'
+        : '';
+
     // 1. Avoid Double Injection
     if (document.getElementById('soulbot-widget')) {
         console.warn("SoulBot Widget already exists.");
@@ -190,7 +195,7 @@
                 idToken = await auth.currentUser.getIdToken();
             }
 
-            const response = await fetch('/api/chat', {
+            const response = await fetch(`${apiBase}/api/chat`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${idToken}`,
@@ -252,7 +257,7 @@
                 idToken = await auth.currentUser.getIdToken();
             }
 
-            const response = await fetch('/api/chat', {
+            const response = await fetch(`${apiBase}/api/chat`, {
                 method: 'POST',
                 headers: { 
                     'Authorization': `Bearer ${idToken}`,
