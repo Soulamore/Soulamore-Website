@@ -27,9 +27,16 @@ jobs:
           projectId: soulamore-f0a64
       - name: Purge Cloudflare Cache
         run: |
-          echo "Purging Cloudflare cache for production domains..."
-          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+          echo "Purging Cloudflare cache for .com domain..."
+          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_COM_ID }}/purge_cache" \
             -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
             -H "Content-Type: application/json" \
             --data '{"purge_everything":true}'
-          echo "Cloudflare cache purge requested successfully!"
+          
+          echo "Purging Cloudflare cache for .in domain..."
+          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_IN_ID }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}'
+          
+          echo "Cloudflare cache purges completed successfully!"
