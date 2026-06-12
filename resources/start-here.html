@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <!-- DOMAIN ROUTER & CANONICAL -->
+    <!-- DOMAIN ROUTER, FIRST-TIME ROUTER FLAGS & CANONICAL -->
     <script>
         (function() {
+            // Set first-time visitor flag immediately so returning visits show index.html
+            localStorage.setItem('soulamore_visited', 'true');
+
             var host = window.location.hostname;
             var path = window.location.pathname;
             var search = window.location.search;
@@ -25,544 +27,612 @@
         })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="New to Soulamore? Start here. Curated resources and guidance for your mental health journey.">
-    <title>Start Here | Soulamore Resources</title>
+    <meta name="description" content="New to Soulamore? Start here. Curated anonymous emotional support, peer wellness spaces, and professional therapy matching for your mental health journey.">
+    <meta name="keywords" content="mental health India, student wellness, anonymous support, affordable therapy, overthinking, burnout, Soulamore">
+    <title>Start Here | Soulamore Anonymous Emotional Support</title>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soulamore.com/resources/start-here.html">
+    <meta property="og:title" content="Start Here | Soulamore Anonymous Support">
+    <meta property="og:description" content="Is your mind loud at night? Find your safe space to vent, connect with understanding peers, and find calm. No judgment. No identity linked.">
+    <meta property="og:image" content="https://soulamore.com/assets/images/social-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://soulamore.com/resources/start-here.html">
+    <meta name="twitter:title" content="Start Here | Soulamore Anonymous Support">
+    <meta name="twitter:description" content="Is your mind loud at night? Find your safe space to vent, connect with understanding peers, and find calm. No judgment.">
+    <meta name="twitter:image" content="https://soulamore.com/assets/images/social-preview.png">
+
+    <!-- JSON-LD Schema (Organization) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Soulamore",
+      "url": "https://soulamore.com",
+      "logo": "https://soulamore.com/assets/images/logo.webp",
+      "sameAs": [
+        "https://www.instagram.com/soulamore_/",
+        "https://www.linkedin.com/company/soulamore/",
+        "https://www.facebook.com/share/1LihokP4wQ/?mibextid=wwXIfr"
+      ],
+      "description": "A safe, anonymous ecosystem for mental wellness and peer support.",
+      "founder": {
+        "@type": "Person",
+        "name": "Aditya Harsh",
+        "url": "https://www.linkedin.com/in/aditya-harsh-1101/"
+      }
+    }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "What is Soulamore and how does it work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Soulamore is an anonymous emotional support platform that offers peer support and AI based emotional conversations. It is designed as a safe space where people can talk about stress, overthinking, burnout, or personal struggles without fear of judgment."
+        }
+      }, {
+        "@type": "Question",
+        "name": "Is Soulamore a therapy or online counseling platform?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Soulamore is not a therapy or psychiatric service. It does not replace professional mental health treatment. Instead, it provides anonymous peer support and emotional wellness tools."
+        }
+      }, {
+        "@type": "Question",
+        "name": "Can I use Soulamore anonymously?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Soulamore is built as an anonymous emotional support space. You can share your thoughts and feelings without revealing your identity."
+        }
+      }]
+    }
+    </script>
 
     <!-- Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Global CSS -->
-    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/global.css?v=3.2">
 
     <style>
-        <!-- The body element inherits background and color naturally from global.css 
-        -->
-        .page-wrapper
-        {
-        padding-top:
-        110px;
-        padding-bottom:
-        80px;
-        max-width:
-        1200px;
-        margin:
-        0
-        auto;
-        padding-left:
-        20px;
-        padding-right:
-        20px;
+        /* CSS variables and background parameters */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.7);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --border-glass: rgba(255, 255, 255, 0.1);
         }
-        .page-header
-        {
-        text-align:
-        center;
-        margin-bottom:
-        60px;
+
+        body {
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
         }
-        .page-header
-        h1
-        {
-        font-family:
-        'Outfit',
-        sans-serif;
-        font-size:
-        3.5rem;
-        font-weight:
-        700;
-        margin-bottom:
-        15px;
-        background:
-        linear-gradient(135deg,
-        #4ECDC4,
-        #F49F75);
-        -webkit-background-clip:
-        text;
-        -webkit-text-fill-color:
-        transparent;
-        background-clip:
-        text;
+
+        /* Ambient visuals matching landing page */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 80px 80px;
+            pointer-events: none;
         }
-        .page-header
-        p
-        {
-        font-size:
-        1.3rem;
-        color:
-        #94a3b8;
-        max-width:
-        700px;
-        margin:
-        0
-        auto;
-        line-height:
-        1.6;
+
+        .bg-noise {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            pointer-events: none;
+            mix-blend-mode: overlay;
         }
-        /*
-        Path
-        Cards
-        */
-        .path-grid
-        {
-        display:
-        grid;
-        grid-template-columns:
-        repeat(2,
-        minmax(320px,
-        1fr));
-        max-width:
-        920px;
-        margin-left:
-        auto;
-        margin-right:
-        auto;
-        gap:
-        30px;
-        margin-bottom:
-        60px;
+
+        .aurora-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
         }
-        .path-card
-        {
-        background:
-        rgba(30,
-        41,
-        59,
-        0.6);
-        border:
-        1px
-        solid
-        rgba(78,
-        205,
-        196,
-        0.2);
-        border-radius:
-        16px;
-        padding:
-        30px;
-        transition:
-        all
-        0.3s
-        ease;
-        position:
-        relative;
-        overflow:
-        hidden;
+
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.22;
+            animation: auroraFloat 20s infinite alternate;
         }
-        .path-card:before
-        {
-        content:
-        '';
-        position:
-        absolute;
-        top:
-        0;
-        left:
-        0;
-        right:
-        0;
-        height:
-        4px;
-        background:
-        linear-gradient(90deg,
-        #4ECDC4,
-        #F49F75);
-        transform:
-        scaleX(0);
-        transform-origin:
-        left;
-        transition:
-        transform
-        0.3s
-        ease;
+
+        .blob-1 {
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: var(--teal-glow);
         }
-        .path-card:hover
-        {
-        transform:
-        translateY(-5px);
-        box-shadow:
-        0
-        10px
-        30px
-        rgba(78,
-        205,
-        196,
-        0.2);
+
+        .blob-2 {
+            bottom: -15%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: var(--peach-glow);
+            animation-duration: 30s;
+            animation-delay: -5s;
         }
-        .path-card:hover:before
-        {
-        transform:
-        scaleX(1);
+
+        .blob-3 {
+            top: 40%;
+            left: 30%;
+            width: 400px;
+            height: 400px;
+            background: #a78bfa;
+            opacity: 0.12;
+            animation-duration: 25s;
+            animation-delay: -10s;
         }
-        .path-icon
-        {
-        font-size:
-        3rem;
-        color:
-        #4ECDC4;
-        margin-bottom:
-        20px;
+
+        @keyframes auroraFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 60px) scale(1.1); }
         }
-        .path-card
-        h3
-        {
-        font-family:
-        'Outfit',
-        sans-serif;
-        font-size:
-        1.6rem;
-        color:
-        #e2e8f0;
-        margin-bottom:
-        15px;
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
         }
-        .path-card
-        p
-        {
-        color:
-        #94a3b8;
-        line-height:
-        1.7;
-        margin-bottom:
-        20px;
+        ::-webkit-scrollbar-track {
+            background: var(--deep-space);
         }
-        .path-link
-        {
-        display:
-        inline-flex;
-        align-items:
-        center;
-        gap:
-        8px;
-        color:
-        #4ECDC4;
-        text-decoration:
-        none;
-        font-weight:
-        600;
-        transition:
-        gap
-        0.3s
-        ease;
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--teal-glow), var(--peach-glow));
+            border-radius: 5px;
+            border: 2px solid var(--deep-space);
         }
-        .path-link:hover
-        {
-        gap:
-        12px;
+
+        /* Atmosphere bubbles */
+        .thought-bubble {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.04);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            user-select: none;
+            animation: floatUp linear infinite;
+            z-index: 1;
         }
-        /*
-        Section
-        Headers
-        */
-        .section-header
-        {
-        text-align:
-        center;
-        margin:
-        80px
-        0
-        40px;
+
+        @keyframes floatUp {
+            from { transform: translateY(110vh) scale(0.8); }
+            to { transform: translateY(-10vh) scale(1); }
         }
-        .section-header
-        h2
-        {
-        font-family:
-        'Outfit',
-        sans-serif;
-        font-size:
-        2.5rem;
-        color:
-        #F49F75;
-        margin-bottom:
-        15px;
+
+        /* Audio controls style */
+        .audio-control {
+            position: fixed;
+            bottom: 40px;
+            left: 30px;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            transition: 0.3s;
         }
-        .section-header
-        p
-        {
-        font-size:
-        1.1rem;
-        color:
-        #94a3b8;
+        .audio-control:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-2px);
         }
-        /*
-        Resource
-        List
-        */
-        .resource-list
-        {
-        max-width:
-        800px;
-        margin:
-        0
-        auto;
+        .audio-bars .bar {
+            width: 3px;
+            background: var(--teal-glow);
+            height: 5px;
+            margin-right: 2px;
+            display: inline-block;
         }
-        .resource-item
-        {
-        background:
-        rgba(30,
-        41,
-        59,
-        0.4);
-        border-left:
-        4px
-        solid
-        #4ECDC4;
-        padding:
-        25px;
-        margin-bottom:
-        20px;
-        border-radius:
-        8px;
-        transition:
-        all
-        0.3s
-        ease;
+        .playing .bar {
+            animation: soundWave 0.5s infinite;
         }
-        .resource-item:hover
-        {
-        background:
-        rgba(30,
-        41,
-        59,
-        0.7);
-        transform:
-        translateX(5px);
+        @keyframes soundWave {
+            0%, 100% { height: 5px; }
+            50% { height: 15px; }
         }
-        .resource-item
-        h4
-        {
-        font-family:
-        'Outfit',
-        sans-serif;
-        font-size:
-        1.3rem;
-        color:
-        #4ECDC4;
-        margin-bottom:
-        10px;
+
+        /* Layout structure */
+        .page-wrapper {
+            padding-top: var(--header-clearance);
+            padding-bottom: 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+            position: relative;
+            z-index: 5;
         }
-        .resource-item
-        p
-        {
-        color:
-        #cbd5e1;
-        line-height:
-        1.6;
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease-out;
         }
-        .resource-meta
-        {
-        display:
-        flex;
-        gap:
-        15px;
-        margin-top:
-        10px;
-        font-size:
-        0.9rem;
-        color:
-        #64748b;
+
+        .page-header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--teal-glow), var(--peach-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 20px rgba(78, 205, 196, 0.25));
         }
-        .resource-meta
-        span
-        {
-        display:
-        flex;
-        align-items:
-        center;
-        gap:
-        5px;
+
+        .page-header p {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
-        /*
-        CTA
-        Section
-        */
-        .cta-box
-        {
-        background:
-        linear-gradient(135deg,
-        rgba(78,
-        205,
-        196,
-        0.1),
-        rgba(244,
-        159,
-        117,
-        0.1));
-        border:
-        2px
-        solid
-        rgba(78,
-        205,
-        196,
-        0.3);
-        border-radius:
-        20px;
-        padding:
-        50px;
-        text-align:
-        center;
-        margin-top:
-        80px;
-        max-width:
-        920px;
-        margin-left:
-        auto;
-        margin-right:
-        auto;
-        margin-bottom:
-        70px;
+
+        /* Path Cards grid */
+        .path-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 960px;
+            margin: 0 auto 60px;
+            gap: 30px;
         }
-        .cta-box
-        h3
-        {
-        font-family:
-        'Outfit',
-        sans-serif;
-        font-size:
-        2rem;
-        color:
-        #e2e8f0;
-        margin-bottom:
-        20px;
+
+        .path-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 35px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .cta-box
-        p
-        {
-        font-size:
-        1.1rem;
-        color:
-        #94a3b8;
-        margin-bottom:
-        30px;
-        max-width:
-        600px;
-        margin-left:
-        auto;
-        margin-right:
-        auto;
+
+        .path-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--teal-glow), var(--peach-glow));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
         }
-        .cta-buttons
-        {
-        display:
-        flex;
-        gap:
-        20px;
-        justify-content:
-        center;
-        flex-wrap:
-        wrap;
+
+        .path-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(30, 41, 59, 0.85);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 15px rgba(78, 205, 196, 0.15);
         }
-        .cta-btn
-        {
-        display:
-        inline-flex;
-        align-items:
-        center;
-        gap:
-        10px;
-        padding:
-        15px
-        35px;
-        background:
-        linear-gradient(135deg,
-        #4ECDC4,
-        #2a9d8f);
-        color:
-        #0f172a;
-        font-weight:
-        600;
-        text-decoration:
-        none;
-        border-radius:
-        50px;
-        transition:
-        all
-        0.3s
-        ease;
-        box-shadow:
-        0
-        4px
-        15px
-        rgba(78,
-        205,
-        196,
-        0.3);
+
+        .path-card:hover::before {
+            transform: scaleX(1);
         }
-        .cta-btn:hover
-        {
-        transform:
-        translateY(-2px);
-        box-shadow:
-        0
-        6px
-        20px
-        rgba(78,
-        205,
-        196,
-        0.5);
+
+        .path-icon {
+            font-size: 2.2rem;
+            color: var(--teal-glow);
+            margin-bottom: 20px;
+            background: rgba(78, 205, 196, 0.08);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            border: 1px solid rgba(78, 205, 196, 0.15);
         }
-        .cta-btn.secondary
-        {
-        background:
-        transparent;
-        border:
-        2px
-        solid
-        #F49F75;
-        color:
-        #F49F75;
+
+        .path-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 12px;
         }
-        .cta-btn.secondary:hover
-        {
-        background:
-        rgba(244,
-        159,
-        117,
-        0.1);
+
+        .path-card p {
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            flex-grow: 1;
         }
-        @media
-        (max-width:
-        768px)
-        {
-        .page-header
-        h1
-        {
-        font-size:
-        2.5rem;
+
+        .path-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--teal-glow);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: gap 0.3s ease, color 0.3s;
         }
-        .path-grid
-        {
-        grid-template-columns:
-        1fr;
+
+        .path-card:hover .path-link {
+            color: var(--peach-glow);
         }
-        .cta-buttons
-        {
-        flex-direction:
-        column;
-        align-items:
-        stretch;
+
+        .path-link:hover {
+            gap: 12px;
         }
+
+        /* Recommended Reading list */
+        .section-header {
+            text-align: center;
+            margin: 80px 0 40px;
+        }
+
+        .section-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--peach-glow);
+            margin-bottom: 12px;
+        }
+
+        .section-header p {
+            font-size: 1.05rem;
+            color: #94a3b8;
+        }
+
+        .resource-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .resource-item {
+            background: rgba(30, 41, 59, 0.4);
+            border-left: 4px solid var(--teal-glow);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 0 16px 16px 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .resource-item:hover {
+            background: rgba(30, 41, 59, 0.7);
+            transform: translateX(6px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .resource-item h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--teal-glow);
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        .resource-item:hover h4 {
+            color: #ffffff;
+        }
+
+        .resource-item p {
+            color: #cbd5e1;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .resource-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .resource-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .resource-meta i {
+            color: var(--peach-glow);
+        }
+
+        /* CTA Section Box */
+        .cta-box {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.08), rgba(244, 159, 117, 0.08));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            padding: 50px 40px;
+            text-align: center;
+            margin-top: 80px;
+            max-width: 960px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 50px;
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        .cta-box h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .cta-box p {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 35px;
+            background: linear-gradient(135deg, var(--teal-glow), #2a9d8f);
+            color: #0f172a;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.25);
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.45);
+        }
+
+        .cta-btn.secondary {
+            background: transparent;
+            border: 1px solid var(--peach-glow);
+            color: var(--peach-glow);
+            box-shadow: none;
+        }
+
+        .cta-btn.secondary:hover {
+            background: rgba(244, 159, 117, 0.08);
+            color: #ffb088;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 900px) {
+            .page-header h1 {
+                font-size: 2.8rem;
+            }
+            .path-grid {
+                grid-template-columns: 1fr;
+            }
+            .cta-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .audio-control {
+                bottom: 135px;
+                left: auto;
+                right: 20px;
+            }
         }
     </style>
     <link rel="icon" href="../assets/images/favicon_symbol.webp" type="image/x-icon">
 </head>
 
 <body>
+    <!-- AUDIO & VISUALIZER -->
+    <audio id="ambientAudio" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mp3">
+    </audio>
+    <div class="audio-control" onclick="toggleAudio()">
+        <div class="audio-bars" id="audioVisualizer">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <span id="audioText">Play Audio</span>
+    </div>
+
+    <!-- BACKGROUND LAYERS -->
+    <div class="bg-grid"></div>
+    <div class="bg-noise"></div>
+    <div id="particles"></div>
+    <div id="atmosphere"></div>
+    <div id="scroll-progress"></div>
+
+    <div class="aurora-container">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+    </div>
+
     <div id="app-shell">
         <div id="shell-fixed">
             <header class="island-nav" id="main-header"></header>
         </div>
 
-        <main id="shell-content" class="page-wrapper">
+        <main id="shell-content">
+            <div class="page-wrapper">
             <!-- Header -->
             <div class="page-header">
                 <h1>Start Here</h1>
                 <p>
                     New to Soulamore? This is your entry point.<br>
-                    Find your path, explore resources, and take the first step.
+                    Find your path, explore self-care tools, and take the first step.
                 </p>
             </div>
 
@@ -570,77 +640,83 @@
             <div class="path-grid">
                 <!-- Path 1 -->
                 <div class="path-card">
-                    <div class="path-icon"><i class="fas fa-user-friends"></i></div>
-                    <h3>I Need Someone to Talk To</h3>
-                    <p>
-                        Sometimes you don't need advice. You just need someone who listens
-                        without judgment.
-                    </p>
-                    <a href="../community/support-groups/support-groups.html" class="path-link">
-                        Find Peer Support <i class="fas fa-arrow-right"></i>
+                    <div>
+                        <div class="path-icon"><i class="fas fa-user-friends"></i></div>
+                        <h3>I Need Someone to Talk To</h3>
+                        <p>
+                            Sometimes you don't need advice. You just need an empathetic listener. Connect with understanding, trained peers anonymously.
+                        </p>
+                    </div>
+                    <a href="../our-peers/index.html" class="path-link">
+                        Meet Peers <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
 
                 <!-- Path 2 -->
                 <div class="path-card">
-                    <div class="path-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <h3>I Want to Learn</h3>
-                    <p>
-                        Understand mental health, coping strategies, and how to support
-                        yourself and others.
-                    </p>
-                    <a href="../community/blogs/blogs.html" class="path-link">
+                    <div>
+                        <div class="path-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <h3>I Want to Learn</h3>
+                        <p>
+                            Understand emotional regulation, stress responses, and discover practical methods to support yourself and your friends.
+                        </p>
+                    </div>
+                    <a href="../community/blogs.html" class="path-link">
                         Explore Educational Articles <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
 
                 <!-- Path 3 -->
                 <div class="path-card">
-                    <div class="path-icon"><i class="fas fa-stethoscope"></i></div>
-                    <h3>I Need Professional Help</h3>
-                    <p>
-                        Connect with verified psychologists who understand Indian context
-                        and offer safe, confidential support.
-                    </p>
-                    <a href="../join-us/psychologist.html" class="path-link">
+                    <div>
+                        <div class="path-icon"><i class="fas fa-user-md"></i></div>
+                        <h3>I Need Professional Help</h3>
+                        <p>
+                            Connect with verified clinical psychologists who understand your specific context and offer secure, confidential online counseling.
+                        </p>
+                    </div>
+                    <a href="../our-psychologists/psychologists.html" class="path-link">
                         Find a Psychologist <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
 
                 <!-- Path 4 -->
                 <div class="path-card">
-                    <div class="path-icon"><i class="fas fa-tools"></i></div>
-                    <h3>I Need Quick Relief</h3>
-                    <p>
-                        Try self-care tools designed for moments when everything feels
-                        too heavy right now.
-                    </p>
+                    <div>
+                        <div class="path-icon"><i class="fas fa-toolbox"></i></div>
+                        <h3>I Need Quick Relief</h3>
+                        <p>
+                            Try lightweight, interactive self-care tools designed to soothe and focus your mind when things get heavy.
+                        </p>
+                    </div>
                     <a href="../tools/5-step-reset.html" class="path-link">
-                        Try Self-Care Tools <i class="fas fa-arrow-right"></i>
+                        Try 5-Step Reset <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
 
                 <!-- Path 5 -->
                 <div class="path-card">
-                    <div class="path-icon"><i class="fas fa-question-circle"></i></div>
-                    <h3>I Want to Understand Why</h3>
-                    <p>
-                        Learn why talking about mental health feels harder than suffering,
-                        and why that needs to change.
-                    </p>
+                    <div>
+                        <div class="path-icon"><i class="fas fa-book-open"></i></div>
+                        <h3>I Want to Understand Why</h3>
+                        <p>
+                            Read our startup manifesto and learn why we created Soulamore as a zero-barrier anonymous emotional sanctuary.
+                        </p>
+                    </div>
                     <a href="../company/why-soulamore-exists.html" class="path-link">
-                        Read Our Story <i class="fas fa-arrow-right"></i>
+                        Read Our Manifesto <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
 
                 <!-- Path 6 -->
                 <div class="path-card">
-                    <div class="path-icon"><i class="fas fa-hands-helping"></i></div>
-                    <h3>I Want to Help Others</h3>
-                    <p>
-                        Become a peer supporter and use your lived experience to help
-                        others who are struggling.
-                    </p>
+                    <div>
+                        <div class="path-icon"><i class="fas fa-hands-helping"></i></div>
+                        <h3>I Want to Help Others</h3>
+                        <p>
+                            Join our community as a trained peer supporter. Use your empathy and lived experience to guide others who are struggling.
+                        </p>
+                    </div>
                     <a href="../join-us/peer.html" class="path-link">
                         Join as a Peer <i class="fas fa-arrow-right"></i>
                     </a>
@@ -649,16 +725,15 @@
 
             <!-- Recommended Reading Section -->
             <div class="section-header">
-                <h2>Recommended Reading (Coming Soon)</h2>
+                <h2>Recommended Reading</h2>
                 <p>Curated articles to get you started</p>
             </div>
 
             <div class="resource-list">
                 <div class="resource-item">
-                    <h4>Understanding Your Emotions Don't Make You Weak</h4>
+                    <h4>Understanding Your Emotions Doesn't Make You Weak</h4>
                     <p>
-                        Learn why feeling overwhelmed is not a character flaw,
-                        and how to navigate difficult emotions without shame.
+                        Learn why feeling overwhelmed is a natural human response, and how to navigate difficult emotional valleys without shame.
                     </p>
                     <div class="resource-meta">
                         <span><i class="fas fa-user-md"></i> By Psychologist</span>
@@ -670,8 +745,7 @@
                 <div class="resource-item">
                     <h4>How I Told My Parents I Needed Help</h4>
                     <p>
-                        A peer's honest account of navigating the hardest conversation
-                        and what happened after.
+                        An honest, personal account of navigating the hardest conversation about mental health with family, and the support that followed.
                     </p>
                     <div class="resource-meta">
                         <span><i class="fas fa-users"></i> Peer Story</span>
@@ -681,10 +755,9 @@
                 </div>
 
                 <div class="resource-item">
-                    <h4>When Self-Care Isn't Enough</h4>
+                    <h4>When Self-Care Tools Aren't Enough</h4>
                     <p>
-                        Sometimes breathing exercises and journaling don't cut it.
-                        Here's how to recognize when you need more support.
+                        Sometimes breathing exercises and journaling are not enough. Here is how to recognize when it is time to seek professional counseling.
                     </p>
                     <div class="resource-meta">
                         <span><i class="fas fa-user-md"></i> By Psychologist</span>
@@ -698,23 +771,76 @@
             <div class="cta-box">
                 <h3>Ready to take the next step?</h3>
                 <p>
-                    Join thousands of people who chose honesty over hiding,
-                    connection over silence, and healing over suffering alone.
+                    Create a secure, anonymous workspace on Soulamore to track your reflections, save assessment scores, and access deeper support.
                 </p>
                 <div class="cta-buttons">
                     <a href="../portal/login.html" class="cta-btn">
                         <i class="fas fa-user-plus"></i> Join Soulamore
                     </a>
-                    <a href="../community/support-groups/support-groups.html" class="cta-btn secondary">
-                        <i class="fas fa-compass"></i> Explore More
+                    <a href="../index.html" class="cta-btn secondary">
+                        <i class="fas fa-home"></i> View Main Landing
                     </a>
                 </div>
             </div>
 
+            </div> <!-- End page-wrapper -->
+
             <footer id="main-footer"></footer>
         </main>
     </div>
-    <script src="../assets/js/components.js"></script>
-</body>
 
+    <!-- SCRIPTS -->
+    <script src="../assets/js/components.js"></script>
+    <script>
+        // AUDIO CONTROLS
+        const audio = document.getElementById('ambientAudio');
+        const vis = document.getElementById('audioVisualizer');
+        const aText = document.getElementById('audioText');
+        let isPlaying = false;
+        window.toggleAudio = function () {
+            if (isPlaying) { 
+                audio.pause(); 
+                vis.classList.remove('playing'); 
+                aText.innerText = "Play Audio"; 
+            } else { 
+                audio.volume = 0.3; 
+                audio.play().catch(e => console.log("Interaction needed")); 
+                vis.classList.add('playing'); 
+                aText.innerText = "Pause"; 
+            }
+            isPlaying = !isPlaying;
+        };
+
+        // BUBBLES
+        const atmosphere = document.getElementById('atmosphere');
+        const thoughts = ["Hope", "Stress", "Dreams", "Future", "Love", "Anxiety", "Peace", "Growth"];
+
+        if (atmosphere) {
+            setInterval(() => {
+                let t = document.createElement('div');
+                t.classList.add('thought-bubble');
+                t.innerText = thoughts[Math.floor(Math.random() * thoughts.length)];
+                t.style.left = Math.random() * 90 + 'vw';
+                t.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                atmosphere.appendChild(t);
+                setTimeout(() => t.remove(), 25000);
+            }, 25000); // Tighter frequency control
+        }
+
+        // PARTICLES
+        const particleContainer = document.getElementById('particles');
+        if (particleContainer) {
+            for (let i = 0; i < 20; i++) {
+                let p = document.createElement('div');
+                p.classList.add('particle');
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.width = Math.random() * 5 + 'px'; 
+                p.style.height = p.style.width;
+                p.style.animationDuration = Math.random() * 20 + 10 + 's';
+                p.style.animationDelay = -Math.random() * 20 + 's';
+                particleContainer.appendChild(p);
+            }
+        }
+    </script>
+</body>
 </html>

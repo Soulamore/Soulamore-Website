@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soulamore | Brand Assets & Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Theme - Night (Dark Mode) */
+      --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-display: "Outfit", sans-serif;
+
+      --color-background: #0f172a;
+      --color-foreground: #f1f5f9;
+      --color-muted: rgba(255, 255, 255, 0.65);
+      --color-border: rgba(255, 255, 255, 0.1);
+      --color-card: rgba(30, 41, 59, 0.6);
+
+      --color-teal-glow: #4ECDC4;
+      --color-peach-glow: #F49F75;
+      --color-gold-glow: #fbbf24;
+      --color-purple-accent: #a78bfa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-background);
+      color: var(--color-foreground);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      line-height: 1.6;
+      position: relative;
+      overflow-x: hidden;
+      padding: 4rem 2rem;
+    }
+
+    /* Grid & Aurora Overlays matching Soulamore landing */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+    }
+
+    .bg-noise {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      mix-blend-mode: overlay;
+    }
+
+    .aurora-blooms {
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .aurora-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.18;
+    }
+
+    .blob-teal {
+      top: -10%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      background: var(--color-teal-glow);
+    }
+
+    .blob-peach {
+      bottom: -15%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: var(--color-peach-glow);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      z-index: 10;
+      position: relative;
+    }
+
+    header {
+      margin-bottom: 4rem;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 2rem;
+    }
+
+    .header-nav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--color-foreground);
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .dot-pulsing {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--color-peach-glow);
+      display: inline-block;
+      position: relative;
+      box-shadow: 0 0 10px var(--color-peach-glow);
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 8px var(--color-peach-glow);
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+        box-shadow: 0 0 16px var(--color-peach-glow);
+      }
+    }
+
+    .project-tagline {
+      font-family: var(--font-sans);
+      color: var(--color-muted);
+      font-size: 1.05rem;
+      font-weight: 400;
+    }
+
+    h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin: 3rem 0 1.5rem 0;
+      color: var(--color-foreground);
+      border-left: 4px solid var(--color-teal-glow);
+      padding-left: 12px;
+    }
+
+    .grid-two-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .grid-two-cols {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card Styling */
+    .card {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Colors Spec Table-style grid */
+    .palette-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .swatch-group {
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .swatch-group-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+      color: var(--color-peach-glow);
+    }
+
+    .swatch-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .swatch-item {
+      display: flex;
+      flex-direction: column;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .swatch-color-box {
+      height: 80px;
+      width: 100%;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .swatch-info {
+      padding: 0.8rem;
+    }
+
+    .swatch-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #f8fafc;
+    }
+
+    .swatch-variable {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.75rem;
+      color: var(--color-teal-glow);
+      margin-top: 2px;
+    }
+
+    .swatch-hex {
+      font-size: 0.75rem;
+      color: var(--color-muted);
+      margin-top: 2px;
+    }
+
+    /* Typography Preview */
+    .font-sample {
+      margin-bottom: 2rem;
+    }
+
+    .font-sample-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-peach-glow);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .font-sample-display {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+
+    .font-sample-sans {
+      font-family: var(--font-sans);
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    /* Code Block */
+    pre {
+      background: #0b0f19;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      margin-top: 1rem;
+    }
+
+    /* Square Brand Logo Container */
+    .logo-aspect-card {
+      background: #0f172a;
+      width: 100%;
+      max-width: 480px;
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      margin: 1.5rem auto;
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+    }
+
+    .logo-inner-grid {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .logo-inner-noise {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      mix-blend-mode: overlay;
+    }
+
+    .logo-aurora {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .logo-blob-1 {
+      position: absolute;
+      top: -15%;
+      left: -15%;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: var(--color-teal-glow);
+      filter: blur(50px);
+      opacity: 0.22;
+    }
+
+    .logo-blob-2 {
+      position: absolute;
+      bottom: -15%;
+      right: -15%;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: var(--color-peach-glow);
+      filter: blur(50px);
+      opacity: 0.22;
+    }
+
+    .logo-blob-3 {
+      position: absolute;
+      top: 35%;
+      left: 25%;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background: var(--color-purple-accent);
+      filter: blur(50px);
+      opacity: 0.12;
+    }
+
+    .brand-logo-content {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem;
+      z-index: 10;
+    }
+
+    .brand-logo-text {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(40px, 9vw, 68px);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+      color: #ffffff;
+      user-select: none;
+      position: relative;
+      z-index: 10;
+      /* Soft premium text gradient glow */
+      background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 50%, var(--color-teal-glow) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 15px rgba(78, 205, 196, 0.4));
+    }
+
+    /* Downloader Controls widget */
+    .control-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .control-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .control-select {
+      background: #0f172a;
+      color: #fff;
+      border: 1px solid var(--color-border);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      cursor: pointer;
+      outline: none;
+      min-width: 170px;
+    }
+
+    .control-select:focus {
+      border-color: var(--color-teal-glow);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 2.2rem;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-peach-glow), var(--color-gold-glow));
+      color: #0f172a;
+      box-shadow: 0 4px 15px rgba(244, 159, 117, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(244, 159, 117, 0.5);
+    }
+
+    .btn-secondary {
+      background-color: rgba(255, 255, 255, 0.04);
+      color: var(--color-foreground);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn-list {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    /* Reusable UI Components Demo */
+    .ui-showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 1.5rem;
+    }
+
+    /* Glass Card */
+    .showcase-glass-card {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.8rem;
+      position: relative;
+      overflow: hidden;
+      transition: 0.3s ease-in-out;
+    }
+
+    .showcase-glass-card:hover {
+      border-color: var(--color-peach-glow);
+      background: rgba(244, 159, 117, 0.05);
+      transform: translateY(-4px);
+    }
+
+    .showcase-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      background: rgba(244, 159, 117, 0.1);
+      color: var(--color-peach-glow);
+      border: 1px solid rgba(244, 159, 117, 0.2);
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.8rem;
+    }
+
+    .showcase-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+
+    .showcase-desc {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      margin-bottom: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-noise"></div>
+  <div class="aurora-blooms">
+    <div class="aurora-blob blob-teal"></div>
+    <div class="aurora-blob blob-peach"></div>
+  </div>
+
+  <div class="container">
+    <header>
+      <a href="#" class="header-nav-brand">
+        <span class="dot-pulsing"></span>
+        <span>Soulamore</span>
+      </a>
+      <p class="project-tagline">Official Brand Assets & Design System Cheat Sheet</p>
+    </header>
+
+    <!-- Interactive Square Logo Card -->
+    <section class="card" style="margin-bottom: 3rem;">
+      <h2>Square Brand Logo (Interactive Exporter)</h2>
+      <p style="color: var(--color-muted); margin-bottom: 1.5rem; font-size: 0.95rem;">
+        Recreation of the Soulamore logo inside a perfect square container (`aspect-ratio: 1/1`). Includes the grid system, grain noise, and ambient Aurora Blooms. Configure and export as a high-resolution PNG.
+      </p>
+
+      <div class="logo-aspect-card" id="logo-preview-box">
+        <!-- Live Layout Background Layers -->
+        <div class="logo-aurora" id="preview-aurora">
+          <div class="logo-blob-1"></div>
+          <div class="logo-blob-2"></div>
+          <div class="logo-blob-3"></div>
+        </div>
+        <div class="logo-inner-grid" id="preview-grid"></div>
+        <div class="logo-inner-noise" id="preview-noise"></div>
+
+        <!-- Main Logo Wrapper -->
+        <div class="brand-logo-content">
+          <h1 class="brand-logo-text" id="logo-text-element">
+            SOULAMORE
+          </h1>
+        </div>
+      </div>
+
+      <!-- Exporter Controls Widget -->
+      <div class="control-group">
+        <div class="control-item">
+          <label class="control-label" for="bg-select">Background Type</label>
+          <select id="bg-select" class="control-select" onchange="togglePreviewBg()">
+            <option value="solid">With Background (Aurora & Grid)</option>
+            <option value="transparent">Transparent (Logo Only)</option>
+          </select>
+        </div>
+
+        <div class="control-item">
+          <label class="control-label" for="size-select">Export Dimensions</label>
+          <select id="size-select" class="control-select">
+            <option value="512">512 x 512 px</option>
+            <option value="1024" selected>1024 x 1024 px</option>
+            <option value="2048">2048 x 2048 px</option>
+          </select>
+        </div>
+
+        <button onclick="downloadLogo()" class="btn btn-primary" style="margin-top: 1rem;">
+          Export PNG
+        </button>
+      </div>
+
+      <div style="margin-top: 1.8rem;">
+        <h3 style="font-size: 0.9rem; color: var(--color-peach-glow); margin-bottom: 0.5rem;">Typography Logo Code</h3>
+        <p style="color: var(--color-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
+          Use this CSS setup to recreate the Soulamore glowing typography brand mark in vanilla HTML:
+        </p>
+        <pre><code>&lt;!-- Brand Logo Typography Markup --&gt;
+&lt;div class="logo-wrapper" style="display: inline-block; padding: 10px;"&gt;
+  &lt;h1 style="font-family: 'Outfit', sans-serif; font-size: 68px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; text-align: center; margin: 0; background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 50%, #4ECDC4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(78, 205, 196, 0.4));"&gt;
+    SOULAMORE
+  &lt;/h1&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </section>
+
+    <!-- Swatches Section -->
+    <section class="card" style="margin-bottom: 3rem;">
+      <h2>Design Tokens: Dark & Light Color Palettes</h2>
+      <p style="color: var(--color-muted); margin-bottom: 1.5rem; font-size: 0.95rem;">
+        Soulamore's brand theme supports both Night (Dark Mode) and Day (Light Mode) configurations. Night mode relies on dark space slate, while Day mode bridges high readability with clean slate backdrops.
+      </p>
+
+      <div class="palette-grid">
+        <!-- Night Palette -->
+        <div class="swatch-group">
+          <div class="swatch-group-title">Night Palette (Dark Mode - Default)</div>
+          <div class="swatch-list">
+            <!-- Background -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: #0f172a;"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">Base Background</div>
+                <div class="swatch-variable">--bg-main</div>
+                <div class="swatch-hex">#0f172a</div>
+              </div>
+            </div>
+            <!-- Card -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: rgba(30, 41, 59, 0.7);"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">Navy Card Glass</div>
+                <div class="swatch-variable">--bg-card</div>
+                <div class="swatch-hex">rgba(30, 41, 59, 0.7)</div>
+              </div>
+            </div>
+            <!-- Text primary -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: #f1f5f9;"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">Starlight Text</div>
+                <div class="swatch-variable">--text-primary</div>
+                <div class="swatch-hex">#f1f5f9</div>
+              </div>
+            </div>
+            <!-- Teal Glow -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: #4ECDC4;"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">Teal Glow (Primary Accent)</div>
+                <div class="swatch-variable">--teal-glow</div>
+                <div class="swatch-hex">#4ECDC4</div>
+              </div>
+            </div>
+            <!-- Peach Glow -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: #F49F75;"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">Peach Glow (Secondary Accent)</div>
+                <div class="swatch-variable">--peach-glow</div>
+                <div class="swatch-hex">#F49F75</div>
+              </div>
+            </div>
+            <!-- Gold Glow -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: #fbbf24;"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">Gold Glow (Tertiary Accent)</div>
+                <div class="swatch-variable">--accent-tertiary</div>
+                <div class="swatch-hex">#fbbf24</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day Palette -->
+        <div class="swatch-group">
+          <div class="swatch-group-title">Day Palette (Light Mode Override)</div>
+          <div class="swatch-list">
+            <!-- Background -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: #f1f5f9;"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">Base Background</div>
+                <div class="swatch-variable">--bg-main</div>
+                <div class="swatch-hex">#f1f5f9</div>
+              </div>
+            </div>
+            <!-- Card -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: rgba(255, 255, 255, 0.92);"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">White Card Glass</div>
+                <div class="swatch-variable">--bg-card</div>
+                <div class="swatch-hex">rgba(255, 255, 255, 0.92)</div>
+              </div>
+            </div>
+            <!-- Text primary -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: #1f2d3d;"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">Slate Dark Text</div>
+                <div class="swatch-variable">--text-primary</div>
+                <div class="swatch-hex">#1f2d3d</div>
+              </div>
+            </div>
+            <!-- Text Secondary -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: #526377;"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">Slate Secondary Text</div>
+                <div class="swatch-variable">--text-secondary</div>
+                <div class="swatch-hex">#526377</div>
+              </div>
+            </div>
+            <!-- Borders soft -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: #dbe2ea;"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">Soft Light Borders</div>
+                <div class="swatch-variable">--border-soft</div>
+                <div class="swatch-hex">#dbe2ea</div>
+              </div>
+            </div>
+            <!-- Background Subtle -->
+            <div class="swatch-item">
+              <div class="swatch-color-box" style="background-color: rgba(15, 23, 42, 0.05);"></div>
+              <div class="swatch-info">
+                <div class="swatch-name">Subtle Slate Overlay</div>
+                <div class="swatch-variable">--bg-subtle</div>
+                <div class="swatch-hex">rgba(15, 23, 42, 0.05)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Typography & CSS Configuration -->
+    <div class="grid-two-cols" style="margin-bottom: 3rem;">
+      <section class="card">
+        <h2>Typography & Scale</h2>
+        <p style="color: var(--color-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">
+          Official font pairings imported via Google Fonts. Headings utilize Outfit for bold geometric elegance. Body and controls use Plus Jakarta Sans.
+        </p>
+
+        <div class="font-sample">
+          <div class="font-sample-label">Headings & Displays (Font: Outfit)</div>
+          <div class="font-sample-display">SOULAMORE</div>
+        </div>
+
+        <div class="font-sample">
+          <div class="font-sample-label">Body & Controls (Font: Plus Jakarta Sans)</div>
+          <div class="font-sample-sans">A safe anonymous environment where your emotions can breathe.</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Global CSS Token Mapping</h2>
+        <p style="color: var(--color-muted); margin-bottom: 0.5rem; font-size: 0.9rem;">
+          Include these theme root rules inside global stylesheets to align with Soulamore layout dimensions and geometries:
+        </p>
+        <pre><code>:root {
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  
+  --radius-main: 32px; /* Smooth card curvature */
+  --radius-sm: 24px;   /* Minor control items */
+  --blur-main: 12px;   /* Standard glass backdrop blur */
+  --header-clearance: 110px;
+}</code></pre>
+      </section>
+    </div>
+
+    <!-- UI Elements Showcase -->
+    <section class="card">
+      <h2>Standard UI Components</h2>
+      <p style="color: var(--color-muted); margin-bottom: 1.5rem; font-size: 0.95rem;">
+        Standard elements designed to fit the glass grid environment.
+      </p>
+
+      <div class="ui-showcase-grid">
+        <!-- Buttons Column -->
+        <div class="showcase-glass-card">
+          <span class="showcase-tag">Interactive Controls</span>
+          <div class="showcase-title">Buttons & CTAs</div>
+          <div class="showcase-desc">Default gradients utilizing peach and gold glows, and clear border secondary options.</div>
+          <div class="btn-list" style="margin-top: 1rem;">
+            <button class="btn btn-primary">Primary Gradient</button>
+            <button class="btn btn-secondary">Secondary Card</button>
+          </div>
+        </div>
+
+        <!-- Glass card preview -->
+        <div class="showcase-glass-card">
+          <span class="showcase-tag">Support Groups</span>
+          <div class="showcase-title">Campus Wellness Hub</div>
+          <div class="showcase-desc">A safe anonymous space designed for students navigating exams, academic pressure, and relocation anxiety.</div>
+          <a href="#" class="btn btn-secondary" style="padding: 0.5rem 1.4rem; font-size: 0.75rem;">Enter Space</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function togglePreviewBg() {
+      const bgType = document.getElementById('bg-select').value;
+      const previewBox = document.getElementById('logo-preview-box');
+      const aurora = document.getElementById('preview-aurora');
+      const grid = document.getElementById('preview-grid');
+      const noise = document.getElementById('preview-noise');
+      const text = document.getElementById('logo-text-element');
+
+      if (bgType === 'transparent') {
+        previewBox.style.background = 'transparent';
+        previewBox.style.boxShadow = 'none';
+        aurora.style.opacity = '0';
+        grid.style.opacity = '0';
+        noise.style.opacity = '0';
+        text.style.filter = 'none';
+      } else {
+        previewBox.style.background = '#0f172a';
+        previewBox.style.boxShadow = '0 12px 48px rgba(0, 0, 0, 0.6)';
+        aurora.style.opacity = '1';
+        grid.style.opacity = '1';
+        noise.style.opacity = '1';
+        text.style.filter = 'drop-shadow(0 0 15px rgba(78, 205, 196, 0.4))';
+      }
+    }
+
+    async function downloadLogo() {
+      const size = parseInt(document.getElementById('size-select').value) || 1024;
+      const bgType = document.getElementById('bg-select').value || 'solid';
+
+      // Create an offscreen canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      // Wait for fonts to load
+      await document.fonts.ready;
+
+      // Draw background
+      if (bgType === 'solid') {
+        ctx.fillStyle = '#0f172a'; // --deep-space
+        ctx.fillRect(0, 0, size, size);
+
+        // Draw Aurora radial blobs (simulating CSS blobs)
+        // Blob 1 (Teal): top-left
+        const g1 = ctx.createRadialGradient(size * 0.1, size * 0.1, 0, size * 0.1, size * 0.1, size * 0.6);
+        g1.addColorStop(0, 'rgba(78, 205, 196, 0.22)');
+        g1.addColorStop(1, 'rgba(78, 205, 196, 0)');
+        ctx.fillStyle = g1;
+        ctx.fillRect(0, 0, size, size);
+
+        // Blob 2 (Peach): bottom-right
+        const g2 = ctx.createRadialGradient(size * 0.9, size * 0.9, 0, size * 0.9, size * 0.9, size * 0.7);
+        g2.addColorStop(0, 'rgba(244, 159, 117, 0.22)');
+        g2.addColorStop(1, 'rgba(244, 159, 117, 0)');
+        ctx.fillStyle = g2;
+        ctx.fillRect(0, 0, size, size);
+
+        // Blob 3 (Purple): center-left
+        const g3 = ctx.createRadialGradient(size * 0.35, size * 0.6, 0, size * 0.35, size * 0.6, size * 0.55);
+        g3.addColorStop(0, 'rgba(167, 139, 250, 0.12)');
+        g3.addColorStop(1, 'rgba(167, 139, 250, 0)');
+        ctx.fillStyle = g3;
+        ctx.fillRect(0, 0, size, size);
+
+        // Draw Grid Overlay lines
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+        ctx.lineWidth = Math.max(1, size / 1000);
+        const gridStep = size / (1024 / 60); // 60px grids scaled
+        for (let x = 0; x <= size; x += gridStep) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, size);
+          ctx.stroke();
+        }
+        for (let y = 0; y <= size; y += gridStep) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(size, y);
+          ctx.stroke();
+        }
+
+        // Draw Noise/Grain
+        const imgData = ctx.getImageData(0, 0, size, size);
+        const pixels = imgData.data;
+        for (let i = 0; i < pixels.length; i += 4) {
+          const noiseVal = (Math.random() - 0.5) * 6; // subtle grain
+          pixels[i] = Math.min(255, Math.max(0, pixels[i] + noiseVal));
+          pixels[i+1] = Math.min(255, Math.max(0, pixels[i+1] + noiseVal));
+          pixels[i+2] = Math.min(255, Math.max(0, pixels[i+2] + noiseVal));
+        }
+        ctx.putImageData(imgData, 0, 0);
+      } else {
+        // Clear to transparent
+        ctx.clearRect(0, 0, size, size);
+      }
+
+      // Draw Glowing Logo Text
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const fontSize = size * 0.11; // 110px relative to 1024px width
+      ctx.font = `bold ${fontSize}px "Outfit", sans-serif`;
+
+      // Apply subtle shadow/glow to text if background is enabled
+      if (bgType === 'solid') {
+        ctx.shadowColor = 'rgba(78, 205, 196, 0.5)';
+        ctx.shadowBlur = size * 0.025; // 25px relative blur
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+      }
+
+      // Render text using linear gradient fill
+      const textX = size / 2;
+      const textY = size / 2;
+      const gradient = ctx.createLinearGradient(textX - size * 0.3, textY - fontSize, textX + size * 0.3, textY + fontSize);
+      gradient.addColorStop(0, '#ffffff');
+      gradient.addColorStop(0.5, '#e2e8f0');
+      gradient.addColorStop(1, '#4ECDC4');
+      ctx.fillStyle = gradient;
+
+      // Track letter-spacing emulated on canvas (canvas doesn't natively support letter-spacing in all browsers, so we add spaces or draw characters manually)
+      // For clean rendering, we can draw the spaced text. Let's add spacing between characters: "S O U L A M O R E"
+      const spacedText = "SOULAMORE".split("").join("  ");
+      ctx.fillText(spacedText, textX, textY);
+
+      // Reset shadows
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+
+      // Trigger browser download
+      const link = document.createElement('a');
+      link.download = `soulamore-logo-${size}x${size}-${bgType === 'transparent' ? 'transparent' : 'aurora-grid'}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>
