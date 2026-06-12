@@ -41,6 +41,38 @@ function updateAuthUI(user) {
             const src = script.getAttribute('src');
             if (src) return src.split('assets/js/components')[0];
         }
+        
+        const path = window.location.pathname.toLowerCase();
+        
+        // 2-Levels Deep Check
+        if (path.includes('/spaces/campus/') ||
+            path.includes('/spaces/soulamore-away/') ||
+            path.includes('/spaces/soulamore-workplace/') ||
+            path.includes('/spaces/assessments/') ||
+            path.includes('/tools/confession-box/') ||
+            path.includes('/portal/admin-dashboard/') ||
+            (path.includes('/our-peers/') && path.split('/our-peers/')[1]?.includes('/'))) {
+            return "../../";
+        }
+        
+        // 1-Level Deep Check
+        if (path.includes('/spaces/') ||
+            path.includes('/tools/') ||
+            path.includes('/company/') ||
+            path.includes('/community/') ||
+            path.includes('/our-peers/') ||
+            path.includes('/our-psychologists/') ||
+            path.includes('/portal/') ||
+            path.includes('/journal/') ||
+            path.includes('/auth/') ||
+            path.includes('/login/') ||
+            path.includes('/join-us/') ||
+            path.includes('/pages/') ||
+            path.includes('/resources/') ||
+            path.includes('/new pages/') || path.includes('/new%20pages/')) {
+            return "../";
+        }
+        
         return '';
     }
 
@@ -74,9 +106,7 @@ function updateAuthUI(user) {
             // User is not logged in
             if (loginBtn) {
                 loginBtn.textContent = 'Log In / Sign Up';
-                // Fix path based on current location
-                const isAuthPage = window.location.pathname.includes('/auth/');
-                loginBtn.href = isAuthPage ? 'login.html' : 'auth/login.html';
+                loginBtn.href = `${getRootPath()}portal/login.html`;
                 loginBtn.onclick = null;
             }
 

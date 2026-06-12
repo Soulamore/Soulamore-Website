@@ -94,7 +94,7 @@ function getRootPath() {
     const path = window.location.pathname;
     if (path.includes('/spaces/') || path.includes('/tools/') || path.includes('/company/') ||
         path.includes('/community/') || path.includes('/our-peers/') || path.includes('/portal/') ||
-        path.includes('/pages/')) {
+        path.includes('/pages/') || path.includes('/resources/')) {
 
         const isLocal = window.location.protocol === 'file:';
         // Local files often have deeper paths, hosted files are usually /folder/file.html

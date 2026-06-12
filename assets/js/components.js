@@ -1487,6 +1487,7 @@ function getRootPath() {
         path.includes('/login/') ||
         path.includes('/join-us/') ||
         path.includes('/pages/') ||
+        path.includes('/resources/') ||
         path.includes('/new pages/') || path.includes('/new%20pages/')) {
         return "../";
     }
