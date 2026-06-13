@@ -143,6 +143,12 @@ When user's prompt is NOT in English:
 2. What PRINCIPLES must I apply?
 3. How does this DIFFER from generic output?
 
+### 🗄️ Reports Archiving Protocol
+
+- **Maximum Capacity**: Always keep a maximum of 5 most recent report files at the root of `reports/ADITYA/ANTIGRAVITY`.
+- **Automatic Archiving**: Move older reports (chronologically sorted by prefix index `001_` to `060_`) to the `reports/ADITYA/ANTIGRAVITY/archive` directory.
+- **Commit Coverage**: All archived files must remain tracked in version control.
+
 ---
 
 ## TIER 1: CODE RULES (When Writing Code)
