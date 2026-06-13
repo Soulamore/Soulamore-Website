@@ -495,55 +495,63 @@ export function updatePulseStats() {
     const f = document.getElementById('pulseFlowers');
     const c = document.getElementById('pulseCandles');
 
-    // Fallback values
-    const setFallback = () => {
-        if (h && (h.innerText.includes('spin') || h.innerText === '...' || h.innerText.trim() === '')) h.innerText = '1,280';
-        if (f && (f.innerText.includes('spin') || f.innerText === '...' || f.innerText.trim() === '')) f.innerText = '850';
-        if (c && (c.innerText.includes('spin') || c.innerText === '...' || c.innerText.trim() === '')) c.innerText = '430';
-    };
+    const CACHE_KEY = 'soulamore_pulse_stats_cache';
 
-    const fallbackTimeout = setTimeout(setFallback, 2000);
-
-    // INTERACTION GATE: Only start real-time listener on interaction
-    const triggers = ['mousedown', 'keydown', 'scroll', 'touchstart'];
-    const startListener = () => {
-        triggers.forEach(t => window.removeEventListener(t, startListener));
+    // Show last-live-recorded data from localStorage while Firestore loads
+    const showCachedOrZero = () => {
         try {
-            // Match the Problem Wall logic exactly (limit 200)
-            import("./firebase-config.js").then(({ db, collection, query, limit, onSnapshot }) => {
-                const q = query(collection(db, "problem-wall-notes"), limit(200));
-                onSnapshot(q, (snapshot) => {
-                    clearTimeout(fallbackTimeout);
-                    let hearts = 0, flowers = 0, candles = 0;
-                    snapshot.forEach((doc) => {
-                        const data = doc.data();
-                        if (data.isHidden !== true) {
-                            hearts += (data.hearts || 0);
-                            flowers += (data.flowers || 0);
-                            candles += (data.candles || 0);
-                        }
-                    });
-
-                    if (h) h.innerText = hearts.toLocaleString();
-                    if (f) f.innerText = flowers.toLocaleString();
-                    if (c) c.innerText = candles.toLocaleString();
-
-                    window.SoulPulseData = { hearts, flowers, candles };
-                }, (error) => {
-                    console.error("Pulse Stats Error:", error);
-                    setFallback();
-                });
-            }).catch((e) => {
-                console.error("Firebase dynamic import error:", e);
-                setFallback();
-            });
-        } catch (e) {
-            console.error("Firebase Init Error:", e);
-            setFallback();
+            const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+            if (cached) {
+                if (h) h.innerText = Number(cached.hearts || 0).toLocaleString();
+                if (f) f.innerText = Number(cached.flowers || 0).toLocaleString();
+                if (c) c.innerText = Number(cached.candles || 0).toLocaleString();
+                console.log('✅ Pulse stats: showing last live recorded data from cache');
+            } else {
+                if (h) h.innerText = '0';
+                if (f) f.innerText = '0';
+                if (c) c.innerText = '0';
+            }
+        } catch {
+            if (h) h.innerText = '0';
+            if (f) f.innerText = '0';
+            if (c) c.innerText = '0';
         }
     };
 
-    triggers.forEach(t => window.addEventListener(t, startListener, { passive: true }));
+    // Start Firestore listener immediately (public data, no auth needed)
+    try {
+        import("./firebase-config.js").then(({ db, collection, query, limit, onSnapshot }) => {
+            const q = query(collection(db, "problem-wall-notes"), limit(200));
+            onSnapshot(q, (snapshot) => {
+                let hearts = 0, flowers = 0, candles = 0;
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.isHidden !== true) {
+                        hearts += (data.hearts || 0);
+                        flowers += (data.flowers || 0);
+                        candles += (data.candles || 0);
+                    }
+                });
+
+                if (h) h.innerText = hearts.toLocaleString();
+                if (f) f.innerText = flowers.toLocaleString();
+                if (c) c.innerText = candles.toLocaleString();
+
+                // Cache live results for next load
+                localStorage.setItem(CACHE_KEY, JSON.stringify({ hearts, flowers, candles, timestamp: Date.now() }));
+                window.SoulPulseData = { hearts, flowers, candles };
+            }, (error) => {
+                console.warn("⚠️ Pulse Stats Firestore error, showing cache:", error.message);
+                showCachedOrZero();
+            });
+        }).catch((e) => {
+            console.warn("⚠️ Pulse Stats import error, showing cache:", e.message);
+            showCachedOrZero();
+        });
+    } catch (e) {
+        console.warn("⚠️ Pulse Stats init error, showing cache:", e.message);
+        showCachedOrZero();
+    }
 }
 
 // Make globally available for inline HTML onclicks (via a bridge helper if needed)
