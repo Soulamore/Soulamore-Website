@@ -21,6 +21,9 @@ export * from './triggers/on-user-create';
 // Export email triggers
 export * from './triggers/emailTriggers';
 
+// Export moderation triggers
+export * from './triggers/moderationTriggers';
+
 // Export new core services
 export * from './llmRouter';
 export * from './healthMonitoring'; // Exports getApiHealth
