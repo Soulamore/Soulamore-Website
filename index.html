@@ -2122,8 +2122,7 @@
             <div class="pillar-card" style="padding: 30px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3 style="margin:0; font-size:1.4rem;">Aditya</h3>
-                    <span
-                        style="border:1px solid var(--accent-primary); color:var(--accent-primary); padding:2px 8px; font-size:0.7rem; border-radius:20px;">ONLINE</span>
+                    <span id="peer-status-aditya" style="display:none; padding:2px 8px; font-size:0.7rem; border-radius:20px;"></span>
                 </div>
                 <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
                     Here to help you
@@ -2136,8 +2135,7 @@
             <div class="pillar-card" style="padding: 30px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3 style="margin:0; font-size:1.4rem;">Lakshit</h3>
-                    <span
-                        style="border:1px solid var(--accent-secondary); color:var(--accent-secondary); padding:2px 8px; font-size:0.7rem; border-radius:20px;">AWAY</span>
+                    <span id="peer-status-lakshit" style="display:none; padding:2px 8px; font-size:0.7rem; border-radius:20px;"></span>
                 </div>
                 <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
                     Ready to listen
@@ -2150,8 +2148,7 @@
             <div class="pillar-card" style="padding: 30px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3 style="margin:0; font-size:1.4rem;">Aarti</h3>
-                    <span
-                        style="border:1px solid var(--accent-primary); color:var(--accent-primary); padding:2px 8px; font-size:0.7rem; border-radius:20px;">ONLINE</span>
+                    <span id="peer-status-aarti" style="display:none; padding:2px 8px; font-size:0.7rem; border-radius:20px;"></span>
                 </div>
                 <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
                     Available to chat
@@ -2164,8 +2161,7 @@
             <div class="pillar-card" style="padding: 30px; border-color:var(--peach-glow);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3 style="margin:0; font-size:1.4rem;">Renu</h3>
-                    <span
-                        style="background:rgba(244, 159, 117, 0.2); color:var(--accent-secondary); padding:2px 8px; font-size:0.7rem; border-radius:20px;">SESSIONS</span>
+                    <span id="peer-status-renu" style="display:none; padding:2px 8px; font-size:0.7rem; border-radius:20px;"></span>
                 </div>
                 <p style="font-size:0.95rem; opacity:0.7; margin-bottom:25px; line-height:1.6;">
                     Certified Yoga
@@ -2921,6 +2917,69 @@
             document.addEventListener('DOMContentLoaded', updatePulseStats);
         } else {
             updatePulseStats();
+        }
+    </script>
+
+    <!-- MODULE: Dynamic Peer Statuses -->
+    <script type="module">
+        import { db, collection, getDocs } from './assets/js/firebase-config.js';
+
+        async function updatePeerStatuses() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "professionals"));
+                const peersData = {};
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.name) {
+                        peersData[data.name.toLowerCase().trim()] = data;
+                    }
+                });
+
+                const peersToUpdate = [
+                    { id: 'peer-status-aditya', name: 'aditya' },
+                    { id: 'peer-status-lakshit', name: 'lakshit' },
+                    { id: 'peer-status-aarti', name: 'aarti' },
+                    { id: 'peer-status-renu', name: 'renu' }
+                ];
+
+                peersToUpdate.forEach(peer => {
+                    const badge = document.getElementById(peer.id);
+                    if (!badge) return;
+
+                    const match = peersData[peer.name];
+                    if (match) {
+                        const status = (match.onlineStatus || 'away').toUpperCase();
+                        badge.textContent = status;
+                        badge.style.display = 'inline-block';
+                        
+                        if (status === 'ONLINE') {
+                            badge.style.border = '1px solid var(--accent-primary)';
+                            badge.style.color = 'var(--accent-primary)';
+                            badge.style.background = 'transparent';
+                        } else if (status === 'SESSIONS') {
+                            badge.style.background = 'rgba(244, 159, 117, 0.2)';
+                            badge.style.color = 'var(--accent-secondary)';
+                            badge.style.border = 'none';
+                        } else {
+                            badge.style.border = '1px solid var(--accent-secondary)';
+                            badge.style.color = 'var(--accent-secondary)';
+                            badge.style.background = 'transparent';
+                        }
+                    } else {
+                        // Default fallback/hide if peer not in database professionals collection
+                        badge.style.display = 'none';
+                    }
+                });
+            } catch (error) {
+                console.warn("⚠️ Peer availability load failed:", error.message);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updatePeerStatuses);
+        } else {
+            updatePeerStatuses();
         }
     </script>
     <!-- NUCLEAR RESPONSIVE OVERRIDE (Injected for Immediate Fix) -->

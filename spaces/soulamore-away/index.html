@@ -1261,7 +1261,8 @@
                                 style="font-size:1.2rem;"></i> <i class="far fa-paper-plane"
                                 style="font-size:1.2rem;"></i>
                         </div>
-                        <div style="text-align:left; margin-top:10px; font-weight:600; font-size:0.8rem;">342 likes
+                        <div style="text-align:left; margin-top:10px; font-weight:600; font-size:0.8rem;">
+                            <a href="https://www.instagram.com/soulamore_/" target="_blank" style="color:var(--teal-glow); text-decoration:none;">Follow on Instagram ↗</a>
                         </div>
                     </div>
 
@@ -1347,18 +1348,16 @@
             if (!cityInput || cityInput.value.trim() === "") return;
             const city = cityInput.value.trim();
 
+            // Sanitize input
+            const escapeHTML = (str) => str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
+            const safeCity = escapeHTML(city);
+
             btn.innerText = "Scanning...";
             setTimeout(() => {
-                let count = Math.floor(Math.random() * 30) + 5;
-                if (city.toLowerCase() === "berlin") count = 42;
                 result.style.display = "block";
-                // Sanitize input
-                const escapeHTML = (str) => str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
-                const safeCity = escapeHTML(city);
-
-                result.innerHTML = `<i class="fas fa-users"></i> We found <span style="color:white; font-size:1.5rem;">${count}</span> peers near ${safeCity} ready to help!`;
+                result.innerHTML = `<i class="fas fa-map-marker-alt"></i> We're growing in <strong>${safeCity}</strong>. <a href="/join-us/peer.html" style="color:var(--teal-glow); text-decoration:underline;">Join as a Peer</a> to support people in your city.`;
                 btn.innerText = "Scan Area";
-            }, 1500);
+            }, 1000);
         }
 
         // --- PARTICLES ---
