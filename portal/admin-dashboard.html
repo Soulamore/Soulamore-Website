@@ -895,7 +895,7 @@
                 <a href="#" class="side-link" data-view="approvals" onclick="switchView('approvals', this)">
                     <i class="fas fa-check-double"></i> <span>Content Queue</span>
                     <span class="badgex"
-                        style="background:var(--admin-accent); color:white; font-size:0.7rem; padding:2px 6px; border-radius:10px; margin-left:auto;">3</span>
+                        style="background:var(--admin-accent); color:white; font-size:0.7rem; padding:2px 6px; border-radius:10px; margin-left:auto;">0</span>
                 </a>
                 <a href="#" class="side-link" data-view="users" onclick="switchView('users', this)">
                     <i class="fas fa-users-cog"></i> <span>User Mgmt</span>
@@ -1941,7 +1941,7 @@
 
     <script src="../assets/js/portal-utils.js"></script>
     <script type="module">
-        import { auth, db, collection, query, where, getDocs, orderBy, updateDoc, doc, limit, addDoc, serverTimestamp, getDoc, setDoc, deleteDoc, writeBatch, functionsInstance, httpsCallable } from "../assets/js/firebase-config.js";
+        import { auth, db, collection, query, where, getDocs, orderBy, updateDoc, doc, limit, addDoc, serverTimestamp, getDoc, setDoc, deleteDoc, writeBatch, functionsInstance, httpsCallable, onSnapshot } from "../assets/js/firebase-config.js";
         import { getPractitionerMetadata } from "../assets/js/practitioner-handler.js";
 
         // Dynamic API Base URL for local development/emulator testing
@@ -2009,7 +2009,8 @@
                 }
                 if (mergedCount > 0) {
                     alert(`✅ Successfully merged ${mergedCount} duplicate accounts.`);
-                    // CRITICAL: Refresh the list immediately
+                    // CRITICAL: Invalidate cache and refresh the list immediately
+                    window.invalidateCache();
                     await loadAllUsers();
                     if (window.clearUserSelection) window.clearUserSelection();
                 } else {
@@ -2835,6 +2836,10 @@
                 // Show empty state instead of error
                 window.contentQueueData = [];
                 renderContentQueue([]);
+                const badge = document.querySelector('.badgex');
+                if (badge) {
+                    badge.textContent = '0';
+                }
             }
         }
 
@@ -2959,10 +2964,17 @@
         // OVERVIEW STATS LOADER
         async function loadOverviewStats() {
             try {
-                // Load pending approvals count
-                const pendingQ = query(collection(db, "peer_stories"), where("status", "==", "pending"));
-                const pendingSnap = await getDocs(pendingQ);
-                const pendingCount = pendingSnap.size;
+                // Load pending approvals count: peer stories (status == pending)
+                const pendingStoriesQ = query(collection(db, "peer_stories"), where("status", "==", "pending"));
+                const pendingStoriesSnap = await getDocs(pendingStoriesQ);
+                const pendingStoriesCount = pendingStoriesSnap.size;
+
+                // Load pending approvals count: blog posts (status == pending_approval)
+                const pendingBlogsQ = query(collection(db, "blog_posts"), where("status", "==", "pending_approval"));
+                const pendingBlogsSnap = await getDocs(pendingBlogsQ);
+                const pendingBlogsCount = pendingBlogsSnap.size;
+
+                const pendingCount = pendingStoriesCount + pendingBlogsCount;
 
                 const pendingEl = document.getElementById('stat-pending-approvals');
                 if (pendingEl) pendingEl.textContent = pendingCount;
@@ -2994,28 +3006,45 @@
 
                 // Load confessions count
                 const confessionsSnap = await getDocs(collection(db, "confessions"));
+                const confessionsCount = confessionsSnap.size;
                 const confessionsEl = document.getElementById('stat-confessions-count');
-                if (confessionsEl) confessionsEl.textContent = confessionsSnap.size.toLocaleString();
+                if (confessionsEl) confessionsEl.textContent = confessionsCount.toLocaleString();
 
                 // Load postcards count
                 const postcardsSnap = await getDocs(collection(db, "postcards"));
+                const postcardsCount = postcardsSnap.size;
                 const postcardsEl = document.getElementById('stat-postcards-count');
-                if (postcardsEl) postcardsEl.textContent = postcardsSnap.size.toLocaleString();
+                if (postcardsEl) postcardsEl.textContent = postcardsCount.toLocaleString();
 
                 // Load vents count
                 const ventsSnap = await getDocs(collection(db, "vents"));
+                const ventsCount = ventsSnap.size;
                 const ventsEl = document.getElementById('stat-vents-count');
-                if (ventsEl) ventsEl.textContent = ventsSnap.size.toLocaleString();
+                if (ventsEl) ventsEl.textContent = ventsCount.toLocaleString();
 
                 // Load problem wall notes count
                 const problemWallSnap = await getDocs(collection(db, "problem-wall-notes"));
+                const problemWallCount = problemWallSnap.size;
                 const problemWallEl = document.getElementById('stat-problem-wall-count');
-                if (problemWallEl) problemWallEl.textContent = problemWallSnap.size.toLocaleString();
+                if (problemWallEl) problemWallEl.textContent = problemWallCount.toLocaleString();
+
+                // Cache successful results in localStorage
+                const statsToCache = {
+                    pending: pendingCount,
+                    users: usersCount,
+                    flagged: flaggedCount,
+                    duplicates: duplicateCount,
+                    confessions: confessionsCount,
+                    postcards: postcardsCount,
+                    vents: ventsCount,
+                    problemWall: problemWallCount,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('soulamore_admin_stats_cache', JSON.stringify(statsToCache));
 
             } catch (err) {
                 console.warn("⚠️ Error loading overview stats (using fallback):", err.message);
 
-                // FALLBACK: Use cached/local data or estimates
                 const pendingEl = document.getElementById('stat-pending-approvals');
                 const usersEl = document.getElementById('stat-active-users');
                 const flaggedEl = document.getElementById('stat-flagged-content');
@@ -3025,16 +3054,36 @@
                 const ventsEl = document.getElementById('stat-vents-count');
                 const problemWallEl = document.getElementById('stat-problem-wall-count');
 
-                if (pendingEl) pendingEl.textContent = '3';
-                if (usersEl) usersEl.textContent = '6';
-                if (flaggedEl) flaggedEl.textContent = '1';
-                if (duplicateEl) duplicateEl.textContent = '1';
-                if (confessionsEl) confessionsEl.textContent = '12';
-                if (postcardsEl) postcardsEl.textContent = '24';
-                if (ventsEl) ventsEl.textContent = '8';
-                if (problemWallEl) problemWallEl.textContent = '15';
+                // Try loading from localStorage cache
+                const cachedStatsStr = localStorage.getItem('soulamore_admin_stats_cache');
+                if (cachedStatsStr) {
+                    try {
+                        const cached = JSON.parse(cachedStatsStr);
+                        if (pendingEl) pendingEl.textContent = cached.pending ?? 0;
+                        if (usersEl) usersEl.textContent = (cached.users ?? 0).toLocaleString();
+                        if (flaggedEl) flaggedEl.textContent = (cached.flagged ?? 0).toString();
+                        if (duplicateEl) duplicateEl.textContent = (cached.duplicates ?? 0);
+                        if (confessionsEl) confessionsEl.textContent = (cached.confessions ?? 0).toLocaleString();
+                        if (postcardsEl) postcardsEl.textContent = (cached.postcards ?? 0).toLocaleString();
+                        if (ventsEl) ventsEl.textContent = (cached.vents ?? 0).toLocaleString();
+                        if (problemWallEl) problemWallEl.textContent = (cached.problemWall ?? 0).toLocaleString();
+                        console.log('✅ Overview stats showing last live recorded data from localStorage cache');
+                        return;
+                    } catch (cacheErr) {
+                        console.error("Failed to parse cached stats:", cacheErr);
+                    }
+                }
 
-                console.log('✅ Overview stats showing fallback data');
+                // If no cache, fall back to 0
+                if (pendingEl) pendingEl.textContent = '0';
+                if (usersEl) usersEl.textContent = '0';
+                if (flaggedEl) flaggedEl.textContent = '0';
+                if (duplicateEl) duplicateEl.textContent = '0';
+                if (confessionsEl) confessionsEl.textContent = '0';
+                if (postcardsEl) postcardsEl.textContent = '0';
+                if (ventsEl) ventsEl.textContent = '0';
+                if (problemWallEl) problemWallEl.textContent = '0';
+                console.log('✅ Overview stats showing default 0 due to query failure and no cache');
             }
         }
 
@@ -4030,20 +4079,19 @@
                     });
                 });
 
-                // If Firestore is offline or empty, load offline preview fallback groups
                 if (groups.length === 0) {
-                    console.log("No groups found in Firestore database/cache. Loading mock fallback groups for preview.");
-                    const offlineGroups = [
-                        { id: 'offline-1', name: 'Relationships', tag: 'HEALING', category: 'Relationships', facilitator: 'TBD', members: [], nextSession: null, status: 'active' },
-                        { id: 'offline-2', name: 'Neurodivergence', tag: 'AWARENESS', category: 'Neurodivergence', facilitator: 'TBD', members: [], nextSession: null, status: 'active' },
-                        { id: 'offline-3', name: 'Habits & Compulsions', tag: 'RECOVERY', category: 'Habits', facilitator: 'TBD', members: [], nextSession: null, status: 'active' },
-                        { id: 'offline-4', name: 'Expats in Germany', tag: 'COMMUNITY', category: 'Life', facilitator: 'TBD', members: [], nextSession: null, status: 'active' },
-                        { id: 'offline-5', name: "Women's Circles", tag: 'SISTERHOOD', category: 'Life', facilitator: 'TBD', members: [], nextSession: null, status: 'active' }
-                    ];
-                    offlineGroups.forEach(g => {
-                        totalGroups++;
-                        groups.push(g);
-                    });
+                    console.log("No groups found in Firestore.");
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px;">No support groups found.</td></tr>';
+                    if (statTotalGroups) statTotalGroups.textContent = '0';
+                    if (statTotalMembers) statTotalMembers.textContent = '0';
+                    if (statUpcomingSessions) statUpcomingSessions.textContent = '0';
+                    localStorage.setItem('soulamore_admin_groups_cache', JSON.stringify({
+                        groups: [],
+                        totalGroups: 0,
+                        totalMembers: 0,
+                        upcomingSessions: 0
+                    }));
+                    return;
                 }
 
                 // Sort by displayOrder
@@ -4058,8 +4106,7 @@
                         })
                         : 'Not Scheduled';
 
-                    const statusColor = group.status === 'active' ? '#22c55e' : (group.status === 'full' ? '#f59e0b' : '#ef4444');
-                    const statusLabel = group.status.charAt(0).toUpperCase() + group.status.slice(1);
+                    const statusLabel = group.status ? group.status.charAt(0).toUpperCase() + group.status.slice(1) : 'Active';
 
                     htmlContent += `
                         <tr data-id="${group.id}" draggable="true" style="border-bottom:1px solid rgba(255,255,255,0.03); cursor:grab;">
@@ -4081,7 +4128,7 @@
                                 <div style="font-size:0.85rem; color:var(--teal-accent);">${nextDate}</div>
                             </td>
                             <td style="padding:20px;">
-                                <span class="status-pill status-${group.status}">
+                                <span class="status-pill status-${group.status || 'active'}">
                                     <span class="status-dot"></span>
                                     ${statusLabel}
                                 </span>
@@ -4106,68 +4153,89 @@
                 if (statTotalMembers) statTotalMembers.textContent = totalMembers;
                 if (statUpcomingSessions) statUpcomingSessions.textContent = upcomingSessions;
 
+                // Update cache
+                localStorage.setItem('soulamore_admin_groups_cache', JSON.stringify({
+                    groups: groups,
+                    totalGroups: totalGroups,
+                    totalMembers: totalMembers,
+                    upcomingSessions: upcomingSessions
+                }));
+
                 // Setup drag and drop after rendering
                 setupDragAndDrop();
 
             } catch (err) {
-                console.error("Error loading groups management:", err);
+                console.error("Error loading groups management, checking localStorage:", err);
+                const cachedGroupsStr = localStorage.getItem('soulamore_admin_groups_cache');
+                if (cachedGroupsStr) {
+                    try {
+                        const cached = JSON.parse(cachedGroupsStr);
+                        const groups = cached.groups || [];
+                        
+                        let htmlContent = '';
+                        groups.forEach(group => {
+                            const nextDate = group.nextSession
+                                ? (typeof group.nextSession.toDate === 'function' ? group.nextSession.toDate() : new Date(group.nextSession)).toLocaleString('en-GB', {
+                                    day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit'
+                                })
+                                : 'Not Scheduled';
+                            const statusLabel = group.status ? group.status.charAt(0).toUpperCase() + group.status.slice(1) : 'Active';
+
+                            htmlContent += `
+                                <tr data-id="${group.id}" draggable="true" style="border-bottom:1px solid rgba(255,255,255,0.03); cursor:grab;">
+                                    <td style="padding:15px; text-align:center; opacity:0.5;">
+                                        <i class="fas fa-grip-vertical" style="font-size:1rem;"></i>
+                                    </td>
+                                    <td style="padding:20px;">
+                                        <div style="font-weight:700;">${group.name}</div>
+                                        <div style="font-size:0.75rem; opacity:0.6;">${group.tag || 'GROUP'}</div>
+                                    </td>
+                                    <td style="padding:20px;">
+                                        <span class="category-badge">
+                                            ${group.category || 'General'}
+                                        </span>
+                                    </td>
+                                    <td style="padding:20px;">${group.facilitator || 'TBD'}</td>
+                                    <td style="padding:20px;">${group.members?.length || 0}</td>
+                                    <td style="padding:20px;">
+                                        <div style="font-size:0.85rem; color:var(--teal-accent);">${nextDate}</div>
+                                    </td>
+                                    <td style="padding:20px;">
+                                        <span class="status-pill status-${group.status || 'active'}">
+                                            <span class="status-dot"></span>
+                                            ${statusLabel}
+                                        </span>
+                                    </td>
+                                    <td style="padding:20px; text-align:right;">
+                                        <div style="display:flex; gap:8px; justify-content:flex-end;">
+                                            <button class="btn-table-action" onclick="editGroup('${group.id}')">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <button class="btn-table-action danger" onclick="deleteGroup('${group.id}')">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        tbody.innerHTML = htmlContent;
+                        if (statTotalGroups) statTotalGroups.textContent = cached.totalGroups ?? 0;
+                        if (statTotalMembers) statTotalMembers.textContent = cached.totalMembers ?? 0;
+                        if (statUpcomingSessions) statUpcomingSessions.textContent = cached.upcomingSessions ?? 0;
+                        setupDragAndDrop();
+                        console.log('✅ Loaded groups from localStorage cache (last live recorded state)');
+                        return;
+                    } catch (cacheErr) {
+                        console.error("Failed to parse cached groups:", cacheErr);
+                    }
+                }
                 
-                // Offline preview fallback to enable design verification
-                const offlineGroups = [
-                    { id: 'offline-1', name: 'Relationships', tag: 'HEALING', category: 'Relationships', facilitator: 'TBD', members: [], nextSession: null, status: 'active' },
-                    { id: 'offline-2', name: 'Neurodivergence', tag: 'AWARENESS', category: 'Neurodivergence', facilitator: 'TBD', members: [], nextSession: null, status: 'active' },
-                    { id: 'offline-3', name: 'Habits & Compulsions', tag: 'RECOVERY', category: 'Habits', facilitator: 'TBD', members: [], nextSession: null, status: 'active' },
-                    { id: 'offline-4', name: 'Expats in Germany', tag: 'COMMUNITY', category: 'Life', facilitator: 'TBD', members: [], nextSession: null, status: 'active' },
-                    { id: 'offline-5', name: "Women's Circles", tag: 'SISTERHOOD', category: 'Life', facilitator: 'TBD', members: [], nextSession: null, status: 'active' }
-                ];
-                
-                let htmlContent = '';
-                offlineGroups.forEach(group => {
-                    htmlContent += `
-                        <tr data-id="${group.id}" draggable="true" style="border-bottom:1px solid rgba(255,255,255,0.03); cursor:grab;">
-                            <td style="padding:15px; text-align:center; opacity:0.5;">
-                                <i class="fas fa-grip-vertical" style="font-size:1rem;"></i>
-                            </td>
-                            <td style="padding:20px;">
-                                <div style="font-weight:700;">${group.name}</div>
-                                <div style="font-size:0.75rem; opacity:0.6;">${group.tag || 'GROUP'}</div>
-                            </td>
-                            <td style="padding:20px;">
-                                <span class="category-badge">
-                                    ${group.category || 'General'}
-                                </span>
-                            </td>
-                            <td style="padding:20px;">${group.facilitator || 'TBD'}</td>
-                            <td style="padding:20px;">${group.members?.length || 0}</td>
-                            <td style="padding:20px;">
-                                <div style="font-size:0.85rem; color:var(--teal-accent);">Not Scheduled</div>
-                            </td>
-                            <td style="padding:20px;">
-                                <span class="status-pill status-${group.status}">
-                                    <span class="status-dot"></span>
-                                    Active
-                                </span>
-                            </td>
-                            <td style="padding:20px; text-align:right;">
-                                <div style="display:flex; gap:8px; justify-content:flex-end;">
-                                    <button class="btn-table-action" onclick="editGroup('${group.id}')">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </button>
-                                    <button class="btn-table-action danger" onclick="deleteGroup('${group.id}')">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                tbody.innerHTML = htmlContent;
-                if (statTotalGroups) statTotalGroups.textContent = '5 (Preview)';
+                // Show empty state if no cache
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px;">No support groups found.</td></tr>';
+                if (statTotalGroups) statTotalGroups.textContent = '0';
                 if (statTotalMembers) statTotalMembers.textContent = '0';
                 if (statUpcomingSessions) statUpcomingSessions.textContent = '0';
-                
-                setupDragAndDrop();
             }
         }
         window.toggleNewsletterSort = function() {
@@ -4768,7 +4836,7 @@
                 console.log("📦 Loading users from cache...");
                 window.allUsersData = window.adminCache.users;
                 renderUsersTable(window.allUsersData);
-                if (countBadge) countBadge.textContent = `${window.allUsersData.length} users`;
+                if (countBadge) countBadge.textContent = `${window.allUsersData.length} Users`;
                 return;
             }
 
@@ -4794,29 +4862,20 @@
                     });
                 });
 
+                if (usersSnap.empty) {
+                    console.warn("⚠️ No users found in the 'users' collection!");
+                    window.allUsersData = [];
+                    window.adminCache.users = [];
+                    localStorage.setItem('soulamore_admin_users_cache', JSON.stringify([]));
+                    renderUsersTable([]);
+                    if (countBadge) countBadge.textContent = `0 Users`;
+                    return;
+                }
+
                 // Update cache
                 window.adminCache.users = window.allUsersData;
                 window.adminCache.lastFetch = Date.now();
-
-                if (usersSnap.empty) {
-                    console.warn("⚠️ No users found in the 'users' collection! Loading mock fallback users.");
-                    window.allUsersData = [
-                        { id: "mock-1", displayName: "Dev Session Admin", email: "admin@soulamore.dev", role: "admin", status: "active", location: "online" },
-                        { id: "mock-2", displayName: "Dr. Sarah Jenkins", email: "sarah.j@soulamore.com", role: "psychologist", status: "active", location: "delhi" },
-                        { id: "mock-3", displayName: "Aarav Sharma", email: "aarav@soulamore.com", role: "peer", status: "active", location: "mumbai" },
-                        { id: "mock-4", displayName: "Jane Doe", email: "jane.doe@example.com", role: "member", status: "active", location: "bangalore" },
-                        { id: "mock-5", displayName: "John Smith (Duplicate 1)", email: "john.smith@example.com", role: "member", status: "active", location: "online" },
-                        { id: "mock-6", displayName: "John Smith (Duplicate 2)", email: "john.smith@example.com", role: "member", status: "active", location: "online" },
-                        { id: "mock-7", displayName: "Dr. Marcus Vance", email: "marcus.v@soulamore.com", role: "psychologist", status: "pending", location: "pune" },
-                        { id: "mock-8", displayName: "Elena Rostova", email: "elena.r@soulamore.com", role: "peer", status: "pending", location: "online" },
-                        { id: "mock-9", displayName: "Dr. Kabir Mehta", email: "kabir.m@soulamore.com", role: "psychologist", status: "pending", location: "mumbai" },
-                        { id: "mock-10", displayName: "Maya Lin", email: "maya.l@soulamore.com", role: "peer", status: "pending", location: "delhi" }
-                    ];
-                    window.adminCache.users = window.allUsersData;
-                    renderUsersTable(window.allUsersData);
-                    if (countBadge) countBadge.textContent = `${window.allUsersData.length} Users`;
-                    return;
-                }
+                localStorage.setItem('soulamore_admin_users_cache', JSON.stringify(window.allUsersData));
 
                 renderUsersTable(window.allUsersData);
 
@@ -4824,22 +4883,25 @@
                     countBadge.textContent = `${window.allUsersData.length} Users`;
                 }
             } catch (err) {
-                console.error("❌ Error loading users, falling back to mock users:", err);
-                window.allUsersData = [
-                    { id: "mock-1", displayName: "Dev Session Admin", email: "admin@soulamore.dev", role: "admin", status: "active", location: "online" },
-                    { id: "mock-2", displayName: "Dr. Sarah Jenkins", email: "sarah.j@soulamore.com", role: "psychologist", status: "active", location: "delhi" },
-                    { id: "mock-3", displayName: "Aarav Sharma", email: "aarav@soulamore.com", role: "peer", status: "active", location: "mumbai" },
-                    { id: "mock-4", displayName: "Jane Doe", email: "jane.doe@example.com", role: "member", status: "active", location: "bangalore" },
-                    { id: "mock-5", displayName: "John Smith (Duplicate 1)", email: "john.smith@example.com", role: "member", status: "active", location: "online" },
-                    { id: "mock-6", displayName: "John Smith (Duplicate 2)", email: "john.smith@example.com", role: "member", status: "active", location: "online" },
-                    { id: "mock-7", displayName: "Dr. Marcus Vance", email: "marcus.v@soulamore.com", role: "psychologist", status: "pending", location: "pune" },
-                    { id: "mock-8", displayName: "Elena Rostova", email: "elena.r@soulamore.com", role: "peer", status: "pending", location: "online" },
-                    { id: "mock-9", displayName: "Dr. Kabir Mehta", email: "kabir.m@soulamore.com", role: "psychologist", status: "pending", location: "mumbai" },
-                    { id: "mock-10", displayName: "Maya Lin", email: "maya.l@soulamore.com", role: "peer", status: "pending", location: "delhi" }
-                ];
-                window.adminCache.users = window.allUsersData;
+                console.error("❌ Error loading users, checking localStorage cache:", err);
+                const cachedUsersStr = localStorage.getItem('soulamore_admin_users_cache');
+                if (cachedUsersStr) {
+                    try {
+                        window.allUsersData = JSON.parse(cachedUsersStr);
+                        window.adminCache.users = window.allUsersData;
+                        renderUsersTable(window.allUsersData);
+                        if (countBadge) countBadge.textContent = `${window.allUsersData.length} Users`;
+                        console.log('✅ Loaded users from localStorage cache (last live recorded state)');
+                        return;
+                    } catch (cacheErr) {
+                        console.error("Failed to parse cached users:", cacheErr);
+                    }
+                }
+                // No cache available, show empty table
+                window.allUsersData = [];
+                window.adminCache.users = [];
                 renderUsersTable(window.allUsersData);
-                if (countBadge) countBadge.textContent = `${window.allUsersData.length} Users`;
+                if (countBadge) countBadge.textContent = `0 Users`;
             }
         }
 
@@ -5103,7 +5165,11 @@
                 const q = query(collection(db, "newsletters"), orderBy("createdAt", newsletterSortOrder));
                 const snapshot = await getDocs(q);
                 if (snapshot.empty) {
-                    throw new Error("Empty collection");
+                    allNewsletterSubscribers = [];
+                    window.adminCache.newsletter = [];
+                    localStorage.setItem('soulamore_admin_newsletter_cache', JSON.stringify([]));
+                    renderNewsletterTable([]);
+                    return;
                 }
                 allNewsletterSubscribers = snapshot.docs.map(doc => ({
                     id: doc.id,
@@ -5113,16 +5179,25 @@
                 // Update cache
                 window.adminCache.newsletter = allNewsletterSubscribers;
                 window.adminCache.lastFetch = Date.now();
+                localStorage.setItem('soulamore_admin_newsletter_cache', JSON.stringify(allNewsletterSubscribers));
 
                 renderNewsletterTable(allNewsletterSubscribers);
             } catch (err) {
-                console.warn("⚠️ Error loading newsletter subscribers from Firestore, using mock fallback:", err.message);
-                allNewsletterSubscribers = [
-                    { id: "sub-1", email: "aditya.newsletter@soulamore.dev", location: "Delhi", createdAt: new Date(Date.now() - 3600000 * 24).toISOString() },
-                    { id: "sub-2", email: "psych.care@soulamore.dev", location: "Mumbai", createdAt: new Date(Date.now() - 3600000 * 72).toISOString() },
-                    { id: "sub-3", email: "community.echo@soulamore.dev", location: "Bangalore", createdAt: new Date(Date.now() - 3600000 * 120).toISOString() }
-                ];
-                renderNewsletterTable(allNewsletterSubscribers);
+                console.warn("⚠️ Error loading newsletter subscribers, checking cache:", err.message);
+                const cachedNewsletterStr = localStorage.getItem('soulamore_admin_newsletter_cache');
+                if (cachedNewsletterStr) {
+                    try {
+                        allNewsletterSubscribers = JSON.parse(cachedNewsletterStr);
+                        window.adminCache.newsletter = allNewsletterSubscribers;
+                        renderNewsletterTable(allNewsletterSubscribers);
+                        return;
+                    } catch (cacheErr) {
+                        console.error("Failed to parse cached newsletter:", cacheErr);
+                    }
+                }
+                allNewsletterSubscribers = [];
+                window.adminCache.newsletter = [];
+                renderNewsletterTable([]);
             }
         }
 
@@ -5312,20 +5387,59 @@
         window.loadAllUsers = loadAllUsers;
 
         // === DEEP LISTENING HUB FUNCTIONALITY ===
-        window.loadDeepListeningHub = function() {
-            console.log("Deep Listening Hub mock loader triggered.");
+        window.loadDeepListeningHub = async function() {
+            console.log("Loading Deep Listening Hub from Firestore...");
             const tbody = document.getElementById('deep-listening-tbody');
             if (!tbody) return;
-            
-            // Mock venting logs
-            const mockLogs = [
-                { id: "vent-1", timestamp: new Date(Date.now() - 5 * 60000).toLocaleString(), category: "Burn It", device: "Mobile", content: "I feel like I'm doing everything and it's never enough. Just burning out." },
-                { id: "vent-2", timestamp: new Date(Date.now() - 32 * 60000).toLocaleString(), category: "Void Echoes", device: "Desktop", content: "Is anyone else feeling completely disconnected lately? Just trying to find peace." },
-                { id: "vent-3", timestamp: new Date(Date.now() - 110 * 60000).toLocaleString(), category: "Burn It", device: "Tablet", content: "Too much academic pressure. Stressed about finals." },
-                { id: "vent-4", timestamp: new Date(Date.now() - 250 * 60000).toLocaleString(), category: "Void Echoes", device: "Mobile", content: "Grateful for this anonymous space. Finally got it off my chest." }
-            ];
-            
-            tbody.innerHTML = mockLogs.map(l => `
+
+            tbody.innerHTML = '<tr><td colspan="5" style="padding:40px; text-align:center; opacity:0.5;"><i class="fas fa-spinner fa-spin"></i> Loading venting logs...</td></tr>';
+
+            try {
+                const q = query(collection(db, "vents"), orderBy("timestamp", "desc"));
+                const snapshot = await getDocs(q);
+                
+                window.deepListeningVentsData = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    window.deepListeningVentsData.push({
+                        id: docSnap.id,
+                        timestamp: data.timestamp ? (typeof data.timestamp.toDate === 'function' ? data.timestamp.toDate().toLocaleString() : new Date(data.timestamp).toLocaleString()) : 'Unknown',
+                        category: data.action === 'burn' ? 'Burn It' : (data.action === 'shred' ? 'Shred It' : 'Void Echoes'),
+                        device: data.device ? data.device.charAt(0).toUpperCase() + data.device.slice(1) : 'Web',
+                        content: data.content || ''
+                    });
+                });
+
+                // Cache successful results
+                localStorage.setItem('soulamore_admin_vents_cache', JSON.stringify(window.deepListeningVentsData));
+                renderDeepListeningTable(window.deepListeningVentsData);
+            } catch (err) {
+                console.error("Error loading deep listening hub:", err);
+                const cachedVentsStr = localStorage.getItem('soulamore_admin_vents_cache');
+                if (cachedVentsStr) {
+                    try {
+                        window.deepListeningVentsData = JSON.parse(cachedVentsStr);
+                        renderDeepListeningTable(window.deepListeningVentsData);
+                        console.log('✅ Loaded venting logs from localStorage cache');
+                        return;
+                    } catch (cacheErr) {
+                        console.error("Failed to parse cached vents:", cacheErr);
+                    }
+                }
+                tbody.innerHTML = '<tr><td colspan="5" style="padding:40px; text-align:center; opacity:0.5;">No venting logs found.</td></tr>';
+            }
+        };
+
+        function renderDeepListeningTable(logs) {
+            const tbody = document.getElementById('deep-listening-tbody');
+            if (!tbody) return;
+
+            if (logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="padding:40px; text-align:center; opacity:0.5;">No venting logs found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = logs.map(l => `
                 <tr style="transition: background 0.2s;">
                     <td style="padding: 15px; font-size: 0.85rem; color: var(--text-secondary);">${l.timestamp}</td>
                     <td style="padding: 15px;">
@@ -5342,7 +5456,7 @@
                     </td>
                 </tr>
             `).join('');
-        };
+        }
         
         window.filterListeningHub = function(category) {
             console.log("Filtering listening hub by category:", category);
@@ -5357,50 +5471,27 @@
                 activeBtn.classList.add('btn-p');
             }
             
-            // Filter records
-            const tbody = document.getElementById('deep-listening-tbody');
-            if (!tbody) return;
-            
-            const mockLogs = [
-                { id: "vent-1", timestamp: new Date(Date.now() - 5 * 60000).toLocaleString(), category: "Burn It", device: "Mobile", content: "I feel like I'm doing everything and it's never enough. Just burning out." },
-                { id: "vent-2", timestamp: new Date(Date.now() - 32 * 60000).toLocaleString(), category: "Void Echoes", device: "Desktop", content: "Is anyone else feeling completely disconnected lately? Just trying to find peace." },
-                { id: "vent-3", timestamp: new Date(Date.now() - 110 * 60000).toLocaleString(), category: "Burn It", device: "Tablet", content: "Too much academic pressure. Stressed about finals." },
-                { id: "vent-4", timestamp: new Date(Date.now() - 250 * 60000).toLocaleString(), category: "Void Echoes", device: "Mobile", content: "Grateful for this anonymous space. Finally got it off my chest." }
-            ];
-            
-            const filtered = category === 'all' ? mockLogs : mockLogs.filter(l => {
+            const logs = window.deepListeningVentsData || [];
+            const filtered = category === 'all' ? logs : logs.filter(l => {
                 if (category === 'burn') return l.category === 'Burn It';
-                if (category === 'echo') return l.category === 'Void Echoes';
+                if (category === 'echo') return l.category === 'Void Echoes' || l.category === 'Shred It';
                 return true;
             });
             
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="padding:40px; text-align:center; opacity:0.5;">No venting logs found in this category.</td></tr>`;
-            } else {
-                tbody.innerHTML = filtered.map(l => `
-                    <tr style="transition: background 0.2s;">
-                        <td style="padding: 15px; font-size: 0.85rem; color: var(--text-secondary);">${l.timestamp}</td>
-                        <td style="padding: 15px;">
-                            <span class="category-badge" style="background:${l.category === 'Burn It' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(45, 212, 191, 0.15)'}; color:${l.category === 'Burn It' ? '#ef4444' : '#2dd4bf'}; padding:4px 10px; border-radius:20px; font-size:0.75rem; font-weight:600;">
-                                ${l.category}
-                            </span>
-                        </td>
-                        <td style="padding: 15px; font-size: 0.85rem; opacity: 0.7;">${l.device}</td>
-                        <td style="padding: 15px; font-size: 0.9rem; color: var(--text-main); font-weight: 500;">"${l.content}"</td>
-                        <td style="padding: 15px;">
-                            <button onclick="moderateListeningLog('${l.id}')" class="btn-table-action danger" style="padding:6px 12px; font-size:0.75rem;">
-                                <i class="fas fa-trash-alt" style="margin-right:4px;"></i> Delete
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
+            renderDeepListeningTable(filtered);
         };
 
-        window.moderateListeningLog = function(id) {
-            if (confirm('Are you sure you want to moderate (delete) this anonymous vent?')) {
+        window.moderateListeningLog = async function(id) {
+            if (!confirm('Are you sure you want to permanently delete this anonymous vent?')) return;
+
+            try {
+                await deleteDoc(doc(db, "vents", id));
                 alert('Vent moderated successfully');
                 loadDeepListeningHub();
+                loadOverviewStats(); // Refresh Overview counts
+            } catch (err) {
+                console.error("Error moderating vent:", err);
+                alert("Failed to moderate vent: " + err.message);
             }
         };
 
@@ -5423,6 +5514,7 @@
                 
                 if (success) {
                     console.log(`✅ Role successfully changed to ${newRole}`);
+                    window.invalidateCache(); // Invalidate local cache on mutation
                     await loadAllUsers(); // Refresh table
                 } else {
                     throw new Error("Profile update failed");
@@ -5443,6 +5535,7 @@
                 // Use the deleteDoc imported at the top level
                 await deleteDoc(doc(db, "users", uid));
                 alert("✅ User record deleted successfully.");
+                window.invalidateCache(); // Invalidate local cache on deletion
                 await loadAllUsers();
             } catch (err) {
                 console.error("Error deleting user:", err);
@@ -5545,6 +5638,7 @@
                 await updateDoc(appRef, { status: "approved", processedAt: serverTimestamp() });
 
                 alert("Verified! The profile is now LIVE on Soulamore.");
+                window.invalidateCache(); // Invalidate local cache on mutation
                 loadPendingApplications();
             } catch (err) {
                 console.error(err);
@@ -5564,6 +5658,7 @@
                     processedAt: serverTimestamp()
                 });
                 alert("Application rejected.");
+                window.invalidateCache(); // Invalidate local cache on mutation
                 loadPendingApplications();
             } catch (err) {
                 alert("Failed to reject.");
@@ -5694,6 +5789,7 @@
                 alert(`✅ User role updated to: ${newRole}`);
 
                 // Refresh the dashboard to show changes
+                window.invalidateCache();
                 loadAllUsers();
                 return true;
             } catch (error) {
