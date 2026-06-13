@@ -183,6 +183,18 @@ service cloud.firestore {
     match /psychologists/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isAdmin(); }
     match /contacts/{id} { allow read: if isAdmin(); allow create: if true; allow update, delete: if isAdmin(); }
     match /newsletters/{id} { allow read: if isAdmin(); allow create: if true; allow update, delete: if isAdmin(); }
+    
+    // Postcards (Soulamore Away) - allow anyone to create/read postcards, restrict edit/delete to Admin
+    match /postcards/{id} {
+      allow read, create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    // Trigger Email collection (Mail) - allow anyone to trigger email creation, restrict read/edit/delete to Admin
+    match /mail/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
 
     // ==================== SYSTEM & OTHERS ====================
 
