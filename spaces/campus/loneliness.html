@@ -697,8 +697,35 @@
     <script src="../../assets/js/components.js"></script>
     <script src="../../assets/js/main.js"></script>
     <script>
-        // --- RANDOM VISITOR COUNT ---
-        document.getElementById('visitorCount').innerText = Math.floor(Math.random() * (34 - 12 + 1) + 12);
+        // Visitor count: hidden until real Firebase presence data loads
+        const visitorEl = document.getElementById('visitorCount');
+        const badge = visitorEl ? visitorEl.closest('.presence-badge') : null;
+        if (badge) badge.style.visibility = 'hidden';
+
+        // Try to read real presence from Firebase (reuse global db if loaded)
+        const tryPresence = () => {
+            if (!window.db || !window.query || !window.collection || !window.onSnapshot || !window.where) return;
+            try {
+                const twoMinsAgo = new Date(Date.now() - 2 * 60 * 1000);
+                const q = window.query(window.collection(window.db, 'presence'), window.where('lastSeen', '>', twoMinsAgo));
+                window.onSnapshot(q, (snap) => {
+                    const count = snap.size || 1;
+                    if (visitorEl) visitorEl.innerText = count;
+                    if (badge) badge.style.visibility = 'visible';
+                }, () => {
+                    // Presence query failed — keep badge hidden, never show fake number
+                    if (badge) badge.style.visibility = 'hidden';
+                });
+            } catch (e) {
+                if (badge) badge.style.visibility = 'hidden';
+            }
+        };
+        // Retry until Firebase globals are ready
+        let presenceTries = 0;
+        const presenceRetry = setInterval(() => {
+            if (window.db) { clearInterval(presenceRetry); tryPresence(); }
+            if (++presenceTries > 10) clearInterval(presenceRetry);
+        }, 500);
 
         // --- ECHO SPACE LOGIC ---
         function sendEcho() {

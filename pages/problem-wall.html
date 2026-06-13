@@ -1612,28 +1612,14 @@
             // Default Base Count
             window.currentBaseCount = 1;
 
-            // Initialize Jitter Engine to make the counter feel "alive" (Runs regardless of query success)
-            if (!window.presenceJitterInterval) {
-                window.presenceJitterInterval = setInterval(() => {
-                    if (!window.currentBaseCount) return;
-
-                    // 25% chance to fluctuate by +1 or +2 playfully to indicate movement
-                    const isJittering = Math.random() < 0.25;
-                    const displayCount = isJittering
-                        ? window.currentBaseCount + Math.floor(Math.random() * 2) + 1
-                        : window.currentBaseCount;
-
-                    if (userCountEl) userCountEl.innerText = displayCount;
-                    if (userCountMob) userCountMob.innerText = displayCount;
-
-                    // Update Dot Color based on momentary activity
-                    const dots = document.querySelectorAll('.live-dot');
-                    dots.forEach(d => {
-                        d.style.background = displayCount > 1 ? '#10b981' : '#fbbf24'; // Green if others, Yellow if solo
-                        d.style.animationDuration = displayCount > 5 ? '1s' : '2s'; // Faster pulse if busy
-                    });
-                }, 5000 + Math.random() * 5000); // Random interval between 5-10s
-            }
+            // Update dots based on real count
+            const updateDots = (count) => {
+                const dots = document.querySelectorAll('.live-dot');
+                dots.forEach(d => {
+                    d.style.background = count > 1 ? '#10b981' : '#fbbf24';
+                    d.style.animationDuration = count > 5 ? '1s' : '2s';
+                });
+            };
 
             // 3. Listen for Active Users (Last 2 minutes)
             // Note: Requires a composite index exemption or simple query.
@@ -1649,13 +1635,7 @@
                     // Trigger immediate baseline update
                     if (userCountEl) userCountEl.innerText = window.currentBaseCount;
                     if (userCountMob) userCountMob.innerText = window.currentBaseCount;
-
-                    // Dot updates handled mostly by jitter, but do immediate pass
-                    const dots = document.querySelectorAll('.live-dot');
-                    dots.forEach(d => {
-                        d.style.background = window.currentBaseCount > 1 ? '#10b981' : '#fbbf24';
-                        d.style.animationDuration = window.currentBaseCount > 5 ? '1s' : '2s';
-                    });
+                    updateDots(window.currentBaseCount);
 
                 }, (error) => {
                     // Fallback to "1" if query fails (permissions/index)
@@ -1663,6 +1643,7 @@
                     window.currentBaseCount = 1;
                     if (userCountEl) userCountEl.innerText = "1";
                     if (userCountMob) userCountMob.innerText = "1";
+                    updateDots(1);
                 });
             } catch (e) {
                 console.error("Presence Init Error:", e);
