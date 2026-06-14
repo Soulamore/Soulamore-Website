@@ -62,7 +62,7 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
     // Soulful Header & Footer (CSS for breathing animation)
     const SOUL_STYLE = `
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Lora:italic,wght@0,400;1,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Lora:italic,wght@0,400;1,400&family=Sacramento&display=swap');
         .soul-container { font-family: 'Outfit', sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; }
         .soul-header { padding: 40px 0; text-align: center; }
         .soul-body { padding: 0 20px; font-size: 1.05rem; }
@@ -103,7 +103,7 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
         ${SOUL_STYLE}
         <div class="soul-container">
           <div class="soul-header">
-            <h1 style="color: #2dd4bf; font-family: 'Outfit'; font-weight: 700;">Soulamore</h1>
+            <h1 style="color: #2dd4bf; font-family: 'Sacramento', cursive; font-size: 3rem; font-weight: 400; margin: 0; text-align: center;">Soulamore</h1>
           </div>
           <div class="soul-body">
             <p>Hi ${data.name || 'dear soul'},</p>
