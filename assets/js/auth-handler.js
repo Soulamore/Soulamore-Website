@@ -32,50 +32,60 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// Update UI based on auth state
-function updateAuthUI(user) {
-    // Keep navigation links correct from any subdirectory
-    function getRootPath() {
-        const script = document.querySelector('script[src*="components.js"]');
-        if (script) {
-            const src = script.getAttribute('src');
-            if (src) return src.split('assets/js/components')[0];
+// Keep navigation links correct from any subdirectory
+function getRootPath() {
+    // Robust Path Resolution (v5.0)
+    // Compare the absolute URL of components.js with the current page URL to calculate depth
+    const script = document.querySelector('script[src*="components.js"]');
+    if (script && script.src) {
+        const src = script.src;
+        const index = src.indexOf('assets/js/components.js');
+        if (index !== -1) {
+            const scriptDir = src.substring(0, index);
+            const pageUrl = window.location.href.split('?')[0].split('#')[0];
+            const relativePath = pageUrl.substring(scriptDir.length);
+            const depth = (relativePath.match(/\//g) || []).length;
+            return '../'.repeat(depth);
         }
-        
-        const path = window.location.pathname.toLowerCase();
-        
-        // 2-Levels Deep Check
-        if (path.includes('/spaces/campus/') ||
-            path.includes('/spaces/soulamore-away/') ||
-            path.includes('/spaces/soulamore-workplace/') ||
-            path.includes('/spaces/assessments/') ||
-            path.includes('/tools/confession-box/') ||
-            path.includes('/portal/admin-dashboard/') ||
-            (path.includes('/our-peers/') && path.split('/our-peers/')[1]?.includes('/'))) {
-            return "../../";
-        }
-        
-        // 1-Level Deep Check
-        if (path.includes('/spaces/') ||
-            path.includes('/tools/') ||
-            path.includes('/company/') ||
-            path.includes('/community/') ||
-            path.includes('/our-peers/') ||
-            path.includes('/our-psychologists/') ||
-            path.includes('/portal/') ||
-            path.includes('/journal/') ||
-            path.includes('/auth/') ||
-            path.includes('/login/') ||
-            path.includes('/join-us/') ||
-            path.includes('/pages/') ||
-            path.includes('/resources/') ||
-            path.includes('/new pages/') || path.includes('/new%20pages/')) {
-            return "../";
-        }
-        
-        return '';
     }
 
+    // Fallback if script tag parsing somehow fails
+    const path = window.location.pathname.toLowerCase();
+
+    // 2-Levels Deep Check
+    if (path.includes('/spaces/campus/') ||
+        path.includes('/spaces/soulamore-away/') ||
+        path.includes('/spaces/soulamore-workplace/') ||
+        path.includes('/spaces/assessments/') ||
+        path.includes('/tools/confession-box/') ||
+        path.includes('/portal/admin-dashboard/') ||
+        (path.includes('/our-peers/') && path.split('/our-peers/')[1]?.includes('/'))) {
+        return "../../";
+    }
+
+    // 1-Level Deep Check
+    if (path.includes('/spaces/') ||
+        path.includes('/tools/') ||
+        path.includes('/company/') ||
+        path.includes('/community/') ||
+        path.includes('/our-peers/') ||
+        path.includes('/our-psychologists/') ||
+        path.includes('/portal/') ||
+        path.includes('/journal/') ||
+        path.includes('/auth/') ||
+        path.includes('/login/') ||
+        path.includes('/join-us/') ||
+        path.includes('/pages/') ||
+        path.includes('/resources/') ||
+        path.includes('/new pages/') || path.includes('/new%20pages/')) {
+        return "../";
+    }
+
+    return '';
+}
+
+// Update UI based on auth state
+function updateAuthUI(user) {
     // IMMEDIATE UPDATE (No setTimeout)
     const loginBtn = document.querySelector('.nav-btn, a[href*="login.html"]');
     const userIconBtn = document.querySelector('.user-icon-btn');
@@ -147,7 +157,7 @@ function showUserMenu(user) {
             <div id="authUserDisplayName" style="font-weight: 600; color: white;"></div>
             <div id="authUserEmail" style="font-size: 0.85rem; opacity: 0.7; color: #e2e8f0;"></div>
         </div>
-        <a href="profile.html" style="
+        <a href="${getRootPath()}profile.html" style="
             display: block;
             width: 100%;
             padding: 10px;

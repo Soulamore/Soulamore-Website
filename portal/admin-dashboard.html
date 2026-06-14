@@ -1261,12 +1261,22 @@
                     </div>
                 </div>
                 <div class="workspace-body">
+                    <!-- COLLAPSIBLE SECTION: CAMPAIGN ENGINE HEADER -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: rgba(255,255,255,0.02); padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; color: var(--soul-teal);">
+                            <i class="fas fa-bullhorn"></i> Campaign Designer
+                        </div>
+                        <button class="btn-s" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem; padding: 4px 8px; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;" onclick="toggleNewsletterCampaignCollapse(this)" id="btn-toggle-campaign-collapse" title="Collapse/Expand">
+                            <i class="fas fa-chevron-up"></i> Collapse
+                        </button>
+                    </div>
+
                     <!-- CAMPAIGN ENGINE INLINE (2-COLUMN GRID) -->
-                    <div style="display: flex; gap: 24px; align-items: flex-start; justify-content: space-between; margin-bottom: 30px; width: 100%;">
+                    <div id="newsletter-campaign-engine" style="display: flex; gap: 24px; align-items: stretch; justify-content: space-between; margin-bottom: 30px; width: 100%;">
                         
                         <!-- LEFT COLUMN: Compact Form Card (58% width) -->
-                        <div style="flex: 1.3; min-width: 0;">
-                            <div style="background: #0f172a; border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); color: #f8fafc;">
+                        <div style="flex: 1.3; min-width: 0; display: flex; flex-direction: column;">
+                            <div style="background: #0f172a; border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); color: #f8fafc; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
                                 
                                 <!-- COMPACT HEADER ROW: Title + Template Quickselect -->
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
@@ -1276,16 +1286,16 @@
                                     
                                     <!-- Compact Quick Select template buttons -->
                                     <div style="display: flex; gap: 8px;">
-                                        <button onclick="loadSoulamoreTemplate('feature')" style="padding: 6px 12px; background: rgba(45, 212, 191, 0.08); color: var(--soul-teal); border: 1px solid rgba(45, 212, 191, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(45, 212, 191, 0.15)';" onmouseout="this.style.background='rgba(45, 212, 191, 0.08)';">
+                                        <button id="btn-template-feature" onclick="loadSoulamoreTemplate('feature')" style="padding: 6px 12px; background: rgba(45, 212, 191, 0.08); color: var(--soul-teal); border: 1px solid rgba(45, 212, 191, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(45, 212, 191, 0.15)';" onmouseout="if(this.style.borderColor !== 'var(--soul-teal)') { this.style.background='rgba(45, 212, 191, 0.08)'; }">
                                             🌸 Feature
                                         </button>
-                                        <button onclick="loadSoulamoreTemplate('confession')" style="padding: 6px 12px; background: rgba(251, 191, 36, 0.08); color: var(--soul-amber); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(251, 191, 36, 0.15)';" onmouseout="this.style.background='rgba(251, 191, 36, 0.08)';">
+                                        <button id="btn-template-confession" onclick="loadSoulamoreTemplate('confession')" style="padding: 6px 12px; background: rgba(251, 191, 36, 0.08); color: var(--soul-amber); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(251, 191, 36, 0.15)';" onmouseout="if(this.style.borderColor !== 'var(--soul-amber)') { this.style.background='rgba(251, 191, 36, 0.08)'; }">
                                             🌌 Confession
                                         </button>
-                                        <button onclick="loadSoulamoreTemplate('reminder')" style="padding: 6px 12px; background: rgba(45, 212, 191, 0.08); color: var(--soul-teal); border: 1px solid rgba(45, 212, 191, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(45, 212, 191, 0.15)';" onmouseout="this.style.background='rgba(45, 212, 191, 0.08)';">
+                                        <button id="btn-template-reminder" onclick="loadSoulamoreTemplate('reminder')" style="padding: 6px 12px; background: rgba(45, 212, 191, 0.08); color: var(--soul-teal); border: 1px solid rgba(45, 212, 191, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(45, 212, 191, 0.15)';" onmouseout="if(this.style.borderColor !== 'var(--soul-teal)') { this.style.background='rgba(45, 212, 191, 0.08)'; }">
                                             🤍 Reminder
                                         </button>
-                                        <button onclick="loadSoulamoreTemplate('postcard')" style="padding: 6px 12px; background: rgba(251, 191, 36, 0.08); color: var(--soul-amber); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(251, 191, 36, 0.15)';" onmouseout="this.style.background='rgba(251, 191, 36, 0.08)';">
+                                        <button id="btn-template-postcard" onclick="loadSoulamoreTemplate('postcard')" style="padding: 6px 12px; background: rgba(251, 191, 36, 0.08); color: var(--soul-amber); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(251, 191, 36, 0.15)';" onmouseout="if(this.style.borderColor !== 'var(--soul-amber)') { this.style.background='rgba(251, 191, 36, 0.08)'; }">
                                             📮 Postcard
                                         </button>
                                     </div>
@@ -1348,7 +1358,7 @@
                                     </div>
 
                                     <!-- Optional Fields: Hero Image, CTA Text, CTA Link (Compact Grid) -->
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 12px;">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
                                         <div class="form-group" style="margin: 0;">
                                             <label style="display: block; font-weight: 800; font-size: 0.7rem; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">Hero Image (Optional)</label>
                                             <input id="campaign-image" type="text" placeholder="https://..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; font-size: 0.85rem; outline: none;" oninput="updateLocalLivePreview()">
@@ -1377,7 +1387,7 @@
                         </div>
 
                         <!-- RIGHT COLUMN: Sticky Live Preview (42% width) -->
-                        <div style="flex: 0.95; min-width: 320px; position: sticky; top: 15px; background: #0f172a; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); padding: 20px; display: flex; flex-direction: column; gap: 12px; height: 500px; overflow: hidden; color: #f8fafc;">
+                        <div style="flex: 0.95; min-width: 320px; position: sticky; top: 15px; background: #0f172a; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); padding: 20px; display: flex; flex-direction: column; gap: 12px; height: auto; min-height: 500px; align-self: stretch; overflow: hidden; color: #f8fafc;">
                             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
                                 <div style="font-weight: 800; font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px;">
                                     <i class="fas fa-eye" style="color: var(--soul-teal);"></i> Campaign Live Preview
@@ -1394,7 +1404,7 @@
                                 <div style="color: #64748b;" id="preview-target-header"><span style="font-weight: 600; color: #94a3b8;">To:</span> Global Audience</div>
                                 <div style="color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" id="preview-subject-header"><span style="font-weight: 600; color: #94a3b8;">Subject:</span> (No Subject)</div>
                             </div>
-                            <div style="flex: 1; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; background: #fff; position: relative;">
+                            <div style="flex: 1; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; background: #fff; position: relative; min-height: 300px;">
                                 <iframe id="campaign-live-preview-iframe" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
                             </div>
                         </div>
@@ -1403,9 +1413,32 @@
 
                     <!-- SUBSCRIBER MANAGEMENT -->
                     <div class="dash-card" style="padding:0; overflow:visible;" id="newsletter-table-container">
-                        <div style="padding:20px 25px; border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.01); display:flex; justify-content:space-between; align-items:center;">
-                            <div style="font-weight:700; text-transform:uppercase; font-size:0.85rem; letter-spacing:0.5px;">Subscriber List</div>
-                            <div style="display:flex; gap:12px;">
+                        <div style="padding:20px 25px; border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.01); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                            <div style="font-weight:700; text-transform:uppercase; font-size:0.85rem; letter-spacing:0.5px; display:flex; align-items:center; gap:10px;">
+                                <span>Subscriber List</span>
+                                <button class="btn-s" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem; padding: 4px 8px; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;" onclick="toggleNewsletterTableCollapse(this)" id="btn-toggle-subscribers-collapse" title="Collapse/Expand">
+                                    <i class="fas fa-chevron-up"></i> Collapse
+                                </button>
+                            </div>
+                            <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                                <!-- Search Bar -->
+                                <div style="position:relative; display:flex; align-items:center;">
+                                    <i class="fas fa-search" style="position:absolute; left:10px; font-size:0.8rem; color:#64748b;"></i>
+                                    <input type="text" id="newsletter-search-input" oninput="filterNewsletterSubscribers()" placeholder="Search email/location..." style="background:#0f172a; border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#fff; padding:6px 12px 6px 28px; font-size:0.8rem; outline:none; width:180px; transition:all 0.2s;" onfocus="this.style.width='240px'; this.style.borderColor='var(--soul-teal)';" onblur="if(this.value==='') { this.style.width='180px'; } this.style.borderColor='rgba(255,255,255,0.1)';">
+                                </div>
+                                <!-- Sorting Selection Dropdown -->
+                                <div style="display:flex; align-items:center; gap:8px; font-size:0.8rem; opacity:0.8;">
+                                    <span>Sort By:</span>
+                                    <select id="newsletter-sort-select" onchange="changeNewsletterSort(this.value)" style="background:#0f172a; border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#fff; padding:6px 12px; font-size:0.8rem; cursor:pointer; outline:none; height:36px;">
+                                        <option value="date-desc">Date (Newest)</option>
+                                        <option value="date-asc">Date (Oldest)</option>
+                                        <option value="email-asc">Email (A-Z)</option>
+                                        <option value="email-desc">Email (Z-A)</option>
+                                        <option value="location-asc">Location (A-Z)</option>
+                                        <option value="location-desc">Location (Z-A)</option>
+                                        <option value="user-first">Registered Users First</option>
+                                    </select>
+                                </div>
                                 <button class="btn-dash-success" style="height:36px; padding:0 15px; font-size:0.8rem; display:flex; align-items:center; gap:8px;" onclick="importNewsletterCSV()">
                                     <i class="fas fa-upload"></i> Import CSV
                                 </button>
@@ -1414,9 +1447,11 @@
                                 </button>
                             </div>
                         </div>
-                        <div style="padding:40px; text-align:center;">
-                            <i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:15px; color:var(--admin-accent);"></i>
-                            <div>Loading subscribers...</div>
+                        <div id="newsletter-table-body">
+                            <div style="padding:40px; text-align:center;">
+                                <i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:15px; color:var(--admin-accent);"></i>
+                                <div>Loading subscribers...</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -5009,22 +5044,27 @@
 
         // ADDITIVE MODULE 2: Newsletter Hub Functions
         async function loadNewsletterSubscribers() {
-            const container = document.getElementById('newsletter-table-container');
+            const container = document.getElementById('newsletter-table-body');
             if (!container) return;
 
             // Check cache first
             if (window.isCacheValid() && window.adminCache.newsletter) {
                 console.log("📦 Loading newsletter from cache...");
                 allNewsletterSubscribers = window.adminCache.newsletter;
-                renderNewsletterTable(allNewsletterSubscribers);
+                const sortSelect = document.getElementById('newsletter-sort-select');
+                if (sortSelect) {
+                    changeNewsletterSort(sortSelect.value);
+                } else {
+                    renderNewsletterTable(allNewsletterSubscribers);
+                }
                 return;
             }
 
             container.innerHTML = '<div style="padding:40px; text-align:center;"><i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:15px; color:var(--admin-accent);"></i><div>Loading subscribers...</div></div>';
 
             try {
-                // Fetch with dynamic sorting
-                const q = query(collection(db, "newsletters"), orderBy("createdAt", newsletterSortOrder));
+                // Fetch with default sorting, client-side sorting handles selections
+                const q = query(collection(db, "newsletters"), orderBy("createdAt", "desc"));
                 const snapshot = await getDocs(q);
                 if (snapshot.empty) {
                     allNewsletterSubscribers = [];
@@ -5043,7 +5083,12 @@
                 window.adminCache.lastFetch = Date.now();
                 localStorage.setItem('soulamore_admin_newsletter_cache', JSON.stringify(allNewsletterSubscribers));
 
-                renderNewsletterTable(allNewsletterSubscribers);
+                const sortSelect = document.getElementById('newsletter-sort-select');
+                if (sortSelect) {
+                    changeNewsletterSort(sortSelect.value);
+                } else {
+                    renderNewsletterTable(allNewsletterSubscribers);
+                }
             } catch (err) {
                 console.warn("⚠️ Error loading newsletter subscribers, checking cache:", err.message);
                 const cachedNewsletterStr = localStorage.getItem('soulamore_admin_newsletter_cache');
@@ -5051,20 +5096,95 @@
                     try {
                         allNewsletterSubscribers = JSON.parse(cachedNewsletterStr);
                         window.adminCache.newsletter = allNewsletterSubscribers;
-                        renderNewsletterTable(allNewsletterSubscribers);
+                        const sortSelect = document.getElementById('newsletter-sort-select');
+                        if (sortSelect) {
+                            changeNewsletterSort(sortSelect.value);
+                        } else {
+                            renderNewsletterTable(allNewsletterSubscribers);
+                        }
                         return;
                     } catch (cacheErr) {
                         console.error("Failed to parse cached newsletter:", cacheErr);
                     }
                 }
                 allNewsletterSubscribers = [];
-                window.adminCache.newsletter = [];
                 renderNewsletterTable([]);
             }
         }
 
+        window.changeNewsletterSort = function(sortType) {
+            const userEmails = new Set((window.allUsersData || []).map(u => (u.email || '').toLowerCase()));
+            
+            allNewsletterSubscribers.sort((a, b) => {
+                let valA = '', valB = '';
+                
+                switch (sortType) {
+                    case 'date-desc':
+                    case 'date-asc':
+                        const dateA = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : new Date(0);
+                        const dateB = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : new Date(0);
+                        return sortType === 'date-desc' ? dateB - dateA : dateA - dateB;
+                        
+                    case 'email-asc':
+                    case 'email-desc':
+                        valA = (a.email || '').toLowerCase();
+                        valB = (b.email || '').toLowerCase();
+                        return sortType === 'email-asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                        
+                    case 'location-asc':
+                    case 'location-desc':
+                        const getLocString = (item) => {
+                            if (!item.location) return '';
+                            if (typeof item.location === 'object') {
+                                return (item.location.name || item.location.city || '').toLowerCase();
+                            }
+                            return item.location.toLowerCase();
+                        };
+                        valA = getLocString(a);
+                        valB = getLocString(b);
+                        return sortType === 'location-asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                        
+                    case 'user-first':
+                        const aUser = userEmails.has((a.email || '').toLowerCase()) ? 1 : 0;
+                        const bUser = userEmails.has((b.email || '').toLowerCase()) ? 1 : 0;
+                        return bUser - aUser; // Users first
+                }
+                return 0;
+            });
+            
+            renderNewsletterTable(allNewsletterSubscribers);
+        };
+
+        window.filterNewsletterSubscribers = function() {
+            const queryVal = (document.getElementById('newsletter-search-input')?.value || '').toLowerCase().trim();
+            if (queryVal === '') {
+                const sortSelect = document.getElementById('newsletter-sort-select');
+                if (sortSelect) {
+                    changeNewsletterSort(sortSelect.value);
+                } else {
+                    renderNewsletterTable(allNewsletterSubscribers);
+                }
+                return;
+            }
+
+            const filtered = allNewsletterSubscribers.filter(sub => {
+                const email = (sub.email || '').toLowerCase();
+                let loc = '';
+                if (sub.location) {
+                    if (typeof sub.location === 'object') {
+                        loc = (sub.location.name || sub.location.city || '').toLowerCase();
+                    } else {
+                        loc = sub.location.toLowerCase();
+                    }
+                }
+                return email.includes(queryVal) || loc.includes(queryVal);
+            });
+
+            renderNewsletterTable(filtered);
+        };
+
         function renderNewsletterTable(subscribers) {
-            const container = document.getElementById('newsletter-table-container');
+            const container = document.getElementById('newsletter-table-body');
             if (!container) return;
 
             if (subscribers.length === 0) {
@@ -5072,16 +5192,17 @@
                 return;
             }
 
+            const userEmails = new Set((window.allUsersData || []).map(u => (u.email || '').toLowerCase()));
+
             let html = `
                 <div style="overflow-x:auto;">
                     <table class="premium-table">
                         <thead>
                             <tr>
                                 <th>Subscriber Email</th>
+                                <th>Account Type</th>
                                 <th>Location</th>
-                                <th style="cursor:pointer;" onclick="toggleNewsletterSort()">
-                                    Joined On <i id="newsletter-sort-icon" class="fas fa-sort-amount-${newsletterSortOrder === 'desc' ? 'down' : 'up'}" style="margin-left:8px; color:var(--admin-accent);"></i>
-                                </th>
+                                <th>Joined On</th>
                                 <th style="text-align:right;">Management</th>
                             </tr>
                         </thead>
@@ -5096,9 +5217,15 @@
                                     }
                                 }
 
+                                const isRegisteredUser = userEmails.has((sub.email || '').toLowerCase());
+                                const accountBadge = isRegisteredUser 
+                                    ? '<span class="status-pill status-active" style="display:inline-flex; align-items:center; gap:6px;"><span class="pulse-dot active" style="margin:0;"></span>User</span>'
+                                    : '<span class="category-badge">Visitor</span>';
+
                                 return `
                                     <tr>
                                         <td class="email-cell">${sub.email || 'N/A'}</td>
+                                        <td>${accountBadge}</td>
                                         <td class="meta-cell">${locDisplay}</td>
                                         <td class="meta-cell">${sub.createdAt ? (sub.createdAt.toDate ? new Date(sub.createdAt.toDate()).toLocaleDateString() : new Date(sub.createdAt).toLocaleDateString()) : 'N/A'}</td>
                                         <td class="actions-cell">
@@ -6121,6 +6248,8 @@
             }
         };
 
+        let currentCampaignAccentColor = '#2dd4bf'; // Default Teal
+
         window.loadSoulamoreTemplate = function(type) {
             const titleInput = document.getElementById('campaign-title');
             const contentInput = document.getElementById('campaign-content');
@@ -6159,8 +6288,44 @@
                 }
             };
 
+            // Remove active style from all template buttons
+            const btnTypes = ['feature', 'confession', 'reminder', 'postcard'];
+            btnTypes.forEach(t => {
+                const btn = document.getElementById(`btn-template-${t}`);
+                if (btn) {
+                    if (t === 'feature' || t === 'reminder') {
+                        btn.style.background = 'rgba(45, 212, 191, 0.08)';
+                        btn.style.borderColor = 'rgba(45, 212, 191, 0.15)';
+                    } else {
+                        btn.style.background = 'rgba(251, 191, 36, 0.08)';
+                        btn.style.borderColor = 'rgba(251, 191, 36, 0.15)';
+                    }
+                }
+            });
+
             const t = templates[type];
             if (t) {
+                // Update accent color
+                if (type === 'feature' || type === 'reminder') {
+                    currentCampaignAccentColor = '#2dd4bf'; // Teal
+                } else if (type === 'confession') {
+                    currentCampaignAccentColor = '#fbbf24'; // Amber
+                } else if (type === 'postcard') {
+                    currentCampaignAccentColor = '#f49f75'; // Peach
+                }
+
+                // Highlight selected button
+                const activeBtn = document.getElementById(`btn-template-${type}`);
+                if (activeBtn) {
+                    if (type === 'feature' || type === 'reminder') {
+                        activeBtn.style.background = 'rgba(45, 212, 191, 0.25)';
+                        activeBtn.style.borderColor = 'var(--soul-teal)';
+                    } else {
+                        activeBtn.style.background = 'rgba(251, 191, 36, 0.25)';
+                        activeBtn.style.borderColor = 'var(--soul-amber)';
+                    }
+                }
+
                 if (titleInput) titleInput.value = t.title;
                 if (contentInput) contentInput.value = t.content;
                 if (imageInput) imageInput.value = t.image;
@@ -6214,13 +6379,13 @@
             let ctaHtml = '';
             if (ctaText && ctaLink) {
                 ctaHtml = `<div style="text-align: center; margin: 20px 0;">
-                    <a href="${escapeHtml(ctaLink)}" target="_blank" style="display: inline-block; padding: 10px 24px; background: #8E44AD; color: #ffffff; text-decoration: none; border-radius: 50px; font-weight: 700; font-family: sans-serif; font-size: 0.85rem; box-shadow: 0 6px 12px rgba(142,68,173,0.15); transition: 0.2s;">
+                    <a href="${escapeHtml(ctaLink)}" target="_blank" style="display: inline-block; padding: 10px 24px; background: ${currentCampaignAccentColor}; color: #ffffff; text-decoration: none; border-radius: 50px; font-weight: 700; font-family: sans-serif; font-size: 0.85rem; box-shadow: 0 6px 12px ${currentCampaignAccentColor}26; transition: 0.2s;">
                         ${escapeHtml(ctaText)}
                     </a>
                 </div>`;
             }
 
-            // Compiler markup mirroring Brevo email fallback
+            // Compiler markup mirroring Brevo email fallback (enforcing Purple Ban)
             const SOUL_STYLE = `
               <style>
                 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Lora:italic,wght@0,400;1,400&display=swap');
@@ -6233,8 +6398,8 @@
                   display: inline-block;
                   padding: 12px;
                   border-radius: 50%;
-                  background: rgba(142, 68, 173, 0.04);
-                  border: 1px solid rgba(142, 68, 173, 0.08);
+                  background: ${currentCampaignAccentColor}0d;
+                  border: 1px solid ${currentCampaignAccentColor}26;
                   margin: 10px 0;
                   animation: breath 8s ease-in-out infinite;
                   text-align: center;
@@ -6250,7 +6415,7 @@
             const SOUL_FOOTER = `
               <div class="soul-footer">
                 <div class="breathing-prompt">
-                  <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: #8E44AD; font-weight: 700;">Breathe</div>
+                  <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: ${currentCampaignAccentColor}; font-weight: 700;">Breathe</div>
                   <div style="font-size: 0.55rem; opacity: 0.6; color: #64748b;">Inhale ... Exhale</div>
                 </div>
                 <p class="quote">"Deep breaths are like little love notes to your soul."</p>
@@ -6268,7 +6433,7 @@
                 <body>
                   <div class="soul-container">
                     <div class="soul-header">
-                      <h1 style="color: #8E44AD; font-family: 'Outfit', sans-serif; font-weight: 700; margin: 0; font-size: 1.5rem; letter-spacing: -0.5px;">Soulamore</h1>
+                      <h1 style="color: ${currentCampaignAccentColor}; font-family: 'Outfit', sans-serif; font-weight: 700; margin: 0; font-size: 1.5rem; letter-spacing: -0.5px;">Soulamore</h1>
                     </div>
                     <div class="soul-body">
                       <p style="font-weight: 600; margin-top: 0; color: #1e293b; font-size: 0.95rem;">Hi Alex Designer,</p>
@@ -6285,6 +6450,32 @@
             const iframe = document.getElementById('campaign-live-preview-iframe');
             if (iframe) {
                 iframe.srcdoc = html;
+            }
+        };
+
+        window.toggleNewsletterCampaignCollapse = function(btn) {
+            const engine = document.getElementById('newsletter-campaign-engine');
+            if (!engine) return;
+            const isCollapsed = engine.style.display === 'none';
+            if (isCollapsed) {
+                engine.style.display = 'flex';
+                btn.innerHTML = '<i class="fas fa-chevron-up"></i> Collapse';
+            } else {
+                engine.style.display = 'none';
+                btn.innerHTML = '<i class="fas fa-chevron-down"></i> Expand';
+            }
+        };
+
+        window.toggleNewsletterTableCollapse = function(btn) {
+            const body = document.getElementById('newsletter-table-body');
+            if (!body) return;
+            const isCollapsed = body.style.display === 'none';
+            if (isCollapsed) {
+                body.style.display = 'block';
+                btn.innerHTML = '<i class="fas fa-chevron-up"></i> Collapse';
+            } else {
+                body.style.display = 'none';
+                btn.innerHTML = '<i class="fas fa-chevron-down"></i> Expand';
             }
         };
 
