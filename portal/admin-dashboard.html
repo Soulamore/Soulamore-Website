@@ -3364,7 +3364,7 @@
                                 </div>
                             `).join('')}
                         </div>
-                        <button onclick="mergeCluster(${clusterIndex})" class="btn-dash-primary" style="
+                        <button onclick="mergeCluster(${clusterIndex}, this)" class="btn-dash-primary" style="
                             margin-top:15px;
                             padding:10px 20px;
                             background:linear-gradient(135deg, #ef4444, #dc2626);
@@ -3395,7 +3395,7 @@
             }
         }
 
-        window.mergeCluster = async function(clusterIndex) {
+         window.mergeCluster = async function(clusterIndex, btn) {
             const cluster = duplicateClusters[clusterIndex];
             if (!cluster) return;
 
@@ -3412,10 +3412,11 @@
                 return;
             }
 
-            const btn = event.currentTarget;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Merging...';
-            btn.disabled = true;
+            const originalText = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Merging...';
+                btn.disabled = true;
+            }
 
             try {
                 // Import required functions
@@ -3454,8 +3455,10 @@
             } catch (err) {
                 console.error("Error merging:", err);
                 alert(`❌ Merge failed: ${err.message}`);
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                if (btn) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
             }
         };
 
