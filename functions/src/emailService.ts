@@ -71,8 +71,8 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
           display: inline-block;
           padding: 20px;
           border-radius: 50%;
-          background: rgba(142, 68, 173, 0.05);
-          border: 1px solid rgba(142, 68, 173, 0.1);
+          background: rgba(45, 212, 191, 0.05);
+          border: 1px solid rgba(45, 212, 191, 0.1);
           margin: 20px 0;
           animation: breath 8s ease-in-out infinite;
         }
@@ -87,7 +87,7 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
     const SOUL_FOOTER = `
       <div class="soul-footer">
         <div class="breathing-prompt">
-          <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #8E44AD;">Breathe</div>
+          <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #2dd4bf;">Breathe</div>
           <div style="font-size: 0.6rem; opacity: 0.6;">Inhale ... Exhale</div>
         </div>
         <p class="quote">"Deep breaths are like little love notes to your soul."</p>
@@ -103,7 +103,7 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
         ${SOUL_STYLE}
         <div class="soul-container">
           <div class="soul-header">
-            <h1 style="color: #8E44AD; font-family: 'Outfit'; font-weight: 700;">Soulamore</h1>
+            <h1 style="color: #2dd4bf; font-family: 'Outfit'; font-weight: 700;">Soulamore</h1>
           </div>
           <div class="soul-body">
             <p>Hi ${data.name || 'dear soul'},</p>
@@ -129,7 +129,7 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
 
     html = html.replace(/{{YEAR}}/g, new Date().getFullYear().toString());
     html = html.replace(/{{WEBSITE_URL}}/g, 'https://soulamore.com');
-    html = html.replace(/{{ACCENT_COLOR}}/g, '#8E44AD');
+    html = html.replace(/{{ACCENT_COLOR}}/g, '#2dd4bf');
     
     // Global Fallback for Name
     html = html.replace(/{{NAME}}/g, data.name || 'dear soul');
