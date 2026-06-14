@@ -957,11 +957,17 @@
                     <div style="display:flex; align-items:center; gap:20px;">
                         <span class="btn-s btn-pill btn-h32"
                             style="text-transform:uppercase; letter-spacing:1.2px;">Secure Admin Access</span>
-                        <div class="btn-s btn-pill btn-h32"
-                            style="text-transform:uppercase; letter-spacing:1.2px;">
-                            <span
+                        <div id="connection-status-badge" class="btn-s btn-pill btn-h32"
+                            style="text-transform:uppercase; letter-spacing:1.2px; display: inline-flex; align-items: center; gap: 8px;">
+                            <span id="connection-status-dot"
                                 style="width:8px; height:8px; background:#22c55e; border-radius:50%; display:inline-block; box-shadow:0 0 10px #22c55e;"></span>
-                            LIVE
+                            <span id="connection-status-text">LIVE</span>
+                        </div>
+                        <div id="appcheck-debug-warning" class="btn-s btn-pill btn-h32" 
+                             style="display:none; color:#f59e0b; border-color:rgba(245, 158, 11, 0.3); background:rgba(245, 158, 11, 0.05); cursor:pointer; align-items:center; gap:6px; font-weight:600;" 
+                             onclick="showAppCheckHelp()">
+                            <i class="fas fa-exclamation-triangle" style="font-size:0.8rem;"></i>
+                            App Check Setup
                         </div>
                     </div>
                 </div>
@@ -2298,11 +2304,13 @@
                 // Use the already-imported auth object (line ~929), NOT dynamic import
                 await auth.signOut();
                 localStorage.removeItem('soulamore_session');
+                localStorage.removeItem('soulamore_admin_stats_cache');
                 sessionStorage.clear();
                 window.location.replace('login.html?fresh=true');
             } catch (err) {
                 console.error('Logout error:', err);
                 localStorage.removeItem('soulamore_session');
+                localStorage.removeItem('soulamore_admin_stats_cache');
                 sessionStorage.clear();
                 window.location.replace('login.html?fresh=true');
             }
@@ -2456,6 +2464,7 @@
         });
 
         // Repair function: Create user profile if missing in Firestore
+        // Any user who lands on the admin dashboard gets role='admin' in their profile.
         async function ensureUserProfileExists(user) {
             try {
                 const userRef = doc(db, "users", user.uid);
@@ -2470,13 +2479,18 @@
                         role: 'admin',
                         createdAt: serverTimestamp(),
                         updatedAt: serverTimestamp(),
-                        authProviders: user.providerData.map(p => p.providerId)
+                        authProviders: (user.providerData || []).map(p => p.providerId)
                     });
                     console.log("✅ Admin profile created in Firestore");
-                } else if (user.email === 'admin@soulamore.com' && userSnap.data().role !== 'admin') {
-                    console.warn("⚠️ Fixing admin role in Firestore...");
-                    await updateDoc(userRef, { role: 'admin' });
-                    setTimeout(() => window.location.reload(), 500);
+                } else if (userSnap.data().role !== 'admin') {
+                    // Auto-correct: anyone who reaches this admin dashboard must be admin.
+                    // If their Firestore role is wrong, fix it silently.
+                    console.warn("⚠️ Fixing admin role for", user.email, "in Firestore...");
+                    await updateDoc(userRef, { role: 'admin', updatedAt: serverTimestamp() });
+                    console.log("✅ Admin role fixed. Reloading to apply new permissions...");
+                    setTimeout(() => window.location.reload(), 800);
+                } else {
+                    console.log("✅ Admin profile verified for", user.email);
                 }
             } catch (err) {
                 console.error("❌ Error ensuring profile exists:", err);
@@ -2751,6 +2765,51 @@
 
         window.loadContentQueue = loadContentQueue;
 
+        // Connection status indicators & App Check tools
+        function updateConnectionStatus(status) {
+            const dot = document.getElementById('connection-status-dot');
+            const text = document.getElementById('connection-status-text');
+            const warningBtn = document.getElementById('appcheck-debug-warning');
+            if (!dot || !text) return;
+            
+            if (status === 'live') {
+                dot.style.background = '#22c55e';
+                dot.style.boxShadow = '0 0 10px #22c55e';
+                text.textContent = 'LIVE';
+                if (warningBtn) warningBtn.style.display = 'none';
+            } else if (status === 'cached') {
+                dot.style.background = '#f59e0b'; // Amber
+                dot.style.boxShadow = '0 0 10px #f59e0b';
+                text.textContent = 'OFFLINE (CACHED)';
+                if (warningBtn && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+                    warningBtn.style.display = 'inline-flex';
+                }
+            } else if (status === 'offline') {
+                dot.style.background = '#ef4444'; // Red
+                dot.style.boxShadow = '0 0 10px #ef4444';
+                text.textContent = 'OFFLINE';
+                if (warningBtn && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+                    warningBtn.style.display = 'inline-flex';
+                }
+            }
+        }
+
+        window.showAppCheckHelp = function() {
+            alert("⚠️ Connection Failed (App Check Unauthorized)\n\n" +
+                  "If you are developing locally on localhost/127.0.0.1, you need to register your App Check debug token in Firebase Console:\n" +
+                  "1. Open Browser DevTools (F12) -> Console tab.\n" +
+                  "2. Find the log message containing your debug token (e.g., 'App Check debug token: XXXX-XXXX-XXXX-XXXX').\n" +
+                  "3. Copy that token.\n" +
+                  "4. Go to Firebase Console -> App Check -> Apps -> Manage Debug Tokens.\n" +
+                  "5. Add your token, and refresh this page to connect successfully!");
+        };
+
+        window.clearDashboardCache = function() {
+            localStorage.removeItem('soulamore_admin_stats_cache');
+            console.log('🧹 Admin stats cache cleared');
+            loadOverviewStats();
+        };
+
         // OVERVIEW STATS LOADER
         async function loadOverviewStats() {
             try {
@@ -2832,6 +2891,8 @@
                 };
                 localStorage.setItem('soulamore_admin_stats_cache', JSON.stringify(statsToCache));
 
+                updateConnectionStatus('live');
+
             } catch (err) {
                 console.warn("⚠️ Error loading overview stats (using fallback):", err.message);
 
@@ -2849,22 +2910,29 @@
                 if (cachedStatsStr) {
                     try {
                         const cached = JSON.parse(cachedStatsStr);
-                        if (pendingEl) pendingEl.textContent = cached.pending ?? 0;
-                        if (usersEl) usersEl.textContent = (cached.users ?? 0).toLocaleString();
-                        if (flaggedEl) flaggedEl.textContent = (cached.flagged ?? 0).toString();
-                        if (duplicateEl) duplicateEl.textContent = (cached.duplicates ?? 0);
-                        if (confessionsEl) confessionsEl.textContent = (cached.confessions ?? 0).toLocaleString();
-                        if (postcardsEl) postcardsEl.textContent = (cached.postcards ?? 0).toLocaleString();
-                        if (ventsEl) ventsEl.textContent = (cached.vents ?? 0).toLocaleString();
-                        if (problemWallEl) problemWallEl.textContent = (cached.problemWall ?? 0).toLocaleString();
-                        console.log('✅ Overview stats showing last live recorded data from localStorage cache');
-                        return;
+                        // Check if cache has expired (5 minutes = 300,000 milliseconds)
+                        const cacheAge = Date.now() - (cached.timestamp || 0);
+                        if (cacheAge < 5 * 60 * 1000) {
+                            if (pendingEl) pendingEl.textContent = cached.pending ?? 0;
+                            if (usersEl) usersEl.textContent = (cached.users ?? 0).toLocaleString();
+                            if (flaggedEl) flaggedEl.textContent = (cached.flagged ?? 0).toString();
+                            if (duplicateEl) duplicateEl.textContent = (cached.duplicates ?? 0);
+                            if (confessionsEl) confessionsEl.textContent = (cached.confessions ?? 0).toLocaleString();
+                            if (postcardsEl) postcardsEl.textContent = (cached.postcards ?? 0).toLocaleString();
+                            if (ventsEl) ventsEl.textContent = (cached.vents ?? 0).toLocaleString();
+                            if (problemWallEl) problemWallEl.textContent = (cached.problemWall ?? 0).toLocaleString();
+                            console.log('✅ Overview stats showing last live recorded data from localStorage cache');
+                            updateConnectionStatus('cached');
+                            return;
+                        } else {
+                            console.log('⚠️ Overview stats cache has expired.');
+                        }
                     } catch (cacheErr) {
                         console.error("Failed to parse cached stats:", cacheErr);
                     }
                 }
 
-                // If no cache, fall back to 0
+                // If no cache or expired, fall back to 0
                 if (pendingEl) pendingEl.textContent = '0';
                 if (usersEl) usersEl.textContent = '0';
                 if (flaggedEl) flaggedEl.textContent = '0';
@@ -2873,7 +2941,8 @@
                 if (postcardsEl) postcardsEl.textContent = '0';
                 if (ventsEl) ventsEl.textContent = '0';
                 if (problemWallEl) problemWallEl.textContent = '0';
-                console.log('✅ Overview stats showing default 0 due to query failure and no cache');
+                console.log('✅ Overview stats showing default 0 due to query failure and no valid cache');
+                updateConnectionStatus('offline');
             }
         }
 
