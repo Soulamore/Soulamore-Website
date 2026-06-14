@@ -789,7 +789,7 @@ const NAV_DATA = [
                 children: [
                     { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'our-peers/about.html' },
                     { id: 'nav-meet-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
-                    { id: 'nav-join-peer', label: 'Join as Peer', href: 'join-us/peer.html' }
+                    { id: 'nav-join-peer', label: 'Join as Peer', href: 'join-us/index.html' }
                 ]
             },
             {
@@ -798,7 +798,7 @@ const NAV_DATA = [
                 href: '#',
                 type: 'submenu',
                 children: [
-                    { id: 'nav-what-psych', label: 'What is Therapy?', href: 'New Pages/Psychologists Landing.html' },
+                    { id: 'nav-what-psych', label: 'What is Therapy?', href: 'portal/Psychologists Landing.html' },
                     { id: 'nav-meet-psych', label: 'Meet Our Psychologists', href: 'our-psychologists/psychologists.html' },
                     { id: 'nav-join-psych', label: 'Join as Psychologist', href: 'join-us/psychologist.html' }
                 ]
@@ -838,8 +838,8 @@ const NAV_DATA = [
         type: 'dropdown',
         children: [
             { id: 'nav-support-groups-community', label: 'Support Groups', href: 'community/support-groups/support-groups.html' },
-            { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
-            { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
+            { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs/blogs.html' },
+            { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum/forum.html' },
             { id: 'nav-for-parents', label: 'For Families', href: 'company/for-parents.html' }
         ]
     },
@@ -1019,7 +1019,7 @@ const getFooterHTML = (rootPath) => `
                 <li><a href="${rootPath}spaces/campus/campus-ambassadors.html">Campus Ambassadors</a></li>
                 <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
                 <li><a href="${rootPath}community/support-groups/support-groups.html">Support Groups</a></li>
-                <li><a href="${rootPath}community/forum.html">Discussion Forum</a></li>
+                <li><a href="${rootPath}community/forum/forum.html">Discussion Forum</a></li>
                 <li><a href="${rootPath}company/for-parents.html">For Family (Comfort)</a></li>
                 <li><a href="${rootPath}join-us/index.html">Join the Team</a></li>
             </ul>
@@ -1449,14 +1449,18 @@ document.addEventListener('DOMContentLoaded', () => {
  * Correctly handles both hosted (web) and local (file://) environments.
  */
 function getRootPath() {
-    // Robust Path Resolution (v4.0)
-    // Always use the relative path hardcoded by the developer in the <script src="..."> tag
+    // Robust Path Resolution (v5.0)
+    // Compare the absolute URL of components.js with the current page URL to calculate depth
     const script = document.querySelector('script[src*="components.js"]');
-    if (script) {
-        const src = script.getAttribute('src');
-        if (src) {
-            // Extracts whatever prefix precedes "assets/js/components" e.g., "../../" or "../" or ""
-            return src.split('assets/js/components')[0];
+    if (script && script.src) {
+        const src = script.src;
+        const index = src.indexOf('assets/js/components.js');
+        if (index !== -1) {
+            const scriptDir = src.substring(0, index);
+            const pageUrl = window.location.href.split('?')[0].split('#')[0];
+            const relativePath = pageUrl.substring(scriptDir.length);
+            const depth = (relativePath.match(/\//g) || []).length;
+            return '../'.repeat(depth);
         }
     }
 

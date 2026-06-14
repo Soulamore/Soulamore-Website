@@ -91,22 +91,53 @@ async function initGlobalTicker() {
 }
 
 function getRootPath() {
-    const path = window.location.pathname;
-    if (path.includes('/spaces/') || path.includes('/tools/') || path.includes('/company/') ||
-        path.includes('/community/') || path.includes('/our-peers/') || path.includes('/portal/') ||
-        path.includes('/pages/') || path.includes('/resources/')) {
-
-        const isLocal = window.location.protocol === 'file:';
-        // Local files often have deeper paths, hosted files are usually /folder/file.html
-        if (isLocal) {
-            return '../'; // Simplified for common dev setup
+    // Robust Path Resolution (v5.0)
+    // Compare the absolute URL of components.js with the current page URL to calculate depth
+    const script = document.querySelector('script[src*="components.js"]');
+    if (script && script.src) {
+        const src = script.src;
+        const index = src.indexOf('assets/js/components.js');
+        if (index !== -1) {
+            const scriptDir = src.substring(0, index);
+            const pageUrl = window.location.href.split('?')[0].split('#')[0];
+            const relativePath = pageUrl.substring(scriptDir.length);
+            const depth = (relativePath.match(/\//g) || []).length;
+            return '../'.repeat(depth);
         }
-
-        // Count depth if needed
-        const depth = (path.match(/\//g) || []).length;
-        if (depth >= 3) return '../../';
-        if (depth >= 2) return '../';
     }
+
+    // Fallback if script tag parsing somehow fails
+    const path = window.location.pathname.toLowerCase();
+
+    // 2-Levels Deep Check
+    if (path.includes('/spaces/campus/') ||
+        path.includes('/spaces/soulamore-away/') ||
+        path.includes('/spaces/soulamore-workplace/') ||
+        path.includes('/spaces/assessments/') ||
+        path.includes('/tools/confession-box/') ||
+        path.includes('/portal/admin-dashboard/') ||
+        (path.includes('/our-peers/') && path.split('/our-peers/')[1]?.includes('/'))) {
+        return "../../";
+    }
+
+    // 1-Level Deep Check
+    if (path.includes('/spaces/') ||
+        path.includes('/tools/') ||
+        path.includes('/company/') ||
+        path.includes('/community/') ||
+        path.includes('/our-peers/') ||
+        path.includes('/our-psychologists/') ||
+        path.includes('/portal/') ||
+        path.includes('/journal/') ||
+        path.includes('/auth/') ||
+        path.includes('/login/') ||
+        path.includes('/join-us/') ||
+        path.includes('/pages/') ||
+        path.includes('/resources/') ||
+        path.includes('/new pages/') || path.includes('/new%20pages/')) {
+        return "../";
+    }
+
     return '';
 }
 
