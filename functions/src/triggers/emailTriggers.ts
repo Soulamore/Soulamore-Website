@@ -134,7 +134,7 @@ export const onLeadCreated = functions.firestore
         // 1. Internal Notification (Admin)
         const adminHtml = `
             <div style="font-family: 'Inter', sans-serif; color: #1A1A1A; padding: 40px; border-radius: 8px;">
-                <h2 style="color: ${isUrgent ? '#ef4444' : '#8E44AD'};">
+                <h2 style="color: ${isUrgent ? '#ef4444' : '#2dd4bf'};">
                     ${isUrgent ? 'URGENT: CRISIS ESCALATION' : 'New Recommended Match Request'}
                 </h2>
                 <p>A user has completed an assessment and requested an outreach.</p>

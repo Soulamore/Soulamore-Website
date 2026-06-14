@@ -1557,12 +1557,12 @@
                         <div style="padding:20px 25px; border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.01); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
                             <div style="display:flex; gap:10px; align-items:center;">
                                 <span style="font-weight:700; text-transform:uppercase; font-size:0.85rem; letter-spacing:0.5px; margin-right:10px;">Filter Logs:</span>
-                                <input type="date" style="height:40px; padding:0 12px; font-size:0.85rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--text-main);">
-                                <select style="height:40px; padding:0 12px; font-size:0.85rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--text-main); cursor:pointer;">
-                                    <option>All Categories</option>
-                                    <option>Peers</option>
-                                    <option>Psychologists</option>
-                                    <option>Support Groups</option>
+                                <input type="date" id="sessions-date-filter" style="height:40px; padding:0 12px; font-size:0.85rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--text-main);" onchange="filterAndRenderSessions()">
+                                <select id="sessions-category-filter" style="height:40px; padding:0 12px; font-size:0.85rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--text-main); cursor:pointer;" onchange="filterAndRenderSessions()">
+                                    <option value="all">All Categories</option>
+                                    <option value="peer">Peers</option>
+                                    <option value="psych">Psychologists</option>
+                                    <option value="group">Support Groups</option>
                                 </select>
                             </div>
                             <div style="display:flex; gap:12px; align-items:center;">
@@ -2893,7 +2893,9 @@
                 // Load duplicate emails count
                 const emailCounts = {};
                 usersSnap.forEach(doc => {
-                    const email = doc.data().email;
+                    const data = doc.data();
+                    if (data.isMerged) return; // Skip already merged accounts
+                    const email = data.email;
                     if (email) {
                         emailCounts[email] = (emailCounts[email] || 0) + 1;
                     }
@@ -3348,10 +3350,12 @@
                 const emailMap = {};
 
                 usersSnapshot.forEach(doc => {
-                    const email = doc.data().email;
+                    const data = doc.data();
+                    if (data.isMerged) return; // Skip already merged accounts
+                    const email = data.email;
                     if (email) {
                         if (!emailMap[email]) emailMap[email] = [];
-                        emailMap[email].push({ id: doc.id, ...doc.data() });
+                        emailMap[email].push({ id: doc.id, ...data });
                     }
                 });
 
@@ -3517,52 +3521,105 @@
         window.loadOverviewStats = loadOverviewStats;
 
         // 1. MASTER SESSIONS LOADER
-        async function loadMasterSessions() {
-            const container = document.getElementById('sessions-table-container');
-            const headerHtml = `<div class="session-row" style="background:rgba(255,255,255,0.05); font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); padding:15px 20px;">
-                <div>SL-ID</div>
-                <div>Customer / Practitioner</div>
-                <div>Category</div>
-                <div>Time / Status</div>
-                <div>Actions</div>
-            </div>`;
+        let allSessionsData = [];
 
-            container.innerHTML = headerHtml + '<div style="padding:40px; text-align:center; opacity:0.5;">Loading sessions...</div>';
+        async function loadMasterSessions() {
+            const tbody = document.getElementById('sessions-tbody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '<tr><td colspan="5" style="padding:40px; text-align:center; opacity:0.5;"><i class="fas fa-spinner fa-spin"></i> Loading sessions...</td></tr>';
 
             try {
-                const q = query(collection(db, "peer_bookings"), orderBy("createdAt", "desc"), limit(50));
+                // Ensure users are loaded first so we can resolve names
+                if (!window.allUsersData || window.allUsersData.length === 0) {
+                    await loadAllUsers();
+                }
+
+                const q = query(collection(db, "peer_bookings"), orderBy("createdAt", "desc"), limit(100));
                 const snapshot = await getDocs(q);
 
-                let html = headerHtml;
-                if (snapshot.empty) {
-                    html += '<div style="padding:40px; text-align:center; opacity:0.5;">No sessions found.</div>';
-                } else {
-                    snapshot.forEach(docSnap => {
-                        const data = docSnap.data();
-                        const tagClass = data.tag === 'psych' ? 'tag-psych' : (data.tag === 'group' ? 'tag-group' : 'tag-peer');
-                        const statusColor = data.status === 'confirmed' ? '#22c55e' : (data.status === 'pending' ? '#fbbf24' : 'var(--text-muted)');
-                        const date = data.createdAt ? data.createdAt.toDate().toLocaleString() : 'N/A';
-
-                        html += `
-                            <div class="session-row">
-                                <div style="font-family:'Outfit'; font-weight:700;">${data.slId || 'N/A'}</div>
-                                <div>${data.userName || 'User'} / <strong>${data.peerName || 'Practitioner'}</strong></div>
-                                <div><span class="${tagClass}">${(data.tag || 'peer').toUpperCase()}</span></div>
-                                <div>
-                                    <div style="font-size:0.9rem;">${date}</div>
-                                    <div style="font-size:0.75rem; color:${statusColor};">${(data.status || 'unknown').toUpperCase()}</div>
-                                </div>
-                                <div><button class="btn-dash-secondary" style="padding:5px 12px; font-size:0.75rem;">Manage</button></div>
-                            </div>
-                        `;
+                allSessionsData = [];
+                snapshot.forEach(docSnap => {
+                    allSessionsData.push({
+                        id: docSnap.id,
+                        ...docSnap.data()
                     });
-                }
-                container.innerHTML = html;
+                });
+
+                filterAndRenderSessions();
             } catch (err) {
                 console.error("Error loading sessions:", err);
-                container.innerHTML = headerHtml + '<div style="padding:40px; text-align:center; color:var(--admin-accent);">Failed to load sessions.</div>';
+                tbody.innerHTML = '<tr><td colspan="5" style="padding:40px; text-align:center; color:var(--admin-accent);">Failed to load sessions.</td></tr>';
             }
         }
+
+        window.filterAndRenderSessions = function() {
+            const tbody = document.getElementById('sessions-tbody');
+            if (!tbody) return;
+
+            const categoryFilter = document.getElementById('sessions-category-filter')?.value || 'all';
+            const dateFilter = document.getElementById('sessions-date-filter')?.value || '';
+
+            let filtered = allSessionsData;
+
+            // Apply category filter
+            if (categoryFilter !== 'all') {
+                filtered = filtered.filter(session => {
+                    const tag = session.tag || 'peer';
+                    return tag === categoryFilter;
+                });
+            }
+
+            // Apply date filter
+            if (dateFilter) {
+                filtered = filtered.filter(session => {
+                    if (!session.createdAt) return false;
+                    const sessionDateStr = session.createdAt.toDate 
+                        ? new Date(session.createdAt.toDate()).toISOString().split('T')[0]
+                        : new Date(session.createdAt).toISOString().split('T')[0];
+                    return sessionDateStr === dateFilter;
+                });
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="padding:40px; text-align:center; opacity:0.5;">No sessions found matching filters.</td></tr>';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(session => {
+                const tagClass = session.tag === 'psych' ? 'tag-psych' : (session.tag === 'group' ? 'tag-group' : 'tag-peer');
+                const statusColor = session.status === 'confirmed' ? '#22c55e' : (session.status === 'pending' ? '#fbbf24' : 'var(--text-muted)');
+                const date = session.createdAt 
+                    ? (session.createdAt.toDate ? session.createdAt.toDate().toLocaleString() : new Date(session.createdAt).toLocaleString())
+                    : 'N/A';
+
+                // Resolve user and peer names from window.allUsersData
+                const user = (window.allUsersData || []).find(u => u.id === session.userId);
+                const peer = (window.allUsersData || []).find(u => u.id === session.peerId);
+                const resolvedUserName = user ? (user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email) : (session.userName || 'User');
+                const resolvedPeerName = peer ? (peer.name || `${peer.firstName || ''} ${peer.lastName || ''}`.trim() || peer.email) : (session.peerName || 'Practitioner');
+
+                html += `
+                    <tr>
+                        <td style="font-family:'Outfit'; font-weight:700;">${session.slId || 'N/A'}</td>
+                        <td>${resolvedUserName} / <strong>${resolvedPeerName}</strong></td>
+                        <td><span class="${tagClass}">${(session.tag || 'peer').toUpperCase()}</span></td>
+                        <td>
+                            <div style="font-size:0.9rem;">${date}</div>
+                            <div style="font-size:0.75rem; color:${statusColor}; font-weight:600;">${(session.status || 'unknown').toUpperCase()}</div>
+                        </td>
+                        <td style="text-align:right;">
+                            <button class="btn-s btn-rounded btn-dash-secondary" style="padding:5px 12px; font-size:0.75rem;">Manage</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        };
+
+        window.loadMasterSessions = loadMasterSessions;
 
         // 2. ACCOUNTING LOADER
         async function loadAccounting() {
@@ -5063,6 +5120,15 @@
         async function loadNewsletterSubscribers() {
             const container = document.getElementById('newsletter-table-body');
             if (!container) return;
+
+            // Ensure window.allUsersData is loaded so we can identify Registered Users vs Visitors
+            if (!window.allUsersData || window.allUsersData.length === 0 || !window.isCacheValid()) {
+                try {
+                    await loadAllUsers();
+                } catch (e) {
+                    console.warn("Failed to pre-load users for newsletter display:", e);
+                }
+            }
 
             // Check cache first
             if (window.isCacheValid() && window.adminCache.newsletter) {

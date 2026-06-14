@@ -179,6 +179,12 @@ service cloud.firestore {
     match /maintenance_settings/{id} { allow read: if true; allow write: if isAdmin(); }
     match /announcements/{id} { allow read: if true; allow write: if isAdmin(); }
 
+    // Support Groups
+    match /support_groups/{groupId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Forms - allow anyone to submit (create) but restrict management to Admins
     match /peers/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isAdmin(); }
     match /psychologists/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isAdmin(); }
