@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            // 1. Redirect Firebase Traffic
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            // 2. Canonical Injection
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Reminder - Soulamore</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; line-height: 1.8; color: #1e293b; margin: 0; padding: 0; background-color: #f1f5f9; -webkit-font-smoothing: antialiased; }
+        .wrapper { background-color: #f1f5f9; padding: 60px 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 32px; overflow: hidden; box-shadow: 0 40px 100px rgba(15, 23, 42, 0.1); border: 1px solid rgba(15, 23, 42, 0.05); }
+        .header { background: #0A0F1A; padding: 70px 40px; text-align: center; position: relative; overflow: hidden; }
+        .header::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L100 100 M50 0 L150 100 M0 50 L100 150" stroke="rgba(78, 205, 196, 0.1)" stroke-width="1" fill="none"/></svg>');
+            opacity: 0.3;
+        }
+        .logo { height: 52px; width: auto; position: relative; z-index: 10; }
+        .content { padding: 80px 60px; background: #ffffff; }
+        .greeting { font-family: 'Outfit', sans-serif; font-size: 32px; color: #0f172a; margin-bottom: 25px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; }
+        .message { font-size: 17px; color: #475569; margin-bottom: 40px; line-height: 1.8; }
+        .reminder-box { border: 1px solid #4ECDC4; border-radius: 20px; padding: 30px; margin: 30px 0; background: #f0fdfa; border-left: 6px solid #4ECDC4; }
+        .time-detail { font-family: 'Outfit', sans-serif; font-size: 24px; color: #0f172a; font-weight: 700; display: block; margin-bottom: 10px; }
+        .button { 
+            display: inline-block; 
+            padding: 20px 50px; 
+            background: linear-gradient(135deg, #4ECDC4 0%, #2a9d8f 100%); 
+            color: #ffffff !important; 
+            text-decoration: none; 
+            border-radius: 50px; 
+            font-weight: 700; 
+            margin: 30px 0; 
+            font-family: 'Outfit', sans-serif; 
+            text-transform: uppercase; 
+            font-size: 13px; 
+            letter-spacing: 2px;
+            box-shadow: 0 10px 25px rgba(78, 205, 196, 0.2);
+        }
+        .footer { padding: 60px 45px; text-align: center; font-size: 12px; color: #94a3b8; background: #f8fafc; border-top: 1px solid #f1f5f9; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <img src="https://soulamore.com/assets/images/logo.webp" alt="Soulamore" class="logo">
+            </div>
+            <div class="content">
+                <h1 class="greeting">Soon, we listen.</h1>
+                <p class="message">This is a gentle reminder for your scheduled session with your Peer Listener. Taking this time for yourself is a powerful act of healing.</p>
+                
+                <div class="reminder-box">
+                    <span class="time-detail">When: {{BOOKING_TIME}}</span>
+                    <p style="margin:0; font-size: 15px; color: #475569;">With: {{PEER_NAME}}</p>
+                </div>
+
+                <div style="text-align: center;">
+                    <a href="{{VIDEO_LINK}}" class="button">Join Video Room</a>
+                </div>
+
+                <p style="text-align: center; color: #0f172a; font-family: 'Outfit', sans-serif; font-weight: 600; margin-top: 40px;">Deep breathes,<br>The Soulamore Team</p>
+            </div>
+            <div class="footer">
+                <p>&copy; {{YEAR}} Soulamore | India's Safety Net</p>
+                <p>Establishing true identity to protect your anonymity.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
