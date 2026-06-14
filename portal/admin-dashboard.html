@@ -2002,7 +2002,7 @@
 
     <script src="../assets/js/portal-utils.js"></script>
     <script type="module">
-        import { auth, db, collection, query, where, getDocs, orderBy, updateDoc, doc, limit, addDoc, serverTimestamp, getDoc, setDoc, deleteDoc, writeBatch, functionsInstance, httpsCallable, onSnapshot } from "../assets/js/firebase-config.js";
+        import { auth, db, collection, query, where, getDocs, orderBy, updateDoc, doc, limit, addDoc, serverTimestamp, getDoc, setDoc, deleteDoc, writeBatch, functionsInstance, httpsCallable, onSnapshot, arrayUnion } from "../assets/js/firebase-config.js";
         import { getPractitionerMetadata } from "../assets/js/practitioner-handler.js";
 
         // Dynamic API Base URL for local development/emulator testing
@@ -2056,6 +2056,20 @@
 
                     for (const secondaryId of secondaryIds) {
                         try {
+                            // Fetch secondary user data to copy payments
+                            const secondaryDoc = await getDoc(doc(db, "users", secondaryId));
+                            if (secondaryDoc.exists()) {
+                                const secondaryData = secondaryDoc.data();
+                                if (secondaryData.razorpayPayments && secondaryData.razorpayPayments.length > 0) {
+                                    // Consolidate payment history to primary account
+                                    await updateDoc(doc(db, "users", primaryId), {
+                                        razorpayPayments: arrayUnion(...secondaryData.razorpayPayments),
+                                        updatedAt: serverTimestamp()
+                                    });
+                                }
+                            }
+
+                            // Mark secondary account as merged
                             await updateDoc(doc(db, "users", secondaryId), {
                                 mergedInto: primaryId,
                                 isMerged: true,
@@ -3464,22 +3478,25 @@
                 // Merge data from secondary accounts
                 for (const secondaryId of secondaryIds) {
                     const secondaryDoc = await getDoc(doc(db, "users", secondaryId));
+                    if (!secondaryDoc.exists()) continue;
+
                     const secondaryData = secondaryDoc.data();
 
-                    // Merge arrays (payments, etc.)
-                    const updates = {};
-
-                    // Merge Razorpay payments if they exist
+                    // Merge Razorpay payments if they exist to the primary account
                     if (secondaryData.razorpayPayments && secondaryData.razorpayPayments.length > 0) {
-                        updates.razorpayPayments = arrayUnion(...secondaryData.razorpayPayments);
+                        await updateDoc(doc(db, "users", primaryId), {
+                            razorpayPayments: arrayUnion(...secondaryData.razorpayPayments),
+                            updatedAt: serverTimestamp()
+                        });
                     }
 
-                    // Mark as merged
-                    updates.mergedInto = primaryId;
-                    updates.isMerged = true;
-                    updates.mergedAt = serverTimestamp();
-
-                    await updateDoc(doc(db, "users", secondaryId), updates);
+                    // Mark secondary account as merged
+                    await updateDoc(doc(db, "users", secondaryId), {
+                        mergedInto: primaryId,
+                        isMerged: true,
+                        mergedAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    });
                 }
 
                 alert(`✅ Successfully merged ${secondaryIds.length} account(s) into primary account!\n\nPayment history has been preserved from all accounts.`);
@@ -5523,6 +5540,14 @@
             try {
                 // Use the deleteDoc imported at the top level
                 await deleteDoc(doc(db, "users", uid));
+
+                // Attempt to clean up corresponding role entry if it exists
+                try {
+                    await deleteDoc(doc(db, "roles", uid));
+                } catch (roleErr) {
+                    console.warn(`Could not delete role document for ${uid}:`, roleErr);
+                }
+
                 alert("✅ User record deleted successfully.");
                 window.invalidateCache(); // Invalidate local cache on deletion
                 await loadAllUsers();
