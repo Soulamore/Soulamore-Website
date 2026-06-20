@@ -2208,12 +2208,12 @@ window.toggleMobileMenu = function () {
                     // User is logged in
                     if (navAuthBtn) {
                         navAuthBtn.textContent = 'Dashboard';
-                        navAuthBtn.href = window.SoulFirebase.rootPath + 'portal/user-dashboard.html';
+                        navAuthBtn.href = getRootPath() + 'portal/user-dashboard.html';
                         navAuthBtn.classList.add('nav-btn-active');
                     }
                     if (mobileProfileBtn) {
                         mobileProfileBtn.textContent = 'Dashboard';
-                        mobileProfileBtn.href = window.SoulFirebase.rootPath + 'portal/user-dashboard.html';
+                        mobileProfileBtn.href = getRootPath() + 'portal/user-dashboard.html';
                     }
                     if (userIconBtn) {
                         userIconBtn.style.display = 'flex';
@@ -2227,12 +2227,12 @@ window.toggleMobileMenu = function () {
                     // User is logged out
                     if (navAuthBtn) {
                         navAuthBtn.textContent = 'Log In / Sign Up';
-                        navAuthBtn.href = window.SoulFirebase.rootPath + 'portal/login.html';
+                        navAuthBtn.href = getRootPath() + 'portal/login.html';
                         navAuthBtn.classList.remove('nav-btn-active');
                     }
                     if (mobileProfileBtn) {
                         mobileProfileBtn.textContent = 'Log In';
-                        mobileProfileBtn.href = window.SoulFirebase.rootPath + 'portal/login.html';
+                        mobileProfileBtn.href = getRootPath() + 'portal/login.html';
                     }
                     if (userIconBtn) {
                         userIconBtn.style.display = 'none';
