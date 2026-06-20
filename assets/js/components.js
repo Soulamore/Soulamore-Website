@@ -1449,50 +1449,35 @@ document.addEventListener('DOMContentLoaded', () => {
  * Correctly handles both hosted (web) and local (file://) environments.
  */
 function getRootPath() {
-    // Robust Path Resolution (v5.0)
-    // Compare the absolute URL of components.js with the current page URL to calculate depth
     const script = document.querySelector('script[src*="components.js"]');
-    if (script && script.src) {
-        const src = script.src;
-        const index = src.indexOf('assets/js/components.js');
-        if (index !== -1) {
-            const scriptDir = src.substring(0, index);
-            const pageUrl = window.location.href.split('?')[0].split('#')[0];
-            const relativePath = pageUrl.substring(scriptDir.length);
-            const depth = (relativePath.match(/\//g) || []).length;
-            return '../'.repeat(depth);
+    if (script) {
+        const rawSrc = script.getAttribute('src');
+        if (rawSrc && !rawSrc.startsWith('http') && !rawSrc.startsWith('/')) {
+            const depth = (rawSrc.match(/\.\.\//g) || []).length;
+            return depth > 0 ? '../'.repeat(depth) : '';
         }
     }
 
-    // Fallback if script tag parsing somehow fails
     const path = window.location.pathname.toLowerCase();
 
-    // 2-Levels Deep Check
     if (path.includes('/spaces/campus/') ||
         path.includes('/spaces/soulamore-away/') ||
         path.includes('/spaces/soulamore-workplace/') ||
         path.includes('/spaces/assessments/') ||
         path.includes('/tools/confession-box/') ||
         path.includes('/portal/admin-dashboard/') ||
-        (path.includes('/our-peers/') && path.split('/our-peers/')[1]?.includes('/'))) {
+        (path.includes('/our-peers/') && path.split('/our-peers/')[1] && path.split('/our-peers/')[1].includes('/'))) {
         return "../../";
     }
 
-    // 1-Level Deep Check
     if (path.includes('/spaces/') ||
         path.includes('/tools/') ||
         path.includes('/company/') ||
-        path.includes('/community/') ||
+        path.includes('/portal/') ||
         path.includes('/our-peers/') ||
         path.includes('/our-psychologists/') ||
-        path.includes('/portal/') ||
-        path.includes('/journal/') ||
-        path.includes('/auth/') ||
-        path.includes('/login/') ||
         path.includes('/join-us/') ||
-        path.includes('/pages/') ||
-        path.includes('/resources/') ||
-        path.includes('/new pages/') || path.includes('/new%20pages/')) {
+        path.includes('/pages/')) {
         return "../";
     }
 
