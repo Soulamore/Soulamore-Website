@@ -23,7 +23,7 @@ export function initFeedbackWidget() {
     button.style.cssText = `
         position: fixed;
         bottom: 52px;
-        right: 20px;
+        left: 20px; /* Moved left to avoid overlapping with SoulBot widget */
         z-index: 9998;
         background: linear-gradient(135deg, #4ECDC4, #F49F75);
         color: #0f172a;
