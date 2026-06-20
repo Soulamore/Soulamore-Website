@@ -211,6 +211,12 @@ service cloud.firestore {
     
     match /therapists/{id} { allow read: if true; allow write: if isAdmin(); }
 
+    // Feedback - allow anyone to submit, restrict management to Admins
+    match /feedback/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
     // Safety Reports - allow creation by anyone, management only by Admin
     match /safety_reports/{id} {
       allow create: if true;
