@@ -115,15 +115,16 @@ function createFeedbackModal() {
                     <label style="display: block; margin-bottom: 8px; color: #f1f5f9; font-weight: 500;">
                         How was your experience?
                     </label>
-                    <div style="display: flex; gap: 10px; font-size: 2rem;">
+                    <div id="star-rating-container" style="display: flex; gap: 10px; font-size: 2rem;">
                         ${[1, 2, 3, 4, 5].map(num => `
                             <input type="radio" name="rating" value="${num}" id="rating${num}" style="display: none;">
-                            <label for="rating${num}" style="
+                            <label for="rating${num}" class="feedback-star" data-value="${num}" style="
                                 cursor: pointer;
                                 transition: 0.3s;
-                                opacity: 0.5;
-                            " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">
-                                <i class="fas fa-star" style="color: #fbbf24;"></i>
+                                opacity: 0.3;
+                                color: #fbbf24;
+                            ">
+                                <i class="fas fa-star"></i>
                             </label>
                         `).join('')}
                     </div>
@@ -185,6 +186,37 @@ function createFeedbackModal() {
     `;
     
     document.body.appendChild(modal);
+
+    // Add star interactivity
+    const stars = modal.querySelectorAll('.feedback-star');
+
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            const val = parseInt(this.getAttribute('data-value'));
+            stars.forEach(s => {
+                const sVal = parseInt(s.getAttribute('data-value'));
+                s.style.opacity = sVal <= val ? '1' : '0.3';
+            });
+        });
+
+        star.addEventListener('mouseout', function() {
+            const checked = modal.querySelector('input[name="rating"]:checked');
+            const val = checked ? parseInt(checked.value) : 0;
+            stars.forEach(s => {
+                const sVal = parseInt(s.getAttribute('data-value'));
+                s.style.opacity = sVal <= val ? '1' : '0.3';
+            });
+        });
+
+        star.addEventListener('click', function() {
+            const val = parseInt(this.getAttribute('data-value'));
+            modal.querySelector(`#rating${val}`).checked = true;
+            stars.forEach(s => {
+                const sVal = parseInt(s.getAttribute('data-value'));
+                s.style.opacity = sVal <= val ? '1' : '0.3';
+            });
+        });
+    });
 }
 
 /**
