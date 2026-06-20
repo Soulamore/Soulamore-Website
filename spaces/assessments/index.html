@@ -1454,7 +1454,19 @@
         // --- DYNAMIC GRID & FILTERING LOGIC ---
         let ALL_TESTS = []; // Initialized via fetch
         const gridEl = document.getElementById('assessments-grid');
+        let filteredTests = [];
+        let currentPage = 0;
+        const BATCH_SIZE = 6;
+        let activeDomains = new Set();   // empty = All
+        let activeContexts = new Set();
         
+        const primaryFilterBar = document.getElementById('primary-filters');
+        const contextFilterBar = document.getElementById('context-filters');
+        const pagers = document.querySelectorAll('.pager-container');
+        const sideNav = document.querySelector('.side-nav');
+        const allPrevBtns = document.querySelectorAll('.prev-btn');
+        const allNextBtns = document.querySelectorAll('.next-btn');
+
         window.addEventListener('load', async () => {
             try {
                 // Tier 4 Optimization: Lazy-load Directory & Citations
@@ -1478,20 +1490,6 @@
                 console.error('[Soulamore] Assessment data failed to initialize:', error);
                 if (gridEl) gridEl.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-secondary);"><i class="fas fa-circle-exclamation" style="font-size:2rem;margin-bottom:15px;display:block;color:var(--peach-glow)"></i><p>Assessment data failed to load. Please refresh the page.</p></div>';
             }
-
-            let filteredTests = [];
-            let currentPage = 0;
-            const BATCH_SIZE = 6;
-            let activeDomains = new Set();   // empty = All
-            let activeContexts = new Set();
-            
-            const primaryFilterBar = document.getElementById('primary-filters');
-            const contextFilterBar = document.getElementById('context-filters');
-            const pagers = document.querySelectorAll('.pager-container');
-            const sideNav = document.querySelector('.side-nav');
-            const allPrevBtns = document.querySelectorAll('.prev-btn');
-            const allNextBtns = document.querySelectorAll('.next-btn');
-
             // --- MUST BE DECLARED BEFORE initializeEngine() ---
             const DOMAINS = [
                 "Anxiety Spectrum",
