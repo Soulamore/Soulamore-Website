@@ -1453,10 +1453,9 @@
 
         // --- DYNAMIC GRID & FILTERING LOGIC ---
         let ALL_TESTS = []; // Initialized via fetch
+        const gridEl = document.getElementById('assessments-grid');
         
         window.addEventListener('load', async () => {
-            const gridEl = document.getElementById('assessments-grid');
-
             try {
                 // Tier 4 Optimization: Lazy-load Directory & Citations
                 const [dirRes, citRes] = await Promise.all([
@@ -1516,14 +1515,10 @@
                 "Grief", "Students", "Expat"
             ];
 
-            initializeEngine();
-
-
             function initializeEngine() {
                 ALL_TESTS = getDiscoveryOrder([...ALL_TESTS]);
                 filteredTests = [...ALL_TESTS];
-                // Initialize filters after DOM is ready
-                document.addEventListener('DOMContentLoaded', setupFilters);
+                setupFilters();
                 renderGrid(0);
                 injectIndexSchema();
             }
@@ -1871,8 +1866,7 @@
                 if (e.key === 'ArrowRight') handleNavigate('next');
             });
 
-            setupFilters();
-            // renderGrid(0); // Called inside initializeEngine now
+            // Initialization now happens fully after the JSON payload is fetched
 
 
             async function loadClinicalCitations() {
