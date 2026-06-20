@@ -922,6 +922,9 @@
                 <a href="#" class="side-link" data-view="deep-listening" onclick="switchView('deep-listening', this)">
                     <i class="fas fa-ear-listen"></i> <span>Deep Listening</span>
                 </a>
+                <a href="#" class="side-link" data-view="site-feedback" onclick="switchView('site-feedback', this)">
+                    <i class="fas fa-comment-dots"></i> <span>Site Feedback</span>
+                </a>
 
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:15px 0;">
                 <a href="#" class="side-link" onclick="switchView('settings', this)"><i class="fas fa-cog"></i>
@@ -1920,6 +1923,39 @@
 
 
 
+        <!-- VIEW: SITE FEEDBACK -->
+        <div id="view-site-feedback" class="view-section">
+            <div class="workspace-header">
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <div style="width:45px; height:45px; background:var(--admin-accent-soft); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--admin-accent); border: 1px solid var(--admin-accent-glow);">
+                        <i class="fas fa-comment-dots" style="font-size:1.2rem;"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.6rem; margin:0; color:var(--text-main);">Site Feedback</h2>
+                        <div style="font-size:0.85rem; opacity:0.6; font-weight:500;">User feedback and ratings</div>
+                    </div>
+                </div>
+            </div>
+            <div class="workspace-body" style="padding: 30px;">
+                <div class="dash-card">
+                    <table class="premium-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User</th>
+                                <th>Rating</th>
+                                <th>Feedback</th>
+                                <th>Page Context</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedback-tbody">
+                            <tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading feedback...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         </main>
     </div>
 
@@ -2613,6 +2649,7 @@
             if (viewId === 'maintenance-panel') loadMaintenancePanel();
             if (viewId === 'deep-listening') loadDeepListeningHub();
             if (viewId === 'api-health') loadApiHealth();
+            if (viewId === 'site-feedback') loadSiteFeedback();
         };
 
         // ✅ FIX: Trigger Overview view immediately after switchView is defined
@@ -6761,6 +6798,45 @@
 
 
         // === API HEALTH TELEMETRY ===
+
+        window.loadSiteFeedback = async function() {
+            const tbody = document.getElementById('feedback-tbody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading feedback...</td></tr>';
+            
+            try {
+                const feedbackRef = collection(db, 'feedback');
+                const q = query(feedbackRef, orderBy('createdAt', 'desc'), limit(50));
+                const snapshot = await getDocs(q);
+                
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; opacity:0.5;">No feedback received yet.</td></tr>';
+                    return;
+                }
+                
+                let html = '';
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleString() : 'N/A';
+                    const rating = data.rating ? `${data.rating} / 5 ⭐` : '-';
+                    html += `
+                        <tr>
+                            <td class="meta-cell">${date}</td>
+                            <td class="email-cell">${data.email || 'Anonymous'}</td>
+                            <td><span class="category-badge">${rating}</span></td>
+                            <td style="max-width: 300px; white-space: pre-wrap;">${data.feedback || ''}</td>
+                            <td class="meta-cell" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href="${data.page || '#'}" target="_blank" style="color:#2dd4bf;">${data.page ? 'View Context' : '-'}</a></td>
+                        </tr>
+                    `;
+                });
+                
+                tbody.innerHTML = html;
+            } catch (err) {
+                console.error("Error loading feedback:", err);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#ef4444;">Failed to load feedback.</td></tr>';
+            }
+        };
 
         window.loadApiHealth = async function() {
             const logsEl = document.getElementById('telemetry-logs');

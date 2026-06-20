@@ -319,3 +319,37 @@ export const triggerExpatOutreach = functions.https.onCall(async (data, context)
 
     return { success: true, results: { success: count } };
 });
+
+/**
+ * Trigger: On Feedback Submitted
+ */
+export const onFeedbackCreated = functions.firestore
+    .document('feedback/{docId}')
+    .onCreate(async (snap, context) => {
+        const data = snap.data();
+        if (!data) return null;
+
+        const body = `
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid rgba(45, 212, 191, 0.2);">
+                <h2 style="color: #2dd4bf; margin-top: 0;">New User Feedback</h2>
+                <p><strong>Rating:</strong> ${data.rating ? data.rating + ' / 5 Stars ⭐' : 'No rating'}</p>
+                <p><strong>Feedback:</strong><br/>${data.feedback || 'No text'}</p>
+                <p><strong>User Email:</strong> ${data.email || 'Anonymous'}</p>
+                <p><strong>Page:</strong> ${data.page || 'Unknown'}</p>
+            </div>
+        `;
+
+        const { compileTemplate } = await import('../emailService');
+        const html = compileTemplate(
+            { email: 'contact.soulamore@gmail.com', name: 'Soulamore Admin' },
+            'New Site Feedback Received',
+            body
+        );
+
+        return await sendEmail(
+            { email: 'contact.soulamore@gmail.com', name: 'Soulamore Admin' },
+            'New Site Feedback Received',
+            html
+        );
+    });
+
