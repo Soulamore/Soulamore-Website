@@ -1,7 +1,17 @@
-# Soulamore Platform: Interactive Use Cases & Testing Report
-**Prepared for:** Aditya & Abhishek (Testing Team)
-**Last Updated:** 21 June 2026
-**Purpose:** Use cases, user flows, and interactive test scripts to verify the functionality of the Soulamore platform, starting with the dashboards and compliance portals.
+# 070 — Soulamore Platform: Features Testing Suite & Use Cases
+**Prepared by:** Antigravity (QA/Test Specialist)
+**For:** Aditya & Abhishek (Testing Team)
+**Date:** 21 June 2026
+**Classification:** Internal — Active Testing Workspace & Living Test Register
+**Status:** Living Document (Update as you test)
+
+---
+
+## 🏁 Session Handoff Info
+*   **✅ Completed**: Setup of the testing report following the Universal Reporting Protocol. Staged and configured Git tracking for reports folders except for local archives.
+*   **🚧 In-Progress**: Manual feature testing by Aditya and Abhishek.
+*   **⚠️ Blockers**: None. Active session fully authenticated.
+*   **⏭️ Next Action**: Abhishek/Aditya to run manual test cases detailed in Section 2 and Section 3 below on `localhost:3000` or the live site.
 
 ---
 
@@ -10,7 +20,7 @@
 
 ---
 
-## 🖥️ SECTION 1: DASHBOARD USE CASES
+## 🖥️ SECTION 1: USER & ADMIN DASHBOARDS USE CASES
 
 ### Use Case 1.1 — User Dashboard: Wellness Data Consent Wall
 * **Verify that new users are blocked from dashboard access until they give explicit consent for processing sensitive wellness data.**

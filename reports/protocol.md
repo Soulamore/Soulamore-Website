@@ -57,6 +57,26 @@ Every session MUST end with a report containing:
 | **PRG** | Progress | General feature implementation. |
 | **BUG** | Bugfix | Troubleshooting and resolution. |
 | **ARC** | Architecture | System-level design decisions. |
+| **TST** | Testing | Test plans, test suites, manual verification, QA registers. |
+
+---
+
+## 🧪 Testing Protocol (TST)
+
+Testing reports (e.g., test plans, test suites, manual verification checklists) serve as living registers for manual and automated feature verification. They must follow these rules:
+
+1. **Naming**: Use the `TST` code in the file name: `{NNN}_{YYYY-MM-DD}_{AGENT}_TST_{Title}.md`.
+2. **Handoff Info**: Must include the standard Session Handoff sections.
+3. **Use Case Structure**: Each test case or verify target must be documented in a table with:
+   - **Use Case ID & Title**
+   - **Actors**
+   - **Pre-conditions**
+   - **Test Steps**
+   - **Expected Results**
+   - **Status**: Mark clearly as `⬜ PENDING`, `✅ PASS`, or `❌ FAIL [Details]`.
+   - **Tested By**: Initials of the verifying team member (e.g., `AD` for Aditya, `AB` for Abhishek).
+   - **Date Verified**: The date when the test was run.
+4. **Collaboration**: Testing reports are designed as living documents. Verifiers must edit the status, name, and date columns directly in the report file as they test features on local or staging environments.
 
 ---
 
