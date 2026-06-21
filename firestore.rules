@@ -244,6 +244,21 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Deletion Requests
+    match /deletion_requests/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+      allow create: if isSelf(userId);
+      allow update: if isSelf(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Security Events (Breach logs)
+    match /security_events/{id} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
     // Default: Deny all other access
     match /{document=**} {
       allow read, write: if false;

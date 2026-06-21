@@ -174,6 +174,16 @@
                             
                             if (userDoc.exists()) {
                                 const userData = userDoc.data();
+
+                                if (userData.status === 'pending_deletion') {
+                                    console.warn('🔒 Account is pending deletion. Logging out...');
+                                    alert("This account is scheduled for deletion and is currently deactivated. If you wish to restore your account, please contact support.");
+                                    const { auth } = await import('./firebase-config.js');
+                                    await auth.signOut();
+                                    localStorage.removeItem('soulamore_session');
+                                    window.location.href = '../portal/login.html';
+                                    return;
+                                }
                                 
                                 if (userData.ageGateTier === 'minor' && userData.parentalConsentStatus === 'pending') {
                                     console.log('🔒 Minor user pending consent check. Checking approvals...');
