@@ -22,9 +22,8 @@ export async function probeAllServices() {
     const BREVO_KEY = process.env.BREVO_API_KEY?.trim();
     if (!BREVO_KEY) throw new Error("BREVO_API_KEY secret is not set in the function environment.");
 
-    const { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } = require('@getbrevo/brevo');
-    const apiInstance = new TransactionalEmailsApi();
-    apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
+    const { BrevoClient } = require('@getbrevo/brevo');
+    new BrevoClient({ apiKey: BREVO_KEY });
 
     results.services.brevo = {
       status: 'operational',
