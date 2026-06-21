@@ -1044,10 +1044,9 @@ const getFooterHTML = (rootPath) => `
     </div>
 
     <div class="footer-bottom" style="margin-top:50px; padding-top:30px; border-top:1px solid rgba(255,255,255,0.1); text-align:center; font-size:0.75rem; opacity:0.75; line-height:1.8; color: #94a3b8;">
-        <div>© 2026 Hashlilly Private Limited. All rights reserved.</div>
-        <div style="margin-top: 5px;">Hashlilly Private Limited | CIN: U62099PB2026OPC068567 | Reg No: UDYAM-PB-20-0003915</div>
-        <div>Grievance Officer: <a href="mailto:tech.hashlilly@gmail.com" style="color: #4ECDC4; text-decoration: underline;">tech.hashlilly@gmail.com</a></div>
-        <div style="margin-top: 10px; font-style: italic; opacity: 0.8;">Advertising automation platforms, software engineering, and experimental laboratory systems.</div>
+        <div>© 2026 Hashlilly (OPC) Private Limited. All rights reserved.</div>
+        <div style="margin-top: 5px;">Hashlilly (OPC) Private Limited | CIN: U62099PB2026OPC068567 | Reg No: UDYAM-PB-20-0003915</div>
+        <div>Grievance Officer: <a href="mailto:support@soulamore.in" style="color: #4ECDC4; text-decoration: underline;">support@soulamore.in</a></div>
         <div style="margin-top: 15px; font-size: 0.7rem; color: #ff6b6b; font-weight: 500;">Disclaimer: Soulamore is a self-reflection space and peer-support community. We are not a clinical service and do not provide medical advice.</div>
     </div>
 </div>
