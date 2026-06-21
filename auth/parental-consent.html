@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parental Consent | Soulamore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="../assets/images/favicon_symbol.webp" type="image/x-icon">
+    <style>
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --teal-glow: #4ECDC4;
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px);
+            text-align: center;
+        }
+
+        .icon-wrapper {
+            font-size: 3.5rem;
+            color: var(--teal-glow);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+
+        p {
+            font-size: 1rem;
+            opacity: 0.85;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .details-box {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .detail-row {
+            margin-bottom: 10px;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, var(--teal-glow), #2a9d8f);
+            color: var(--deep-space);
+        }
+
+        .btn-approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-deny {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-deny:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .status-msg {
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .status-approved {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-denied {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon-wrapper" id="page-icon">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h1 id="page-title">Parental Verification</h1>
+        <p id="page-desc">Please review and confirm if you approve the creation of this child account on Soulamore.</p>
+
+        <div id="loading" style="padding: 20px 0;">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--teal-glow);"></i>
+            <p style="margin-top:10px; font-size:0.9rem;">Verifying token...</p>
+        </div>
+
+        <div id="consent-content" style="display: none;">
+            <div class="details-box">
+                <div class="detail-row"><strong>Parent Email:</strong> <span id="lbl-parent">parent@example.com</span></div>
+                <div class="detail-row"><strong>Request Date:</strong> <span id="lbl-date">-</span></div>
+                <div class="detail-row"><strong>Data processing:</strong> Sensitive wellness logs (private journals)</div>
+            </div>
+
+            <div class="btn-group" id="actions">
+                <button onclick="updateConsent('approved')" class="btn btn-approve">Approve Account</button>
+                <button onclick="updateConsent('denied')" class="btn btn-deny">Deny Request</button>
+            </div>
+        </div>
+
+        <div id="status-box" class="status-msg"></div>
+    </div>
+
+    <script type="module">
+        import { db, doc, getDoc, updateDoc, serverTimestamp } from "../assets/js/firebase-config.js";
+
+        let consentDocRef = null;
+        let token = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            token = urlParams.get('token');
+
+            if (!token) {
+                showError("Invalid or missing verification token.");
+                return;
+            }
+
+            try {
+                consentDocRef = doc(db, "parental_consents", token);
+                const docSnap = await getDoc(consentDocRef);
+
+                if (!docSnap.exists()) {
+                    showError("Consent request link has expired or is invalid.");
+                    return;
+                }
+
+                const data = docSnap.data();
+
+                if (data.status !== 'pending') {
+                    showPreResolved(data.status);
+                    return;
+                }
+
+                document.getElementById('lbl-parent').textContent = data.parentEmail;
+                if (data.requestSentAt) {
+                    const dateVal = data.requestSentAt.toDate ? data.requestSentAt.toDate() : new Date(data.requestSentAt);
+                    document.getElementById('lbl-date').textContent = dateVal.toLocaleDateString() + ' ' + dateVal.toLocaleTimeString();
+                }
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('consent-content').style.display = 'block';
+
+            } catch (err) {
+                console.error("Token verification failed:", err);
+                showError("Database connection failed. Please check your internet and try again.");
+            }
+        });
+
+        window.updateConsent = async function (status) {
+            if (!consentDocRef) return;
+            const actionBtnGroup = document.getElementById('actions');
+            actionBtnGroup.style.opacity = '0.5';
+            actionBtnGroup.style.pointerEvents = 'none';
+
+            try {
+                // 1. Update parental consent document
+                await updateDoc(consentDocRef, {
+                    status: status,
+                    respondedAt: serverTimestamp(),
+                    consentTokenUsed: true
+                });
+
+                showResolution(status);
+            } catch (e) {
+                console.error("Consent update failed:", e);
+                alert("Failed to submit decision: " + e.message);
+                actionBtnGroup.style.opacity = '1';
+                actionBtnGroup.style.pointerEvents = 'auto';
+            }
+        };
+
+        function showPreResolved(status) {
+            document.getElementById('loading').style.display = 'none';
+            const statusBox = document.getElementById('status-box');
+            statusBox.style.display = 'block';
+            
+            if (status === 'approved') {
+                statusBox.className = 'status-msg status-approved';
+                statusBox.innerHTML = '<i class="fas fa-check-circle"></i> This request has already been approved.';
+                document.getElementById('page-icon').style.color = '#10b981';
+            } else {
+                statusBox.className = 'status-msg status-denied';
+                statusBox.innerHTML = '<i class="fas fa-times-circle"></i> This request has already been denied.';
+                document.getElementById('page-icon').style.color = '#ef4444';
+            }
+        }
+
+        function showResolution(status) {
+            document.getElementById('consent-content').style.display = 'none';
+            const statusBox = document.getElementById('status-box');
+            statusBox.style.display = 'block';
+            
+            if (status === 'approved') {
+                statusBox.className = 'status-msg status-approved';
+                statusBox.innerHTML = '<i class="fas fa-check-circle"></i> Account Approved! Your child can now log in to Soulamore.';
+                document.getElementById('page-icon').style.color = '#10b981';
+                document.getElementById('page-title').textContent = "Approval Confirmed";
+                document.getElementById('page-desc').textContent = "Thank you. The account request has been approved successfully.";
+            } else {
+                statusBox.className = 'status-msg status-denied';
+                statusBox.innerHTML = '<i class="fas fa-times-circle"></i> Request Denied. The pending account request has been rejected.';
+                document.getElementById('page-icon').style.color = '#ef4444';
+                document.getElementById('page-title').textContent = "Request Denied";
+                document.getElementById('page-desc').textContent = "The account registration will be cancelled and deleted.";
+            }
+        }
+
+        function showError(msg) {
+            document.getElementById('loading').style.display = 'none';
+            const statusBox = document.getElementById('status-box');
+            statusBox.style.display = 'block';
+            statusBox.className = 'status-msg status-denied';
+            statusBox.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${msg}`;
+            document.getElementById('page-icon').style.color = '#ef4444';
+        }
+    </script>
+</body>
+</html>

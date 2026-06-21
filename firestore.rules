@@ -34,8 +34,7 @@ service cloud.firestore {
     // Role verification flags (Verified Status)
     match /roles/{userId} {
       allow read: if isSelf(userId) || isAdmin();
-      allow create, update: if isSelf(userId) || isAdmin();
-      allow delete: if isAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
     // Practitioner metadata (Private settings/UPI)
@@ -221,6 +220,28 @@ service cloud.firestore {
     match /safety_reports/{id} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
+    }
+
+    // Cookie Consents
+    match /cookie_consents/{id} {
+      allow create: if true;
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update, delete: if isAdmin();
+    }
+
+    // Processing Consents (Wellness & Marketing decisions)
+    match /processing_consents/{id} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
+    // Parental Consents for Minors
+    match /parental_consents/{id} {
+      allow create: if isSignedIn() && request.resource.data.minorUserId == request.auth.uid;
+      allow read, update: if true; // Accessed via verification token by external parent
+      allow delete: if isAdmin();
     }
 
     // Default: Deny all other access
