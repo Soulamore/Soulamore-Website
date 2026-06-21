@@ -125,7 +125,7 @@ const sendTemplatedEmail = async (to, subject, folder, fileName, replacements = 
     if (!html) return;
 
     const mailOptions = {
-        from: '"Soulamore Engine" <contact.soulamore@gmail.com>',
+        from: '"Soulamore Engine" <support@soulamore.in>',
         to,
         subject,
         html
@@ -497,7 +497,7 @@ exports.sendLeadNotificationEmail = functions.firestore
     if (isUrgent) {
         // Dispatch High Risk Admin Alert
         await sendTemplatedEmail(
-            'contact.soulamore@gmail.com', // Admin notification
+            'support@soulamore.in', // Admin notification
             `[CRITICAL: HIGH RISK] ${lead.name || 'Anonymous User'}`,
             'admin',
             'high_risk_lifeline_alert.html',

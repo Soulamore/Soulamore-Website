@@ -149,7 +149,7 @@ export const onLeadCreated = functions.firestore
         `;
 
         await sendEmail(
-            { email: 'contact.soulamore@gmail.com' }, 
+            { email: 'support@soulamore.in' }, 
             `${subjectPrefix}Lead: ${lead.name || 'Anonymous'}`, 
             adminHtml
         );
@@ -341,13 +341,13 @@ export const onFeedbackCreated = functions.firestore
 
         const { compileTemplate } = await import('../emailService');
         const html = compileTemplate(
-            { email: 'contact.soulamore@gmail.com', name: 'Soulamore Admin' },
+            { email: 'support@soulamore.in', name: 'Soulamore Admin' },
             'New Site Feedback Received',
             body
         );
 
         return await sendEmail(
-            { email: 'contact.soulamore@gmail.com', name: 'Soulamore Admin' },
+            { email: 'support@soulamore.in', name: 'Soulamore Admin' },
             'New Site Feedback Received',
             html
         );

@@ -96,7 +96,7 @@ You MUST reply strictly in JSON format matching this schema:
         `;
 
         await sendEmail(
-          { email: 'contact.soullamore@gmail.com', name: 'Soulamore Admin' },
+          { email: 'support@soulamore.in', name: 'Soulamore Admin' },
           `⚠️ SAFETY ALERT: Flagged Content (${contentType})`,
           emailHtml
         );
