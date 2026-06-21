@@ -19,34 +19,57 @@ export function initFeedbackWidget() {
     // Create floating button
     const button = document.createElement('button');
     button.id = 'feedback-widget-btn';
-    button.innerHTML = '<i class="fas fa-comment-dots"></i> Feedback';
-    button.style.cssText = `
-        position: fixed;
-        bottom: 52px;
-        left: 20px; /* Moved left to avoid overlapping with SoulBot widget */
-        z-index: 9998;
-        background: linear-gradient(135deg, #4ECDC4, #F49F75);
-        color: #0f172a;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 50px;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.95rem;
+    button.innerHTML = '<i class="fas fa-comment-dots"></i><span class="feedback-btn-text">Feedback</span>';
+    
+    // Inject Stylesheet
+    const style = document.createElement('style');
+    style.id = 'feedback-widget-styles';
+    style.textContent = `
+        #feedback-widget-btn {
+            position: fixed;
+            bottom: 100px;
+            left: 30px;
+            z-index: 9998;
+            background: linear-gradient(135deg, #4ECDC4, #F49F75);
+            color: #0f172a;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        #feedback-widget-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.5);
+        }
+        @media (max-width: 1024px) {
+            #feedback-widget-btn {
+                bottom: 120px;
+                left: auto !important;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                padding: 0;
+                border-radius: 50%;
+                justify-content: center;
+            }
+            #feedback-widget-btn .feedback-btn-text {
+                display: none;
+            }
+            #feedback-widget-btn i {
+                font-size: 1.25rem;
+                margin: 0;
+            }
+        }
     `;
-    button.onmouseover = function() {
-        this.style.transform = 'translateY(-3px)';
-        this.style.boxShadow = '0 6px 20px rgba(78, 205, 196, 0.5)';
-    };
-    button.onmouseout = function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 4px 15px rgba(78, 205, 196, 0.4)';
-    };
+    document.head.appendChild(style);
+
     button.onclick = openFeedbackModal;
     
     document.body.appendChild(button);
@@ -189,6 +212,7 @@ function createFeedbackModal() {
 
     // Add star interactivity
     const stars = modal.querySelectorAll('.feedback-star');
+    const ratingInputs = modal.querySelectorAll('input[name="rating"]');
 
     stars.forEach(star => {
         star.addEventListener('mouseover', function() {
@@ -207,10 +231,11 @@ function createFeedbackModal() {
                 s.style.opacity = sVal <= val ? '1' : '0.3';
             });
         });
+    });
 
-        star.addEventListener('click', function() {
-            const val = parseInt(this.getAttribute('data-value'));
-            modal.querySelector(`#rating${val}`).checked = true;
+    ratingInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const val = parseInt(this.value);
             stars.forEach(s => {
                 const sVal = parseInt(s.getAttribute('data-value'));
                 s.style.opacity = sVal <= val ? '1' : '0.3';

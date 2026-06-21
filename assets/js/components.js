@@ -1785,7 +1785,7 @@ function injectSoulBotWidget() {
                     <button class="sb-send" onclick="sendWidgetMessage()"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
-            <div id="soulbot-widget-fab" onclick="toggleWidget()" style="display: none;"> <!-- Hidden on mobile via CSS, manually hidden here for safety -->
+            <div id="soulbot-widget-fab" onclick="toggleWidget()">
                 <i class="fas fa-robot"></i>
             </div>
         </div>
