@@ -67,18 +67,23 @@ Every session MUST end with a report containing:
 
 Testing reports (e.g., test plans, test suites, manual verification checklists) serve as living registers for manual and automated feature verification. They must follow these rules:
 
-1. **Storage & Naming**: Store all testing reports in the dedicated `reports/testing/` folder. Use the `TST` code in the file name: `{NNN}_{YYYY-MM-DD}_{AGENT}_TST_{Title}.md`.
+1. **Storage & Naming**: Store all testing reports in the dedicated `reports/testing/` folder. They use a nomenclature separate from agent reports:
+   ```
+   TEST_[Feature_Name]_Suite.md
+   ```
+   *(e.g., `TEST_Soulamore_Features_Suite.md`. No sequential numbers or agent names in the filename).*
 2. **Handoff Info**: Must include the standard Session Handoff sections.
-3. **Use Case Structure**: Each test case or verify target must be documented in a table with:
+3. **Use Case Structure**: Each test case must support a collaborative verification process for both Aditya (AD) and Abhishek (AB). Document them using the following format:
    - **Use Case ID & Title**
    - **Actors**
    - **Pre-conditions**
    - **Test Steps**
    - **Expected Results**
-   - **Status**: Mark clearly as `⬜ PENDING`, `✅ PASS`, or `❌ FAIL [Details]`.
-   - **Tested By**: Initials of the verifying team member (e.g., `AD` for Aditya, `AB` for Abhishek).
-   - **Date Verified**: The date when the test was run.
-4. **Collaboration**: Testing reports are designed as living documents. Verifiers must edit the status, name, and date columns directly in the report file as they test features on local or staging environments.
+   - **Aditya (AD) Status**: `⬜ PENDING` | `✅ PASS` | `❌ FAIL [Details]`
+   - **Aditya (AD) Verified Date**: Date or `—`
+   - **Abhishek (AB) Status**: `⬜ PENDING` | `✅ PASS` | `❌ FAIL [Details]`
+   - **Abhishek (AB) Verified Date**: Date or `—`
+4. **Collaboration**: Testing reports are living registers. Both Aditya and Abhishek can directly edit their respective status and date rows in the markdown file as they execute manual or automated testing.
 
 ---
 

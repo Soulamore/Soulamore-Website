@@ -1,4 +1,4 @@
-# 070 — Soulamore Platform: Features Testing Suite & Use Cases
+# Soulamore Platform: Features Testing Suite & Use Cases
 **Prepared by:** Antigravity (QA/Test Specialist)
 **For:** Aditya & Abhishek (Testing Team)
 **Date:** 21 June 2026
@@ -16,7 +16,7 @@
 ---
 
 > [!NOTE]
-> **Aditya & Abhishek:** Use this file as your living test register. When you verify a feature, update the **Status** column (e.g., mark it `✅ PASS` or `❌ FAIL [Details]`), add your initials under **Tested By**, and record the date.
+> **Aditya & Abhishek:** Use this file as your collaborative test register. When you verify a feature, update your respective status row (e.g., mark it `✅ PASS` or `❌ FAIL [Details]`) and write the verification date. Both of you must independently verify each use case.
 
 ---
 
@@ -31,9 +31,10 @@
 | **Pre-conditions** | User is logged in but has not yet accepted the wellness data processing consent. |
 | **Test Steps** | 1. Navigate to `/portal/user-dashboard.html` while logged in.<br>2. Confirm a full-screen modal ("Before You Begin") appears immediately, blocking the dashboard view.<br>3. Attempt to click outside the modal or press `ESC` to close it.<br>4. Click the **"I Consent"** button inside the modal. |
 | **Expected Results** | - The modal cannot be dismissed by clicking outside or pressing `ESC`. It hard-blocks all user dashboard interaction.<br>- Clicking "I Consent" successfully writes a consent record to `processing_consents` collection in Firestore, closes the modal, and unlocks the dashboard. |
-| **Status** | `⬜ PENDING` |
-| **Tested By** | — |
-| **Date Verified** | — |
+| **Aditya (AD) Status** | `⬜ PENDING` |
+| **Aditya (AD) Date** | — |
+| **Abhishek (AB) Status** | `⬜ PENDING` |
+| **Abhishek (AB) Date** | — |
 
 ---
 
@@ -46,9 +47,10 @@
 | **Pre-conditions** | User is logged in and has existing data (journals, mood logs, profile info) in Firestore. |
 | **Test Steps** | 1. Navigate to settings panel inside the user dashboard.<br>2. Find the **"Privacy & Data Rights"** section.<br>3. Click the **"Download My Data (JSON)"** button.<br>4. Inspect the downloaded `.json` file. |
 | **Expected Results** | - An HTTP-callable function `exportUserData` compiles user profile, journals, mood entries, consent records, and bookings.<br>- A JSON file downloads automatically containing structured data with Firestore Timestamps formatted as ISO strings. |
-| **Status** | `⬜ PENDING` |
-| **Tested By** | — |
-| **Date Verified** | — |
+| **Aditya (AD) Status** | `⬜ PENDING` |
+| **Aditya (AD) Date** | — |
+| **Abhishek (AB) Status** | `⬜ PENDING` |
+| **Abhishek (AB) Date** | — |
 
 ---
 
@@ -61,9 +63,10 @@
 | **Pre-conditions** | User is logged in and has previously accepted wellness consent. |
 | **Test Steps** | 1. Navigate to **Privacy & Data Rights** section in the settings panel.<br>2. Locate the active **"Wellness Data Consent"** toggle status (Active).<br>3. Click **"Withdraw Consent"** and confirm the confirmation popup. |
 | **Expected Results** | - The consent record status is updated in Firestore `processing_consents`.<br>- The user is automatically signed out immediately to enforce processing halt.<br>- Future logins are redirected back to the consent wall. |
-| **Status** | `⬜ PENDING` |
-| **Tested By** | — |
-| **Date Verified** | — |
+| **Aditya (AD) Status** | `⬜ PENDING` |
+| **Aditya (AD) Date** | — |
+| **Abhishek (AB) Status** | `⬜ PENDING` |
+| **Abhishek (AB) Date** | — |
 
 ---
 
@@ -76,9 +79,10 @@
 | **Pre-conditions** | Admin is logged in and has access to `/portal/admin-dashboard.html`. |
 | **Test Steps** | 1. Open the Admin Dashboard.<br>2. Click on the **"Security Events"** tab/link in the sidebar.<br>3. Confirm that logged client-side or server-side events are listed.<br>4. Click **"Refresh Logs"** and check for updates. |
 | **Expected Results** | - Recent security events (timestamps, severity, user identifier, description) fetch successfully from the `security_events` collection.<br>- Unauthorized access attempts are logged with IP hashes/IDs. |
-| **Status** | `⬜ PENDING` |
-| **Tested By** | — |
-| **Date Verified** | — |
+| **Aditya (AD) Status** | `⬜ PENDING` |
+| **Aditya (AD) Date** | — |
+| **Abhishek (AB) Status** | `⬜ PENDING` |
+| **Abhishek (AB) Date** | — |
 
 ---
 
@@ -91,9 +95,10 @@
 | **Pre-conditions** | Admin is logged in; target user has requested deletion and is marked `pending_deletion`. |
 | **Test Steps** | 1. Open Admin Dashboard and select the **"Users"** tab.<br>2. Locate the user marked `Pending Deletion`.<br>3. Click the **"Delete User (Immediate)"** button. |
 | **Expected Results** | - Admin triggers secure Cloud Function `runAccountDeletion`.<br>- All related collections are cascade-deleted instantly.<br>- Firebase Auth profile of the user is deleted immediately. |
-| **Status** | `⬜ PENDING` |
-| **Tested By** | — |
-| **Date Verified** | — |
+| **Aditya (AD) Status** | `⬜ PENDING` |
+| **Aditya (AD) Date** | — |
+| **Abhishek (AB) Status** | `⬜ PENDING` |
+| **Abhishek (AB) Date** | — |
 
 ---
 
@@ -108,9 +113,10 @@
 | **Pre-conditions** | Visitor is on the signup page `/portal/signup.html`. |
 | **Test Steps** | 1. Input signup details: name, email, password.<br>2. In the Date of Birth picker, select a date that evaluates to **under 13 years old** from the current date.<br>3. Click **"Sign Up"**. |
 | **Expected Results** | - The signup attempt is immediately blocked client-side.<br>- An error message displays: *"Soulamore requires users to be at least 13 years old. You cannot create an account."*<br>- No write operation occurs to Firebase Auth or Firestore. |
-| **Status** | `⬜ PENDING` |
-| **Tested By** | — |
-| **Date Verified** | — |
+| **Aditya (AD) Status** | `⬜ PENDING` |
+| **Aditya (AD) Date** | — |
+| **Abhishek (AB) Status** | `⬜ PENDING` |
+| **Abhishek (AB) Date** | — |
 
 ---
 
@@ -123,9 +129,10 @@
 | **Pre-conditions** | Visitor is on the signup page. |
 | **Test Steps** | 1. Enter details and select a DOB that evaluates to **between 13 and 17 years old**.<br>2. Confirm that a **Parent/Guardian Email** field appears dynamically.<br>3. Fill in parent's email and complete registration.<br>4. Attempt to log in immediately using the new credentials. |
 | **Expected Results** | - Account is created but flagged `ageGateTier: 'minor'` and `parentalConsentStatus: 'pending'`.<br>- Parent receives authorization link via email.<br>- Minor is redirected to `/auth/parental-consent-pending.html` and logged out.<br>- Logging in before approval displays the pending screen and logs the user out. |
-| **Status** | `⬜ PENDING` |
-| **Tested By** | — |
-| **Date Verified** | — |
+| **Aditya (AD) Status** | `⬜ PENDING` |
+| **Aditya (AD) Date** | — |
+| **Abhishek (AB) Status** | `⬜ PENDING` |
+| **Abhishek (AB) Date** | — |
 
 ---
 
@@ -138,9 +145,10 @@
 | **Pre-conditions** | A minor registered and triggered a parental consent pending record. |
 | **Test Steps** | 1. Visit `/auth/parental-consent.html?token=VALID_TOKEN&child=CHILD_UID` in a clean browser window.<br>2. Click **"Approve Consent"**.<br>3. Return to the minor's login page and log in as the minor. |
 | **Expected Results** | - Click handler updates Firestore `parental_consents/{id}` status to `approved`.<br>- The minor can now log in successfully and access their dashboard. |
-| **Status** | `⬜ PENDING` |
-| **Tested By** | — |
-| **Date Verified** | — |
+| **Aditya (AD) Status** | `⬜ PENDING` |
+| **Aditya (AD) Date** | — |
+| **Abhishek (AB) Status** | `⬜ PENDING` |
+| **Abhishek (AB) Date** | — |
 
 ---
 
@@ -153,9 +161,10 @@
 | **Pre-conditions** | Visitor is on the signup page. |
 | **Test Steps** | 1. Enter details and DOB.<br>2. Set password to a known breached password (e.g., `password123`).<br>3. Click **"Sign Up"**. |
 | **Expected Results** | - Password SHA-1 hash is computed; the first 5 characters are sent to the HIBP range API.<br>- Registration is blocked with a warning: *"This password has appeared in a data breach. Please choose a more secure password."* |
-| **Status** | `⬜ PENDING` |
-| **Tested By** | — |
-| **Date Verified** | — |
+| **Aditya (AD) Status** | `⬜ PENDING` |
+| **Aditya (AD) Date** | — |
+| **Abhishek (AB) Status** | `⬜ PENDING` |
+| **Abhishek (AB) Date** | — |
 
 ---
 
@@ -170,9 +179,10 @@
 | **Pre-conditions** | Cookies/Local Storage cleared. |
 | **Test Steps** | 1. Visit the homepage `/index.html`.<br>2. Locate the cookie banner at the bottom.<br>3. Click the **"Essential Only"** button.<br>4. Check `localStorage` for `cookieConsent`. |
 | **Expected Results** | - `localStorage.getItem('cookieConsent')` is set to `essential`.<br>- The banner disappears and no tracking scripts are initialized. |
-| **Status** | `⬜ PENDING` |
-| **Tested By** | — |
-| **Date Verified** | — |
+| **Aditya (AD) Status** | `⬜ PENDING` |
+| **Aditya (AD) Date** | — |
+| **Abhishek (AB) Status** | `⬜ PENDING` |
+| **Abhishek (AB) Date** | — |
 
 ---
 
@@ -187,9 +197,10 @@
 | **Pre-conditions** | Browsing the live site. |
 | **Test Steps** | 1. Navigate to `/spaces/soulamore-workplace/plans.html` and scroll to the bottom.<br>2. Navigate to `/index.html` and scroll to the bottom.<br>3. Confirm company name is `Hashlilly (OPC) Private Limited`.<br>4. Confirm contact email is `support@soulamore.in`.<br>5. Verify that the advertising automation scope line is removed. |
 | **Expected Results** | - Company information matches the updated legally compliant terms.<br>- Cache-busted versions (`?v=3.6`) force the updated script on both desktops and mobile devices. |
-| **Status** | `⬜ PENDING` |
-| **Tested By** | — |
-| **Date Verified** | — |
+| **Aditya (AD) Status** | `⬜ PENDING` |
+| **Aditya (AD) Date** | — |
+| **Abhishek (AB) Status** | `⬜ PENDING` |
+| **Abhishek (AB) Date** | — |
 
 ---
 
