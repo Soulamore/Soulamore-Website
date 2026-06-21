@@ -8,10 +8,9 @@ import * as sib from '@getbrevo/brevo';
  * Official API Integration for High-Performance Delivery (v3.0 Brevo)
  */
 
-const apiInstance = new sib.TransactionalEmailsApi();
 // Initialize API Key from environment or fallback to the one provided in CORE_INTELLIGENCE
 const BREVO_KEY = process.env.BREVO_API_KEY?.trim() || 'uninitialized';
-apiInstance.setApiKey(sib.TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
+const client = new sib.BrevoClient({ apiKey: BREVO_KEY });
 
 const SENDER_EMAIL = "care@soulamore.com"; 
 const SENDER_NAME = "Soulamore Care";
@@ -154,10 +153,10 @@ export async function sendEmail(recipient: EmailRecipient, subject: string, html
       replyTo: { email: SENDER_EMAIL, name: SENDER_NAME }
     };
 
-    const data = await apiInstance.sendTransacEmail(sendSmtpEmail as any);
+    const data = await client.transactionalEmails.sendTransacEmail(sendSmtpEmail as any);
     
     functions.logger.info(`✅ Successfully sent soulful update to ${recipient.email}`);
-    return { success: true, messageId: data.body.messageId };
+    return { success: true, messageId: data.messageId };
   } catch (error: any) {
     functions.logger.error('💥 Execution error in sendEmail (Brevo):', error.message);
     return { success: false, error: error.message };
