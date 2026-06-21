@@ -925,6 +925,9 @@
                 <a href="#" class="side-link" data-view="site-feedback" onclick="switchView('site-feedback', this)">
                     <i class="fas fa-comment-dots"></i> <span>Site Feedback</span>
                 </a>
+                <a href="#" class="side-link" data-view="security" onclick="switchView('security', this)">
+                    <i class="fas fa-shield-alt"></i> <span>Security Events</span>
+                </a>
 
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:15px 0;">
                 <a href="#" class="side-link" onclick="switchView('settings', this)"><i class="fas fa-cog"></i>
@@ -1921,10 +1924,101 @@
                 </div>
             </div>
 
+        <!-- VIEW: SECURITY & BREACH MONITORING -->
+        <div id="view-security" class="view-section" style="display:none;">
+            <div class="workspace-header">
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <div style="width:45px; height:45px; background:rgba(239,68,68,0.1); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#ef4444; border: 1px solid rgba(239,68,68,0.2);">
+                        <i class="fas fa-shield-alt" style="font-size:1.2rem;"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.6rem; margin:0; color:var(--text-main);">Security & Breach Monitoring</h2>
+                        <div style="font-size:0.85rem; opacity:0.6; font-weight:500;">Compliance, alerts, and incident logs</div>
+                    </div>
+                </div>
+            </div>
+            <div class="workspace-body" style="padding: 30px;">
+                <div class="dashboard-grid" style="display:grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start;">
+                    
+                    <!-- LEFT COLUMN: Security Events Table -->
+                    <div class="dash-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <h3 style="margin:0;">Recent Security Events</h3>
+                            <button class="btn-dash-primary" onclick="loadSecurityEvents()" style="padding:6px 12px; font-size:0.8rem;"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                        <div style="max-height: 500px; overflow-y: auto;">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Severity</th>
+                                        <th>Type</th>
+                                        <th>Details</th>
+                                        <th>User</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="security-events-tbody">
+                                    <tr>
+                                        <td colspan="5" style="text-align:center; padding:30px; opacity:0.5;">Loading security events...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
+                    <!-- RIGHT COLUMN: Actions & Breach Form -->
+                    <div style="display:flex; flex-direction:column; gap:20px;">
+                        
+                        <!-- Manual Incident Report -->
+                        <div class="dash-card">
+                            <h3 style="margin-bottom:15px;">Log Security Event</h3>
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <div>
+                                    <label style="display:block; font-size:0.8rem; opacity:0.7; margin-bottom:5px;">Severity</label>
+                                    <select id="log-sec-severity" style="width:100%; padding:8px; background:var(--bg-deep); border:1px solid var(--border-soft); border-radius:8px; color:var(--text-primary); outline:none;">
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="critical">Critical</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block; font-size:0.8rem; opacity:0.7; margin-bottom:5px;">Event Type</label>
+                                    <input type="text" id="log-sec-type" placeholder="e.g. Brute Force Attempt, CSRF" style="width:100%; padding:8px; background:var(--bg-deep); border:1px solid var(--border-soft); border-radius:8px; color:var(--text-primary); outline:none;">
+                                </div>
+                                <div>
+                                    <label style="display:block; font-size:0.8rem; opacity:0.7; margin-bottom:5px;">Description</label>
+                                    <textarea id="log-sec-desc" placeholder="Event details..." style="width:100%; height:80px; padding:8px; background:var(--bg-deep); border:1px solid var(--border-soft); border-radius:8px; color:var(--text-primary); outline:none; resize:none;"></textarea>
+                                </div>
+                                <button class="btn-dash-primary" onclick="submitManualSecurityEvent()" style="width:100%; padding:10px; cursor:pointer;">Log Incident</button>
+                            </div>
+                        </div>
+
+                        <!-- Breach Playbook Tool -->
+                        <div class="dash-card">
+                            <h3 style="margin-bottom:10px;">Breach Report Generator</h3>
+                            <p style="font-size:0.8rem; opacity:0.6; line-height:1.4; margin-bottom:15px;">Pre-fill the compliance breach template (GDPR 72h notice / DPDP Sec 8) for regulatory filing.</p>
+                            <button class="btn-dash-secondary" onclick="generateBreachNotice()" style="width:100%; padding:10px; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
+                                <i class="fas fa-file-invoice"></i> Draft Incident Notice
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Breach Template Area -->
+                <div class="dash-card" id="breach-template-card" style="margin-top:30px; display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h3 style="margin:0; color:#ef4444;"><i class="fas fa-file-medical-alt"></i> Draft Breach Notification Form (Regulatory Ready)</h3>
+                        <button class="btn-dash-secondary" onclick="document.getElementById('breach-template-card').style.display='none'" style="padding:4px 10px; font-size:0.8rem;">Dismiss</button>
+                    </div>
+                    <textarea id="breach-notice-textarea" readonly style="width:100%; height:300px; padding:15px; background:#0f172a; border:1px solid rgba(239,68,68,0.3); border-radius:12px; color:#f1f5f9; font-family:'Courier New', monospace; font-size:0.85rem; line-height:1.5; outline:none; resize:vertical;"></textarea>
+                    <p style="font-size:0.75rem; opacity:0.5; margin-top:10px;">* Copies of this notice must be submitted to the Data Protection Board of India (DPBI) and the EU Supervisory Authority within 72 hours of detection.</p>
+                </div>
+            </div>
+        </div>
 
         <!-- VIEW: SITE FEEDBACK -->
-        <div id="view-site-feedback" class="view-section">
+        <div id="view-site-feedback" class="view-section" style="display:none;">
             <div class="workspace-header">
                 <div style="display:flex; align-items:center; gap:16px;">
                     <div style="width:45px; height:45px; background:var(--admin-accent-soft); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--admin-accent); border: 1px solid var(--admin-accent-glow);">
@@ -2650,6 +2744,7 @@
             if (viewId === 'deep-listening') loadDeepListeningHub();
             if (viewId === 'api-health') loadApiHealth();
             if (viewId === 'site-feedback') loadSiteFeedback();
+            if (viewId === 'security') loadSecurityEvents();
         };
 
         // ✅ FIX: Trigger Overview view immediately after switchView is defined
@@ -6967,6 +7062,138 @@
                 
                 console.error("Telemetry Error:", err);
             }
+        };
+
+        // === SECURITY & BREACH MONITORING EVENT HANDLERS ===
+        window.loadSecurityEvents = async function() {
+            const tbody = document.getElementById('security-events-tbody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading security events...</td></tr>';
+
+            try {
+                const q = query(collection(db, 'security_events'), orderBy('timestamp', 'desc'), limit(50));
+                const snapshot = await getDocs(q);
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; opacity:0.5; padding: 20px;">No security events logged.</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'N/A';
+                    const severity = data.severity || 'low';
+                    
+                    let badgeColor = '#94a3b8';
+                    let badgeBg = 'rgba(148,163,184,0.1)';
+                    if (severity === 'critical') { badgeColor = '#ef4444'; badgeBg = 'rgba(239,68,68,0.15)'; }
+                    else if (severity === 'high') { badgeColor = '#f97316'; badgeBg = 'rgba(249,115,22,0.15)'; }
+                    else if (severity === 'medium') { badgeColor = '#eab308'; badgeBg = 'rgba(234,179,8,0.15)'; }
+                    else if (severity === 'low') { badgeColor = '#22c55e'; badgeBg = 'rgba(34,197,94,0.15)'; }
+
+                    const severityBadge = `<span style="color:${badgeColor}; background:${badgeBg}; padding:3px 8px; border-radius:50px; font-size:0.75rem; font-weight:700; border:1px solid ${badgeColor}30; text-transform:uppercase;">${severity}</span>`;
+
+                    html += `
+                        <tr>
+                            <td class="meta-cell">${date}</td>
+                            <td>${severityBadge}</td>
+                            <td style="font-weight:600; color:#f1f5f9;">${data.eventType || 'N/A'}</td>
+                            <td style="max-width:300px; white-space:pre-wrap; font-size:0.85rem; opacity:0.8;">${data.description || 'N/A'}</td>
+                            <td class="email-cell">${data.userEmail || 'System'}</td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html;
+            } catch (err) {
+                console.error("Error loading security events:", err);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#ef4444; padding:20px;">Failed to load security events: ' + err.message + '</td></tr>';
+            }
+        };
+
+        window.submitManualSecurityEvent = async function() {
+            const severity = document.getElementById('log-sec-severity').value;
+            const eventType = document.getElementById('log-sec-type').value.trim();
+            const description = document.getElementById('log-sec-desc').value.trim();
+
+            if (!eventType || !description) {
+                alert("Please fill in the Event Type and Description fields.");
+                return;
+            }
+
+            const btn = document.querySelector('#view-security .btn-dash-primary[onclick*="submitManualSecurityEvent"]');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = "Logging...";
+
+            try {
+                const logSecurityEventFn = httpsCallable(functionsInstance, 'logSecurityEvent');
+                await logSecurityEventFn({ severity, eventType, description });
+
+                alert("✅ Security event logged successfully!");
+                document.getElementById('log-sec-type').value = '';
+                document.getElementById('log-sec-desc').value = '';
+                await loadSecurityEvents();
+            } catch (err) {
+                console.error("Failed to log security event:", err);
+                alert("Failed to log event: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        };
+
+        window.generateBreachNotice = function() {
+            const dateStr = new Date().toLocaleString();
+            const template = `======================================================================
+FORMAL SECURITY BREACH NOTIFICATION (REGULATORY SUBMISSION READY)
+Under: GDPR Article 33 / India DPDP Act 2023, Section 8(6)
+======================================================================
+
+1. DATA FIDUCIARY / CONTROLLER DETAILS
+----------------------------------------------------------------------
+Entity Name: Hashlilly Private Limited (Soulamore Platform)
+CIN: U62099PB2026OPC068567
+Registered Office: Punjab, India
+Grievance Representative: Aditya Harsh
+Contact Email: contact.soulamore@gmail.com
+
+2. NATURE AND CONTEXT OF THE INCIDENT
+----------------------------------------------------------------------
+Incident Detected At: ${dateStr}
+Incident Category: [e.g. Unauthorized Database Access / Authentication Anomaly]
+Source/Mechanism: [Describe briefly, e.g. Credential stuffing, database leak, etc.]
+Type of Personal Data Affected: [e.g. User Profile metadata, Journal Entry keywords]
+
+3. IMPACT ASSESSMENT & ESTIMATED NUMBERS
+----------------------------------------------------------------------
+Approximate Number of Data Subjects Affected: [Insert Estimated Users]
+Approximate Number of Personal Data Records Affected: [Insert Estimated Records]
+Risk Category: [Low / Medium / High / Critical]
+
+4. MITIGATION AND REMEDIAL MEASURES IMPLEMENTED
+----------------------------------------------------------------------
+Immediate Action: Affected account sessions revoked, Firestore Rules updated, auth rate limits enforced.
+Post-Breach Measures: Automated data retention jobs verified, security events logged.
+
+5. ADVICE TO AFFECTED DATA SUBJECTS
+----------------------------------------------------------------------
+Recommended Action: Change credentials, enable MFA, ignore suspicious emails claiming association.
+
+======================================================================
+Submission Prepared By: Soulamore Security Team
+File Reference: SEC-BREACH-${Date.now()}
+======================================================================`;
+
+            document.getElementById('breach-notice-textarea').value = template;
+            document.getElementById('breach-notice-textarea').select();
+            document.getElementById('breach-template-card').style.display = 'block';
+            
+            // Scroll to the template card
+            const card = document.getElementById('breach-template-card');
+            if (card) card.scrollIntoView({ behavior: 'smooth' });
         };
 
         // Initialize API Health when tab is clicked

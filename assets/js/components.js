@@ -1349,9 +1349,15 @@ function injectSubnav() {
 }
 
 // --- 11. COOKIE CONSENT ---
+function getCookieConsent() {
+    return localStorage.getItem('cookieConsent') || null;
+}
+window.getCookieConsent = getCookieConsent;
+
 function injectCookieBanner() {
-    // 1. Check if already consented
-    if (localStorage.getItem('cookieConsent') === 'accepted') return;
+    // 1. Check if already consented (either accepted or essential only)
+    const consent = localStorage.getItem('cookieConsent');
+    if (consent === 'accepted' || consent === 'essential') return;
 
     // 2. Create Banner
     const banner = document.createElement('div');
@@ -1363,7 +1369,8 @@ function injectCookieBanner() {
                 bottom: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                max-width: 400px;
+                max-width: 440px;
+                width: calc(100% - 40px);
                 background: rgba(15, 23, 42, 0.95);
                 backdrop-filter: blur(12px);
                 border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1379,31 +1386,44 @@ function injectCookieBanner() {
             
             .cb-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-weight: 600; color: #4ECDC4; }
             .cb-text { font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px; line-height: 1.5; }
-            .cb-actions { display: flex; gap: 10px; justify-content: flex-end; }
+            .cb-actions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
             
-            .cb-btn { padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; cursor: pointer; border: none; font-weight: 600; transition: 0.3s; }
+            .cb-btn { padding: 8px 16px; border-radius: 50px; font-size: 0.85rem; cursor: pointer; border: none; font-weight: 600; transition: 0.3s; }
             .cb-accept { background: #4ECDC4; color: #0f172a; }
             .cb-accept:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3); }
             
-            .cb-info { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.1); }
-            .cb-info:hover { color: white; border-color: white; }
+            .cb-reject { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.15); }
+            .cb-reject:hover { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.35); transform: translateY(-2px); }
+
+            .cb-info { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid transparent; padding-left: 5px; padding-right: 5px; }
+            .cb-info:hover { color: white; text-decoration: underline; }
         </style>
         <div class="cb-header"><i class="fas fa-cookie-bite"></i> Human, we use cookies.</div>
-        <div class="cb-text">Not the chocolate chip kind (sadly). Just the digital kind to keep you logged in and make sure the site works. No tracking for ads.</div>
+        <div class="cb-text">Not the chocolate chip kind (sadly). Just the digital kind to keep you logged in and make sure the site works. We do not use advertising or tracking cookies.</div>
         <div class="cb-actions">
-            <button class="cb-btn cb-info" onclick="window.location.href='/company/privacy-policy.html'">Privacy</button>
-            <button class="cb-btn cb-accept" id="acceptCookies">Got it</button>
+            <button class="cb-btn cb-info" onclick="window.location.href='/company/privacy-policy.html'">Privacy Policy</button>
+            <button class="cb-btn cb-reject" id="rejectCookies">Essential Only</button>
+            <button class="cb-btn cb-accept" id="acceptCookies">Accept All</button>
         </div>
     `;
 
     document.body.appendChild(banner);
 
-    // 3. Bind Event
-    document.getElementById('acceptCookies').addEventListener('click', () => {
-        localStorage.setItem('cookieConsent', 'accepted');
+    const dismissBanner = () => {
         banner.style.opacity = '0';
         banner.style.transform = 'translateY(20px)';
         setTimeout(() => banner.remove(), 500);
+    };
+
+    // 3. Bind Events
+    document.getElementById('acceptCookies').addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'accepted');
+        dismissBanner();
+    });
+
+    document.getElementById('rejectCookies').addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'essential');
+        dismissBanner();
     });
 }
 

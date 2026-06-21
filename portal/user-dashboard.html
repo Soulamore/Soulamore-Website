@@ -341,6 +341,56 @@
                                     <button class="btn-dash-secondary" onclick="sendPasswordReset()">Change Password</button>
                                 </div>
                             </div>
+
+                            <!-- PRIVACY & DATA RIGHTS CARD -->
+                            <div class="dash-card" id="privacy-rights-card">
+                                <h3 style="margin-bottom:20px; display:flex; align-items:center; gap:10px;">
+                                    <i class="fas fa-shield-alt" style="color:#4ECDC4;"></i> Privacy & Data Rights
+                                </h3>
+                                <div style="display:flex; flex-direction:column; gap:20px;">
+                                    <!-- Consent Status -->
+                                    <div style="border-bottom:1px solid var(--border-soft); padding-bottom:15px;">
+                                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                            <span style="font-size:0.9rem; font-weight:600; opacity:0.9;">Wellness Data Processing</span>
+                                            <span id="wellness-consent-badge" style="font-size:0.75rem; padding:3px 10px; border-radius:50px; background:rgba(78,205,196,0.1); color:#4ECDC4; border:1px solid rgba(78,205,196,0.2);">Active</span>
+                                        </div>
+                                        <p style="font-size:0.8rem; opacity:0.6; line-height:1.4; margin:0 0 10px 0;">We process your self-reflections and wellness logs securely for personalized insights.</p>
+                                        <button class="theme-btn" id="btn-withdraw-consent" onclick="handleWithdrawConsent()" style="padding:6px 12px; font-size:0.8rem; border-radius:10px; width:auto; border:1px solid rgba(239, 68, 68, 0.3); background:transparent; color:#ef4444; cursor:pointer;">Withdraw Consent</button>
+                                    </div>
+
+                                    <!-- Data Portability -->
+                                    <div style="border-bottom:1px solid var(--border-soft); padding-bottom:15px;">
+                                        <span style="font-size:0.9rem; font-weight:600; opacity:0.9; display:block; margin-bottom:8px;">Data Portability (GDPR Art. 20)</span>
+                                        <p style="font-size:0.8rem; opacity:0.6; line-height:1.4; margin:0 0 10px 0;">Download a complete machine-readable copy of your personal data, journal entries, and activity logs.</p>
+                                        <button class="btn-dash-primary" id="btn-export-data" onclick="handleExportData()" style="padding:8px 16px; font-size:0.8rem; border-radius:10px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+                                            <i class="fas fa-file-download"></i> Download My Data (JSON)
+                                        </button>
+                                    </div>
+
+                                    <!-- Cookie Preferences -->
+                                    <div style="border-bottom:1px solid var(--border-soft); padding-bottom:15px;">
+                                        <span style="font-size:0.9rem; font-weight:600; opacity:0.9; display:block; margin-bottom:8px;">Cookie Customization</span>
+                                        <p style="font-size:0.8rem; opacity:0.6; line-height:1.4; margin:0 0 10px 0;">Reset your cookie preferences to change your settings between Accept All and Essential Only.</p>
+                                        <button class="btn-dash-secondary" onclick="handleResetCookies()" style="padding:8px 16px; font-size:0.8rem; border-radius:10px; cursor:pointer;">
+                                            Reset Cookie Preferences
+                                        </button>
+                                    </div>
+
+                                    <!-- Account Deletion -->
+                                    <div>
+                                        <span style="font-size:0.9rem; font-weight:600; opacity:0.9; display:block; margin-bottom:8px; color:#ef4444;">Danger Zone</span>
+                                        <p style="font-size:0.8rem; opacity:0.6; line-height:1.4; margin:0 0 10px 0;">Request permanent deletion of your profile, journals, mood entries, and all associated personal data. This cannot be undone.</p>
+                                        <button class="theme-btn" onclick="handleDeleteAccountRequest()" style="padding:8px 16px; font-size:0.8rem; border-radius:10px; border:1px solid #ef4444; background:rgba(239,68,68,0.1); color:#ef4444; font-weight:600; cursor:pointer; width:auto;">
+                                            Request Account Deletion
+                                        </button>
+                                    </div>
+
+                                    <!-- Contact details -->
+                                    <div style="font-size:0.75rem; opacity:0.5; text-align:center; margin-top:5px; line-height:1.4;">
+                                        Have questions about your data rights? Contact our Grievance Officer at <a href="mailto:contact.soulamore@gmail.com?subject=Rights%20Request%20-%20GDPR/DPDP" style="color:#4ECDC4; text-decoration:underline;">contact.soulamore@gmail.com</a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                 </div>
             </div>
@@ -1226,7 +1276,7 @@
             <!-- SoulBot in dashboard now uses iframe to soulbot-chat.html (same working implementation) -->
             <!-- PROFILE SAVE MODULE -->
             <script type="module">
-                import { auth, db, doc, updateDoc } from "../assets/js/firebase-config.js";
+                import { auth, db, doc, updateDoc, setDoc, serverTimestamp, functionsInstance, httpsCallable, collection, query, where, getDocs, signOut } from "../assets/js/firebase-config.js";
                 import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
                 window.saveProfileChanges = async function(nameId, phoneId) {
@@ -1275,6 +1325,145 @@
                         alert(`✅ Password reset link sent to ${user.email}. Check your inbox.`);
                     } catch(e) {
                         alert('Failed to send reset: ' + e.message);
+                    }
+                };
+
+                // Privacy Dashboard Event Handlers (GDPR & DPDP Compliance)
+                window.handleWithdrawConsent = async function() {
+                    const user = auth.currentUser;
+                    if (!user) { alert('Not logged in.'); return; }
+
+                    const confirmWithdraw = confirm("Are you sure you want to withdraw your wellness data processing consent? Under the DPDP Act 2023, you have the right to withdraw consent at any time. This will restrict Soulamore from processing your journal and mood logs for insights, and your account status will be deactivated.");
+                    if (!confirmWithdraw) return;
+
+                    const btn = document.getElementById('btn-withdraw-consent');
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                    try {
+                        // 1. Query for active wellness consent records in processing_consents
+                        const q = query(
+                            collection(db, 'processing_consents'),
+                            where('userId', '==', user.uid),
+                            where('consentType', '==', 'wellness_data_processing'),
+                            where('consented', '==', true)
+                        );
+                        const snap = await getDocs(q);
+                        
+                        // 2. Mark consent documents as inactive
+                        const promises = snap.docs.map(docSnap => {
+                            return updateDoc(docSnap.ref, {
+                                consented: false,
+                                withdrawnAt: serverTimestamp()
+                            });
+                        });
+                        await Promise.all(promises);
+
+                        // 3. Update user profile flag
+                        await updateDoc(doc(db, 'users', user.uid), {
+                            consentWellnessDataProcessing: false,
+                            consentWithdrawnAt: serverTimestamp()
+                        });
+
+                        // 4. Update UI Badge and Button
+                        const consentBadge = document.getElementById('wellness-consent-badge');
+                        if (consentBadge) {
+                            consentBadge.textContent = 'Inactive';
+                            consentBadge.style.background = 'rgba(239,68,68,0.1)';
+                            consentBadge.style.color = '#ef4444';
+                            consentBadge.style.borderColor = 'rgba(239,68,68,0.2)';
+                        }
+                        btn.textContent = 'Consent Withdrawn';
+                        btn.disabled = true;
+
+                        alert("✅ Wellness consent withdrawn successfully. You will be logged out to enforce this status change.");
+                        
+                        // Sign out to trigger re-consent/auth checks on next load
+                        await signOut(auth);
+                        localStorage.removeItem('soulamore_session');
+                        window.location.href = '../portal/login.html';
+                    } catch (e) {
+                        console.error("Consent withdrawal error:", e);
+                        alert("Failed to withdraw consent: " + e.message);
+                        btn.disabled = false;
+                        btn.textContent = "Withdraw Consent";
+                    }
+                };
+
+                window.handleExportData = async function() {
+                    const user = auth.currentUser;
+                    if (!user) { alert('Not logged in.'); return; }
+
+                    const btn = document.getElementById('btn-export-data');
+                    const originalHtml = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Export...';
+
+                    try {
+                        const exportUserDataFn = httpsCallable(functionsInstance, 'exportUserData');
+                        const res = await exportUserDataFn();
+                        
+                        if (res.data && res.data.success) {
+                            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(res.data.data, null, 2));
+                            const downloadAnchor = document.createElement('a');
+                            downloadAnchor.setAttribute("href", dataStr);
+                            downloadAnchor.setAttribute("download", `soulamore_data_export_${new Date().toISOString().split('T')[0]}.json`);
+                            document.body.appendChild(downloadAnchor);
+                            downloadAnchor.click();
+                            downloadAnchor.remove();
+                            alert("✅ Your data has been exported successfully. The download should start automatically.");
+                        } else {
+                            throw new Error("Export response was unsuccessful.");
+                        }
+                    } catch (e) {
+                        console.error("Export error:", e);
+                        alert("Failed to export data: " + e.message);
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = originalHtml;
+                    }
+                };
+
+                window.handleResetCookies = function() {
+                    localStorage.removeItem('cookieConsent');
+                    alert("✅ Cookie preferences reset. The consent banner will now re-open.");
+                    if (typeof window.injectCookieBanner === 'function') {
+                        window.injectCookieBanner();
+                    } else {
+                        window.location.reload();
+                    }
+                };
+
+                window.handleDeleteAccountRequest = async function() {
+                    const user = auth.currentUser;
+                    if (!user) { alert('Not logged in.'); return; }
+
+                    const dangerConfirm = confirm("⚠️ DANGER ZONE: Are you absolutely sure you want to request permanent account deletion?\n\nThis will schedule your account for permanent deletion. Under GDPR and DPDP compliance rules, we hold data for 30 days before permanent erasure. During this window, you will not be able to log in. Click OK to request deletion.");
+                    if (!dangerConfirm) return;
+
+                    const doubleConfirm = prompt("To confirm deletion, please type 'DELETE MY ACCOUNT' below:");
+                    if (doubleConfirm !== 'DELETE MY ACCOUNT') {
+                        alert("Confirmation mismatch. Deletion request cancelled.");
+                        return;
+                    }
+
+                    try {
+                        // Write a deletion request document in Firestore (doc ID is user.uid)
+                        await setDoc(doc(db, 'deletion_requests', user.uid), {
+                            userId: user.uid,
+                            email: user.email || '',
+                            requestedAt: serverTimestamp()
+                        });
+
+                        alert("✅ Account deletion requested. Your account is now scheduled for deletion in 30 days and you have been signed out.");
+                        
+                        // Sign out and redirect
+                        await signOut(auth);
+                        localStorage.removeItem('soulamore_session');
+                        window.location.href = '../portal/login.html';
+                    } catch (e) {
+                        console.error("Account deletion request error:", e);
+                        alert("Failed to request deletion: " + e.message);
                     }
                 };
             </script>
@@ -1952,6 +2141,33 @@
                         const el = document.getElementById(id);
                         if (el && data.phone) el.value = data.phone;
                     });
+
+                    // Update wellness consent status badge (Compliance Dashboard)
+                    const consentBadge = document.getElementById('wellness-consent-badge');
+                    const withdrawBtn = document.getElementById('btn-withdraw-consent');
+                    if (data.consentWellnessDataProcessing) {
+                        if (consentBadge) {
+                            consentBadge.textContent = 'Active';
+                            consentBadge.style.background = 'rgba(78,205,196,0.1)';
+                            consentBadge.style.color = '#4ECDC4';
+                            consentBadge.style.borderColor = 'rgba(78,205,196,0.2)';
+                        }
+                        if (withdrawBtn) {
+                            withdrawBtn.textContent = 'Withdraw Consent';
+                            withdrawBtn.disabled = false;
+                        }
+                    } else {
+                        if (consentBadge) {
+                            consentBadge.textContent = 'Inactive';
+                            consentBadge.style.background = 'rgba(239,68,68,0.1)';
+                            consentBadge.style.color = '#ef4444';
+                            consentBadge.style.borderColor = 'rgba(239,68,68,0.2)';
+                        }
+                        if (withdrawBtn) {
+                            withdrawBtn.textContent = 'Consent Withdrawn';
+                            withdrawBtn.disabled = true;
+                        }
+                    }
 
                     console.log('✅ User profile loaded:', displayName);
                 } else {

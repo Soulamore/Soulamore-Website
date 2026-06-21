@@ -101,7 +101,7 @@ function showCrisisModalTier1() {
                 </div>
                 <div style="display: flex; gap: 15px; justify-content: center; align-items: center;">
                     <button id="btn-crisis-dismiss" style="border: none; padding: 12px 24px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; cursor: pointer; background: #10b981; color: white; transition: 0.3s;">I'm safe — continue to app</button>
-                    <a href="/company/compliance.html" target="_blank" style="font-size: 0.9rem; color: #4ECDC4; text-decoration: underline;">View more resources</a>
+                    <a href="/get-help-now.html" target="_blank" style="font-size: 0.9rem; color: #4ECDC4; text-decoration: underline;">View more resources</a>
                 </div>
             </div>
         </div>
