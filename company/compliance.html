@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            // 1. Redirect Firebase Traffic
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            // 2. Canonical Injection
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Hashlilly Portfolio Compliance & Security Declaration. Learn how we meet DPDP 2023, IT Act 2000, GDPR, and security audit standards.">
+    <title>Legal & Security Compliance Declaration | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    <style>
+        /* --- THEME: MIDNIGHT VEGITO --- */
+        :root {
+            --deep-space: #0f172a;
+            --navy-glass: rgba(30, 41, 59, 0.9);
+            --starlight: #f1f5f9;
+            --peach-glow: #F49F75;
+            --teal-glow: #4ECDC4;
+            --gold-glow: #fbbf24;
+            --alert-red: #ef4444;
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            border-radius: 0;
+            padding: 40px 24px 100px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- BACKGROUND --- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(-10vh);
+            }
+        }
+
+        /* --- LAYOUT: SIDEBAR & CONTENT --- */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-top: 0;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #4ECDC4, #F49F75);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            opacity: 0.7;
+        }
+
+        .legal-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 40px;
+            margin-bottom: 100px;
+            align-items: start;
+        }
+
+        /* TABS (Sidebar) */
+        .legal-tabs {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 20px;
+            position: sticky;
+            top: 100px;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px 15px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .tab-btn.active {
+            background: var(--teal-glow);
+            color: var(--deep-space);
+            font-weight: 700;
+        }
+
+        .tab-btn.active i {
+            color: var(--deep-space);
+        }
+
+        /* CONTENT CARDS */
+        .content-area {
+            min-height: 500px;
+        }
+
+        .legal-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            padding: 40px;
+            border-radius: 20px;
+            display: none;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .legal-card.active {
+            display: block;
+            animation: slideUp 0.4s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .legal-card h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .legal-card h3 {
+            font-size: 1.2rem;
+            color: white;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--teal-glow);
+            padding-left: 10px;
+        }
+
+        .legal-card p {
+            margin-bottom: 15px;
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        .legal-card ul {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .legal-card li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        .legal-card li::before {
+            content: '\2022';
+            color: var(--teal-glow);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* Status badge styles */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(78, 205, 196, 0.15);
+            color: var(--teal-glow);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+        }
+
+        .status-badge.active {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        /* Disclaimer card specific rules */
+        .alert-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--alert-red);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .alert-box h4 {
+            color: var(--alert-red);
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-box p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        @media(max-width: 800px) {
+            .legal-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .legal-tabs {
+                position: relative;
+                top: 0;
+                margin-bottom: 30px;
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 5px;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+            }
+
+            .tab-btn {
+                padding: 12px;
+                background: rgba(15, 23, 42, 0.5);
+                border: 1px solid var(--border-glass);
+            }
+
+            .hero h1 {
+                font-size: 2.3rem;
+            }
+        }
+    </style>
+    <link rel="icon" href="./assets/images/favicon_symbol.webp" type="image/x-icon">
+</head>
+
+<body>
+
+    <!-- APP SHELL START -->
+    <div id="app-shell">
+        <!-- PARTICLES -->
+        <div id="particles"></div>
+
+        <div id="shell-fixed">
+            <header id="main-header"></header>
+        </div>
+
+        <main id="shell-content">
+            <div class="container">
+
+                <!-- HERO -->
+                <section class="hero fade-in">
+                    <h1 class="hero-title-premium">Legal & Security Compliance</h1>
+                    <p>Hashlilly Portfolio Compliance Register & Audited System Disclosures</p>
+                </section>
+
+                <!-- LAYOUT -->
+                <div class="legal-layout fade-in">
+
+                    <!-- TABS -->
+                    <div class="legal-tabs">
+                        <button class="tab-btn active" onclick="openTab('overview', this)">
+                            <i class="fas fa-info-circle"></i> Overview
+                        </button>
+                        <button class="tab-btn" onclick="openTab('dpdp', this)">
+                            <i class="fas fa-shield-alt"></i> DPDP & GDPR
+                        </button>
+                        <button class="tab-btn" onclick="openTab('security', this)">
+                            <i class="fas fa-lock"></i> Security Architecture
+                        </button>
+                        <button class="tab-btn" onclick="openTab('corporate', this)">
+                            <i class="fas fa-building"></i> Corporate Register
+                        </button>
+                    </div>
+
+                    <!-- CONTENT AREA -->
+                    <div class="content-area">
+
+                        <!-- 1. OVERVIEW -->
+                        <div id="overview" class="legal-card active">
+                            <h2><i class="fas fa-info-circle"></i> Compliance Overview</h2>
+                            <p>This declaration outlines the specific legal, regulatory, and security frameworks implemented across the Hashlilly Private Limited product portfolio (incorporating <em>Soulamore</em>, <em>That's Missing</em>, <em>BoozeD In</em>, and <em>hashlilly.in</em>).</p>
+                            <p>We actively comply with national laws, security standards, and user-privacy benchmarks to ensure structural transparency and robust data safety.</p>
+
+                            <h3>Key Alignment Pillars</h3>
+                            <ul>
+                                <li><strong>Data Privacy Laws:</strong> Fully integrated with the Digital Personal Data Protection Act, 2023 (DPDP) in India, and GDPR frameworks internationally.</li>
+                                <li><strong>Information Technology Act, 2000:</strong> Adheres to Indian intermediary regulations, including active grievance redressal channels.</li>
+                                <li><strong>Vulnerability Defenses:</strong> Structural audit fixes covering IDOR, XSS, CSRF, authentication configurations, and rate-limiting.</li>
+                                <li><strong>Anti-Dark Patterns:</strong> Absolute transparency in cookie consent, free-vs-paid plans, and data options.</li>
+                            </ul>
+
+                            <div class="alert-box">
+                                <h4><i class="fas fa-shield-check"></i> System Status: Compliant</h4>
+                                <p>All mandatory compliance checks and security upgrades are verified and active on the live cluster. Regular quarterly monitoring is scheduled.</p>
+                            </div>
+                        </div>
+
+                        <!-- 2. DPDP & GDPR -->
+                        <div id="dpdp" class="legal-card">
+                            <h2><i class="fas fa-shield-alt"></i> DPDP Act 2023 & GDPR Compliance</h2>
+                            <p>We manage user data in strict accordance with the Digital Personal Data Protection Act, 2023 (India) and General Data Protection Regulation (EU).</p>
+
+                            <h3>Data Intermediary & Grievance Protocol</h3>
+                            <p>Under Section 79 of the Information Technology Act and DPDP intermediaries mandates, we maintain active grievance mechanisms:</p>
+                            <ul>
+                                <li><strong>Grievance Officer:</strong> Aditya Harsh</li>
+                                <li><strong>Contact Channel:</strong> <a href="mailto:tech.hashlilly@gmail.com" style="color:var(--teal-glow); text-decoration: underline;">tech.hashlilly@gmail.com</a></li>
+                                <li><strong>Response SLA:</strong> Inquiries are addressed and resolved within 30 days.</li>
+                            </ul>
+
+                            <h3>Privacy-First Architectures</h3>
+                            <ul>
+                                <li><strong>Explicit & Revocable Consent:</strong> Users are prompted with a blocking, detailed consent modal before accessing sensitive wellness features (like journal and mood logs). Consent can be withdrawn at any time under Settings.</li>
+                                <li><strong>Data Minimization:</strong> We only process email addresses for account validation and security. We do not link personal identity records to anonymous user submissions.</li>
+                                <li><strong>Zero Tracking on Soulamore:</strong> The Soulamore platform is free of advertising networks, cross-site trackers, and marketing cookies.</li>
+                                <li><strong>Intermediary Interactivity Control:</strong> In compliance with national guidelines, automated crisis response overlays redirect users facing emotional distress to validated third-party professional helplines (like <em>iCall</em> and <em>Vandrevala Foundation</em>).</li>
+                            </ul>
+
+                            <h3>User Rights Dashboard (Privacy Center)</h3>
+                            <p>Every account dashboard provides direct, automated access to the following rights without requiring support requests:</p>
+                            <ul>
+                                <li><strong>Right to Deletion:</strong> Permanently deletes profiles, mood records, and journal entries, executing a complete DB clean-up within 30 days.</li>
+                                <li><strong>Right to Portability:</strong> Downloads a comprehensive structured JSON/CSV archive containing all user profile and usage data.</li>
+                                <li><strong>Consent Records:</strong> Logs history showing exactly what version of the Privacy Policy was accepted.</li>
+                            </ul>
+                        </div>
+
+                        <!-- 3. SECURITY ARCHITECTURE -->
+                        <div id="security" class="legal-card">
+                            <h2><i class="fas fa-lock"></i> Audited Security Architecture</h2>
+                            <p>Following a rigorous security review, our technical system has been hardened against common operational vulnerabilities:</p>
+
+                            <h3>1. IDOR Safeguards (Insecure Direct Object Reference)</h3>
+                            <p>We have completely mitigated URL-enumeration vulnerabilities:</p>
+                            <ul>
+                                <li><strong>UUID v4 Implementation:</strong> Database entries (journal logs, confessions, bookings) are referenced using high-entropy random UUIDs instead of sequential integers.</li>
+                                <li><strong>Server-Side Ownership Validation:</strong> Every API endpoint enforces checks confirming that the authenticated session user matches the resource owner.</li>
+                            </ul>
+
+                            <h3>2. Session & Token Hardening</h3>
+                            <ul>
+                                <li><strong>HttpOnly Cookie Storage:</strong> Authentication JWTs are stored using `httpOnly`, `Secure`, and `SameSite=Strict` cookies. This keeps credentials hidden from client-side JavaScript, rendering XSS token theft impossible.</li>
+                                <li><strong>Firebase App Check:</strong> Enforces server-side validation using reCAPTCHA Enterprise and device-attestation check tokens to prevent unauthorized script-based API requests to Firestore databases.</li>
+                            </ul>
+
+                            <h3>3. Input Sanitization & XSS Mitigation</h3>
+                            <ul>
+                                <li><strong>DOMPurify Integration:</strong> User-generated content (including markdown inputs in journals) is passed through DOMPurify client-side and validated server-side to strip malicious script tags.</li>
+                                <li><strong>Content Security Policy (CSP):</strong> Configured to prevent execution of unauthorized external scripts.</li>
+                            </ul>
+
+                            <h3>4. Abuse Prevention & Rate Limiting</h3>
+                            <ul>
+                                <li><strong>Brute Force Shielding:</strong> Login, signup, and feedback API pathways are protected by rate limiters (by IP and user ID), implementing exponential backoff.</li>
+                                <li><strong>Bot Mitigation:</strong> CAPTCHAs are active on public forms to block automated spam and credential stuffing.</li>
+                            </ul>
+                        </div>
+
+                        <!-- 4. CORPORATE REGISTER -->
+                        <div id="corporate" class="legal-card">
+                            <h2><i class="fas fa-building"></i> Corporate Register & IP Disclosure</h2>
+                            <p>In accordance with the Companies Act 2013 and intellectual property frameworks, this section details corporate register entries for Hashlilly Private Limited:</p>
+
+                            <h3>Corporate Disclosures</h3>
+                            <ul>
+                                <li><strong>Company Name:</strong> Hashlilly Private Limited</li>
+                                <li><strong>Corporate Identification Number (CIN):</strong> U62099PB2026OPC068567</li>
+                                <li><strong>Registration Number:</strong> UDYAM-PB-20-0003915</li>
+                                <li><strong>Registered Office:</strong> 210, New Generation Extension, Dhakoli, SAS Nagar, Punjab - 140603.</li>
+                                <li><strong>Scope of Operations:</strong> Advertising automation platforms, software engineering, and experimental laboratory systems.</li>
+                            </ul>
+
+                            <h3>Trademark Registry</h3>
+                            <p>The following names, logos, and brands are trademarks owned by Hashlilly Private Limited and are filed under applicable national classes (35, 41, 42, 43, 44):</p>
+                            <ul>
+                                <li><strong>Deskai</strong></li>
+                                <li><strong>LillyPost</strong></li>
+                                <li><strong>Resume Engine</strong></li>
+                                <li><strong>Soulamore</strong></li>
+                                <li><strong>Terraclaw</strong></li>
+                                <li><strong>That's Missing</strong></li>
+                                <li><strong>BoozeDIn</strong></li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div style="text-align:center; opacity:0.6; margin-bottom:60px; font-size: 0.9rem;">
+                    "We build technology on a foundation of absolute transparency and verified compliance."
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <!-- APP SHELL END -->
+
+    <!-- STANDARDIZED FOOTER -->
+    <footer></footer>
+
+    <script src="../assets/js/components.js?v=3.5"></script>
+    <script src="../assets/js/main.js"></script>
+    <script>
+        // --- TAB SWITCHING ---
+        function openTab(tabId, btn) {
+            // Hide all content
+            document.querySelectorAll('.legal-card').forEach(card => card.classList.remove('active'));
+            // Remove active class from buttons
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            // Show content
+            document.getElementById(tabId).classList.add('active');
+            // Activate button
+            btn.classList.add('active');
+        }
+
+        // --- PARTICLES ---
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = Math.random() * 4 + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.opacity = Math.random() * 0.3;
+            particleContainer.appendChild(p);
+        }
+    </script>
+</body>
+
+</html>

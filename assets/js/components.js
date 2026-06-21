@@ -1034,6 +1034,7 @@ const getFooterHTML = (rootPath) => `
                 <li><a href="${rootPath}company/press.html">Press & Media Kit</a></li>
                 <li><a href="${rootPath}company/why-soulamore-exists.html">Why Soulamore Exists</a></li>
                 <li><a href="${rootPath}company/transparency.html">Transparency Report</a></li>
+                <li><a href="${rootPath}company/compliance.html">Compliance Declaration</a></li>
                 <li><a href="${rootPath}company/contact.html">Contact</a></li>
                 <li><a href="${rootPath}company/legal.html">Privacy & Legal</a></li>
                 <li><a href="${rootPath}get-help-now.html" style="color:var(--ember-red); font-weight:600;">Crisis Resources</a></li>
@@ -1042,9 +1043,13 @@ const getFooterHTML = (rootPath) => `
 
     </div>
 
-    <div class="footer-bottom" style="margin-top:50px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); text-align:center; font-size:0.8rem; opacity:0.4;">
-        © 2025 by Hashlilly! All rights reserved. <br>
-        <span style="font-size:0.7rem;">Disclaimer: We are not a replacement for professional medical help.</span>
+    <div class="footer-bottom" style="margin-top:50px; padding-top:30px; border-top:1px solid rgba(255,255,255,0.1); text-align:center; font-size:0.75rem; opacity:0.75; line-height:1.8; color: #94a3b8;">
+        <div>© 2026 Hashlilly Private Limited. Deskai, LillyPost, Resume Engine, Soulamore, Terraclaw, That's Missing, and BoozeDIn are trademarks of Hashlilly Private Limited.</div>
+        <div style="margin-top: 5px;">Hashlilly Private Limited | CIN: U62099PB2026OPC068567 | Reg No: UDYAM-PB-20-0003915</div>
+        <div>Registered Address: 210, New Generation Extension, Dhakoli, SAS Nagar, Punjab - 140603.</div>
+        <div>Grievance Officer: <a href="mailto:tech.hashlilly@gmail.com" style="color: #4ECDC4; text-decoration: underline;">tech.hashlilly@gmail.com</a></div>
+        <div style="margin-top: 10px; font-style: italic; opacity: 0.8;">Advertising automation platforms, software engineering, and experimental laboratory systems.</div>
+        <div style="margin-top: 15px; font-size: 0.7rem; color: #ff6b6b; font-weight: 500;">Disclaimer: Soulamore is a self-reflection space and peer-support community. We are not a clinical service and do not provide medical advice.</div>
     </div>
 </div>
 `;
