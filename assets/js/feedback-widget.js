@@ -189,6 +189,24 @@ function createFeedbackModal() {
                     " placeholder="Your email for follow-up">
                 </div>
                 
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; color: #f1f5f9; font-weight: 500;">
+                        Attach a photo if you want (optional)
+                    </label>
+                    <input type="file" id="feedback-photo" accept="image/*" style="
+                        width: 100%;
+                        background: rgba(255, 255, 255, 0.05);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 12px;
+                        padding: 12px;
+                        color: #f1f5f9;
+                        font-family: 'Plus Jakarta Sans', sans-serif;
+                        font-size: 0.9rem;
+                        outline: none;
+                        cursor: pointer;
+                    ">
+                </div>
+                
                 <button type="submit" style="
                     width: 100%;
                     background: linear-gradient(135deg, #4ECDC4, #F49F75);
@@ -267,6 +285,47 @@ window.closeFeedbackModal = function() {
 };
 
 /**
+ * Compress and resize uploaded image helper
+ */
+function compressImage(file, maxWidth, maxHeight, quality) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                resolve(dataUrl);
+            };
+            img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+    });
+}
+
+/**
  * Submit feedback
  */
 window.submitFeedback = async function(event) {
@@ -276,17 +335,28 @@ window.submitFeedback = async function(event) {
     const rating = form.querySelector('input[name="rating"]:checked')?.value;
     const feedback = form.querySelector('textarea[name="feedback"]').value;
     const email = form.querySelector('input[name="email"]').value;
+    const photoFile = form.querySelector('#feedback-photo')?.files[0];
     
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
     submitBtn.disabled = true;
     
+    let photoBase64 = null;
+    if (photoFile) {
+        try {
+            photoBase64 = await compressImage(photoFile, 800, 800, 0.7);
+        } catch (err) {
+            console.warn("Failed to compress image, skipping:", err);
+        }
+    }
+    
     try {
         await addDoc(collection(db, 'feedback'), {
             rating: rating ? parseInt(rating) : null,
             feedback: feedback,
             email: email || null,
+            photo: photoBase64,
             createdAt: new Date(),
             userAgent: navigator.userAgent,
             page: window.location.href

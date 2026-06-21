@@ -57,13 +57,14 @@ export async function getUserRole(uid, email = '') {
 /**
  * Sign Up with Email/Password
  */
-export async function signUpWithEmail(email, password, name) {
+export async function signUpWithEmail(email, password, name, additionalProfileData = {}) {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
         await createUserProfile(user, {
-            displayName: name || email.split('@')[0]
+            displayName: name || email.split('@')[0],
+            ...additionalProfileData
         });
 
         console.log("Registered:", user.uid);

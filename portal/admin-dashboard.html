@@ -6820,12 +6820,19 @@
                     const data = docSnap.data();
                     const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleString() : 'N/A';
                     const rating = data.rating ? `${data.rating} / 5 ⭐` : '-';
+                    const photoHtml = data.photo ? `
+                        <div style="margin-top: 8px;">
+                            <a href="${data.photo}" target="_blank">
+                                <img src="${data.photo}" style="max-width: 100px; max-height: 100px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;" title="Click to view full image"/>
+                            </a>
+                        </div>
+                    ` : '';
                     html += `
                         <tr>
                             <td class="meta-cell">${date}</td>
                             <td class="email-cell">${data.email || 'Anonymous'}</td>
                             <td><span class="category-badge">${rating}</span></td>
-                            <td style="max-width: 300px; white-space: pre-wrap;">${data.feedback || ''}</td>
+                            <td style="max-width: 300px; white-space: pre-wrap;">${data.feedback || ''}${photoHtml}</td>
                             <td class="meta-cell" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href="${data.page || '#'}" target="_blank" style="color:#2dd4bf;">${data.page ? 'View Context' : '-'}</a></td>
                         </tr>
                     `;
