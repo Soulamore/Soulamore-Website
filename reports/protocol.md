@@ -10,17 +10,19 @@ Agents are recognized as **Full-Stack Specialists**. You have the authority and 
 ---
 
 ## 📁 Directory Structure
-All reports MUST be stored in: `reports/ADITYA/{AGENT_NAME}/`
+All general agent reports MUST be stored in: `reports/ADITYA/{AGENT_NAME}/`
+All testing-specific plans, suites, and QA registers MUST be stored in: `reports/testing/`
 
 ```plaintext
 reports/
-├── ADITYA/
+├── ADITYA/            # General agent reports
 │   ├── ANTIGRAVITY/   # Antigravity reports
 │   ├── QWEN/          # Qwen Code reports
 │   ├── CODEX/         # Codex reports
 │   ├── CURSOR/        # Cursor reports
 │   ├── KILOCODE/      # Kilocode reports
 │   └── OPENCODE/      # Opencode reports
+├── testing/           # Dedicated folder for testing suites & QA registers
 └── PROTOCOL.md        # Local copy of this document
 ```
 
@@ -65,7 +67,7 @@ Every session MUST end with a report containing:
 
 Testing reports (e.g., test plans, test suites, manual verification checklists) serve as living registers for manual and automated feature verification. They must follow these rules:
 
-1. **Naming**: Use the `TST` code in the file name: `{NNN}_{YYYY-MM-DD}_{AGENT}_TST_{Title}.md`.
+1. **Storage & Naming**: Store all testing reports in the dedicated `reports/testing/` folder. Use the `TST` code in the file name: `{NNN}_{YYYY-MM-DD}_{AGENT}_TST_{Title}.md`.
 2. **Handoff Info**: Must include the standard Session Handoff sections.
 3. **Use Case Structure**: Each test case or verify target must be documented in a table with:
    - **Use Case ID & Title**
@@ -84,7 +86,7 @@ Testing reports (e.g., test plans, test suites, manual verification checklists) 
 | Type | Location | Content |
 | :--- | :--- | :--- |
 | **Docs** | `docs/` | Timeless reference (Setup guide, API specs). |
-| **Reports** | `reports/ADITYA/{AGENT}/` | Time-bound work (Session reports, Fix logs). |
+| **Reports** | `reports/ADITYA/{AGENT}/` or `reports/testing/` | Time-bound work or active verification registers. |
 
 ---
 
