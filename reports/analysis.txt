@@ -1,0 +1,743 @@
+Soulamore Hosting Bandwidth Analysis
+Executive Summary:
+ 
+Soulamore’s unexpected Firebase Hosting egress can have multiple causes beyond SPA rewrites and brute-force scraping. Major culprits include image hotlinking, oversized assets, poor caching, endless client polling or loops, redirect loops, exposed files, and bots probing hidden domains. Each issue creates unnecessary data transfer – for example, hotlinked images or large uncompressed videos directly inflate bandwidth. We systematically analyze each root cause category, showing
+ 
+how it inflates egress
+,
+ 
+how to detect it via logs and analytics
+, and
+ 
+precise mitigations with config examples
+. We also provide a prioritized checklist (executive actions, immediate fixes first), tables comparing impact/difficulty, and a Mermaid flowchart of the mitigation workflow. Key actions include enabling Cloudflare protections (hotlinking, bot filters, WAF), optimizing assets and cache-control headers, fixing config (redirects, rewrites), and locking down unused domains. Implementing these can cut tens to hundreds of gigabytes of unwanted traffic.
+1) Hotlinking and Third-Party Embedding
+When other sites embed your images/videos (direct URLs on soulamore.com), every view on
+ 
+their
+ 
+site triggers data from your origin. This “hotlinking” directly boosts your egress. Cloudflare notes that enabling Hotlink Protection “prevents your images from being used by other sites, which can reduce the bandwidth consumed by your origin server”
+[1]
+.
+Detection:
+ 
+Check the
+ 
+referer
+ 
+field in logs. In Firebase’s Hosting logs (via Cloud Logging), each entry has an
+ 
+httpRequest.referer
+ 
+(if the referer is not blank)
+[2]
+. Filter for requests where
+ 
+referer
+ 
+is external (not your domain). In Cloudflare Analytics or Firewall Events (Logpush), look for HTTP requests for images where
+ 
+Client.Request.Referer
+ 
+is empty or from other domains. For example, a Cloud Logging query:
+resource.type="firebase_domain" jsonPayload.requestUrl=~"\\.(png|jpe?g|gif)$" AND jsonPayload.referer!~"soulamore.com"
+This finds image hits with an external referer. An alert could be set if >X% of image requests have foreign referers. Also, sudden spikes of image requests from unusual countries may hint at hotlinking.
+Mitigation:
+ 
+Enable Cloudflare’s Hotlink Protection feature
+[1]
+ 
+or create a Firewall rule blocking requests where the
+ 
+Referer
+ 
+header is not your domain. For example, a Cloudflare WAF rule:
+(http.request.uri.path matches "^/.*\.(png|jpe?g|gif|svg)$") 
+  and (not http.request.referer contains "soulamore.com")
+→ block
+This blocks image requests unless the referer is your site (Google crawler’s blank referer is usually allowed by Cloudflare by default). You can also whitelist specific domains (e.g. Google image cache) via “hotlink-ok” directories
+[3]
+. In
+ 
+firebase.json
+, there’s no direct hotlink setting, but you can add an
+ 
+X-Robots-Tag: noindex, nofollow
+ 
+header (shown below) to discourage indexing of raw image URLs by bots.
+Estimated Savings:
+ 
+Hotlinked images can account for
+ 
+10–30%+
+ 
+of origin bandwidth on image-heavy sites. Blocking external embedding can directly eliminate that overhead.
+2) Large/Unoptimized Assets (Images, Video, Fonts, Bundles)
+Issue:
+ 
+Oversized files (uncompressed images/videos/fonts/JS) multiply bandwidth. Every user or bot download of a large file counts against egress. Large image files, high-res videos, or giant JS/CSS bundles dramatically increase data transfer.
+How it inflates egress:
+ 
+For example, a 5 MB image loaded 1,000 times = 5 GB egress. Unoptimized media (PNG vs compressed JPEG/WebP) or un-minified bundles can be several times larger than necessary.
+Detection:
+ 
+Use Firebase Hosting logs and Cloudflare analytics to find top contributors by size. In Cloud Logging:
+resource.type="firebase_domain"
+jsonPayload.responseSize>1000000
+| top 10 by responseSize
+This shows largest files served. In Cloudflare Analytics, check
+ 
+Traffic > Top Hosts
+ 
+for your domain and file types. High
+ 
+responseSize
+ 
+in logs indicates heavy files
+[4]
+. Also use Lighthouse or web.dev tools to audit asset sizes.
+Mitigation:
+ 
+Compress and resize images (e.g. convert JPEGs to WebP or use Cloudflare Polish
+[5]
+). For example, Cloudflare’s Polish (Pro/Business) automatically strips metadata and applies lossy/lossless compression, serving smaller images without code changes
+[5]
+. Videos should be external (YouTube/R3) or serve adaptive bitrate. Subset and compress web fonts. Minify and code-split JS/CSS (avoid shipping an entire 1 MB+ React bundle if not needed). For bundling, ensure tree-shaking and gzip (Firebase CDN auto-compresses gzip by
+ 
+Accept-Encoding
+).
+Cloudflare Config:
+ 
+Enable
+ 
+Polish
+ 
+(lossless or lossy) on images. Enable
+ 
+Brotli
+ 
+compression (Cloudflare setting) to compress text assets.
+firebase.json:
+ 
+Serve pre-optimized images; ensure you don’t upload huge originals.
+Nginx/Other:
+ 
+(If using custom proxy) use
+ 
+gzip_static
+ 
+or image optimization modules.
+Estimated Savings:
+ 
+Typical image optimization can cut image sizes by ~30–70%. Overall, optimizing media and bundles can
+ 
+halve
+ 
+bandwidth from assets.
+3) Missing or Incorrect Cache-Control Headers
+Issue:
+ 
+If static files aren’t cached (or are set to
+ 
+no-cache
+/
+no-store
+), the CDN and browsers re-fetch them each time. Firebase’s CDN requires a proper
+ 
+Cache-Control
+ 
+header to store content at the edge
+[6]
+. Without it, every request is “uncached” (billed at uncached rate).
+How it inflates egress:
+ 
+Uncached responses always hit the origin. For example, if an image is 1 MB and users reload the page 100 times, that’s 100 MB egress instead of 1 MB (if cached after first).
+Detection:
+ 
+Check logs for
+ 
+cacheHit:false
+. In Cloud Logging, filter
+ 
+httpRequest.cacheHit=false AND httpRequest.status=200
+. Also filter for static file paths repeatedly requested (large responseSize with
+ 
+cacheHit=false
+). In Cloudflare analytics, see
+ 
+Cache
+ 
+reports (cache hit ratios).
+Threshold/Alert:
+ 
+Set an alert if cache-hit ratio drops below a threshold (e.g. <90%).
+Mitigation:
+ 
+Set aggressive Cache-Control. In
+ 
+firebase.json
+, add headers rules:
+"headers": [
+  {
+    "source": "**/*.@(jpg|jpeg|png|gif|svg|webp)",
+    "headers": [{"key": "Cache-Control","value": "public,max-age=31536000,immutable"}]
+  },
+  {
+    "source": "**/*.@(js|css)",
+    "headers": [{"key": "Cache-Control","value": "public,max-age=31536000,immutable"}]
+  },
+  {
+    "source": "**/*.@(woff|woff2|ttf|eot)",
+    "headers": [{"key": "Cache-Control","value": "public,max-age=31536000,immutable"}]
+  },
+  {
+    "source": "**/*.html",
+    "headers": [{"key": "Cache-Control","value": "public,max-age=300,s-maxage=600"}]
+  }
+]
+This caches images/fonts/js for 1 year (immutable), HTML for shorter periods. Ensure you use fingerprinting (file names with hashes) so long cache is safe. Cloudflare will honor these headers by default. Remember, as [38†L1537-L1544] notes, CDN only caches responses with a
+ 
+Cache-Control: max-age/s-maxage
+ 
+header
+ 
+and
+ 
+size ≤10 MiB
+[6]
+, so also break up or compress files >10 MB.
+Estimated Savings:
+ 
+Proper caching can reduce origin egress for repeat visits by
+ 
+80–90%
+ 
+on static assets. By caching JS/CSS/images, you avoid re-downloading megabytes per view.
+4) Infinite Polling/Websocket Loops or Client-Side Fetch Loops
+Issue:
+ 
+A bug in client code (e.g. setInterval polling every second, recursive fetch without pause, WebSocket emitting data rapidly) can cause constant traffic even without user interaction.
+How it inflates egress:
+ 
+Each poll or websocket message may return some payload. A poll every second = 60 requests/minute. Even a 10 KB JSON response yields 600 KB/minute per user. Multiply by bots or idle tabs, it adds up.
+Detection:
+ 
+Use logs to find rapid repeated requests from the same IP/UA in short time intervals. In Cloud Logging, group by
+ 
+remoteIp
+ 
+and count requests per minute:
+resource.type="firebase_domain"
+| stats count() by jsonPayload.remoteIp, bin(1m)
+A threshold (e.g. >100 requests/min from one IP) may indicate a runaway loop. Alternatively, filter for endpoints known to poll. High
+ 
+response_count
+ 
+per unique IP in Monitoring can alert.
+Mitigation:
+ 
+Fix the code. Reduce polling frequency or switch to WebSockets/Server-Sent Events. Add flags to stop polls when not needed (e.g. on page blur). Ensure error cases stop retry loops. On the CDN side, no simple fix other than rate-limiting at Cloudflare. You can set a Cloudflare Rate Limiting rule on the API endpoint to allow X req/min per IP and block excess. Example (Cloudflare dashboard):
+Create a Rate Limiting rule for
+ 
+*.soulamore.com/api/
+ 
+with threshold 60/min, block for 1h.
+Estimated Savings:
+ 
+Capping polling to once per minute (vs once per second) cuts related bandwidth by
+ 
+~60×
+ 
+for that feature. Even simple rate-limiting can eliminate large percentages of this egress.
+5) Misconfigured Redirects (Infinite Loops)
+Issue:
+ 
+Redirect loops multiply requests. If page A redirects to B and back to A, each initial visit triggers multiple HTTP requests (and responses). Even a double-redirect wastes bandwidth.
+How it inflates egress:
+ 
+Example: A → B → A with 301/302. A single user hit on A becomes 2 extra round-trips. If the loop repeats indefinitely, it could drain hundreds of KB per visit.
+Detection:
+ 
+Look for high
+ 
+status
+ 
+in 3xx in logs and repeated sequences. In Cloud Logging:
+resource.type="firebase_domain" httpRequest.status>=300 AND httpRequest.status<400
+Examine the frequent sequences of the same
+ 
+requestUrl
+. In Firebase Hosting Usage (console), if “redirect” is listed, confirm its count. Identify any page that keeps issuing a 301/302 back and forth.
+Mitigation:
+ 
+Fix the redirect rules. In
+ 
+firebase.json
+, ensure your
+ 
+redirects
+ 
+are unambiguous. For example:
+"redirects": [
+  {"source": "/old-path", "destination": "/new-path", "type": 301},
+  {"source": "/en", "destination": "https://soulamore.com", "type": 301}
+]
+Avoid circular patterns. In Nginx (if used), ensure your
+ 
+return
+ 
+or
+ 
+rewrite
+ 
+does not loop. After fixing, test with
+ 
+curl -I
+ 
+to ensure no chain loops.
+Estimated Savings:
+ 
+Eliminating loops removes the extra round-trip overhead. If each loop was adding ~200 KB per visit, stopping it directly cuts that egress.
+6) Public Storage Buckets or Exposed Files
+Issue:
+ 
+If a Firebase Storage bucket or Google Cloud Storage is publicly readable (and linked from anywhere), anyone can download big files. These downloads generate egress (on Cloud Storage billing, not Hosting). Similar risk if an entire directory of static files (e.g. backups) is exposed.
+How it inflates egress:
+ 
+Unintended file sharing – e.g. PDFs, videos in Storage – can be crawled or shared. A single 100 MB file hit 100 times = 10 GB. Since Firebase Hosting and Storage are separate billing, large storage egress can also appear on your bill.
+Detection:
+ 
+Check Cloud Storage usage in the Google Cloud Console. Use Cloud Audit Logs (ensure they’re enabled) to see access events on buckets. In Logging, filter by
+ 
+resource.type="gcs_bucket"
+ 
+and large
+ 
+size
+. Also, search for URLs pointing to
+ 
+storage.googleapis.com/your-bucket
+ 
+in logs. Any spikes indicate public downloads.
+Mitigation:
+ 
+Lock down the bucket. In Firebase Storage rules, disallow unauthenticated reads unless required. Use authenticated access or signed URLs for files. Remove any
+ 
+List
+ 
+permission to prevent directory enumeration. If using Firebase Hosting to serve storage files, consider moving them behind Cloud Functions or Cloud Storage with signed URLs. For extra safety, set CORS to only allow expected origins.
+Estimated Savings:
+ 
+Locking a public 500 MB video could save 500 MB per unexpected hit. Overall, removing large public assets can remove multi-gigabyte leaks.
+7) Bots Hitting Default
+ 
+*.web.app
+ 
+/
+ 
+*.firebaseapp.com
+ 
+Domains
+Issue:
+ 
+Firebase projects always have default domains (
+soulamore.web.app
+,
+ 
+soulamore.firebaseapp.com
+). Bots frequently probe these even when you use a custom domain (soulamore.com). Since Cloudflare (protecting
+ 
+soulamore.com
+) doesn’t cover these, malicious or automated bots can hit the default hostnames directly.
+How it inflates egress:
+ 
+Each bot request to the default domain still returns your site (or 404/redirect) and counts toward hosting bandwidth. We saw millions of bogus requests from a “meta-externalagent” crawler hitting the
+ 
+.web.app
+ 
+domain
+[7]
+.
+Detection:
+ 
+Use Cloud Logging and filter by
+ 
+jsonPayload.hostname
+. For example:
+resource.type="firebase_domain" jsonPayload.hostname:"soulamore-f0a64"
+Any hits where
+ 
+hostname
+ 
+ends with
+ 
+.web.app
+ 
+or
+ 
+.firebaseapp.com
+ 
+reveal this traffic. Look at
+ 
+userAgent
+ 
+fields for suspicious crawlers (e.g. known bot names). If traffic to default domains spikes, that’s the source.
+Mitigation:
+ 
+You cannot fully disable the domains
+[8]
+, but you can minimize their impact. At runtime (client-side), redirect these hostnames to your custom domain. For example, in your main HTML or Cloud Function:
+if (window.location.hostname.endsWith(".web.app") ||
+    window.location.hostname.endsWith(".firebaseapp.com")) {
+  window.location.replace("https://www.soulamore.com");
+}
+However, better is at the network edge: use a
+ 
+Cloudflare Worker
+ 
+to intercept requests to the default domain and issue a 301 to
+ 
+soulamore.com
+. In the Firebase Console under
+ 
+Hosting → Custom Domains
+, remove any entries of
+ 
+*.web.app
+/
+*.firebaseapp.com
+ 
+(to require manual CNAME if possible). In Cloudflare, block known scraping bots by UA (e.g. rule
+ 
+http.user_agent contains "meta-externalagent"
+ 
+→ Block).
+Estimated Savings:
+ 
+In our case, disabling
+ 
+.web.app
+ 
+traffic blocked ~70 GB/day. Even if your bot traffic is smaller, cutting off default-domain bots can remove
+ 
+most
+ 
+of non-user traffic (often >80% of waste).
+8) Preview/Deploy URLs Indexed
+Issue:
+ 
+Firebase’s preview/deploy URLs (like
+ 
+soulamore--pr123.firebaseapp.com
+ 
+or
+ 
+soulamore-preview.hosting.link
+) can be indexed by search engines or crawled if shared. These essentially duplicate your site content on separate hostnames, doubling traffic if crawled separately.
+How it inflates egress:
+ 
+Every visit to a preview URL (intended for testing) still serves your assets. If Google indexes it, it can lead to automated or user hits.
+Detection:
+ 
+In Cloud Logging, filter for any
+ 
+hostname
+ 
+that matches deploy or hosting link patterns. E.g.:
+resource.type="firebase_domain" jsonPayload.requestUrl:("pr-" OR "hosting.link")
+Also check Google Search Console and Analytics for any traffic on those domains.
+Mitigation:
+ 
+Immediately unpublish or delete any staging URLs not in use. Add the below to
+ 
+robots.txt
+ 
+in those deployments to block crawlers:
+User-agent: *
+Disallow: /
+(Alternatively, use
+ 
+robots_noindex
+ 
+headers). In the Firebase Console under “Previews” or “Hosting > Releases”, remove any publish links. If using GitHub preview channels, disable publicly accessible previews.
+Estimated Savings:
+ 
+Removing indexing of previews can prevent extra crawling. If a preview URL got 100 hits/day at 5 MB/page, that’s 500 MB/day. While usually smaller, it completely eliminates unwanted visits.
+9) CDN Origin Pull Misconfiguration
+Issue:
+ 
+If Cloudflare or another CDN is configured incorrectly (e.g. CNAME points to the wrong origin), every request might bounce through multiple layers or skip caching. An origin pull loop (CDN pulling from itself) can double-charge data.
+How it inflates egress:
+ 
+For example, if Cloudflare pulls from
+ 
+soulamore.web.app
+ 
+instead of
+ 
+soulamore.com
+, you effectively bypass your custom domain cache. Also, if DNS is mis-set (e.g. CNAME loop), requests may not cache.
+Detection:
+ 
+In Cloudflare DNS settings, ensure your site is proxied (orange-cloud icon) and points to
+ 
+soulamore.com
+ 
+(the actual origin). If you see multiple entries or odd A records, fix them. In logs, look for unusual request patterns or cycles. This issue is rare but important to check if none of the above applies.
+Mitigation:
+ 
+Correct your DNS/CNAME. For a Firebase site, typically you CNAME your custom domain to
+ 
+ghs.googlehosted.com
+ 
+(handled by Firebase) and enable proxy. If you used Cloudflare as the authoritative DNS, ensure the proxying is only on the custom zone, not on
+ 
+.web.app
+ 
+zones. No additional firebase.json change is needed.
+Estimated Savings:
+ 
+Mostly avoids subtle inefficiencies; proper CDN config ensures caching works and no accidental double-fetch.
+10) Automated Vulnerability Scanners and DDoS
+Issue:
+ 
+Malicious scanners or DDoS bots can flood your site. Even if not causing actual outage, high-volume scanning (e.g. with tools like curl, Nikto, Arachni, or botnets) can drive up bandwidth.
+How it inflates egress:
+ 
+Thousands of hits from vulnerability scanners or DDoS bots, even for innocuous pages, accumulate gigabytes. These often use known UA strings (e.g.
+ 
+Nikto
+,
+ 
+Arachni
+,
+ 
+sqlmap
+,
+ 
+masscan
+).
+Detection:
+ 
+In Cloudflare’s Firewall Events or logs (or Firebase logs via Cloud Logging), look for repetitive hits with bot-like
+ 
+userAgent
+ 
+or high hit rates from a few IP ranges. Use log queries such as:
+resource.type="firebase_domain" jsonPayload.userAgent:"Nikto"
+or search for many 404s from the same IP. Also monitor requests/sec via Firebase Hosting metrics. An alert on >1000 requests/min from one IP or Geo can catch a DDoS.
+Mitigation:
+ 
+Enable Cloudflare’s DDoS/HTTP flood protection. Turn on
+ 
+Bot Fight Mode
+ 
+or
+ 
+Super Bot Fight Mode
+ 
+and
+ 
+Rate Limiting
+. Set a general rule to challenge or block suspicious UAs: e.g.
+(http.user_agent contains "sqlmap" or "curl" or "Nikto" or "Arachni") 
+→ block
+Or simply use Cloudflare’s
+ 
+User-Agent Blocking
+. For high-rate traffic (like >200 reqs/min/IP), enable a Rate Limiting rule for “any path” to block the IP for some time. Also consider “Under Attack Mode” during peaks. Ensure App Check (Firebase) or reCAPTCHA for forms to prevent abuse.
+Estimated Savings:
+ 
+Blocking a DDoS or scanner early can save hundreds of GBs in a large attack. Even script kiddies can generate ~10 GB/day; stopping them preserves bandwidth and money.
+Comparison of Issues (Impact, Detection, Mitigation)
+Cause
+Impact
+Detection Difficulty
+Mitigation Effort
+1. Hotlinking/Embedding
+High (images)
+Medium (log analysis of referer)
+Low (enable WAF rule)
+2. Large Assets
+High
+Medium (identify big files in logs)
+Medium (optimize assets)
+3. Bad Cache-Control
+High
+Medium (check headers & cacheHit)
+Low (add headers)
+4. Polling/Websocket Loops
+Medium
+High (code review, log analysis)
+Medium (code fix/rate limit)
+5. Redirect Loops
+Medium
+Medium (follow redirect chains)
+Low (fix redirects)
+6. Exposed Storage Files
+Medium
+High (monitor Storage logs)
+High (secure buckets)
+7. Bots on default domains
+High
+Medium (logs for hostname/UA)
+Medium (block domains/bots)
+8. Preview URLs indexed
+Low
+Low (search console, logs)
+Low (robots.txt/remove)
+9. CDN Misconfig
+Low-Medium
+High (requires config review)
+Low (correct DNS/CNAME)
+10. Scanners/DDoS
+High
+Medium (log spikes, UA)
+Medium (WAF/ratelimit)
+Impact
+ 
+estimates how much bandwidth each cause can generate (High=likely tens of GB+).
+ 
+Detection Difficulty
+ 
+reflects how easily logs/metrics reveal it.
+ 
+Mitigation Effort
+ 
+rates how complex the fix is (Low=quick config change, High=major code rewrite or architecture change). Immediate priorities:
+ 
+hotlink prevention, cache headers, and blocking default-domain bots
+ 
+yield the fastest gains; optimizing assets and securing storage come next.
+flowchart LR
+  Start((Spike Detected)) --> Analyze[Analyze Logs \n & Metrics]
+  Analyze --> Hotlinking{Hotlinking?\n(external referers)}
+  Hotlinking -->|Yes| FixHotlink[Enable Cloudflare Hotlink Protection<br>Block external Referers]
+  Hotlinking -->|No| LargeAssets{Large Assets?\n( >X MB files )}
+  LargeAssets -->|Yes| FixAssets[Compress images/videos<br>Enable Cloudflare Polish\nMinify and split bundles]
+  LargeAssets -->|No| CacheMiss{Cache-Control Missing?\n(cacheHit=false)}
+  CacheMiss -->|Yes| FixCache[Add Cache-Control headers in firebase.json]
+  CacheMiss -->|No| Polling{Infinite Polling?\n(high req/same IP)}
+  Polling -->|Yes| FixPolling[Throttle or fix polling<br>Cloudflare Rate Limit]
+  Polling -->|No| Redirect{Redirect loop?}
+  Redirect -->|Yes| FixRedirect[Correct redirect rules (firebase.json/Nginx)]
+  Redirect -->|No| Storage{Public Storage?\n(exposed files)}
+  Storage -->|Yes| FixStorage[Restrict bucket access\nUse signed URLs]
+  Storage -->|No| DefaultBots{Bots on .web.app?}
+  DefaultBots -->|Yes| FixDefaultBots[Block bots by UA/domain<br>Disable default domains via Worker]
+  DefaultBots -->|No| Preview{Preview URLs indexed?}
+  Preview -->|Yes| FixPreview[Remove preview deployments\nDisallow in robots.txt]
+  Preview -->|No| CDNConfig{CDN Misconfig?}
+  CDNConfig -->|Yes| FixCDN[Fix DNS/CNAME for CDN\nEnsure orange-cloud on custom domain]
+  CDNConfig -->|No| DDoS{Scanner/DDoS?}
+  DDoS -->|Yes| FixDDoS[Enable Bot Management\nRate limiting/Challenge mode]
+  DDoS --> Monitor
+  FixHotlink --> Monitor[Monitor Usage]
+  FixAssets --> Monitor
+  FixCache --> Monitor
+  FixPolling --> Monitor
+  FixRedirect --> Monitor
+  FixStorage --> Monitor
+  FixDefaultBots --> Monitor
+  FixPreview --> Monitor
+  FixCDN --> Monitor
+  Monitor --> End((Resolved))
+Suggested Logs/Screenshots to Collect
+Firebase Console (Hosting → Usage):
+ 
+Take screenshots of the bandwidth graph and
+ 
+Top URLs
+ 
+list. This shows which resources and dates spiked.
+Cloud Logging Queries:
+ 
+In Google Cloud Logs Explorer (filter resourceType=
+firebase_domain
+), run queries:
+Top request sizes:
+ 
+| top 10 by responseSize
+ 
+(find largest asset hits).
+Non-cached hits:
+ 
+cacheHit=false
+.
+Hotlink referrers:
+ 
+referer!~"soulamore.com"
+.
+Domain hits:
+ 
+hostname~"firebaseapp.com" OR hostname~"web.app"
+.
+Bot UAs: filter for known strings (e.g.
+ 
+userAgent:"-Scanner"
+).
+Create log-based metrics (e.g. count of 404s or 500s, or bytes transferred).
+Cloudflare Analytics/Firewall:
+ 
+If using Cloudflare, look at the
+ 
+Security Events
+ 
+or
+ 
+Firewall
+ 
+logs for blocked requests (e.g. referer blocks, bot fights) and
+ 
+Traffic > Bandwidth
+ 
+for domains.
+These data help confirm which root cause dominates. For example, if the referer filter shows millions of requests from Google Image Search, that’s hotlinking. If
+ 
+cacheHit
+ 
+is false for 99% of responses, caching is misconfigured. Use these to fine-tune thresholds (e.g. alert if a single IP issues >500 requests/min).
+Sources:
+ 
+We rely on Firebase Hosting and Cloudflare documentation for guidance on CDN behavior and protection. For instance, Firebase notes that only responses with
+ 
+Cache-Control: max-age
+ 
+(and ≤10 MiB) will be cached
+[6]
+. Cloudflare’s docs explain that Hotlink Protection “prevents images from being used by other sites, reducing bandwidth”
+[1]
+ 
+and that Polish auto-compresses images
+[5]
+. These features, combined with log analysis via the fields in Firebase logs (referer, responseSize, userAgent)
+[9]
+, allow precise diagnosis and fixes. By following this prioritized checklist, Soulamore can drastically reduce unwanted egress and bring costs under control.
+[1]
+ 
+[3]
+ 
+Hotlink Protection · Cloudflare Web Application Firewall (WAF) docs
+https://developers.cloudflare.com/waf/tools/scrape-shield/hotlink-protection/
+[2]
+ 
+[4]
+ 
+[7]
+ 
+[9]
+ 
+View, search, and filter your site's web request logs with Cloud Logging  |  Firebase Hosting
+https://firebase.google.com/docs/hosting/web-request-logs-and-metrics
+[5]
+ 
+Cloudflare Polish · Cloudflare Images docs
+https://developers.cloudflare.com/images/polish/
+[6]
+ 
+Cache app content  |  Firebase App Hosting
+https://firebase.google.com/docs/app-hosting/optimize-cache
+[8]
+ 
+How to turn off default domain in firebase hosting - firebase - Stack Overflow
+https://stackoverflow.com/questions/61396081/how-to-turn-off-default-domain-in-firebase-hosting-firebase
