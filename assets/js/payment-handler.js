@@ -3,7 +3,7 @@
  * Handles payment processing for peer bookings
  */
 
-import { confirmBooking, getBooking } from "./peer-booking-handler.js";
+import { confirmBooking } from "./peer-booking-handler.js";
 
 // Razorpay configuration (should be loaded from environment/config)
 // For production, use environment variables or Firebase Functions to keep keys secure

@@ -277,10 +277,10 @@ export function mapPsychologistRecordToProfile(record, key = 'dynamic-psychologi
   const fee = record.sessionFee || record.rate || 'Contract';
   const expertise = Array.isArray(record.expertise) && record.expertise.length > 0
     ? record.expertise
-    : ['Emotional wellbeing'];
+    : (Array.isArray(record.tags) && record.tags.length > 0 ? record.tags : ['Emotional wellbeing']);
   const styleTags = Array.isArray(record.therapeuticStyle) && record.therapeuticStyle.length > 0
     ? record.therapeuticStyle
-    : ['Reflective', 'Grounded'];
+    : (typeof record.approach === 'string' && record.approach ? [record.approach] : ['Reflective', 'Grounded']);
   const values = Array.isArray(record.values) && record.values.length > 0
     ? record.values
     : ['Confidential', 'Respectful'];

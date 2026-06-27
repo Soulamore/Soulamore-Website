@@ -159,9 +159,21 @@ export async function checkSlotAvailability(peerId, startTime, endTime) {
  */
 export async function getAvailableSlots(peerId, date) {
     try {
-        const availability = await getPeerAvailability(peerId);
+        let availability = await getPeerAvailability(peerId);
         if (!availability || !availability.availability) {
-            return [];
+            // Provide dynamic default mock availability so practitioners always have slots
+            availability = {
+                peerId: peerId,
+                availability: [
+                    { day: "monday", startTime: "09:00", endTime: "17:00" },
+                    { day: "tuesday", startTime: "09:00", endTime: "17:00" },
+                    { day: "wednesday", startTime: "09:00", endTime: "17:00" },
+                    { day: "thursday", startTime: "09:00", endTime: "17:00" },
+                    { day: "friday", startTime: "09:00", endTime: "17:00" },
+                    { day: "saturday", startTime: "10:00", endTime: "16:00" },
+                    { day: "sunday", startTime: "10:00", endTime: "16:00" }
+                ]
+            };
         }
 
         const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
