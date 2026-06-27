@@ -234,8 +234,30 @@ export function mountPsychologistProfile({ profile, root, loadingEl, errorEl }) 
   function renderByTab(tabId) {
     const tab = profile.tabs.find((entry) => entry.id === tabId) || profile.tabs[0];
     const activeIds = new Set(tab.sections);
-    mainColumn.innerHTML = groupedSections.main.filter((section) => activeIds.has(section.id)).map(renderPsychologistSection).join('');
-    sideColumn.innerHTML = groupedSections.side.filter((section) => activeIds.has(section.id)).map(renderPsychologistSection).join('');
+    const mainHtml = groupedSections.main.filter((section) => activeIds.has(section.id)).map(renderPsychologistSection).join('');
+    const sideHtml = groupedSections.side.filter((section) => activeIds.has(section.id)).map(renderPsychologistSection).join('');
+
+    mainColumn.innerHTML = mainHtml;
+    sideColumn.innerHTML = sideHtml;
+
+    const gridEl = root.querySelector('.content-grid');
+    if (gridEl) {
+      if (!mainHtml) {
+        gridEl.classList.add('no-left');
+        mainColumn.style.display = 'none';
+      } else {
+        gridEl.classList.remove('no-left');
+        mainColumn.style.display = '';
+      }
+
+      if (!sideHtml) {
+        gridEl.classList.add('no-right');
+        sideColumn.style.display = 'none';
+      } else {
+        gridEl.classList.remove('no-right');
+        sideColumn.style.display = '';
+      }
+    }
   }
 
   mountTabs({
