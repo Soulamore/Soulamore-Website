@@ -33,14 +33,16 @@ export function initCrossTabSync() {
         }
     });
 
-    // Broadcaster: Notify other tabs of auth changes
     onAuthStateChanged(auth, (user) => {
+        const previousState = localStorage.getItem('authStateChanged');
         if (user) {
             localStorage.setItem('authStateChanged', 'logged_in');
             localStorage.setItem('userRole', sessionStorage.getItem('userRole') || 'user');
         } else {
-            localStorage.setItem('authStateChanged', 'logged_out');
-            localStorage.removeItem('userRole');
+            if (previousState === 'logged_in') {
+                localStorage.setItem('authStateChanged', 'logged_out');
+                localStorage.removeItem('userRole');
+            }
         }
     });
 }

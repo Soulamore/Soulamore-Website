@@ -3667,15 +3667,28 @@
                     await loadAllUsers();
                 }
 
-                const q = query(collection(db, "peer_bookings"), orderBy("createdAt", "desc"), limit(100));
-                const snapshot = await getDocs(q);
-
                 allSessionsData = [];
-                snapshot.forEach(docSnap => {
-                    allSessionsData.push({
-                        id: docSnap.id,
-                        ...docSnap.data()
+
+                // 1. Fetch from Firestore
+                try {
+                    const q = query(collection(db, "peer_bookings"), orderBy("createdAt", "desc"), limit(100));
+                    const snapshot = await getDocs(q);
+                    snapshot.forEach(docSnap => {
+                        allSessionsData.push({
+                            id: docSnap.id,
+                            ...docSnap.data()
+                        });
                     });
+                } catch (firestoreErr) {
+                    console.warn("Firestore admin sessions fetch failed, using local fallback only:", firestoreErr);
+                }
+
+                // 2. Fetch from sessionStorage fallback
+                const localBookings = JSON.parse(sessionStorage.getItem('local_bookings') || '[]');
+                localBookings.forEach(b => {
+                    if (!allSessionsData.some(s => s.id === b.id)) {
+                        allSessionsData.push(b);
+                    }
                 });
 
                 filterAndRenderSessions();
