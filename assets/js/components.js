@@ -2260,3 +2260,270 @@ window.toggleMobileMenu = function () {
     }
 })();
 
+// --- B2B LEAD CAPTURE MODAL (Partner With Us) ---
+(function() {
+    // 1. Inject Styles
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .partner-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(15px);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+        .partner-modal-card {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            padding: 35px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        .partner-modal-overlay.active {
+            opacity: 1;
+        }
+        .partner-modal-overlay.active .partner-modal-card {
+            transform: scale(1);
+        }
+        .partner-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .partner-modal-close:hover {
+            color: #f1f5f9;
+        }
+        .partner-form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .partner-form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        .partner-form-input, .partner-form-select {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #f1f5f9;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .partner-form-input:focus, .partner-form-select:focus {
+            border-color: #4ECDC4;
+        }
+        .partner-submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4ECDC4, #2a9d8f);
+            color: #0f172a;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .partner-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.3);
+        }
+        .partner-submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 2. Build HTML
+    function createModal() {
+        const modalId = 'soulamore-partner-modal';
+        if (document.getElementById(modalId)) return;
+
+        const overlay = document.createElement('div');
+        overlay.id = modalId;
+        overlay.className = 'partner-modal-overlay';
+        overlay.innerHTML = `
+            <div class="partner-modal-card">
+                <button class="partner-modal-close" id="partner-modal-close-btn">&times;</button>
+                <div style="font-size: 2.5rem; color: #4ECDC4; text-align: center; margin-bottom: 15px;">
+                    <i class="fas fa-school"></i>
+                </div>
+                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; text-align: center; margin-bottom: 8px; color: #fff;">Partner with Soulamore</h3>
+                <p style="font-size: 0.9rem; opacity: 0.8; text-align: center; margin-bottom: 25px; line-height: 1.5; color: #94a3b8;">
+                    Help us build a resilient campus. Fill out the details below to receive the Soulamore Campus SC 2025 Compliance Pitch Deck.
+                </p>
+                <form id="partner-lead-form">
+                    <div class="partner-form-group">
+                        <label class="partner-form-label">School / Institution Name</label>
+                        <input type="text" id="partner-school" class="partner-form-input" placeholder="e.g. Stanford University" required>
+                    </div>
+                    <div class="partner-form-group">
+                        <label class="partner-form-label">Contact Person Name</label>
+                        <input type="text" id="partner-name" class="partner-form-input" placeholder="e.g. Dr. Jane Doe" required>
+                    </div>
+                    <div class="partner-form-group">
+                        <label class="partner-form-label">Work Email Address</label>
+                        <input type="email" id="partner-email" class="partner-form-input" placeholder="e.g. jdoe@stanford.edu" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="partner-form-group">
+                            <label class="partner-form-label">Your Role</label>
+                            <select id="partner-role" class="partner-form-select" required>
+                                <option value="Principal">Principal</option>
+                                <option value="Administrator">Administrator</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Student Rep">Student Rep</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="partner-form-group">
+                            <label class="partner-form-label">Estimated Student Count</label>
+                            <input type="number" id="partner-capacity" class="partner-form-input" placeholder="e.g. 500" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="partner-submit-btn" id="partner-submit-btn">Request Pitch Deck</button>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        // Bind events
+        document.getElementById('partner-modal-close-btn').addEventListener('click', closeModal);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeModal();
+        });
+
+        document.getElementById('partner-lead-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('partner-submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            const data = {
+                schoolName: document.getElementById('partner-school').value,
+                contactName: document.getElementById('partner-name').value,
+                email: document.getElementById('partner-email').value,
+                role: document.getElementById('partner-role').value,
+                capacity: document.getElementById('partner-capacity').value
+            };
+
+            try {
+                if (window.SoulBackend && window.SoulBackend.submitLead) {
+                    const success = await window.SoulBackend.submitLead(data);
+                    if (success) {
+                        showSuccessState();
+                    } else {
+                        alert("Something went wrong. Please try again.");
+                        btn.disabled = false;
+                        btn.innerHTML = 'Request Pitch Deck';
+                    }
+                } else {
+                    const rootPath = window.location.pathname.includes('/spaces/') || window.location.pathname.includes('/portal/') ? '../' : './';
+                    const { handleLead } = await import(rootPath + 'assets/js/data-handler.js');
+                    const success = await handleLead(data);
+                    if (success) {
+                        showSuccessState();
+                    } else {
+                        alert("Submission failed. Please check network.");
+                        btn.disabled = false;
+                        btn.innerHTML = 'Request Pitch Deck';
+                    }
+                }
+            } catch (err) {
+                console.error("Lead submission error:", err);
+                alert("Lead capture error: " + err.message);
+                btn.disabled = false;
+                btn.innerHTML = 'Request Pitch Deck';
+            }
+        });
+    }
+
+    function showSuccessState() {
+        const card = document.querySelector('.partner-modal-card');
+        card.innerHTML = `
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="font-size: 3.5rem; color: #4ECDC4; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; margin-bottom: 12px; color: #fff;">Thank You!</h3>
+                <p style="font-size: 0.95rem; opacity: 0.85; line-height: 1.6; margin-bottom: 25px; color: #94a3b8;">
+                    We have successfully captured your campus information. 
+                    A Soulamore representative will send the <strong>Campus SC 2025 Compliance Pitch Deck</strong> to your work email shortly.
+                </p>
+                <button class="partner-submit-btn" id="partner-modal-close-success-btn">Close Window</button>
+            </div>
+        `;
+        document.getElementById('partner-modal-close-success-btn').addEventListener('click', () => {
+            document.getElementById('soulamore-partner-modal').remove();
+        });
+    }
+
+    function openModal(e) {
+        if (e) e.preventDefault();
+        createModal();
+        const modal = document.getElementById('soulamore-partner-modal');
+        modal.style.display = 'flex';
+        modal.offsetHeight; // Force reflow
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('soulamore-partner-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.remove(); // Clean up from DOM when closed
+            }, 300);
+        }
+    }
+
+    window.openPartnerModal = openModal;
+
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('a, button');
+        if (!target) return;
+
+        const isPartnerBtn = target.classList.contains('partner-btn');
+        const href = target.getAttribute('href') || '';
+        const isPartnerMailto = href.includes('mailto:contact@soulamore.com') || href.includes('mailto:support@soulamore.in');
+
+        if (isPartnerBtn || isPartnerMailto) {
+            openModal(e);
+        }
+    });
+})();
+

@@ -71,6 +71,7 @@ const db = getFirestore(app);
 // Initialize Firebase Authentication
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 const functionsInstance = getFunctions(app, 'us-central1');
 
 // Export for use in other modules

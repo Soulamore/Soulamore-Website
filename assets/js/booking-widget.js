@@ -326,11 +326,15 @@ export function initBookingWidget(config) {
                     sessionStorage.setItem('guest_booking_email', guestEmail);
                     console.log("Logged in anonymously as guest:", activeUser.uid);
                 } catch (anonErr) {
-                    console.error("Guest login failed:", anonErr);
-                    setMessage("Failed to initialize guest booking: " + anonErr.message, true);
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = "Confirm & Pay";
-                    return;
+                    console.warn("Guest login via Firebase failed, falling back to local guest session:", anonErr);
+                    activeUser = {
+                        uid: "guest_" + Math.random().toString(36).substr(2, 9),
+                        isAnonymous: true,
+                        displayName: guestName,
+                        email: guestEmail
+                    };
+                    sessionStorage.setItem('guest_booking_name', guestName);
+                    sessionStorage.setItem('guest_booking_email', guestEmail);
                 }
             }
 
@@ -354,16 +358,19 @@ export function initBookingWidget(config) {
                 const startTime = selectedSlot.start;
                 const endTime = selectedSlot.end;
 
+                const finalName = guestName || activeUser.displayName || "Friend";
+                const finalEmail = guestEmail || activeUser.email || "";
+
                 const booking = await createBookingRequest(
                     activeUser.uid,
                     peerId,
                     planKey,
                     startTime,
-                    endTime
+                    endTime,
+                    finalName,
+                    finalEmail
                 );
 
-                const finalName = guestName || activeUser.displayName || providerName || "Friend";
-                const finalEmail = guestEmail || activeUser.email || "";
 
                 await openRazorpayCheckout(
                     booking.bookingId,
