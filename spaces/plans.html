@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Soulamore plans and pricing. Affordable mental wellness for individuals, students, and organisations." />
+  <title>Plans & Pricing | Soulamore</title>
+  <link rel="icon" href="/assets/images/logo.webp" />
+  <style>
+    :root {
+      --bg: #0d0d0f;
+      --surface: #141417;
+      --surface2: #1a1a1f;
+      --border: #1f1f24;
+      --text: #e8e8ec;
+      --muted: #7a7a8a;
+      --accent: #9b6dff;
+      --accent-soft: #9b6dff18;
+      --green: #4ade80;
+      --font-display: 'Georgia', 'Times New Roman', serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); line-height: 1.7; }
+
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 2rem; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: var(--bg); z-index: 100;
+    }
+    nav a.logo { font-family: var(--font-display); font-size: 1.2rem; color: var(--text); text-decoration: none; }
+    nav a.logo span { color: var(--accent); }
+    nav a.back { font-size: 0.85rem; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 0.4rem; transition: color 0.2s; }
+    nav a.back:hover { color: var(--text); }
+
+    .hero { text-align: center; padding: 5rem 2rem 3rem; }
+    .eyebrow { font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.2rem; }
+    h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; line-height: 1.2; margin-bottom: 1.2rem; }
+    .hero p { color: var(--muted); max-width: 480px; margin: 0 auto; }
+
+    /* TOGGLE */
+    .toggle-row { display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 2rem auto 3rem; }
+    .toggle-label { font-size: 0.9rem; color: var(--muted); }
+    .toggle-label.active { color: var(--text); }
+    .toggle-switch {
+      width: 48px; height: 26px; background: var(--accent); border-radius: 999px;
+      position: relative; cursor: pointer; transition: background 0.3s;
+    }
+    .toggle-switch::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 20px; height: 20px; border-radius: 50%; background: #fff;
+      transition: transform 0.3s;
+    }
+    .toggle-switch.annual::after { transform: translateX(22px); }
+    .save-badge {
+      font-size: 0.7rem; background: #4ade8022; color: var(--green);
+      padding: 0.2rem 0.6rem; border-radius: 999px; border: 1px solid #4ade8040;
+    }
+
+    /* PLANS */
+    .plans-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem; max-width: 1100px; margin: 0 auto; padding: 0 2rem 4rem;
+    }
+    .plan-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2rem; position: relative;
+      transition: border-color 0.2s;
+    }
+    .plan-card:hover { border-color: var(--accent); }
+    .plan-card.featured { border-color: var(--accent); background: linear-gradient(160deg, #9b6dff0d, var(--surface)); }
+    .featured-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); color: #fff; font-size: 0.7rem; padding: 0.3rem 1rem;
+      border-radius: 999px; white-space: nowrap; letter-spacing: 0.08em;
+    }
+    .plan-name { font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .plan-price { display: flex; align-items: baseline; gap: 0.3rem; margin-bottom: 0.4rem; }
+    .plan-price .amount { font-family: var(--font-display); font-size: 2.4rem; color: var(--text); }
+    .plan-price .period { color: var(--muted); font-size: 0.85rem; }
+    .plan-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.8rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+    .feature-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+    .feature-list li { font-size: 0.88rem; color: var(--muted); display: flex; align-items: flex-start; gap: 0.6rem; }
+    .feature-list li::before { content: '✓'; color: var(--green); font-size: 0.8rem; margin-top: 2px; flex-shrink: 0; }
+    .feature-list li.missing { opacity: 0.4; }
+    .feature-list li.missing::before { content: '—'; color: var(--muted); }
+    .plan-cta {
+      display: block; text-align: center; padding: 0.85rem;
+      border-radius: 999px; font-size: 0.9rem; cursor: pointer;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .plan-cta.primary { background: var(--accent); color: #fff; border: none; }
+    .plan-cta.primary:hover { opacity: 0.85; }
+    .plan-cta.ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .plan-cta.ghost:hover { color: var(--text); border-color: var(--muted); }
+
+    /* ENTERPRISE */
+    .enterprise {
+      max-width: 1100px; margin: 0 auto; padding: 0 2rem 4rem;
+    }
+    .enterprise-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 3rem;
+      display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center;
+    }
+    .enterprise-card h2 { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; margin-bottom: 0.8rem; }
+    .enterprise-card p { color: var(--muted); font-size: 0.9rem; max-width: 480px; }
+    .enterprise-features { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.2rem; }
+    .enterprise-features span {
+      font-size: 0.78rem; padding: 0.3rem 0.8rem; border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent); border: 1px solid #9b6dff25;
+    }
+
+    /* FAQ */
+    .faq { max-width: 720px; margin: 0 auto; padding: 2rem 2rem 5rem; }
+    .faq h2 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 400; margin-bottom: 2rem; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 1.2rem 0; }
+    .faq-item summary { font-size: 0.92rem; color: var(--text); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; color: var(--accent); font-size: 1.2rem; }
+    details[open] .faq-item summary::after { content: '−'; }
+    .faq-item p { font-size: 0.88rem; color: var(--muted); padding-top: 0.8rem; line-height: 1.7; }
+
+    footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 768px) {
+      .plans-grid { grid-template-columns: 1fr; }
+      .enterprise-card { grid-template-columns: 1fr; }
+      nav { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="logo" href="/index.html">Soul<span>amore</span></a>
+    <a class="back" href="/index.html">← Home</a>
+  </nav>
+
+  <div class="hero">
+    <p class="eyebrow">Pricing</p>
+    <h1>Support that fits your life</h1>
+    <p>No hidden fees. No pressure. Start free and grow when you're ready.</p>
+  </div>
+
+  <div class="toggle-row">
+    <span class="toggle-label active" id="monthly-label">Monthly</span>
+    <div class="toggle-switch" id="billing-toggle" onclick="toggleBilling()"></div>
+    <span class="toggle-label" id="annual-label">Annual</span>
+    <span class="save-badge">Save 30%</span>
+  </div>
+
+  <div class="plans-grid">
+
+    <!-- Free -->
+    <div class="plan-card">
+      <p class="plan-name">Free</p>
+      <div class="plan-price">
+        <span class="amount">₹0</span>
+        <span class="period">forever</span>
+      </div>
+      <p class="plan-desc">For anyone who needs a safe space to begin. No credit card, no commitment.</p>
+      <ul class="feature-list">
+        <li>Confession Box (anonymous)</li>
+        <li>Problem Wall — read & react</li>
+        <li>5-Step Reset tool</li>
+        <li>Mental Playground</li>
+        <li>Vent Box</li>
+        <li>SoulBot AI (5 chats/day)</li>
+        <li class="missing">Journal & mood tracking</li>
+        <li class="missing">Group sessions</li>
+        <li class="missing">Peer bookings</li>
+      </ul>
+      <a href="/portal/signup.html" class="plan-cta ghost">Start free</a>
+    </div>
+
+    <!-- Soul -->
+    <div class="plan-card featured">
+      <span class="featured-badge">Most Popular</span>
+      <p class="plan-name">Soul</p>
+      <div class="plan-price">
+        <span class="amount" id="soul-price">₹299</span>
+        <span class="period" id="soul-period">/month</span>
+      </div>
+      <p class="plan-desc">For anyone ready to go deeper — with journaling, unlimited SoulBot, and peer access.</p>
+      <ul class="feature-list">
+        <li>Everything in Free</li>
+        <li>SoulBot AI — unlimited</li>
+        <li>Private journal & mood tracker</li>
+        <li>Problem Wall — post anonymously</li>
+        <li>Clinical assessments (all 110)</li>
+        <li>1 peer session per month</li>
+        <li>Priority support response</li>
+        <li class="missing">Group circles</li>
+        <li class="missing">Psychologist sessions</li>
+      </ul>
+      <a href="/portal/signup.html" class="plan-cta primary">Get started</a>
+    </div>
+
+    <!-- Pro -->
+    <div class="plan-card">
+      <p class="plan-name">Pro</p>
+      <div class="plan-price">
+        <span class="amount" id="pro-price">₹799</span>
+        <span class="period" id="pro-period">/month</span>
+      </div>
+      <p class="plan-desc">For those who want consistent, structured support with real human guidance.</p>
+      <ul class="feature-list">
+        <li>Everything in Soul</li>
+        <li>4 peer sessions per month</li>
+        <li>1 psychologist session per month</li>
+        <li>Support Group circles (unlimited)</li>
+        <li>Personalised peer matching</li>
+        <li>Shared session notes & insights</li>
+        <li>24h care team response</li>
+        <li>Early access to new tools</li>
+      </ul>
+      <a href="/portal/signup.html" class="plan-cta ghost">Get started</a>
+    </div>
+
+  </div>
+
+  <!-- Enterprise -->
+  <div class="enterprise">
+    <div class="enterprise-card">
+      <div>
+        <h2>For Campuses & Workplaces</h2>
+        <p>Bring Soulamore to your institution — a full mental wellness infrastructure for your students or employees, with aggregate insights and zero individual surveillance.</p>
+        <div class="enterprise-features">
+          <span>Custom onboarding</span>
+          <span>HR / Admin dashboard</span>
+          <span>Privacy-first analytics</span>
+          <span>Dedicated psychologist</span>
+          <span>SLA-backed support</span>
+          <span>DPDP Act compliant</span>
+        </div>
+      </div>
+      <div>
+        <a href="mailto:hello@soulamore.com" class="plan-cta primary" style="white-space: nowrap;">Contact us →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq">
+    <h2>Common questions</h2>
+
+    <details>
+      <div class="faq-item">
+        <summary>Can I cancel anytime?</summary>
+        <p>Yes. There are no lock-in contracts. You can cancel your subscription at any time and retain access until the end of your billing period.</p>
+      </div>
+    </details>
+
+    <details>
+      <div class="faq-item">
+        <summary>Is my data private?</summary>
+        <p>Absolutely. Your journal entries, session notes, and anonymous posts are never shared with third parties. We are compliant with India's DPDP Act 2023.</p>
+      </div>
+    </details>
+
+    <details>
+      <div class="faq-item">
+        <summary>What payment methods do you accept?</summary>
+        <p>We accept UPI, all major debit and credit cards, and net banking through our secure payment gateway.</p>
+      </div>
+    </details>
+
+    <details>
+      <div class="faq-item">
+        <summary>Can I get a refund?</summary>
+        <p>If you experience a technical issue or feel the platform wasn't as described, contact us at hello@soulamore.com within 7 days of purchase. We review each request individually.</p>
+      </div>
+    </details>
+
+    <details>
+      <div class="faq-item">
+        <summary>Are the psychologist sessions on this platform licensed?</summary>
+        <p>Yes. All psychologists listed on Soulamore hold valid RCI registration or equivalent licensure. You can view their credentials on their profile pages.</p>
+      </div>
+    </details>
+  </div>
+
+  <footer>
+    <p>© 2025 Soulamore · <a href="/company/why-soulamore-exists.html">Why We Exist</a> · <a href="/get-help-now.html">Crisis Support</a> · <a href="mailto:hello@soulamore.com">Contact</a></p>
+  </footer>
+
+  <script>
+    let isAnnual = false;
+    const prices = { soul: { monthly: '₹299', annual: '₹209' }, pro: { monthly: '₹799', annual: '₹559' } };
+
+    function toggleBilling() {
+      isAnnual = !isAnnual;
+      const toggle = document.getElementById('billing-toggle');
+      toggle.classList.toggle('annual', isAnnual);
+      document.getElementById('monthly-label').classList.toggle('active', !isAnnual);
+      document.getElementById('annual-label').classList.toggle('active', isAnnual);
+      const key = isAnnual ? 'annual' : 'monthly';
+      const period = isAnnual ? '/month, billed annually' : '/month';
+      document.getElementById('soul-price').textContent = prices.soul[key];
+      document.getElementById('soul-period').textContent = period;
+      document.getElementById('pro-price').textContent = prices.pro[key];
+      document.getElementById('pro-period').textContent = period;
+    }
+  </script>
+
+</body>
+</html>
