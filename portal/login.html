@@ -190,8 +190,8 @@
 
 
 
-                    <button type="button" onclick="handleDevBypass(event)"
-                        style="background:transparent; border:none; color:rgba(255,255,255,0.4); font-size:0.85rem; width:100%; margin:15px 0 0; cursor:pointer; text-decoration:underline;">
+                    <button type="button" id="devBypassBtn" onclick="handleDevBypass(event)"
+                        style="display:none; background:transparent; border:none; color:rgba(255,255,255,0.4); font-size:0.85rem; width:100%; margin:15px 0 0; cursor:pointer; text-decoration:underline;">
                         &lt;/&gt; Developer Preview (Skip Login)
                     </button>
 
@@ -869,6 +869,13 @@
 
         // Init - select first pill
         setRole(0);
+
+        // Show Dev Bypass ONLY on Local Hostname
+        const host = window.location.hostname;
+        if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')) {
+            const devBtn = document.getElementById('devBypassBtn');
+            if (devBtn) devBtn.style.display = 'inline-block';
+        }
 
         // --- 2. DEV BYPASS ---
         function handleDevBypass(event) {
