@@ -651,7 +651,7 @@
             <!-- Content -->
         </div>
         <div class="comment-section">
-            <input type="text" placeholder="Write a supportive comment..."
+            <input type="text" id="comment-input" placeholder="Write a supportive comment..."
                 style="width:100%; padding:10px; border-radius:8px; border:none; background:var(--border-subtle); color:white;">
         </div>
     </div>
@@ -768,11 +768,66 @@
                         <button class="btn btn-primary" onclick="window.open('${post.instagram_reel_url}')">Read Instagram Comments</button>
                     </div>`
                     :
-                    `<div style="opacity:0.6; font-style:italic;">Loading comments...</div>`
+                    `<div id="comments-container"><div style="opacity:0.6; font-style:italic;">Loading comments...</div></div>`
                 }
             `;
 
             viewer.classList.add('active');
+
+            if (post.source !== 'confession') {
+                window.soulamoreApi.getComments(id).then(comments => {
+                    const container = document.getElementById('comments-container');
+                    if (!container) return;
+                    if (comments.length === 0) {
+                        container.innerHTML = `<div style="opacity:0.6; font-style:italic;">No comments yet. Share your support!</div>`;
+                    } else {
+                        container.innerHTML = comments.map(c => `
+                            <div class="comment-card" style="margin-top:15px; padding:12px; background:rgba(255,255,255,0.03); border-radius:12px; border:1px solid var(--border-glass);">
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:0.8rem; color:var(--text-secondary);">
+                                    <div class="user-avatar-sm" style="width:20px; height:20px; font-size:0.6rem;">${c.author.charAt(0)}</div>
+                                    <span style="font-weight:600; color:var(--starlight);">${c.author}</span>
+                                    <span>• ${c.time}</span>
+                                </div>
+                                <div style="font-size:0.95rem; line-height:1.4; color:#cbd5e1; padding-left:28px;">${c.text}</div>
+                            </div>
+                        `).join('');
+                    }
+                }).catch(err => {
+                    console.error("Error loading comments:", err);
+                    const container = document.getElementById('comments-container');
+                    if (container) container.innerHTML = `<div style="color:red; font-size:0.9rem;">Failed to load comments.</div>`;
+                });
+
+                // Set up submission
+                const input = document.getElementById('comment-input');
+                if (input) {
+                    document.querySelector('.comment-section').style.display = 'block';
+                    input.onkeydown = async (e) => {
+                        if (e.key === 'Enter' && input.value.trim()) {
+                            const commentText = input.value.trim();
+                            input.value = '';
+                            input.disabled = true;
+
+                            try {
+                                await window.soulamoreApi.addComment(id, {
+                                    author: "You",
+                                    text: commentText
+                                });
+                                // Reload comments
+                                openPost(id);
+                                // Refresh feed counts
+                                renderFeed();
+                            } catch (err) {
+                                console.error(err);
+                            } finally {
+                                input.disabled = false;
+                            }
+                        }
+                    };
+                }
+            } else {
+                document.querySelector('.comment-section').style.display = 'none';
+            }
         }
 
         function closeViewer() {

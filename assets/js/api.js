@@ -79,7 +79,27 @@ const MockData = {
             upvotes: 89,
             comments: 15
         }
-    ]
+    ],
+    comments: {
+        1: [
+            { author: "Zen_Gardener", time: "1 hour ago", text: "I'm with you. Finals feel like an absolute wall. Take a 15-minute breather." },
+            { author: "StudyBuddy_99", time: "30 minutes ago", text: "Same here, brain feels like mush. Let's try active recall instead of passive reading." }
+        ],
+        2: [
+            { author: "Social_Butterfly_In_Training", time: "3 hours ago", text: "Walking out is a win! You tried, and that counts. Next time, try standing outside the door for 2 mins." },
+            { author: "Introvert_Power", time: "2 hours ago", text: "Don't beat yourself up. Parties are overstimulating. Coffee shop meetups are much better!" }
+        ],
+        3: [
+            { author: "HomeSick_Too", time: "4 hours ago", text: "I feel this so much. Try calling your mom and asking for a recipe you can cook locally!" }
+        ],
+        4: [
+            { author: "NightOwl", time: "12 hours ago", text: "Definitely at night. There are no distractions, so all thoughts get amplified." },
+            { author: "SunsetLover", time: "8 hours ago", text: "I started journaling right before sleep to empty my head, it helps." }
+        ],
+        6: [
+            { author: "GroundedSoul", time: "2 days ago", text: "Those questions are so helpful. Saved them for my roommate." }
+        ]
+    }
 };
 
 const api = {
@@ -88,6 +108,33 @@ const api = {
         if (API_MODE === 'MOCK') {
             return new Promise(resolve => {
                 setTimeout(() => resolve(MockData.posts), 500); // Simulate network latency
+            });
+        }
+    },
+
+    getComments: async (postId) => {
+        if (API_MODE === 'MOCK') {
+            return new Promise(resolve => {
+                setTimeout(() => resolve(MockData.comments[postId] || []), 300);
+            });
+        }
+    },
+
+    addComment: async (postId, comment) => {
+        if (API_MODE === 'MOCK') {
+            return new Promise(resolve => {
+                if (!MockData.comments[postId]) {
+                    MockData.comments[postId] = [];
+                }
+                const newComment = {
+                    ...comment,
+                    time: "Just now"
+                };
+                MockData.comments[postId].push(newComment);
+                // Also update comment count on the post
+                const post = MockData.posts.find(p => p.id === postId);
+                if (post) post.comments += 1;
+                resolve(newComment);
             });
         }
     },

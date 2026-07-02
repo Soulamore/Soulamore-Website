@@ -23,7 +23,9 @@ service cloud.firestore {
 
     // Users collection - Central profile data
     match /users/{userId} {
-      allow read: if isSelf(userId) || isAdmin();
+      allow read: if isSelf(userId) 
+                  || isAdmin() 
+                  || (resource != null && 'role' in resource.data && (resource.data.role.lower().matches('.*psychologist.*') || resource.data.role.lower().matches('.*peer.*')));
       allow create: if isSelf(userId);
       allow update: if isSelf(userId) 
                     && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])
@@ -185,8 +187,8 @@ service cloud.firestore {
     }
 
     // Forms - allow anyone to submit (create) but restrict management to Admins
-    match /peers/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isAdmin(); }
-    match /psychologists/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isAdmin(); }
+    match /peers/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isSelf(id) || isAdmin(); }
+    match /psychologists/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isSelf(id) || isAdmin(); }
     match /contacts/{id} { allow read: if isAdmin(); allow create: if true; allow update, delete: if isAdmin(); }
     match /newsletters/{id} { allow read: if isAdmin(); allow create: if true; allow update, delete: if isAdmin(); }
     
@@ -257,6 +259,12 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();
+    }
+
+    // Leads (B2B Lead Capture) - allow creation by anyone, management only by Admin
+    match /leads/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
     }
 
     // Default: Deny all other access

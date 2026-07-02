@@ -240,6 +240,11 @@
             margin-bottom: 60px;
         }
 
+        .content-grid.no-left,
+        .content-grid.no-right {
+            grid-template-columns: 1fr;
+        }
+
         .glass-panel {
             background: var(--navy-glass);
             border: 1px solid var(--border-glass);
@@ -411,7 +416,7 @@
             font-size: 1.1rem;
         }
 
-        @media (max-width: 900px) {
+         @media (max-width: 900px) {
             .content-grid {
                 grid-template-columns: 1fr;
             }
@@ -419,6 +424,83 @@
             .profile-name {
                 font-size: 2.2rem;
             }
+        }
+
+        /* Booking Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: var(--navy-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 30px;
+            width: 100%;
+            max-width: 550px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--starlight);
+            font-size: 1.8rem;
+            cursor: pointer;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .close-modal:hover {
+            opacity: 1;
+        }
+
+        /* Dark mode inputs override for booking widget inside modal */
+        #booking-widget-root input,
+        #booking-widget-root select {
+            background: rgba(15, 23, 42, 0.6) !important;
+            color: var(--starlight) !important;
+            border-color: rgba(78, 205, 196, 0.3) !important;
+        }
+        #booking-widget-root input:focus,
+        #booking-widget-root select:focus {
+            outline: none;
+            border-color: var(--teal-glow) !important;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.2);
+        }
+        #booking-widget-root select option {
+            background: #0f172a;
+            color: var(--starlight);
+        }
+        #booking-widget-root button {
+            background: linear-gradient(135deg, var(--teal-glow), #45b7af) !important;
+            color: #0f172a !important;
+            font-weight: 600 !important;
+            border: none !important;
+            border-radius: 12px !important;
+            transition: all 0.2s !important;
+        }
+        #booking-widget-root button:hover {
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.4) !important;
+            transform: translateY(-1px);
         }
     </style>
     <link rel="icon" href="../assets/images/favicon_symbol.webp" type="image/x-icon">
@@ -431,11 +513,17 @@
     <div id="error-msg" class="loader hidden" style="color:var(--alert-red);">Profile not found.</div>
     <div id="profile-content" class="container hidden"></div>
 
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="close-modal" id="close-booking-modal">&times;</button>
+            <div id="booking-widget-root"></div>
+        </div>
+    </div>
+
     <script type="module">
         import { resolvePsychologistProfile, mapPsychologistRecordToProfile } from "../assets/js/profile-catalog.js";
         import { mountPsychologistProfile } from "../assets/js/profile-renderers.js";
-        import { getUserProfile } from "../assets/js/profile-handler.js";
-        import { initBookingWidget } from "../assets/js/booking-widget.js";
 
         const params = new URLSearchParams(window.location.search);
         const key = params.get('slug') || params.get('id') || 'bhagyavathi';
@@ -444,21 +532,128 @@
         const loadingEl = document.getElementById('loading');
         const errorEl = document.getElementById('error-msg');
 
+        function setupBookBtnListener(profile) {
+            if (!profile) return;
+            const bookBtn = root.querySelector('.book-btn');
+            if (bookBtn) {
+                // Clone node to clear old listeners if re-rendered
+                const newBookBtn = bookBtn.cloneNode(true);
+                bookBtn.parentNode.replaceChild(newBookBtn, bookBtn);
+
+                newBookBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const modal = document.getElementById('booking-modal');
+                    if (modal) {
+                        modal.style.display = 'flex';
+                        try {
+                            const { initBookingWidget } = await import("../assets/js/booking-widget.js");
+                            initBookingWidget({
+                                peerId: profile.slug,
+                                rootId: "booking-widget-root",
+                                providerName: profile.hero.name || "Psychologist"
+                            });
+                        } catch (err) {
+                            console.error("Failed to load booking widget:", err);
+                        }
+                    }
+                });
+            }
+        }
+
         async function init() {
             let profile = resolvePsychologistProfile(key);
 
-            if (!profile && params.get('id')) {
-                const record = await getUserProfile(params.get('id'));
-                profile = mapPsychologistRecordToProfile(record, params.get('id'));
+            if (profile) {
+                mountPsychologistProfile({ profile, root, loadingEl, errorEl });
+                setupBookBtnListener(profile);
+                return;
             }
 
-            mountPsychologistProfile({ profile, root, loadingEl, errorEl });
+            const uid = params.get('id');
+            if (uid) {
+                // Try reading from cache first for instant sub-second loading
+                const cacheKey = `profile_cache_${uid}`;
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                    try {
+                        profile = JSON.parse(cached);
+                        console.log("⚡ Profile loaded from local cache");
+                        mountPsychologistProfile({ profile, root, loadingEl, errorEl });
+                        setupBookBtnListener(profile);
+                    } catch (e) {
+                        console.warn("Failed to parse cached profile:", e);
+                    }
+                }
+
+                // Fetch fresh profile in the background (or foreground if cache is empty)
+                const fetchFresh = async () => {
+                    let freshProfile = null;
+                    try {
+                        const { db, doc, getDoc } = await import("../assets/js/firebase-config.js");
+                        const profSnap = await getDoc(doc(db, "professionals", uid));
+                        if (profSnap.exists()) {
+                            const record = profSnap.data();
+                            freshProfile = mapPsychologistRecordToProfile(record, uid);
+                        }
+                    } catch (profErr) {
+                        console.warn("Public professionals profile fetch failed, trying users collection fallback:", profErr);
+                    }
+
+                    if (!freshProfile) {
+                        try {
+                            const { getUserProfile } = await import("../assets/js/profile-handler.js");
+                            const record = await getUserProfile(uid);
+                            freshProfile = mapPsychologistRecordToProfile(record, uid);
+                        } catch (userErr) {
+                            console.error("User profile fallback failed:", userErr);
+                        }
+                    }
+
+                    if (freshProfile) {
+                        localStorage.setItem(cacheKey, JSON.stringify(freshProfile));
+                        // Re-render if data has changed or was not loaded yet
+                        if (!profile || JSON.stringify(profile) !== JSON.stringify(freshProfile)) {
+                            profile = freshProfile;
+                            mountPsychologistProfile({ profile, root, loadingEl, errorEl });
+                            setupBookBtnListener(profile);
+                        }
+                    } else if (!profile) {
+                        // Fail if not in cache and network fetch returned nothing
+                        mountPsychologistProfile({ profile: null, root, loadingEl, errorEl });
+                    }
+                };
+
+                if (profile) {
+                    fetchFresh();
+                } else {
+                    await fetchFresh();
+                }
+            } else {
+                mountPsychologistProfile({ profile: null, root, loadingEl, errorEl });
+            }
         }
 
         init().catch((error) => {
             console.error(error);
-            loadingEl.classList.add('hidden');
-            errorEl.classList.remove('hidden');
+            mountPsychologistProfile({ profile: null, root, loadingEl, errorEl });
+        });
+
+        // Close modal listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('booking-modal');
+            const closeBtn = document.getElementById('close-booking-modal');
+            
+            if (closeBtn && modal) {
+                closeBtn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+            }
+            
+            window.addEventListener('click', (e) => {
+                if (modal && e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
         });
 
         const particleContainer = document.getElementById('particles');

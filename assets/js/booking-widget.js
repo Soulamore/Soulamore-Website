@@ -63,17 +63,67 @@ export function initBookingWidget(config) {
 
                 <div id="${rootId}-auth-warning" style="margin-bottom:16px; display:none;">
                     <div style="
-                        padding:10px 12px;
-                        border-radius:10px;
-                        background:rgba(248, 250, 252, 0.9);
-                        border:1px solid rgba(148, 163, 184, 0.5);
-                        font-size:0.85rem;
+                        padding:12px 16px;
+                        border-radius:12px;
+                        background: rgba(255, 255, 255, 0.05);
+                        border: 1px solid rgba(78, 205, 196, 0.2);
+                        color: #f8fafc;
+                        font-size:0.88rem;
+                        line-height: 1.5;
                     ">
-                        <i class="fas fa-lock"></i>
-                        <span style="margin-left:6px;">
-                            Please log in to book a session.
-                            <a href="../portal/login.html" style="text-decoration:underline;">Log in / Sign up</a>
-                        </span>
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; font-weight:600; color:var(--teal-glow);">
+                            <i class="fas fa-lock"></i> Account Recommended
+                        </div>
+                        <p style="margin:0 0 10px 0; opacity:0.8;">
+                            Logging in lets you track sessions and view receipts in your dashboard.
+                        </p>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <a href="../portal/login.html" style="
+                                color:#0f172a;
+                                background:var(--teal-glow);
+                                padding:5px 12px;
+                                border-radius:6px;
+                                text-decoration:none;
+                                font-weight:600;
+                                font-size:0.75rem;
+                            ">Log in / Sign up</a>
+                            <span style="opacity:0.5; font-size:0.75rem;">or book as guest below</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="${rootId}-guest-fields" style="margin-bottom:16px; display:none;">
+                    <div style="display:flex; flex-wrap:wrap; gap:16px;">
+                        <div style="flex:1 1 200px;">
+                            <label style="display:block; font-size:0.8rem; opacity:0.7; margin-bottom:6px;">
+                                Your Name (Guest)
+                            </label>
+                            <input type="text"
+                                   id="${rootId}-guest-name"
+                                   placeholder="e.g. Jane Doe"
+                                   style="
+                                       width:100%;
+                                       padding:10px 12px;
+                                       border-radius:10px;
+                                       border:1px solid rgba(148, 163, 184, 0.7);
+                                       font-size:0.9rem;
+                                   ">
+                        </div>
+                        <div style="flex:1 1 200px;">
+                            <label style="display:block; font-size:0.8rem; opacity:0.7; margin-bottom:6px;">
+                                Email Address
+                            </label>
+                            <input type="email"
+                                   id="${rootId}-guest-email"
+                                   placeholder="e.g. jane@example.com"
+                                   style="
+                                       width:100%;
+                                       padding:10px 12px;
+                                       border-radius:10px;
+                                       border:1px solid rgba(148, 163, 184, 0.7);
+                                       font-size:0.9rem;
+                                   ">
+                        </div>
                     </div>
                 </div>
 
@@ -243,12 +293,57 @@ export function initBookingWidget(config) {
 
     if (submitBtn) {
         submitBtn.addEventListener("click", async () => {
-            if (!currentUser) {
-                window.location.href = "../portal/login.html";
-                return;
+            let activeUser = currentUser;
+            let guestName = "";
+            let guestEmail = "";
+
+            if (!activeUser) {
+                const nameInput = document.getElementById(`${rootId}-guest-name`);
+                const emailInput = document.getElementById(`${rootId}-guest-email`);
+                guestName = nameInput ? nameInput.value.trim() : "";
+                guestEmail = emailInput ? emailInput.value.trim() : "";
+
+                if (!guestName || !guestEmail) {
+                    setMessage("Please fill in your name and email to book as guest, or log in first.", true);
+                    return;
+                }
+
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
+                    setMessage("Please enter a valid email address.", true);
+                    return;
+                }
+
+                try {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "Setting up guest account...";
+                    setMessage("");
+
+                    const { signInAnonymously } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
+                    const userCredential = await signInAnonymously(auth);
+                    activeUser = userCredential.user;
+
+                    sessionStorage.setItem('guest_booking_name', guestName);
+                    sessionStorage.setItem('guest_booking_email', guestEmail);
+                    console.log("Logged in anonymously as guest:", activeUser.uid);
+                } catch (anonErr) {
+                    console.warn("Guest login via Firebase failed, falling back to local guest session:", anonErr);
+                    activeUser = {
+                        uid: "guest_" + Math.random().toString(36).substr(2, 9),
+                        isAnonymous: true,
+                        displayName: guestName,
+                        email: guestEmail
+                    };
+                    sessionStorage.setItem('guest_booking_name', guestName);
+                    sessionStorage.setItem('guest_booking_email', guestEmail);
+                }
             }
+
             if (!selectedDate || !selectedSlot) {
                 setMessage("Please choose a date and time slot.", true);
+                if (!currentUser) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Confirm & Pay";
+                }
                 return;
             }
 
@@ -263,30 +358,40 @@ export function initBookingWidget(config) {
                 const startTime = selectedSlot.start;
                 const endTime = selectedSlot.end;
 
+                const finalName = guestName || activeUser.displayName || "Friend";
+                const finalEmail = guestEmail || activeUser.email || "";
+
                 const booking = await createBookingRequest(
-                    currentUser.uid,
+                    activeUser.uid,
                     peerId,
                     planKey,
                     startTime,
-                    endTime
+                    endTime,
+                    finalName,
+                    finalEmail
                 );
+
 
                 await openRazorpayCheckout(
                     booking.bookingId,
                     booking.amount,
-                    currentUser.uid,
-                    currentUser.displayName || providerName || "Friend",
-                    currentUser.email || "",
-                    currentUser.phoneNumber || "",
+                    activeUser.uid,
+                    finalName,
+                    finalEmail,
+                    activeUser.phoneNumber || "",
                     { planName: plan.name }
                 );
 
-                setMessage("Payment successful. Your session will appear in 'My Sessions' shortly.");
+                setMessage("Payment successful. Your session is confirmed!");
                 submitBtn.textContent = "Booked";
 
                 setTimeout(() => {
-                    window.location.href = "../portal/user-dashboard.html?view=bookings";
-                }, 2000);
+                    if (activeUser.isAnonymous) {
+                        window.location.href = "../index.html?booking_success=true";
+                    } else {
+                        window.location.href = "../portal/user-dashboard.html?view=bookings";
+                    }
+                }, 2500);
             } catch (err) {
                 console.error("BookingWidget: booking/payment failed", err);
                 setMessage(err.message || "Payment failed or was cancelled. Please try again.", true);
@@ -301,6 +406,10 @@ export function initBookingWidget(config) {
         currentUser = user;
         if (authWarning) {
             authWarning.style.display = user ? "none" : "block";
+        }
+        const guestFields = document.getElementById(`${rootId}-guest-fields`);
+        if (guestFields) {
+            guestFields.style.display = user ? "none" : "block";
         }
     });
 }

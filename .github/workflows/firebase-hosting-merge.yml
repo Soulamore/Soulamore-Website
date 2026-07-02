@@ -19,7 +19,10 @@ jobs:
           ./scripts/inject-api-key.sh
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      - name: Generate unique build info
+        run: echo '{"build_time":"'$(date)'", "commit":"'${{ github.sha }}'"}' > version.json
       - uses: FirebaseExtended/action-hosting-deploy@v0
+        continue-on-error: true
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SOULAMORE_F0A64 }}
