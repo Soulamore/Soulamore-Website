@@ -147,25 +147,7 @@
             });
         }
 
-        // Main auth check
-        async function runAuthCheck() {
-            try {
-                const { auth, onAuthStateChanged } = await import('./firebase-config.js');
-
-                onAuthStateChanged(auth, async (user) => {
-                    // --- DEV BYPASS CHECK ---
-                    const session = JSON.parse(localStorage.getItem('soulamore_session') || '{}');
-                    const isDevSession = session.isLoggedIn && session.userId && session.userId.startsWith('dev-');
-
-                    if (!user && !isDevSession) {
-                        console.log('⚠️ No user logged in, redirecting to login');
-                        window.location.href = LOGIN_URL;
-                        return;
-                    }
-
-                    console.log('✅ User authenticated:', user ? user.email : 'Dev Session');
-
-                    // --- COMPLIANCE CHECK: MINOR CONSENT & ONBOARDING GATE ---
+        // --- COMPLIANCE CHECK: MINOR CONSENT & ONBOARDING GATE ---
                     if (user && !isDevSession) {
                         try {
                             const { doc, getDoc, db, collection, query, where, getDocs, updateDoc } = await import('./firebase-config.js');
