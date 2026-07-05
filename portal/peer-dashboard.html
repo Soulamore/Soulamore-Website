@@ -1356,7 +1356,7 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                                     <label style="display:block; font-weight:600; margin-bottom:10px;">This space may
                                         feel
                                         right if...</label>
-                                    <textarea
+                                    <textarea id="prof-match"
                                         style="width:100%; height:140px; background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:15px; color:var(--text-main); font-family:'Outfit'; line-height:1.6; resize:vertical;">• You're overthinking small things that don't feel small.
 • You feel emotionally tired but aren't sure why.
 • You're carrying things you haven't said out loud yet.
@@ -1368,11 +1368,18 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                                     <label style="display:block; font-weight:600; margin-bottom:10px;">What our
                                         conversation
                                         looks like</label>
-                                    <textarea
+                                    <textarea id="prof-convo"
                                         style="width:100%; height:120px; background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:15px; color:var(--text-main); font-family:'Outfit'; line-height:1.6; resize:vertical;">• We start wherever you are (no agenda).
 • You can talk, type, or take breaks.
 • I won't interrupt or rush you.
 • There's no "right" outcome expected.</textarea>
+                                </div>
+
+                                <div style="margin-top:25px;">
+                                     <label style="display:block; font-weight:600; margin-bottom:10px;">My Boundaries</label>
+                                     <textarea id="prof-bound"
+                                         placeholder="Specify your boundaries (e.g., Peers do not diagnose or treat mental health conditions...)"
+                                         style="width:100%; height:100px; background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:15px; color:var(--text-main); font-family:'Outfit'; line-height:1.6; resize:vertical;"></textarea>
                                 </div>
                             </div>
 
@@ -1395,7 +1402,7 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                                 <div style="margin-bottom:20px;">
                                     <label
                                         style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:5px;">Languages</label>
-                                    <input type="text" value="English, Hindi"
+                                    <input type="text" id="prof-languages" value="English, Hindi"
                                         style="width:100%; padding:10px; background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-main); font-family:'Outfit';">
                                 </div>
 
@@ -2483,6 +2490,9 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                 if (document.getElementById('prof-display-name')) document.getElementById('prof-display-name').value = data.name || "";
                 if (document.getElementById('prof-quote')) document.getElementById('prof-quote').value = data.quote || "";
                 if (document.getElementById('prof-bio')) document.getElementById('prof-bio').value = data.bio || "";
+                if (document.getElementById('prof-match')) document.getElementById('prof-match').value = data.bestMatch || "";
+                if (document.getElementById('prof-convo')) document.getElementById('prof-convo').value = data.conversationStyle || "";
+                if (document.getElementById('prof-bound')) document.getElementById('prof-bound').value = data.boundaries || "";
                 
                 const langInput = document.getElementById('prof-languages');
                 if (langInput) {
@@ -2564,7 +2574,10 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                 quote: document.getElementById('prof-quote').value,
                 bio: document.getElementById('prof-bio').value,
                 tags: activeTags,
-                languages: (document.getElementById('prof-languages').value || "").split(',').map(s => s.trim()).filter(s => s)
+                languages: (document.getElementById('prof-languages').value || "").split(',').map(s => s.trim()).filter(s => s),
+                bestMatch: document.getElementById('prof-match').value,
+                conversationStyle: document.getElementById('prof-convo').value,
+                boundaries: document.getElementById('prof-bound').value
             };
             console.log("[Save Profile] Data:", profileData);
 
