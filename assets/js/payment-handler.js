@@ -150,7 +150,8 @@ export async function openRazorpayCheckout(bookingId, amount, userId, userName, 
                             console.error("Client-side confirmation failed too:", confirmErr);
                             reject(error);
                         }
-                    },
+                    }
+                },
                 modal: {
                     ondismiss: function() {
                         // User closed the checkout
