@@ -3,11 +3,11 @@
 ---
 
 ## 📋 Ticket Metadata
-- **Status:** `⏳ PENDING_VERIFICATION`
+- **Status:** `🔄 IN_PROGRESS`
 - **Severity:** 🔴 CRITICAL
-- **Reporter:** Abhishek Singla (Via Abhishek Bugs.docx)
+- **Reporter:** Abhishek Singla (Via Abhishek Bugs.docx), Aditya (Via 260704 - Profile pages and going towards dashboards.docx)
 - **Assignee:** Aditya (Developer)
-- **Date Reported:** 2026-06-28
+- **Date Reported:** 2026-06-28 (Aditya follow-up: 2026-07-04)
 - **Target Release / Feature:** Peer Support / Peer Directory & Profiles
 
 ---
