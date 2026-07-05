@@ -20,7 +20,7 @@ import {
     PEER_PLAN_TYPES,
     DEFAULT_PLANS
 } from "./peer-booking-handler.js";
-import { openRazorpayCheckout } from "./payment-handler.js";
+import { openRazorpayCheckout } from "./payment-handler.js?v=3.6";
 
 /**
  * Initialize a booking widget inside a given root element.

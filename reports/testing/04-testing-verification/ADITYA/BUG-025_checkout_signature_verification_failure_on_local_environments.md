@@ -3,7 +3,7 @@
 ---
 
 ## 📋 Ticket Metadata
-- **Status:** `🔄 IN_PROGRESS`
+- **Status:** `⏳ PENDING_VERIFICATION`
 - **Severity:** 🟠 HIGH
 - **Reporter:** Aditya (Developer Audit)
 - **Assignee:** Aditya (Developer)
