@@ -3,7 +3,7 @@
 ---
 
 ## 📋 Ticket Metadata
-- **Status:** `🔄 IN_PROGRESS`
+- **Status:** `⏳ PENDING_VERIFICATION`
 - **Severity:** 🔴 CRITICAL
 - **Reporter:** Abhishek Singla (Via Abhishek Bugs.docx), Aditya (Via 260704 - Profile pages and going towards dashboards.docx)
 - **Assignee:** Aditya (Developer)
@@ -73,7 +73,7 @@ The application fails to resolve the path and redirects to the 404 Not Found pag
 
 ### Developer Verification
 - **Verified By:** Aditya (Developer)
-- **Verification Date:** 2026-07-04
+- **Verification Date:** 2026-07-05
 - **Test Result:** `✅ PASS`
 
 ### Independent Tester Verification

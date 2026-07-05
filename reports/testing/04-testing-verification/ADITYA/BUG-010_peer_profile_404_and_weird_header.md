@@ -3,7 +3,7 @@
 ---
 
 ## 📋 Ticket Metadata
-- **Status:** `🔄 IN_PROGRESS`
+- **Status:** `⏳ PENDING_VERIFICATION`
 - **Severity:** 🟠 HIGH
 - **Reporter:** Aditya (Via 260627 - Login loop and dashboard login loop.docx), Abhishek Singla (Via Abhishek Bugs.docx)
 - **Assignee:** Aditya (Developer)
@@ -65,7 +65,7 @@ The page routes to a 404 page (attempting to load `auth/login.html` or another i
 
 ### Developer Verification
 - **Verified By:** Aditya (Developer)
-- **Verification Date:** 2026-06-28
+- **Verification Date:** 2026-07-05
 - **Test Result:** `✅ PASS`
 
 ### Independent Tester Verification
