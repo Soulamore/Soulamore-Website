@@ -135,7 +135,54 @@ function renderAvailability() {
             <button data-action="add" data-day="${day}" style="background:none; border:none; color:var(--accent-theme); cursor:pointer;"><i class="fas fa-plus"></i></button>
         </div>`;
     }).join('');
+    updateWeeklySnapshot();
     console.log('✅ Rendered');
+}
+
+function formatTime12Hour(timeStr) {
+    if (!timeStr) return '';
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const h12 = hours % 12 || 12;
+    const mStr = minutes.toString().padStart(2, '0');
+    return `${h12.toString().padStart(2, '0')}:${mStr} ${ampm}`;
+}
+
+function updateWeeklySnapshot() {
+    const container = document.getElementById('weekly-snapshot-list-peer');
+    if (!container) {
+        console.log('⚠️ Weekly snapshot container not found');
+        return;
+    }
+
+    container.innerHTML = DAYS.map((day, i) => {
+        const slots = currentAvailabilityPeer.filter(s => s.day.toLowerCase() === day);
+        if (slots.length === 0) {
+            return `
+                <div style="padding:15px; background:var(--bg-deep, rgba(0,0,0,0.1)); border-radius:10px; border:1px solid var(--border-subtle, rgba(255,255,255,0.05)); display:flex; justify-content:space-between; align-items:center; opacity:0.5;">
+                    <div>
+                        <div style="font-weight:600; font-size:0.95rem; color:var(--text-main);">${DAY_LABELS[i]}</div>
+                        <div style="font-size:0.8rem; opacity:0.7; color:var(--text-muted);">No slots defined</div>
+                    </div>
+                    <i class="fas fa-times-circle" style="color:var(--text-muted, #94a3b8);"></i>
+                </div>
+            `;
+        }
+
+        const slotStrings = slots.map(slot => {
+            return `${formatTime12Hour(slot.startTime)} - ${formatTime12Hour(slot.endTime)}`;
+        }).join(', ');
+
+        return `
+            <div style="padding:15px; background:rgba(244, 159, 117, 0.05); border-radius:10px; border:1px solid rgba(244, 159, 117, 0.2); display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-weight:600; font-size:0.95rem; color:var(--text-main);">${DAY_LABELS[i]}</div>
+                    <div style="font-size:0.8rem; opacity:0.7; color:var(--text-muted);">${slotStrings}</div>
+                </div>
+                <i class="fas fa-check-circle" style="color:var(--accent-theme, #f49f75);"></i>
+            </div>
+        `;
+    }).join('');
 }
 
 async function saveAvailability() {
@@ -206,5 +253,8 @@ function removeSlot(day, index) {
 
 function updateSlot(day, index, field, value) {
     const slots = currentAvailabilityPeer.filter(s => s.day.toLowerCase() === day);
-    if (index >= 0 && index < slots.length) slots[index][field] = value;
+    if (index >= 0 && index < slots.length) {
+        slots[index][field] = value;
+        updateWeeklySnapshot();
+    }
 }
