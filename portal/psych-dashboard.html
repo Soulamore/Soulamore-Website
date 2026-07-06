@@ -980,8 +980,8 @@
                             <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">Sync booking requests directly
                                 to
                                 your Google Calendar.</p>
-                            <button class="btn-dash-primary" style="width:100%; opacity:0.7;"
-                                onclick="alert('Google Calendar integration coming soon!')" aria-label="Connect Google Calendar (Coming Soon)">
+                            <button id="connect-gcal-btn-availability" class="btn-dash-primary" style="width:100%;"
+                                onclick="connectGoogleCalendar()" aria-label="Connect Google Calendar">
                                 <i class="fab fa-google"></i> Connect Google Calendar
                             </button>
                         </div>
@@ -1819,6 +1819,7 @@
         const meta = await getPractitionerMetadata(uid);
         const badge = document.getElementById('gcal-status-badge');
         const btn = document.getElementById('connect-gcal-btn');
+        const btnAvailability = document.getElementById('connect-gcal-btn-availability');
         
         if(meta && meta.gcalLinked) {
             if(badge) {
@@ -1826,11 +1827,15 @@
                 badge.style.color = '#22c55e';
                 badge.textContent = '● Connected';
             }
-            if(btn) {
-                btn.style.opacity = '0.5';
-                btn.innerHTML = '<i class="fas fa-check" style="margin-right:10px;"></i> Calendar Sync Active';
-                btn.onclick = () => alert("Your Google Calendar is already linked. To disconnect, contact support@soulamore.com");
-            }
+            const updateBtn = (b) => {
+                if(b) {
+                    b.style.opacity = '0.5';
+                    b.innerHTML = '<i class="fas fa-check" style="margin-right:10px;"></i> Calendar Sync Active';
+                    b.onclick = () => alert("Your Google Calendar is already linked. To disconnect, contact support@soulamore.com");
+                }
+            };
+            updateBtn(btn);
+            updateBtn(btnAvailability);
         }
     }
 

@@ -1497,34 +1497,30 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                             </p>
                         </div>
 
-                        <!-- Right: Snapshot of week -->
-                        <div class="dash-card">
-                            <h3 style="margin-bottom:20px; font-family:'Outfit';">Weekly Snapshot</h3>
-                            <div style="display:flex; flex-direction:column; gap:12px;">
-                                <div
-                                    style="padding:15px; background:rgba(45, 212, 191, 0.05); border-radius:10px; border:1px solid rgba(45, 212, 191, 0.2); display:flex; justify-content:space-between; align-items:center;">
-                                    <div>
-                                        <div style="font-weight:600; font-size:0.95rem;">Monday</div>
-                                        <div style="font-size:0.8rem; opacity:0.7;">06:00 PM - 09:00 PM</div>
+                        <!-- Right: Snapshot of week & Calendar Sync -->
+                        <div style="display:flex; flex-direction:column; gap:20px;">
+                            <!-- Weekly Snapshot Card -->
+                            <div class="dash-card" style="margin-bottom:0;">
+                                <h3 style="margin-bottom:20px; font-family:'Outfit';">Weekly Snapshot</h3>
+                                <div id="weekly-snapshot-list-peer" style="display:flex; flex-direction:column; gap:12px;">
+                                    <div style="padding:20px; text-align:center; opacity:0.5;">
+                                        <i class="fas fa-spinner fa-spin" style="font-size:1.5rem; margin-bottom:10px;"></i>
+                                        <div>Loading snapshot...</div>
                                     </div>
-                                    <i class="fas fa-check-circle" style="color:var(--accent-theme);"></i>
                                 </div>
-                                <div
-                                    style="padding:15px; background:rgba(45, 212, 191, 0.05); border-radius:10px; border:1px solid rgba(45, 212, 191, 0.1); display:flex; justify-content:space-between; align-items:center;">
-                                    <div>
-                                        <div style="font-weight:600; font-size:0.95rem;">Thursday</div>
-                                        <div style="font-size:0.8rem; opacity:0.7;">06:00 PM - 09:00 PM</div>
-                                    </div>
-                                    <i class="fas fa-check-circle" style="color:var(--accent-theme);"></i>
+                            </div>
+                            
+                            <!-- Calendar Sync Card -->
+                            <div class="dash-card">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                    <h3 style="font-family:'Outfit'; color:var(--accent-theme, #f49f75); margin:0;">Calendar Sync</h3>
+                                    <span id="gcal-status-badge-availability" style="font-size:0.8rem; background:rgba(239, 68, 68, 0.1); color:#ef4444; padding:4px 12px; border-radius:20px;">● Disconnected</span>
                                 </div>
-                                <div
-                                    style="padding:15px; background:var(--bg-deep); border-radius:10px; border:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; opacity:0.5;">
-                                    <div>
-                                        <div style="font-weight:600; font-size:0.95rem;">Saturday</div>
-                                        <div style="font-size:0.8rem; opacity:0.7;">No slots defined</div>
-                                    </div>
-                                    <i class="fas fa-times-circle"></i>
-                                </div>
+                                <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px; line-height:1.5;">Sync your volunteer slots and booking events directly with Google Calendar.</p>
+                                <button id="connect-gcal-btn-availability" class="btn-dash-primary" style="width:100%; border-color:var(--accent-theme, #f49f75); background:var(--accent-theme, #f49f75); color:var(--bg-main, #0b0f19);"
+                                    onclick="connectGoogleCalendar()" aria-label="Connect Google Calendar">
+                                    <i class="fab fa-google" style="margin-right:8px;"></i> Connect Google Calendar
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -2408,19 +2404,30 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                 // 3. Update Calendar Link Status
                 const meta = await getPractitionerMetadata(uid);
                 const badge = document.getElementById('gcal-status-badge');
+                const badgeAvailability = document.getElementById('gcal-status-badge-availability');
                 const btn = document.getElementById('connect-gcal-btn');
+                const btnAvailability = document.getElementById('connect-gcal-btn-availability');
                 
                 if(meta && meta.gcalLinked) {
-                    if(badge) {
-                        badge.style.background = 'rgba(34, 197, 94, 0.1)';
-                        badge.style.color = '#22c55e';
-                        badge.textContent = '● Connected';
-                    }
-                    if(btn) {
-                        btn.style.opacity = '0.5';
-                        btn.innerHTML = '<i class="fas fa-check" style="margin-right:10px;"></i> Calendar Sync Active';
-                        btn.onclick = () => alert("Your Google Calendar is already linked. To disconnect, contact support@soulamore.com");
-                    }
+                    const updateBadge = (bg) => {
+                        if (bg) {
+                            bg.style.background = 'rgba(34, 197, 94, 0.1)';
+                            bg.style.color = '#22c55e';
+                            bg.textContent = '● Connected';
+                        }
+                    };
+                    updateBadge(badge);
+                    updateBadge(badgeAvailability);
+                    
+                    const updateBtn = (b) => {
+                        if (b) {
+                            b.style.opacity = '0.5';
+                            b.innerHTML = '<i class="fas fa-check" style="margin-right:10px;"></i> Calendar Sync Active';
+                            b.onclick = () => alert("Your Google Calendar is already linked. To disconnect, contact support@soulamore.com");
+                        }
+                    };
+                    updateBtn(btn);
+                    updateBtn(btnAvailability);
                 }
 
             } catch(err) {

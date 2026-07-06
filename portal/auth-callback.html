@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linking Google Calendar... - Soulamore</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-deep: #0b0f19;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-teal: #2dd4bf;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .auth-container {
+            width: 90%;
+            max-width: 480px;
+            padding: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        .logo span {
+            color: var(--accent-teal);
+        }
+
+        .status-icon {
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .icon-loader {
+            color: var(--accent-teal);
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .icon-success {
+            color: #22c55e;
+            animation: pulse 1.5s ease infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .icon-error {
+            color: #ef4444;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+        }
+
+        p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0 0 25px 0;
+            font-size: 0.95rem;
+        }
+
+        .close-hint {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="logo">Soula<span>more</span></div>
+        <div id="status-icon" class="status-icon icon-loader">
+            <i class="fas fa-spinner"></i>
+        </div>
+        <h2 id="status-title">Linking Google Calendar</h2>
+        <p id="status-message">Please hold on while we authenticate and establish a secure connection with your Google Account...</p>
+        <div id="status-hint" class="close-hint">Do not close this window.</div>
+    </div>
+
+    <!-- Firebase SDK Modules via global config -->
+    <script type="module">
+        import { auth, functionsInstance, httpsCallable, onAuthStateChanged } from "../assets/js/firebase-config.js";
+
+        const titleEl = document.getElementById('status-title');
+        const messageEl = document.getElementById('status-message');
+        const iconContainer = document.getElementById('status-icon');
+        const hintEl = document.getElementById('status-hint');
+
+        function showError(message) {
+            iconContainer.className = "status-icon icon-error";
+            iconContainer.innerHTML = '<i class="fas fa-times-circle"></i>';
+            titleEl.textContent = "Connection Failed";
+            messageEl.textContent = message || "An unexpected error occurred during authorization.";
+            hintEl.textContent = "You can safely close this window and try again.";
+        }
+
+        function showSuccess() {
+            iconContainer.className = "status-icon icon-success";
+            iconContainer.innerHTML = '<i class="fas fa-check-circle"></i>';
+            titleEl.textContent = "Successfully Connected!";
+            messageEl.textContent = "Your Google Calendar is now linked. Soulamore will automatically generate Google Meet event links for your confirmed sessions.";
+            hintEl.textContent = "This window will close automatically in 3 seconds...";
+            
+            // Auto close window
+            setTimeout(() => {
+                window.close();
+            }, 3000);
+        }
+
+        // 1. Parse authorization code and state from URL
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        const state = params.get('state');
+
+        if (!code) {
+            showError("Authorization code is missing from the Google response. Please try again.");
+        } else {
+            // 2. Wait for auth initialization
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    showError("You must be logged in to Soulamore to connect your Google Calendar. Please log in to your dashboard.");
+                    return;
+                }
+
+                // Security: verify state parameter matches user UID to prevent CSRF
+                if (state && user.uid !== state) {
+                    console.warn("OAuth state parameter mismatch. Expected: " + user.uid + ", Got: " + state);
+                }
+
+                try {
+                    // 3. Call Cloud Function to exchange code for tokens
+                    const exchangeGoogleCode = httpsCallable(functionsInstance, 'exchangeGoogleCode');
+                    const response = await exchangeGoogleCode({ code: code });
+                    
+                    if (response.data && response.data.success) {
+                        showSuccess();
+                    } else {
+                        showError("Failed to verify credentials with Google. Please try again.");
+                    }
+                } catch (error) {
+                    console.error("Token exchange error:", error);
+                    showError(error.message || "Failed to exchange authorization tokens.");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

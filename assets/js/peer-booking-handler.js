@@ -177,44 +177,59 @@ export async function getAvailableSlots(peerId, date) {
         }
 
         const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-        const daySchedule = availability.availability.find(slot => slot.day.toLowerCase() === dayName);
+        const daySchedules = availability.availability.filter(slot => slot.day.toLowerCase() === dayName);
 
-        if (!daySchedule) {
+        if (daySchedules.length === 0) {
             return []; // Peer not available on this day
         }
 
-        // Generate time slots (every hour or based on session duration)
+        // Generate time slots (every hour or based on session duration) for all slots configured
         const slots = [];
-        const [startHour, startMin] = daySchedule.startTime.split(':').map(Number);
-        const [endHour, endMin] = daySchedule.endTime.split(':').map(Number);
+        for (const schedule of daySchedules) {
+            const [startHour, startMin] = schedule.startTime.split(':').map(Number);
+            const [endHour, endMin] = schedule.endTime.split(':').map(Number);
 
-        const startTime = new Date(date);
-        startTime.setHours(startHour, startMin, 0, 0);
+            const startTime = new Date(date);
+            startTime.setHours(startHour, startMin, 0, 0);
 
-        const endTime = new Date(date);
-        endTime.setHours(endHour, endMin, 0, 0);
+            const endTime = new Date(date);
+            endTime.setHours(endHour, endMin, 0, 0);
 
-        // Generate slots (1 hour sessions by default)
-        let currentTime = new Date(startTime);
-        while (currentTime < endTime) {
-            const slotEnd = new Date(currentTime);
-            slotEnd.setHours(currentTime.getHours() + 1);
+            // Generate slots (1 hour sessions by default)
+            let currentTime = new Date(startTime);
+            while (currentTime < endTime) {
+                const slotEnd = new Date(currentTime);
+                slotEnd.setHours(currentTime.getHours() + 1);
 
-            // Check if this slot is available (not booked)
-            const isAvailable = await checkSlotAvailability(peerId, currentTime, slotEnd);
+                // Check if this slot is available (not booked)
+                const isAvailable = await checkSlotAvailability(peerId, currentTime, slotEnd);
 
-            if (isAvailable) {
-                slots.push({
-                    start: new Date(currentTime),
-                    end: new Date(slotEnd),
-                    display: currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
-                });
+                if (isAvailable) {
+                    slots.push({
+                        start: new Date(currentTime),
+                        end: new Date(slotEnd),
+                        display: currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+                    });
+                }
+
+                currentTime.setHours(currentTime.getHours() + 1);
             }
-
-            currentTime.setHours(currentTime.getHours() + 1);
         }
 
-        return slots;
+        // Sort slots chronologically and remove duplicate slots
+        const uniqueSlots = [];
+        const seenStarts = new Set();
+
+        slots.sort((a, b) => a.start.getTime() - b.start.getTime());
+        for (const slot of slots) {
+            const startMs = slot.start.getTime();
+            if (!seenStarts.has(startMs)) {
+                seenStarts.add(startMs);
+                uniqueSlots.push(slot);
+            }
+        }
+
+        return uniqueSlots;
     } catch (error) {
         console.error("Error getting available slots:", error);
         return [];

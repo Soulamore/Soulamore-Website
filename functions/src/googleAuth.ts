@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions/v1';
+import * as admin from 'firebase-admin';
 
 /**
  * Google Auth Handler
@@ -47,5 +48,46 @@ export const getGoogleAuthUrl = functions.https.onCall(async (data, context) => 
     } catch (error: any) {
         console.error("🔥 [getGoogleAuthUrl] Error:", error.message);
         throw new functions.https.HttpsError('internal', error.message || 'Failed to generate auth URL');
+    }
+});
+
+export const exchangeGoogleCode = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'User must be logged in.');
+    }
+    
+    const code = data.code;
+    if (!code) {
+        throw new functions.https.HttpsError('invalid-argument', 'No authorization code provided.');
+    }
+
+    try {
+        const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+        const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
+        if (!CLIENT_ID || !CLIENT_SECRET) {
+            throw new Error("Google Calendar configuration is missing client secrets.");
+        }
+
+        const { google } = require('googleapis');
+        const oauth2Client = new google.auth.OAuth2(
+            CLIENT_ID,
+            CLIENT_SECRET,
+            REDIRECT_URI
+        );
+
+        const { tokens } = await oauth2Client.getToken(code);
+        
+        // Store tokens in practitioner_metadata (encrypted in a perfect world)
+        await admin.firestore().collection('practitioner_metadata').doc(context.auth.uid).set({
+            gcalLinked: true,
+            gcalTokens: tokens, // Includes access_token and refresh_token
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("🔥 [exchangeGoogleCode] Error:", error.message);
+        throw new functions.https.HttpsError('internal', error.message || 'Google token exchange failed.');
     }
 });
