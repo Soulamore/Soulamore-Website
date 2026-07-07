@@ -119,26 +119,41 @@ export async function getPeerAvailability(peerId) {
  */
 export async function checkSlotAvailability(peerId, startTime, endTime) {
     try {
-        // Get existing bookings for this peer in the time range
-        const bookingsRef = collection(db, PEER_BOOKINGS_COLLECTION);
-        const q = query(
-            bookingsRef,
-            where("peerId", "==", peerId),
-            where("status", "in", ["confirmed", "pending"])
-        );
+        const getBusySlotsFn = httpsCallable(functionsInstance, 'getPeerBusySlots');
+        const res = await getBusySlotsFn({ peerId });
+        const busySlots = res.data.busySlots || [];
 
-        const snapshot = await getDocs(q);
-        const existingBookings = snapshot.docs.map(doc => doc.data());
-
-        // Check for conflicts
         const bookingStart = new Date(startTime).getTime();
         const bookingEnd = new Date(endTime).getTime();
 
-        for (const booking of existingBookings) {
-            const existingStart = booking.startTime?.toDate?.()?.getTime() || new Date(booking.startTime).getTime();
-            const existingEnd = booking.endTime?.toDate?.()?.getTime() || new Date(booking.endTime).getTime();
+        for (const booking of busySlots) {
+            let existingStart;
+            let existingEnd;
 
-            // Check for overlap
+            if (booking.startTime && typeof booking.startTime === 'object') {
+                if (booking.startTime._seconds) {
+                    existingStart = booking.startTime._seconds * 1000;
+                } else if (booking.startTime.seconds) {
+                    existingStart = booking.startTime.seconds * 1000;
+                } else {
+                    existingStart = new Date(booking.startTime).getTime();
+                }
+            } else {
+                existingStart = new Date(booking.startTime).getTime();
+            }
+
+            if (booking.endTime && typeof booking.endTime === 'object') {
+                if (booking.endTime._seconds) {
+                    existingEnd = booking.endTime._seconds * 1000;
+                } else if (booking.endTime.seconds) {
+                    existingEnd = booking.endTime.seconds * 1000;
+                } else {
+                    existingEnd = new Date(booking.endTime).getTime();
+                }
+            } else {
+                existingEnd = new Date(booking.endTime).getTime();
+            }
+
             if ((bookingStart < existingEnd && bookingEnd > existingStart)) {
                 return false; // Slot is booked
             }
@@ -183,6 +198,16 @@ export async function getAvailableSlots(peerId, date) {
             return []; // Peer not available on this day
         }
 
+        // Fetch busy slots once to optimize network roundtrips
+        let busySlots = [];
+        try {
+            const getBusySlotsFn = httpsCallable(functionsInstance, 'getPeerBusySlots');
+            const res = await getBusySlotsFn({ peerId });
+            busySlots = res.data.busySlots || [];
+        } catch (err) {
+            console.error("Error fetching busy slots from functions:", err);
+        }
+
         // Generate time slots (every hour or based on session duration) for all slots configured
         const slots = [];
         for (const schedule of daySchedules) {
@@ -201,8 +226,43 @@ export async function getAvailableSlots(peerId, date) {
                 const slotEnd = new Date(currentTime);
                 slotEnd.setHours(currentTime.getHours() + 1);
 
-                // Check if this slot is available (not booked)
-                const isAvailable = await checkSlotAvailability(peerId, currentTime, slotEnd);
+                const bookingStart = currentTime.getTime();
+                const bookingEnd = slotEnd.getTime();
+                let isAvailable = true;
+
+                for (const booking of busySlots) {
+                    let existingStart;
+                    let existingEnd;
+
+                    if (booking.startTime && typeof booking.startTime === 'object') {
+                        if (booking.startTime._seconds) {
+                            existingStart = booking.startTime._seconds * 1000;
+                        } else if (booking.startTime.seconds) {
+                            existingStart = booking.startTime.seconds * 1000;
+                        } else {
+                            existingStart = new Date(booking.startTime).getTime();
+                        }
+                    } else {
+                        existingStart = new Date(booking.startTime).getTime();
+                    }
+
+                    if (booking.endTime && typeof booking.endTime === 'object') {
+                        if (booking.endTime._seconds) {
+                            existingEnd = booking.endTime._seconds * 1000;
+                        } else if (booking.endTime.seconds) {
+                            existingEnd = booking.endTime.seconds * 1000;
+                        } else {
+                            existingEnd = new Date(booking.endTime).getTime();
+                        }
+                    } else {
+                        existingEnd = new Date(booking.endTime).getTime();
+                    }
+
+                    if ((bookingStart < existingEnd && bookingEnd > existingStart)) {
+                        isAvailable = false;
+                        break; // Slot overlaps with existing booking
+                    }
+                }
 
                 if (isAvailable) {
                     slots.push({

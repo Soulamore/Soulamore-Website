@@ -91,3 +91,36 @@ export const exchangeGoogleCode = functions.https.onCall(async (data, context) =
         throw new functions.https.HttpsError('internal', error.message || 'Google token exchange failed.');
     }
 });
+
+/**
+ * Securely retrieve busy slots for a given peer to check availability.
+ * Avoids exposing patient/user private details to client queries.
+ */
+export const getPeerBusySlots = functions.https.onCall(async (data, context) => {
+    const peerId = data.peerId;
+    if (!peerId) {
+        throw new functions.https.HttpsError('invalid-argument', 'No peer ID provided.');
+    }
+
+    try {
+        const bookingsRef = admin.firestore().collection('peer_bookings');
+        const snapshot = await bookingsRef
+            .where('peerId', '==', peerId)
+            .where('status', 'in', ['confirmed', 'pending'])
+            .get();
+
+        const busySlots = snapshot.docs.map(doc => {
+            const bData = doc.data();
+            return {
+                startTime: bData.startTime,
+                endTime: bData.endTime
+            };
+        });
+
+        return { busySlots };
+    } catch (error: any) {
+        console.error("🔥 [getPeerBusySlots] Error:", error.message);
+        throw new functions.https.HttpsError('internal', error.message || 'Failed to check busy slots.');
+    }
+});
+

@@ -263,6 +263,22 @@
                             <option value="English">English</option>
                             <option value="Hindi">Hindi</option>
                         </select>
+                        <select class="filter-select" id="locationFilter" onchange="filterPsychs()">
+                            <option value="all">Location: All</option>
+                            <option value="Remote">Remote</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Bengaluru">Bengaluru</option>
+                            <option value="Mayapur">Mayapur</option>
+                        </select>
+                        <select class="filter-select" id="typologyFilter" onchange="filterPsychs()">
+                            <option value="all">Approach: All</option>
+                            <option value="CBT">CBT</option>
+                            <option value="ACT">ACT</option>
+                            <option value="Psychodynamic">Psychodynamic</option>
+                            <option value="Trauma">Trauma-Informed</option>
+                            <option value="Queer Affirmative">Queer Affirmative</option>
+                        </select>
                     </div>
                 </div>
 
@@ -330,7 +346,8 @@
                             lang: data.languages || "English",
                             online: data.onlineStatus === 'online',
                             verified: data.verified !== false,
-                            profileUrl: `/our-psychologists/profile.html?id=${doc.id}`
+                            profileUrl: `/our-psychologists/profile.html?id=${doc.id}`,
+                            location: data.location || data.city || "Remote"
                         });
                     }
                 });
@@ -365,7 +382,8 @@
                         lang: "English, Tamil",
                         online: true,
                         verified: true,
-                        profileUrl: "/our-psychologists/profile.html?slug=bhagyavathi"
+                        profileUrl: "/our-psychologists/profile.html?slug=bhagyavathi",
+                        location: "Mayapur"
                     },
                     {
                         id: 1,
@@ -381,7 +399,8 @@
                         lang: "English, Hindi",
                         online: true,
                         verified: true,
-                        profileUrl: "/our-psychologists/palak-shori.html"
+                        profileUrl: "/our-psychologists/palak-shori.html",
+                        location: "Delhi"
                     },
                 ];
                 renderPsychs();
@@ -393,11 +412,21 @@
             const grid = document.getElementById('psychGrid');
             const specVal = document.getElementById('specFilter').value;
             const langVal = document.getElementById('langFilter').value;
+            const locVal = document.getElementById('locationFilter').value;
+            const typVal = document.getElementById('typologyFilter').value;
 
             const filtered = psychs.filter(p => {
-                const tagMatch = specVal === 'all' || (p.tags && p.tags.includes(specVal)) || (p.category && p.category.includes(specVal));
+                const specMatch = specVal === 'all' || (p.tags && p.tags.includes(specVal)) || (p.category && p.category.includes(specVal));
                 const langMatch = langVal === 'all' || (p.lang && p.lang.includes(langVal));
-                return tagMatch && langMatch;
+                const locMatch = locVal === 'all' || (p.location && p.location.toLowerCase().includes(locVal.toLowerCase()));
+                
+                // Typology check matching tags, role, or category text
+                const typMatch = typVal === 'all' || 
+                    (p.tags && p.tags.some(t => t.toLowerCase().includes(typVal.toLowerCase()))) || 
+                    (p.role && p.role.toLowerCase().includes(typVal.toLowerCase())) ||
+                    (p.category && p.category.toLowerCase().includes(typVal.toLowerCase()));
+
+                return specMatch && langMatch && locMatch && typMatch;
             });
 
             if (filtered.length === 0) {
@@ -420,12 +449,16 @@
                          ${psych.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')} 
                     </div>
 
-                     <div style="font-style:italic; opacity:0.7; font-size:0.85rem; margin-bottom:15px;">
+                     <div style="font-style:italic; opacity:0.7; font-size:0.85rem; margin-bottom:10px;">
                         <i class="fas fa-star" style="color:var(--gold-glow);"></i> ${psych.rating} (${psych.reviews} reviews) • ${psych.exp}+ Yrs Exp
+                     </div>
+
+                    <div style="font-size:0.9rem; opacity:0.8; margin-bottom:5px;">
+                       <i class="fas fa-language"></i> ${psych.lang}
                     </div>
 
-                    <div style="margin-bottom:20px; font-size:0.9rem; opacity:0.8;">
-                       <i class="fas fa-language"></i> ${psych.lang}
+                    <div style="font-size:0.9rem; opacity:0.8; margin-bottom:20px;">
+                       <i class="fas fa-map-marker-alt"></i> ${psych.location || 'Remote'}
                     </div>
 
                     <div style="margin-top:auto; width:100%;">
