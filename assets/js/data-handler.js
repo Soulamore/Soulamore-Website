@@ -358,7 +358,7 @@ export async function handlePostcard(payload, city = "Unknown", friendEmail = nu
             const senderName = isAnonymous ? "Someone who cares" : "A friend";
 
             // Need to pass the visual data to the template
-            await triggerEmail(
+            const emailSent = await triggerEmail(
                 cleanEmail,
                 "Someone sent you a postcard from Soulamore Away",
                 "postcard_replica",
@@ -370,6 +370,10 @@ export async function handlePostcard(payload, city = "Unknown", friendEmail = nu
                     senderName: senderName
                 }
             );
+            if (!emailSent) {
+                console.warn("⚠️ Postcard email trigger failed.");
+                return false;
+            }
         }
 
         return true;
