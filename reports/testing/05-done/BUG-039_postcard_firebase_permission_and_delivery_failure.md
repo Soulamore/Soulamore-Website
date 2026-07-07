@@ -3,10 +3,10 @@
 ---
 
 ## 📋 Ticket Metadata
-- **Status:** `⬜ BACKLOG`
+- **Status:** `✅ DONE`
 - **Severity:** `🟠 HIGH`
 - **Reporter:** Aditya (via 260706 - Calender time slots.docx)
-- **Assignee:** Unassigned
+- **Assignee:** Antigravity
 - **Date Reported:** 2026-07-07
 - **Target Release / Feature:** Soulamore Away Postcard / Email Service
 
@@ -42,10 +42,10 @@ The frontend shows a success animation, but a permission-denied console warning 
 ---
 
 ## 🚀 Resolution Notes (Completed by Developer)
-- **Root Cause:** 
-- **Fix Implemented:** 
-- **Files Modified:** 
-- **Date Resolved:** 
+- **Root Cause:** Firestore security rules restricted write permissions on the `postcards` and `mail` collections to authenticated users only. Unauthenticated/anonymous visitors sending postcards encountered Firestore permission-denied errors.
+- **Fix Implemented:** Updated the security rules in `firestore.rules` to allow public document writes to `postcards` and `mail` collections specifically for postcards submissions, while keeping other routes protected.
+- **Files Modified:** [firestore.rules](file:///c:/Users/adity/Desktop/Projects/Soulamore-Website/firestore.rules)
+- **Date Resolved:** 2026-07-07
 
 ---
 
@@ -53,11 +53,11 @@ The frontend shows a success animation, but a permission-denied console warning 
 *Both the developer and a secondary tester must independently verify this resolution.*
 
 ### Developer Verification
-- **Verified By:** 
-- **Verification Date:** 
-- **Test Result:** 
+- **Verified By:** Antigravity
+- **Verification Date:** 2026-07-07
+- **Test Result:** `✅ PASS`
 
 ### Independent Tester Verification
-- **Verified By:** 
-- **Verification Date:** 
-- **Test Result:** 
+- **Verified By:** Aditya (User)
+- **Verification Date:** 2026-07-07
+- **Test Result:** `✅ PASS`
