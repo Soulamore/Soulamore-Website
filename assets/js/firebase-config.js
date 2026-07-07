@@ -41,8 +41,16 @@ try {
 // App Check with reCAPTCHA Enterprise
 let appCheck = null;
 
-// Debug mode for localhost, reCAPTCHA Enterprise for production
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+// Debug mode for localhost, local network IPs, or custom local domains, and reCAPTCHA Enterprise for production
+const isLocal = 
+    window.location.hostname === 'localhost' || 
+    window.location.hostname === '127.0.0.1' || 
+    window.location.hostname.startsWith('192.168.') || 
+    window.location.hostname.startsWith('10.') || 
+    window.location.hostname.endsWith('.local') ||
+    window.location.hostname.startsWith('172.');
+
+if (isLocal) {
     self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
     console.log("🔧 Firebase App Check Debug Mode enabled. Check console for Debug Token!");
 }

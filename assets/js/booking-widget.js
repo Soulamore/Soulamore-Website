@@ -269,7 +269,41 @@ export function initBookingWidget(config) {
         }
 
         try {
-            const dateObj = new Date(dateStr + "T00:00:00");
+            let dateObj;
+            
+            // Robust parsing of dateStr (e.g., YYYY-MM-DD or DD/MM/YYYY)
+            if (dateStr.includes('-')) {
+                const parts = dateStr.split('-');
+                if (parts[0].length === 4) {
+                    // YYYY-MM-DD
+                    const [year, month, day] = parts.map(Number);
+                    dateObj = new Date(year, month - 1, day);
+                } else {
+                    // DD-MM-YYYY or MM-DD-YYYY fallback
+                    const [day, month, year] = parts.map(Number);
+                    dateObj = new Date(year, month - 1, day);
+                }
+            } else if (dateStr.includes('/')) {
+                const parts = dateStr.split('/');
+                if (parts[2] && parts[2].length === 4) {
+                    // DD/MM/YYYY
+                    const [day, month, year] = parts.map(Number);
+                    dateObj = new Date(year, month - 1, day);
+                } else if (parts[0].length === 4) {
+                    // YYYY/MM/DD
+                    const [year, month, day] = parts.map(Number);
+                    dateObj = new Date(year, month - 1, day);
+                } else {
+                    dateObj = new Date(dateStr);
+                }
+            } else {
+                dateObj = new Date(dateStr);
+            }
+
+            if (isNaN(dateObj.getTime())) {
+                throw new Error("Parsed date is Invalid Date");
+            }
+
             selectedDate = dateObj;
             selectedSlot = null;
             setMessage("Loading available slots...", false);
