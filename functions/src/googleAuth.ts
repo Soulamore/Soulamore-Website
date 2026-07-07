@@ -124,3 +124,111 @@ export const getPeerBusySlots = functions.https.onCall(async (data, context) => 
     }
 });
 
+/**
+ * Callable function for Admin Diagnostics to test email delivery.
+ * Restricts access to authorized administrators only.
+ */
+export const testEmailProvider = functions.https.onCall(async (data, context) => {
+    // 1. Guard authentication
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Access denied. Administrator session required.');
+    }
+
+    try {
+        // 2. Validate administrator privileges
+        const adminDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+        if (adminDoc.data()?.role !== 'admin') {
+            throw new functions.https.HttpsError('permission-denied', 'Access denied. Insufficient account privileges.');
+        }
+
+        const provider = data.provider;
+        const recipientEmail = data.recipient || 'contact.soulamore@gmail.com';
+
+        if (provider === 'zepto') {
+            // Retrieve Zoho ZeptoMail API Key securely from Firebase config
+            const config = (functions as any).config();
+            const ZEPTO_TOKEN = config?.zeptomail?.password || '';
+            if (!ZEPTO_TOKEN) {
+                return {
+                    success: false,
+                    status: 500,
+                    response: { error: "ZeptoMail token not configured in functions config (zeptomail.password)." }
+                };
+            }
+
+            const response = await (globalThis as any).fetch("https://api.zeptomail.eu/v1.1/email", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": ZEPTO_TOKEN
+                },
+                body: JSON.stringify({
+                    from: {
+                        address: "care@soulamore.com",
+                        name: "Soulamore Test (ZeptoMail)"
+                    },
+                    to: [
+                        {
+                            email_address: {
+                                address: recipientEmail,
+                                name: "Aditya"
+                            }
+                        }
+                    ],
+                    subject: "Soulamore ZeptoMail Test",
+                    htmlbody: "<h3>Hello Aditya!</h3><p>This is a test transactional email from ZeptoMail.</p>"
+                })
+            });
+            const resData = await response.json();
+            return {
+                success: response.status === 201 || response.status === 200,
+                status: response.status,
+                response: resData
+            };
+        } else {
+            // Retrieve Brevo API Key securely from environment or Firebase config
+            const config = (functions as any).config();
+            const BREVO_KEY = process.env.BREVO_API_KEY?.trim() || config?.brevo?.api_key || '';
+            if (!BREVO_KEY) {
+                return {
+                    success: false,
+                    status: 500,
+                    response: { error: "Brevo API key not configured in environment (BREVO_API_KEY) or config (brevo.api_key)." }
+                };
+            }
+
+            const response = await (globalThis as any).fetch("https://api.brevo.com/v3/smtp/email", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "api-key": BREVO_KEY
+                },
+                body: JSON.stringify({
+                    sender: {
+                        name: "Soulamore Test (Brevo)",
+                        email: "care@soulamore.com"
+                    },
+                    to: [
+                        {
+                            email: recipientEmail,
+                            name: "Aditya"
+                        }
+                    ],
+                    subject: "Soulamore Brevo Test",
+                    htmlContent: "<h3>Hello Aditya!</h3><p>This is a test promotional/campaign email from Brevo.</p>"
+                })
+            });
+            const resData = await response.json();
+            return {
+                success: response.status === 201 || response.status === 200,
+                status: response.status,
+                response: resData
+            };
+        }
+    } catch (error: any) {
+        console.error("🔥 [testEmailProvider] Error:", error.message);
+        throw new functions.https.HttpsError('internal', error.message || 'Email delivery diagnostic failed.');
+    }
+});
+
+
