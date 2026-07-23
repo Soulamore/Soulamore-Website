@@ -13,7 +13,10 @@ service cloud.firestore {
       return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
     }
     function isAdmin() {
-      return hasCurrentUserProfile() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return (isSignedIn() && request.auth.token != null && 'email' in request.auth.token && 
+              (request.auth.token.email.lower() == 'admin@soulamore.com' || 
+               request.auth.token.email.lower() == 'aditya110197@gmail.com')) 
+             || (hasCurrentUserProfile() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
     }
     function isPublishedStatus(status) {
       return status in ['published', 'approved', 'public'];
