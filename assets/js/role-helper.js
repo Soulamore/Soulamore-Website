@@ -7,7 +7,12 @@ import { db, doc, getDoc } from "./firebase-config.js";
 import { getUserProfile } from "./profile-handler.js";
 
 const HARDCODED_ROLE_OVERRIDES = {
-    'admin@soulamore.com': 'admin'
+    'admin@soulamore.com': 'admin',
+    'aditya110197@gmail.com': 'user',         // Aditya (User)
+    'abhisheksingla74@gmail.com': 'peer',     // Zoya Narula (Peer Listener)
+    'sonikas1625@gmail.com': 'peer',          // Sonika Sharma (Peer Listener)
+    'yashmeetkaur011@gmail.com': 'psychologist', // Bhagyavathi (Psychologist)
+    'aryanharsh2005@gmail.com': 'psychologist'   // Palak Shori (Psychologist)
 };
 
 function normalizeRoleValue(role) {
