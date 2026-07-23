@@ -8,7 +8,7 @@ import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.7.1
 import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, startAfter, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, linkWithCredential, EmailAuthProvider, updatePassword, signInAnonymously, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
 // Note: enableIndexedDbPersistence was removed in Firebase v10. Offline persistence is now enabled by default.
 
 // ... (existing code for firebaseConfig, initializeApp, etc. remains unchanged) ...
@@ -57,10 +57,10 @@ if (isLocal) {
 
 try {
     appCheck = initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
+        provider: new ReCaptchaEnterpriseProvider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
         isTokenAutoRefreshEnabled: true
     });
-    console.log("✅ Firebase App Check initialized (v3)");
+    console.log("✅ Firebase App Check initialized (Enterprise)");
 } catch (err) {
     console.warn("⚠️ App Check initialization failed:", err.message);
 }
