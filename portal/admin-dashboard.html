@@ -1531,6 +1531,26 @@
                         </div>
                     </div>
 
+                    <!-- EMAIL DIAGNOSTICS TESTER -->
+                    <div class="dash-card" style="margin-top:30px;">
+                        <h3 style="margin:0 0 15px 0;"><i class="fas fa-paper-plane"></i> Email Provider Diagnostics</h3>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px; align-items:flex-end;">
+                            <div style="flex:1; min-width:250px;">
+                                <label style="display:block; font-size:0.8rem; opacity:0.6; margin-bottom:5px;">Recipient Email ID</label>
+                                <input type="email" id="test-email-recipient" value="contact.soulamore@gmail.com" style="width:100%; height:40px; padding:0 12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--text-main); outline:none;">
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <button onclick="runEmailDiagnostic('zepto')" class="btn-s btn-rounded btn-h42" style="background:#ea580c; border:none; height:40px; padding:0 15px; color:white; font-weight:600; cursor:pointer;">
+                                    Test ZeptoMail
+                                </button>
+                                <button onclick="runEmailDiagnostic('brevo')" class="btn-s btn-rounded btn-h42" style="background:#0284c7; border:none; height:40px; padding:0 15px; color:white; font-weight:600; cursor:pointer;">
+                                    Test Brevo
+                                </button>
+                            </div>
+                        </div>
+                        <pre id="diagnostic-results" style="background:#000; color:#fff; font-family:monospace; padding:15px; border-radius:10px; font-size:0.85rem; display:none; max-height:180px; overflow-y:auto; border:1px solid rgba(255,255,255,0.1); white-space:pre-wrap; word-break:break-all;"></pre>
+                    </div>
+
                     <div class="dash-card" style="margin-top:30px;">
                         <h3 style="margin-bottom:20px;"><i class="fas fa-terminal"></i> Telemetry Logs</h3>
                         <div id="telemetry-logs" style="background:#000; color:#0f0; font-family:monospace; padding:15px; border-radius:10px; font-size:0.85rem; height:200px; overflow-y:auto; line-height:1.6;">
@@ -2145,6 +2165,38 @@
         let dataLoaded = false;
         let newsletterSortOrder = 'desc'; // Default sorting
         let allNewsletterSubscribers = []; // Store for client-side sorting/filtering
+
+        // === EMAIL DIAGNOSTICS FUNCTION ===
+        window.runEmailDiagnostic = async function(provider) {
+            const recipient = document.getElementById('test-email-recipient').value;
+            const resultsDiv = document.getElementById('diagnostic-results');
+            
+            if (!recipient) {
+                alert("Please enter a valid recipient email address.");
+                return;
+            }
+
+            resultsDiv.style.display = 'block';
+            resultsDiv.style.color = '#38bdf8'; // Sky blue info
+            resultsDiv.innerText = `[DIAGNOSTIC] Sending test email via ${provider === 'zepto' ? 'ZeptoMail' : 'Brevo'} to ${recipient}...`;
+
+            try {
+                const testEmailFn = httpsCallable(functionsInstance, 'testEmailProvider');
+                const res = await testEmailFn({ provider, recipient });
+                
+                if (res.data.success) {
+                    resultsDiv.style.color = '#4ade80'; // Light green success
+                    resultsDiv.innerText = `✅ [SUCCESS] Sent successfully!\nStatus: ${res.data.status}\nResponse: ${JSON.stringify(res.data.response, null, 2)}`;
+                } else {
+                    resultsDiv.style.color = '#f87171'; // Light red failure
+                    resultsDiv.innerText = `❌ [FAILED] Delivery reported failure.\nStatus: ${res.data.status}\nResponse: ${JSON.stringify(res.data.response, null, 2)}`;
+                }
+            } catch (err) {
+                console.error("Diagnostic error:", err);
+                resultsDiv.style.color = '#f87171'; // Light red error
+                resultsDiv.innerText = `❌ [ERROR] Cloud Function invocation failed.\nDetails: ${err.message}`;
+            }
+        };
 
         // ========================================
         // 1. DYNAMIC SCRIPTS & UTILITIES

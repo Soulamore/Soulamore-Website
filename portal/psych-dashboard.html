@@ -980,8 +980,8 @@
                             <p style="font-size:0.9rem; opacity:0.7; margin-bottom:20px;">Sync booking requests directly
                                 to
                                 your Google Calendar.</p>
-                            <button class="btn-dash-primary" style="width:100%; opacity:0.7;"
-                                onclick="alert('Google Calendar integration coming soon!')" aria-label="Connect Google Calendar (Coming Soon)">
+                            <button id="connect-gcal-btn-availability" class="btn-dash-primary" style="width:100%;"
+                                onclick="connectGoogleCalendar()" aria-label="Connect Google Calendar">
                                 <i class="fab fa-google"></i> Connect Google Calendar
                             </button>
                         </div>
@@ -1101,6 +1101,11 @@
                                 <textarea id="prof-approach"
                                     style="width:100%; height:140px; background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:15px; color:var(--text-main); font-family:'Outfit'; line-height:1.6; resize:vertical;"
                                     placeholder="Describe your therapy style (CBT, Humanistic, etc)..."></textarea>
+                                <div style="margin-top:25px;">
+                                    <label style="display:block; font-weight:600; margin-bottom:10px;">First Session Expectations</label>
+                                    <textarea id="prof-expectations" placeholder="Explain what to expect during the first session..." 
+                                        style="width:100%; height:100px; background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:12px; padding:15px; color:var(--text-main); font-family:'Outfit'; line-height:1.6; resize:vertical;"></textarea>
+                                </div>
                             </div>
 
                             <!-- SAVE ACTION -->
@@ -1121,9 +1126,19 @@
                                     <input type="text" id="prof-languages" placeholder="English, Hindi, etc"
                                         style="width:100%; padding:10px; background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-main); font-family:'Outfit';">
                                 </div>
-                                <div>
+                                <div style="margin-bottom:20px;">
                                     <label style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:5px;">Session Rate (₹)</label>
                                     <input type="number" id="prof-rate" placeholder="1500"
+                                        style="width:100%; padding:10px; background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-main); font-family:'Outfit';">
+                                </div>
+                                <div style="margin-bottom:20px;">
+                                    <label style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:5px;">Professional Qualification</label>
+                                    <input type="text" id="prof-qualification" placeholder="e.g. Trauma-Informed, PhD" 
+                                        style="width:100%; padding:10px; background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-main); font-family:'Outfit';">
+                                </div>
+                                <div style="margin-bottom:0;">
+                                    <label style="display:block; font-size:0.85rem; opacity:0.7; margin-bottom:5px;">Practice Values (comma separated)</label>
+                                    <input type="text" id="prof-values" placeholder="e.g. Confidential, Empathy, Respect" 
                                         style="width:100%; padding:10px; background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-main); font-family:'Outfit';">
                                 </div>
                             </div>
@@ -1804,6 +1819,7 @@
         const meta = await getPractitionerMetadata(uid);
         const badge = document.getElementById('gcal-status-badge');
         const btn = document.getElementById('connect-gcal-btn');
+        const btnAvailability = document.getElementById('connect-gcal-btn-availability');
         
         if(meta && meta.gcalLinked) {
             if(badge) {
@@ -1811,11 +1827,15 @@
                 badge.style.color = '#22c55e';
                 badge.textContent = '● Connected';
             }
-            if(btn) {
-                btn.style.opacity = '0.5';
-                btn.innerHTML = '<i class="fas fa-check" style="margin-right:10px;"></i> Calendar Sync Active';
-                btn.onclick = () => alert("Your Google Calendar is already linked. To disconnect, contact support@soulamore.com");
-            }
+            const updateBtn = (b) => {
+                if(b) {
+                    b.style.opacity = '0.5';
+                    b.innerHTML = '<i class="fas fa-check" style="margin-right:10px;"></i> Calendar Sync Active';
+                    b.onclick = () => alert("Your Google Calendar is already linked. To disconnect, contact support@soulamore.com");
+                }
+            };
+            updateBtn(btn);
+            updateBtn(btnAvailability);
         }
     }
 
@@ -1953,7 +1973,9 @@
                     'prof-quote': 'quote',
                     'prof-bio': 'bio',
                     'prof-approach': 'approach',
-                    'prof-rate': 'rate'
+                    'prof-rate': 'rate',
+                    'prof-expectations': 'firstSessionExpectations',
+                    'prof-qualification': 'qualification'
                 };
                 
                 Object.entries(fields).forEach(([id, key]) => {
@@ -1964,6 +1986,11 @@
                 const langInput = document.getElementById('prof-languages');
                 if (langInput) {
                     langInput.value = Array.isArray(data.languages) ? data.languages.join(', ') : (data.languages || "");
+                }
+
+                const valuesInput = document.getElementById('prof-values');
+                if (valuesInput) {
+                    valuesInput.value = Array.isArray(data.values) ? data.values.join(', ') : (data.values || "");
                 }
 
                 if (tagSelectorInstance && data.tags) {
@@ -1996,7 +2023,10 @@
                 approach: document.getElementById('prof-approach').value,
                 rate: Number(document.getElementById('prof-rate').value),
                 tags: activeTags,
-                languages: (document.getElementById('prof-languages').value || "").split(',').map(s => s.trim()).filter(s => s)
+                languages: (document.getElementById('prof-languages').value || "").split(',').map(s => s.trim()).filter(s => s),
+                firstSessionExpectations: document.getElementById('prof-expectations').value,
+                qualification: document.getElementById('prof-qualification').value,
+                values: (document.getElementById('prof-values').value || "").split(',').map(s => s.trim()).filter(s => s)
             };
 
             const result = await savePublicProfile(auth.currentUser.uid, profileData);
