@@ -3,7 +3,7 @@
  * Handles: Vents, Confessions, Applications, and Soulbot Leads.
  */
 
-import { db, collection, addDoc, serverTimestamp, query, onSnapshot, orderBy } from "./firebase-config.js";
+import { db, collection, addDoc, getDocs, where, serverTimestamp, query, onSnapshot, orderBy } from "./firebase-config.js";
 import { validateSubmission } from "./safety-filter.js";
 
 // --- 1. VENT BOX (Anonymous) ---
@@ -358,7 +358,7 @@ export async function handlePostcard(payload, city = "Unknown", friendEmail = nu
             const senderName = isAnonymous ? "Someone who cares" : "A friend";
 
             // Need to pass the visual data to the template
-            await triggerEmail(
+            const emailSent = await triggerEmail(
                 cleanEmail,
                 "Someone sent you a postcard from Soulamore Away",
                 "postcard_replica",
@@ -370,6 +370,10 @@ export async function handlePostcard(payload, city = "Unknown", friendEmail = nu
                     senderName: senderName
                 }
             );
+            if (!emailSent) {
+                console.warn("⚠️ Postcard email trigger failed.");
+                return false;
+            }
         }
 
         return true;
@@ -554,6 +558,25 @@ export function updatePulseStats() {
     }
 }
 
+// --- 12. B2B LEADS (Partner With Us) ---
+export async function handleLead(data) {
+    try {
+        const cleanData = {};
+        for (const [key, value] of Object.entries(data)) {
+            cleanData[key] = sanitizeInput(value);
+        }
+        await addDoc(collection(db, "leads"), {
+            ...cleanData,
+            status: "new",
+            timestamp: serverTimestamp()
+        });
+        return true;
+    } catch (e) {
+        console.error("Error saving lead: ", e);
+        return false;
+    }
+}
+
 // Make globally available for inline HTML onclicks (via a bridge helper if needed)
 window.SoulBackend = {
     submitVent: handleVentSubmission,
@@ -563,6 +586,7 @@ window.SoulBackend = {
     submitContact: handleContact,
     submitPostcard: handlePostcard,
     submitNewsletter: handleNewsletter,
+    submitLead: handleLead,
     crossPollinateToProblemWall: crossPollinateToProblemWall,
     getAggregateStats: getAggregateStats,
     subscribeToShredCount: subscribeToShredCount,

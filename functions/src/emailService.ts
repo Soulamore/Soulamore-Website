@@ -8,10 +8,9 @@ import * as sib from '@getbrevo/brevo';
  * Official API Integration for High-Performance Delivery (v3.0 Brevo)
  */
 
-const apiInstance = new sib.TransactionalEmailsApi();
 // Initialize API Key from environment or fallback to the one provided in CORE_INTELLIGENCE
 const BREVO_KEY = process.env.BREVO_API_KEY?.trim() || 'uninitialized';
-apiInstance.setApiKey(sib.TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
+const client = new sib.BrevoClient({ apiKey: BREVO_KEY });
 
 const SENDER_EMAIL = "care@soulamore.com"; 
 const SENDER_NAME = "Soulamore Care";
@@ -62,7 +61,7 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
     // Soulful Header & Footer (CSS for breathing animation)
     const SOUL_STYLE = `
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Lora:italic,wght@0,400;1,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Lora:italic,wght@0,400;1,400&family=Sacramento&display=swap');
         .soul-container { font-family: 'Outfit', sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; }
         .soul-header { padding: 40px 0; text-align: center; }
         .soul-body { padding: 0 20px; font-size: 1.05rem; }
@@ -71,8 +70,8 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
           display: inline-block;
           padding: 20px;
           border-radius: 50%;
-          background: rgba(142, 68, 173, 0.05);
-          border: 1px solid rgba(142, 68, 173, 0.1);
+          background: rgba(45, 212, 191, 0.05);
+          border: 1px solid rgba(45, 212, 191, 0.1);
           margin: 20px 0;
           animation: breath 8s ease-in-out infinite;
         }
@@ -87,7 +86,7 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
     const SOUL_FOOTER = `
       <div class="soul-footer">
         <div class="breathing-prompt">
-          <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #8E44AD;">Breathe</div>
+          <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #2dd4bf;">Breathe</div>
           <div style="font-size: 0.6rem; opacity: 0.6;">Inhale ... Exhale</div>
         </div>
         <p class="quote">"Deep breaths are like little love notes to your soul."</p>
@@ -103,7 +102,7 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
         ${SOUL_STYLE}
         <div class="soul-container">
           <div class="soul-header">
-            <h1 style="color: #8E44AD; font-family: 'Outfit'; font-weight: 700;">Soulamore</h1>
+            <h1 style="color: #2dd4bf; font-family: 'Sacramento', cursive; font-size: 3rem; font-weight: 400; margin: 0; text-align: center;">Soulamore</h1>
           </div>
           <div class="soul-body">
             <p>Hi ${data.name || 'dear soul'},</p>
@@ -129,7 +128,7 @@ export function compileTemplate(recipient: EmailRecipient, subject: string, body
 
     html = html.replace(/{{YEAR}}/g, new Date().getFullYear().toString());
     html = html.replace(/{{WEBSITE_URL}}/g, 'https://soulamore.com');
-    html = html.replace(/{{ACCENT_COLOR}}/g, '#8E44AD');
+    html = html.replace(/{{ACCENT_COLOR}}/g, '#2dd4bf');
     
     // Global Fallback for Name
     html = html.replace(/{{NAME}}/g, data.name || 'dear soul');
@@ -154,10 +153,10 @@ export async function sendEmail(recipient: EmailRecipient, subject: string, html
       replyTo: { email: SENDER_EMAIL, name: SENDER_NAME }
     };
 
-    const data = await apiInstance.sendTransacEmail(sendSmtpEmail as any);
+    const data = await client.transactionalEmails.sendTransacEmail(sendSmtpEmail as any);
     
     functions.logger.info(`✅ Successfully sent soulful update to ${recipient.email}`);
-    return { success: true, messageId: data.body.messageId };
+    return { success: true, messageId: data.messageId };
   } catch (error: any) {
     functions.logger.error('💥 Execution error in sendEmail (Brevo):', error.message);
     return { success: false, error: error.message };

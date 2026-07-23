@@ -1,0 +1,61 @@
+﻿                </div>
+            `}).join('');
+        }
+
+        // Initialize API
+        initFeed();
+
+        // --- 3. MODAL LOGIC ---
+        function openModal() { document.getElementById('createModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('createModal').style.display = 'none'; }
+
+        // --- 4. VIEWER LOGIC ---
+        function openPost(id) {
+            const post = feedData.find(p => p.id === id);
+            if (!post) return;
+
+            const viewer = document.getElementById('postViewer');
+            const body = document.getElementById('viewerBody');
+
+            body.innerHTML = `
+                <div class="tag-pill" style="display:inline-block; margin-bottom:10px;">${post.tag}</div>
+                <h1 style="font-size:1.8rem; margin-bottom:15px; line-height:1.2;">${post.title}</h1>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; color:var(--text-secondary); font-size:0.9rem;">
+                    <div class="user-avatar-sm" style="width:25px; height:25px; font-size:0.7rem;">AB</div>
+                    ${post.author} • ${post.time}
+                </div>
+                <p style="font-size:1.1rem; line-height:1.6; color:#cbd5e1;">${post.content}</p>
+                <hr style="border:0; border-top:1px solid var(--border-glass); margin:30px 0;">
+                <h3 style="margin-bottom:20px;">Comments</h3>
+                ${post.source === 'confession' ?
+                    `<div style="padding:20px; background:var(--bg-subtle); border-radius:10px; text-align:center;">
+                        <p style="margin-bottom:15px; opacity:0.8;">This confession is discussed anonymously here, but public comments are on Instagram (non-anonymous).</p>
+                        <button class="btn btn-primary" onclick="window.open('${post.instagram_reel_url}')">Read Instagram Comments</button>
+                    </div>`
+                    :
+                    `<div style="opacity:0.6; font-style:italic;">Loading comments...</div>`
+                }
+            `;
+
+            viewer.classList.add('active');
+        }
+
+        function closeViewer() {
+            document.getElementById('postViewer').classList.remove('active');
+        }
+
+        // --- 5. ANIMATION ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = 1; entry.target.style.transform = "translateY(0)"; } });
+        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    </script>
+    <!-- GLOBAL FOOTER (HASHLILLY STANDARD) -->
+
+    <script src="../../assets/js/soulbot-beta.js"></script>
+    <script src="../../assets/js/launch-popup.js"></script>
+</body>
+
+</html>
+

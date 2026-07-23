@@ -205,7 +205,7 @@
                     </div>
 
                     <div style="font-size:0.75rem; opacity:0.6; color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif;">
-                        If you’re a peer or psychologist, reach out at <a href="mailto:contact.soulamore@gmail.com" style="color:#4ECDC4; text-decoration:underline;">contact.soulamore@gmail.com</a>.
+                        If you’re a peer or psychologist, reach out at <a href="mailto:support@soulamore.in" style="color:#4ECDC4; text-decoration:underline;">support@soulamore.in</a>.
                     </div>
                 </div>
             </div>

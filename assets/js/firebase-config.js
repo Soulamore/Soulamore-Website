@@ -8,7 +8,7 @@ import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.7.1
 import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot, increment, arrayUnion, arrayRemove, deleteDoc, runTransaction, startAfter, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, PhoneAuthProvider, RecaptchaVerifier, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, linkWithCredential, EmailAuthProvider, updatePassword, signInAnonymously, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
 // Note: enableIndexedDbPersistence was removed in Firebase v10. Offline persistence is now enabled by default.
 
 // ... (existing code for firebaseConfig, initializeApp, etc. remains unchanged) ...
@@ -41,18 +41,26 @@ try {
 // App Check with reCAPTCHA Enterprise
 let appCheck = null;
 
-// Debug mode for localhost, reCAPTCHA Enterprise for production
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+// Debug mode for localhost, local network IPs, or custom local domains, and reCAPTCHA Enterprise for production
+const isLocal = 
+    window.location.hostname === 'localhost' || 
+    window.location.hostname === '127.0.0.1' || 
+    window.location.hostname.startsWith('192.168.') || 
+    window.location.hostname.startsWith('10.') || 
+    window.location.hostname.endsWith('.local') ||
+    window.location.hostname.startsWith('172.');
+
+if (isLocal) {
     self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
     console.log("🔧 Firebase App Check Debug Mode enabled. Check console for Debug Token!");
 }
 
 try {
     appCheck = initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
+        provider: new ReCaptchaEnterpriseProvider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
         isTokenAutoRefreshEnabled: true
     });
-    console.log("✅ Firebase App Check initialized (v3)");
+    console.log("✅ Firebase App Check initialized (Enterprise)");
 } catch (err) {
     console.warn("⚠️ App Check initialization failed:", err.message);
 }
@@ -71,6 +79,7 @@ const db = getFirestore(app);
 // Initialize Firebase Authentication
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 const functionsInstance = getFunctions(app, 'us-central1');
 
 // Export for use in other modules

@@ -77,17 +77,43 @@ export const onBookingUpdated = functions.firestore
                     meet_link: newData.meetLink || 'https://soulamore.com/portal/'
                 });
 
-                // Send to User
-                await sendEmail({ email: newData.userEmail || userData.email }, subject, html);
+                const userEmail = newData.userEmail || userData.email;
+                let userStatus = 'skipped_missing_email';
+                let peerStatus = 'skipped_missing_email';
+                const deliveryErrors: string[] = [];
 
-                // CC or separate alert to Peer
-                if (peerData.email) {
-                    await sendEmail(
-                        { email: peerData.email, name: peerData.name }, 
-                        `New Booking Confirmed: ${newData.slId}`, 
-                        `<p>Hello ${peerData.name}, you have a new confirmed booking (${newData.slId}) for ${formattedDate}. Link: ${newData.meetLink}</p>`
-                    );
+                if (userEmail) {
+                    try {
+                        await sendEmail({ email: userEmail }, subject, html);
+                        userStatus = 'sent';
+                    } catch (error) {
+                        userStatus = 'failed';
+                        deliveryErrors.push(`user: ${error instanceof Error ? error.message : 'unknown error'}`);
+                    }
                 }
+
+                if (peerData.email) {
+                    try {
+                        await sendEmail(
+                            { email: peerData.email, name: peerData.name },
+                            `New Booking Confirmed: ${newData.slId}`,
+                            `<p>Hello ${peerData.name}, you have a new confirmed booking (${newData.slId}) for ${formattedDate}. Link: ${newData.meetLink}</p>`
+                        );
+                        peerStatus = 'sent';
+                    } catch (error) {
+                        peerStatus = 'failed';
+                        deliveryErrors.push(`peer: ${error instanceof Error ? error.message : 'unknown error'}`);
+                    }
+                }
+
+                await change.after.ref.update({
+                    emailDelivery: {
+                        user: userStatus,
+                        peer: peerStatus,
+                        attemptedAt: admin.firestore.FieldValue.serverTimestamp(),
+                        errors: deliveryErrors
+                    }
+                });
 
                 return true;
             } catch (err) {
@@ -134,7 +160,7 @@ export const onLeadCreated = functions.firestore
         // 1. Internal Notification (Admin)
         const adminHtml = `
             <div style="font-family: 'Inter', sans-serif; color: #1A1A1A; padding: 40px; border-radius: 8px;">
-                <h2 style="color: ${isUrgent ? '#ef4444' : '#8E44AD'};">
+                <h2 style="color: ${isUrgent ? '#ef4444' : '#2dd4bf'};">
                     ${isUrgent ? 'URGENT: CRISIS ESCALATION' : 'New Recommended Match Request'}
                 </h2>
                 <p>A user has completed an assessment and requested an outreach.</p>
@@ -149,7 +175,7 @@ export const onLeadCreated = functions.firestore
         `;
 
         await sendEmail(
-            { email: 'contact.soulamore@gmail.com' }, 
+            { email: 'support@soulamore.in' }, 
             `${subjectPrefix}Lead: ${lead.name || 'Anonymous'}`, 
             adminHtml
         );
@@ -319,3 +345,37 @@ export const triggerExpatOutreach = functions.https.onCall(async (data, context)
 
     return { success: true, results: { success: count } };
 });
+
+/**
+ * Trigger: On Feedback Submitted
+ */
+export const onFeedbackCreated = functions.firestore
+    .document('feedback/{docId}')
+    .onCreate(async (snap, context) => {
+        const data = snap.data();
+        if (!data) return null;
+
+        const body = `
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid rgba(45, 212, 191, 0.2);">
+                <h2 style="color: #2dd4bf; margin-top: 0;">New User Feedback</h2>
+                <p><strong>Rating:</strong> ${data.rating ? data.rating + ' / 5 Stars ⭐' : 'No rating'}</p>
+                <p><strong>Feedback:</strong><br/>${data.feedback || 'No text'}</p>
+                <p><strong>User Email:</strong> ${data.email || 'Anonymous'}</p>
+                <p><strong>Page:</strong> ${data.page || 'Unknown'}</p>
+            </div>
+        `;
+
+        const { compileTemplate } = await import('../emailService');
+        const html = compileTemplate(
+            { email: 'support@soulamore.in', name: 'Soulamore Admin' },
+            'New Site Feedback Received',
+            body
+        );
+
+        return await sendEmail(
+            { email: 'support@soulamore.in', name: 'Soulamore Admin' },
+            'New Site Feedback Received',
+            html
+        );
+    });
+

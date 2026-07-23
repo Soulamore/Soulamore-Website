@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soulamore Portal | Developer Access Bypass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --text-primary: #f1f5f9;
+            --text-muted: rgba(255, 255, 255, 0.65);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            
+            --color-teal: #4ECDC4;
+            --color-peach: #F49F75;
+            --color-silver: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ambient background blooms */
+        .aurora {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+        }
+
+        .blob-teal {
+            top: -10%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: var(--color-teal);
+        }
+
+        .blob-peach {
+            bottom: -10%;
+            right: -10%;
+            width: 450px;
+            height: 450px;
+            background: var(--color-peach);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 580px;
+            z-index: 10;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 30%, var(--color-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .bypass-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .bypass-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-admin {
+            border-color: rgba(203, 213, 225, 0.3);
+        }
+        .btn-admin:hover {
+            border-color: var(--color-silver);
+            box-shadow: 0 0 20px rgba(203, 213, 225, 0.2);
+        }
+        .btn-admin .badge {
+            background: rgba(203, 213, 225, 0.1);
+            color: var(--color-silver);
+        }
+
+        .btn-peer {
+            border-color: rgba(244, 159, 117, 0.3);
+        }
+        .btn-peer:hover {
+            border-color: var(--color-peach);
+            box-shadow: 0 0 20px rgba(244, 159, 117, 0.25);
+        }
+        .btn-peer .badge {
+            background: rgba(244, 159, 117, 0.1);
+            color: var(--color-peach);
+        }
+
+        .btn-psych {
+            border-color: rgba(78, 205, 196, 0.3);
+        }
+        .btn-psych:hover {
+            border-color: var(--color-teal);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.25);
+        }
+        .btn-psych .badge {
+            background: rgba(78, 205, 196, 0.1);
+            color: var(--color-teal);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.35rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 700;
+        }
+
+        .btn-arrow {
+            opacity: 0.6;
+            transition: transform 0.3s ease;
+        }
+
+        .bypass-btn:hover .btn-arrow {
+            transform: translateX(4px);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="aurora">
+        <div class="blob blob-teal"></div>
+        <div class="blob blob-peach"></div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h1>Soulamore</h1>
+            <p class="subtitle">Select a developer role to set local session bypass & enter dashboard</p>
+            
+            <div class="btn-list">
+                <button onclick="loginAs('admin')" class="bypass-btn btn-admin">
+                    <span>👑 Access Admin Portal</span>
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <span class="badge">Admin</span>
+                        <span class="btn-arrow">➔</span>
+                    </span>
+                </button>
+
+                <button onclick="loginAs('peer')" class="bypass-btn btn-peer">
+                    <span>🍑 Access Peer Portal</span>
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <span class="badge">Peer</span>
+                        <span class="btn-arrow">➔</span>
+                    </span>
+                </button>
+
+                <button onclick="loginAs('psychologist')" class="bypass-btn btn-psych">
+                    <span>💎 Access Psychologist Portal</span>
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <span class="badge">Psych</span>
+                        <span class="btn-arrow">➔</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sessions = {
+            admin: {
+                isLoggedIn: true,
+                userId: 'dev-admin',
+                role: 'admin',
+                email: 'admin@soulamore.dev',
+                name: 'Dev Admin',
+                photoURL: '/assets/images/default-avatar.png'
+            },
+            peer: {
+                isLoggedIn: true,
+                userId: 'dev-peer',
+                role: 'peer',
+                email: 'peer@soulamore.dev',
+                name: 'Dev Supporter',
+                photoURL: '/assets/images/default-avatar.png'
+            },
+            psychologist: {
+                isLoggedIn: true,
+                userId: 'dev-psych',
+                role: 'psychologist',
+                email: 'psych@soulamore.dev',
+                name: 'Dr. Dev Specialist',
+                photoURL: '/assets/images/default-avatar.png'
+            }
+        };
+
+        function loginAs(role) {
+            if (sessions[role]) {
+                localStorage.setItem('soulamore_session', JSON.stringify(sessions[role]));
+                const dashMap = {
+                    admin: 'admin-dashboard.html',
+                    peer: 'peer-dashboard.html',
+                    psychologist: 'psych-dashboard.html'
+                };
+                window.location.href = dashMap[role];
+            }
+        }
+    </script>
+</body>
+</html>

@@ -19,34 +19,57 @@ export function initFeedbackWidget() {
     // Create floating button
     const button = document.createElement('button');
     button.id = 'feedback-widget-btn';
-    button.innerHTML = '<i class="fas fa-comment-dots"></i> Feedback';
-    button.style.cssText = `
-        position: fixed;
-        bottom: 52px;
-        right: 20px;
-        z-index: 9998;
-        background: linear-gradient(135deg, #4ECDC4, #F49F75);
-        color: #0f172a;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 50px;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.95rem;
+    button.innerHTML = '<i class="fas fa-comment-dots"></i><span class="feedback-btn-text">Feedback</span>';
+    
+    // Inject Stylesheet
+    const style = document.createElement('style');
+    style.id = 'feedback-widget-styles';
+    style.textContent = `
+        #feedback-widget-btn {
+            position: fixed;
+            bottom: 100px;
+            left: 30px;
+            z-index: 9998;
+            background: linear-gradient(135deg, #4ECDC4, #F49F75);
+            color: #0f172a;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        #feedback-widget-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.5);
+        }
+        @media (max-width: 1024px) {
+            #feedback-widget-btn {
+                bottom: 120px;
+                left: auto !important;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                padding: 0;
+                border-radius: 50%;
+                justify-content: center;
+            }
+            #feedback-widget-btn .feedback-btn-text {
+                display: none;
+            }
+            #feedback-widget-btn i {
+                font-size: 1.25rem;
+                margin: 0;
+            }
+        }
     `;
-    button.onmouseover = function() {
-        this.style.transform = 'translateY(-3px)';
-        this.style.boxShadow = '0 6px 20px rgba(78, 205, 196, 0.5)';
-    };
-    button.onmouseout = function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 4px 15px rgba(78, 205, 196, 0.4)';
-    };
+    document.head.appendChild(style);
+
     button.onclick = openFeedbackModal;
     
     document.body.appendChild(button);
@@ -115,15 +138,16 @@ function createFeedbackModal() {
                     <label style="display: block; margin-bottom: 8px; color: #f1f5f9; font-weight: 500;">
                         How was your experience?
                     </label>
-                    <div style="display: flex; gap: 10px; font-size: 2rem;">
+                    <div id="star-rating-container" style="display: flex; gap: 10px; font-size: 2rem;">
                         ${[1, 2, 3, 4, 5].map(num => `
                             <input type="radio" name="rating" value="${num}" id="rating${num}" style="display: none;">
-                            <label for="rating${num}" style="
+                            <label for="rating${num}" class="feedback-star" data-value="${num}" style="
                                 cursor: pointer;
                                 transition: 0.3s;
-                                opacity: 0.5;
-                            " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">
-                                <i class="fas fa-star" style="color: #fbbf24;"></i>
+                                opacity: 0.3;
+                                color: #fbbf24;
+                            ">
+                                <i class="fas fa-star"></i>
                             </label>
                         `).join('')}
                     </div>
@@ -165,6 +189,24 @@ function createFeedbackModal() {
                     " placeholder="Your email for follow-up">
                 </div>
                 
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; color: #f1f5f9; font-weight: 500;">
+                        Attach a photo if you want (optional)
+                    </label>
+                    <input type="file" id="feedback-photo" accept="image/*" style="
+                        width: 100%;
+                        background: rgba(255, 255, 255, 0.05);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 12px;
+                        padding: 12px;
+                        color: #f1f5f9;
+                        font-family: 'Plus Jakarta Sans', sans-serif;
+                        font-size: 0.9rem;
+                        outline: none;
+                        cursor: pointer;
+                    ">
+                </div>
+                
                 <button type="submit" style="
                     width: 100%;
                     background: linear-gradient(135deg, #4ECDC4, #F49F75);
@@ -185,6 +227,39 @@ function createFeedbackModal() {
     `;
     
     document.body.appendChild(modal);
+
+    // Add star interactivity
+    const stars = modal.querySelectorAll('.feedback-star');
+    const ratingInputs = modal.querySelectorAll('input[name="rating"]');
+
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            const val = parseInt(this.getAttribute('data-value'));
+            stars.forEach(s => {
+                const sVal = parseInt(s.getAttribute('data-value'));
+                s.style.opacity = sVal <= val ? '1' : '0.3';
+            });
+        });
+
+        star.addEventListener('mouseout', function() {
+            const checked = modal.querySelector('input[name="rating"]:checked');
+            const val = checked ? parseInt(checked.value) : 0;
+            stars.forEach(s => {
+                const sVal = parseInt(s.getAttribute('data-value'));
+                s.style.opacity = sVal <= val ? '1' : '0.3';
+            });
+        });
+    });
+
+    ratingInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const val = parseInt(this.value);
+            stars.forEach(s => {
+                const sVal = parseInt(s.getAttribute('data-value'));
+                s.style.opacity = sVal <= val ? '1' : '0.3';
+            });
+        });
+    });
 }
 
 /**
@@ -210,6 +285,47 @@ window.closeFeedbackModal = function() {
 };
 
 /**
+ * Compress and resize uploaded image helper
+ */
+function compressImage(file, maxWidth, maxHeight, quality) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                resolve(dataUrl);
+            };
+            img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+    });
+}
+
+/**
  * Submit feedback
  */
 window.submitFeedback = async function(event) {
@@ -219,17 +335,28 @@ window.submitFeedback = async function(event) {
     const rating = form.querySelector('input[name="rating"]:checked')?.value;
     const feedback = form.querySelector('textarea[name="feedback"]').value;
     const email = form.querySelector('input[name="email"]').value;
+    const photoFile = form.querySelector('#feedback-photo')?.files[0];
     
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
     submitBtn.disabled = true;
     
+    let photoBase64 = null;
+    if (photoFile) {
+        try {
+            photoBase64 = await compressImage(photoFile, 800, 800, 0.7);
+        } catch (err) {
+            console.warn("Failed to compress image, skipping:", err);
+        }
+    }
+    
     try {
         await addDoc(collection(db, 'feedback'), {
             rating: rating ? parseInt(rating) : null,
             feedback: feedback,
             email: email || null,
+            photo: photoBase64,
             createdAt: new Date(),
             userAgent: navigator.userAgent,
             page: window.location.href

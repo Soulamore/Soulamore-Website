@@ -13,7 +13,10 @@ service cloud.firestore {
       return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
     }
     function isAdmin() {
-      return hasCurrentUserProfile() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return (isSignedIn() && request.auth.token != null && 'email' in request.auth.token && 
+              (request.auth.token.email.lower() == 'admin@soulamore.com' || 
+               request.auth.token.email.lower() == 'aditya110197@gmail.com')) 
+             || (hasCurrentUserProfile() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
     }
     function isPublishedStatus(status) {
       return status in ['published', 'approved', 'public'];
@@ -23,18 +26,20 @@ service cloud.firestore {
 
     // Users collection - Central profile data
     match /users/{userId} {
-      allow read: if isSelf(userId) || isAdmin();
+      allow read: if isSelf(userId) 
+                  || isAdmin() 
+                  || (resource != null && 'role' in resource.data && (resource.data.role.lower().matches('.*psychologist.*') || resource.data.role.lower().matches('.*peer.*')));
       allow create: if isSelf(userId);
       allow update: if isSelf(userId) 
                     && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])
                     || isAdmin();
+      allow delete: if isAdmin();
     }
 
     // Role verification flags (Verified Status)
     match /roles/{userId} {
       allow read: if isSelf(userId) || isAdmin();
-      allow create, update: if isSelf(userId) || isAdmin();
-      allow delete: if false;
+      allow create, update, delete: if isAdmin();
     }
 
     // Practitioner metadata (Private settings/UPI)
@@ -83,15 +88,35 @@ service cloud.firestore {
     // Peer Bookings
     match /peer_bookings/{bookingId} {
       allow read: if isAdmin() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid));
-      allow create: if isSignedIn();
-      allow update: if isAdmin() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid));
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'pending_payment'
+        && request.resource.data.paymentId == null;
+      allow update: if isAdmin() || (
+        isSignedIn()
+        && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'userId',
+          'peerId',
+          'amount',
+          'sessions',
+          'status',
+          'paymentId',
+          'paymentData',
+          'financials',
+          'razorpayOrderId',
+          'razorpayOrderAmount',
+          'razorpayOrderStatus',
+          'confirmedAt'
+        ])
+      );
       allow delete: if isAdmin();
     }
 
     // Payments
     match /payments/{paymentId} {
       allow read: if isAdmin() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid));
-      allow create: if isSignedIn();
+      allow create: if false;
       allow update, delete: if isAdmin();
     }
 
@@ -178,9 +203,15 @@ service cloud.firestore {
     match /maintenance_settings/{id} { allow read: if true; allow write: if isAdmin(); }
     match /announcements/{id} { allow read: if true; allow write: if isAdmin(); }
 
+    // Support Groups
+    match /support_groups/{groupId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Forms - allow anyone to submit (create) but restrict management to Admins
-    match /peers/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isAdmin(); }
-    match /psychologists/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isAdmin(); }
+    match /peers/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isSelf(id) || isAdmin(); }
+    match /psychologists/{id} { allow read: if isSignedIn(); allow create: if true; allow update, delete: if isSelf(id) || isAdmin(); }
     match /contacts/{id} { allow read: if isAdmin(); allow create: if true; allow update, delete: if isAdmin(); }
     match /newsletters/{id} { allow read: if isAdmin(); allow create: if true; allow update, delete: if isAdmin(); }
     
@@ -204,8 +235,57 @@ service cloud.firestore {
     
     match /therapists/{id} { allow read: if true; allow write: if isAdmin(); }
 
+    // Feedback - allow anyone to submit, restrict management to Admins
+    match /feedback/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
     // Safety Reports - allow creation by anyone, management only by Admin
     match /safety_reports/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Cookie Consents
+    match /cookie_consents/{id} {
+      allow create: if true;
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update, delete: if isAdmin();
+    }
+
+    // Processing Consents (Wellness & Marketing decisions)
+    match /processing_consents/{id} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
+    // Parental Consents for Minors
+    match /parental_consents/{id} {
+      allow create: if isSignedIn() && request.resource.data.minorUserId == request.auth.uid;
+      allow read, update: if true; // Accessed via verification token by external parent
+      allow delete: if isAdmin();
+    }
+
+    // Deletion Requests
+    match /deletion_requests/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+      allow create: if isSelf(userId);
+      allow update: if isSelf(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Security Events (Breach logs)
+    match /security_events/{id} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // Leads (B2B Lead Capture) - allow creation by anyone, management only by Admin
+    match /leads/{id} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }

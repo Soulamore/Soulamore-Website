@@ -17,6 +17,9 @@ export * from './roles';
 
 // Export auth triggers
 export * from './triggers/on-user-create';
+export * from './triggers/dataRetentionTrigger';
+export * from './triggers/securityMonitor';
+
 
 // Export email triggers
 export * from './triggers/emailTriggers';
@@ -31,6 +34,8 @@ export * from './campaigns';
 export * from './emailService';
 export * from './googleAuth';
 export * from './apiRouter';
+export * from './privacyRights';
+export * from './razorpayPayments';
 
 // Health check function
 export const healthCheckV2 = onCall({ cors: true }, () => {

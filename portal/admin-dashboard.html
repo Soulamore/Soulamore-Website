@@ -922,6 +922,12 @@
                 <a href="#" class="side-link" data-view="deep-listening" onclick="switchView('deep-listening', this)">
                     <i class="fas fa-ear-listen"></i> <span>Deep Listening</span>
                 </a>
+                <a href="#" class="side-link" data-view="site-feedback" onclick="switchView('site-feedback', this)">
+                    <i class="fas fa-comment-dots"></i> <span>Site Feedback</span>
+                </a>
+                <a href="#" class="side-link" data-view="security" onclick="switchView('security', this)">
+                    <i class="fas fa-shield-alt"></i> <span>Security Events</span>
+                </a>
 
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:15px 0;">
                 <a href="#" class="side-link" onclick="switchView('settings', this)"><i class="fas fa-cog"></i>
@@ -1261,12 +1267,22 @@
                     </div>
                 </div>
                 <div class="workspace-body">
+                    <!-- COLLAPSIBLE SECTION: CAMPAIGN ENGINE HEADER -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: rgba(255,255,255,0.02); padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; color: var(--soul-teal);">
+                            <i class="fas fa-bullhorn"></i> Campaign Designer
+                        </div>
+                        <button class="btn-s" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem; padding: 4px 8px; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;" onclick="toggleNewsletterCampaignCollapse(this)" id="btn-toggle-campaign-collapse" title="Collapse/Expand">
+                            <i class="fas fa-chevron-up"></i> Collapse
+                        </button>
+                    </div>
+
                     <!-- CAMPAIGN ENGINE INLINE (2-COLUMN GRID) -->
-                    <div style="display: flex; gap: 24px; align-items: flex-start; justify-content: space-between; margin-bottom: 30px; width: 100%;">
+                    <div id="newsletter-campaign-engine" style="display: flex; gap: 24px; align-items: stretch; justify-content: space-between; margin-bottom: 30px; width: 100%;">
                         
                         <!-- LEFT COLUMN: Compact Form Card (58% width) -->
-                        <div style="flex: 1.3; min-width: 0;">
-                            <div style="background: #0f172a; border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); color: #f8fafc;">
+                        <div style="flex: 1.3; min-width: 0; display: flex; flex-direction: column;">
+                            <div style="background: #0f172a; border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); color: #f8fafc; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
                                 
                                 <!-- COMPACT HEADER ROW: Title + Template Quickselect -->
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
@@ -1276,16 +1292,16 @@
                                     
                                     <!-- Compact Quick Select template buttons -->
                                     <div style="display: flex; gap: 8px;">
-                                        <button onclick="loadSoulamoreTemplate('feature')" style="padding: 6px 12px; background: rgba(45, 212, 191, 0.08); color: var(--soul-teal); border: 1px solid rgba(45, 212, 191, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(45, 212, 191, 0.15)';" onmouseout="this.style.background='rgba(45, 212, 191, 0.08)';">
+                                        <button id="btn-template-feature" onclick="loadSoulamoreTemplate('feature')" style="padding: 6px 12px; background: rgba(45, 212, 191, 0.08); color: var(--soul-teal); border: 1px solid rgba(45, 212, 191, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(45, 212, 191, 0.15)';" onmouseout="if(this.style.borderColor !== 'var(--soul-teal)') { this.style.background='rgba(45, 212, 191, 0.08)'; }">
                                             🌸 Feature
                                         </button>
-                                        <button onclick="loadSoulamoreTemplate('confession')" style="padding: 6px 12px; background: rgba(251, 191, 36, 0.08); color: var(--soul-amber); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(251, 191, 36, 0.15)';" onmouseout="this.style.background='rgba(251, 191, 36, 0.08)';">
+                                        <button id="btn-template-confession" onclick="loadSoulamoreTemplate('confession')" style="padding: 6px 12px; background: rgba(251, 191, 36, 0.08); color: var(--soul-amber); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(251, 191, 36, 0.15)';" onmouseout="if(this.style.borderColor !== 'var(--soul-amber)') { this.style.background='rgba(251, 191, 36, 0.08)'; }">
                                             🌌 Confession
                                         </button>
-                                        <button onclick="loadSoulamoreTemplate('reminder')" style="padding: 6px 12px; background: rgba(45, 212, 191, 0.08); color: var(--soul-teal); border: 1px solid rgba(45, 212, 191, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(45, 212, 191, 0.15)';" onmouseout="this.style.background='rgba(45, 212, 191, 0.08)';">
+                                        <button id="btn-template-reminder" onclick="loadSoulamoreTemplate('reminder')" style="padding: 6px 12px; background: rgba(45, 212, 191, 0.08); color: var(--soul-teal); border: 1px solid rgba(45, 212, 191, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(45, 212, 191, 0.15)';" onmouseout="if(this.style.borderColor !== 'var(--soul-teal)') { this.style.background='rgba(45, 212, 191, 0.08)'; }">
                                             🤍 Reminder
                                         </button>
-                                        <button onclick="loadSoulamoreTemplate('postcard')" style="padding: 6px 12px; background: rgba(251, 191, 36, 0.08); color: var(--soul-amber); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(251, 191, 36, 0.15)';" onmouseout="this.style.background='rgba(251, 191, 36, 0.08)';">
+                                        <button id="btn-template-postcard" onclick="loadSoulamoreTemplate('postcard')" style="padding: 6px 12px; background: rgba(251, 191, 36, 0.08); color: var(--soul-amber); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 30px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(251, 191, 36, 0.15)';" onmouseout="if(this.style.borderColor !== 'var(--soul-amber)') { this.style.background='rgba(251, 191, 36, 0.08)'; }">
                                             📮 Postcard
                                         </button>
                                     </div>
@@ -1348,7 +1364,7 @@
                                     </div>
 
                                     <!-- Optional Fields: Hero Image, CTA Text, CTA Link (Compact Grid) -->
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 12px;">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
                                         <div class="form-group" style="margin: 0;">
                                             <label style="display: block; font-weight: 800; font-size: 0.7rem; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">Hero Image (Optional)</label>
                                             <input id="campaign-image" type="text" placeholder="https://..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; font-size: 0.85rem; outline: none;" oninput="updateLocalLivePreview()">
@@ -1377,7 +1393,7 @@
                         </div>
 
                         <!-- RIGHT COLUMN: Sticky Live Preview (42% width) -->
-                        <div style="flex: 0.95; min-width: 320px; position: sticky; top: 15px; background: #0f172a; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); padding: 20px; display: flex; flex-direction: column; gap: 12px; height: 500px; overflow: hidden; color: #f8fafc;">
+                        <div style="flex: 0.95; min-width: 320px; position: sticky; top: 15px; background: #0f172a; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); padding: 20px; display: flex; flex-direction: column; gap: 12px; height: auto; min-height: 500px; align-self: stretch; overflow: hidden; color: #f8fafc;">
                             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
                                 <div style="font-weight: 800; font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px;">
                                     <i class="fas fa-eye" style="color: var(--soul-teal);"></i> Campaign Live Preview
@@ -1394,7 +1410,7 @@
                                 <div style="color: #64748b;" id="preview-target-header"><span style="font-weight: 600; color: #94a3b8;">To:</span> Global Audience</div>
                                 <div style="color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" id="preview-subject-header"><span style="font-weight: 600; color: #94a3b8;">Subject:</span> (No Subject)</div>
                             </div>
-                            <div style="flex: 1; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; background: #fff; position: relative;">
+                            <div style="flex: 1; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; background: #fff; position: relative; min-height: 300px;">
                                 <iframe id="campaign-live-preview-iframe" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
                             </div>
                         </div>
@@ -1403,9 +1419,32 @@
 
                     <!-- SUBSCRIBER MANAGEMENT -->
                     <div class="dash-card" style="padding:0; overflow:visible;" id="newsletter-table-container">
-                        <div style="padding:20px 25px; border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.01); display:flex; justify-content:space-between; align-items:center;">
-                            <div style="font-weight:700; text-transform:uppercase; font-size:0.85rem; letter-spacing:0.5px;">Subscriber List</div>
-                            <div style="display:flex; gap:12px;">
+                        <div style="padding:20px 25px; border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.01); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                            <div style="font-weight:700; text-transform:uppercase; font-size:0.85rem; letter-spacing:0.5px; display:flex; align-items:center; gap:10px;">
+                                <span>Subscriber List</span>
+                                <button class="btn-s" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem; padding: 4px 8px; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;" onclick="toggleNewsletterTableCollapse(this)" id="btn-toggle-subscribers-collapse" title="Collapse/Expand">
+                                    <i class="fas fa-chevron-up"></i> Collapse
+                                </button>
+                            </div>
+                            <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                                <!-- Search Bar -->
+                                <div style="position:relative; display:flex; align-items:center;">
+                                    <i class="fas fa-search" style="position:absolute; left:10px; font-size:0.8rem; color:#64748b;"></i>
+                                    <input type="text" id="newsletter-search-input" oninput="filterNewsletterSubscribers()" placeholder="Search email/location..." style="background:#0f172a; border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#fff; padding:6px 12px 6px 28px; font-size:0.8rem; outline:none; width:180px; transition:all 0.2s;" onfocus="this.style.width='240px'; this.style.borderColor='var(--soul-teal)';" onblur="if(this.value==='') { this.style.width='180px'; } this.style.borderColor='rgba(255,255,255,0.1)';">
+                                </div>
+                                <!-- Sorting Selection Dropdown -->
+                                <div style="display:flex; align-items:center; gap:8px; font-size:0.8rem; opacity:0.8;">
+                                    <span>Sort By:</span>
+                                    <select id="newsletter-sort-select" onchange="changeNewsletterSort(this.value)" style="background:#0f172a; border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#fff; padding:6px 12px; font-size:0.8rem; cursor:pointer; outline:none; height:36px;">
+                                        <option value="date-desc">Date (Newest)</option>
+                                        <option value="date-asc">Date (Oldest)</option>
+                                        <option value="email-asc">Email (A-Z)</option>
+                                        <option value="email-desc">Email (Z-A)</option>
+                                        <option value="location-asc">Location (A-Z)</option>
+                                        <option value="location-desc">Location (Z-A)</option>
+                                        <option value="user-first">Registered Users First</option>
+                                    </select>
+                                </div>
                                 <button class="btn-dash-success" style="height:36px; padding:0 15px; font-size:0.8rem; display:flex; align-items:center; gap:8px;" onclick="importNewsletterCSV()">
                                     <i class="fas fa-upload"></i> Import CSV
                                 </button>
@@ -1414,9 +1453,11 @@
                                 </button>
                             </div>
                         </div>
-                        <div style="padding:40px; text-align:center;">
-                            <i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:15px; color:var(--admin-accent);"></i>
-                            <div>Loading subscribers...</div>
+                        <div id="newsletter-table-body">
+                            <div style="padding:40px; text-align:center;">
+                                <i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:15px; color:var(--admin-accent);"></i>
+                                <div>Loading subscribers...</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1490,6 +1531,26 @@
                         </div>
                     </div>
 
+                    <!-- EMAIL DIAGNOSTICS TESTER -->
+                    <div class="dash-card" style="margin-top:30px;">
+                        <h3 style="margin:0 0 15px 0;"><i class="fas fa-paper-plane"></i> Email Provider Diagnostics</h3>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px; align-items:flex-end;">
+                            <div style="flex:1; min-width:250px;">
+                                <label style="display:block; font-size:0.8rem; opacity:0.6; margin-bottom:5px;">Recipient Email ID</label>
+                                <input type="email" id="test-email-recipient" value="contact.soulamore@gmail.com" style="width:100%; height:40px; padding:0 12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--text-main); outline:none;">
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <button onclick="runEmailDiagnostic('zepto')" class="btn-s btn-rounded btn-h42" style="background:#ea580c; border:none; height:40px; padding:0 15px; color:white; font-weight:600; cursor:pointer;">
+                                    Test ZeptoMail
+                                </button>
+                                <button onclick="runEmailDiagnostic('brevo')" class="btn-s btn-rounded btn-h42" style="background:#0284c7; border:none; height:40px; padding:0 15px; color:white; font-weight:600; cursor:pointer;">
+                                    Test Brevo
+                                </button>
+                            </div>
+                        </div>
+                        <pre id="diagnostic-results" style="background:#000; color:#fff; font-family:monospace; padding:15px; border-radius:10px; font-size:0.85rem; display:none; max-height:180px; overflow-y:auto; border:1px solid rgba(255,255,255,0.1); white-space:pre-wrap; word-break:break-all;"></pre>
+                    </div>
+
                     <div class="dash-card" style="margin-top:30px;">
                         <h3 style="margin-bottom:20px;"><i class="fas fa-terminal"></i> Telemetry Logs</h3>
                         <div id="telemetry-logs" style="background:#000; color:#0f0; font-family:monospace; padding:15px; border-radius:10px; font-size:0.85rem; height:200px; overflow-y:auto; line-height:1.6;">
@@ -1522,12 +1583,12 @@
                         <div style="padding:20px 25px; border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.01); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
                             <div style="display:flex; gap:10px; align-items:center;">
                                 <span style="font-weight:700; text-transform:uppercase; font-size:0.85rem; letter-spacing:0.5px; margin-right:10px;">Filter Logs:</span>
-                                <input type="date" style="height:40px; padding:0 12px; font-size:0.85rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--text-main);">
-                                <select style="height:40px; padding:0 12px; font-size:0.85rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--text-main); cursor:pointer;">
-                                    <option>All Categories</option>
-                                    <option>Peers</option>
-                                    <option>Psychologists</option>
-                                    <option>Support Groups</option>
+                                <input type="date" id="sessions-date-filter" style="height:40px; padding:0 12px; font-size:0.85rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--text-main);" onchange="filterAndRenderSessions()">
+                                <select id="sessions-category-filter" style="height:40px; padding:0 12px; font-size:0.85rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--text-main); cursor:pointer;" onchange="filterAndRenderSessions()">
+                                    <option value="all">All Categories</option>
+                                    <option value="peer">Peers</option>
+                                    <option value="psych">Psychologists</option>
+                                    <option value="group">Support Groups</option>
                                 </select>
                             </div>
                             <div style="display:flex; gap:12px; align-items:center;">
@@ -1883,7 +1944,131 @@
                 </div>
             </div>
 
+        <!-- VIEW: SECURITY & BREACH MONITORING -->
+        <div id="view-security" class="view-section" style="display:none;">
+            <div class="workspace-header">
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <div style="width:45px; height:45px; background:rgba(239,68,68,0.1); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#ef4444; border: 1px solid rgba(239,68,68,0.2);">
+                        <i class="fas fa-shield-alt" style="font-size:1.2rem;"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.6rem; margin:0; color:var(--text-main);">Security & Breach Monitoring</h2>
+                        <div style="font-size:0.85rem; opacity:0.6; font-weight:500;">Compliance, alerts, and incident logs</div>
+                    </div>
+                </div>
+            </div>
+            <div class="workspace-body" style="padding: 30px;">
+                <div class="dashboard-grid" style="display:grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start;">
+                    
+                    <!-- LEFT COLUMN: Security Events Table -->
+                    <div class="dash-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <h3 style="margin:0;">Recent Security Events</h3>
+                            <button class="btn-dash-primary" onclick="loadSecurityEvents()" style="padding:6px 12px; font-size:0.8rem;"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                        <div style="max-height: 500px; overflow-y: auto;">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Severity</th>
+                                        <th>Type</th>
+                                        <th>Details</th>
+                                        <th>User</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="security-events-tbody">
+                                    <tr>
+                                        <td colspan="5" style="text-align:center; padding:30px; opacity:0.5;">Loading security events...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
+                    <!-- RIGHT COLUMN: Actions & Breach Form -->
+                    <div style="display:flex; flex-direction:column; gap:20px;">
+                        
+                        <!-- Manual Incident Report -->
+                        <div class="dash-card">
+                            <h3 style="margin-bottom:15px;">Log Security Event</h3>
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <div>
+                                    <label style="display:block; font-size:0.8rem; opacity:0.7; margin-bottom:5px;">Severity</label>
+                                    <select id="log-sec-severity" style="width:100%; padding:8px; background:var(--bg-deep); border:1px solid var(--border-soft); border-radius:8px; color:var(--text-primary); outline:none;">
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="critical">Critical</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block; font-size:0.8rem; opacity:0.7; margin-bottom:5px;">Event Type</label>
+                                    <input type="text" id="log-sec-type" placeholder="e.g. Brute Force Attempt, CSRF" style="width:100%; padding:8px; background:var(--bg-deep); border:1px solid var(--border-soft); border-radius:8px; color:var(--text-primary); outline:none;">
+                                </div>
+                                <div>
+                                    <label style="display:block; font-size:0.8rem; opacity:0.7; margin-bottom:5px;">Description</label>
+                                    <textarea id="log-sec-desc" placeholder="Event details..." style="width:100%; height:80px; padding:8px; background:var(--bg-deep); border:1px solid var(--border-soft); border-radius:8px; color:var(--text-primary); outline:none; resize:none;"></textarea>
+                                </div>
+                                <button class="btn-dash-primary" onclick="submitManualSecurityEvent()" style="width:100%; padding:10px; cursor:pointer;">Log Incident</button>
+                            </div>
+                        </div>
+
+                        <!-- Breach Playbook Tool -->
+                        <div class="dash-card">
+                            <h3 style="margin-bottom:10px;">Breach Report Generator</h3>
+                            <p style="font-size:0.8rem; opacity:0.6; line-height:1.4; margin-bottom:15px;">Pre-fill the compliance breach template (GDPR 72h notice / DPDP Sec 8) for regulatory filing.</p>
+                            <button class="btn-dash-secondary" onclick="generateBreachNotice()" style="width:100%; padding:10px; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
+                                <i class="fas fa-file-invoice"></i> Draft Incident Notice
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Breach Template Area -->
+                <div class="dash-card" id="breach-template-card" style="margin-top:30px; display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h3 style="margin:0; color:#ef4444;"><i class="fas fa-file-medical-alt"></i> Draft Breach Notification Form (Regulatory Ready)</h3>
+                        <button class="btn-dash-secondary" onclick="document.getElementById('breach-template-card').style.display='none'" style="padding:4px 10px; font-size:0.8rem;">Dismiss</button>
+                    </div>
+                    <textarea id="breach-notice-textarea" readonly style="width:100%; height:300px; padding:15px; background:#0f172a; border:1px solid rgba(239,68,68,0.3); border-radius:12px; color:#f1f5f9; font-family:'Courier New', monospace; font-size:0.85rem; line-height:1.5; outline:none; resize:vertical;"></textarea>
+                    <p style="font-size:0.75rem; opacity:0.5; margin-top:10px;">* Copies of this notice must be submitted to the Data Protection Board of India (DPBI) and the EU Supervisory Authority within 72 hours of detection.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: SITE FEEDBACK -->
+        <div id="view-site-feedback" class="view-section" style="display:none;">
+            <div class="workspace-header">
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <div style="width:45px; height:45px; background:var(--admin-accent-soft); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--admin-accent); border: 1px solid var(--admin-accent-glow);">
+                        <i class="fas fa-comment-dots" style="font-size:1.2rem;"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.6rem; margin:0; color:var(--text-main);">Site Feedback</h2>
+                        <div style="font-size:0.85rem; opacity:0.6; font-weight:500;">User feedback and ratings</div>
+                    </div>
+                </div>
+            </div>
+            <div class="workspace-body" style="padding: 30px;">
+                <div class="dash-card">
+                    <table class="premium-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User</th>
+                                <th>Rating</th>
+                                <th>Feedback</th>
+                                <th>Page Context</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedback-tbody">
+                            <tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading feedback...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         </main>
     </div>
@@ -1967,7 +2152,7 @@
 
     <script src="../assets/js/portal-utils.js"></script>
     <script type="module">
-        import { auth, db, collection, query, where, getDocs, orderBy, updateDoc, doc, limit, addDoc, serverTimestamp, getDoc, setDoc, deleteDoc, writeBatch, functionsInstance, httpsCallable, onSnapshot } from "../assets/js/firebase-config.js";
+        import { auth, db, collection, query, where, getDocs, orderBy, updateDoc, doc, limit, addDoc, serverTimestamp, getDoc, setDoc, deleteDoc, writeBatch, functionsInstance, httpsCallable, onSnapshot, arrayUnion } from "../assets/js/firebase-config.js";
         import { getPractitionerMetadata } from "../assets/js/practitioner-handler.js";
 
         // Dynamic API Base URL for local development/emulator testing
@@ -1980,6 +2165,38 @@
         let dataLoaded = false;
         let newsletterSortOrder = 'desc'; // Default sorting
         let allNewsletterSubscribers = []; // Store for client-side sorting/filtering
+
+        // === EMAIL DIAGNOSTICS FUNCTION ===
+        window.runEmailDiagnostic = async function(provider) {
+            const recipient = document.getElementById('test-email-recipient').value;
+            const resultsDiv = document.getElementById('diagnostic-results');
+            
+            if (!recipient) {
+                alert("Please enter a valid recipient email address.");
+                return;
+            }
+
+            resultsDiv.style.display = 'block';
+            resultsDiv.style.color = '#38bdf8'; // Sky blue info
+            resultsDiv.innerText = `[DIAGNOSTIC] Sending test email via ${provider === 'zepto' ? 'ZeptoMail' : 'Brevo'} to ${recipient}...`;
+
+            try {
+                const testEmailFn = httpsCallable(functionsInstance, 'testEmailProvider');
+                const res = await testEmailFn({ provider, recipient });
+                
+                if (res.data.success) {
+                    resultsDiv.style.color = '#4ade80'; // Light green success
+                    resultsDiv.innerText = `✅ [SUCCESS] Sent successfully!\nStatus: ${res.data.status}\nResponse: ${JSON.stringify(res.data.response, null, 2)}`;
+                } else {
+                    resultsDiv.style.color = '#f87171'; // Light red failure
+                    resultsDiv.innerText = `❌ [FAILED] Delivery reported failure.\nStatus: ${res.data.status}\nResponse: ${JSON.stringify(res.data.response, null, 2)}`;
+                }
+            } catch (err) {
+                console.error("Diagnostic error:", err);
+                resultsDiv.style.color = '#f87171'; // Light red error
+                resultsDiv.innerText = `❌ [ERROR] Cloud Function invocation failed.\nDetails: ${err.message}`;
+            }
+        };
 
         // ========================================
         // 1. DYNAMIC SCRIPTS & UTILITIES
@@ -2021,6 +2238,20 @@
 
                     for (const secondaryId of secondaryIds) {
                         try {
+                            // Fetch secondary user data to copy payments
+                            const secondaryDoc = await getDoc(doc(db, "users", secondaryId));
+                            if (secondaryDoc.exists()) {
+                                const secondaryData = secondaryDoc.data();
+                                if (secondaryData.razorpayPayments && secondaryData.razorpayPayments.length > 0) {
+                                    // Consolidate payment history to primary account
+                                    await updateDoc(doc(db, "users", primaryId), {
+                                        razorpayPayments: arrayUnion(...secondaryData.razorpayPayments),
+                                        updatedAt: serverTimestamp()
+                                    });
+                                }
+                            }
+
+                            // Mark secondary account as merged
                             await updateDoc(doc(db, "users", secondaryId), {
                                 mergedInto: primaryId,
                                 isMerged: true,
@@ -2564,6 +2795,8 @@
             if (viewId === 'maintenance-panel') loadMaintenancePanel();
             if (viewId === 'deep-listening') loadDeepListeningHub();
             if (viewId === 'api-health') loadApiHealth();
+            if (viewId === 'site-feedback') loadSiteFeedback();
+            if (viewId === 'security') loadSecurityEvents();
         };
 
         // ✅ FIX: Trigger Overview view immediately after switchView is defined
@@ -2844,7 +3077,9 @@
                 // Load duplicate emails count
                 const emailCounts = {};
                 usersSnap.forEach(doc => {
-                    const email = doc.data().email;
+                    const data = doc.data();
+                    if (data.isMerged) return; // Skip already merged accounts
+                    const email = data.email;
                     if (email) {
                         emailCounts[email] = (emailCounts[email] || 0) + 1;
                     }
@@ -3299,10 +3534,12 @@
                 const emailMap = {};
 
                 usersSnapshot.forEach(doc => {
-                    const email = doc.data().email;
+                    const data = doc.data();
+                    if (data.isMerged) return; // Skip already merged accounts
+                    const email = data.email;
                     if (email) {
                         if (!emailMap[email]) emailMap[email] = [];
-                        emailMap[email].push({ id: doc.id, ...doc.data() });
+                        emailMap[email].push({ id: doc.id, ...data });
                     }
                 });
 
@@ -3429,22 +3666,25 @@
                 // Merge data from secondary accounts
                 for (const secondaryId of secondaryIds) {
                     const secondaryDoc = await getDoc(doc(db, "users", secondaryId));
+                    if (!secondaryDoc.exists()) continue;
+
                     const secondaryData = secondaryDoc.data();
 
-                    // Merge arrays (payments, etc.)
-                    const updates = {};
-
-                    // Merge Razorpay payments if they exist
+                    // Merge Razorpay payments if they exist to the primary account
                     if (secondaryData.razorpayPayments && secondaryData.razorpayPayments.length > 0) {
-                        updates.razorpayPayments = arrayUnion(...secondaryData.razorpayPayments);
+                        await updateDoc(doc(db, "users", primaryId), {
+                            razorpayPayments: arrayUnion(...secondaryData.razorpayPayments),
+                            updatedAt: serverTimestamp()
+                        });
                     }
 
-                    // Mark as merged
-                    updates.mergedInto = primaryId;
-                    updates.isMerged = true;
-                    updates.mergedAt = serverTimestamp();
-
-                    await updateDoc(doc(db, "users", secondaryId), updates);
+                    // Mark secondary account as merged
+                    await updateDoc(doc(db, "users", secondaryId), {
+                        mergedInto: primaryId,
+                        isMerged: true,
+                        mergedAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    });
                 }
 
                 alert(`✅ Successfully merged ${secondaryIds.length} account(s) into primary account!\n\nPayment history has been preserved from all accounts.`);
@@ -3465,52 +3705,118 @@
         window.loadOverviewStats = loadOverviewStats;
 
         // 1. MASTER SESSIONS LOADER
-        async function loadMasterSessions() {
-            const container = document.getElementById('sessions-table-container');
-            const headerHtml = `<div class="session-row" style="background:rgba(255,255,255,0.05); font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); padding:15px 20px;">
-                <div>SL-ID</div>
-                <div>Customer / Practitioner</div>
-                <div>Category</div>
-                <div>Time / Status</div>
-                <div>Actions</div>
-            </div>`;
+        let allSessionsData = [];
 
-            container.innerHTML = headerHtml + '<div style="padding:40px; text-align:center; opacity:0.5;">Loading sessions...</div>';
+        async function loadMasterSessions() {
+            const tbody = document.getElementById('sessions-tbody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '<tr><td colspan="5" style="padding:40px; text-align:center; opacity:0.5;"><i class="fas fa-spinner fa-spin"></i> Loading sessions...</td></tr>';
 
             try {
-                const q = query(collection(db, "peer_bookings"), orderBy("createdAt", "desc"), limit(50));
-                const snapshot = await getDocs(q);
-
-                let html = headerHtml;
-                if (snapshot.empty) {
-                    html += '<div style="padding:40px; text-align:center; opacity:0.5;">No sessions found.</div>';
-                } else {
-                    snapshot.forEach(docSnap => {
-                        const data = docSnap.data();
-                        const tagClass = data.tag === 'psych' ? 'tag-psych' : (data.tag === 'group' ? 'tag-group' : 'tag-peer');
-                        const statusColor = data.status === 'confirmed' ? '#22c55e' : (data.status === 'pending' ? '#fbbf24' : 'var(--text-muted)');
-                        const date = data.createdAt ? data.createdAt.toDate().toLocaleString() : 'N/A';
-
-                        html += `
-                            <div class="session-row">
-                                <div style="font-family:'Outfit'; font-weight:700;">${data.slId || 'N/A'}</div>
-                                <div>${data.userName || 'User'} / <strong>${data.peerName || 'Practitioner'}</strong></div>
-                                <div><span class="${tagClass}">${(data.tag || 'peer').toUpperCase()}</span></div>
-                                <div>
-                                    <div style="font-size:0.9rem;">${date}</div>
-                                    <div style="font-size:0.75rem; color:${statusColor};">${(data.status || 'unknown').toUpperCase()}</div>
-                                </div>
-                                <div><button class="btn-dash-secondary" style="padding:5px 12px; font-size:0.75rem;">Manage</button></div>
-                            </div>
-                        `;
-                    });
+                // Ensure users are loaded first so we can resolve names
+                if (!window.allUsersData || window.allUsersData.length === 0) {
+                    await loadAllUsers();
                 }
-                container.innerHTML = html;
+
+                allSessionsData = [];
+
+                // 1. Fetch from Firestore
+                try {
+                    const q = query(collection(db, "peer_bookings"), orderBy("createdAt", "desc"), limit(100));
+                    const snapshot = await getDocs(q);
+                    snapshot.forEach(docSnap => {
+                        allSessionsData.push({
+                            id: docSnap.id,
+                            ...docSnap.data()
+                        });
+                    });
+                } catch (firestoreErr) {
+                    console.warn("Firestore admin sessions fetch failed, using local fallback only:", firestoreErr);
+                }
+
+                // 2. Fetch from sessionStorage fallback
+                const localBookings = JSON.parse(sessionStorage.getItem('local_bookings') || '[]');
+                localBookings.forEach(b => {
+                    if (!allSessionsData.some(s => s.id === b.id)) {
+                        allSessionsData.push(b);
+                    }
+                });
+
+                filterAndRenderSessions();
             } catch (err) {
                 console.error("Error loading sessions:", err);
-                container.innerHTML = headerHtml + '<div style="padding:40px; text-align:center; color:var(--admin-accent);">Failed to load sessions.</div>';
+                tbody.innerHTML = '<tr><td colspan="5" style="padding:40px; text-align:center; color:var(--admin-accent);">Failed to load sessions.</td></tr>';
             }
         }
+
+        window.filterAndRenderSessions = function() {
+            const tbody = document.getElementById('sessions-tbody');
+            if (!tbody) return;
+
+            const categoryFilter = document.getElementById('sessions-category-filter')?.value || 'all';
+            const dateFilter = document.getElementById('sessions-date-filter')?.value || '';
+
+            let filtered = allSessionsData;
+
+            // Apply category filter
+            if (categoryFilter !== 'all') {
+                filtered = filtered.filter(session => {
+                    const tag = session.tag || 'peer';
+                    return tag === categoryFilter;
+                });
+            }
+
+            // Apply date filter
+            if (dateFilter) {
+                filtered = filtered.filter(session => {
+                    if (!session.createdAt) return false;
+                    const sessionDateStr = session.createdAt.toDate 
+                        ? new Date(session.createdAt.toDate()).toISOString().split('T')[0]
+                        : new Date(session.createdAt).toISOString().split('T')[0];
+                    return sessionDateStr === dateFilter;
+                });
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="padding:40px; text-align:center; opacity:0.5;">No sessions found matching filters.</td></tr>';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(session => {
+                const tagClass = session.tag === 'psych' ? 'tag-psych' : (session.tag === 'group' ? 'tag-group' : 'tag-peer');
+                const statusColor = session.status === 'confirmed' ? '#22c55e' : (session.status === 'pending' ? '#fbbf24' : 'var(--text-muted)');
+                const date = session.createdAt 
+                    ? (session.createdAt.toDate ? session.createdAt.toDate().toLocaleString() : new Date(session.createdAt).toLocaleString())
+                    : 'N/A';
+
+                // Resolve user and peer names from window.allUsersData
+                const user = (window.allUsersData || []).find(u => u.id === session.userId);
+                const peer = (window.allUsersData || []).find(u => u.id === session.peerId);
+                const resolvedUserName = user ? (user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email) : (session.userName || 'User');
+                const resolvedPeerName = peer ? (peer.name || `${peer.firstName || ''} ${peer.lastName || ''}`.trim() || peer.email) : (session.peerName || 'Practitioner');
+
+                html += `
+                    <tr>
+                        <td style="font-family:'Outfit'; font-weight:700;">${session.slId || 'N/A'}</td>
+                        <td>${resolvedUserName} / <strong>${resolvedPeerName}</strong></td>
+                        <td><span class="${tagClass}">${(session.tag || 'peer').toUpperCase()}</span></td>
+                        <td>
+                            <div style="font-size:0.9rem;">${date}</div>
+                            <div style="font-size:0.75rem; color:${statusColor}; font-weight:600;">${(session.status || 'unknown').toUpperCase()}</div>
+                        </td>
+                        <td style="text-align:right;">
+                            <button class="btn-s btn-rounded btn-dash-secondary" style="padding:5px 12px; font-size:0.75rem;">Manage</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        };
+
+        window.loadMasterSessions = loadMasterSessions;
 
         // 2. ACCOUNTING LOADER
         async function loadAccounting() {
@@ -5009,22 +5315,36 @@
 
         // ADDITIVE MODULE 2: Newsletter Hub Functions
         async function loadNewsletterSubscribers() {
-            const container = document.getElementById('newsletter-table-container');
+            const container = document.getElementById('newsletter-table-body');
             if (!container) return;
+
+            // Ensure window.allUsersData is loaded so we can identify Registered Users vs Visitors
+            if (!window.allUsersData || window.allUsersData.length === 0 || !window.isCacheValid()) {
+                try {
+                    await loadAllUsers();
+                } catch (e) {
+                    console.warn("Failed to pre-load users for newsletter display:", e);
+                }
+            }
 
             // Check cache first
             if (window.isCacheValid() && window.adminCache.newsletter) {
                 console.log("📦 Loading newsletter from cache...");
                 allNewsletterSubscribers = window.adminCache.newsletter;
-                renderNewsletterTable(allNewsletterSubscribers);
+                const sortSelect = document.getElementById('newsletter-sort-select');
+                if (sortSelect) {
+                    changeNewsletterSort(sortSelect.value);
+                } else {
+                    renderNewsletterTable(allNewsletterSubscribers);
+                }
                 return;
             }
 
             container.innerHTML = '<div style="padding:40px; text-align:center;"><i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:15px; color:var(--admin-accent);"></i><div>Loading subscribers...</div></div>';
 
             try {
-                // Fetch with dynamic sorting
-                const q = query(collection(db, "newsletters"), orderBy("createdAt", newsletterSortOrder));
+                // Fetch with default sorting, client-side sorting handles selections
+                const q = query(collection(db, "newsletters"), orderBy("createdAt", "desc"));
                 const snapshot = await getDocs(q);
                 if (snapshot.empty) {
                     allNewsletterSubscribers = [];
@@ -5043,7 +5363,12 @@
                 window.adminCache.lastFetch = Date.now();
                 localStorage.setItem('soulamore_admin_newsletter_cache', JSON.stringify(allNewsletterSubscribers));
 
-                renderNewsletterTable(allNewsletterSubscribers);
+                const sortSelect = document.getElementById('newsletter-sort-select');
+                if (sortSelect) {
+                    changeNewsletterSort(sortSelect.value);
+                } else {
+                    renderNewsletterTable(allNewsletterSubscribers);
+                }
             } catch (err) {
                 console.warn("⚠️ Error loading newsletter subscribers, checking cache:", err.message);
                 const cachedNewsletterStr = localStorage.getItem('soulamore_admin_newsletter_cache');
@@ -5051,20 +5376,95 @@
                     try {
                         allNewsletterSubscribers = JSON.parse(cachedNewsletterStr);
                         window.adminCache.newsletter = allNewsletterSubscribers;
-                        renderNewsletterTable(allNewsletterSubscribers);
+                        const sortSelect = document.getElementById('newsletter-sort-select');
+                        if (sortSelect) {
+                            changeNewsletterSort(sortSelect.value);
+                        } else {
+                            renderNewsletterTable(allNewsletterSubscribers);
+                        }
                         return;
                     } catch (cacheErr) {
                         console.error("Failed to parse cached newsletter:", cacheErr);
                     }
                 }
                 allNewsletterSubscribers = [];
-                window.adminCache.newsletter = [];
                 renderNewsletterTable([]);
             }
         }
 
+        window.changeNewsletterSort = function(sortType) {
+            const userEmails = new Set((window.allUsersData || []).map(u => (u.email || '').toLowerCase()));
+            
+            allNewsletterSubscribers.sort((a, b) => {
+                let valA = '', valB = '';
+                
+                switch (sortType) {
+                    case 'date-desc':
+                    case 'date-asc':
+                        const dateA = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : new Date(0);
+                        const dateB = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : new Date(0);
+                        return sortType === 'date-desc' ? dateB - dateA : dateA - dateB;
+                        
+                    case 'email-asc':
+                    case 'email-desc':
+                        valA = (a.email || '').toLowerCase();
+                        valB = (b.email || '').toLowerCase();
+                        return sortType === 'email-asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                        
+                    case 'location-asc':
+                    case 'location-desc':
+                        const getLocString = (item) => {
+                            if (!item.location) return '';
+                            if (typeof item.location === 'object') {
+                                return (item.location.name || item.location.city || '').toLowerCase();
+                            }
+                            return item.location.toLowerCase();
+                        };
+                        valA = getLocString(a);
+                        valB = getLocString(b);
+                        return sortType === 'location-asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                        
+                    case 'user-first':
+                        const aUser = userEmails.has((a.email || '').toLowerCase()) ? 1 : 0;
+                        const bUser = userEmails.has((b.email || '').toLowerCase()) ? 1 : 0;
+                        return bUser - aUser; // Users first
+                }
+                return 0;
+            });
+            
+            renderNewsletterTable(allNewsletterSubscribers);
+        };
+
+        window.filterNewsletterSubscribers = function() {
+            const queryVal = (document.getElementById('newsletter-search-input')?.value || '').toLowerCase().trim();
+            if (queryVal === '') {
+                const sortSelect = document.getElementById('newsletter-sort-select');
+                if (sortSelect) {
+                    changeNewsletterSort(sortSelect.value);
+                } else {
+                    renderNewsletterTable(allNewsletterSubscribers);
+                }
+                return;
+            }
+
+            const filtered = allNewsletterSubscribers.filter(sub => {
+                const email = (sub.email || '').toLowerCase();
+                let loc = '';
+                if (sub.location) {
+                    if (typeof sub.location === 'object') {
+                        loc = (sub.location.name || sub.location.city || '').toLowerCase();
+                    } else {
+                        loc = sub.location.toLowerCase();
+                    }
+                }
+                return email.includes(queryVal) || loc.includes(queryVal);
+            });
+
+            renderNewsletterTable(filtered);
+        };
+
         function renderNewsletterTable(subscribers) {
-            const container = document.getElementById('newsletter-table-container');
+            const container = document.getElementById('newsletter-table-body');
             if (!container) return;
 
             if (subscribers.length === 0) {
@@ -5072,16 +5472,17 @@
                 return;
             }
 
+            const userEmails = new Set((window.allUsersData || []).map(u => (u.email || '').toLowerCase()));
+
             let html = `
                 <div style="overflow-x:auto;">
                     <table class="premium-table">
                         <thead>
                             <tr>
                                 <th>Subscriber Email</th>
+                                <th>Account Type</th>
                                 <th>Location</th>
-                                <th style="cursor:pointer;" onclick="toggleNewsletterSort()">
-                                    Joined On <i id="newsletter-sort-icon" class="fas fa-sort-amount-${newsletterSortOrder === 'desc' ? 'down' : 'up'}" style="margin-left:8px; color:var(--admin-accent);"></i>
-                                </th>
+                                <th>Joined On</th>
                                 <th style="text-align:right;">Management</th>
                             </tr>
                         </thead>
@@ -5096,9 +5497,15 @@
                                     }
                                 }
 
+                                const isRegisteredUser = userEmails.has((sub.email || '').toLowerCase());
+                                const accountBadge = isRegisteredUser 
+                                    ? '<span class="status-pill status-active" style="display:inline-flex; align-items:center; gap:6px;"><span class="pulse-dot active" style="margin:0;"></span>User</span>'
+                                    : '<span class="category-badge">Visitor</span>';
+
                                 return `
                                     <tr>
                                         <td class="email-cell">${sub.email || 'N/A'}</td>
+                                        <td>${accountBadge}</td>
                                         <td class="meta-cell">${locDisplay}</td>
                                         <td class="meta-cell">${sub.createdAt ? (sub.createdAt.toDate ? new Date(sub.createdAt.toDate()).toLocaleDateString() : new Date(sub.createdAt).toLocaleDateString()) : 'N/A'}</td>
                                         <td class="actions-cell">
@@ -5396,6 +5803,14 @@
             try {
                 // Use the deleteDoc imported at the top level
                 await deleteDoc(doc(db, "users", uid));
+
+                // Attempt to clean up corresponding role entry if it exists
+                try {
+                    await deleteDoc(doc(db, "roles", uid));
+                } catch (roleErr) {
+                    console.warn(`Could not delete role document for ${uid}:`, roleErr);
+                }
+
                 alert("✅ User record deleted successfully.");
                 window.invalidateCache(); // Invalidate local cache on deletion
                 await loadAllUsers();
@@ -6121,6 +6536,8 @@
             }
         };
 
+        let currentCampaignAccentColor = '#2dd4bf'; // Default Teal
+
         window.loadSoulamoreTemplate = function(type) {
             const titleInput = document.getElementById('campaign-title');
             const contentInput = document.getElementById('campaign-content');
@@ -6159,8 +6576,44 @@
                 }
             };
 
+            // Remove active style from all template buttons
+            const btnTypes = ['feature', 'confession', 'reminder', 'postcard'];
+            btnTypes.forEach(t => {
+                const btn = document.getElementById(`btn-template-${t}`);
+                if (btn) {
+                    if (t === 'feature' || t === 'reminder') {
+                        btn.style.background = 'rgba(45, 212, 191, 0.08)';
+                        btn.style.borderColor = 'rgba(45, 212, 191, 0.15)';
+                    } else {
+                        btn.style.background = 'rgba(251, 191, 36, 0.08)';
+                        btn.style.borderColor = 'rgba(251, 191, 36, 0.15)';
+                    }
+                }
+            });
+
             const t = templates[type];
             if (t) {
+                // Update accent color
+                if (type === 'feature' || type === 'reminder') {
+                    currentCampaignAccentColor = '#2dd4bf'; // Teal
+                } else if (type === 'confession') {
+                    currentCampaignAccentColor = '#fbbf24'; // Amber
+                } else if (type === 'postcard') {
+                    currentCampaignAccentColor = '#f49f75'; // Peach
+                }
+
+                // Highlight selected button
+                const activeBtn = document.getElementById(`btn-template-${type}`);
+                if (activeBtn) {
+                    if (type === 'feature' || type === 'reminder') {
+                        activeBtn.style.background = 'rgba(45, 212, 191, 0.25)';
+                        activeBtn.style.borderColor = 'var(--soul-teal)';
+                    } else {
+                        activeBtn.style.background = 'rgba(251, 191, 36, 0.25)';
+                        activeBtn.style.borderColor = 'var(--soul-amber)';
+                    }
+                }
+
                 if (titleInput) titleInput.value = t.title;
                 if (contentInput) contentInput.value = t.content;
                 if (imageInput) imageInput.value = t.image;
@@ -6214,16 +6667,16 @@
             let ctaHtml = '';
             if (ctaText && ctaLink) {
                 ctaHtml = `<div style="text-align: center; margin: 20px 0;">
-                    <a href="${escapeHtml(ctaLink)}" target="_blank" style="display: inline-block; padding: 10px 24px; background: #8E44AD; color: #ffffff; text-decoration: none; border-radius: 50px; font-weight: 700; font-family: sans-serif; font-size: 0.85rem; box-shadow: 0 6px 12px rgba(142,68,173,0.15); transition: 0.2s;">
+                    <a href="${escapeHtml(ctaLink)}" target="_blank" style="display: inline-block; padding: 10px 24px; background: ${currentCampaignAccentColor}; color: #ffffff; text-decoration: none; border-radius: 50px; font-weight: 700; font-family: sans-serif; font-size: 0.85rem; box-shadow: 0 6px 12px ${currentCampaignAccentColor}26; transition: 0.2s;">
                         ${escapeHtml(ctaText)}
                     </a>
                 </div>`;
             }
 
-            // Compiler markup mirroring Brevo email fallback
+            // Compiler markup mirroring Brevo email fallback (enforcing Purple Ban)
             const SOUL_STYLE = `
               <style>
-                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Lora:italic,wght@0,400;1,400&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Lora:italic,wght@0,400;1,400&family=Sacramento&display=swap');
                 body { margin: 0; padding: 10px; background-color: #f8fafc; font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; }
                 .soul-container { line-height: 1.5; color: #1e293b; max-width: 100%; margin: 0 auto; background: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-sizing: border-box; }
                 .soul-header { padding: 10px 0 15px 0; text-align: center; border-bottom: 1px solid #f1f5f9; margin-bottom: 15px; }
@@ -6233,8 +6686,8 @@
                   display: inline-block;
                   padding: 12px;
                   border-radius: 50%;
-                  background: rgba(142, 68, 173, 0.04);
-                  border: 1px solid rgba(142, 68, 173, 0.08);
+                  background: ${currentCampaignAccentColor}0d;
+                  border: 1px solid ${currentCampaignAccentColor}26;
                   margin: 10px 0;
                   animation: breath 8s ease-in-out infinite;
                   text-align: center;
@@ -6250,7 +6703,7 @@
             const SOUL_FOOTER = `
               <div class="soul-footer">
                 <div class="breathing-prompt">
-                  <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: #8E44AD; font-weight: 700;">Breathe</div>
+                  <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: ${currentCampaignAccentColor}; font-weight: 700;">Breathe</div>
                   <div style="font-size: 0.55rem; opacity: 0.6; color: #64748b;">Inhale ... Exhale</div>
                 </div>
                 <p class="quote">"Deep breaths are like little love notes to your soul."</p>
@@ -6266,9 +6719,23 @@
                   ${SOUL_STYLE}
                 </head>
                 <body>
-                  <div class="soul-container">
-                    <div class="soul-header">
-                      <h1 style="color: #8E44AD; font-family: 'Outfit', sans-serif; font-weight: 700; margin: 0; font-size: 1.5rem; letter-spacing: -0.5px;">Soulamore</h1>
+                    <div class="soul-header" style="text-align: center; padding: 10px 0 15px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 15px; display: flex; justify-content: center;">
+                      <div style="display: inline-flex; align-items: stretch; gap: 20px; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; user-select: none; text-align: left;">
+                        <!-- Logo Symbol -->
+                        <div style="width: 107px; height: auto; flex-shrink: 0; transform: translateY(-2px);">
+                          <svg viewBox="0 210 545 412" style="width: 100%; height: 100%; fill: ${currentCampaignAccentColor}; display: block;" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M348.23,495.66c109.67,14.96,118.27-113.32,196.74-154.12-25.52,164.97-148.96,219.99-292,266.46-14.91-60.04,17.44-123.77,75.38-149.54,35.03-15.58,73.84-22.24,105.96-44.82,9.08-6.38,10.29,1.39,9.82,7.72-8.26,47.7-61.53,45.81-95.91,74.3Z"/>
+                            <path d="M181.25,469.74c-231.92-110.62-88.6-350.01,62.47-217.43,11.06,11.14,17.33,11.46,28.66.57,130.91-109.59,218.26,74.16,89.4,161.78-2.64-7.89,4.37-12.04,6.79-17.75,6.43-15.17,14.57-29.71,19.95-45.21,33.19-81.75-45.17-128.03-106.78-74.77-19.37,17.99-31.19,15.31-50.53,1.65-47.02-40.17-148.48-17.88-132.72,57.01,8.72,45.83,38.08,78.95,68.69,111.48,5.69,6.05,15.64,9.87,14.07,22.67Z"/>
+                            <path d="M0,411.2c59.37,32.68,65.33,128.96,151.4,122.02-26.16-26.41-77.66-22.09-71.3-69.33,76.77,46.03,161.8,40.04,151.84,156.16C123.05,591.11,13.07,539.82,0,411.2Z"/>
+                            <path d="M249.65,477.74c-49.09-.24-53.83-72.68-2.97-75.87,52.05-3.19,52.69,74.22,2.97,75.87Z"/>
+                          </svg>
+                        </div>
+                        <!-- Logo Text Block -->
+                        <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+                          <span style="font-family: 'Sacramento', cursive; font-size: 57px; font-weight: 400; color: ${currentCampaignAccentColor}; line-height: 0.95; display: block; margin: 0; padding: 0; transform: translateY(-2px);">Soulamore</span>
+                          <span style="font-size: 13px; font-weight: 500; color: #303c6c; letter-spacing: 0.03em; display: block; margin: 4px 0 0 3px; padding: 0;">Your Partner in Mental Wellness</span>
+                        </div>
+                      </div>
                     </div>
                     <div class="soul-body">
                       <p style="font-weight: 600; margin-top: 0; color: #1e293b; font-size: 0.95rem;">Hi Alex Designer,</p>
@@ -6285,6 +6752,32 @@
             const iframe = document.getElementById('campaign-live-preview-iframe');
             if (iframe) {
                 iframe.srcdoc = html;
+            }
+        };
+
+        window.toggleNewsletterCampaignCollapse = function(btn) {
+            const engine = document.getElementById('newsletter-campaign-engine');
+            if (!engine) return;
+            const isCollapsed = engine.style.display === 'none';
+            if (isCollapsed) {
+                engine.style.display = 'flex';
+                btn.innerHTML = '<i class="fas fa-chevron-up"></i> Collapse';
+            } else {
+                engine.style.display = 'none';
+                btn.innerHTML = '<i class="fas fa-chevron-down"></i> Expand';
+            }
+        };
+
+        window.toggleNewsletterTableCollapse = function(btn) {
+            const body = document.getElementById('newsletter-table-body');
+            if (!body) return;
+            const isCollapsed = body.style.display === 'none';
+            if (isCollapsed) {
+                body.style.display = 'block';
+                btn.innerHTML = '<i class="fas fa-chevron-up"></i> Collapse';
+            } else {
+                body.style.display = 'none';
+                btn.innerHTML = '<i class="fas fa-chevron-down"></i> Expand';
             }
         };
 
@@ -6466,6 +6959,52 @@
 
         // === API HEALTH TELEMETRY ===
 
+        window.loadSiteFeedback = async function() {
+            const tbody = document.getElementById('feedback-tbody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading feedback...</td></tr>';
+            
+            try {
+                const feedbackRef = collection(db, 'feedback');
+                const q = query(feedbackRef, orderBy('createdAt', 'desc'), limit(50));
+                const snapshot = await getDocs(q);
+                
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; opacity:0.5;">No feedback received yet.</td></tr>';
+                    return;
+                }
+                
+                let html = '';
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleString() : 'N/A';
+                    const rating = data.rating ? `${data.rating} / 5 ⭐` : '-';
+                    const photoHtml = data.photo ? `
+                        <div style="margin-top: 8px;">
+                            <a href="${data.photo}" target="_blank">
+                                <img src="${data.photo}" style="max-width: 100px; max-height: 100px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;" title="Click to view full image"/>
+                            </a>
+                        </div>
+                    ` : '';
+                    html += `
+                        <tr>
+                            <td class="meta-cell">${date}</td>
+                            <td class="email-cell">${data.email || 'Anonymous'}</td>
+                            <td><span class="category-badge">${rating}</span></td>
+                            <td style="max-width: 300px; white-space: pre-wrap;">${data.feedback || ''}${photoHtml}</td>
+                            <td class="meta-cell" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href="${data.page || '#'}" target="_blank" style="color:#2dd4bf;">${data.page ? 'View Context' : '-'}</a></td>
+                        </tr>
+                    `;
+                });
+                
+                tbody.innerHTML = html;
+            } catch (err) {
+                console.error("Error loading feedback:", err);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#ef4444;">Failed to load feedback.</td></tr>';
+            }
+        };
+
         window.loadApiHealth = async function() {
             const logsEl = document.getElementById('telemetry-logs');
             const log = (msg, type = 'info') => {
@@ -6588,6 +7127,138 @@
                 
                 console.error("Telemetry Error:", err);
             }
+        };
+
+        // === SECURITY & BREACH MONITORING EVENT HANDLERS ===
+        window.loadSecurityEvents = async function() {
+            const tbody = document.getElementById('security-events-tbody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading security events...</td></tr>';
+
+            try {
+                const q = query(collection(db, 'security_events'), orderBy('timestamp', 'desc'), limit(50));
+                const snapshot = await getDocs(q);
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; opacity:0.5; padding: 20px;">No security events logged.</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'N/A';
+                    const severity = data.severity || 'low';
+                    
+                    let badgeColor = '#94a3b8';
+                    let badgeBg = 'rgba(148,163,184,0.1)';
+                    if (severity === 'critical') { badgeColor = '#ef4444'; badgeBg = 'rgba(239,68,68,0.15)'; }
+                    else if (severity === 'high') { badgeColor = '#f97316'; badgeBg = 'rgba(249,115,22,0.15)'; }
+                    else if (severity === 'medium') { badgeColor = '#eab308'; badgeBg = 'rgba(234,179,8,0.15)'; }
+                    else if (severity === 'low') { badgeColor = '#22c55e'; badgeBg = 'rgba(34,197,94,0.15)'; }
+
+                    const severityBadge = `<span style="color:${badgeColor}; background:${badgeBg}; padding:3px 8px; border-radius:50px; font-size:0.75rem; font-weight:700; border:1px solid ${badgeColor}30; text-transform:uppercase;">${severity}</span>`;
+
+                    html += `
+                        <tr>
+                            <td class="meta-cell">${date}</td>
+                            <td>${severityBadge}</td>
+                            <td style="font-weight:600; color:#f1f5f9;">${data.eventType || 'N/A'}</td>
+                            <td style="max-width:300px; white-space:pre-wrap; font-size:0.85rem; opacity:0.8;">${data.description || 'N/A'}</td>
+                            <td class="email-cell">${data.userEmail || 'System'}</td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html;
+            } catch (err) {
+                console.error("Error loading security events:", err);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#ef4444; padding:20px;">Failed to load security events: ' + err.message + '</td></tr>';
+            }
+        };
+
+        window.submitManualSecurityEvent = async function() {
+            const severity = document.getElementById('log-sec-severity').value;
+            const eventType = document.getElementById('log-sec-type').value.trim();
+            const description = document.getElementById('log-sec-desc').value.trim();
+
+            if (!eventType || !description) {
+                alert("Please fill in the Event Type and Description fields.");
+                return;
+            }
+
+            const btn = document.querySelector('#view-security .btn-dash-primary[onclick*="submitManualSecurityEvent"]');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = "Logging...";
+
+            try {
+                const logSecurityEventFn = httpsCallable(functionsInstance, 'logSecurityEvent');
+                await logSecurityEventFn({ severity, eventType, description });
+
+                alert("✅ Security event logged successfully!");
+                document.getElementById('log-sec-type').value = '';
+                document.getElementById('log-sec-desc').value = '';
+                await loadSecurityEvents();
+            } catch (err) {
+                console.error("Failed to log security event:", err);
+                alert("Failed to log event: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        };
+
+        window.generateBreachNotice = function() {
+            const dateStr = new Date().toLocaleString();
+            const template = `======================================================================
+FORMAL SECURITY BREACH NOTIFICATION (REGULATORY SUBMISSION READY)
+Under: GDPR Article 33 / India DPDP Act 2023, Section 8(6)
+======================================================================
+
+1. DATA FIDUCIARY / CONTROLLER DETAILS
+----------------------------------------------------------------------
+Entity Name: Hashlilly (OPC) Private Limited (Soulamore Platform)
+CIN: U62099PB2026OPC068567
+Registered Office: Punjab, India
+Grievance Representative: Aditya Harsh
+Contact Email: support@soulamore.in
+
+2. NATURE AND CONTEXT OF THE INCIDENT
+----------------------------------------------------------------------
+Incident Detected At: ${dateStr}
+Incident Category: [e.g. Unauthorized Database Access / Authentication Anomaly]
+Source/Mechanism: [Describe briefly, e.g. Credential stuffing, database leak, etc.]
+Type of Personal Data Affected: [e.g. User Profile metadata, Journal Entry keywords]
+
+3. IMPACT ASSESSMENT & ESTIMATED NUMBERS
+----------------------------------------------------------------------
+Approximate Number of Data Subjects Affected: [Insert Estimated Users]
+Approximate Number of Personal Data Records Affected: [Insert Estimated Records]
+Risk Category: [Low / Medium / High / Critical]
+
+4. MITIGATION AND REMEDIAL MEASURES IMPLEMENTED
+----------------------------------------------------------------------
+Immediate Action: Affected account sessions revoked, Firestore Rules updated, auth rate limits enforced.
+Post-Breach Measures: Automated data retention jobs verified, security events logged.
+
+5. ADVICE TO AFFECTED DATA SUBJECTS
+----------------------------------------------------------------------
+Recommended Action: Change credentials, enable MFA, ignore suspicious emails claiming association.
+
+======================================================================
+Submission Prepared By: Soulamore Security Team
+File Reference: SEC-BREACH-${Date.now()}
+======================================================================`;
+
+            document.getElementById('breach-notice-textarea').value = template;
+            document.getElementById('breach-notice-textarea').select();
+            document.getElementById('breach-template-card').style.display = 'block';
+            
+            // Scroll to the template card
+            const card = document.getElementById('breach-template-card');
+            if (card) card.scrollIntoView({ behavior: 'smooth' });
         };
 
         // Initialize API Health when tab is clicked

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soulamore Logo Layout Tuner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sacramento&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-slate: #0f172a;
+      --color-peach: #f4976c;
+      --color-blue: #303c6c;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem 1rem;
+      background-color: #f8fafc;
+      color: var(--color-slate);
+      font-family: "Plus Jakarta Sans", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 950px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .editor-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .editor-layout {
+        grid-template-columns: 1.2fr 1fr;
+      }
+    }
+
+    .preview-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 4rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      transition: background-color 0.3s ease;
+      min-height: 280px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Reference Guide Lines */
+    .guide-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      border-top: 1px dashed #ef4444;
+      pointer-events: none;
+      z-index: 100;
+      display: none;
+    }
+
+    .theme-controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      justify-content: center;
+    }
+
+    .theme-btn {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 0.4rem 0.8rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .theme-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .theme-btn.active {
+      background: var(--color-slate);
+      color: #ffffff;
+      border-color: var(--color-slate);
+    }
+
+    /* Controls styling */
+    .controls-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+    }
+
+    .controls-card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0 0 1.25rem 0;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .slider-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .slider-item label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #475569;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .slider-item label span {
+      font-family: monospace;
+      color: var(--color-peach);
+      font-weight: 700;
+    }
+
+    .slider-item input[type="range"] {
+      width: 100%;
+      accent-color: var(--color-peach);
+      cursor: pointer;
+    }
+
+    /* Dropdowns & Selects */
+    .control-select {
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-family: inherit;
+      font-size: 0.85rem;
+      outline: none;
+      cursor: pointer;
+      background-color: #ffffff;
+    }
+
+    .control-select:focus {
+      border-color: var(--color-peach);
+    }
+
+    /* Code Block Section */
+    .code-section {
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      grid-column: 1 / -1;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 0.75rem;
+    }
+
+    .code-title {
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f1f5f9;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Soulamore Logo Layout Tuner</h1>
+      <p class="subtitle">Fine-tune offsets, dimensions, and container vertical alignment options dynamically.</p>
+    </header>
+
+    <div class="theme-controls">
+      <button class="theme-btn active" id="btn-theme-day" onclick="changeTheme('day')">Day (White BG)</button>
+      <button class="theme-btn" id="btn-theme-peach" onclick="changeTheme('peach')">Peach BG</button>
+      <button class="theme-btn" id="btn-theme-night" onclick="changeTheme('night')">Night (Dark BG)</button>
+    </div>
+
+    <div class="editor-layout">
+      
+      <!-- Live Render Area -->
+      <div class="preview-card" id="preview-container">
+        <!-- Overlay Guide Lines -->
+        <div id="guide-line-top" class="guide-line"></div>
+        <div id="guide-line-bottom" class="guide-line"></div>
+        
+        <!-- Interactive Render Target -->
+        <div id="logo-preview-wrapper" style="display: inline-flex; align-items: center; gap: 20px; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; user-select: none;">
+          <!-- Logo Symbol -->
+          <div id="preview-icon-wrapper" style="width: 72px; height: auto; flex-shrink: 0; transform: translateY(0px);">
+            <svg viewBox="0 210 545 412" id="preview-svg-symbol" style="width: 100%; height: 100%; fill: #f4976c; display: block;" xmlns="http://www.w3.org/2000/svg">
+              <path d="M348.23,495.66c109.67,14.96,118.27-113.32,196.74-154.12-25.52,164.97-148.96,219.99-292,266.46-14.91-60.04,17.44-123.77,75.38-149.54,35.03-15.58,73.84-22.24,105.96-44.82,9.08-6.38,10.29,1.39,9.82,7.72-8.26,47.7-61.53,45.81-95.91,74.3Z"/>
+              <path d="M181.25,469.74c-231.92-110.62-88.6-350.01,62.47-217.43,11.06,11.14,17.33,11.46,28.66.57,130.91-109.59,218.26,74.16,89.4,161.78-2.64-7.89,4.37-12.04,6.79-17.75,6.43-15.17,14.57-29.71,19.95-45.21,33.19-81.75-45.17-128.03-106.78-74.77-19.37,17.99-31.19,15.31-50.53,1.65-47.02-40.17-148.48-17.88-132.72,57.01,8.72,45.83,38.08,78.95,68.69,111.48,5.69,6.05,15.64,9.87,14.07,22.67Z"/>
+              <path d="M0,411.2c59.37,32.68,65.33,128.96,151.4,122.02-26.16-26.41-77.66-22.09-71.3-69.33,76.77,46.03,161.8,40.04,151.84,156.16C123.05,591.11,13.07,539.82,0,411.2Z"/>
+              <path d="M249.65,477.74c-49.09-.24-53.83-72.68-2.97-75.87,52.05-3.19,52.69,74.22,2.97,75.87Z"/>
+            </svg>
+          </div>
+          <!-- Logo Text Block -->
+          <div id="preview-text-block" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+            <span id="preview-title" style="font-family: 'Sacramento', cursive; font-size: 58px; font-weight: 400; color: #0f172a; line-height: 0.95; display: block; margin: 0; padding: 0; transform: translateY(-2px);">Soulamore</span>
+            <span id="preview-tagline" style="font-size: 13px; font-weight: 500; color: #303c6c; letter-spacing: 0.03em; display: block; margin: 4px 0 0 3px; padding: 0;">Your Partner in Mental Wellness</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sliders Controls Area -->
+      <div class="controls-card">
+        <h2>Tuner Parameters</h2>
+        <div class="slider-group">
+          
+          <div class="slider-item">
+            <label for="select-valign">Container Align-Items (Vertical Alignment):</label>
+            <select id="select-valign" class="control-select" onchange="updateLogoStyles()">
+              <option value="center" selected>center</option>
+              <option value="flex-start">flex-start</option>
+              <option value="flex-end">flex-end</option>
+              <option value="baseline">baseline</option>
+              <option value="stretch">stretch</option>
+            </select>
+          </div>
+
+          <div class="slider-item">
+            <label>Icon Width: <span id="val-icon-width">72px</span></label>
+            <input type="range" id="slider-icon-width" min="30" max="150" value="72" oninput="updateLogoStyles()">
+          </div>
+
+          <div class="slider-item">
+            <label>Icon Vertical Shift: <span id="val-icon-shift">0px</span></label>
+            <input type="range" id="slider-icon-shift" min="-40" max="40" value="0" oninput="updateLogoStyles()">
+          </div>
+
+          <div class="slider-item">
+            <label>Horizontal Gap: <span id="val-gap">20px</span></label>
+            <input type="range" id="slider-gap" min="0" max="60" value="20" oninput="updateLogoStyles()">
+          </div>
+
+          <div class="slider-item">
+            <label>Title Size (Soulamore): <span id="val-title-size">58px</span></label>
+            <input type="range" id="slider-title-size" min="30" max="120" value="58" oninput="updateLogoStyles()">
+          </div>
+
+          <div class="slider-item">
+            <label>Title Vertical Shift: <span id="val-title-shift">-2px</span></label>
+            <input type="range" id="slider-title-shift" min="-30" max="30" value="-2" oninput="updateLogoStyles()">
+          </div>
+
+          <div class="slider-item">
+            <label>Tagline Size: <span id="val-tagline-size">13px</span></label>
+            <input type="range" id="slider-tagline-size" min="9" max="30" value="13" oninput="updateLogoStyles()">
+          </div>
+
+          <div class="slider-item">
+            <label>Tagline Top Margin: <span id="val-tagline-margin">4px</span></label>
+            <input type="range" id="slider-tagline-margin" min="-10" max="30" value="4" oninput="updateLogoStyles()">
+          </div>
+
+          <div class="slider-item">
+            <label>Tagline Left Indent: <span id="val-tagline-indent">3px</span></label>
+            <input type="range" id="slider-tagline-indent" min="-10" max="30" value="3" oninput="updateLogoStyles()">
+          </div>
+
+          <div class="slider-item" style="flex-direction: row; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+            <input type="checkbox" id="check-guides" onchange="updateLogoStyles()" style="cursor: pointer; width: 16px; height: 16px; margin: 0;">
+            <label for="check-guides" style="margin: 0; cursor: pointer; color: #475569;">Show Alignment Guide Lines</label>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Code Output Area -->
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-title">Real-time Copyable Inline HTML</span>
+          <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+        </div>
+        <pre><code id="code-block"></code></pre>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let currentTheme = 'day';
+
+    const themeColors = {
+      day: {
+        bg: '#ffffff',
+        icon: '#f4976c',
+        title: '#0f172a',
+        tagline: '#303c6c'
+      },
+      peach: {
+        bg: '#f4976c',
+        icon: '#ffffff',
+        title: '#ffffff',
+        tagline: '#ffffff'
+      },
+      night: {
+        bg: '#0f172a',
+        icon: '#ffffff',
+        title: '#ffffff',
+        tagline: 'rgba(255, 255, 255, 0.7)'
+      }
+    };
+
+    function changeTheme(theme) {
+      currentTheme = theme;
+      
+      // Update buttons active status
+      document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`btn-theme-${theme}`).classList.add('active');
+
+      // Update background colors
+      const container = document.getElementById('preview-container');
+      container.style.backgroundColor = themeColors[theme].bg;
+
+      // Force recalculate elements
+      updateLogoStyles();
+    }
+
+    function updateLogoStyles() {
+      // Gather slider and select values
+      const alignVal = document.getElementById('select-valign').value;
+      const iconWidth = document.getElementById('slider-icon-width').value;
+      const iconShift = document.getElementById('slider-icon-shift').value;
+      const gap = document.getElementById('slider-gap').value;
+      const titleSize = document.getElementById('slider-title-size').value;
+      const titleShift = document.getElementById('slider-title-shift').value;
+      const taglineSize = document.getElementById('slider-tagline-size').value;
+      const taglineMargin = document.getElementById('slider-tagline-margin').value;
+      const taglineIndent = document.getElementById('slider-tagline-indent').value;
+      const showGuides = document.getElementById('check-guides').checked;
+
+      // Update labels in real-time
+      document.getElementById('val-icon-width').textContent = `${iconWidth}px`;
+      document.getElementById('val-icon-shift').textContent = `${iconShift}px`;
+      document.getElementById('val-gap').textContent = `${gap}px`;
+      document.getElementById('val-title-size').textContent = `${titleSize}px`;
+      document.getElementById('val-title-shift').textContent = `${titleShift}px`;
+      document.getElementById('val-tagline-size').textContent = `${taglineSize}px`;
+      document.getElementById('val-tagline-margin').textContent = `${taglineMargin}px`;
+      document.getElementById('val-tagline-indent').textContent = `${taglineIndent}px`;
+
+      // Get current theme styling assets
+      const colors = themeColors[currentTheme];
+
+      // Apply style attributes to the live DOM elements
+      const wrapper = document.getElementById('logo-preview-wrapper');
+      const iconWrapper = document.getElementById('preview-icon-wrapper');
+      const symbol = document.getElementById('preview-svg-symbol');
+      const titleEl = document.getElementById('preview-title');
+      const taglineEl = document.getElementById('preview-tagline');
+
+      wrapper.style.alignItems = alignVal;
+      wrapper.style.gap = `${gap}px`;
+
+      iconWrapper.style.width = `${iconWidth}px`;
+      iconWrapper.style.transform = `translateY(${iconShift}px)`;
+      symbol.style.fill = colors.icon;
+
+      titleEl.style.fontSize = `${titleSize}px`;
+      titleEl.style.transform = `translateY(${titleShift}px)`;
+      titleEl.style.color = colors.title;
+
+      taglineEl.style.fontSize = `${taglineSize}px`;
+      taglineEl.style.marginTop = `${taglineMargin}px`;
+      taglineEl.style.marginLeft = `${taglineIndent}px`;
+      taglineEl.style.color = colors.tagline;
+
+      // Update Guide Lines positions
+      const guideTop = document.getElementById('guide-line-top');
+      const guideBottom = document.getElementById('guide-line-bottom');
+      const container = document.getElementById('preview-container');
+
+      if (showGuides) {
+        const wrapperRect = wrapper.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        const relativeTop = wrapperRect.top - containerRect.top;
+        const relativeBottom = wrapperRect.bottom - containerRect.top;
+
+        guideTop.style.display = 'block';
+        guideTop.style.top = `${relativeTop}px`;
+
+        guideBottom.style.display = 'block';
+        guideBottom.style.top = `${relativeBottom}px`;
+      } else {
+        guideTop.style.display = 'none';
+        guideBottom.style.display = 'none';
+      }
+
+      // Generate HTML Output Code String
+      const codeOutput = `<div style="display: inline-flex; align-items: ${alignVal}; gap: ${gap}px; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; user-select: none;">
+  <!-- Logo Symbol -->
+  <div style="width: ${iconWidth}px; height: auto; flex-shrink: 0; transform: translateY(${iconShift}px);">
+    <svg viewBox="0 210 545 412" style="width: 100%; height: 100%; fill: ${colors.icon}; display: block;" xmlns="http://www.w3.org/2000/svg">
+      <path d="M348.23,495.66c109.67,14.96,118.27-113.32,196.74-154.12-25.52,164.97-148.96,219.99-292,266.46-14.91-60.04,17.44-123.77,75.38-149.54,35.03-15.58,73.84-22.24,105.96-44.82,9.08-6.38,10.29,1.39,9.82,7.72-8.26,47.7-61.53,45.81-95.91,74.3Z"/>
+      <path d="M181.25,469.74c-231.92-110.62-88.6-350.01,62.47-217.43,11.06,11.14,17.33,11.46,28.66.57,130.91-109.59,218.26,74.16,89.4,161.78-2.64-7.89,4.37-12.04,6.79-17.75,6.43-15.17,14.57-29.71,19.95-45.21,33.19-81.75-45.17-128.03-106.78-74.77-19.37,17.99-31.19,15.31-50.53,1.65-47.02-40.17-148.48-17.88-132.72,57.01,8.72,45.83,38.08,78.95,68.69,111.48,5.69,6.05,15.64,9.87,14.07,22.67Z"/>
+      <path d="M0,411.2c59.37,32.68,65.33,128.96,151.4,122.02-26.16-26.41-77.66-22.09-71.3-69.33,76.77,46.03,161.8,40.04,151.84,156.16C123.05,591.11,13.07,539.82,0,411.2Z"/>
+      <path d="M249.65,477.74c-49.09-.24-53.83-72.68-2.97-75.87,52.05-3.19,52.69,74.22,2.97,75.87Z"/>
+    </svg>
+  </div>
+  <!-- Logo Text Block -->
+  <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+    <span style="font-family: 'Sacramento', cursive; font-size: ${titleSize}px; font-weight: 400; color: ${colors.title}; line-height: 0.95; display: block; margin: 0; padding: 0; transform: translateY(${titleShift}px);">Soulamore</span>
+    <span style="font-size: ${taglineSize}px; font-weight: 500; color: ${colors.tagline}; letter-spacing: 0.03em; display: block; margin: ${taglineMargin}px 0 0 ${taglineIndent}px; padding: 0;">Your Partner in Mental Wellness</span>
+  </div>
+</div>`;
+
+      document.getElementById('code-block').textContent = codeOutput;
+    }
+
+    function copyCode() {
+      const codeText = document.getElementById('code-block').textContent;
+      navigator.clipboard.writeText(codeText).then(() => {
+        const copyBtn = document.querySelector('.copy-btn');
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy Code';
+        }, 2000);
+      });
+    }
+
+    // Set initial configuration
+    window.addEventListener('DOMContentLoaded', () => {
+      changeTheme('day');
+      
+      // Update guides on window resize to ensure accuracy
+      window.addEventListener('resize', () => {
+        if (document.getElementById('check-guides').checked) {
+          updateLogoStyles();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

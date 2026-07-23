@@ -789,7 +789,7 @@ const NAV_DATA = [
                 children: [
                     { id: 'nav-what-peer', label: 'What is Peer Therapy?', href: 'our-peers/about.html' },
                     { id: 'nav-meet-peers', label: 'Meet Our Peers', href: 'our-peers/index.html' },
-                    { id: 'nav-join-peer', label: 'Join as Peer', href: 'join-us/peer.html' }
+                    { id: 'nav-join-peer', label: 'Join as Peer', href: 'join-us/index.html' }
                 ]
             },
             {
@@ -798,7 +798,7 @@ const NAV_DATA = [
                 href: '#',
                 type: 'submenu',
                 children: [
-                    { id: 'nav-what-psych', label: 'What is Therapy?', href: 'New Pages/Psychologists Landing.html' },
+                    { id: 'nav-what-psych', label: 'What is Therapy?', href: 'portal/Psychologists Landing.html' },
                     { id: 'nav-meet-psych', label: 'Meet Our Psychologists', href: 'our-psychologists/psychologists.html' },
                     { id: 'nav-join-psych', label: 'Join as Psychologist', href: 'join-us/psychologist.html' }
                 ]
@@ -838,8 +838,8 @@ const NAV_DATA = [
         type: 'dropdown',
         children: [
             { id: 'nav-support-groups-community', label: 'Support Groups', href: 'community/support-groups/support-groups.html' },
-            { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs.html' },
-            { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum.html' },
+            { id: 'nav-blogs', label: 'Blogs & Stories', href: 'community/blogs/blogs.html' },
+            { id: 'nav-forum', label: 'Discussion Forum', href: 'community/forum/forum.html' },
             { id: 'nav-for-parents', label: 'For Families', href: 'company/for-parents.html' }
         ]
     },
@@ -1019,7 +1019,7 @@ const getFooterHTML = (rootPath) => `
                 <li><a href="${rootPath}spaces/campus/campus-ambassadors.html">Campus Ambassadors</a></li>
                 <li><a href="${rootPath}our-peers/index.html">Meet Peers</a></li>
                 <li><a href="${rootPath}community/support-groups/support-groups.html">Support Groups</a></li>
-                <li><a href="${rootPath}community/forum.html">Discussion Forum</a></li>
+                <li><a href="${rootPath}community/forum/forum.html">Discussion Forum</a></li>
                 <li><a href="${rootPath}company/for-parents.html">For Family (Comfort)</a></li>
                 <li><a href="${rootPath}join-us/index.html">Join the Team</a></li>
             </ul>
@@ -1034,6 +1034,7 @@ const getFooterHTML = (rootPath) => `
                 <li><a href="${rootPath}company/press.html">Press & Media Kit</a></li>
                 <li><a href="${rootPath}company/why-soulamore-exists.html">Why Soulamore Exists</a></li>
                 <li><a href="${rootPath}company/transparency.html">Transparency Report</a></li>
+                <li><a href="${rootPath}company/compliance.html">Compliance Declaration</a></li>
                 <li><a href="${rootPath}company/contact.html">Contact</a></li>
                 <li><a href="${rootPath}company/legal.html">Privacy & Legal</a></li>
                 <li><a href="${rootPath}get-help-now.html" style="color:var(--ember-red); font-weight:600;">Crisis Resources</a></li>
@@ -1042,9 +1043,11 @@ const getFooterHTML = (rootPath) => `
 
     </div>
 
-    <div class="footer-bottom" style="margin-top:50px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); text-align:center; font-size:0.8rem; opacity:0.4;">
-        © 2025 by Hashlilly! All rights reserved. <br>
-        <span style="font-size:0.7rem;">Disclaimer: We are not a replacement for professional medical help.</span>
+    <div class="footer-bottom" style="margin-top:50px; padding-top:30px; border-top:1px solid rgba(255,255,255,0.1); text-align:center; font-size:0.75rem; opacity:0.75; line-height:1.8; color: #94a3b8;">
+        <div>© 2026 Hashlilly (OPC) Private Limited. All rights reserved.</div>
+        <div style="margin-top: 5px;">Hashlilly (OPC) Private Limited | CIN: U62099PB2026OPC068567 | Reg No: UDYAM-PB-20-0003915</div>
+        <div>Grievance Officer: <a href="mailto:support@soulamore.in" style="color: #4ECDC4; text-decoration: underline;">support@soulamore.in</a></div>
+        <div style="margin-top: 15px; font-size: 0.7rem; color: #ff6b6b; font-weight: 500;">Disclaimer: Soulamore is a self-reflection space and peer-support community. We are not a clinical service and do not provide medical advice.</div>
     </div>
 </div>
 `;
@@ -1345,9 +1348,15 @@ function injectSubnav() {
 }
 
 // --- 11. COOKIE CONSENT ---
+function getCookieConsent() {
+    return localStorage.getItem('cookieConsent') || null;
+}
+window.getCookieConsent = getCookieConsent;
+
 function injectCookieBanner() {
-    // 1. Check if already consented
-    if (localStorage.getItem('cookieConsent') === 'accepted') return;
+    // 1. Check if already consented (either accepted or essential only)
+    const consent = localStorage.getItem('cookieConsent');
+    if (consent === 'accepted' || consent === 'essential') return;
 
     // 2. Create Banner
     const banner = document.createElement('div');
@@ -1359,7 +1368,8 @@ function injectCookieBanner() {
                 bottom: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                max-width: 400px;
+                max-width: 440px;
+                width: calc(100% - 40px);
                 background: rgba(15, 23, 42, 0.95);
                 backdrop-filter: blur(12px);
                 border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1375,31 +1385,44 @@ function injectCookieBanner() {
             
             .cb-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-weight: 600; color: #4ECDC4; }
             .cb-text { font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px; line-height: 1.5; }
-            .cb-actions { display: flex; gap: 10px; justify-content: flex-end; }
+            .cb-actions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
             
-            .cb-btn { padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; cursor: pointer; border: none; font-weight: 600; transition: 0.3s; }
+            .cb-btn { padding: 8px 16px; border-radius: 50px; font-size: 0.85rem; cursor: pointer; border: none; font-weight: 600; transition: 0.3s; }
             .cb-accept { background: #4ECDC4; color: #0f172a; }
             .cb-accept:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3); }
             
-            .cb-info { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.1); }
-            .cb-info:hover { color: white; border-color: white; }
+            .cb-reject { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.15); }
+            .cb-reject:hover { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.35); transform: translateY(-2px); }
+
+            .cb-info { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid transparent; padding-left: 5px; padding-right: 5px; }
+            .cb-info:hover { color: white; text-decoration: underline; }
         </style>
         <div class="cb-header"><i class="fas fa-cookie-bite"></i> Human, we use cookies.</div>
-        <div class="cb-text">Not the chocolate chip kind (sadly). Just the digital kind to keep you logged in and make sure the site works. No tracking for ads.</div>
+        <div class="cb-text">Not the chocolate chip kind (sadly). Just the digital kind to keep you logged in and make sure the site works. We do not use advertising or tracking cookies.</div>
         <div class="cb-actions">
-            <button class="cb-btn cb-info" onclick="window.location.href='/company/privacy-policy.html'">Privacy</button>
-            <button class="cb-btn cb-accept" id="acceptCookies">Got it</button>
+            <button class="cb-btn cb-info" onclick="window.location.href='/company/privacy-policy.html'">Privacy Policy</button>
+            <button class="cb-btn cb-reject" id="rejectCookies">Essential Only</button>
+            <button class="cb-btn cb-accept" id="acceptCookies">Accept All</button>
         </div>
     `;
 
     document.body.appendChild(banner);
 
-    // 3. Bind Event
-    document.getElementById('acceptCookies').addEventListener('click', () => {
-        localStorage.setItem('cookieConsent', 'accepted');
+    const dismissBanner = () => {
         banner.style.opacity = '0';
         banner.style.transform = 'translateY(20px)';
         setTimeout(() => banner.remove(), 500);
+    };
+
+    // 3. Bind Events
+    document.getElementById('acceptCookies').addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'accepted');
+        dismissBanner();
+    });
+
+    document.getElementById('rejectCookies').addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'essential');
+        dismissBanner();
     });
 }
 
@@ -1449,46 +1472,35 @@ document.addEventListener('DOMContentLoaded', () => {
  * Correctly handles both hosted (web) and local (file://) environments.
  */
 function getRootPath() {
-    // Robust Path Resolution (v4.0)
-    // Always use the relative path hardcoded by the developer in the <script src="..."> tag
     const script = document.querySelector('script[src*="components.js"]');
     if (script) {
-        const src = script.getAttribute('src');
-        if (src) {
-            // Extracts whatever prefix precedes "assets/js/components" e.g., "../../" or "../" or ""
-            return src.split('assets/js/components')[0];
+        const rawSrc = script.getAttribute('src');
+        if (rawSrc && !rawSrc.startsWith('http') && !rawSrc.startsWith('/')) {
+            const depth = (rawSrc.match(/\.\.\//g) || []).length;
+            return depth > 0 ? '../'.repeat(depth) : '';
         }
     }
 
-    // Fallback if script tag parsing somehow fails
     const path = window.location.pathname.toLowerCase();
 
-    // 2-Levels Deep Check
     if (path.includes('/spaces/campus/') ||
         path.includes('/spaces/soulamore-away/') ||
         path.includes('/spaces/soulamore-workplace/') ||
         path.includes('/spaces/assessments/') ||
         path.includes('/tools/confession-box/') ||
         path.includes('/portal/admin-dashboard/') ||
-        (path.includes('/our-peers/') && path.split('/our-peers/')[1]?.includes('/'))) {
+        (path.includes('/our-peers/') && path.split('/our-peers/')[1] && path.split('/our-peers/')[1].includes('/'))) {
         return "../../";
     }
 
-    // 1-Level Deep Check
     if (path.includes('/spaces/') ||
         path.includes('/tools/') ||
         path.includes('/company/') ||
-        path.includes('/community/') ||
+        path.includes('/portal/') ||
         path.includes('/our-peers/') ||
         path.includes('/our-psychologists/') ||
-        path.includes('/portal/') ||
-        path.includes('/journal/') ||
-        path.includes('/auth/') ||
-        path.includes('/login/') ||
         path.includes('/join-us/') ||
-        path.includes('/pages/') ||
-        path.includes('/resources/') ||
-        path.includes('/new pages/') || path.includes('/new%20pages/')) {
+        path.includes('/pages/')) {
         return "../";
     }
 
@@ -1796,7 +1808,7 @@ function injectSoulBotWidget() {
                     <button class="sb-send" onclick="sendWidgetMessage()"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
-            <div id="soulbot-widget-fab" onclick="toggleWidget()" style="display: none;"> <!-- Hidden on mobile via CSS, manually hidden here for safety -->
+            <div id="soulbot-widget-fab" onclick="toggleWidget()">
                 <i class="fas fa-robot"></i>
             </div>
         </div>
@@ -2204,12 +2216,12 @@ window.toggleMobileMenu = function () {
                     // User is logged in
                     if (navAuthBtn) {
                         navAuthBtn.textContent = 'Dashboard';
-                        navAuthBtn.href = window.SoulFirebase.rootPath + 'portal/user-dashboard.html';
+                        navAuthBtn.href = getRootPath() + 'portal/user-dashboard.html';
                         navAuthBtn.classList.add('nav-btn-active');
                     }
                     if (mobileProfileBtn) {
                         mobileProfileBtn.textContent = 'Dashboard';
-                        mobileProfileBtn.href = window.SoulFirebase.rootPath + 'portal/user-dashboard.html';
+                        mobileProfileBtn.href = getRootPath() + 'portal/user-dashboard.html';
                     }
                     if (userIconBtn) {
                         userIconBtn.style.display = 'flex';
@@ -2223,12 +2235,12 @@ window.toggleMobileMenu = function () {
                     // User is logged out
                     if (navAuthBtn) {
                         navAuthBtn.textContent = 'Log In / Sign Up';
-                        navAuthBtn.href = window.SoulFirebase.rootPath + 'portal/login.html';
+                        navAuthBtn.href = getRootPath() + 'portal/login.html';
                         navAuthBtn.classList.remove('nav-btn-active');
                     }
                     if (mobileProfileBtn) {
                         mobileProfileBtn.textContent = 'Log In';
-                        mobileProfileBtn.href = window.SoulFirebase.rootPath + 'portal/login.html';
+                        mobileProfileBtn.href = getRootPath() + 'portal/login.html';
                     }
                     if (userIconBtn) {
                         userIconBtn.style.display = 'none';
@@ -2246,5 +2258,272 @@ window.toggleMobileMenu = function () {
     } else {
         initAuthSync();
     }
+})();
+
+// --- B2B LEAD CAPTURE MODAL (Partner With Us) ---
+(function() {
+    // 1. Inject Styles
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .partner-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(15px);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+        .partner-modal-card {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            padding: 35px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        .partner-modal-overlay.active {
+            opacity: 1;
+        }
+        .partner-modal-overlay.active .partner-modal-card {
+            transform: scale(1);
+        }
+        .partner-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .partner-modal-close:hover {
+            color: #f1f5f9;
+        }
+        .partner-form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .partner-form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        .partner-form-input, .partner-form-select {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #f1f5f9;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .partner-form-input:focus, .partner-form-select:focus {
+            border-color: #4ECDC4;
+        }
+        .partner-submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4ECDC4, #2a9d8f);
+            color: #0f172a;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .partner-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.3);
+        }
+        .partner-submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 2. Build HTML
+    function createModal() {
+        const modalId = 'soulamore-partner-modal';
+        if (document.getElementById(modalId)) return;
+
+        const overlay = document.createElement('div');
+        overlay.id = modalId;
+        overlay.className = 'partner-modal-overlay';
+        overlay.innerHTML = `
+            <div class="partner-modal-card">
+                <button class="partner-modal-close" id="partner-modal-close-btn">&times;</button>
+                <div style="font-size: 2.5rem; color: #4ECDC4; text-align: center; margin-bottom: 15px;">
+                    <i class="fas fa-school"></i>
+                </div>
+                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; text-align: center; margin-bottom: 8px; color: #fff;">Partner with Soulamore</h3>
+                <p style="font-size: 0.9rem; opacity: 0.8; text-align: center; margin-bottom: 25px; line-height: 1.5; color: #94a3b8;">
+                    Help us build a resilient campus. Fill out the details below to receive the Soulamore Campus SC 2025 Compliance Pitch Deck.
+                </p>
+                <form id="partner-lead-form">
+                    <div class="partner-form-group">
+                        <label class="partner-form-label">School / Institution Name</label>
+                        <input type="text" id="partner-school" class="partner-form-input" placeholder="e.g. Stanford University" required>
+                    </div>
+                    <div class="partner-form-group">
+                        <label class="partner-form-label">Contact Person Name</label>
+                        <input type="text" id="partner-name" class="partner-form-input" placeholder="e.g. Dr. Jane Doe" required>
+                    </div>
+                    <div class="partner-form-group">
+                        <label class="partner-form-label">Work Email Address</label>
+                        <input type="email" id="partner-email" class="partner-form-input" placeholder="e.g. jdoe@stanford.edu" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="partner-form-group">
+                            <label class="partner-form-label">Your Role</label>
+                            <select id="partner-role" class="partner-form-select" required>
+                                <option value="Principal">Principal</option>
+                                <option value="Administrator">Administrator</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Student Rep">Student Rep</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="partner-form-group">
+                            <label class="partner-form-label">Estimated Student Count</label>
+                            <input type="number" id="partner-capacity" class="partner-form-input" placeholder="e.g. 500" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="partner-submit-btn" id="partner-submit-btn">Request Pitch Deck</button>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        // Bind events
+        document.getElementById('partner-modal-close-btn').addEventListener('click', closeModal);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeModal();
+        });
+
+        document.getElementById('partner-lead-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('partner-submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            const data = {
+                schoolName: document.getElementById('partner-school').value,
+                contactName: document.getElementById('partner-name').value,
+                email: document.getElementById('partner-email').value,
+                role: document.getElementById('partner-role').value,
+                capacity: document.getElementById('partner-capacity').value
+            };
+
+            try {
+                if (window.SoulBackend && window.SoulBackend.submitLead) {
+                    const success = await window.SoulBackend.submitLead(data);
+                    if (success) {
+                        showSuccessState();
+                    } else {
+                        alert("Something went wrong. Please try again.");
+                        btn.disabled = false;
+                        btn.innerHTML = 'Request Pitch Deck';
+                    }
+                } else {
+                    const rootPath = window.location.pathname.includes('/spaces/') || window.location.pathname.includes('/portal/') ? '../' : './';
+                    const { handleLead } = await import(rootPath + 'assets/js/data-handler.js');
+                    const success = await handleLead(data);
+                    if (success) {
+                        showSuccessState();
+                    } else {
+                        alert("Submission failed. Please check network.");
+                        btn.disabled = false;
+                        btn.innerHTML = 'Request Pitch Deck';
+                    }
+                }
+            } catch (err) {
+                console.error("Lead submission error:", err);
+                alert("Lead capture error: " + err.message);
+                btn.disabled = false;
+                btn.innerHTML = 'Request Pitch Deck';
+            }
+        });
+    }
+
+    function showSuccessState() {
+        const card = document.querySelector('.partner-modal-card');
+        card.innerHTML = `
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="font-size: 3.5rem; color: #4ECDC4; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; margin-bottom: 12px; color: #fff;">Thank You!</h3>
+                <p style="font-size: 0.95rem; opacity: 0.85; line-height: 1.6; margin-bottom: 25px; color: #94a3b8;">
+                    We have successfully captured your campus information. 
+                    A Soulamore representative will send the <strong>Campus SC 2025 Compliance Pitch Deck</strong> to your work email shortly.
+                </p>
+                <button class="partner-submit-btn" id="partner-modal-close-success-btn">Close Window</button>
+            </div>
+        `;
+        document.getElementById('partner-modal-close-success-btn').addEventListener('click', () => {
+            document.getElementById('soulamore-partner-modal').remove();
+        });
+    }
+
+    function openModal(e) {
+        if (e) e.preventDefault();
+        createModal();
+        const modal = document.getElementById('soulamore-partner-modal');
+        modal.style.display = 'flex';
+        modal.offsetHeight; // Force reflow
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('soulamore-partner-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.remove(); // Clean up from DOM when closed
+            }, 300);
+        }
+    }
+
+    window.openPartnerModal = openModal;
+
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('a, button');
+        if (!target) return;
+
+        const isPartnerBtn = target.classList.contains('partner-btn');
+        const href = target.getAttribute('href') || '';
+        const isPartnerMailto = href.includes('mailto:contact@soulamore.com') || href.includes('mailto:support@soulamore.in');
+
+        if (isPartnerBtn || isPartnerMailto) {
+            openModal(e);
+        }
+    });
 })();
 

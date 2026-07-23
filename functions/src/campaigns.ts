@@ -20,11 +20,38 @@ export async function handleCampaignTrigger(data: any, auth: any) {
     const { targetGroup, templateData, campaignData, isTest, customEmails, testEmail } = data;
     
     const finalSubject = templateData?.title || campaignData?.title || data.subject;
-    const finalBody = templateData?.content || campaignData?.content || data.body;
+    const rawBody = templateData?.content || campaignData?.content || data.body;
     const finalIsTest = isTest || testEmail;
 
-    if (!finalSubject || !finalBody) {
+    if (!finalSubject || !rawBody) {
         throw new Error('Missing subject/title or body/content.');
+    }
+
+    // Build rich HTML body matching the admin live preview
+    let finalBody = rawBody
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+    const imageUrl = templateData?.imageUrl || campaignData?.imageUrl || data.imageUrl;
+    if (imageUrl) {
+        finalBody += `
+          <div style="margin: 20px 0; border-radius: 12px; overflow: hidden; max-height: 200px; border: 1px solid #e2e8f0;">
+            <img src="${imageUrl}" style="width: 100%; height: auto; display: block; object-fit: cover;" alt="Campaign Hero" />
+          </div>
+        `;
+    }
+
+    const ctaText = templateData?.ctaText || campaignData?.ctaText || data.ctaText;
+    const ctaLink = templateData?.ctaLink || campaignData?.ctaLink || data.ctaLink;
+    if (ctaText && ctaLink) {
+        finalBody += `
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="${ctaLink}" target="_blank" style="display: inline-block; padding: 10px 24px; background: #2dd4bf; color: #ffffff; text-decoration: none; border-radius: 50px; font-weight: 700; font-family: sans-serif; font-size: 0.85rem; box-shadow: 0 6px 12px rgba(45, 212, 191, 0.15); transition: 0.2s;">
+              ${ctaText}
+            </a>
+          </div>
+        `;
     }
 
     // 2. Resolve Recipients
@@ -111,7 +138,34 @@ export async function handleCampaignPreview(data: any, auth: any) {
 
     const { subject, body, campaignData, templateData } = data;
     const finalSubject = subject || templateData?.title || campaignData?.title || "Preview Subject";
-    const finalBody = body || templateData?.content || campaignData?.content || "Preview Content";
+    const rawBody = body || templateData?.content || campaignData?.content || "Preview Content";
+
+    // Build rich HTML body matching the admin live preview
+    let finalBody = rawBody
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+    const imageUrl = templateData?.imageUrl || campaignData?.imageUrl || data.imageUrl;
+    if (imageUrl) {
+        finalBody += `
+          <div style="margin: 20px 0; border-radius: 12px; overflow: hidden; max-height: 200px; border: 1px solid #e2e8f0;">
+            <img src="${imageUrl}" style="width: 100%; height: auto; display: block; object-fit: cover;" alt="Campaign Hero" />
+          </div>
+        `;
+    }
+
+    const ctaText = templateData?.ctaText || campaignData?.ctaText || data.ctaText;
+    const ctaLink = templateData?.ctaLink || campaignData?.ctaLink || data.ctaLink;
+    if (ctaText && ctaLink) {
+        finalBody += `
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="${ctaLink}" target="_blank" style="display: inline-block; padding: 10px 24px; background: #2dd4bf; color: #ffffff; text-decoration: none; border-radius: 50px; font-weight: 700; font-family: sans-serif; font-size: 0.85rem; box-shadow: 0 6px 12px rgba(45, 212, 191, 0.15); transition: 0.2s;">
+              ${ctaText}
+            </a>
+          </div>
+        `;
+    }
 
     const html = compileTemplate({ email: auth.email || 'preview@soulamore.com', name: 'Alex Designer' }, finalSubject, finalBody, 'broadcast');
 

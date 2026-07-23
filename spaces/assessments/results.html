@@ -175,7 +175,7 @@
 
         .metric-box h4 {
             font-size: 0.85rem;
-            color: #94a3b8;
+            color: #e2e8f0;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 5px;
@@ -491,7 +491,7 @@
         }
 
         .share-btn {
-            padding: 12px 24px;
+            padding: 14px 24px;
             border-radius: 50px;
             border: 1px solid var(--border-glass);
             background: rgba(255, 255, 255, 0.03);
@@ -633,6 +633,9 @@
                             <button onclick="shareResults('copy')" class="share-btn">
                                 <i class="fas fa-link"></i> Copy Link
                             </button>
+                            <button onclick="downloadPDFReport()" class="share-btn" style="background: var(--engine-theme); color: #0f172a; border-color: var(--engine-theme); font-weight: 600;">
+                                <i class="fas fa-file-pdf"></i> Download PDF
+                            </button>
                         </div>
                     </div>
 
@@ -672,7 +675,8 @@
 
 <!-- REQUIRED SDKS & DATA -->
 <script type="module" src="../../assets/js/firebase-config.js"></script>
-<script src="../../assets/js/components.js"></script>
+<script src="../../assets/js/components.js?v=3.6"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script type="module">
     import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
@@ -1169,6 +1173,196 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
                     alert('Link copied to clipboard!');
                 });
             }
+        };
+
+        // --- PDF GENERATION FUNCTION ---
+        window.downloadPDFReport = function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'p',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const pageHeight = doc.internal.pageSize.height;
+            const pageWidth = doc.internal.pageSize.width;
+            const margin = 20;
+            let y = 30;
+
+            // Helper to add header on every page
+            function addHeader() {
+                doc.setFillColor(15, 23, 42); // Navy/Slate background for header
+                doc.rect(0, 0, pageWidth, 20, 'F');
+                doc.setFont("Helvetica", "bold");
+                doc.setFontSize(14);
+                doc.setTextColor(78, 205, 196); // Teal glow color
+                doc.text("SOULAMORE", margin, 13);
+                doc.setFont("Helvetica", "normal");
+                doc.setFontSize(9);
+                doc.setTextColor(255, 255, 255);
+                doc.text("Clinical Self-Assessment Blueprint", pageWidth - margin - 50, 13);
+            }
+
+            // Helper to add footer on every page
+            function addFooter(pageNum) {
+                doc.setFont("Helvetica", "normal");
+                doc.setFontSize(7.5);
+                doc.setTextColor(148, 163, 184); // Muted gray
+                
+                const disclaimer = "Disclaimer: This assessment is a tool for self-reflection and screening, not a clinical diagnosis. It does not replace professional therapy or psychiatric intervention. For support, reach out to care@soulamore.com.";
+                const splitDisclaimer = doc.splitTextToSize(disclaimer, pageWidth - 2 * margin);
+                
+                let footerY = pageHeight - 18;
+                splitDisclaimer.forEach(line => {
+                    doc.text(line, margin, footerY);
+                    footerY += 3.5;
+                });
+
+                doc.text(`Page ${pageNum}`, pageWidth - margin - 10, pageHeight - 8);
+            }
+
+            // Initialize Page 1
+            addHeader();
+            addFooter(1);
+            let currentPage = 1;
+
+            // Title Section
+            y = 35;
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(22);
+            doc.setTextColor(15, 23, 42);
+            doc.text("Assessment Reflection Blueprint", margin, y);
+            y += 10;
+
+            // Meta Details Card
+            doc.setFillColor(248, 250, 252); // Light gray background
+            doc.setDrawColor(226, 232, 240); // Slate border
+            doc.rect(margin, y, pageWidth - 2 * margin, 35, 'FD');
+
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(10);
+            doc.setTextColor(71, 85, 105);
+
+            const userName = data.user_identity && data.user_identity.name ? data.user_identity.name : "Anonymous Friend";
+            const userEmail = data.user_identity && data.user_identity.email ? data.user_identity.email : "Not Provided";
+            const domainName = data.domain ? data.domain.replace(/_/g, ' ').toUpperCase() : "MENTAL WELLNESS";
+
+            doc.text("USER IDENTIFICATION:", margin + 5, y + 8);
+            doc.setFont("Helvetica", "normal");
+            doc.setTextColor(15, 23, 42);
+            doc.text(`${userName} (${userEmail})`, margin + 5, y + 13);
+
+            doc.setFont("Helvetica", "bold");
+            doc.setTextColor(71, 85, 105);
+            doc.text("ASSESSMENT DOMAIN:", margin + 5, y + 22);
+            doc.setFont("Helvetica", "normal");
+            doc.setTextColor(15, 23, 42);
+            doc.text(domainName, margin + 5, y + 27);
+
+            // Right Column in the card for Scores
+            const scoreX = pageWidth - margin - 60;
+            doc.setFont("Helvetica", "bold");
+            doc.setTextColor(71, 85, 105);
+            doc.text("RAW SCORE:", scoreX, y + 8);
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(78, 205, 196); // Teal for score
+            doc.text(`${metrics.raw_score} / ${metrics.max_possible}`, scoreX, y + 14);
+
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(10);
+            doc.setTextColor(71, 85, 105);
+            doc.text("SEVERITY CLASSIFICATION:", scoreX, y + 22);
+            doc.setFont("Helvetica", "bold");
+            
+            let bandColor = [16, 185, 129]; // green
+            if (metrics.severity_band === 'severe') bandColor = [239, 68, 68]; // red
+            else if (metrics.severity_band === 'moderate') bandColor = [245, 158, 11]; // orange
+            doc.setTextColor(bandColor[0], bandColor[1], bandColor[2]);
+            doc.text(metrics.severity_band.toUpperCase(), scoreX, y + 27);
+
+            y += 45;
+
+            // Helper for page break checks
+            function checkPageBreak(neededHeight) {
+                if (y + neededHeight > pageHeight - 25) {
+                    doc.addPage();
+                    currentPage += 1;
+                    addHeader();
+                    addFooter(currentPage);
+                    y = 30; // reset y on new page
+                }
+            }
+
+            // AI Reflection Text Section
+            checkPageBreak(15);
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(15, 23, 42);
+            doc.text("Clinical AI Reflection & Guidance", margin, y);
+            y += 7;
+
+            // Get plain text of reflection
+            const reflectionEl = document.getElementById('reflectionContent');
+            const reflectionText = reflectionEl ? reflectionEl.innerText : "";
+            
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(51, 65, 85);
+            
+            // Split text into wrapped lines
+            const splitText = doc.splitTextToSize(reflectionText, pageWidth - 2 * margin);
+            const lineHeight = 5.5;
+
+            splitText.forEach(line => {
+                checkPageBreak(lineHeight);
+                doc.text(line, margin, y);
+                y += lineHeight;
+            });
+
+            y += 10;
+
+            // Citations / Literature Section
+            checkPageBreak(25);
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(15, 23, 42);
+            doc.text("Clinical Literature References", margin, y);
+            y += 6;
+
+            let citationsContext = [];
+            if (window.SoulamoreCitations && data.assessment_id) {
+                const citationsData = window.SoulamoreCitations;
+                const assessmentMetaVal = citationsData[data.assessment_id];
+                if (assessmentMetaVal && assessmentMetaVal.citations) {
+                    citationsContext = assessmentMetaVal.citations;
+                }
+            }
+
+            if (citationsContext.length > 0) {
+                doc.setFont("Helvetica", "normal");
+                doc.setFontSize(8.5);
+                doc.setTextColor(71, 85, 105);
+                
+                citationsContext.forEach(cit => {
+                    const citLine = `${cit.name} - ${cit.description}`;
+                    const splitCit = doc.splitTextToSize(citLine, pageWidth - 2 * margin);
+                    
+                    checkPageBreak(splitCit.length * 4.5 + 4);
+                    splitCit.forEach(line => {
+                        doc.text(line, margin, y);
+                        y += 4.5;
+                    });
+                    y += 2; // spacing between citations
+                });
+            } else {
+                doc.setFont("Helvetica", "italic");
+                doc.setFontSize(9);
+                doc.text("General clinical and psychological screening guidelines.", margin, y);
+                y += 6;
+            }
+
+            doc.save(`Soulamore_Assessment_${domainName.toLowerCase()}_Report.pdf`);
         };
     });
 </script>
