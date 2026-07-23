@@ -19,8 +19,8 @@ import {
     createBookingRequest,
     PEER_PLAN_TYPES,
     DEFAULT_PLANS
-} from "./peer-booking-handler.js";
-import { openRazorpayCheckout } from "./payment-handler.js?v=3.6";
+} from "./peer-booking-handler.js?v=20260723-4";
+import { openRazorpayCheckout } from "./payment-handler.js?v=20260723-5";
 
 /**
  * Initialize a booking widget inside a given root element.
@@ -383,7 +383,6 @@ export function initBookingWidget(config) {
 
             const planKey = planSelect ? planSelect.value : PEER_PLAN_TYPES.PER_SESSION;
             const plan = DEFAULT_PLANS[planKey] || DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION];
-
             try {
                 submitBtn.disabled = true;
                 submitBtn.textContent = "Opening payment...";
@@ -404,7 +403,6 @@ export function initBookingWidget(config) {
                     finalName,
                     finalEmail
                 );
-
 
                 await openRazorpayCheckout(
                     booking.bookingId,
