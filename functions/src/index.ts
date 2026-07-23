@@ -35,6 +35,7 @@ export * from './emailService';
 export * from './googleAuth';
 export * from './apiRouter';
 export * from './privacyRights';
+export * from './razorpayPayments';
 
 // Health check function
 export const healthCheckV2 = onCall({ cors: true }, () => {

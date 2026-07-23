@@ -1,138 +1,285 @@
-# Soulamore Collaborative Testing Playbook & Rules
+# Soulamore Testing and QA Playbook
 
-Welcome to the **Soulamore Testing & QA Workspace**. This directory is structured to support a 4-person testing and development team collaborating asynchronously via a shared **Google Drive** folder linked to local PCs. 
+This directory is the shared workspace for reporting, assigning, fixing,
+testing, and closing Soulamore defects. The folders act as a Kanban board:
+each issue has one Markdown ticket, and its folder represents its current state.
 
-This playbook defines our workflows, file-handling rules, and collision-prevention procedures to ensure efficient tracking and accurate delivery.
+## Source of truth
 
----
+- Code and configuration are managed through Git.
+- Testing tickets and attachments are stored in this shared directory.
+- A ticket must exist in exactly one workflow folder at a time.
+- The ticket file is the permanent audit record for that issue.
+- A browser success message alone is not verification. Check stored data,
+  visible UI, logs, notifications, and external delivery where applicable.
 
-## 🏗️ Folder Structure (Filesystem Kanban Board)
+## Folder structure
 
-To prevent file-syncing conflicts on Google Drive, we use a **Filesystem Kanban Board**. Instead of editing a single database or file, each bug is tracked in its own `.md` file, which is moved through folders to update its status.
-
-```plaintext
+```text
 reports/testing/
-├── README.md                          # This Playbook & Rulebook
-├── templates/
-│   ├── BUG_TEMPLATE.md                # Template for reporting bugs
-│   └── VERIFICATION_TEMPLATE.md       # Template for new feature test suites
-├── 01-inbox/                          # Raw files, shared docx, and screenshots
-├── 02-backlog/                        # Standardized bug reports (unassigned)
-├── 03-in-progress/                    # Active developer fixes / investigation
-│   ├── ADITYA/
-│   ├── ABHISHEK/
-│   ├── ARYAN/
-│   └── YASHMEET/
-├── 04-testing-verification/           # Resolved issues awaiting verification
-│   ├── ADITYA/
-│   ├── ABHISHEK/
-│   ├── ARYAN/
-│   └── YASHMEET/
-└── 05-done/                           # Fully verified and closed tickets
+|-- README.md
+|-- templates/
+|   |-- BUG_TEMPLATE.md
+|   `-- VERIFICATION_TEMPLATE.md
+|-- 01-inbox/
+|-- 02-backlog/
+|-- 03-in-progress/
+|   |-- ADITYA/
+|   |-- ABHISHEK/
+|   |-- ARYAN/
+|   `-- YASHMEET/
+|-- 04-testing-verification/
+|   |-- ADITYA/
+|   |-- ABHISHEK/
+|   |-- ARYAN/
+|   `-- YASHMEET/
+`-- 05-done/
 ```
 
----
+| Folder | Meaning |
+|---|---|
+| `01-inbox` | Raw screenshots, recordings, logs, documents, and unprocessed reports |
+| `02-backlog` | Standardized, numbered, unassigned tickets |
+| `03-in-progress/NAME` | Tickets actively investigated or fixed by that developer |
+| `04-testing-verification/NAME` | Resolved tickets assigned to that tester |
+| `05-done` | Independently verified and closed tickets |
+| `templates` | Canonical bug and test-suite templates |
 
-## 🔄 Bug Lifecycle & Workflow Rules
+## Ticket naming and unique IDs
 
-### Phase 1: Triage & Logging (`01-inbox` ➔ `02-backlog`)
-1. **Raw Sharing:** Drop any raw `.docx` reports, raw logs, or raw screenshots into `01-inbox/`.
-2. **Standardization:** Convert the raw reports into a standardized Markdown bug file.
-   - Open [BUG_TEMPLATE.md](file:///c:/Users/adity/Desktop/Projects/Soulamore-Website/reports/testing/templates/BUG_TEMPLATE.md).
-   - Copy its content and create a new file under `02-backlog/`.
-   - **Nomenclature:** Name the file `BUG-[ID]_[Summary].md` (e.g., `BUG-001_dashboard_modal_consent.md`). Use 3 digits for IDs.
-   - Fill in the metadata, steps to reproduce, actual/expected behaviors, and path to screenshots.
+Use:
 
-### Phase 2: Assignment (`02-backlog` ➔ `03-in-progress/[Assignee]`)
-1. When a developer starts working on a bug:
-   - Move the bug markdown file from `02-backlog/` to their assignee subfolder in `03-in-progress/` (e.g., `03-in-progress/ADITYA/`).
-   - Edit the file and update the **Assignee** header field to your name.
-   - Change the Status field to `🔄 IN_PROGRESS`.
-2. **AI Automation Trigger:** Alternatively, if a developer/collaborator informs the AI agent: *"I wanna solve this bug"*, the agent will automatically move the ticket to their respective folder in `03-in-progress/`, assign it, and update the status to `🔄 IN_PROGRESS`.
+```text
+BUG-NNN_short_descriptive_summary.md
+```
 
-### Phase 3: Resolution & QA Handover (`03-in-progress/[Assignee]` ➔ `04-testing-verification/[Tester]`)
-1. Once the bug is fixed in the code:
-   - **Resolution Logging (Mandatory):** Edit the bug file to fully document the solution details under **Resolution Notes** (specifically detailed Root Cause, Fix Implemented, and the exact list of Files Modified). This forms our permanent troubleshooting audit log.
-   - Change the Status field to `⏳ PENDING_VERIFICATION`.
-   - Update the **Developer Verification** section (Verified By, Date, Result: `✅ PASS`).
-   - Move the file from your subfolder in `03-in-progress/` to the target tester's subfolder in `04-testing-verification/` (e.g., `04-testing-verification/ABHISHEK/` if Abhishek is the one verifying it).
+Example:
 
-### Phase 4: Final Sign-off (`04-testing-verification/[Tester]` ➔ `05-done`)
-1. The tester opens their subfolder in `04-testing-verification/`, pulls the latest changes, runs the code, and executes the reproduce steps.
-2. Edit the file to fill in the **Independent Tester Verification** section (Verified By, Date, Result).
-3. If verification passes:
-   - Change the Status field to `✅ DONE`.
-   - Move the file from their verification subfolder to `05-done/`.
-4. If verification fails:
-   - Add details to the Verification Log.
-   - Move the file back to the developer's subfolder in `03-in-progress/` (e.g., `03-in-progress/ADITYA/`) and notify them.
+```text
+BUG-027_peer_booking_not_visible.md
+```
 
----
+Use lowercase words separated by underscores. Do not put spaces, personal names,
+or status names in the filename.
 
-## ⚡ Google Drive & Git Sync Safety Protocols
+Before creating a ticket:
 
-Since the folder is synced on Google Drive and tracked in Git, follow these rules to avoid **Conflicted Copies** or **Merge Conflicts**:
+1. Search for `BUG-*.md` across every testing workflow folder.
+2. Find the highest three-digit ID.
+3. Use the next number.
+4. Immediately create the ticket in `02-backlog` to reserve the ID.
+5. Never reuse an ID, even for deleted, rejected, or duplicate reports.
 
-1. **Move, Don't Merge:** Moving files between directories is an atomic filesystem operation. It updates the status of a ticket instantly on Google Drive without editing the file body, reducing conflicts.
-2. **Single-Editor Rule:** Do not open and edit a bug ticket markdown file that has another person listed as the assignee, unless you are the tester writing a verification log.
-3. **Commit often:** When you move a file, commit the change immediately in Git. Use a clear commit message format:
-   ```text
-   docs(testing): move BUG-001 to in-progress (assigned to [Name])
-   docs(testing): move BUG-001 to verification (resolved)
-   docs(testing): move BUG-001 to done (verified by [Name])
-   ```
-4. **Git vs Drive:** 
-   - Code changes and project configuration files are managed in Git.
-   - Active testing folders and attachments can be synced via Google Drive for team members who don't run Git, but standard developers should pull/push via Git to keep them in sync.
+If two people choose the same ID, the person whose ticket has not yet synced or
+been committed must take the next ID and rename its evidence references.
 
----
+PowerShell inventory:
 
-## 📂 Active Test Suites Nomenclature
-For running full feature suites rather than individual bug reports (such as [TEST_Soulamore_Features_Suite.md](file:///c:/Users/adity/Desktop/Projects/Soulamore-Website/reports/testing/TEST_Soulamore_Features_Suite.md)):
-- Name them: `TEST_[Feature-Name]_[Date].md`
-- Make sure all testers update their respective status columns inside the use case tables.
+```powershell
+Get-ChildItem reports/testing -Recurse -File -Filter "BUG-*.md" |
+    Sort-Object Name |
+    Select-Object Name, FullName
+```
 
----
+## Bug lifecycle
 
-## 🔗 How Other Team Members (e.g., Aryan) Link Their Folders
+### 1. Capture and triage
 
-If Aryan (or anyone else) wants to link the shared Google Drive `03 - Reports` folder into his local codebase so that changes sync in real-time, he should follow these steps:
+```text
+01-inbox -> 02-backlog
+```
 
-### Step 1: Identify the two paths on his PC
-1. **Google Drive Sync Path:** The path where Google Drive syncs the shared folder on his PC (e.g., `G:\My Drive\Soulamore\01 - Website\03 - Reports`).
-2. **Local Codebase Path:** The path to the `Soulamore-Website` directory on his PC (e.g., `C:\Users\Aryan\Desktop\Soulamore-Website`).
+1. Put raw evidence in `01-inbox`.
+2. Search for an existing ticket for the same defect.
+3. Reproduce the issue when safe.
+4. Reserve the next unique ID.
+5. Copy [BUG_TEMPLATE.md](templates/BUG_TEMPLATE.md) into `02-backlog`.
+6. Rename it using the ticket naming rule.
+7. Complete the metadata, environment, reproduction steps, expected result,
+   actual result, impact, and evidence.
+8. Set `Status` to `BACKLOG`.
 
-### Step 2: Clear the local reports directory name
-To prevent link conflicts, Aryan must rename or delete the existing `reports` directory in his local codebase:
-- Rename `reports` to `reports_backup` in his codebase folder.
+Never include passwords, secret keys, tokens, cookies, private health data, or
+unredacted personal information.
 
-### Step 3: Run the linking command
+### 2. Assignment and investigation
 
-#### On Windows (Command Prompt - CMD):
-Open Command Prompt and run the following command (replace with his actual paths):
+```text
+02-backlog -> 03-in-progress/ASSIGNEE
+```
+
+When accepting a ticket:
+
+1. Synchronize the latest state.
+2. Confirm nobody else has assigned it.
+3. Move it into the developer's named folder.
+4. Set `Assignee` to that developer.
+5. Set `Status` to `IN_PROGRESS`.
+6. Add the assignment to the Activity Log.
+7. Commit or synchronize the move promptly.
+
+An AI agent may do this only when explicitly asked to take ownership of an exact
+ticket and when the assignee is known.
+
+### 3. Resolution and QA handoff
+
+```text
+03-in-progress/DEVELOPER -> 04-testing-verification/TESTER
+```
+
+Before handoff, the developer must:
+
+1. Record the proven root cause.
+2. Explain the implemented fix.
+3. List every relevant modified file.
+4. Record tests and commands executed.
+5. Document remaining risks or untested cases.
+6. Complete Developer Verification.
+7. Set `Status` to `PENDING_VERIFICATION`.
+8. Assign a tester other than the developer whenever possible.
+9. Move the ticket into that tester's verification folder.
+
+Compilation alone is not sufficient verification for a user-facing defect.
+
+### 4. Independent verification
+
+On pass:
+
+```text
+04-testing-verification/TESTER -> 05-done
+```
+
+On failure:
+
+```text
+04-testing-verification/TESTER -> 03-in-progress/DEVELOPER
+```
+
+The tester synchronizes the fixed version, repeats the original reproduction
+steps, checks every acceptance criterion, runs relevant regressions, and records
+the tested build or URL plus evidence.
+
+On pass, set `Status` to `DONE` and move the ticket to `05-done`.
+
+On failure, set `Status` to `IN_PROGRESS`, record the failure in the Verification
+Log, move the same ticket back to its developer, and notify them. Do not create a
+new ticket for the same unresolved defect.
+
+## Severity and priority
+
+| Severity | Definition |
+|---|---|
+| `CRITICAL` | Security, privacy, payment, data loss, crisis safety, or complete core-workflow failure |
+| `HIGH` | Major feature failure without a practical workaround |
+| `MEDIUM` | Partial feature failure or a reasonable workaround exists |
+| `LOW` | Minor visual, wording, or low-impact behavior issue |
+
+| Priority | Definition |
+|---|---|
+| `P0` | Stop other work and respond immediately |
+| `P1` | Address in the current work cycle |
+| `P2` | Schedule normally |
+| `P3` | Address when capacity permits |
+
+Severity measures impact; priority measures scheduling. State the concrete impact
+instead of choosing `CRITICAL` merely because an issue is inconvenient.
+
+## Evidence and portable links
+
+Prefer a ticket-specific folder:
+
+```text
+01-inbox/BUG-NNN/
+```
+
+Use descriptive attachment names:
+
+```text
+01-page-before.png
+02-browser-console-error.png
+03-network-response.json
+```
+
+Use relative Markdown links:
+
+```markdown
+[Console error](../01-inbox/BUG-027/02-browser-console-error.png)
+```
+
+Never use `file:///`, a drive letter, or a person's home-directory path in a
+shared report. Redact secrets and personal data from all evidence.
+
+## Git and Google Drive safety
+
+Google Drive and Git can both change the same files. Moving tickets reduces
+conflicts but does not eliminate them.
+
+1. Synchronize before editing or moving.
+2. Only one person edits a ticket at a time.
+3. Do not edit another person's assigned ticket except as its tester or with
+   explicit coordination.
+4. Close editors before moving a ticket.
+5. Move the existing ticket; do not copy it.
+6. Confirm the old path disappeared and the new path exists.
+7. Commit related code and ticket changes promptly.
+8. Never silently delete a Drive conflicted copy. Compare both and preserve all
+   unique history.
+9. If Git and Drive disagree, stop editing, preserve both versions, coordinate
+   with the assignee, and reconcile them into one canonical ticket.
+
+Suggested commits:
+
+```text
+docs(testing): add BUG-027 peer booking visibility report
+docs(testing): assign BUG-027 to Aryan
+docs(testing): hand BUG-027 to Abhishek for verification
+docs(testing): close BUG-027 after independent verification
+```
+
+## Feature verification suites
+
+For a group of related test cases, use:
+
+```text
+TEST_feature_name_YYYY-MM-DD.md
+```
+
+Start from
+[VERIFICATION_TEMPLATE.md](templates/VERIFICATION_TEMPLATE.md).
+
+Each case must include prerequisites, steps, expected and actual results, tester,
+date, evidence, and status. Create a separate bug ticket for each discovered
+product defect.
+
+## Linking the shared reports directory
+
+Back up any existing local `reports` directory before linking the shared Drive
+folder. Verify both paths carefully.
+
+Windows Command Prompt:
+
 ```cmd
-mklink /J "C:\path\to\local\codebase\reports" "G:\path\to\GoogleDrive\03 - Reports"
+mklink /J "C:\path\to\Soulamore-Website\reports" "G:\path\to\GoogleDrive\03 - Reports"
 ```
 
-#### On macOS (Terminal):
-On newer macOS versions, Google Drive installs under the **File Provider** framework. The default path looks like this:
-`/Users/<username>/Library/CloudStorage/GoogleDrive-<email>/My Drive/.../03 - Reports`
+macOS:
 
-Aryan (or the Mac user) can run:
 ```bash
-ln -s "/Users/Aryan/Library/CloudStorage/GoogleDrive-aryan@email.com/My Drive/Projects/Soulamore/01 - Website/03 - Reports" "/Users/Aryan/Desktop/Soulamore-Website/reports"
+ln -s "/Users/NAME/Library/CloudStorage/GoogleDrive-ACCOUNT/My Drive/path/03 - Reports" "/Users/NAME/path/Soulamore-Website/reports"
 ```
 
-> [!TIP]
-> **Easiest way to get the paths on Mac without typing:**
-> 1. Open Terminal.
-> 2. Type `ln -s ` (make sure there is a space after `s`).
-> 3. Drag and drop the Google Drive `03 - Reports` folder from Finder directly into the Terminal window. (This automatically pastes the exact path).
-> 4. Press Space.
-> 5. Drag and drop the local `Soulamore-Website` folder into Terminal, and type `/reports` at the end of it.
-> 6. Press **Enter**.
+After linking, open this README locally and verify an agreed harmless temporary
+file synchronizes. Keep the backup until unique content has been reconciled.
 
-### Step 4: Verification
-The user opens their local codebase folder. They will see the `reports` folder present, and any changes they or anyone else makes will automatically sync to everyone!
-Once verified, they can safely delete `reports_backup`.
+## New-report checklist
 
+- [ ] Search for duplicates.
+- [ ] Reproduce safely.
+- [ ] Reserve the next ID across all workflow folders.
+- [ ] Copy the bug template into `02-backlog`.
+- [ ] Use a portable filename and relative evidence links.
+- [ ] Record environment, exact steps, expected result, and actual result.
+- [ ] Explain concrete impact.
+- [ ] Remove secrets and sensitive personal data.
+- [ ] Set status to `BACKLOG`.
+- [ ] Synchronize and commit promptly.

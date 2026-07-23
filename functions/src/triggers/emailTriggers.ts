@@ -77,17 +77,43 @@ export const onBookingUpdated = functions.firestore
                     meet_link: newData.meetLink || 'https://soulamore.com/portal/'
                 });
 
-                // Send to User
-                await sendEmail({ email: newData.userEmail || userData.email }, subject, html);
+                const userEmail = newData.userEmail || userData.email;
+                let userStatus = 'skipped_missing_email';
+                let peerStatus = 'skipped_missing_email';
+                const deliveryErrors: string[] = [];
 
-                // CC or separate alert to Peer
-                if (peerData.email) {
-                    await sendEmail(
-                        { email: peerData.email, name: peerData.name }, 
-                        `New Booking Confirmed: ${newData.slId}`, 
-                        `<p>Hello ${peerData.name}, you have a new confirmed booking (${newData.slId}) for ${formattedDate}. Link: ${newData.meetLink}</p>`
-                    );
+                if (userEmail) {
+                    try {
+                        await sendEmail({ email: userEmail }, subject, html);
+                        userStatus = 'sent';
+                    } catch (error) {
+                        userStatus = 'failed';
+                        deliveryErrors.push(`user: ${error instanceof Error ? error.message : 'unknown error'}`);
+                    }
                 }
+
+                if (peerData.email) {
+                    try {
+                        await sendEmail(
+                            { email: peerData.email, name: peerData.name },
+                            `New Booking Confirmed: ${newData.slId}`,
+                            `<p>Hello ${peerData.name}, you have a new confirmed booking (${newData.slId}) for ${formattedDate}. Link: ${newData.meetLink}</p>`
+                        );
+                        peerStatus = 'sent';
+                    } catch (error) {
+                        peerStatus = 'failed';
+                        deliveryErrors.push(`peer: ${error instanceof Error ? error.message : 'unknown error'}`);
+                    }
+                }
+
+                await change.after.ref.update({
+                    emailDelivery: {
+                        user: userStatus,
+                        peer: peerStatus,
+                        attemptedAt: admin.firestore.FieldValue.serverTimestamp(),
+                        errors: deliveryErrors
+                    }
+                });
 
                 return true;
             } catch (err) {
