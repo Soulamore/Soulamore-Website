@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soulamore Journal & Emotional Wellbeing Insights | Soulamore</title>
+    <meta name="description" content="Warm, down-to-earth mental health perspectives, grounding rituals, and empathetic guidance to support your emotional journey.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <style>
+        :root {
+            --bg-deep: #0b1120;
+            --bg-card: rgba(19, 27, 46, 0.7);
+            --border-soft: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --accent-teal: #2dd4bf;
+            --accent-amber: #fbbf24;
+            --accent-blue: #38bdf8;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .blog-header {
+            background: radial-gradient(circle at 50% 20%, rgba(45, 212, 191, 0.12), transparent 70%);
+            padding: 80px 24px 40px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .blog-header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin: 0 0 16px 0;
+            background: linear-gradient(135deg, #ffffff 30%, #2dd4bf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .blog-header p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 680px;
+            margin: 0 auto 30px;
+            font-weight: 400;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 100px;
+        }
+
+        /* Search & Filter Bar */
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .pillar-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pillar-pill {
+            padding: 8px 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-soft);
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .pillar-pill:hover, .pillar-pill.active {
+            background: rgba(45, 212, 191, 0.15);
+            color: var(--accent-teal);
+            border-color: rgba(45, 212, 191, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .search-box {
+            position: relative;
+            min-width: 260px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-soft);
+            border-radius: 20px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Articles Grid */
+        .article-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 30px;
+        }
+
+        .article-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(45, 212, 191, 0.3);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .article-pillar {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: var(--accent-teal);
+            background: rgba(45, 212, 191, 0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 14px;
+            align-self: flex-start;
+        }
+
+        .article-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            color: white;
+            line-height: 1.35;
+        }
+
+        .article-excerpt {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0 0 20px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 16px;
+            margin-top: auto;
+        }
+
+        .read-link {
+            color: var(--accent-teal);
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.2s ease;
+        }
+
+        .article-card:hover .read-link {
+            gap: 10px;
+        }
+
+        /* Crisis Banner */
+        .crisis-banner {
+            background: rgba(251, 191, 36, 0.06);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 60px;
+            text-align: center;
+        }
+
+        .crisis-banner h3 {
+            margin: 0 0 8px 0;
+            color: var(--accent-amber);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-teal);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="blog-header">
+        <a href="/" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Soulamore</a>
+        <h1>Soulamore Journal & Perspectives</h1>
+        <p>Warm, down-to-earth thoughts on emotional wellbeing, grounded coping practices, and navigating life with gentle self-compassion.</p>
+    </div>
+
+    <div class="container">
+        <!-- Filter & Search Controls -->
+        <div class="filter-section">
+            <div class="pillar-pills" id="pillar-filters">
+                <button class="pillar-pill active" onclick="filterArticles('all', this)">All Perspectives</button>
+                <button class="pillar-pill" onclick="filterArticles('understanding-feelings', this)">Understanding Feelings</button>
+                <button class="pillar-pill" onclick="filterArticles('everyday-coping', this)">Everyday Coping</button>
+                <button class="pillar-pill" onclick="filterArticles('relationships-connection', this)">Relationships & Connection</button>
+                <button class="pillar-pill" onclick="filterArticles('seeking-help', this)">Seeking Help</button>
+                <button class="pillar-pill" onclick="filterArticles('resilience-growth', this)">Resilience & Growth</button>
+            </div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="blog-search" placeholder="Search topics or keywords..." oninput="handleSearch()">
+            </div>
+        </div>
+
+        <!-- Article Grid Container -->
+        <div class="article-grid" id="articles-container">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 0; opacity: 0.6;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p style="margin-top: 12px;">Gathering articles...</p>
+            </div>
+        </div>
+
+        <!-- Crisis Helpline Footer Banner -->
+        <div class="crisis-banner">
+            <h3><i class="fas fa-heart-pulse"></i> In Need of Immediate Support?</h3>
+            <p style="margin: 0 0 12px 0; opacity: 0.8; font-size: 0.92rem;">
+                If you are going through distress or need urgent care, free confidential support lines are available 24/7.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; font-size: 0.88rem;">
+                <a href="https://telemanas.mohfw.gov.in/" target="_blank" style="color: var(--accent-amber); font-weight: 700; text-decoration: underline;">Tele-MANAS: 14416</a>
+                <a href="https://www.vandrevalafoundation.com/" target="_blank" style="color: var(--accent-amber); font-weight: 700; text-decoration: underline;">Vandrevala Foundation: +91 9999 666 555</a>
+                <a href="/resources/get-help" style="color: var(--accent-teal); font-weight: 700; text-decoration: underline;">Soulamore Emergency Directory</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let articlesData = [];
+
+        async function initBlog() {
+            try {
+                const res = await fetch('/assets/data/blog-posts.json?t=' + Date.now());
+                if (res.ok) {
+                    articlesData = await res.json();
+                }
+            } catch (err) {
+                console.warn('Could not load local blog-posts.json:', err);
+            }
+
+            renderArticles(articlesData);
+        }
+
+        function renderArticles(list) {
+            const container = document.getElementById('articles-container');
+            if (!container) return;
+
+            // Only show published articles for public readers (or pending if demo mode)
+            const visible = list.filter(a => a.status === 'published' || a.status === 'pending_review');
+
+            if (visible.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 0; color: rgba(255,255,255,0.6);">
+                        <i class="fas fa-feather-alt" style="font-size: 2rem; color: #2dd4bf; margin-bottom: 12px;"></i>
+                        <p style="font-size: 1.1rem; font-weight: 600; margin: 0;">New perspectives are on their way.</p>
+                        <p style="font-size: 0.88rem; opacity: 0.7;">Check back shortly as our editorial queue publishes new articles.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = visible.map(article => `
+                <article class="article-card">
+                    <div>
+                        <span class="article-pillar">${formatPillar(article.pillar)}</span>
+                        <h2 class="article-title">${article.title}</h2>
+                        <p class="article-excerpt">${article.metaDescription}</p>
+                    </div>
+                    <div class="article-meta">
+                        <span><i class="far fa-clock"></i> ${article.readTimeMinutes || 3} min read</span>
+                        <a href="/pages/blog-post.html?slug=${article.slug}" class="read-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function formatPillar(pillar) {
+            if (!pillar) return 'Wellbeing';
+            return pillar.replace(/-/g, ' ');
+        }
+
+        function filterArticles(pillar, btn) {
+            document.querySelectorAll('.pillar-pill').forEach(p => p.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            if (pillar === 'all') {
+                renderArticles(articlesData);
+            } else {
+                const filtered = articlesData.filter(a => a.pillar === pillar);
+                renderArticles(filtered);
+            }
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('blog-search').value.toLowerCase().trim();
+            if (!query) {
+                renderArticles(articlesData);
+                return;
+            }
+            const filtered = articlesData.filter(a => 
+                a.title.toLowerCase().includes(query) || 
+                a.metaDescription.toLowerCase().includes(query)
+            );
+            renderArticles(filtered);
+        }
+
+        window.addEventListener('DOMContentLoaded', initBlog);
+    </script>
+</body>
+</html>

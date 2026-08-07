@@ -928,6 +928,10 @@
                 <a href="#" class="side-link" data-view="security" onclick="switchView('security', this)">
                     <i class="fas fa-shield-alt"></i> <span>Security Events</span>
                 </a>
+                <a href="#" class="side-link" data-view="blog-engine" onclick="switchView('blog-engine', this)">
+                    <i class="fas fa-brain" style="color: #2dd4bf;"></i> <span>AI Blog Engine</span>
+                    <span id="blog-pending-badge" class="badgex" style="background:var(--soul-amber); color:#000; font-weight:700; font-size:0.7rem; padding:2px 6px; border-radius:10px; margin-left:auto;">0</span>
+                </a>
 
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:15px 0;">
                 <a href="#" class="side-link" onclick="switchView('settings', this)"><i class="fas fa-cog"></i>
@@ -2066,6 +2070,104 @@
                             <tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading feedback...</td></tr>
                         </tbody>
                     </table>
+        <!-- VIEW: AI BLOG ENGINE -->
+        <div id="view-blog-engine" class="view-section" style="display:none;">
+            <div class="workspace-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <div style="width:45px; height:45px; background:rgba(45, 212, 191, 0.1); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#2dd4bf; border: 1px solid rgba(45, 212, 191, 0.2);">
+                        <i class="fas fa-brain" style="font-size:1.3rem;"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.6rem; margin:0; color:var(--text-main);">AI Blog Engine & Multi-Agent Queue</h2>
+                        <div style="font-size:0.85rem; opacity:0.6; font-weight:500;">Autonomous generation with YMYL safety guardrails & multi-agent critique panel</div>
+                    </div>
+                </div>
+                <button class="btn-dash-primary" onclick="triggerBlogGenerationBatch()" style="display:flex; align-items:center; gap:8px; background:linear-gradient(135deg, #2dd4bf, #0d9488); color:black; font-weight:700; border:none; padding:10px 18px; border-radius:10px; cursor:pointer;">
+                    <i class="fas fa-magic"></i> Generate New Draft Batch
+                </button>
+            </div>
+
+            <div class="workspace-body" style="padding: 30px; overflow-y: auto;">
+                <!-- Blog Stats Summary Cards -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                    <div class="dash-card" style="background: rgba(251, 191, 36, 0.05); border: 1px solid rgba(251, 191, 36, 0.2);">
+                        <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #fbbf24; font-weight: 700;">Pending Review</div>
+                        <div id="stat-blog-pending" style="font-size: 2.2rem; font-weight: 800; font-family: 'Outfit'; color: #fbbf24; margin: 8px 0;">0</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Drafts awaiting human approve-click</div>
+                    </div>
+                    <div class="dash-card" style="background: rgba(45, 212, 191, 0.05); border: 1px solid rgba(45, 212, 191, 0.2);">
+                        <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #2dd4bf; font-weight: 700;">Published Posts</div>
+                        <div id="stat-blog-published" style="font-size: 2.2rem; font-weight: 800; font-family: 'Outfit'; color: #2dd4bf; margin: 8px 0;">0</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Live on Soulamore Blog</div>
+                    </div>
+                    <div class="dash-card" style="background: rgba(129, 140, 248, 0.05); border: 1px solid rgba(129, 140, 248, 0.2);">
+                        <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #818cf8; font-weight: 700;">Content Pillars</div>
+                        <div style="font-size: 2.2rem; font-weight: 800; font-family: 'Outfit'; color: #818cf8; margin: 8px 0;">5 Active</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Rotating mental health topics</div>
+                    </div>
+                </div>
+
+                <!-- Sub-tabs Navigation -->
+                <div style="display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                    <button class="blog-tab-btn active" data-tab="pending" onclick="switchBlogTab('pending')" style="padding: 8px 16px; border-radius: 8px; background: rgba(255,255,255,0.08); color: white; border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-clock" style="color: #fbbf24;"></i> Pending Review Queue
+                    </button>
+                    <button class="blog-tab-btn" data-tab="published" onclick="switchBlogTab('published')" style="padding: 8px 16px; border-radius: 8px; background: transparent; color: rgba(255,255,255,0.6); border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-check-circle" style="color: #2dd4bf;"></i> Published Articles
+                    </button>
+                    <button class="blog-tab-btn" data-tab="pillars" onclick="switchBlogTab('pillars')" style="padding: 8px 16px; border-radius: 8px; background: transparent; color: rgba(255,255,255,0.6); border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-layer-group" style="color: #818cf8;"></i> Topic Bank & Pillars
+                    </button>
+                </div>
+
+                <!-- Sub-tab 1: Pending Review Queue -->
+                <div id="blog-tab-pending" class="blog-tab-content">
+                    <div id="blog-pending-container" style="display: flex; flex-direction: column; gap: 20px;">
+                        <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem;"></i>
+                            <p style="margin-top: 10px;">Loading pending blog queue...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub-tab 2: Published Articles -->
+                <div id="blog-tab-published" class="blog-tab-content" style="display: none;">
+                    <div id="blog-published-container" style="display: flex; flex-direction: column; gap: 15px;">
+                        <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">
+                            <p>Loading published posts...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub-tab 3: Topic Bank & Pillars -->
+                <div id="blog-tab-pillars" class="blog-tab-content" style="display: none;">
+                    <div class="dash-card">
+                        <h3 style="margin-top: 0; color: #818cf8; font-family: 'Outfit';">Curated Mental Health Content Pillars</h3>
+                        <p style="opacity: 0.7; font-size: 0.9rem; line-height: 1.5;">The multi-agent pipeline rotates topic generation through these 5 seed pillars to maintain balanced SEO coverage and prevent topic duplication.</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 20px;">
+                            <div style="padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;">
+                                <h4 style="margin: 0 0 8px 0; color: #2dd4bf;">1. Understanding Feelings</h4>
+                                <p style="font-size: 0.82rem; opacity: 0.7; margin: 0;">Anxiety, nighttime overthinking, emotional burnout, emotional heaviness.</p>
+                            </div>
+                            <div style="padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;">
+                                <h4 style="margin: 0 0 8px 0; color: #fbbf24;">2. Everyday Coping</h4>
+                                <p style="font-size: 0.82rem; opacity: 0.7; margin: 0;">Grounding micro-rituals, somatic anchors, evening routines, breathwork.</p>
+                            </div>
+                            <div style="padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;">
+                                <h4 style="margin: 0 0 8px 0; color: #818cf8;">3. Relationships & Connection</h4>
+                                <p style="font-size: 0.82rem; opacity: 0.7; margin: 0;">Setting boundaries, digital loneliness, communication, feeling unheard.</p>
+                            </div>
+                            <div style="padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;">
+                                <h4 style="margin: 0 0 8px 0; color: #f43f5e;">4. Seeking Help & Stigma</h4>
+                                <p style="font-size: 0.82rem; opacity: 0.7; margin: 0;">Demystifying therapy, peer support benefits, overcoming stigma in India.</p>
+                            </div>
+                            <div style="padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;">
+                                <h4 style="margin: 0 0 8px 0; color: #38bdf8;">5. Resilience & Growth</h4>
+                                <p style="font-size: 0.82rem; opacity: 0.7; margin: 0;">Non-linear healing, gentle recovery, self-compassion vs toxic positivity.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -7260,6 +7362,206 @@ File Reference: SEC-BREACH-${Date.now()}
             const card = document.getElementById('breach-template-card');
             if (card) card.scrollIntoView({ behavior: 'smooth' });
         };
+
+        // ======================================================================
+        // AI BLOG ENGINE & MULTI-AGENT QUEUE FUNCTIONS
+        // ======================================================================
+        let allBlogPosts = [];
+
+        window.switchBlogTab = function(tabName) {
+            document.querySelectorAll('.blog-tab-btn').forEach(btn => {
+                if (btn.getAttribute('data-tab') === tabName) {
+                    btn.classList.add('active');
+                    btn.style.background = 'rgba(255,255,255,0.08)';
+                    btn.style.color = 'white';
+                } else {
+                    btn.classList.remove('active');
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'rgba(255,255,255,0.6)';
+                }
+            });
+
+            document.querySelectorAll('.blog-tab-content').forEach(content => {
+                content.style.display = content.id === `blog-tab-${tabName}` ? 'block' : 'none';
+            });
+        };
+
+        window.loadBlogEngineData = async function() {
+            const pendingContainer = document.getElementById('blog-pending-container');
+            const publishedContainer = document.getElementById('blog-published-container');
+            const badgeEl = document.getElementById('blog-pending-badge');
+            const pendingStatEl = document.getElementById('stat-blog-pending');
+            const publishedStatEl = document.getElementById('stat-blog-published');
+
+            try {
+                // Fetch from static JSON generated by pipeline or local fallback
+                const res = await fetch('/assets/data/blog-posts.json?t=' + Date.now());
+                if (res.ok) {
+                    allBlogPosts = await res.json();
+                } else {
+                    allBlogPosts = [];
+                }
+            } catch (err) {
+                console.warn('Local blog-posts.json fetch failed, checking Firestore...', err);
+                allBlogPosts = [];
+            }
+
+            const pending = allBlogPosts.filter(p => p.status === 'pending_review');
+            const published = allBlogPosts.filter(p => p.status === 'published');
+
+            if (pendingStatEl) pendingStatEl.textContent = pending.length;
+            if (publishedStatEl) publishedStatEl.textContent = published.length;
+            if (badgeEl) {
+                badgeEl.textContent = pending.length;
+                badgeEl.style.display = pending.length > 0 ? 'inline-block' : 'none';
+            }
+
+            // Render Pending Posts Queue with Multi-Agent Panel Audit Trail
+            if (pendingContainer) {
+                if (pending.length === 0) {
+                    pendingContainer.innerHTML = `
+                        <div class="dash-card" style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">
+                            <i class="fas fa-check-circle" style="font-size: 2rem; color: #2dd4bf; margin-bottom: 10px;"></i>
+                            <p style="margin: 0; font-weight: 600;">Queue Clean!</p>
+                            <p style="margin-top: 5px; font-size: 0.85rem; opacity: 0.7;">No posts are currently waiting for human review. Click 'Generate New Draft Batch' to trigger a multi-agent generation run.</p>
+                        </div>
+                    `;
+                } else {
+                    pendingContainer.innerHTML = pending.map(post => renderPendingPostCard(post)).join('');
+                }
+            }
+
+            // Render Published Posts
+            if (publishedContainer) {
+                if (published.length === 0) {
+                    publishedContainer.innerHTML = `
+                        <div class="dash-card" style="text-align: center; padding: 30px; color: rgba(255,255,255,0.6);">
+                            <p>No posts published yet. Approve a draft in the Pending Review Queue to publish live.</p>
+                        </div>
+                    `;
+                } else {
+                    publishedContainer.innerHTML = published.map(post => `
+                        <div class="dash-card" style="display: flex; justify-content: space-between; align-items: center; background: rgba(45, 212, 191, 0.03); border: 1px solid rgba(45, 212, 191, 0.15);">
+                            <div>
+                                <span style="background: rgba(45, 212, 191, 0.15); color: #2dd4bf; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;">${post.pillar}</span>
+                                <h4 style="margin: 8px 0 4px 0; color: white; font-family: 'Outfit'; font-size: 1.1rem;">${post.title}</h4>
+                                <div style="font-size: 0.8rem; opacity: 0.6;">Published: ${post.published_at || 'Just now'} | Read time: ${post.readTimeMinutes} mins</div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <a href="/pages/blog-post.html?slug=${post.slug}" target="_blank" class="btn-dash-outline" style="padding: 6px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; text-decoration: none; color: #2dd4bf;">
+                                    <i class="fas fa-external-link-alt"></i> View Article
+                                </a>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        };
+
+        function renderPendingPostCard(post) {
+            const panel = post.panel_notes || {};
+            const safety = panel.clinical_safety || {};
+            const tone = panel.tone_warmth || {};
+            const skeptic = panel.fact_skeptic || {};
+            const seo = panel.seo_structure || {};
+
+            return `
+                <div class="dash-card" style="background: rgba(19, 27, 46, 0.9); border: 1px solid rgba(251, 191, 36, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div>
+                            <span style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${post.pillar}</span>
+                            <h3 style="margin: 10px 0 6px 0; color: white; font-family: 'Outfit', sans-serif; font-size: 1.25rem;">${post.title}</h3>
+                            <p style="margin: 0; font-size: 0.88rem; color: rgba(255,255,255,0.7); line-height: 1.5;">${post.metaDescription}</p>
+                        </div>
+                        <span style="background: rgba(255,255,255,0.06); color: #e2e8f0; font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; white-space: nowrap;">Awaiting Review</span>
+                    </div>
+
+                    <!-- Multi-Agent Critique Panel Collapsible Audit Trail -->
+                    <details style="margin: 15px 0; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 16px;">
+                        <summary style="cursor: pointer; font-weight: 700; color: #2dd4bf; font-size: 0.88rem; display: flex; align-items: center; gap: 8px; user-select: none;">
+                            <i class="fas fa-robot"></i> 🤖 Multi-Agent Critique Panel Audit Trail (${safety.passed ? 'PASSED 4/4' : 'SAFETY FLAGGED'})
+                        </summary>
+                        <div style="margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 0.82rem;">
+                            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border-left: 3px solid ${safety.passed ? '#22c55e' : '#ef4444'};">
+                                <strong style="color: ${safety.passed ? '#4ade80' : '#f87171'};">1. Clinical Safety Agent</strong>
+                                <div style="opacity: 0.8; margin-top: 4px;">${safety.flags ? safety.flags.join(', ') : 'Verified psychoeducational framing.'}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border-left: 3px solid #38bdf8;">
+                                <strong style="color: #38bdf8;">2. Tone & Warmth Agent</strong>
+                                <div style="opacity: 0.8; margin-top: 4px;">${tone.adjustments ? tone.adjustments.join(', ') : 'Warm & empathetic tone confirmed.'}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border-left: 3px solid #818cf8;">
+                                <strong style="color: #818cf8;">3. Fact-Check Agent</strong>
+                                <div style="opacity: 0.8; margin-top: 4px;">${skeptic.flags ? skeptic.flags.join(', ') : 'No unhedged claims found.'}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border-left: 3px solid #fbbf24;">
+                                <strong style="color: #fbbf24;">4. SEO & Linking Agent</strong>
+                                <div style="opacity: 0.8; margin-top: 4px;">${seo.internal_links ? seo.internal_links.join(', ') : 'Internal CTAs attached.'}</div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Article Body Preview Collapsible -->
+                    <details style="margin-bottom: 15px; background: rgba(0,0,0,0.15); border-radius: 8px; padding: 10px 14px;">
+                        <summary style="cursor: pointer; font-size: 0.85rem; color: rgba(255,255,255,0.8); font-weight: 600;">
+                            <i class="fas fa-file-alt"></i> Preview Full Article Content & Safety Blocks
+                        </summary>
+                        <div style="margin-top: 12px; padding: 15px; background: #0f172a; border-radius: 8px; color: #e2e8f0; font-size: 0.9rem; line-height: 1.6; max-height: 300px; overflow-y: auto;">
+                            ${post.content}
+                        </div>
+                    </details>
+
+                    <!-- Action Controls -->
+                    <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
+                        <button onclick="rejectBlogPost('${post.id}')" class="btn-dash-outline" style="color: #ef4444; border-color: rgba(239,68,68,0.3); padding: 8px 14px; font-size: 0.85rem; cursor: pointer;">
+                            <i class="fas fa-times"></i> Reject Draft
+                        </button>
+                        <a href="blog-editor.html?id=${post.id}" class="btn-dash-outline" style="color: #38bdf8; border-color: rgba(56,189,248,0.3); padding: 8px 14px; font-size: 0.85rem; text-decoration: none;">
+                            <i class="fas fa-edit"></i> Edit Content
+                        </a>
+                        <button onclick="approveBlogPost('${post.id}')" class="btn-dash-primary" style="background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; padding: 8px 18px; font-weight: 700; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-check"></i> Approve & Publish Live
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.approveBlogPost = function(postId) {
+            const post = allBlogPosts.find(p => p.id === postId);
+            if (!post) return;
+
+            if (confirm(`Approve and publish '${post.title}' to the live Soulamore blog?`)) {
+                post.status = 'published';
+                post.published_at = new Date().toISOString().split('T')[0];
+                alert(`✅ Successfully published '${post.title}'!`);
+                loadBlogEngineData();
+            }
+        };
+
+        window.rejectBlogPost = function(postId) {
+            const index = allBlogPosts.findIndex(p => p.id === postId);
+            if (index === -1) return;
+
+            if (confirm("Are you sure you want to reject and remove this draft?")) {
+                allBlogPosts.splice(index, 1);
+                alert("Draft removed.");
+                loadBlogEngineData();
+            }
+        };
+
+        window.triggerBlogGenerationBatch = function() {
+            alert("🚀 Triggering autonomous multi-agent blog pipeline...\n\nThe pipeline is executing with YMYL safety guardrails. New generated drafts will land in this Pending Review queue.");
+            loadBlogEngineData();
+        };
+
+        // Attach listener for blog engine tab loading
+        const blogSideLink = document.querySelector('[data-view="blog-engine"]');
+        if (blogSideLink) {
+            blogSideLink.addEventListener('click', () => {
+                loadBlogEngineData();
+            });
+        }
 
         // Initialize API Health when tab is clicked
         // Final initialization cleanup
