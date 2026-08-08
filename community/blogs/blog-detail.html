@@ -25,7 +25,7 @@
         })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Soulamore Blog Post">
+    <meta name="description" content="Read full article on Soulamore Stories - mental health insights and expert guidance.">
     <title>Soulamore Stories</title>
 
     <!-- Open Graph / Facebook -->
@@ -34,7 +34,7 @@
 
     <!-- Fonts -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/global.css">
@@ -47,23 +47,35 @@
         html,
         body {
             overflow-x: hidden;
-            /* Prevent horizontal scrolling on mobile */
         }
 
         body {
             background-color: #0f172a;
+            color: #f8fafc;
         }
 
         body.light-mode {
             background-color: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        /* --- READING PROGRESS BAR --- */
+        #reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(to right, #4ECDC4, #fbbf24);
+            width: 0%;
+            z-index: 1000;
+            transition: width 0.1s ease-out;
         }
 
         .post-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 820px;
             margin: 0 auto;
-            padding: 40px 20px 80px;
-            /* Reduced from 140px */
+            padding: 30px 20px 80px;
             position: relative;
             z-index: 10;
         }
@@ -71,49 +83,51 @@
         /* --- POST HERO --- */
         .post-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 35px;
         }
 
         .post-meta {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #94a3b8;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             text-transform: uppercase;
             letter-spacing: 1px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .post-tag {
-            background: rgba(78, 205, 196, 0.1);
-            color: var(--teal-glow);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-weight: 600;
+            background: rgba(78, 205, 196, 0.12);
+            color: #4ECDC4;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-weight: 700;
+            border: 1px solid rgba(78, 205, 196, 0.3);
         }
 
         .post-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 3rem;
-            line-height: 1.2;
-            margin-bottom: 30px;
-            background: linear-gradient(to right, #fff, #fbbf24);
-            background-clip: text;
-            /* Standard */
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 25px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #fbbf24 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .hero-image {
             width: 100%;
-            height: 400px;
+            height: 420px;
             border-radius: 20px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 50px;
+            margin-bottom: 45px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
         }
 
@@ -127,21 +141,21 @@
         .post-body {
             font-family: 'Lora', serif;
             font-size: 1.2rem;
-            line-height: 1.8;
-            color: #cbd5e1;
-            /* Almost white for readability */
+            line-height: 1.85;
+            color: #e2e8f0;
         }
 
         .post-body p {
-            margin-bottom: 25px;
+            margin-bottom: 28px;
         }
 
         .post-body h2,
         .post-body h3 {
             font-family: 'Outfit', sans-serif;
             color: #fff;
-            margin-top: 40px;
+            margin-top: 45px;
             margin-bottom: 20px;
+            font-weight: 700;
         }
 
         .post-body h2 {
@@ -149,301 +163,280 @@
         }
 
         .post-body h3 {
-            font-size: 1.6rem;
-            color: var(--peach-glow);
+            font-size: 1.5rem;
         }
 
         .post-body blockquote {
-            border-left: 4px solid var(--teal-glow);
-            padding-left: 20px;
-            margin: 40px 0;
-            font-style: italic;
-            font-size: 1.4rem;
-            color: var(--teal-glow);
+            border-left: 4px solid #4ECDC4;
             background: rgba(78, 205, 196, 0.05);
-            padding: 20px 20px 20px 30px;
-            border-radius: 0 10px 10px 0;
+            padding: 20px 24px;
+            margin: 30px 0;
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            color: #f1f5f9;
         }
 
-        .post-body ul,
-        .post-body ol {
-            margin-bottom: 25px;
-            padding-left: 20px;
+        .post-body ul, .post-body ol {
+            margin-bottom: 28px;
+            padding-left: 24px;
         }
 
         .post-body li {
             margin-bottom: 10px;
         }
 
-        .post-body strong {
-            color: #fff;
-            font-weight: 600;
-        }
-
-        /* --- ENGAGEMENT BAR (STICKY) --- */
-        .engagement-bar {
-            position: fixed;
-            left: calc(50% - 520px);
-            top: 250px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(12px);
-            padding: 15px;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: 0.3s;
-            opacity: 0;
-            transform: translateX(-20px);
-            animation: slideInLeft 0.5s 0.5s ease-out forwards;
-            z-index: 1000;
-        }
-
-        @keyframes slideInLeft {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .engage-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 1.1rem;
-            position: relative;
-        }
-
-        .engage-btn:hover {
-            color: var(--teal-glow);
-            border-color: var(--teal-glow);
-            background: rgba(78, 205, 196, 0.1);
-            transform: scale(1.1);
-        }
-
-        .engage-btn.like-btn.active {
-            color: #ef4444;
-            border-color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
-        }
-
-        .engage-count {
-            position: absolute;
-            top: -5px;
-            right: -10px;
-            font-size: 0.7rem;
-            background: var(--teal-glow);
-            color: var(--deep-space);
-            font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 10px;
-        }
-
-        /* --- AUTHOR CARD --- */
+        /* --- AUTHOR BOX --- */
         .author-box {
+            margin-top: 60px;
             background: rgba(30, 41, 59, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 30px;
-            margin-top: 80px;
             display: flex;
             align-items: center;
             gap: 20px;
+            flex-wrap: wrap;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
         }
 
-        .author-avatar {
-            width: 80px;
-            height: 80px;
+        .author-avatar-lg {
+            width: 76px;
+            height: 76px;
             border-radius: 50%;
-            background: #334155;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: rgba(255, 255, 255, 0.5);
+            object-fit: cover;
+            border: 3px solid #4ECDC4;
             flex-shrink: 0;
         }
 
-        .author-info h4 {
-            font-size: 1.3rem;
-            margin-bottom: 5px;
-            color: #fff;
+        .author-info {
+            flex: 1;
+            min-width: 240px;
         }
 
         .author-role {
-            color: var(--teal-glow);
-            font-size: 0.9rem;
+            font-size: 0.75rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 10px;
+            color: #4ECDC4;
+            margin-bottom: 4px;
             display: block;
         }
 
+        .author-info h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
         .author-bio {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.9rem;
             color: #94a3b8;
-            font-size: 0.95rem;
+            margin: 0;
             line-height: 1.5;
         }
 
-        /* --- MOBILE --- */
-        @media (max-width: 1100px) {
-            .engagement-bar {
-                position: fixed;
-                top: auto;
-                bottom: 30px;
-                left: 50%;
-                transform: translateX(-50%) !important;
-                flex-direction: row;
-                width: auto;
-                z-index: 1000;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-                border-color: var(--teal-glow);
-            }
-
-            .post-title {
-                font-size: 2.2rem;
-            }
-
-            .hero-image {
-                height: 250px;
-            }
+        /* --- ENGAGEMENT BAR --- */
+        .engage-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 10px 24px;
+            border-radius: 99px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            z-index: 100;
         }
 
-        /* --- SMARTPHONE SPECIFIC --- */
-        @media (max-width: 768px) {
-            .post-container {
-                padding: 30px 20px 80px;
-            }
-
-            .post-body {
-                font-size: 1.1rem;
-                overflow-wrap: break-word;
-                /* Ensure long words break instead of overflowing */
-                word-wrap: break-word;
-            }
-
-            .post-body blockquote {
-                padding: 15px 15px 15px 20px;
-                /* Reduce padding on mobile */
-                margin: 30px 0;
-                font-size: 1.2rem;
-                /* Reduce font size slightly */
-            }
-
-            .author-box {
-                flex-direction: column;
-                text-align: center;
-                padding: 20px;
-            }
-
-            .author-box a {
-                margin: 15px auto 0 !important;
-            }
+        .engage-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
         }
 
-        body.light-mode .post-meta,
-        body.light-mode .post-body,
-        body.light-mode .author-bio {
-            color: var(--text-secondary);
+        .engage-btn:hover {
+            color: #4ECDC4;
+            transform: scale(1.1);
         }
 
-        body.light-mode .post-title {
-            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .engage-btn.active {
+            color: #ef4444;
         }
 
+        /* --- RELATED STORIES --- */
+        .related-section {
+            margin-top: 70px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .related-section h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #ffffff;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .related-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .related-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(78, 205, 196, 0.3);
+        }
+
+        .related-card img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+        }
+
+        .related-card-body {
+            padding: 16px;
+        }
+
+        .related-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+            line-height: 1.35;
+        }
+
+        /* LIGHT MODE OVERRIDES */
+        body.light-mode {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        body.light-mode .post-body {
+            color: var(--text-primary);
+        }
+
+        body.light-mode .post-title,
         body.light-mode .post-body h2,
+        body.light-mode .post-body h3,
         body.light-mode .author-info h4 {
             color: var(--text-primary);
         }
 
-        body.light-mode .hero-image,
-        body.light-mode .engagement-bar,
-        body.light-mode .author-box {
-            border-color: var(--border-subtle);
-        }
-
-        body.light-mode .engagement-bar,
         body.light-mode .author-box {
             background: var(--bg-card);
-        }
-
-        body.light-mode .engage-btn {
-            color: var(--text-secondary);
             border-color: var(--border-subtle);
         }
+
+        body.light-mode .engage-bar {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: var(--border-subtle);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+        }
     </style>
-    <link rel="icon" href="../../assets/images/favicon_symbol.webp" type="image/x-icon">
 </head>
 
 <body>
+    <!-- READING PROGRESS INDICATOR -->
+    <div id="reading-progress"></div>
+
     <div id="app-shell">
         <div id="shell-fixed">
             <header></header>
         </div>
 
-        <!-- PARTICLES -->
-        <div id="particles"
-            style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:-1;"></div>
+        <!-- PARTICLES BACKGROUND -->
+        <div id="particles" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:-1;"></div>
 
         <main id="shell-content">
-            <!-- MAIN CONTENT -->
-            <div class="post-container fade-in" id="mainContent">
-                <!-- Content injected by JS -->
-                <div style="height: 60vh; display:flex; align-items:center; justify-content:center;">
-                    <p>Loading post...</p>
+            <div class="post-container" id="mainContent">
+                <!-- Content injected dynamically by JS -->
+            </div>
+
+            <!-- RELATED STORIES SECTION -->
+            <div class="post-container" style="padding-top:0;">
+                <div class="related-section" id="relatedSection">
+                    <h3>Explore More Stories</h3>
+                    <div class="related-grid" id="relatedGrid"></div>
                 </div>
             </div>
 
-            <!-- STICKY SIDEBAR (Engagement) -->
-            <aside class="engagement-bar" id="engageBar" style="display:none;">
-                <button class="engage-btn like-btn" onclick="toggleLike(this)">
+            <!-- ENGAGEMENT FLOATING BAR -->
+            <aside class="engage-bar" id="engageBar" style="display:none;">
+                <button class="engage-btn" id="likeBtn" onclick="toggleLike(this)">
                     <i class="fas fa-heart"></i>
-                    <span class="engage-count" id="likeCount">0</span>
+                    <span id="likeCount">0</span>
                 </button>
-                <button class="engage-btn" onclick="copyLink()">
+                <div style="width:1px; height:18px; background:rgba(255,255,255,0.15);"></div>
+                <button class="engage-btn" onclick="copyLink()" title="Copy Article Link">
                     <i class="fas fa-link"></i>
                 </button>
-                <button class="engage-btn" onclick="shareTwitter()">
+                <button class="engage-btn" onclick="shareTwitter()" title="Share on Twitter">
                     <i class="fab fa-twitter"></i>
-                </button>
-                <button class="engage-btn" onclick="scrollToComments()">
-                    <i class="fas fa-comment"></i>
                 </button>
             </aside>
         </main>
 
-        <!-- FOOTER -->
         <footer></footer>
     </div>
 
+    <!-- SCRIPTS -->
     <script src="../../assets/js/components.js?v=3.6"></script>
     <script type="module">
-        import { getPostById } from '../assets/js/blog-data.js';
-        import { db, doc, getDoc, setDoc, updateDoc, increment } from '../assets/js/firebase-config.js';
+        // FIXED IMPORT PATHS FROM BLOG-DETAIL.HTML TO ROOT ASSETS (../../assets/js/)
+        import { getPostById, getAllPosts } from '../../assets/js/blog-data.js';
+        import { db, doc, getDoc, setDoc, updateDoc, increment } from '../../assets/js/firebase-config.js';
 
         // 1. Get ID from URL
         const params = new URLSearchParams(window.location.search);
         const postId = params.get('id');
         const container = document.getElementById('mainContent');
         const engageBar = document.getElementById('engageBar');
+        const relatedGrid = document.getElementById('relatedGrid');
 
         let isLikeUpdating = false;
 
+        // Reading progress listener
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            const progressEl = document.getElementById('reading-progress');
+            if (progressEl) progressEl.style.width = (scrolled || 0) + '%';
+        });
+
         async function initPost() {
             if (!postId) {
-                container.innerHTML = `<div style="text-align:center;"><h2>Post not found</h2><a href="../blogs/blogs.html" style="color:var(--teal-glow);">Back to Stories</a></div>`;
+                container.innerHTML = `<div style="text-align:center; padding:80px 20px;"><h2>Post not found</h2><a href="blogs.html" style="color:#4ECDC4;">Back to Stories</a></div>`;
                 return;
             }
 
@@ -453,109 +446,128 @@
                 // UPDATE METADATA
                 document.title = `${post.title} | Soulamore Stories`;
 
-                // RENDER (Author portion is already correctly updated in preceding chunks, but we re-render here)
+                // RENDER MAIN POST
                 container.innerHTML = `
-                    <div class="post-header">
+                    <div class="post-header fade-in">
                         <div class="post-meta">
-                            <span class="post-tag">${post.topic}</span>
+                            <span class="post-tag">${post.topic || 'Mental Health'}</span>
                             <span>•</span>
-                            <span>${post.readTime} Read</span>
+                            <span><i class="far fa-clock" style="margin-right:4px;"></i>${post.readTime || '5 min read'}</span>
                             <span>•</span>
                             <span>${post.date}</span>
                         </div>
                         <h1 class="post-title">${post.title}</h1>
                     </div>
 
-                    <div class="hero-image">
+                    <div class="hero-image fade-in">
                         <img src="${post.image}" alt="${post.title}">
                     </div>
 
-                    <article class="post-body">
+                    <article class="post-body fade-in">
                         ${post.content}
                     </article>
 
-                    <div class="author-box">
-                        ${post.authorImage ? '<img src="' + post.authorImage + '" alt="' + post.author + '" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">' : '<div class="author-avatar"><i class="fas ' + (post.type === 'Psychologist' ? 'fa-user-md' : 'fa-user') + '"></i></div>'}
+                    <div class="author-box fade-in">
+                        <img src="${post.authorImage || '../../assets/images/Founder/Aditya%20Harsh.jpg'}" class="author-avatar-lg" alt="${post.author}">
                         <div class="author-info">
-                            <span class="author-role">${post.authorRole}</span>
+                            <span class="author-role">${post.authorRole || post.type}</span>
                             <h4>${post.author}</h4>
-                            <p class="author-bio">${post.authorBio}</p>
+                            <p class="author-bio">${post.authorBio || 'Mental health advocate and writer at Soulamore.'}</p>
                         </div>
-                        ${post.authorLinkedin ? '<a href="' + post.authorLinkedin + '" target="_blank" style="margin-left: auto; color: var(--teal-glow); text-decoration: none; font-size: 1rem; font-weight: 500; display: flex; align-items: center; gap: 8px; padding: 10px 24px; border: 1px solid var(--teal-glow); border-radius: 50px; transition: 0.3s;"><i class="fab fa-linkedin" style="font-size: 1.1rem;"></i> Connect</a>' : ''}
+                        ${post.authorLinkedin ? `
+                            <a href="${post.authorLinkedin}" target="_blank" style="color:#4ECDC4; text-decoration:none; font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border:1px solid rgba(78,205,196,0.4); border-radius:99px; white-space:nowrap;">
+                                <i class="fab fa-linkedin"></i> Connect
+                            </a>
+                        ` : ''}
                     </div>
                 `;
 
-                // Show Engagement Bar
-                engageBar.style.display = 'flex';
+                // Show Engagement Floating Bar
+                if (engageBar) engageBar.style.display = 'flex';
 
-                // Fetch dynamic likes
+                // Fetch dynamic likes count
                 try {
                     const postRef = doc(db, 'blogs', postId);
                     const docSnap = await getDoc(postRef);
                     if (docSnap.exists()) {
                         document.getElementById('likeCount').innerText = docSnap.data().likes || post.likes || 0;
                     } else {
-                        // Initialize it in DB on first load
                         await setDoc(postRef, { likes: post.likes || 0 });
                         document.getElementById('likeCount').innerText = post.likes || 0;
                     }
                 } catch (err) {
-                    console.error("Firebase error loading likes:", err);
-                    document.getElementById('likeCount').innerText = post.likes || 0; // fallback
+                    console.warn("Firebase fallback for likes:", err);
+                    document.getElementById('likeCount').innerText = post.likes || 0;
                 }
 
+                // Render Related Stories
+                renderRelatedStories(post);
+
             } else {
-                container.innerHTML = `<div style="text-align:center;"><h2>Post not found</h2><a href="../blogs/blogs.html" style="color:var(--teal-glow);">Back to Stories</a></div>`;
+                container.innerHTML = `<div style="text-align:center; padding:80px 20px;"><h2>Post not found</h2><a href="blogs.html" style="color:#4ECDC4;">Back to Stories</a></div>`;
             }
+        }
+
+        function renderRelatedStories(currentPost) {
+            if (!relatedGrid) return;
+            const allPosts = getAllPosts();
+            const related = allPosts.filter(p => p.id !== currentPost.id).slice(0, 3);
+
+            let html = '';
+            related.forEach(rel => {
+                html += `
+                    <div class="related-card" onclick="window.location.href='blog-detail.html?id=${rel.id}'">
+                        <img src="${rel.image}" alt="${rel.title}">
+                        <div class="related-card-body">
+                            <div style="font-size:0.75rem; color:#4ECDC4; font-weight:700; margin-bottom:4px;">${rel.type}</div>
+                            <div class="related-card-title">${rel.title}</div>
+                            <div style="font-size:0.75rem; color:#94a3b8;">${rel.readTime || '5 min read'}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            relatedGrid.innerHTML = html;
         }
 
         initPost();
 
-        // ENGAGEMENT FUNCTIONS
+        // ENGAGEMENT ACTIONS
         window.toggleLike = async (btn) => {
             if (isLikeUpdating) return;
             isLikeUpdating = true;
 
             btn.classList.toggle('active');
             const countEl = document.getElementById('likeCount');
-            let count = parseInt(countEl.innerText);
+            let count = parseInt(countEl.innerText) || 0;
 
             try {
                 const postRef = doc(db, 'blogs', postId);
                 if (btn.classList.contains('active')) {
                     count++;
-                    countEl.innerText = count; // Optimistic update
+                    countEl.innerText = count;
                     await updateDoc(postRef, { likes: increment(1) });
                 } else {
-                    count--;
-                    countEl.innerText = count; // Optimistic update
+                    count = Math.max(0, count - 1);
+                    countEl.innerText = count;
                     await updateDoc(postRef, { likes: increment(-1) });
                 }
             } catch (err) {
-                console.error("Failed to update likes:", err);
-                // Revert optimistic update nicely
-                btn.classList.toggle('active');
-                if (btn.classList.contains('active')) countEl.innerText = count + 1;
-                else countEl.innerText = count - 1;
+                console.warn("Optimistic like toggle fallback:", err);
             } finally {
                 isLikeUpdating = false;
             }
-        }
+        };
 
         window.copyLink = () => {
             navigator.clipboard.writeText(window.location.href);
-            alert('Link copied to clipboard!');
-        }
+            alert('Article link copied to clipboard!');
+        };
 
         window.shareTwitter = () => {
             const url = encodeURIComponent(window.location.href);
             const text = encodeURIComponent(document.title);
             window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
-        }
-
-        window.scrollToComments = () => {
-            alert('Comments section coming soon!');
-        }
+        };
     </script>
 </body>
 
