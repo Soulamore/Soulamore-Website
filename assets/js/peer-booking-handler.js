@@ -326,80 +326,39 @@ export function generateSLID() {
  * @param {Date} endTime - Booking end time
  * @returns {Promise<{bookingId: string, amount: number}|null>}
  */
-export async function createBookingRequest(userId, peerId, planType, startTime, endTime, userName = "", userEmail = "") {
+export async function createBookingRequest(userId, peerId, planType, startTime, endTime, userName = "", userEmail = "", bookedByRole = "user", targetUserId = null) {
     try {
-        // Get plan details
         const plan = DEFAULT_PLANS[planType] || DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION];
+        const bookSessionFn = httpsCallable(functionsInstance, 'bookSessionCallable');
 
-        // Check availability
-        const isAvailable = await checkSlotAvailability(peerId, startTime, endTime);
-        if (!isAvailable) {
-            throw new Error("Time slot is no longer available");
-        }
-
-        // Get peer details for commission calculation
-        let practitionerRating = 0;
-        let pRole = "PEER";
-        let peerName = "Peer Listener";
-        try {
-            const peerDoc = await getDoc(doc(db, "users", peerId));
-            if (peerDoc.exists()) {
-                const pData = peerDoc.data();
-                practitionerRating = pData.rating || 0;
-                pRole = (pData.role || "PEER").toUpperCase();
-                peerName = pData.name || pData.displayName || "Peer Listener";
-            }
-        } catch (err) {
-            console.warn("Could not fetch peer details, defaulting to 50% commission", err);
-        }
-
-        const commissionRate = calculateCommission(practitionerRating);
-        const slId = generateSLID();
-
-        // Calculate financial split
-        const totalAmount = plan.price;
-        const soulamoreCut = totalAmount * commissionRate;
-        const practitionerShare = totalAmount - soulamoreCut;
-
-        // Create booking document
-        const bookingRef = await addDoc(collection(db, PEER_BOOKINGS_COLLECTION), {
-            slId: slId,
-            tag: pRole,
-            userId: userId,
+        const requestId = `req_${new Date(startTime).getTime()}_${peerId}_${userId}`;
+        const res = await bookSessionFn({
             peerId: peerId,
+            planType: planType,
+            startTime: new Date(startTime).toISOString(),
+            endTime: new Date(endTime).toISOString(),
             userName: userName,
             userEmail: userEmail,
-            peerName: peerName,
-            planType: planType,
-            startTime: Timestamp.fromDate(new Date(startTime)),
-            endTime: Timestamp.fromDate(new Date(endTime)),
-            amount: totalAmount,
-            financials: {
-                soulamoreCut: soulamoreCut,
-                practitionerShare: practitionerShare,
-                commissionRate: commissionRate,
-                payoutStatus: "pending" // pending -> processing -> released
-            },
-            sessions: plan.sessions,
-            status: "pending_payment", 
-            paymentId: null,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
+            targetUserId: targetUserId || userId,
+            bookedByRole: bookedByRole,
+            requestId: requestId
         });
 
-        console.log("Booking request created with SL-ID:", slId);
+        const data = res.data;
+        console.log("🔒 Atomic booking created via Cloud Function:", data);
 
         return {
-            bookingId: bookingRef.id,
-            slId: slId,
-            amount: totalAmount,
+            bookingId: data.bookingId,
+            slId: data.slId,
+            amount: data.amount,
+            status: data.status,
             plan: plan
         };
     } catch (error) {
-        console.error("Error creating booking request:", error);
-        // Fallback for Guest Users / Permission Denied (e.g. Firebase Anonymous Auth disabled)
-        if (error.code === 'permission-denied' || error.message.includes('permission') || userId.startsWith('guest_')) {
-            console.warn("Falling back to client-side mock booking reference due to Firebase permissions/auth restrictions.");
+        console.error("Error creating atomic booking request:", error);
+        // Fallback for Guest Users / Permission Denied or local sandbox mode
+        if (error.code === 'permission-denied' || error.message.includes('permission') || (userId && userId.startsWith('guest_'))) {
+            console.warn("Falling back to client-side mock booking reference for guest/sandbox testing.");
             const mockBookingId = "bk_" + Math.random().toString(36).substr(2, 9);
             const slId = generateSLID();
             const plan = DEFAULT_PLANS[planType] || DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION];
@@ -417,11 +376,10 @@ export async function createBookingRequest(userId, peerId, planType, startTime, 
                 startTime: startTime,
                 endTime: endTime,
                 amount: plan.price,
-                status: "pending_payment",
+                status: bookedByRole === 'user' ? "pending_payment" : "confirmed",
                 createdAt: new Date().toISOString()
             };
             
-            // Save to sessionStorage for mock dashboard display
             const localBookings = JSON.parse(sessionStorage.getItem('local_bookings') || '[]');
             localBookings.push(mockBooking);
             sessionStorage.setItem('local_bookings', JSON.stringify(localBookings));
@@ -430,10 +388,70 @@ export async function createBookingRequest(userId, peerId, planType, startTime, 
                 bookingId: mockBookingId,
                 slId: slId,
                 amount: plan.price,
+                status: mockBooking.status,
                 plan: plan
             };
         }
         throw error;
+    }
+}
+
+/**
+ * Provider-initiated direct booking for a client (BUG-043, BUG-049)
+ */
+export async function providerBookSession(peerId, targetUserId, startTime, endTime, userName = "", userEmail = "", planType = "per_session", bookedByRole = "peer") {
+    return await createBookingRequest(
+        targetUserId,
+        peerId,
+        planType,
+        startTime,
+        endTime,
+        userName,
+        userEmail,
+        bookedByRole,
+        targetUserId
+    );
+}
+
+/**
+ * User / Provider session reschedule helper (BUG-048)
+ */
+export async function rescheduleSession(bookingId, newStartTime, newEndTime) {
+    try {
+        const fn = httpsCallable(functionsInstance, 'rescheduleSessionCallable');
+        const res = await fn({ bookingId, newStartTime: new Date(newStartTime).toISOString(), newEndTime: new Date(newEndTime).toISOString() });
+        return res.data;
+    } catch (err) {
+        console.error("Error rescheduling session:", err);
+        throw err;
+    }
+}
+
+/**
+ * User / Provider session cancellation helper (BUG-048)
+ */
+export async function cancelSession(bookingId, reason = "") {
+    try {
+        const fn = httpsCallable(functionsInstance, 'cancelSessionCallable');
+        const res = await fn({ bookingId, reason });
+        return res.data;
+    } catch (err) {
+        console.error("Error cancelling session:", err);
+        throw err;
+    }
+}
+
+/**
+ * Provider toggle slot busy/blocked status helper (BUG-045)
+ */
+export async function toggleBusySlot(peerId, startTime, isBlocked = true) {
+    try {
+        const fn = httpsCallable(functionsInstance, 'toggleProviderSlotCallable');
+        const res = await fn({ peerId, startTime: new Date(startTime).toISOString(), isBlocked });
+        return res.data;
+    } catch (err) {
+        console.error("Error toggling busy slot:", err);
+        throw err;
     }
 }
 

@@ -3821,34 +3821,72 @@
                     await loadAllUsers();
                 }
 
-                allSessionsData = [];
+        let adminSessionsUnsubscribe = null;
+        let adminAuditUnsubscribe = null;
 
-                // 1. Fetch from Firestore
-                try {
-                    const q = query(collection(db, "peer_bookings"), orderBy("createdAt", "desc"), limit(100));
-                    const snapshot = await getDocs(q);
+        function loadMasterSessions() {
+            const tbody = document.getElementById('sessions-tbody');
+            if (!tbody) return;
+
+            if (adminSessionsUnsubscribe) {
+                adminSessionsUnsubscribe();
+            }
+
+            try {
+                if (!window.allUsersData || window.allUsersData.length === 0) {
+                    loadAllUsers();
+                }
+
+                const q = query(collection(db, "peer_bookings"), orderBy("createdAt", "desc"), limit(100));
+                
+                adminSessionsUnsubscribe = onSnapshot(q, (snapshot) => {
+                    allSessionsData = [];
                     snapshot.forEach(docSnap => {
                         allSessionsData.push({
                             id: docSnap.id,
                             ...docSnap.data()
                         });
                     });
-                } catch (firestoreErr) {
-                    console.warn("Firestore admin sessions fetch failed, using local fallback only:", firestoreErr);
-                }
 
-                // 2. Fetch from sessionStorage fallback
-                const localBookings = JSON.parse(sessionStorage.getItem('local_bookings') || '[]');
-                localBookings.forEach(b => {
-                    if (!allSessionsData.some(s => s.id === b.id)) {
-                        allSessionsData.push(b);
-                    }
+                    // sessionStorage fallback
+                    const localBookings = JSON.parse(sessionStorage.getItem('local_bookings') || '[]');
+                    localBookings.forEach(b => {
+                        if (!allSessionsData.some(s => s.id === b.id)) {
+                            allSessionsData.push(b);
+                        }
+                    });
+
+                    filterAndRenderSessions();
+                    console.log("⚡ Admin real-time sessions updated:", allSessionsData.length);
+                }, (err) => {
+                    console.warn("Firestore admin sessions onSnapshot error:", err);
                 });
 
-                filterAndRenderSessions();
+                // Listen live to audit_logs stream (BUG-044, BUG-047)
+                if (!adminAuditUnsubscribe) {
+                    const auditQ = query(collection(db, "audit_logs"), orderBy("timestamp", "desc"), limit(20));
+                    adminAuditUnsubscribe = onSnapshot(auditQ, (auditSnap) => {
+                        const auditStreamEl = document.getElementById('admin-audit-stream-container');
+                        if (!auditStreamEl) return;
+                        let auditHtml = '<div style="display:flex; flex-direction:column; gap:8px;">';
+                        auditSnap.forEach(docSnap => {
+                            const a = docSnap.data();
+                            const timeStr = a.timestamp?.toDate ? a.timestamp.toDate().toLocaleTimeString() : 'Just now';
+                            auditHtml += `
+                                <div style="font-size:0.8rem; padding:8px 12px; background:rgba(255,255,255,0.03); border-radius:6px; border-left:3px solid #3b82f6; display:flex; justify-content:space-between;">
+                                    <span><strong>[${a.eventType || 'EVENT'}]</strong> SL-ID: ${a.slId || 'N/A'} (User: ${a.userId || 'Guest'})</span>
+                                    <span style="opacity:0.6;">${timeStr}</span>
+                                </div>
+                            `;
+                        });
+                        auditHtml += '</div>';
+                        auditStreamEl.innerHTML = auditHtml;
+                    }, (auditErr) => {
+                        console.warn("Audit stream subscription error (rules or dev environment):", auditErr);
+                    });
+                }
             } catch (err) {
-                console.error("Error loading sessions:", err);
-                tbody.innerHTML = '<tr><td colspan="5" style="padding:40px; text-align:center; color:var(--admin-accent);">Failed to load sessions.</td></tr>';
+                console.error("Error setting up master session stream:", err);
             }
         }
 
