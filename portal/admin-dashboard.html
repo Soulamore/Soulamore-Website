@@ -2761,12 +2761,19 @@
                 // Load admin info dynamically
                 await loadAdminInfo(uid);
 
-                // Load all dashboard data
+                // Load all dashboard view data in parallel during initial loading screen
                 await Promise.allSettled([
                     loadOverviewStats(),
                     loadAllUsers(),
                     loadContentQueue(),
-                    loadMaintenanceSettings()
+                    loadMaintenanceSettings(),
+                    loadNewsletterSubscribers(),
+                    loadBlogEngineData(),
+                    loadMasterSessions(),
+                    loadDeepListeningHub(),
+                    loadApiHealth(),
+                    loadSecurityEvents(),
+                    loadSiteFeedback()
                 ]);
 
                 // Mark data as loaded
@@ -2879,27 +2886,59 @@
                 if (link) link.classList.add('active');
             }
 
-            // --- DATA LOADERS FOR VIEWS ---
-            if (viewId === 'sessions') loadMasterSessions();
-            if (viewId === 'accounting') loadAccounting();
-            if (viewId === 'support-groups') loadSupportGroups();
-            if (viewId === 'groups-management') loadGroupsManagement();
-            if (viewId === 'user-management') loadPendingApplications();
-            if (viewId === 'users') loadAllUsers();
-            if (viewId === 'approvals') loadContentQueue();
-            if (viewId === 'overview') loadOverviewStats();
-            if (viewId === 'newsletter') loadNewsletterSubscribers();
-            if (viewId === 'confessions-moderation') loadConfessionsModeration();
-            if (viewId === 'lifeline-queue') loadLifelineQueue();
-            if (viewId === 'testimonials-manager') loadTestimonialsManager();
-            if (viewId === 'faq-manager') loadFAQManager();
-            if (viewId === 'spotlight-manager') loadSpotlightManager();
-            if (viewId === 'maintenance-panel') loadMaintenancePanel();
-            if (viewId === 'deep-listening') loadDeepListeningHub();
-            if (viewId === 'api-health') loadApiHealth();
-            if (viewId === 'site-feedback') loadSiteFeedback();
-            if (viewId === 'security') loadSecurityEvents();
-            if (viewId === 'blog-engine') loadBlogEngineData();
+            // --- INSTANT MEMORY CACHE VIEW RENDERERS ---
+            if (viewId === 'sessions') {
+                if (window.allSessionsData && window.allSessionsData.length > 0 && typeof filterAndRenderSessions === 'function') {
+                    filterAndRenderSessions();
+                } else if (typeof loadMasterSessions === 'function') {
+                    loadMasterSessions();
+                }
+            }
+            if (viewId === 'accounting' && typeof loadAccounting === 'function') loadAccounting();
+            if (viewId === 'support-groups' && typeof loadSupportGroups === 'function') loadSupportGroups();
+            if (viewId === 'groups-management' && typeof loadGroupsManagement === 'function') loadGroupsManagement();
+            if (viewId === 'user-management' && typeof loadPendingApplications === 'function') loadPendingApplications();
+            if (viewId === 'users') {
+                if (window.allUsersData && window.allUsersData.length > 0 && typeof renderUsersTable === 'function') {
+                    renderUsersTable(window.allUsersData);
+                    const countBadge = document.getElementById('user-count-badge');
+                    if (countBadge) countBadge.textContent = `${window.allUsersData.length} Users`;
+                } else if (typeof loadAllUsers === 'function') {
+                    loadAllUsers();
+                }
+            }
+            if (viewId === 'approvals') {
+                if (window.contentQueueData && window.contentQueueData.length > 0 && typeof renderContentQueue === 'function') {
+                    renderContentQueue(window.contentQueueData);
+                } else if (typeof loadContentQueue === 'function') {
+                    loadContentQueue();
+                }
+            }
+            if (viewId === 'overview' && typeof loadOverviewStats === 'function') loadOverviewStats();
+            if (viewId === 'newsletter') {
+                if (window.adminCache && window.adminCache.newsletter && window.adminCache.newsletter.length > 0 && typeof renderNewsletterTable === 'function') {
+                    renderNewsletterTable(window.adminCache.newsletter);
+                } else if (typeof loadNewsletterSubscribers === 'function') {
+                    loadNewsletterSubscribers();
+                }
+            }
+            if (viewId === 'confessions-moderation' && typeof loadConfessionsModeration === 'function') loadConfessionsModeration();
+            if (viewId === 'lifeline-queue' && typeof loadLifelineQueue === 'function') loadLifelineQueue();
+            if (viewId === 'testimonials-manager' && typeof loadTestimonialsManager === 'function') loadTestimonialsManager();
+            if (viewId === 'faq-manager' && typeof loadFAQManager === 'function') loadFAQManager();
+            if (viewId === 'spotlight-manager' && typeof loadSpotlightManager === 'function') loadSpotlightManager();
+            if (viewId === 'maintenance-panel' && typeof loadMaintenancePanel === 'function') loadMaintenancePanel();
+            if (viewId === 'deep-listening') {
+                if (window.deepListeningVentsData && window.deepListeningVentsData.length > 0 && typeof renderDeepListeningTable === 'function') {
+                    renderDeepListeningTable(window.deepListeningVentsData);
+                } else if (typeof loadDeepListeningHub === 'function') {
+                    loadDeepListeningHub();
+                }
+            }
+            if (viewId === 'api-health' && typeof loadApiHealth === 'function') loadApiHealth();
+            if (viewId === 'site-feedback' && typeof loadSiteFeedback === 'function') loadSiteFeedback();
+            if (viewId === 'security' && typeof loadSecurityEvents === 'function') loadSecurityEvents();
+            if (viewId === 'blog-engine' && typeof loadBlogEngineData === 'function') loadBlogEngineData();
         };
 
         // ✅ FIX: Trigger Overview view immediately after switchView is defined

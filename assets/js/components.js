@@ -2527,3 +2527,38 @@ window.toggleMobileMenu = function () {
     });
 })();
 
+/* ======================================================================
+ * GLOBAL PRACTITIONER & PROFILE PRELOADER (Instant Profile Navigation)
+ * ====================================================================== */
+(function initPractitionerPreloader() {
+    const staticProfiles = [
+        { id: 'bhagyavathi', slug: 'bhagyavathi', name: 'Bhagyavathi', role: 'Counseling Psychologist', price: 1000, profileUrl: '/our-psychologists/profile.html?slug=bhagyavathi' },
+        { id: 'palak-shori', slug: 'palak-shori', name: 'Palak Shori', role: 'Clinical Psychologist', price: 1800, profileUrl: '/our-psychologists/palak-shori.html' }
+    ];
+
+    if (!sessionStorage.getItem('soulamore_practitioner_cache')) {
+        sessionStorage.setItem('soulamore_practitioner_cache', JSON.stringify(staticProfiles));
+    }
+
+    function warmUpProfileLinks() {
+        document.querySelectorAll('a[href*="psychologists"], a[href*="peer"], a[href*="palak-shori"], a[href*="bhagyavathi"]').forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && !document.querySelector(`link[rel="prefetch"][href="${href}"]`)) {
+                    const prefetch = document.createElement('link');
+                    prefetch.rel = 'prefetch';
+                    prefetch.href = href;
+                    document.head.appendChild(prefetch);
+                }
+            }, { once: true });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', warmUpProfileLinks);
+    } else {
+        warmUpProfileLinks();
+    }
+})();
+
+
