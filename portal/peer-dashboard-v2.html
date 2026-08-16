@@ -1425,8 +1425,42 @@
             }
         };
 
-        window.v2OpenPeerSupervisionModal = function() {
-            document.getElementById('v2PeerSupervisionModal').style.display = 'flex';
+        window.v2SetPeerPresenceStatus = async function(status) {
+            if (!auth.currentUser) return;
+            try {
+                await updateDoc(doc(db, 'users', auth.currentUser.uid), {
+                    onlineStatus: status,
+                    updatedAt: serverTimestamp()
+                });
+                alert(`🟢 Live status updated to: ${status.toUpperCase()}`);
+            } catch (err) {
+                console.error('Error updating status:', err);
+                alert('Failed to update status: ' + err.message);
+            }
+        };
+
+        window.v2BookSessionForClient = async function() {
+            const clientEmail = document.getElementById('v2PeerClientEmail')?.value;
+            const dateStr = document.getElementById('v2PeerSessionDate')?.value;
+            if (!clientEmail || !dateStr) {
+                alert('Please fill out client email and session date/time.');
+                return;
+            }
+            try {
+                await addDoc(collection(db, 'peer_bookings'), {
+                    peerId: auth.currentUser.uid,
+                    peerName: auth.currentUser.displayName || 'Peer Counselor',
+                    userEmail: clientEmail,
+                    startTime: new Date(dateStr),
+                    status: 'confirmed',
+                    bookedByPeer: true,
+                    createdAt: serverTimestamp()
+                });
+                alert(`✅ Follow-up session successfully booked for client ${clientEmail}!`);
+            } catch (err) {
+                console.error('Error booking for client:', err);
+                alert('Failed to book session: ' + err.message);
+            }
         };
 
         window.v2SubmitPeerSupervisionRequest = async function() {

@@ -319,6 +319,34 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Payout Requests (Practitioner payouts)
+    match /payout_requests/{requestId} {
+      allow read: if isSignedIn() && (resource == null || resource.data.providerUid == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.providerUid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Email Broadcast Engine (Mail Queue & Campaigns)
+    match /mail_queue/{id} { allow read, write: if isAdmin(); }
+    match /mail_campaigns/{id} { allow read, write: if isAdmin(); }
+
+    // Patient SOAP Clinical Notes
+    match /patient_soap_notes/{noteId} {
+      allow read, write: if isSignedIn() && (resource == null || resource.data.psychologistUid == request.auth.uid || isAdmin());
+    }
+
+    // User Journals (V2 Sanctuary Reflections)
+    match /user_journals/{journalId} {
+      allow read, write: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Profile Edit Verification Requests (Root Level V2)
+    match /profile_edit_requests/{requestId} {
+      allow read: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
     // Default: Deny all other access
     match /{document=**} {
       allow read, write: if false;

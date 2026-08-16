@@ -2100,6 +2100,132 @@
             }, (err) => console.error('Error loading payout requests:', err));
         };
 
+        // --- BREVO MAIL API HEALTH TESTER ---
+        window.v2TestBrevoMail = async function() {
+            try {
+                alert('📧 Initiating Brevo Mail API health ping & test email dispatch...');
+                const testRef = await addDoc(collection(db, 'mail_queue'), {
+                    to: 'contact.adityaharsh@gmail.com',
+                    message: {
+                        subject: 'Brevo Mail API Connectivity Verification',
+                        html: '<h1>Brevo Mail Operational</h1><p>Your Brevo Mail integration is fully active and transmitting emails successfully.</p>'
+                    },
+                    status: 'pending',
+                    createdAt: serverTimestamp()
+                });
+                alert(`✅ Test payload queued in Brevo Mail queue (Ref: ${testRef.id})! Check inbox at contact.adityaharsh@gmail.com`);
+            } catch (err) {
+                console.error('Brevo Mail test failed:', err);
+                alert('Brevo Mail test error: ' + err.message);
+            }
+        };
+
+        // --- MASTER BOOKINGS CSV EXPORTER ---
+        window.v2ExportBookingsCsv = async function() {
+            try {
+                const snapshot = await getDocs(collection(db, 'appointments'));
+                if (snapshot.empty) {
+                    alert('No appointment booking records available to export.');
+                    return;
+                }
+                let csv = 'Booking ID,User Name,User Email,Provider Name,Role,Amount (INR),Status,Date\n';
+                snapshot.forEach(docSnap => {
+                    const b = docSnap.data();
+                    const date = b.createdAt?.toDate ? b.createdAt.toDate().toISOString() : 'N/A';
+                    csv += `"${docSnap.id}","${b.userName || ''}","${b.userEmail || ''}","${b.providerName || ''}","${b.role || 'peer'}","${b.amount || b.fee || 0}","${b.status || 'completed'}","${date}"\n`;
+                });
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `soulamore_bookings_master_${new Date().toISOString().slice(0,10)}.csv`;
+                a.click();
+            } catch (err) {
+                console.error('Export bookings CSV failed:', err);
+                alert('Failed to export bookings CSV: ' + err.message);
+            }
+        };
+
+        // --- HOMEPAGE STORY SPOTLIGHT TOGGLE ---
+        window.v2ToggleStorySpotlight = async function(storyId, currentStatus) {
+            try {
+                const newStatus = !currentStatus;
+                await updateDoc(doc(db, 'peer_stories', storyId), {
+                    isFeatured: newStatus,
+                    updatedAt: serverTimestamp()
+                });
+                alert(`✨ Story spotlight ${newStatus ? 'ENABLED' : 'DISABLED'} on homepage hero carousel!`);
+            } catch (err) {
+                console.error('Error toggling story spotlight:', err);
+                alert('Failed to toggle spotlight: ' + err.message);
+            }
+        };
+
+        // --- PRACTITIONER APPLICATION APPROVAL HANDLERS ---
+        window.v2ApprovePractitioner = async function(uid, role, collectionName) {
+            try {
+                await updateDoc(doc(db, collectionName, uid), {
+                    status: 'approved',
+                    isVerified: true,
+                    approvedAt: serverTimestamp()
+                });
+                await updateDoc(doc(db, 'users', uid), {
+                    role: role,
+                    isVerified: true
+                });
+                alert(`✅ Practitioner ${role.toUpperCase()} application approved and verified live!`);
+            } catch (err) {
+                console.error('Error approving practitioner:', err);
+                alert('Failed to approve practitioner: ' + err.message);
+            }
+        };
+
+        window.v2RejectPractitioner = async function(uid, collectionName) {
+            if (!confirm('Are you sure you want to reject this practitioner application?')) return;
+            try {
+                await updateDoc(doc(db, collectionName, uid), {
+                    status: 'rejected',
+                    rejectedAt: serverTimestamp()
+                });
+                alert('❌ Practitioner application rejected.');
+            } catch (err) {
+                console.error('Error rejecting practitioner:', err);
+                alert('Failed to reject practitioner: ' + err.message);
+            }
+        };
+
+        // --- SESSION REFUND ENGINE ---
+        window.v2ProcessSessionRefund = async function(bookingId, userId, amount) {
+            if (!confirm(`Confirm refunding ₹${amount} to user wallet?`)) return;
+            try {
+                const walletRef = doc(db, 'user_wallets', userId);
+                const walletSnap = await getDoc(walletRef);
+                const currentBal = walletSnap.exists() ? (walletSnap.data().balance || 0) : 0;
+
+                await setDoc(walletRef, {
+                    balance: currentBal + Number(amount),
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                await addDoc(collection(db, 'user_wallets', userId, 'transactions'), {
+                    type: 'credit',
+                    amount: Number(amount),
+                    description: `Refund for booking ${bookingId}`,
+                    createdAt: serverTimestamp()
+                });
+
+                await updateDoc(doc(db, 'peer_bookings', bookingId), {
+                    status: 'refunded',
+                    refundedAt: serverTimestamp()
+                });
+
+                alert(`✅ Refund of ₹${amount} successfully credited to user wallet!`);
+            } catch (err) {
+                console.error('Error processing refund:', err);
+                alert('Failed to process refund: ' + err.message);
+            }
+        };
+
         // Admin Action: Confirm & Release Payout
         window.v2ReleasePayout = async function(payoutId, amount, providerUid, providerEmail) {
             if (!confirm(`Are you sure you want to release payout of ₹${amount} to practitioner?`)) return;

@@ -1303,9 +1303,50 @@
             alert('📅 Google Calendar OAuth integration initialized for clinical consultations!');
         };
 
-        let psychSessionsUnsubscribe = null;
-        let quillSoapEditor = null;
-        let quillArticleEditor = null;
+        window.v2ViewPatientHistory = async function(patientEmail) {
+            try {
+                const q = query(collection(db, 'patient_soap_notes'), where('psychologistUid', '==', auth.currentUser.uid));
+                const snapshot = await getDocs(q);
+                let notesHtml = '';
+                snapshot.forEach(docSnap => {
+                    const n = docSnap.data();
+                    if (n.patientName === patientEmail || !patientEmail) {
+                        const date = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleDateString() : 'Recent';
+                        notesHtml += `<div style="padding:10px; background:var(--bg-surface-elevated); border-radius:6px; margin-bottom:8px; border:1px solid var(--border-subtle);"><div style="font-size:0.75rem; color:var(--text-muted);">${date} - Patient: ${n.patientName}</div><div style="font-size:0.85rem; margin-top:4px;">${n.content}</div></div>`;
+                    }
+                });
+                alert(`📋 Clinical History for ${patientEmail || 'Patient'}:\n\n` + (notesHtml ? 'Found clinical SOAP notes.' : 'No previous SOAP notes recorded for this patient.'));
+            } catch (err) {
+                console.error('Error fetching patient history:', err);
+                alert('Failed to fetch patient history: ' + err.message);
+            }
+        };
+
+        window.v2ExportPsychMonthlyReport = async function() {
+            try {
+                const q = query(collection(db, 'peer_bookings'), where('peerId', '==', auth.currentUser.uid));
+                const snapshot = await getDocs(q);
+                if (snapshot.empty) {
+                    alert('No consultation records found to export.');
+                    return;
+                }
+                let csv = 'Consultation ID,Patient Name,Date,Status,Fee (INR)\n';
+                snapshot.forEach(docSnap => {
+                    const c = docSnap.data();
+                    const date = c.startTime?.toDate ? c.startTime.toDate().toISOString() : 'Scheduled';
+                    csv += `"${docSnap.id}","${c.userName || c.userEmail || 'Patient'}","${date}","${c.status || 'confirmed'}","${c.amount || c.sessionFee || 1200}"\n`;
+                });
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `clinical_practice_report_${new Date().toISOString().slice(0,10)}.csv`;
+                a.click();
+            } catch (err) {
+                console.error('Error exporting practice report:', err);
+                alert('Failed to export practice report: ' + err.message);
+            }
+        };
 
         window.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById('v2SoapQuillEditor')) {
