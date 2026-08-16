@@ -638,6 +638,18 @@
             .v2-grid-2col { grid-template-columns: 1fr; }
         }
     </style>
+
+    <!-- SEO & OPEN GRAPH META TAGS -->
+    <meta name="description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soulamore.com/portal/admin-dashboard-v2.html">
+    <meta property="og:title" content="Admin Operations Hub | Soulamore V2">
+    <meta property="og:description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta property="og:image" content="https://soulamore.com/assets/images/favicon_symbol.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Admin Operations Hub | Soulamore V2">
+    <meta name="twitter:description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta name="twitter:image" content="https://soulamore.com/assets/images/favicon_symbol.webp">
 </head>
 
 <body>
@@ -1001,7 +1013,46 @@
             }
         };
 
-        window.v2ToggleMaintenanceMode = async function() {
+        window.v2ApproveProfileRequest = async function(requestId, providerId, proposedData) {
+            if (!confirm('Are you sure you want to approve this profile edit and promote it live?')) return;
+            try {
+                // 1. Promote proposedData to live document in users collection
+                await updateDoc(doc(db, 'users', providerId), {
+                    ...proposedData,
+                    lastApprovedAt: serverTimestamp(),
+                    lastApprovedBy: auth.currentUser?.uid || 'admin'
+                });
+
+                // 2. Mark edit request as approved
+                await updateDoc(doc(db, 'profile_edit_requests', requestId), {
+                    status: 'approved',
+                    reviewedAt: serverTimestamp(),
+                    reviewedBy: auth.currentUser?.uid || 'admin'
+                });
+
+                alert('✅ Profile edit approved and promoted live to public profile!');
+            } catch (err) {
+                console.error('Error approving request:', err);
+                alert('Failed to approve request: ' + err.message);
+            }
+        };
+
+        window.v2RejectProfileRequest = async function(requestId) {
+            const note = prompt('Enter rejection note / explanation for provider:');
+            if (note === null) return;
+            try {
+                await updateDoc(doc(db, 'profile_edit_requests', requestId), {
+                    status: 'rejected',
+                    reviewNote: note,
+                    reviewedAt: serverTimestamp(),
+                    reviewedBy: auth.currentUser?.uid || 'admin'
+                });
+                alert('❌ Profile edit request rejected.');
+            } catch (err) {
+                console.error('Error rejecting request:', err);
+                alert('Failed to reject request: ' + err.message);
+            }
+        };
             try {
                 const globalRef = doc(db, 'maintenance_settings', 'global');
                 const docSnap = await getDoc(globalRef);
@@ -1086,24 +1137,79 @@
                     const usersListContainer = document.getElementById('v2UsersListContainer');
                     if (usersCountEl) usersCountEl.textContent = snapshot.size;
 
-                    if (usersListContainer) {
-                        let html = `<div style="display:flex; flex-direction:column; gap:8px;">`;
+                // 1. Profile Approvals Queue Listener (Git PR-Style Diff View)
+                onSnapshot(collection(db, 'profile_edit_requests'), (snapshot) => {
+                    const container = document.getElementById('v2ApprovalsQueueContainer');
+                    const badge = document.getElementById('v2AdminBadge');
+                    let pendingCount = 0;
+
+                    if (snapshot.empty) {
+                        if (badge) badge.textContent = '0';
+                        if (container) container.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:20px;">✅ Zero pending profile edit requests.</div>';
+                    } else {
+                        let html = '';
                         snapshot.forEach(docSnap => {
-                            const u = docSnap.data();
+                            const req = docSnap.data();
+                            const reqId = docSnap.id;
+                            if (req.status === 'pending') pendingCount++;
+
+                            const p = req.proposedData || {};
+                            const prev = req.previousSnapshot || {};
+                            const roleBadge = (req.role || 'provider').toUpperCase();
+
                             html += `
-                                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
-                                    <div>
-                                        <div style="font-weight:600; font-size:0.88rem;">${u.displayName || u.email || 'User'}</div>
-                                        <div style="font-size:0.75rem; color:var(--text-muted);">${u.email || ''}</div>
+                                <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px; margin-bottom:16px;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border-subtle);">
+                                        <div>
+                                            <span style="font-weight:700; font-size:0.92rem;">${req.userEmail || req.userId}</span>
+                                            <span class="v2-badge-pill" style="margin-left:8px;">${roleBadge}</span>
+                                        </div>
+                                        <div style="font-size:0.75rem; font-weight:700; color:${req.status === 'pending' ? '#F59E0B' : req.status === 'approved' ? '#10B981' : '#EF4444'};">
+                                            STATUS: ${(req.status || 'pending').toUpperCase()}
+                                        </div>
                                     </div>
-                                    <div style="font-size:0.75rem; font-weight:600; color:var(--primary-violet);">${(u.role || 'user').toUpperCase()}</div>
+
+                                    <!-- GIT PR-STYLE SIDE-BY-SIDE DIFF GRID -->
+                                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+                                        <div style="background:var(--bg-surface); padding:12px; border-radius:6px; border:1px solid rgba(239,68,68,0.2); font-size:0.78rem;">
+                                            <strong style="color:#EF4444;">- Current Live Document</strong>
+                                            <div style="margin-top:6px; color:var(--text-secondary);">
+                                                <strong>Quote:</strong> ${prev.quote || prev.tagline || 'None'}<br>
+                                                <strong>Bio:</strong> ${prev.bio || 'None'}<br>
+                                                <strong>Tags:</strong> ${Array.isArray(prev.tags) ? prev.tags.join(', ') : (prev.tags || 'None')}
+                                            </div>
+                                        </div>
+                                        <div style="background:var(--bg-surface); padding:12px; border-radius:6px; border:1px solid rgba(16,185,129,0.3); font-size:0.78rem;">
+                                            <strong style="color:#10B981;">+ Proposed Diff</strong>
+                                            <div style="margin-top:6px; color:var(--text-primary);">
+                                                <strong>Quote:</strong> ${p.quote || p.title || 'None'}<br>
+                                                <strong>Bio:</strong> ${p.bio || 'None'}<br>
+                                                <strong>Tags:</strong> ${Array.isArray(p.tags) ? p.tags.join(', ') : (Array.isArray(p.specialties) ? p.specialties.join(', ') : (p.tags || 'None'))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    ${req.status === 'pending' ? `
+                                        <div style="display:flex; gap:10px;">
+                                            <button class="v2-btn-primary" style="background:#10B981; font-size:0.78rem; padding:6px 14px;" onclick="v2ApproveProfileRequest('${reqId}', '${req.userId}', ${JSON.stringify(p).replace(/"/g, '&quot;')})">
+                                                <i class="fas fa-check"></i> Approve & Promote to Live
+                                            </button>
+                                            <button class="v2-btn-primary" style="background:#EF4444; font-size:0.78rem; padding:6px 14px;" onclick="v2RejectProfileRequest('${reqId}')">
+                                                <i class="fas fa-times"></i> Reject Request
+                                            </button>
+                                        </div>
+                                    ` : ''}
                                 </div>
                             `;
                         });
-                        html += `</div>`;
-                        usersListContainer.innerHTML = html;
+
+                        if (badge) badge.textContent = pendingCount;
+                        if (container) container.innerHTML = html;
                     }
                 });
+
+                // 2. Users List Listener
+                onSnapshot(collection(db, 'users'), (snapshot) => {
 
                 // 3. Newsletter Subscribers Listener
                 onSnapshot(collection(db, 'newsletters'), (snapshot) => {
