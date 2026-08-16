@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com;
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+                 font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+                 img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
+                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://region1.google-analytics.com https://www.google-analytics.com https://analytics.google.com;
+                 frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
+
+    <!-- AUTH GUARD -->
+    <script src="../assets/js/portal-utils.js"></script>
+    <script src="../assets/js/auth-guard.js"></script>
+
+    <!-- STANDALONE UI NAVIGATION UTILITIES & DASHBOARD LOADING SYSTEM -->
+    <link rel="stylesheet" href="../assets/css/dashboard-loading.css">
+    <script>
+        function v2SwitchTab(tabName, element) {
+            document.querySelectorAll('.v2-nav-item').forEach(function(el) { el.classList.remove('active'); });
+            if (element) element.classList.add('active');
+
+            document.querySelectorAll('.v2-view-section').forEach(function(sec) { sec.classList.remove('active'); });
+            var targetSec = document.getElementById('v2-view-' + tabName);
+            if (targetSec) targetSec.classList.add('active');
+
+            var titleMap = {
+                overview: 'Workplace Overview',
+                burnout: 'Burnout Self-Assessment',
+                coaching: 'Executive Coaching & Counseling',
+                peers: 'Workplace Peer Supporters',
+                boundaries: 'Work-Life Boundary Tools',
+                settings: 'Workplace Account Settings'
+            };
+            var headerTitle = document.getElementById('v2HeaderTitle');
+            if (headerTitle) headerTitle.textContent = titleMap[tabName] || 'Workplace Wellness Sanctuary';
+        }
+
+        function v2ToggleTheme() {
+            var isDark = document.body.getAttribute('data-theme') === 'dark';
+            var icon = document.getElementById('v2ThemeIcon');
+
+            if (isDark) {
+                document.body.removeAttribute('data-theme');
+                if (icon) icon.className = 'fas fa-moon';
+                localStorage.setItem('soulamore_v2_workplace_theme', 'light');
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                if (icon) icon.className = 'fas fa-sun';
+                localStorage.setItem('soulamore_v2_workplace_theme', 'dark');
+            }
+        }
+
+        if (localStorage.getItem('soulamore_v2_workplace_theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            window.addEventListener('DOMContentLoaded', function() {
+                var icon = document.getElementById('v2ThemeIcon');
+                if (icon) icon.className = 'fas fa-sun';
+            });
+        }
+
+        function v2ToggleMobileSidebar() {
+            var sidebar = document.getElementById('v2Sidebar');
+            if (sidebar) sidebar.classList.toggle('mobile-open');
+        }
+
+        function hideV2Loader() {
+            var loader = document.getElementById('v2DashboardLoader');
+            if (loader) {
+                loader.classList.add('hidden');
+                setTimeout(function() { loader.style.display = 'none'; }, 500);
+            }
+        }
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workplace Wellness Sanctuary | Soulamore V2</title>
+
+    <!-- FONTS & ICONS -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="../assets/images/favicon_symbol.webp" type="image/x-icon">
+
+    <!-- SUPER PREMIUM STYLES & RICH 2-COLUMN GRID SYSTEM -->
+    <style>
+        :root {
+            --bg-canvas: #F0Fdf4;
+            --bg-surface: #FFFFFF;
+            --bg-surface-elevated: #DCFCE7;
+            --border-subtle: rgba(16, 185, 129, 0.15);
+            --border-strong: rgba(16, 185, 129, 0.3);
+            
+            --primary-emerald: #10B981;
+            --primary-emerald-hover: #059669;
+            --emerald-light: #A7F3D0;
+            --emerald-glow: rgba(16, 185, 129, 0.15);
+            
+            --text-primary: #1E293B;
+            --text-secondary: #334155;
+            --text-muted: #64748B;
+            
+            --sidebar-width: 250px;
+            --topbar-height: 64px;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-subtle: 0 4px 20px -2px rgba(16, 185, 129, 0.05);
+            --transition-smooth: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-canvas: #064E3B;
+            --bg-surface: #065F46;
+            --bg-surface-elevated: #047857;
+            --border-subtle: rgba(52, 211, 153, 0.2);
+            --border-strong: rgba(52, 211, 153, 0.4);
+            
+            --primary-emerald: #34D399;
+            --primary-emerald-hover: #6EE7B7;
+            --emerald-light: rgba(52, 211, 153, 0.15);
+            --emerald-glow: rgba(52, 211, 153, 0.25);
+            
+            --text-primary: #F8FAFC;
+            --text-secondary: #ECFDF5;
+            --text-muted: #A7F3D0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+        }
+
+        /* SIDEBAR */
+        .v2-sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .v2-sidebar-brand {
+            height: var(--topbar-height);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .v2-brand-logo-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            height: 42px;
+        }
+
+        .v2-brand-logo-base {
+            height: 42px;
+            max-width: 180px;
+            object-fit: contain;
+        }
+
+        .v2-brand-logo-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 42px;
+            max-width: 180px;
+            object-fit: contain;
+            filter: brightness(0.22);
+            clip-path: inset(0 0 0 32.5%);
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        [data-theme="dark"] .v2-brand-logo-overlay {
+            opacity: 0;
+        }
+
+        .v2-user-profile-badge {
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-surface-elevated);
+            margin: 10px 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .v2-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--emerald-light);
+            color: var(--primary-emerald);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-strong);
+            flex-shrink: 0;
+        }
+
+        .v2-user-info { overflow: hidden; }
+
+        .v2-user-name {
+            font-weight: 600;
+            font-size: 0.84rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .v2-user-status {
+            font-size: 0.7rem;
+            color: var(--primary-emerald);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+
+        .v2-status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary-emerald);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .v2-nav-list {
+            list-style: none;
+            padding: 8px 12px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .v2-nav-section-title {
+            padding: 8px 10px 4px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .v2-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.84rem;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+        }
+
+        .v2-nav-item:hover {
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+        }
+
+        .v2-nav-item.active {
+            background: var(--emerald-light);
+            color: var(--primary-emerald);
+            font-weight: 600;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .v2-nav-item i {
+            width: 18px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .v2-sidebar-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .v2-btn-logout {
+            width: 100%;
+            padding: 8px;
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: var(--transition-smooth);
+        }
+
+        .v2-btn-logout:hover {
+            background: rgba(239, 68, 68, 0.08);
+            color: #EF4444;
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        /* MAIN WRAPPER & GRID */
+        .v2-main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .v2-topbar {
+            height: var(--topbar-height);
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 90;
+            position: relative;
+        }
+
+        .v2-topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .v2-page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .v2-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .v2-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-surface-elevated);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .v2-icon-btn:hover {
+            color: var(--primary-emerald);
+            border-color: var(--border-strong);
+        }
+
+        .v2-content-viewport {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .v2-view-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .v2-view-section.active {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            opacity: 1;
+        }
+
+        .v2-grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .v2-section-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .v2-side-card {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .v2-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .v2-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .v2-btn-primary {
+            background: var(--primary-emerald);
+            color: white;
+            border: none;
+            padding: 9px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: 0.84rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .v2-btn-primary:hover {
+            background: var(--primary-emerald-hover);
+        }
+
+        .v2-textarea {
+            width: 100%;
+            min-height: 90px;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            color: var(--text-primary);
+            font-size: 0.88rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .v2-mobile-sidebar-toggle { display: none; }
+
+        @media (max-width: 900px) {
+            .v2-sidebar { position: fixed; left: -250px; top: 0; }
+            .v2-sidebar.mobile-open { left: 0; }
+            .v2-mobile-sidebar-toggle { display: flex; }
+            .v2-grid-2col { grid-template-columns: 1fr; }
+        }
+    </style>
+
+    <!-- SEO & OPEN GRAPH META TAGS -->
+    <meta name="description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soulamore.com/portal/workplace-dashboard-v2.html">
+    <meta property="og:title" content="Workplace Wellness Sanctuary | Soulamore V2">
+    <meta property="og:description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta property="og:image" content="https://soulamore.com/assets/images/favicon_symbol.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Workplace Wellness Sanctuary | Soulamore V2">
+    <meta name="twitter:description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta name="twitter:image" content="https://soulamore.com/assets/images/favicon_symbol.webp">
+</head>
+
+<body>
+    <!-- WORKPLACE LOADING SCREEN (Safe Earth Theme) -->
+    <div id="v2DashboardLoader" class="dashboard-loading user-theme">
+        <div class="loading-breath-circle">
+            <span style="font-size:2rem;">💼</span>
+        </div>
+        <div class="loading-text-container" style="text-align:center;">
+            <div class="loading-title">Workplace Wellness Sanctuary</div>
+            <div class="loading-subtitle">Connecting to confidential employee wellbeing space...</div>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+        <div class="loading-tips">
+            <div class="loading-tip-icon" style="text-align:center;">🛡️</div>
+            <div class="loading-tip-text" style="text-align:center;">100% confidential. Your employer never sees your personal entries.</div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <nav class="v2-sidebar" id="v2Sidebar">
+        <div class="v2-sidebar-brand">
+            <div class="v2-brand-logo-container">
+                <img src="../assets/images/logo.webp" alt="Soulamore" class="v2-brand-logo-base">
+                <img src="../assets/images/logo.webp" alt="" class="v2-brand-logo-overlay">
+            </div>
+        </div>
+
+        <div class="v2-user-profile-badge">
+            <div class="v2-avatar" id="v2Avatar">W</div>
+            <div class="v2-user-info">
+                <div class="v2-user-name" id="v2UserName">Loading Employee...</div>
+                <div class="v2-user-status"><span class="v2-status-dot"></span> Corporate Member</div>
+            </div>
+        </div>
+
+        <ul class="v2-nav-list">
+            <li class="v2-nav-item active" onclick="v2SwitchTab('overview', this)">
+                <i class="fas fa-briefcase"></i> Overview
+            </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('burnout', this)">
+                <i class="fas fa-heartbeat"></i> Burnout Self-Check
+            </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('coaching', this)">
+                <i class="fas fa-user-tie"></i> Executive Coaching
+            </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('peers', this)">
+                <i class="fas fa-hands-helping"></i> Workplace Peers
+            </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('boundaries', this)">
+                <i class="fas fa-umbrella"></i> Work-Life Boundaries
+            </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('settings', this)">
+                <i class="fas fa-cog"></i> Account Settings
+            </li>
+        </ul>
+
+        <div class="v2-sidebar-footer">
+            <button class="v2-btn-logout" onclick="handleLogout()">
+                <i class="fas fa-arrow-right-from-bracket"></i> Log Out
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN VIEW WRAPPER -->
+    <div class="v2-main-wrapper">
+        <header class="v2-topbar">
+            <div class="v2-topbar-left">
+                <button class="v2-icon-btn v2-mobile-sidebar-toggle" onclick="v2ToggleMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="v2-page-title" id="v2HeaderTitle">Workplace Overview</h1>
+            </div>
+
+            <div class="v2-topbar-right">
+                <!-- Theme Toggle -->
+                <button class="v2-icon-btn" onclick="v2ToggleTheme()" title="Toggle Theme">
+                    <i class="fas fa-moon" id="v2ThemeIcon"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="v2-content-viewport">
+            
+            <!-- 1. OVERVIEW -->
+            <section class="v2-view-section active" id="v2-view-overview">
+                <div class="v2-grid-2col">
+                    <div class="v2-section-card">
+                        <div class="v2-section-header">
+                            <div class="v2-section-title"><i class="fas fa-building" style="color:var(--primary-emerald);"></i> Enterprise Emotional Wellbeing</div>
+                        </div>
+                        <p style="font-size:0.88rem; color:var(--text-secondary); line-height:1.6;">
+                            Prevent workplace burnout, manage high-stress deliverables, and access confidential peer listening & executive coaching.
+                        </p>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-top:8px;">
+                            <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <div style="font-size:0.75rem; color:var(--text-muted);">Confidentiality Guarantee</div>
+                                <div style="font-size:1.1rem; font-weight:600; color:var(--primary-emerald);">100% Private 🛡️</div>
+                            </div>
+                            <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <div style="font-size:0.75rem; color:var(--text-muted);">Workplace Peer Network</div>
+                                <div style="font-size:1.1rem; font-weight:600; color:var(--primary-emerald);">Available 24/7</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="v2-side-card">
+                        <div style="font-weight:600; font-size:0.9rem;"><i class="fas fa-shield-alt" style="color:var(--primary-emerald);"></i> Workplace Tools</div>
+                        <button class="v2-btn-primary" style="justify-content:center;" onclick="v2SwitchTab('burnout')"><i class="fas fa-heartbeat"></i> Take 2-Min Burnout Check</button>
+                        <button class="v2-btn-primary" style="justify-content:center; background:var(--bg-surface); color:var(--text-primary); border:1px solid var(--border-subtle);" onclick="v2SwitchTab('coaching')"><i class="fas fa-user-tie"></i> Book Executive Coach</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. BURNOUT SELF-ASSESSMENT -->
+            <section class="v2-view-section" id="v2-view-burnout">
+                <div class="v2-section-card">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-heartbeat" style="color:var(--primary-emerald);"></i> Confidential Burnout Self-Check</div>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--text-secondary);">Assess chronic workplace exhaustion, detachment, and emotional fatigue.</p>
+                    <a href="../spaces/assessments/index.html" target="_blank" rel="noopener noreferrer" class="v2-btn-primary" style="align-self:flex-start; margin-top:8px;">Start Assessment</a>
+                </div>
+            </section>
+
+            <!-- 3. EXECUTIVE COACHING -->
+            <section class="v2-view-section" id="v2-view-coaching">
+                <div class="v2-section-card">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-user-tie" style="color:var(--primary-emerald);"></i> 1-on-1 Executive Coaching & Counseling</div>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--text-secondary);">Schedule private video consultations with corporate wellness psychologists.</p>
+                    <a href="../our-psychologists/psychologists.html" target="_blank" rel="noopener noreferrer" class="v2-btn-primary" style="align-self:flex-start; margin-top:8px;">Browse Executive Counselors</a>
+                </div>
+            </section>
+
+            <!-- 4. WORKPLACE PEERS -->
+            <section class="v2-view-section" id="v2-view-peers">
+                <div class="v2-section-card">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-hands-helping" style="color:var(--primary-emerald);"></i> Workplace Peer Supporters</div>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--text-secondary);">Connect with trained peer listeners who understand modern workplace dynamics.</p>
+                    <a href="../our-peers/index.html" target="_blank" rel="noopener noreferrer" class="v2-btn-primary" style="align-self:flex-start; margin-top:8px;">Connect with Peer Supporter</a>
+                </div>
+            </section>
+
+            <!-- 5. WORK-LIFE BOUNDARIES -->
+            <section class="v2-view-section" id="v2-view-boundaries">
+                <div class="v2-section-card">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-umbrella" style="color:var(--primary-emerald);"></i> Work-Life Boundary & De-Compression Tools</div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                            <div style="font-weight:600; font-size:0.88rem;">End-of-Day Shutdown Ritual</div>
+                            <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:4px;">Log off Slack/Teams, write down 3 uncompleted tasks for tomorrow, and close the work laptop.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. SETTINGS -->
+            <section class="v2-view-section" id="v2-view-settings">
+                <div class="v2-section-card">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-cog"></i> Account Settings</div>
+                    </div>
+                    <input type="text" class="v2-textarea" style="min-height:auto; padding:10px;" id="v2WorkplaceNameInput" placeholder="Display Name">
+                    <button class="v2-btn-primary" style="align-self:flex-start; margin-top:8px;" onclick="alert('Settings saved!')">Save Preferences</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SCRIPT LOGIC -->
+    <script type="module">
+        import { auth, db, doc, getDoc } from '../assets/js/firebase-config.js';
+
+        async function loadWorkplaceDashboard(uid) {
+            try {
+                const userDoc = await getDoc(doc(db, 'users', uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    const name = data.displayName || data.name || data.email?.split('@')[0] || 'Employee';
+                    
+                    const nameEl = document.getElementById('v2UserName');
+                    const avatarEl = document.getElementById('v2Avatar');
+                    if (nameEl) nameEl.textContent = name;
+                    if (avatarEl) avatarEl.textContent = name.charAt(0).toUpperCase();
+                }
+                hideV2Loader();
+            } catch (err) {
+                console.error('Error loading workplace dashboard:', err);
+                hideV2Loader();
+            }
+        }
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loadWorkplaceDashboard(user.uid);
+            } else {
+                hideV2Loader();
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Verified Licensed Clinical Psychologist Profile | Soulamore V2 Sanctuary">
+    <title>Dr. Clinical Psychologist | Soulamore V2 Sanctuary</title>
+
+    <!-- FONTS & ICONS (OUTFIT, LORA FOR STORYTELLING, PLUS JAKARTA SANS) -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="../assets/images/favicon_symbol.webp" type="image/x-icon">
+
+    <!-- HYBRID SOFT & HIGH-CONTRAST PROFESSIONAL PROFILE STYLES -->
+    <style>
+        :root {
+            /* SOFT LIGHT THEME (Pertaining to Peer Soft Sage & Cream Aesthetic) */
+            --bg-canvas: #F7F9F8;
+            --bg-surface: #FFFFFF;
+            --bg-surface-elevated: #F0F6F5;
+            
+            --border-subtle: rgba(0, 151, 167, 0.15);
+            --border-strong: rgba(0, 151, 167, 0.3);
+            
+            --primary-teal: #00838F;
+            --primary-teal-hover: #006064;
+            --teal-soft: #E0F2F1;
+            --peach-accent: #E66B46;
+            
+            --text-heading: #1E293B;
+            --text-body: #334155;
+            --text-muted: #64748B;
+            
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-pill: 999px;
+            --shadow-soft: 0 10px 30px -5px rgba(0, 131, 143, 0.05);
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.03);
+            --transition-smooth: all 0.25s ease;
+        }
+
+        [data-theme="dark"] {
+            /* SERENE DARK SLATE THEME (Professional Dark Contrast) */
+            --bg-canvas: #0F172A;
+            --bg-surface: #1E293B;
+            --bg-surface-elevated: #24354A;
+            
+            --border-subtle: rgba(0, 172, 193, 0.2);
+            --border-strong: rgba(0, 172, 193, 0.4);
+            
+            --primary-teal: #00ACC1;
+            --primary-teal-hover: #26C6DA;
+            --teal-soft: rgba(0, 172, 193, 0.15);
+            --peach-accent: #F49F75;
+            
+            --text-heading: #F8FAFC;
+            --text-body: #CBD5E1;
+            --text-muted: #94A3B8;
+            
+            --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.3);
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-body);
+            line-height: 1.75;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-heading);
+        }
+
+        .v2-container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 24px 20px 80px;
+            position: relative;
+        }
+
+        /* TOP NAVIGATION STRIP (HEADERLESS PROFILE PAGE) */
+        .v2-top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0 24px;
+            margin-bottom: 20px;
+        }
+
+        .v2-back-btn {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-pill);
+            box-shadow: var(--shadow-card);
+            transition: var(--transition-smooth);
+        }
+
+        .v2-back-btn:hover {
+            color: var(--primary-teal);
+            border-color: var(--primary-teal);
+            transform: translateX(-2px);
+        }
+
+        .v2-top-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .v2-theme-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition-smooth);
+        }
+
+        .v2-theme-btn:hover {
+            color: var(--primary-teal);
+            border-color: var(--primary-teal);
+        }
+
+        .v2-brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .v2-brand-badge img {
+            height: 24px;
+        }
+
+        /* HERO CARD (HYBRID SOFT + HIGH CONTRAST) */
+        .v2-hero-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            text-align: center;
+            position: relative;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 30px;
+        }
+
+        .v2-avatar-glow-ring {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            padding: 4px;
+            background: linear-gradient(135deg, var(--primary-teal), var(--peach-accent));
+            box-shadow: 0 10px 30px rgba(0, 131, 143, 0.15);
+            position: relative;
+        }
+
+        .v2-avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-surface-elevated);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-teal);
+            overflow: hidden;
+        }
+
+        .v2-avatar-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .v2-psych-name {
+            font-size: 2.3rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+
+        .v2-psych-title {
+            color: var(--primary-teal);
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 18px;
+        }
+
+        /* HIGH-CONTRAST HERO QUOTE (SERIF LORA) */
+        .v2-hero-quote {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: 1.15rem;
+            color: var(--text-body);
+            max-width: 680px;
+            margin: 0 auto 24px;
+            line-height: 1.6;
+        }
+
+        .v2-badge-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 26px;
+        }
+
+        .v2-pill-badge {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            padding: 7px 16px;
+            border-radius: var(--radius-pill);
+            font-size: 0.82rem;
+            color: var(--text-body);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .v2-pill-badge.verified {
+            background: var(--teal-soft);
+            border-color: var(--border-strong);
+            color: var(--primary-teal);
+            font-weight: 600;
+        }
+
+        .v2-pill-badge.fee {
+            background: rgba(230, 107, 70, 0.1);
+            border-color: rgba(230, 107, 70, 0.3);
+            color: var(--peach-accent);
+            font-weight: 600;
+        }
+
+        .v2-btn-book {
+            background: var(--primary-teal);
+            color: white;
+            padding: 14px 40px;
+            border-radius: var(--radius-pill);
+            font-size: 0.98rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0, 131, 143, 0.25);
+            transition: var(--transition-smooth);
+        }
+
+        .v2-btn-book:hover {
+            background: var(--primary-teal-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 131, 143, 0.35);
+        }
+
+        /* 2-COLUMN HIGH-CONTRAST GRID */
+        .v2-content-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .v2-glass-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 24px;
+        }
+
+        .v2-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .v2-card-title i {
+            color: var(--primary-teal);
+        }
+
+        /* HIGH-CONTRAST READING TEXT (SERIF & CLEAN SANS BLEND) */
+        .v2-text-body {
+            font-family: 'Lora', serif;
+            font-size: 1.05rem;
+            color: var(--text-body);
+            line-height: 1.8;
+        }
+
+        .v2-chip-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .v2-chip {
+            background: var(--teal-soft);
+            border: 1px solid var(--border-subtle);
+            color: var(--primary-teal);
+            padding: 6px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .v2-bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .v2-bullet-list li {
+            font-size: 0.92rem;
+            color: var(--text-body);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.6;
+        }
+
+        .v2-bullet-list li i {
+            color: var(--primary-teal);
+            margin-top: 4px;
+            font-size: 0.88rem;
+        }
+
+        .v2-review-item {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .v2-review-author {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--primary-teal);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .v2-review-text {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: 0.94rem;
+            color: var(--text-body);
+            line-height: 1.6;
+        }
+
+        /* CRISIS BOUNDARY NOTICE */
+        .v2-boundary-box {
+            background: rgba(239, 68, 68, 0.06);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .v2-boundary-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #EF4444;
+            margin-bottom: 6px;
+        }
+
+        .v2-boundary-text {
+            font-size: 0.82rem;
+            color: var(--text-body);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 840px) {
+            .v2-content-grid {
+                grid-template-columns: 1fr;
+            }
+            .v2-psych-name {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="v2-container">
+
+        <!-- TOP NAVIGATION STRIP (HEADERLESS PROFILE PAGE) -->
+        <header class="v2-top-nav">
+            <a href="psychologists.html" class="v2-back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Practitioners Directory
+            </a>
+
+            <div class="v2-top-actions">
+                <button class="v2-theme-btn" onclick="v2ToggleProfileTheme()" title="Toggle Theme (Light / Dark)">
+                    <i class="fas fa-moon" id="v2ThemeIcon"></i>
+                </button>
+                <div class="v2-brand-badge">
+                    <img src="../assets/images/favicon_symbol.webp" alt="Soulamore">
+                    <span>Soulamore Clinical Sanctuary</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN PROFILE CONTENT -->
+        <main id="v2PsychContent">
+            
+            <!-- HERO CARD -->
+            <div class="v2-hero-card">
+                <div class="v2-avatar-glow-ring">
+                    <div class="v2-avatar-inner" id="pAvatarContainer">
+                        <span id="pAvatarInitial">P</span>
+                    </div>
+                </div>
+
+                <h1 class="v2-psych-name" id="pName">Dr. Palak Shori</h1>
+                <div class="v2-psych-title" id="pTitle">Clinical Psychologist, M.Phil (RCI Registered)</div>
+
+                <div class="v2-hero-quote" id="pQuote">
+                    "Healing isn't about rushing to fix yourself — it's about holding a gentle, structured space where your mind can breathe and build resilience."
+                </div>
+
+                <div class="v2-badge-row">
+                    <span class="v2-pill-badge verified"><i class="fas fa-shield-alt"></i> RCI Verified License</span>
+                    <span class="v2-pill-badge fee" id="pFeePill"><i class="fas fa-tag"></i> ₹1,200 / 45m</span>
+                    <span class="v2-pill-badge" id="pLangsPill"><i class="fas fa-language"></i> English, Hindi</span>
+                </div>
+
+                <button class="v2-btn-book" onclick="v2ScrollToBooking()">
+                    <i class="fas fa-calendar-check"></i> Book Consultation Session
+                </button>
+            </div>
+
+            <!-- 2-COLUMN HIGH-CONTRAST GRID -->
+            <div class="v2-content-grid">
+                
+                <!-- LEFT COLUMN: MAIN CLINICAL DETAILS & STORYTELLING -->
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    
+                    <!-- 1. CLINICAL BIO & APPROACH -->
+                    <div class="v2-glass-card">
+                        <div class="v2-card-title">
+                            <i class="fas fa-stethoscope"></i> Therapeutic Approach & Clinical Background
+                        </div>
+                        <p class="v2-text-body" id="pBio">
+                            Experienced RCI-registered clinical psychologist specializing in Cognitive Behavioral Therapy (CBT), Mindfulness-Based Stress Reduction, and trauma-informed care. I provide a confidential, safe sanctuary space for individuals navigating anxiety disorders, emotional burnout, relationship stressors, and life transitions.
+                        </p>
+                    </div>
+
+                    <!-- 2. SPECIALTIES & MODALITIES -->
+                    <div class="v2-glass-card">
+                        <div class="v2-card-title">
+                            <i class="fas fa-tags"></i> Clinical Specialties & Focus Areas
+                        </div>
+                        <div class="v2-chip-cloud" id="pSpecialtiesCloud">
+                            <span class="v2-chip">Cognitive Behavioral Therapy (CBT)</span>
+                            <span class="v2-chip">EMDR & Trauma-Informed</span>
+                            <span class="v2-chip">Anxiety & Panic Disorders</span>
+                            <span class="v2-chip">Mindfulness-Based Stress Reduction</span>
+                            <span class="v2-chip">Depression & Mood Regulation</span>
+                            <span class="v2-chip">Relationship Counseling</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. SESSION EXPECTATIONS -->
+                    <div class="v2-glass-card">
+                        <div class="v2-card-title">
+                            <i class="fas fa-clock"></i> What to Expect in Our 45-Minute Session
+                        </div>
+                        <ul class="v2-bullet-list" id="pExpectationsList">
+                            <li><i class="fas fa-check-circle"></i> <strong>Confidential Telehealth Space:</strong> Private 1-on-1 encrypted video session via Soulamore Sanctuary.</li>
+                            <li><i class="fas fa-check-circle"></i> <strong>Initial Assessment:</strong> Collaborative review of current stressors, coping mechanisms, and emotional health history.</li>
+                            <li><i class="fas fa-check-circle"></i> <strong>Structured Goal Setting:</strong> Actionable evidence-based strategies tailored to your unique psychological journey.</li>
+                        </ul>
+                    </div>
+
+                    <!-- 4. REVIEWS & PATIENT NOTES -->
+                    <div class="v2-glass-card">
+                        <div class="v2-card-title">
+                            <i class="fas fa-heart"></i> Patient Feedback & Notes of Gratitude
+                        </div>
+                        <div id="pReviewsContainer" style="display:flex; flex-direction:column; gap:12px;">
+                            <div class="v2-review-item">
+                                <div class="v2-review-author"><span>Verified Patient</span> <span>5.0 ★</span></div>
+                                <div class="v2-review-text">"Dr. Shori helped me break out of an overwhelming panic cycle with clear CBT techniques. Highly compassionate."</div>
+                            </div>
+                            <div class="v2-review-item">
+                                <div class="v2-review-author"><span>Student Consultation</span> <span>5.0 ★</span></div>
+                                <div class="v2-review-text">"Gentle, structured, and deeply understanding environment. Felt truly heard."</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN: SIDEBAR WIDGETS & BOOKING -->
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    
+                    <!-- BOOKING WIDGET PANEL -->
+                    <div class="v2-glass-card" id="v2BookingWidgetCard">
+                        <div class="v2-card-title">
+                            <i class="fas fa-calendar-day"></i> Reserve Consultation
+                        </div>
+                        <div id="v2BookingWidgetRoot">
+                            <div style="background:var(--bg-surface-elevated); padding:18px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); text-align:center;">
+                                <div style="font-size:0.88rem; font-weight:600; color:var(--text-heading); margin-bottom:6px;">Standard 45-Min Session</div>
+                                <div style="font-size:1.3rem; font-weight:700; color:var(--peach-accent); margin-bottom:14px;">₹1,200</div>
+                                <button class="v2-btn-book" style="width:100%; justify-content:center; padding:11px 16px; font-size:0.9rem;" onclick="alert('Session booking initiated!')">
+                                    <i class="fas fa-video"></i> Select Available Slot
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CLINICAL BOUNDARIES NOTE -->
+                    <div class="v2-boundary-box">
+                        <div class="v2-boundary-title"><i class="fas fa-shield-heart"></i> Emergency Safety Notice</div>
+                        <div class="v2-boundary-text">
+                            Scheduled telehealth sessions are not intended for immediate crisis emergencies. If you are experiencing acute self-harm thoughts, please click <a href="../get-help-now.html" style="color:#EF4444; font-weight:600; text-decoration:underline;">SOS Immediate Help</a>.
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        function v2ToggleProfileTheme() {
+            var isDark = document.body.getAttribute('data-theme') === 'dark';
+            var icon = document.getElementById('v2ThemeIcon');
+
+            if (isDark) {
+                document.body.removeAttribute('data-theme');
+                if (icon) icon.className = 'fas fa-moon';
+                localStorage.setItem('soulamore_v2_psych_profile_theme', 'light');
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                if (icon) icon.className = 'fas fa-sun';
+                localStorage.setItem('soulamore_v2_psych_profile_theme', 'dark');
+            }
+        }
+
+        if (localStorage.getItem('soulamore_v2_psych_profile_theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            window.addEventListener('DOMContentLoaded', function() {
+                var icon = document.getElementById('v2ThemeIcon');
+                if (icon) icon.className = 'fas fa-sun';
+            });
+        }
+
+        window.v2ScrollToBooking = function() {
+            const el = document.getElementById('v2BookingWidgetCard');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        function renderProfileData(data) {
+            const nameEl = document.getElementById('pName');
+            const titleEl = document.getElementById('pTitle');
+            const bioEl = document.getElementById('pBio');
+            const feeEl = document.getElementById('pFeePill');
+            const langsEl = document.getElementById('pLangsPill');
+            const initialEl = document.getElementById('pAvatarInitial');
+            const specsCloud = document.getElementById('pSpecialtiesCloud');
+
+            if (data.name && nameEl) nameEl.textContent = data.name;
+            if (data.name && initialEl) initialEl.textContent = data.name.replace('Dr. ', '').charAt(0).toUpperCase();
+            if (data.title && titleEl) titleEl.textContent = data.title;
+            if (data.bio && bioEl) bioEl.textContent = data.bio;
+            if (data.fee && feeEl) feeEl.innerHTML = `<i class="fas fa-tag"></i> ₹${data.fee} / 45m`;
+            if (data.languages && langsEl) langsEl.innerHTML = `<i class="fas fa-language"></i> ${data.languages}`;
+
+            if (data.specialties && specsCloud) {
+                const specsArr = Array.isArray(data.specialties) ? data.specialties : data.specialties.split(',');
+                specsCloud.innerHTML = specsArr.map(s => `<span class="v2-chip">${s.trim()}</span>`).join('');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id') || params.get('therapist');
+
+            if (id && window.location.protocol.startsWith('http')) {
+                try {
+                    const { db } = await import("../assets/js/firebase-config.js");
+                    const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                    
+                    let docSnap = await getDoc(doc(db, "professionals", id));
+                    if (!docSnap.exists()) {
+                        docSnap = await getDoc(doc(db, "users", id));
+                    }
+
+                    if (docSnap.exists()) {
+                        const rec = docSnap.data();
+                        renderProfileData({
+                            name: rec.displayName || rec.name,
+                            title: rec.title,
+                            bio: rec.bio || rec.approach,
+                            fee: rec.sessionFee,
+                            languages: rec.languages,
+                            specialties: rec.specialties
+                        });
+                    }
+                } catch (err) {
+                    console.log("Using hybrid soft demonstration profile.");
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

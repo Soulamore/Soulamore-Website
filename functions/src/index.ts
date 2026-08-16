@@ -37,6 +37,7 @@ export * from './apiRouter';
 export * from './privacyRights';
 export * from './razorpayPayments';
 export * from './bookingService';
+export * from './profileEditQueue';
 
 // Health check function
 export const healthCheckV2 = onCall({ cors: true }, () => {

@@ -1,0 +1,2441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            // 1. Redirect Firebase Traffic
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            // 2. Canonical Injection
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com;
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+                 font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+                 img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
+                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://analytics.google.com https://www.google-analytics.com https://region1.google-analytics.com;
+                 frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
+    <!-- AUTH GUARD: Protects this page -->
+    <script src="../assets/js/portal-utils.js"></script>
+    <script src="../assets/js/auth-guard.js"></script>
+    <script>
+        /* --- TOOL MODAL LOGIC (Global) --- */
+        function openTool(url, title) {
+            const modal = document.getElementById('toolModal');
+            const frame = document.getElementById('toolFrame');
+            const titleEl = document.getElementById('modalTitle');
+
+            if (modal && frame && titleEl) {
+                frame.src = url;
+                titleEl.textContent = title || 'Tool';
+                modal.classList.add('active');
+            } else {
+                window.open(url, '_blank'); // Fallback
+            }
+        }
+
+        function closeTool() {
+            const modal = document.getElementById('toolModal');
+            const frame = document.getElementById('toolFrame');
+
+            if (modal) modal.classList.remove('active');
+            if (frame) frame.src = '';
+        }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Space | Soulamore</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/dashboard-sidebar.css">
+    <link rel="stylesheet" href="../assets/css/dashboard-themes.css">
+    <link rel="stylesheet" href="../assets/css/portal-shared.css">
+    <link rel="stylesheet" href="../assets/css/dashboard-loading.css">
+    <link rel="icon" href="../assets/images/favicon_symbol.webp" type="image/x-icon">
+    <!-- FORCE COLOR OVERRIDE: Resolve Black Screen Issue -->
+    <!-- DYNAMIC COLOR FIX (Handled by portal-shared.css and global.css) -->
+    <style>
+        /* SCROLL FIX */
+        body {
+            overflow: hidden !important;
+            /* Keep body fixed, main scrolls */
+        }
+        .sidebar-notif-btn {
+            position: relative;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin-left: auto;
+            transition: all 0.3s ease;
+        }
+        .sidebar-notif-btn:hover {
+            background: rgba(255,255,255,0.1);
+            transform: scale(1.05);
+        }
+        .notif-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ff4757;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 50%;
+            border: 2px solid var(--sidebar-bg, #0f172a);
+        }
+    </style>
+
+    <!-- SEO & OPEN GRAPH META TAGS -->
+    <meta name="description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soulamore.com/portal/_archive/user-dashboard.html">
+    <meta property="og:title" content="My Space | Soulamore">
+    <meta property="og:description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta property="og:image" content="https://soulamore.com/assets/images/favicon_symbol.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="My Space | Soulamore">
+    <meta name="twitter:description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta name="twitter:image" content="https://soulamore.com/assets/images/favicon_symbol.webp">
+</head>
+
+<body>
+    <!-- USER LOADING SCREEN (Safe Earth Theme) -->
+    <div id="user-loading-screen" class="dashboard-loading user-theme">
+        <div class="loading-particles">
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+        </div>
+        <div class="loading-breath-circle">
+            <span style="font-size:2rem;">🌿</span>
+        </div>
+        <div class="loading-text-container">
+            <div class="loading-title" id="user-loading-title">Welcome Back</div>
+            <div class="loading-subtitle" id="user-loading-subtitle">Preparing your safe space...</div>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar" id="user-loading-progress"></div>
+        </div>
+        <div class="loading-tips">
+            <div class="loading-tip-icon" id="user-loading-tip-icon">🌿</div>
+            <div class="loading-tip-text" id="user-loading-tip-text">Your safe space is being prepared...</div>
+        </div>
+    </div>
+    <script>
+        // Auto-hide loading screen after content loads (with 10s safety timeout)
+        window.hideUserLoader = function() {
+            const screen = document.getElementById('user-loading-screen');
+            if (screen) {
+                console.log('🌿 Hiding user loader...');
+                screen.classList.add('hidden');
+                setTimeout(() => screen.style.display = 'none', 500);
+            }
+        };
+
+        // SAFETY TIMEOUT (1.10): Ensure loader hides even if Firestore/Auth hangs
+        setTimeout(() => {
+            const screen = document.getElementById('user-loading-screen');
+            if (screen && !screen.classList.contains('hidden')) {
+                console.warn('⚠️ Loading safety timeout triggered after 10s');
+                window.hideUserLoader();
+            }
+        }, 10000);
+    </script>
+
+    <!-- TOOL FRAME MODAL (Existing) -->
+    <div id="toolModal" class="tool-modal-overlay">
+        <div class="tool-modal-content">
+            <div class="tool-modal-header">
+                <div class="tool-modal-title" id="modalTitle">Tool Name</div><button class="tool-close-btn"
+                    onclick="closeTool()"><i class="fas fa-times"></i></button>
+            </div><iframe id="toolFrame" class="tool-frame" src=""></iframe>
+        </div>
+    </div>
+    <!-- QUICK TOOLS MODAL (New 2x2 Grid) -->
+    <div id="quickToolsModal" class="tool-modal-overlay" onclick="closeToolsModal(event)">
+        <div class="tool-modal-content" style="max-width: 500px; height: auto; min-height: auto; padding-bottom: 30px;"
+            onclick="event.stopPropagation()">
+            <div class="tool-modal-header">
+                <div class="tool-modal-title">Quick Relief</div><button class="tool-close-btn"
+                    onclick="closeToolsModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px;">
+                <!-- Vent Box -->
+                <div class="dash-card link-hover" onclick="window.location.href='../tools/vent-box.html'"
+                    style="margin:0; text-align:center; padding:25px; cursor:pointer; background:var(--alert-red-bg); border-color:var(--alert-red-bg);">
+                    <i class="fas fa-fire" style="font-size:2rem; color:var(--alert-red); margin-bottom:10px;"></i>
+                    <div style="font-weight:700;">Vent Box</div>
+                </div>
+                <!-- Confessing -->
+                <div class="dash-card link-hover" onclick="window.location.href='../tools/confession-box/index.html'"
+                    style="margin:0; text-align:center; padding:25px; cursor:pointer; background:var(--bg-subtle);">
+                    <i class="fas fa-ghost" style="font-size:2rem; color:#e2e8f0; margin-bottom:10px;"></i>
+                    <div style="font-weight:700;">Confessing</div>
+                </div>
+                <!-- Drop It -->
+                <div class="dash-card link-hover" onclick="window.location.href='../tools/drop-it.html'"
+                    style="margin:0; text-align:center; padding:25px; cursor:pointer; background:var(--info-blue-bg); border-color:rgba(56, 189, 248, 0.2);">
+                    <i class="fas fa-hand-holding-water" style="font-size:2rem; color:var(--info-blue); margin-bottom:10px;"></i>
+                    <div style="font-weight:700;">Drop It</div>
+                </div>
+                <!-- Play -->
+                <div class="dash-card link-hover" onclick="window.location.href='../tools/playground.html'"
+                    style="margin:0; text-align:center; padding:25px; cursor:pointer; background:rgba(250, 176, 5, 0.1); border-color:rgba(250, 176, 5, 0.2);">
+                    <i class="fas fa-shapes" style="font-size:2rem; color:#fab005; margin-bottom:10px;"></i>
+                    <div style="font-weight:700;">Play</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MOBILE TOGGLE -->
+    <button class="sidebar-toggle-mobile" id="mobileToggleButton" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="dashboard-layout">
+        <!-- SIDEBAR -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar-lg"><i class="fas fa-user-astronaut"></i></div>
+                <div class="user-info-text">
+                    <div class="name" id="sidebar-name">Loading...</div>
+                    <div class="role" id="sidebar-role" data-hardcoded-role="Member">Member</div>
+                </div>
+                <div class="sidebar-notif-btn" onclick="toggleNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-badge" id="notif-count" style="display:none;">0</span>
+                </div>
+            </div>
+            <div class="sidebar-nav"><a href="#" class="side-link active" onclick="switchView('home', this)"
+                    data-view="home"><i class="fas fa-home"></i><span>Home</span></a><a href="#" class="side-link"
+                    onclick="switchView('journal', this)" data-view="journal"><i class="fas fa-book"></i><span>My
+                        Journal</span></a><a href="#" class="side-link" onclick="switchView('bookings', this)"
+                    data-view="bookings"><i class="fas fa-calendar-alt"></i><span>My Sessions</span></a><a href="#"
+                    id="nav-availability-link" style="display:none;" class="side-link"
+                    onclick="switchView('availability', this)" data-view="availability"><i
+                        class="fas fa-calendar-check"></i><span>My Availability</span></a><a href="#" class="side-link"
+                    onclick="switchView('soulbot', this)" data-view="soulbot"><i class="fas fa-robot"></i><span>SoulBot
+                        AI</span></a><a href="#" onclick="switchView('messages', this)" data-view="messages"
+                    class="side-link"><i class="fas fa-envelope"></i><span>Messages</span></a><a href="#"
+                    onclick="switchView('saved', this)" class="side-link"><i
+                        class="fas fa-bookmark"></i><span>Saved</span></a><a href="#" class="side-link"
+                    onclick="switchView('wallet', this)" data-view="wallet"><i class="fas fa-wallet"></i><span>My
+                        Wallet</span></a>
+                <hr style="border:0; border-top:1px solid var(--bg-subtle); margin:10px 0;"><a href="#"
+                    class="side-link" onclick="switchView('profile', this)" data-view="profile"><i
+                        class="fas fa-user-circle"></i><span>My Profile</span></a><a href="#" class="side-link"
+                    onclick="switchView('settings', this)" data-view="settings"><i
+                        class="fas fa-cog"></i><span>Settings</span></a>
+            </div>
+            <div class="sidebar-footer">
+                <div style="padding:15px; margin-bottom:10px; font-size:0.7rem; color:var(--text-muted); line-height:1.4; opacity:0.6; font-style:italic; border-bottom:1px solid var(--bg-subtle);">
+                    "Guided peer support, strengthened by psychologist supervision and shared learning."
+                </div>
+                <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i>Log Out</button>
+            </div>
+        </nav>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- VIEW: SETTINGS (Appearance & Preferences) -->
+            <!-- VIEW: SETTINGS (Appearance & Preferences) -->
+            <div id="view-settings" class="view-section no-scroll" style="display:none;">
+                <!-- Standardized Header -->
+                <div class="workspace-header">
+                    <div class="workspace-header-content">
+                        <div class="workspace-header-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="workspace-header-text">
+                            <h2 class="workspace-title">Settings</h2>
+                            <div class="workspace-subtitle">Customize your space</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Standardized Body -->
+                <div class="workspace-body">
+                    <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                            <!-- APPEARANCE CARD -->
+                            <div class="dash-card">
+                                <h3 style="margin-bottom:20px;">Appearance & Atmosphere</h3>
+                                <!-- Mode (Light/Dark) -->
+                                <div style="margin-bottom:30px;"><label
+                                        style="display:block; margin-bottom:15px; font-weight:600; opacity:0.9;">Lighting
+                                        Mode</label>
+                                    <div style="display:flex; gap:15px;"><button onclick="setThemeMode('dark')"
+                                            class="theme-btn active" id="btn-mode-dark"><i class="fas fa-moon"></i>Dark
+                                        </button><button onclick="setThemeMode('light')" class="theme-btn"
+                                            id="btn-mode-light"><i class="fas fa-sun"></i>Light </button></div>
+                                </div>
+                                <style>
+                                    .theme-btn:hover {
+                                        transform: translateY(-2px);
+                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                                    }
+                                </style>
+                                <!-- Emotional Theme (HIDDEN FOR NOW) -->
+                                <div style="margin-bottom:30px; display:none;"><label
+                                        style="display:block; margin-bottom:15px; font-weight:600; opacity:0.9;">Emotional
+                                        Theme</label>
+                                    <div style="display:flex; flex-wrap:wrap; gap:10px;"><button
+                                            onclick="setEmotionalTheme('calm')" class="theme-tag active"
+                                            id="btn-theme-calm">🌊
+                                            Calm
+                                            (Default)</button><button onclick="setEmotionalTheme('library-fog')"
+                                            class="theme-tag" id="btn-theme-library-fog">🌫 Library fog</button><button
+                                            onclick="setEmotionalTheme('earth-weight')" class="theme-tag"
+                                            id="btn-theme-earth-weight">🌱
+                                            Earth weight</button><button onclick="setEmotionalTheme('evening-lamp')"
+                                            class="theme-tag" id="btn-theme-evening-lamp">☀️ Evening
+                                            lamp</button><button onclick="setEmotionalTheme('desk-light')"
+                                            class="theme-tag" id="btn-theme-desk-light">🎯 Desk light</button></div>
+                                    <p style="font-size:0.85rem; opacity:0.6; margin-top:15px;">*
+                                        Calm: Night, quiet, safe | Library fog: UI disappears |
+                                        Earth weight: Physical stability | Evening lamp: Human presence | Desk light:
+                                        Mental
+                                        clarity
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- Profile Card Content -->
+                            <div class="dash-card">
+                                <h3 style="margin-bottom:20px;">Personal Information</h3>
+                                <!-- Inline label:input rows -->
+                                <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:20px;">
+                                    <div style="display:grid; grid-template-columns:130px 1fr; align-items:center; gap:16px;">
+                                        <label style="font-size:0.85rem; opacity:0.7; font-weight:500;">Full Name</label>
+                                        <input type="text" id="profile-name" value="Loading..."
+                                            style="padding:10px 14px; background:var(--bg-primary); border:1px solid var(--border-soft); border-radius:10px; color:var(--text-primary); outline:none; width:100%; font-size:0.9rem;">
+                                    </div>
+                                    <div style="display:grid; grid-template-columns:130px 1fr; align-items:center; gap:16px;">
+                                        <label style="font-size:0.85rem; opacity:0.7; font-weight:500;">Phone Number</label>
+                                        <input type="tel" id="profile-phone" value="" placeholder="Add phone number"
+                                            style="padding:10px 14px; background:var(--bg-primary); border:1px solid var(--border-soft); border-radius:10px; color:var(--text-primary); outline:none; width:100%; font-size:0.9rem;">
+                                    </div>
+                                    <div style="display:grid; grid-template-columns:130px 1fr; align-items:center; gap:16px;">
+                                        <label style="font-size:0.85rem; opacity:0.7; font-weight:500;">Email</label>
+                                        <div style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--bg-subtle); border:1px solid var(--border-soft); border-radius:10px;">
+                                            <i class="fab fa-google" style="opacity:0.6; font-size:0.85rem;"></i>
+                                            <span id="profile-email" style="flex:1; font-size:0.9rem; opacity:0.8;">loading...</span>
+                                            <span id="profile-verified" class="verified-badge">Verified</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Actions -->
+                                <div style="display:flex; gap:12px; border-top:1px solid var(--border-soft); padding-top:18px;">
+                                    <button class="btn-dash-primary" onclick="saveProfileChanges('profile-name','profile-phone')" style="padding:10px 25px; font-size:0.9rem;">Save Changes</button>
+                                    <button class="btn-dash-secondary" onclick="sendPasswordReset()">Change Password</button>
+                                </div>
+                            </div>
+
+                            <!-- PRIVACY & DATA RIGHTS CARD -->
+                            <div class="dash-card" id="privacy-rights-card">
+                                <h3 style="margin-bottom:20px; display:flex; align-items:center; gap:10px;">
+                                    <i class="fas fa-shield-alt" style="color:#4ECDC4;"></i> Privacy & Data Rights
+                                </h3>
+                                <div style="display:flex; flex-direction:column; gap:20px;">
+                                    <!-- Consent Status -->
+                                    <div style="border-bottom:1px solid var(--border-soft); padding-bottom:15px;">
+                                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                            <span style="font-size:0.9rem; font-weight:600; opacity:0.9;">Wellness Data Processing</span>
+                                            <span id="wellness-consent-badge" style="font-size:0.75rem; padding:3px 10px; border-radius:50px; background:rgba(78,205,196,0.1); color:#4ECDC4; border:1px solid rgba(78,205,196,0.2);">Active</span>
+                                        </div>
+                                        <p style="font-size:0.8rem; opacity:0.6; line-height:1.4; margin:0 0 10px 0;">We process your self-reflections and wellness logs securely for personalized insights.</p>
+                                        <button class="theme-btn" id="btn-withdraw-consent" onclick="handleWithdrawConsent()" style="padding:6px 12px; font-size:0.8rem; border-radius:10px; width:auto; border:1px solid rgba(239, 68, 68, 0.3); background:transparent; color:#ef4444; cursor:pointer;">Withdraw Consent</button>
+                                    </div>
+
+                                    <!-- Data Portability -->
+                                    <div style="border-bottom:1px solid var(--border-soft); padding-bottom:15px;">
+                                        <span style="font-size:0.9rem; font-weight:600; opacity:0.9; display:block; margin-bottom:8px;">Data Portability (GDPR Art. 20)</span>
+                                        <p style="font-size:0.8rem; opacity:0.6; line-height:1.4; margin:0 0 10px 0;">Download a complete machine-readable copy of your personal data, journal entries, and activity logs.</p>
+                                        <button class="btn-dash-primary" id="btn-export-data" onclick="handleExportData()" style="padding:8px 16px; font-size:0.8rem; border-radius:10px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+                                            <i class="fas fa-file-download"></i> Download My Data (JSON)
+                                        </button>
+                                    </div>
+
+                                    <!-- Cookie Preferences -->
+                                    <div style="border-bottom:1px solid var(--border-soft); padding-bottom:15px;">
+                                        <span style="font-size:0.9rem; font-weight:600; opacity:0.9; display:block; margin-bottom:8px;">Cookie Customization</span>
+                                        <p style="font-size:0.8rem; opacity:0.6; line-height:1.4; margin:0 0 10px 0;">Reset your cookie preferences to change your settings between Accept All and Essential Only.</p>
+                                        <button class="btn-dash-secondary" onclick="handleResetCookies()" style="padding:8px 16px; font-size:0.8rem; border-radius:10px; cursor:pointer;">
+                                            Reset Cookie Preferences
+                                        </button>
+                                    </div>
+
+                                    <!-- Account Deletion -->
+                                    <div>
+                                        <span style="font-size:0.9rem; font-weight:600; opacity:0.9; display:block; margin-bottom:8px; color:#ef4444;">Danger Zone</span>
+                                        <p style="font-size:0.8rem; opacity:0.6; line-height:1.4; margin:0 0 10px 0;">Request permanent deletion of your profile, journals, mood entries, and all associated personal data. This cannot be undone.</p>
+                                        <button class="theme-btn" onclick="handleDeleteAccountRequest()" style="padding:8px 16px; font-size:0.8rem; border-radius:10px; border:1px solid #ef4444; background:rgba(239,68,68,0.1); color:#ef4444; font-weight:600; cursor:pointer; width:auto;">
+                                            Request Account Deletion
+                                        </button>
+                                    </div>
+
+                                    <!-- Contact details -->
+                                    <div style="font-size:0.75rem; opacity:0.5; text-align:center; margin-top:5px; line-height:1.4;">
+                                        Have questions about your data rights? Contact our Grievance Officer at <a href="mailto:support@soulamore.in?subject=Rights%20Request%20-%20GDPR/DPDP" style="color:#4ECDC4; text-decoration:underline;">support@soulamore.in</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <!-- VIEW: PROFILE -->
+            <div id="view-profile" class="view-section" style="display:none;">
+                <div class="workspace-header">
+                    <div class="workspace-header-content">
+                        <div class="workspace-header-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="workspace-header-text">
+                            <h2 class="workspace-title">My Profile</h2>
+                            <div class="workspace-subtitle">Manage your personal information</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="workspace-body">
+                    <div class="dashboard-grid grid-cols-2-1 gap-20">
+                        <div class="flex-col gap-20">
+                            <div class="dash-card">
+                                <h3 class="mb-20">Personal Information</h3>
+                                <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:20px;">
+                                    <div style="display:grid; grid-template-columns:130px 1fr; align-items:center; gap:16px;">
+                                        <label style="font-size:0.85rem; opacity:0.7; font-weight:500;">Full Name</label>
+                                        <input type="text" id="profile-name2" value="Loading..." class="input-field">
+                                    </div>
+                                    <div style="display:grid; grid-template-columns:130px 1fr; align-items:center; gap:16px;">
+                                        <label style="font-size:0.85rem; opacity:0.7; font-weight:500;">Phone Number</label>
+                                        <input type="tel" id="profile-phone2" placeholder="Add phone" class="input-field">
+                                    </div>
+                                    <div style="display:grid; grid-template-columns:130px 1fr; align-items:center; gap:16px;">
+                                        <label style="font-size:0.85rem; opacity:0.7; font-weight:500;">Email</label>
+                                        <div class="input-field flex items-center gap-10">
+                                            <i class="fab fa-google" style="opacity:0.6; font-size:0.85rem;"></i>
+                                            <span id="profile-email2" class="flex-1" style="font-size:0.9rem;">loading...</span>
+                                            <span class="verified-badge">Verified</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-10 pt-15 border-t border-soft">
+                                    <button class="btn-dash-primary" onclick="saveProfileChanges('profile-name2','profile-phone2')">Save Changes</button>
+                                    <button class="btn-dash-secondary" onclick="sendPasswordReset()">Change Password</button>
+                                </div>
+                            </div>
+                            <div class="dash-card">
+                                <h3 class="mb-15 flex items-center gap-10"><i class="fas fa-ghost text-purple-accent"></i>My Confessions</h3>
+                                <div class="text-center p-40 opacity-50">
+                                    <i class="fas fa-ghost text-2xl mb-15 block"></i>
+                                    <p class="m-0">No confessions yet</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dash-card">
+                            <h3 class="mb-15 flex items-center gap-10"><i class="fas fa-bookmark text-teal-accent"></i>Saved Content</h3>
+                            <div class="text-center p-40 opacity-50">
+                                <i class="fas fa-bookmark text-2xl mb-15 block"></i>
+                                <p class="m-0">No saved items yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SOULBOT CHAT (embedded working soulbot-chat) -->
+            <div id="view-soulbot" class="view-section no-scroll" style="display:none;">
+                <div class="workspace-header">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <div style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main); flex-shrink:0;">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.4rem; margin:0;">SoulBot AI</h2>
+                            <div style="font-size:0.8rem; opacity:0.7;">Your 24/7 empathetic companion</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="workspace-body" style="padding:0; overflow:hidden;">
+                    <iframe src="../tools/soulbot-chat.html" style="width:100%; height:100%; border:none; background:transparent;"></iframe>
+                </div>
+            </div>
+            <!-- VIEW: PEER GUIDELINES (User Version) -->
+            <div id="view-peer-guidelines" class="view-section" style="display:none;">
+                <div class="workspace-header">
+                    <div class="workspace-header-content">
+                        <div class="workspace-header-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="workspace-header-text">
+                            <h2 class="workspace-title">Community Guidelines</h2>
+                            <div class="workspace-subtitle">How we maintain a safe space</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Standardized Body -->
+                <div class="workspace-body" style="padding-bottom: 80px;">
+                    <div class="dashboard-grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        
+                        <!-- Rule 1: Empathy & Respect -->
+                        <div class="dash-card link-hover" style="border-left: 4px solid var(--peach-glow);">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                                <div style="width:40px; height:40px; background:rgba(244, 159, 117, 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--peach-glow);">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <h3 style="margin:0; font-family:'Outfit'; font-size:1.1rem;">Empathy & Respect</h3>
+                            </div>
+                            <p style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">Treat every peer listener and community member with radical kindness. Harassment or disrespect is not tolerated here.</p>
+                            <div style="font-size:0.75rem; color:var(--peach-glow); font-weight:600;"><i class="fas fa-circle"></i> Baseline Rule</div>
+                        </div>
+
+                        <!-- Rule 2: Sacred Privacy -->
+                        <div class="dash-card link-hover" style="border-left: 4px solid var(--teal-accent);">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                                <div style="width:40px; height:40px; background:rgba(45, 212, 191, 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--teal-accent);">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <h3 style="margin:0; font-family:'Outfit'; font-size:1.1rem;">Sacred Privacy</h3>
+                            </div>
+                            <p style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">Protect the shared space. Never disclose details from your sessions or community circles with anyone outside the platform.</p>
+                            <div style="font-size:0.75rem; color:var(--teal-accent); font-weight:600;"><i class="fas fa-lock"></i> Encryption Level</div>
+                        </div>
+
+                        <!-- Rule 3: No Clinical Claims -->
+                        <div class="dash-card link-hover" style="border-left: 4px solid #8b5cf6;">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                                <div style="width:40px; height:40px; background:rgba(139, 92, 246, 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#8b5cf6;">
+                                    <i class="fas fa-stethoscope"></i>
+                                </div>
+                                <h3 style="margin:0; font-family:'Outfit'; font-size:1.1rem;">No Clinical Claims</h3>
+                            </div>
+                            <p style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">Peers are here for support, not diagnosis. For professional medical advice, please consult our verified psychologists.</p>
+                            <div style="font-size:0.75rem; color:#8b5cf6; font-weight:600;"><i class="fas fa-info-circle"></i> Resource Scope</div>
+                        </div>
+
+                        <!-- Rule 4: Community Vigilance -->
+                        <div class="dash-card link-hover" style="border-left: 4px solid #f59e0b;">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                                <div style="width:40px; height:40px; background:rgba(245, 158, 11, 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#f59e0b;">
+                                    <i class="fas fa-bell"></i>
+                                </div>
+                                <h3 style="margin:0; font-family:'Outfit'; font-size:1.1rem;">Community Vigilance</h3>
+                            </div>
+                            <p style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">If anything makes you feel unsafe, report it through the safety flag. We are a self-policing space built on mutual trust.</p>
+                            <div style="font-size:0.75rem; color:#f59e0b; font-weight:600;"><i class="fas fa-eye"></i> Safety First</div>
+                        </div>
+
+                        <!-- Rule 5: Crisis Awareness -->
+                        <div class="dash-card link-hover" style="border-left: 4px solid #ef4444;">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                                <div style="width:40px; height:40px; background:rgba(239, 68, 68, 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#ef4444;">
+                                    <i class="fas fa-life-ring"></i>
+                                </div>
+                                <h3 style="margin:0; font-family:'Outfit'; font-size:1.1rem;">Crisis Awareness</h3>
+                            </div>
+                            <p style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">Soulamore is not for life-threatening emergencies. In a crisis, use the "Get Help Now" button for instant external resources.</p>
+                            <div style="font-size:0.75rem; color:#ef4444; font-weight:600;"><i class="fas fa-exclamation-triangle"></i> Urgent Action</div>
+                        </div>
+
+                        <!-- Rule 6: Active Growth -->
+                        <div class="dash-card link-hover" style="border-left: 4px solid #10b981;">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                                <div style="width:40px; height:40px; background:rgba(16, 185, 129, 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#10b981;">
+                                    <i class="fas fa-seedling"></i>
+                                </div>
+                                <h3 style="margin:0; font-family:'Outfit'; font-size:1.1rem;">Active Growth</h3>
+                            </div>
+                            <p style="font-size:0.85rem; opacity:0.8; margin-bottom:10px;">The journey of healing is continuous. Show up for your sessions, reflect in your journal, and grow with the community.</p>
+                            <div style="font-size:0.75rem; color:#10b981; font-weight:600;"><i class="fas fa-arrow-up"></i> Progress Track</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- VIEW: AVAILABILITY (For Peers/Psychologists) -->
+            <div id="view-availability" class="view-section" style="display:none;">
+                <div class="workspace-header">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <div style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main); flex-shrink:0;">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.4rem; margin:0;">My Availability</h2>
+                            <div style="font-size:0.8rem; opacity:0.7;">Manage your available time slots for sessions</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workspace-body">
+                    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px;">
+                        <!-- Weekly Schedule -->
+                        <div class="dash-card">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                                <h3 style="color:var(--teal-accent);">Weekly Schedule</h3>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <button onclick="window.loadAvailabilityUser()" style="background:transparent; border:1px solid var(--border-subtle); color:var(--text-muted); padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.8rem;" title="Refresh">
+                                        <i class="fas fa-sync-alt"></i> Refresh
+                                    </button>
+                                    <div style="font-size:0.8rem; background:rgba(45, 212, 191, 0.1); color:var(--teal-accent); padding:5px 10px; border-radius:20px;">
+                                        <i class="fas fa-globe"></i> GMT+05:30 (IST)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="schedule-list" id="availability-schedule-list-user">
+                                <div style="padding:20px; text-align:center; opacity:0.5;">
+                                    <i class="fas fa-circle-notch fa-spin" style="font-size:1.5rem; margin-bottom:10px; display:block;"></i>
+                                    Loading schedule...
+                                    <div style="font-size:0.85rem; margin-top:10px; opacity:0.7;">If this takes too long, click Refresh</div>
+                                </div>
+                            </div>
+                            <div style="margin-top:25px; text-align:right;">
+                                <button class="btn-dash-primary" id="save-availability-btn-user" onclick="saveAvailabilityUser()">
+                                    <i class="fas fa-spinner fa-spin" id="save-availability-spinner-user" style="display:none;"></i>
+                                    <span id="save-availability-text-user">Save Schedule</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Info Card -->
+                        <div style="display:flex; flex-direction:column; gap:25px;">
+                            <div class="dash-card" style="background:linear-gradient(145deg, rgba(30,41,59,0.7), rgba(15,23,42,0.9)); border:1px solid var(--teal-accent);">
+                                <h3 style="margin-bottom:15px; display:flex; align-items:center; gap:10px;">
+                                    <i class="fas fa-info-circle" style="color:var(--teal-accent);"></i> How It Works
+                                </h3>
+                                <p style="font-size:0.85rem; opacity:0.7; line-height:1.6;">
+                                    Set your weekly availability so others can see when you're free for sessions. Users can book slots during your available times.
+                                </p>
+                                <ul style="font-size:0.85rem; opacity:0.7; line-height:1.8; margin-top:15px; padding-left:20px;">
+                                    <li>Add time slots for each day</li>
+                                    <li>Multiple slots per day supported</li>
+                                    <li>Booked slots are automatically blocked</li>
+                                    <li>Update anytime as your schedule changes</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: HOME (Default) -->
+            <div id="view-home" class="view-section active">
+                <div class="workspace-header">
+                    <div class="workspace-header-content">
+                        <div class="workspace-header-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="workspace-header-text">
+                            <h2 class="workspace-title" id="welcome-greeting">Welcome back</h2>
+                            <div class="workspace-subtitle">Your personal support dashboard</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workspace-body">
+                    <div class="dashboard-flex-column">
+                        
+                        <!-- 1. METRICS ROW -->
+                        <div class="dashboard-grid grid-cols-4 gap-15">
+                            <div class="dash-card p-20 text-center">
+                                <div class="text-xs uppercase tracking-wide opacity-60 mb-5">Sessions</div>
+                                <div id="user-sessions-count" class="text-2xl font-bold text-accent-theme">0</div>
+                            </div>
+                            <div class="dash-card p-20 text-center">
+                                <div class="text-xs uppercase tracking-wide opacity-60 mb-5">Journal</div>
+                                <div id="user-journal-count" class="text-2xl font-bold text-accent-theme">0</div>
+                            </div>
+                            <div class="dash-card p-20 text-center">
+                                <div class="text-xs uppercase tracking-wide opacity-60 mb-5">Mood Streak</div>
+                                <div id="user-mood-streak" class="text-2xl font-bold text-yellow-400">0d</div>
+                            </div>
+                            <div class="dash-card p-20 text-center">
+                                <div class="text-xs uppercase tracking-wide opacity-60 mb-5">Resources</div>
+                                <div id="user-resources-count" class="text-2xl font-bold text-blue-400">0</div>
+                            </div>
+                        </div>
+
+                    <!-- Row 2: Main Content Layout -->
+                    <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; gap:25px;">
+                        
+                        <!-- LEFT COLUMN: PRIMARY ACTIONS -->
+                        <div style="display:flex; flex-direction:column; gap:20px;">
+                            <!-- SoulBot Hero (Enhanced) -->
+                            <div class="dash-card soulbot-hero"
+                                style="background:linear-gradient(135deg, var(--bg-card), rgba(45,212,191,0.05)); border:1px solid rgba(45,212,191,0.3); padding:40px 30px !important; text-align:center; min-height:auto;">
+                                <div style="width:70px; height:70px; background:rgba(45,212,191,0.1); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; border:1px solid rgba(45,212,191,0.2);">
+                                    <i class="fas fa-robot" style="font-size:2.5rem; color:var(--teal-accent);"></i>
+                                </div>
+                                <h2 style="font-family:'Outfit'; font-size:1.8rem; color:var(--text-main); margin-bottom:12px; font-weight:700;">SoulBot is here with you</h2>
+                                <p style="color:var(--text-muted); font-size:1rem; margin-bottom:25px; opacity:0.8; max-width:400px; margin-left:auto; margin-right:auto;">Start where you are. We'll figure out the rest together with empathetic AI guidance.</p>
+                                <button onclick="switchView('soulbot', this)" class="btn-dash-primary" style="padding:14px 40px; font-size:1rem; border-radius:12px;">Continue with SoulBot</button>
+                            </div>
+                            
+                            <!-- Quick Relief Grid (2x2) -->
+                            <div style="margin-bottom:20px;">
+                                <h3 style="font-family:'Outfit'; font-size:1.1rem; margin-bottom:15px; opacity:0.8;">Quick Relief</h3>
+                                <div class="dashboard-grid" style="grid-template-columns: repeat(2, 1fr); gap:15px;">
+                                    <!-- Vent Box -->
+                                    <div class="dash-card link-hover" onclick="window.location.href='../tools/vent-box.html'"
+                                        style="margin:0; padding:20px; cursor:pointer; background:rgba(239, 68, 68, 0.05); border:1px solid rgba(239, 68, 68, 0.1);">
+                                        <div style="display:flex; align-items:center; gap:12px;">
+                                            <i class="fas fa-fire" style="font-size:1.2rem; color:#ef4444;"></i>
+                                            <div style="font-weight:600; font-size:0.95rem;">Vent Box</div>
+                                        </div>
+                                    </div>
+                                    <!-- Confessing -->
+                                    <div class="dash-card link-hover" onclick="window.location.href='../tools/confession-box/index.html'"
+                                        style="margin:0; padding:20px; cursor:pointer; background:rgba(255, 255, 255, 0.02); border:1px solid rgba(255, 255, 255, 0.05);">
+                                        <div style="display:flex; align-items:center; gap:12px;">
+                                            <i class="fas fa-ghost" style="font-size:1.2rem; color:#e2e8f0;"></i>
+                                            <div style="font-weight:600; font-size:0.95rem;">Confessing</div>
+                                        </div>
+                                    </div>
+                                    <!-- Drop It -->
+                                    <div class="dash-card link-hover" onclick="window.location.href='../tools/drop-it.html'"
+                                        style="margin:0; padding:20px; cursor:pointer; background:rgba(56, 189, 248, 0.05); border:1px solid rgba(56, 189, 248, 0.1);">
+                                        <div style="display:flex; align-items:center; gap:12px;">
+                                            <i class="fas fa-hand-holding-water" style="font-size:1.2rem; color:#38bdf8;"></i>
+                                            <div style="font-weight:600; font-size:0.95rem;">Drop It</div>
+                                        </div>
+                                    </div>
+                                    <!-- Play -->
+                                    <div class="dash-card link-hover" onclick="window.location.href='../tools/playground.html'"
+                                        style="margin:0; padding:20px; cursor:pointer; background:rgba(250, 176, 5, 0.05); border:1px solid rgba(250, 176, 5, 0.1);">
+                                        <div style="display:flex; align-items:center; gap:12px;">
+                                            <i class="fas fa-shapes" style="font-size:1.2rem; color:#fab005;"></i>
+                                            <div style="font-weight:600; font-size:0.95rem;">Play</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Support Quick Grid -->
+                            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap:20px;">
+                                <!-- PEER TALK -->
+                                <div class="dash-card link-hover" onclick="window.location.href='../our-peers/index.html'"
+                                    style="padding:25px; cursor:pointer; background:rgba(251,146,60,0.05); border:1px solid rgba(251, 146, 60, 0.1); border-radius:20px;">
+                                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                                        <div style="width:40px; height:40px; background:rgba(251,146,60,0.1); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--peach-glow);">
+                                            <i class="fas fa-hands-helping" style="font-size:1.2rem;"></i>
+                                        </div>
+                                        <h3 style="margin:0; font-family:'Outfit'; font-size:1.2rem; color:var(--peach-glow);">Talk to a Peer</h3>
+                                    </div>
+                                    <p style="font-size:0.9rem; color:var(--text-muted); opacity:0.8; margin:0; line-height:1.5;">Connect with someone who has walked a similar path.</p>
+                                </div>
+                                <!-- PROFESSIONAL HELP -->
+                                <div class="dash-card link-hover" onclick="window.location.href='../our-psychologists/about.html'"
+                                    style="padding:25px; cursor:pointer; background:rgba(45,212,191,0.05); border:1px solid rgba(45, 212, 191, 0.1); border-radius:20px;">
+                                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                                        <div style="width:40px; height:40px; background:rgba(45,212,191,0.1); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--teal-accent);">
+                                            <i class="fas fa-user-md" style="font-size:1.2rem;"></i>
+                                        </div>
+                                        <h3 style="margin:0; font-family:'Outfit'; font-size:1.2rem; color:var(--teal-accent);">Expert Guidance</h3>
+                                    </div>
+                                    <p style="font-size:0.9rem; color:var(--text-muted); opacity:0.8; margin:0; line-height:1.5;">Access professional psychological support and structured care.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT COLUMN: UPDATES & CONTEXT -->
+                        <div style="display:flex; flex-direction:column; gap:20px;">
+                            <!-- Upcoming Session Card -->
+                            <div class="dash-card">
+                                <h3 style="margin-bottom:15px; font-size:1.2rem;">
+                                    Upcoming Sessions</h3>
+                                <!-- Dynamic upcoming sessions list -->
+                                <div id="user-upcoming-sessions">
+                                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                                        <div style="width:45px; height:45px; background:#fbbf24; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--bg-deep); font-weight:700;">Z</div>
+                                        <div style="flex:1;">
+                                            <div style="font-weight:600; font-size:0.9rem;">Zoya (Peer Listener)</div>
+                                            <div style="font-size:0.75rem; opacity:0.6;">Tomorrow, 10:30 AM</div>
+                                        </div>
+                                        <div style="background:rgba(45,212,191,0.1); color:var(--teal-accent); padding:4px 10px; border-radius:12px; font-size:0.7rem; font-weight:600;">Upcoming</div>
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                                        <div style="width:45px; height:45px; background:#4ECDC4; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--bg-deep); font-weight:700;">A</div>
+                                        <div style="flex:1;">
+                                            <div style="font-weight:600; font-size:0.9rem;">Aditya (Peer Listener)</div>
+                                            <div style="font-size:0.75rem; opacity:0.6;">Friday, 4:00 PM</div>
+                                        </div>
+                                        <div style="background:rgba(244,159,117,0.1); color:var(--peach-glow); padding:4px 10px; border-radius:12px; font-size:0.7rem; font-weight:600;">Reserved</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recommended Section -->
+                            <div class="dash-card">
+                                <h4 style="font-family:'Outfit'; font-size:1.05rem; margin-bottom:15px;">Meet Your Listeners</h4>
+                                <div style="display:flex; flex-direction:column; gap:12px;">
+                                    <div class="link-hover" onclick="window.open('../our-peers/profile.html?id=10', '_blank')" style="padding:10px; border-radius:8px; cursor:pointer; display:flex; gap:12px; align-items:center;">
+                                        <div style="width:35px; height:35px; background:#fbbf24; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--bg-deep); font-weight:700; font-size:0.8rem;">Z</div>
+                                        <div style="flex:1;">
+                                            <div style="font-size:0.85rem; font-weight:600;">Zoya</div>
+                                            <div style="font-size:0.7rem; opacity:0.6;">Relationships & Stress</div>
+                                        </div>
+                                    </div>
+                                    <div class="link-hover" onclick="window.open('../our-peers/profile.html?id=1', '_blank')" style="padding:10px; border-radius:8px; cursor:pointer; display:flex; gap:12px; align-items:center;">
+                                        <div style="width:35px; height:35px; background:#4ECDC4; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--bg-deep); font-weight:700; font-size:0.8rem;">A</div>
+                                        <div style="flex:1;">
+                                            <div style="font-size:0.85rem; font-weight:600;">Aditya</div>
+                                            <div style="font-size:0.7rem; opacity:0.6;">Mental Wellness & Anxiety</div>
+                                        </div>
+                                    </div>
+                                    <div class="link-hover" onclick="window.open('../our-peers/profile.html?id=20', '_blank')" style="padding:10px; border-radius:8px; cursor:pointer; display:flex; gap:12px; align-items:center;">
+                                        <div style="width:35px; height:35px; background:#F472B6; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--bg-deep); font-weight:700; font-size:0.8rem;">S</div>
+                                        <div style="flex:1;">
+                                            <div style="font-size:0.85rem; font-weight:600;">Sonika</div>
+                                            <div style="font-size:0.7rem; opacity:0.6;">Social Anxiety & LGBTQ+</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Your Journal Quick Peek -->
+                             <div class="dash-card link-hover" onclick="window.location.href='../journal/index.html'" style="cursor:pointer; background:rgba(255,255,255,0.02);">
+                                 <div style="display:flex; justify-content:space-between; align-items:center;">
+                                     <div style="display:flex; align-items:center; gap:10px;">
+                                         <i class="fas fa-feather" style="color:#a855f7;"></i>
+                                         <span style="font-weight:600; font-size:0.9rem;">View Journal</span>
+                                     </div>
+                                     <i class="fas fa-external-link-alt" style="font-size:0.75rem; color:var(--teal-glow);"></i>
+                                 </div>
+                                 <p style="font-size:0.8rem; opacity:0.6; margin-top:10px;">Access all your entries and mood history →</p>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!-- VIEW: BOOKINGS (Enhanced - Compact) -->
+            <div id="view-bookings" class="view-section" style="display:none;">
+                <div class="workspace-header">
+                    <div class="workspace-header-content">
+                        <div class="workspace-header-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="workspace-header-text">
+                            <h2 class="workspace-title">Guided Sessions</h2>
+                            <div class="workspace-subtitle">Book and manage your support sessions</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="workspace-body">
+                    <!-- TABS -->
+                    <div
+                        style="display:flex; gap:20px; border-bottom:1px solid var(--border-soft); margin-bottom:20px; padding-bottom:10px;">
+                        <div
+                            style="font-weight:700; color:var(--teal-accent); border-bottom:2px solid var(--teal-accent); padding-bottom:5px; cursor:pointer;">
+                            Upcoming</div>
+                        <div style="opacity:0.6; cursor:pointer;">History</div>
+                        <div style="opacity:0.6; cursor:pointer;">Feedback</div>
+                    </div>
+                    <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; gap:20px;">
+                        <!-- MAIN LIST -->
+                        <div class="dash-card">
+                            <h3 style="margin-bottom:15px; font-size:1.2rem;">
+                                Upcoming Sessions</h3>
+                            <!-- Dynamic upcoming sessions list -->
+                            <div id="user-upcoming-sessions">
+                                <div
+                                    style="text-align:center; padding:20px; background:var(--bg-deep); border-radius:12px; border:1px dashed var(--border-subtle);">
+                                    <i class="fas fa-calendar-check"
+                                        style="font-size:1.5rem; opacity:0.3; margin-bottom:10px;"></i>
+                                    <p style="opacity:0.7; font-size:0.9rem; margin-bottom:10px;">
+                                        No upcoming sessions scheduled.</p><button
+                                        onclick="window.location.href='../our-peers/index.html'" class="btn-dash-primary"
+                                        style="font-size:0.85rem; padding:8px 20px;">Book
+                                        a Session</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- SIDEBAR: FIND HELP -->
+                        <div style="display:flex; flex-direction:column; gap:20px;">
+                            <!-- Book New -->
+                            <div class="dash-card">
+                                <h4 style="margin-bottom:10px; font-size:1.1rem;">
+                                    Find Support</h4>
+                                <div onclick="openTool('../our-peers/index.html', 'Browse Peers')" class="action-row peach">
+                                    <div
+                                        style="width:30px; height:30px; background:rgba(244, 159, 117, 0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--peach-glow);">
+                                        <i class="fas fa-hands-helping" style="font-size:0.9rem;"></i>
+                                    </div>
+                                    <div style="font-size:0.85rem;">Browse
+                                        Peer Listeners</div>
+                                </div>
+                                <div onclick="openTool('../our-psychologists/psychologists.html', 'Browse Psychologists')"
+                                    class="action-row">
+                                    <div
+                                        style="width:30px; height:30px; background:rgba(78, 205, 196, 0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--teal-accent);">
+                                        <i class="fas fa-user-md" style="font-size:0.9rem;"></i>
+                                    </div>
+                                    <div style="font-size:0.85rem;">Find a
+                                        Psychologist</div>
+                                </div>
+                            </div>
+                            <!-- Credits -->
+                            <div class="dash-card">
+                                <h4 style="margin-bottom:5px; font-size:1.1rem;">
+                                    Wallet Balance</h4>
+                                <div style="font-size:1.8rem; font-weight:700; color:var(--text-main); margin-bottom: 5px;">
+                                    $0.00</div>
+                                <div style="font-size:0.8rem; opacity:0.6; margin-bottom:15px;">
+                                    Available Credits</div><button
+                                    style="width:100%; padding:10px; background:var(--bg-deep); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; cursor:pointer;" onclick="switchView('wallet')">Add
+                                    Funds</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- VIEW: JOURNAL -->
+            <div id="view-journal" class="view-section" style="display:none;">
+                <div class="workspace-header">
+                    <div class="workspace-header-content">
+                        <div class="workspace-header-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="workspace-header-text">
+                            <h2 class="workspace-title">Personal Journal</h2>
+                            <div class="workspace-subtitle">Reflect and grow privately</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="workspace-body">
+                    <div class="dashboard-center-box">
+                        <div class="coming-soon-wrapper">
+                            <div class="coming-soon-icon bg-peach-glow-light border-peach-glow-dark">
+                                <i class="fas fa-pen-fancy text-peach-glow"></i>
+                            </div>
+                            <div class="coming-soon-badge bg-peach-glow-light border-peach-glow-dark text-peach-glow">Coming Soon</div>
+                            <h2 class="coming-soon-title">My Journal</h2>
+                            <p class="coming-soon-text">A safe, private space for your thoughts, reflections, and growth. Encrypted journaling is on its way.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- VIEW: SAVED -->
+            <div id="view-saved" class="view-section" style="display:none;">
+                <div class="workspace-header">
+                    <div class="workspace-header-content">
+                        <div class="workspace-header-icon">
+                            <i class="fas fa-bookmark"></i>
+                        </div>
+                        <div class="workspace-header-text">
+                            <h2 class="workspace-title">Saved Content</h2>
+                            <div class="workspace-subtitle">Articles, stories, and threads you've bookmarked</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="workspace-body">
+                    <div class="dashboard-center-box" style="display:flex; align-items:center; justify-content:center; height:100%; min-height:400px;">
+                        <div style="text-align:center; max-width:420px;">
+                            <div style="width:80px; height:80px; background:rgba(139,92,246,0.08); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; border:1px solid rgba(139,92,246,0.2);">
+                                <i class="fas fa-bookmark" style="font-size:2rem; color:#8b5cf6;"></i>
+                            </div>
+                            <div style="display:inline-block; background:rgba(139,92,246,0.1); border:1px solid rgba(139,92,246,0.25); color:#8b5cf6; padding:4px 16px; border-radius:50px; font-size:0.72rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:18px;">Coming Soon</div>
+                            <h2 style="font-family:'Outfit'; font-size:1.8rem; color:var(--text-main); margin-bottom:12px; font-weight:700;">Saved for Later</h2>
+                            <p style="color:var(--text-muted); opacity:0.7; line-height:1.7; font-size:0.95rem;">Bookmark articles, peer stories, and forum threads to revisit whenever you need them. Your reading list is coming soon.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: MESSAGES (Integrated) -->
+            <div id="view-messages" class="view-section" style="display:none; height:100%;">
+                <div class="workspace-header">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <div style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main); flex-shrink:0;">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.4rem; margin:0;">Messages</h2>
+                            <div style="font-size:0.8rem; opacity:0.7;">Secure conversations with your peers and pros</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Messages with custom scroll management -->
+                <div class="workspace-body" style="padding-bottom: 20px;">
+                    <div style="display:grid; grid-template-columns: 320px 1fr; gap:20px; height: calc(100vh - 200px); min-height:500px;">
+                        <!-- THREADS -->
+                        <div class="dash-card" style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
+                            <div
+                                style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; opacity:0.6; font-weight:700;">
+                                Active Threads</div>
+                            <div class="thread-item active"
+                                style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; gap:10px; cursor:pointer; background:var(--bg-subtle); border-left:3px solid var(--teal-accent);">
+                                <div
+                                    style="width:40px; height:40px; background:var(--teal-accent); border-radius:50%; color:var(--bg-main); display:flex; align-items:center; justify-content:center;">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:600;">Dr. Emily Stone</div>
+                                    <div style="font-size:0.8rem; opacity:0.7;">Reflection Task</div>
+                                </div>
+                            </div>
+                            <div class="thread-item"
+                                style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; gap:10px; cursor:pointer; background:var(--bg-subtle); border-left:3px solid var(--peach-glow); opacity:0.85;">
+                                <div
+                                    style="width:40px; height:40px; background:var(--peach-glow); border-radius:50%; color:var(--bg-main); display:flex; align-items:center; justify-content:center;">
+                                    <i class="fas fa-hands-helping"></i>
+                                </div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:600;">Peer Sarah</div>
+                                    <div style="font-size:0.8rem; opacity:0.7;">Checking in...</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- CHAT AREA -->
+                        <div class="dash-card" style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
+                            <div
+                                style="padding:15px 20px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <div
+                                        style="width:35px; height:35px; background:var(--teal-accent); color:var(--bg-main); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                        <i class="fas fa-user-md"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:700;">Dr. Emily Stone</div>
+                                        <div style="font-size:0.8rem; opacity:0.6;">Clinical Psychologist
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                style="flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:12px;">
+                                <div class="chat-bubble received"
+                                    style="background:var(--bg-subtle); align-self:flex-start; max-width:75%; padding:12px; border-radius:12px; border-bottom-left-radius:2px;">
+                                    Hi there. Following up on our session yesterday. Here is the reflection
+                                    task. <div
+                                        style="margin-top:10px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; border:1px solid var(--teal-accent);">
+                                        <div style="font-weight:700; color:var(--teal-accent); margin-bottom:5px;">
+                                            <i class="fas fa-pen"></i>Task: Anxiety
+                                        </div>
+                                        <p style="font-size:0.85rem; margin-bottom:5px;">List 3 situations
+                                            this week.</p>
+                                    </div>
+                                </div>
+                                <div class="chat-bubble sent"
+                                    style="background:var(--teal-dim); border:1px solid var(--teal-accent); color:var(--teal-accent); align-self:flex-end; max-width:75%; padding:12px; border-radius:12px; border-bottom-right-radius:2px;">
+                                    Thanks Dr. Stone. I'll work on this tonight.
+                                </div>
+                            </div>
+                            <div style="padding:15px; border-top:1px solid var(--border-subtle); display:flex; gap:10px;">
+                                <input type="text" placeholder="Type a message..."
+                                    style="flex:1; background:rgba(0,0,0,0.2); border:1px solid var(--border-subtle); color:white; padding:12px; border-radius:8px;">
+                                <button
+                                    style="background:var(--teal-accent); color:var(--bg-main); width:40px; border-radius:8px; border:none; cursor:pointer;"><i
+                                        class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- VIEW: WALLET -->
+            <div id="view-wallet" class="view-section" style="display:none;">
+                <div class="workspace-header">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <div style="width:40px; height:40px; background:var(--bg-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-main); flex-shrink:0;">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <h2 style="font-family:'Outfit'; font-weight:700; font-size:1.4rem; margin:0;">My Wallet</h2>
+                            <div style="font-size:0.8rem; opacity:0.7;">Manage funds and payment methods</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="workspace-body">
+                    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap:20px;">
+                        <!-- Balance Card -->
+                        <div class="dash-card"
+                            style="background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), var(--bg-overlay)); border:1px solid var(--teal-accent);">
+                            <h4 style="margin-bottom:10px; opacity:0.8;">Current Balance</h4>
+                            <div style="font-size:3.5rem; font-weight:700; color:var(--teal-accent); font-family:'Outfit';"
+                                id="wallet-balance">$0.00</div>
+                            <div style="margin-top:20px; display:flex; gap:10px;">
+                                <button class="btn-dash-primary" onclick="triggerAddFunds()">+ Add Funds</button>
+                            </div>
+                        </div>
+
+                        <!-- Payment Methods -->
+                        <div class="dash-card">
+                            <h4 style="margin-bottom:15px; opacity:0.8;">Payment Methods</h4>
+                            <div
+                                style="padding:15px; background:var(--bg-subtle); border-radius:10px; display:flex; align-items:center; gap:15px; margin-bottom:10px;">
+                                <i class="fab fa-cc-visa" style="font-size:1.5rem; color:#fff;"></i>
+                                <div style="flex:1;">
+                                    <div style="font-weight:600;">Visa ending in 4242</div>
+                                    <div style="font-size:0.8rem; opacity:0.6;">Expires 12/28</div>
+                                </div>
+                                <span
+                                    style="font-size:0.7rem; background:rgba(45,212,191,0.2); color:var(--accent-teal); padding:3px 8px; border-radius:4px;">Default</span>
+                            </div>
+                            <button class="btn-action-sm"
+                                style="width:100%; border:1px dashed var(--border-subtle); padding:10px; background:transparent; color:var(--text-muted); border-radius:8px; cursor:pointer;">+ Add Payment
+                                Method</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="../assets/js/components.js?v=3.6"
+                onerror="console.error('Failed to load components.js?v=3.6")"></script>
+            <script>function toggleSidebar() {
+                    document.getElementById('sidebar').classList.toggle('open');
+                }
+
+
+
+                // --- VIEW SWITCHING ---
+                // Replaced by Module Import below
+
+
+                // Initial view load function to check URL parameters or default
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Check if there is a 'view' query param, otherwise default to home
+                    // For now just defaulting to home, but logic is easy to extend
+                    // Also restore selected theme
+                    switchView('home');
+                });
+
+                // --- MODAL LOGIC ---
+                function openTool(url, title) {
+                    document.getElementById('modalTitle').innerText = title;
+                    document.getElementById('toolFrame').src = url;
+                    document.getElementById('toolModal').classList.add('open');
+                }
+
+                function closeTool() {
+                    document.getElementById('toolModal').classList.remove('open');
+
+                    // Reset src to stop videos/audio
+                    setTimeout(() => {
+                        document.getElementById('toolFrame').src = '';
+                    }
+
+                        , 300);
+                }
+
+                // --- MOOD LOGIC ---
+                function logMood(mood) {
+                    alert(`Mood tracked: ${mood
+                        }
+
+                . This would be saved to your private journal.`);
+                }
+
+                // Initialize View
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Just default to home, theme is handled by components.js
+                    switchView('home');
+                });
+
+
+                /* SoulBot chat now embedded via iframe (soulbot-chat.html) */
+
+                // Initialize View with Deep Linking
+                document.addEventListener('DOMContentLoaded', () => {
+                    // 1. Check for URL Param ?view=xxx
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const viewParam = urlParams.get('view');
+
+                    if (viewParam) {
+                        switchView(viewParam);
+                    }
+
+                    else {
+                        switchView('home');
+                    }
+
+                    // --- JOURNAL LOGIC (Added for Empty State Demo) ---
+                    renderJournalSidebar();
+                });
+
+                function renderJournalSidebar() {
+                    const list = document.getElementById('journal-list');
+                    const empty = document.getElementById('journal-empty');
+                    // Mock Data or LocalStorage
+                    const stored = localStorage.getItem('my_journal_entries');
+
+                    // Default demo data if nothing stored, to show UI
+                    const entries = stored ? JSON.parse(stored) : [{
+                        title: "Morning Thoughts", date: "Today"
+                    }
+
+                        ,
+                    {
+                        title: "Weekly Reflection", date: "3 days ago"
+                    }
+
+                    ];
+
+                    // Get elements safely
+                    const journalList = document.getElementById('journal-list');
+                    const journalEmpty = document.getElementById('journal-empty');
+
+                    if (!journalList || !journalEmpty) {
+                        console.warn('⚠️ Journal sidebar elements not found');
+                        return;
+                    }
+
+                    if (!entries || entries.length === 0) {
+                        journalList.style.display = 'none';
+                        journalEmpty.style.display = 'block';
+                    } else {
+                        journalList.style.display = 'flex';
+                        journalEmpty.style.display = 'none';
+                        journalList.innerHTML = '';
+
+                        entries.forEach(e => {
+                            const div = document.createElement('div');
+                            div.style.cssText = "padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; font-size:0.9rem; cursor:pointer; margin-bottom:5px;";
+
+                            div.innerHTML = `${e.title}
+                    <br><span style="font-size:0.7em; opacity:0.5;">${e.date}</span>`;
+                            list.appendChild(div);
+                        });
+                    }
+                }
+
+                // --- THEME LOGIC (Moved here for reliability) ---
+                window.setThemeMode = function (mode) {
+                    // Target BOTH body and html to override global styles
+                    document.body.classList.remove('light-mode');
+                    document.documentElement.classList.remove('light-mode');
+
+                    if (mode === 'light') {
+                        document.body.classList.add('light-mode');
+                        document.documentElement.classList.add('light-mode');
+                    }
+
+                    // Update Buttons
+                    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+                    const btn = document.getElementById('btn-mode-' + mode);
+                    if (btn) btn.classList.add('active');
+
+                    // Persist
+                    localStorage.setItem('soul_theme_mode', mode);
+                }
+
+                    ;
+
+                window.setEmotionalTheme = function (theme) {
+                    // Target BOTH body and html
+                    document.body.setAttribute('data-theme', theme);
+                    document.documentElement.setAttribute('data-theme', theme);
+
+                    // Update Buttons
+                    document.querySelectorAll('.theme-tag').forEach(b => b.classList.remove('active'));
+                    const btn = document.getElementById('btn-theme-' + theme);
+                    if (btn) btn.classList.add('active');
+
+                    // Persist
+                    localStorage.setItem('soul_theme_emotion', theme);
+                }
+
+                    ;
+
+                // --- TOOL MODAL LOGIC (Moved here for reliability) ---
+                window.openToolsModal = function () {
+                    document.getElementById('quickToolsModal').classList.add('open');
+                }
+
+                window.closeToolsModal = function (e) {
+                    if (e && e.target !== document.getElementById('quickToolsModal') && !e.target.classList.contains('tool-close-btn')) return;
+                    document.getElementById('quickToolsModal').classList.remove('open');
+                }
+
+                // Init Themes
+                function initThemes() {
+                    const savedMode = localStorage.getItem('soul_theme_mode') || 'dark';
+                    const savedTheme = localStorage.getItem('soul_theme_emotion') || 'calm';
+                    setThemeMode(savedMode);
+                    setEmotionalTheme(savedTheme);
+                }
+
+                // Run Init
+                initThemes();
+
+            </script>
+            <!-- SoulBot in dashboard now uses iframe to soulbot-chat.html (same working implementation) -->
+            <!-- PROFILE SAVE MODULE -->
+            <script type="module">
+                import { auth, db, doc, updateDoc, setDoc, serverTimestamp, functionsInstance, httpsCallable, collection, query, where, getDocs, signOut } from "../assets/js/firebase-config.js";
+                import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+                window.saveProfileChanges = async function(nameId, phoneId) {
+                    const user = auth.currentUser;
+                    if (!user) { alert('Not logged in.'); return; }
+
+                    const nameEl  = document.getElementById(nameId);
+                    const phoneEl = document.getElementById(phoneId);
+                    const newName  = nameEl  ? nameEl.value.trim()  : '';
+                    const newPhone = phoneEl ? phoneEl.value.trim() : '';
+
+                    if (!newName) { alert('Name cannot be empty.'); return; }
+
+                    try {
+                        await updateDoc(doc(db, 'users', user.uid), {
+                            displayName: newName,
+                            phone: newPhone
+                        });
+
+                        // Sync all name/greeting elements live
+                        ['profile-name','profile-name2'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) el.value = newName;
+                        });
+                        ['profile-phone','profile-phone2'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) el.value = newPhone;
+                        });
+                        const greet = document.getElementById('welcome-greeting');
+                        if (greet) greet.innerHTML = `Welcome back, <span style="color:var(--teal-accent);">${newName}</span>`;
+                        const sbName = document.getElementById('sidebar-name');
+                        if (sbName) sbName.innerText = newName;
+
+                        alert('✅ Profile saved successfully!');
+                    } catch(e) {
+                        console.error('Save error:', e);
+                        alert('Failed to save: ' + e.message);
+                    }
+                };
+
+                window.sendPasswordReset = async function() {
+                    const user = auth.currentUser;
+                    if (!user || !user.email) { alert('No email found for this account.'); return; }
+                    try {
+                        await sendPasswordResetEmail(auth, user.email);
+                        alert(`✅ Password reset link sent to ${user.email}. Check your inbox.`);
+                    } catch(e) {
+                        alert('Failed to send reset: ' + e.message);
+                    }
+                };
+
+                // Privacy Dashboard Event Handlers (GDPR & DPDP Compliance)
+                window.handleWithdrawConsent = async function() {
+                    const user = auth.currentUser;
+                    if (!user) { alert('Not logged in.'); return; }
+
+                    const confirmWithdraw = confirm("Are you sure you want to withdraw your wellness data processing consent? Under the DPDP Act 2023, you have the right to withdraw consent at any time. This will restrict Soulamore from processing your journal and mood logs for insights, and your account status will be deactivated.");
+                    if (!confirmWithdraw) return;
+
+                    const btn = document.getElementById('btn-withdraw-consent');
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                    try {
+                        // 1. Query for active wellness consent records in processing_consents
+                        const q = query(
+                            collection(db, 'processing_consents'),
+                            where('userId', '==', user.uid),
+                            where('consentType', '==', 'wellness_data_processing'),
+                            where('consented', '==', true)
+                        );
+                        const snap = await getDocs(q);
+                        
+                        // 2. Mark consent documents as inactive
+                        const promises = snap.docs.map(docSnap => {
+                            return updateDoc(docSnap.ref, {
+                                consented: false,
+                                withdrawnAt: serverTimestamp()
+                            });
+                        });
+                        await Promise.all(promises);
+
+                        // 3. Update user profile flag
+                        await updateDoc(doc(db, 'users', user.uid), {
+                            consentWellnessDataProcessing: false,
+                            consentWithdrawnAt: serverTimestamp()
+                        });
+
+                        // 4. Update UI Badge and Button
+                        const consentBadge = document.getElementById('wellness-consent-badge');
+                        if (consentBadge) {
+                            consentBadge.textContent = 'Inactive';
+                            consentBadge.style.background = 'rgba(239,68,68,0.1)';
+                            consentBadge.style.color = '#ef4444';
+                            consentBadge.style.borderColor = 'rgba(239,68,68,0.2)';
+                        }
+                        btn.textContent = 'Consent Withdrawn';
+                        btn.disabled = true;
+
+                        alert("✅ Wellness consent withdrawn successfully. You will be logged out to enforce this status change.");
+                        
+                        // Sign out to trigger re-consent/auth checks on next load
+                        await signOut(auth);
+                        localStorage.removeItem('soulamore_session');
+                        window.location.href = '../portal/login.html';
+                    } catch (e) {
+                        console.error("Consent withdrawal error:", e);
+                        alert("Failed to withdraw consent: " + e.message);
+                        btn.disabled = false;
+                        btn.textContent = "Withdraw Consent";
+                    }
+                };
+
+                window.handleExportData = async function() {
+                    const user = auth.currentUser;
+                    if (!user) { alert('Not logged in.'); return; }
+
+                    const btn = document.getElementById('btn-export-data');
+                    const originalHtml = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Export...';
+
+                    try {
+                        const exportUserDataFn = httpsCallable(functionsInstance, 'exportUserData');
+                        const res = await exportUserDataFn();
+                        
+                        if (res.data && res.data.success) {
+                            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(res.data.data, null, 2));
+                            const downloadAnchor = document.createElement('a');
+                            downloadAnchor.setAttribute("href", dataStr);
+                            downloadAnchor.setAttribute("download", `soulamore_data_export_${new Date().toISOString().split('T')[0]}.json`);
+                            document.body.appendChild(downloadAnchor);
+                            downloadAnchor.click();
+                            downloadAnchor.remove();
+                            alert("✅ Your data has been exported successfully. The download should start automatically.");
+                        } else {
+                            throw new Error("Export response was unsuccessful.");
+                        }
+                    } catch (e) {
+                        console.error("Export error:", e);
+                        alert("Failed to export data: " + e.message);
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = originalHtml;
+                    }
+                };
+
+                window.handleResetCookies = function() {
+                    localStorage.removeItem('cookieConsent');
+                    alert("✅ Cookie preferences reset. The consent banner will now re-open.");
+                    if (typeof window.injectCookieBanner === 'function') {
+                        window.injectCookieBanner();
+                    } else {
+                        window.location.reload();
+                    }
+                };
+
+                window.handleDeleteAccountRequest = async function() {
+                    const user = auth.currentUser;
+                    if (!user) { alert('Not logged in.'); return; }
+
+                    const dangerConfirm = confirm("⚠️ DANGER ZONE: Are you absolutely sure you want to request permanent account deletion?\n\nThis will schedule your account for permanent deletion. Under GDPR and DPDP compliance rules, we hold data for 30 days before permanent erasure. During this window, you will not be able to log in. Click OK to request deletion.");
+                    if (!dangerConfirm) return;
+
+                    const doubleConfirm = prompt("To confirm deletion, please type 'DELETE MY ACCOUNT' below:");
+                    if (doubleConfirm !== 'DELETE MY ACCOUNT') {
+                        alert("Confirmation mismatch. Deletion request cancelled.");
+                        return;
+                    }
+
+                    try {
+                        // Write a deletion request document in Firestore (doc ID is user.uid)
+                        await setDoc(doc(db, 'deletion_requests', user.uid), {
+                            userId: user.uid,
+                            email: user.email || '',
+                            requestedAt: serverTimestamp()
+                        });
+
+                        alert("✅ Account deletion requested. Your account is now scheduled for deletion in 30 days and you have been signed out.");
+                        
+                        // Sign out and redirect
+                        await signOut(auth);
+                        localStorage.removeItem('soulamore_session');
+                        window.location.href = '../portal/login.html';
+                    } catch (e) {
+                        console.error("Account deletion request error:", e);
+                        alert("Failed to request deletion: " + e.message);
+                    }
+                };
+            </script>
+            <!-- DASHBOARD HYDRATION SCRIPT -->
+            <script type="module">
+                import { onAuthChange } from "../assets/js/auth-service.js";
+                import { getUserProfile, createOrUpdateUserProfile } from "../assets/js/profile-handler.js";
+                import { getUserBookings } from "../assets/js/peer-booking-handler.js";
+
+                // Hydrate dashboard UI whenever auth state changes
+                onAuthChange(async (user) => {
+                    if (!user) {
+                        console.log("Dashboard: no authenticated user.");
+                        return;
+                    }
+
+                    try {
+                        console.log("Dashboard: user detected", user.uid);
+
+                        // 1. Get Profile
+                        let profile = await getUserProfile(user.uid);
+
+                        // 2. If no profile, try to create one (recovery)
+                        if (!profile) {
+                            console.info("Profile missing in dashboard, attempting recovery...");
+                            await createOrUpdateUserProfile(user);
+                            profile = await getUserProfile(user.uid);
+                        }
+
+                        if (!profile) {
+                            console.warn("Dashboard: profile still missing after recovery.");
+                            return;
+                        }
+
+                        // 3. Compute display values
+                        const name = profile.displayName || user.displayName || 'Friend';
+                        const email = profile.email || user.email || '';
+                        const phone = profile.phone || user.phoneNumber || '';
+
+                        // Personal Greeting
+                        const greetingEl = document.getElementById('welcome-greeting');
+                        if (greetingEl) {
+                            greetingEl.innerHTML = `Welcome back, <span style="color:var(--teal-accent);">${name}</span>.`;
+                        }
+
+                        // Sidebar
+                        const sbName = document.getElementById('sidebar-name');
+                        if (sbName) sbName.innerText = name;
+
+                        // Sidebar role is HARDCODED in HTML - do not overwrite from Firestore
+                        // const sbRole = document.getElementById('sidebar-role');
+                        // if (sbRole) sbRole.innerText = (profile.role || 'Member');
+
+                        // Primary profile card
+                        const inName = document.getElementById('profile-name');
+                        if (inName) inName.value = name;
+
+                        const inPhone = document.getElementById('profile-phone');
+                        if (inPhone) inPhone.value = phone;
+
+                        const elEmail = document.getElementById('profile-email');
+                        if (elEmail) elEmail.innerText = email;
+
+                        // Secondary "Profile" view (detailed tab)
+                        const inName2 = document.getElementById('profile-name2');
+                        if (inName2) inName2.value = name;
+
+                        const inPhone2 = document.getElementById('profile-phone2');
+                        if (inPhone2) inPhone2.value = phone;
+
+                        const elEmail2 = document.getElementById('profile-email2');
+                        if (elEmail2) elEmail2.innerText = email;
+
+                        // 4. Upcoming sessions for this user
+                        try {
+                            const bookings = await getUserBookings(user.uid);
+                            const container = document.getElementById('user-upcoming-sessions');
+                            if (container) {
+                                if (!bookings || bookings.length === 0) {
+                                    // keep default empty state
+                                } else {
+                                    container.innerHTML = bookings
+                                        .filter(b => b.status === "confirmed" || b.status === "pending_payment")
+                                        .sort((a, b) => (a.startTime || 0) - (b.startTime || 0))
+                                        .slice(0, 5)
+                                        .map(b => {
+                                            const start = b.startTime ? new Date(b.startTime) : null;
+                                            const when = start ? start.toLocaleString() : "TBD";
+                                            const label = b.planType === "per_session" ? "1:1 Session" : (b.planType || "Session");
+                                            return `
+                                                <div class="dash-card" style="margin-bottom:12px; padding:15px; background:var(--bg-deep); border-radius:12px; border:1px solid var(--border-subtle);">
+                                                    <div style="font-size:0.85rem; opacity:0.7; margin-bottom:4px;">${when}</div>
+                                                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                                                        <div>
+                                                            <div style="font-family:'Outfit'; font-size:1rem; margin-bottom:2px;">${label}</div>
+                                                            <div style="font-size:0.8rem; opacity:0.65;">with ${b.peerName || "your listener"}</div>
+                                                        </div>
+                                                        <span style="font-size:0.75rem; padding:4px 10px; border-radius:999px; border:1px solid var(--border-subtle);">
+                                                            ${b.status === "pending_payment" ? "Pending payment" : "Confirmed"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            `;
+                                        })
+                                        .join("");
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Failed to load user bookings:", e);
+                        }
+
+                        // 5. Check if user is peer/psychologist and show availability link
+                        try {
+                            const { getUserRole } = await import("../assets/js/role-helper.js");
+                            const roleInfo = await getUserRole(user.uid);
+                            
+                            // Also check users collection directly as fallback
+                            const { getUserProfile } = await import("../assets/js/profile-handler.js");
+                            const userProfile = await getUserProfile(user.uid);
+                            const usersCollectionRole = (userProfile?.role || '').toLowerCase();
+                            
+                            const availabilityLink = document.getElementById('nav-availability-link');
+                            if (availabilityLink) {
+                                const isPeerOrPsych = roleInfo?.isPeer || roleInfo?.isPsychologist || 
+                                                     usersCollectionRole === 'peer' || usersCollectionRole === 'psychologist';
+                                
+                                console.log('Role check:', { 
+                                    roleInfo, 
+                                    usersCollectionRole, 
+                                    shouldShow: isPeerOrPsych 
+                                });
+                                
+                                if (isPeerOrPsych) {
+                                    availabilityLink.style.display = 'flex';
+                                    console.log('✅ Showing availability link for peer/psychologist');
+                                } else {
+                                    availabilityLink.style.display = 'none';
+                                    console.log('❌ Hiding availability link - not a peer/psychologist');
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Failed to check user role:", e);
+                        }
+
+                    } catch (error) {
+                        console.error("Dashboard hydration error:", error);
+                    }
+                });
+            </script>
+
+            <!-- AVAILABILITY MANAGEMENT SCRIPT -->
+            <script type="module">
+                import { auth, db } from "../assets/js/firebase-config.js";
+                import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+                let currentAvailabilityUser = [];
+
+                // Get Peer Availability
+                async function getPeerAvailability(peerId) {
+                    try {
+                        const docRef = doc(db, "peer_availability", peerId);
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            return { id: docSnap.id, ...docSnap.data() };
+                        }
+                        return null;
+                    } catch (error) {
+                        console.error("Error getting availability:", error);
+                        return null;
+                    }
+                }
+
+                // Set Peer Availability
+                async function setPeerAvailability(peerId, availability) {
+                    try {
+                        const docRef = doc(db, "peer_availability", peerId);
+                        await setDoc(docRef, {
+                            peerId: peerId,
+                            availability: availability,
+                            timezone: "Asia/Kolkata",
+                            updatedAt: new Date().toISOString()
+                        }, { merge: true });
+                        return true;
+                    } catch (error) {
+                        console.error("Error setting availability:", error);
+                        return false;
+                    }
+                }
+
+                // Initialize availability management
+                window.saveAvailabilityUser = async function() {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('Please log in to save availability');
+                        return;
+                    }
+
+                    const btn = document.getElementById('save-availability-btn-user');
+                    const spinner = document.getElementById('save-availability-spinner-user');
+                    const text = document.getElementById('save-availability-text-user');
+
+                    try {
+                        console.log('Saving availability:', currentAvailabilityUser);
+                        btn.disabled = true;
+                        spinner.style.display = 'inline-block';
+                        text.textContent = 'Saving...';
+
+                        const success = await setPeerAvailability(user.uid, currentAvailabilityUser);
+
+                        if (success) {
+                            alert('✅ Availability saved successfully!');
+                            btn.disabled = false;
+                            spinner.style.display = 'none';
+                            text.textContent = 'Save Schedule';
+                        } else {
+                            throw new Error('Failed to save availability');
+                        }
+                    } catch (error) {
+                        console.error('Error saving availability:', error);
+                        alert('Failed to save availability: ' + error.message);
+                        btn.disabled = false;
+                        spinner.style.display = 'none';
+                        text.textContent = 'Save Schedule';
+                    }
+                };
+
+                // Load availability when view is shown
+                window.loadAvailabilityUser = async function() {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        console.log('❌ No user logged in');
+                        return;
+                    }
+
+                    const container = document.getElementById('availability-schedule-list-user');
+                    if (!container) {
+                        console.log('❌ Container not found');
+                        return;
+                    }
+
+                    try {
+                        console.log('🔄 Loading availability for user:', user.uid);
+                        const availability = await getPeerAvailability(user.uid);
+                        
+                        if (availability && availability.availability) {
+                            console.log('✅ Found availability:', availability.availability);
+                            currentAvailabilityUser = availability.availability;
+                        } else {
+                            console.log('⚠️ No availability found, using defaults');
+                            // Default availability (Mon-Fri, 9-5)
+                            currentAvailabilityUser = [
+                                { day: 'monday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'tuesday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'wednesday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'thursday', startTime: '09:00', endTime: '17:00' },
+                                { day: 'friday', startTime: '09:00', endTime: '17:00' }
+                            ];
+                        }
+
+                        console.log('📝 Rendering availability with:', currentAvailabilityUser);
+                        renderAvailabilityUser();
+                        console.log('✅ Render complete');
+                    } catch (error) {
+                        console.error('❌ Error loading availability:', error);
+                        container.innerHTML = '<div style="color:red; padding:20px;">Error loading schedule: ' + error.message + '<br/><button onclick="window.loadAvailabilityUser()" style="margin-top:10px; padding:8px 16px; cursor:pointer;">Retry</button></div>';
+                    }
+                };
+
+                function renderAvailabilityUser() {
+                    const container = document.getElementById('availability-schedule-list-user');
+                    if (!container) {
+                        console.log('❌ Container not found for rendering');
+                        return;
+                    }
+
+                    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                    const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+                    container.innerHTML = days.map((day, index) => {
+                        const daySlots = currentAvailabilityUser.filter(slot => slot.day.toLowerCase() === day);
+                        const hasSlots = daySlots.length > 0;
+
+                        return `
+                            <div style="padding:15px; border:1px solid var(--border-subtle); border-radius:12px; margin-bottom:12px; background:var(--bg-deep);">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                    <div style="font-weight:600; color:var(--text-main);">${dayLabels[index]}</div>
+                                    <button onclick="addSlotUser('${day}')" style="background:var(--teal-accent); color:var(--bg-main); border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600;">
+                                        <i class="fas fa-plus"></i> Add Slot
+                                    </button>
+                                </div>
+                                ${hasSlots ? daySlots.map((slot, slotIndex) => `
+                                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; padding:8px; background:var(--bg-subtle); border-radius:8px;">
+                                        <input type="time" value="${slot.startTime}"
+                                            onchange="updateSlotTimeUser('${day}', ${slotIndex}, 'start', this.value)"
+                                            style="background:var(--bg-card); border:1px solid var(--border-subtle); color:var(--text-main); padding:5px; border-radius:6px; font-size:0.85rem;">
+                                        <span style="opacity:0.5;">to</span>
+                                        <input type="time" value="${slot.endTime}"
+                                            onchange="updateSlotTimeUser('${day}', ${slotIndex}, 'end', this.value)"
+                                            style="background:var(--bg-card); border:1px solid var(--border-subtle); color:var(--text-main); padding:5px; border-radius:6px; font-size:0.85rem;">
+                                        <button onclick="removeSlotUser('${day}', ${slotIndex})"
+                                            style="background:transparent; border:none; color:#ef4444; cursor:pointer; font-size:0.9rem; margin-left:auto;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                `).join('') : '<div style="opacity:0.5; font-size:0.85rem; padding:8px 0;">No slots added</div>'}
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    console.log('✅ Schedule rendered successfully');
+                }
+
+                window.addSlotUser = function(day) {
+                    console.log('Adding slot for', day);
+                    const newSlot = { day: day, startTime: '09:00', endTime: '17:00' };
+                    currentAvailabilityUser.push(newSlot);
+                    renderAvailabilityUser();
+                };
+
+                window.removeSlotUser = function(day, index) {
+                    const daySlots = currentAvailabilityUser.filter(slot => slot.day.toLowerCase() === day);
+                    if (index >= 0 && index < daySlots.length) {
+                        const slotToRemove = daySlots[index];
+                        const slotIndex = currentAvailabilityUser.indexOf(slotToRemove);
+                        if (slotIndex !== -1) {
+                            currentAvailabilityUser.splice(slotIndex, 1);
+                            renderAvailabilityUser();
+                        }
+                    }
+                };
+
+                window.updateSlotTimeUser = function(day, index, type, value) {
+                    const daySlots = currentAvailabilityUser.filter(slot => slot.day.toLowerCase() === day);
+                    if (index >= 0 && index < daySlots.length) {
+                        const slot = daySlots[index];
+                        if (type === 'start') slot.startTime = value;
+                        if (type === 'end') slot.endTime = value;
+                    }
+                };
+
+                // Hook into view switcher to load availability when shown
+                const originalSwitchView = window.switchView;
+                window.switchView = function(viewName, element) {
+                    if (originalSwitchView) originalSwitchView(viewName, element);
+
+                    if (viewName === 'availability') {
+                        console.log('📅 Availability view opened, loading...');
+                        setTimeout(() => {
+                            window.loadAvailabilityUser();
+                        }, 100);
+                    }
+                };
+                
+                // Auto-load availability on page load for peers/psychologists
+                (async () => {
+                    try {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        
+                        const user = auth.currentUser;
+                        if (!user) return;
+                        
+                        // Check users collection for role
+                        const userProfileDoc = await getDoc(doc(db, "users", user.uid));
+                        const userProfile = userProfileDoc.data();
+                        const usersCollectionRole = (userProfile?.role || '').toLowerCase();
+                        
+                        // Check roles collection
+                        let isPeerOrPsych = false;
+                        try {
+                            const roleDoc = await getDoc(doc(db, "roles", user.uid));
+                            if (roleDoc.exists()) {
+                                const roleData = roleDoc.data();
+                                isPeerOrPsych = roleData.peer === true || roleData.psychologist === true;
+                            }
+                        } catch (e) {
+                            console.warn('Could not check roles collection:', e);
+                        }
+                        
+                        isPeerOrPsych = isPeerOrPsych || usersCollectionRole === 'peer' || usersCollectionRole === 'psychologist';
+                        
+                        if (isPeerOrPsych) {
+                            console.log('✅ User is peer/psychologist, pre-loading availability...');
+                            const availability = await getPeerAvailability(user.uid);
+                            if (availability && availability.availability) {
+                                currentAvailabilityUser = availability.availability;
+                                console.log('✅ Availability pre-loaded:', currentAvailabilityUser);
+                            } else {
+                                console.log('⚠️ No saved availability found');
+                            }
+                        } else {
+                            console.log('ℹ️ User is not a peer/psychologist');
+                        }
+                    } catch (e) {
+                        console.error('❌ Error pre-loading availability:', e);
+                    }
+                })();
+            </script>
+
+
+            <!-- Tools FAB — position managed by portal-shared.css -->
+            <button id="tools-fab" onclick="toggleToolsMenu()" aria-label="Open user toolkit">
+                <i class="fas fa-briefcase"></i>
+            </button>
+
+
+            <!-- TOOLS SLIDE-OUT MENU -->
+            <div id="tools-menu">
+                <!-- Header -->
+                <div
+                    style="padding:20px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2);">
+                    <div>
+                        <h3 style="margin:0; font-family:'Outfit'; font-size:1.2rem;">Self-Help Tools</h3>
+                        <p style="margin:5px 0 0 0; font-size:0.8rem; opacity:0.7;">Quick access to all tools</p>
+                    </div>
+                    <button onclick="toggleToolsMenu()"
+                        style="background:transparent; border:none; color:var(--text-main); cursor:pointer; font-size:1.5rem; opacity:0.7; padding:5px;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Tools List -->
+                <div style="flex:1; overflow-y:auto; padding:15px;" class="tools-list-container">
+                    <!-- Vent Box -->
+                    <div onclick="window.open('../tools/vent-box.html', '_blank')" class="tool-item"
+                        style="background:var(--alert-red-bg); border-color:rgba(239,68,68,0.3);">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div
+                                style="width:40px; height:40px; background:var(--alert-red-bg); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-fire" style="color:var(--alert-red); font-size:1.1rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <h4 style="margin:0; font-size:1rem; color:var(--alert-red);">Vent Box</h4>
+                                <p style="margin:3px 0 0 0; font-size:0.75rem; opacity:0.7;">Release frustration safely
+                                </p>
+                            </div>
+                            <i class="fas fa-external-link-alt" style="opacity:0.5; font-size:0.9rem;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Confession Box -->
+                    <div onclick="window.open('../tools/confession-box/index.html', '_blank')" class="tool-item"
+                        style="background:rgba(139,92,246,0.1); border-color:rgba(139,92,246,0.3);">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div
+                                style="width:40px; height:40px; background:rgba(139,92,246,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-ghost" style="color:#8b5cf6; font-size:1.1rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <h4 style="margin:0; font-size:1rem; color:#8b5cf6;">Confession Box</h4>
+                                <p style="margin:3px 0 0 0; font-size:0.75rem; opacity:0.7;">Share anonymously</p>
+                            </div>
+                            <i class="fas fa-external-link-alt" style="opacity:0.5; font-size:0.9rem;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Drop It -->
+                    <div onclick="window.open('../tools/drop-it.html', '_blank')" class="tool-item"
+                        style="background:var(--info-blue-bg); border-color:rgba(56,189,248,0.3);">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div
+                                style="width:40px; height:40px; background:rgba(56,189,248,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-hand-holding-water" style="color:var(--info-blue); font-size:1.1rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <h4 style="margin:0; font-size:1rem; color:var(--info-blue);">Drop It</h4>
+                                <p style="margin:3px 0 0 0; font-size:0.75rem; opacity:0.7;">Let go of worries</p>
+                            </div>
+                            <i class="fas fa-external-link-alt" style="opacity:0.5; font-size:0.9rem;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Playground -->
+                    <div onclick="window.open('../tools/playground.html', '_blank')" class="tool-item"
+                        style="background:rgba(250,176,5,0.1); border-color:rgba(250,176,5,0.3);">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div
+                                style="width:40px; height:40px; background:rgba(250,176,5,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-shapes" style="color:#fab005; font-size:1.1rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <h4 style="margin:0; font-size:1rem; color:#fab005;">Playground</h4>
+                                <p style="margin:3px 0 0 0; font-size:0.75rem; opacity:0.7;">Creative relief</p>
+                            </div>
+                            <i class="fas fa-external-link-alt" style="opacity:0.5; font-size:0.9rem;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Breathing Exercise -->
+                    <div onclick="window.open('../tools/breathing.html', '_blank')" class="tool-item"
+                        style="background:var(--accent-teal-bg); border-color:rgba(45,212,191,0.3);">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div
+                                style="width:40px; height:40px; background:rgba(45,212,191,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-wind" style="color:var(--teal-accent); font-size:1.1rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <h4 style="margin:0; font-size:1rem; color:var(--teal-accent);">Breathing</h4>
+                                <p style="margin:3px 0 0 0; font-size:0.75rem; opacity:0.7;">Calm your mind</p>
+                            </div>
+                            <i class="fas fa-external-link-alt" style="opacity:0.5; font-size:0.9rem;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Reset Tool -->
+                    <div onclick="window.open('../tools/5-step-reset.html', '_blank')" class="tool-item"
+                        style="background:var(--bg-subtle); border-color:var(--border-subtle);">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div
+                                style="width:40px; height:40px; background:var(--border-subtle); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-redo-alt" style="color:var(--text-main); font-size:1.1rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <h4 style="margin:0; font-size:1rem;">Reset</h4>
+                                <p style="margin:3px 0 0 0; font-size:0.75rem; opacity:0.7;">Start fresh</p>
+                            </div>
+                            <i class="fas fa-external-link-alt" style="opacity:0.5; font-size:0.9rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <script src="../assets/js/portal-utils.js"></script>
+
+    <script type="module">
+        // No import needed. switchView is global.
+        const baseSwitchView = window.switchView;
+
+        // Global Wrapper
+        window.switchView = function (viewName, clickedLink) {
+            if (baseSwitchView) baseSwitchView(viewName, clickedLink);
+            // Link to Journal/Blog logic depending on view if needed
+        };
+    </script>
+
+    <!-- SCRIPT LOGIC -->
+    <script type="module">
+        import { initWalletListener, addFundsMock } from '../assets/js/billing-logic.js';
+        import { auth } from '../assets/js/firebase-config.js';
+
+        // Initialize Wallet on Auth
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                initWalletListener(user.uid, (data) => {
+                    const el = document.getElementById('wallet-balance');
+                    if (el) el.textContent = '$' + (data.balance || 0).toFixed(2);
+                });
+            }
+        });
+
+        window.triggerAddFunds = async function () {
+            const amount = prompt("Enter amount to add ($):", "50");
+            if (!amount || isNaN(amount)) return;
+
+            const btn = document.querySelector('#view-wallet .btn-dash-primary');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+
+            // Simulate Razorpay/Stripe redirect and processing
+            setTimeout(async () => {
+                try {
+                    // Simulate success
+                    const res = await addFundsMock(parseFloat(amount));
+                    if (res.success) {
+                        alert(`✅ $${amount} added to your Soulamore wallet successfully via Secure Gateway.`);
+                    }
+                } catch (e) {
+                    alert("Gateway Error: " + e.message);
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            }, 1500);
+        };
+    </script>
+    <!-- USER DASHBOARD DYNAMIC DATA LOADER -->
+    <script type="module">
+        import { auth, db, collection, query, where, getDocs, doc, getDoc, onSnapshot } from '../assets/js/firebase-config.js';
+
+        // Main data orchestration
+        async function runDashboardLoader(uid, email) {
+            console.log('👤 User Dashboard: Loading data for', email);
+            
+            // Start Notification Listener
+            loadNotifications(uid);
+
+            try {
+                // Load profile
+                await loadUserProfile(uid);
+
+                // Load dynamic data in parallel
+                await Promise.allSettled([
+                    loadUserStats(uid),
+                    loadUserConfessions(uid),
+                    loadUserSavedItems(uid),
+                    loadUserSessions(uid),
+                    loadUserWallet(uid),
+                    loadUpcomingSessions(uid)
+                ]);
+            } catch (err) {
+                console.error('❌ Error loading dashboard data:', err);
+            } finally {
+                // Final hide loader
+                if (typeof window.hideUserLoader === 'function') window.hideUserLoader();
+            }
+        }
+
+        // Notification Listener
+        function loadNotifications(uid) {
+            const q = query(collection(db, 'notifications'), where('userId', '==', uid), where('status', '==', 'unread'));
+            onSnapshot(q, (snapshot) => {
+                const count = snapshot.size;
+                const badge = document.getElementById('notif-count');
+                if (badge) {
+                    badge.textContent = count;
+                    badge.style.display = count > 0 ? 'block' : 'none';
+                }
+            });
+        }
+
+        window.toggleNotifications = function() {
+            // For now, just a placeholder alert until we build the dropdown
+            alert('Your notifications are being synchronized...');
+            // In Phase 2, this will open a floating menu
+        }
+
+        // Listen for Auth OR check Dev Session
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                runDashboardLoader(user.uid, user.email);
+            } else {
+                // Fallback for Dev Session
+                const session = JSON.parse(localStorage.getItem('soulamore_session') || '{}');
+                if (session.isLoggedIn && session.userId && session.userId.startsWith('dev-')) {
+                    console.log('🛠️ Dev Session Detected in Data Loader');
+                    runDashboardLoader(session.userId, session.email);
+                }
+            }
+        });
+
+        async function loadUserProfile(uid) {
+            try {
+                const userDoc = await getDoc(doc(db, 'users', uid));
+                const nameEl = document.getElementById('sidebar-name');
+                const roleEl = document.getElementById('sidebar-role');
+                const profileNameEls = ['profile-name', 'profile-name2'];
+                const profileEmailEls = ['profile-email', 'profile-email2'];
+                const profilePhoneEls = ['profile-phone', 'profile-phone2'];
+
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    const displayName = data.displayName || data.email?.split('@')[0] || 'User';
+
+                    // Update sidebar name only - role is HARDCODED in HTML
+                    if (nameEl) nameEl.textContent = displayName;
+
+                    // Enforce hardcoded role from data attribute (Option 3)
+                    if (roleEl) {
+                        const hardcodedRole = roleEl.getAttribute('data-hardcoded-role') || 'Member';
+                        roleEl.textContent = hardcodedRole;
+                    }
+
+                    // Update profile form fields
+                    profileNameEls.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.value = displayName;
+                    });
+
+                    profileEmailEls.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = data.email || 'loading...';
+                    });
+
+                    profilePhoneEls.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el && data.phone) el.value = data.phone;
+                    });
+
+                    // Update wellness consent status badge (Compliance Dashboard)
+                    const consentBadge = document.getElementById('wellness-consent-badge');
+                    const withdrawBtn = document.getElementById('btn-withdraw-consent');
+                    if (data.consentWellnessDataProcessing) {
+                        if (consentBadge) {
+                            consentBadge.textContent = 'Active';
+                            consentBadge.style.background = 'rgba(78,205,196,0.1)';
+                            consentBadge.style.color = '#4ECDC4';
+                            consentBadge.style.borderColor = 'rgba(78,205,196,0.2)';
+                        }
+                        if (withdrawBtn) {
+                            withdrawBtn.textContent = 'Withdraw Consent';
+                            withdrawBtn.disabled = false;
+                        }
+                    } else {
+                        if (consentBadge) {
+                            consentBadge.textContent = 'Inactive';
+                            consentBadge.style.background = 'rgba(239,68,68,0.1)';
+                            consentBadge.style.color = '#ef4444';
+                            consentBadge.style.borderColor = 'rgba(239,68,68,0.2)';
+                        }
+                        if (withdrawBtn) {
+                            withdrawBtn.textContent = 'Consent Withdrawn';
+                            withdrawBtn.disabled = true;
+                        }
+                    }
+
+                    console.log('✅ User profile loaded:', displayName);
+                } else {
+                    console.warn('⚠️ No user profile found in Firestore');
+                    // user is defined in the outer scope from onAuthStateChanged
+                    const userEmail = user?.email || 'user@soulamore.com';
+                    if (nameEl) nameEl.textContent = userEmail.split('@')[0] || 'User';
+                    // Enforce hardcoded role
+                    if (roleEl) {
+                        const hardcodedRole = roleEl.getAttribute('data-hardcoded-role') || 'Member';
+                        roleEl.textContent = hardcodedRole;
+                    }
+                }
+            } catch (err) {
+                console.error('❌ Error loading user profile:', err);
+            }
+        }
+
+        async function loadUserStats(uid) {
+            try {
+                // Count sessions
+                const sessionsQ = query(collection(db, 'peer_bookings'), where('userId', '==', uid));
+                const sessionsSnap = await getDocs(sessionsQ);
+
+                // Count confessions
+                const confessionsQ = query(collection(db, 'confessions'), where('uid', '==', uid));
+                const confessionsSnap = await getDocs(confessionsQ);
+
+                // Update stats elements
+                const sessionsEl = document.getElementById('user-sessions-count');
+                const journalEl = document.getElementById('user-journal-count');
+                const moodEl = document.getElementById('user-mood-streak');
+                const resourcesEl = document.getElementById('user-resources-count');
+
+                if (sessionsEl) sessionsEl.textContent = sessionsSnap.size;
+                if (journalEl) journalEl.textContent = confessionsSnap.size; // Using confessions as placeholder for journal
+                if (moodEl) moodEl.textContent = '0d'; // Mood tracking not implemented yet
+                if (resourcesEl) resourcesEl.textContent = '0'; // Saved items not implemented yet
+
+                console.log('📊 User stats loaded:', {
+                    sessions: sessionsSnap.size,
+                    journal: confessionsSnap.size,
+                    mood: '0d',
+                    resources: 0
+                });
+            } catch (err) {
+                console.error('❌ Error loading user stats:', err);
+            }
+        }
+
+        async function loadUserConfessions(uid) {
+            try {
+                const container = document.querySelector('#view-profile .dash-card:nth-child(2) > div');
+                if (!container) return;
+
+                const q = query(collection(db, 'confessions'), where('uid', '==', uid));
+                const snap = await getDocs(q);
+
+                if (snap.empty) {
+                    container.innerHTML = `
+                        <div class="text-center p-40 opacity-50">
+                            <i class="fas fa-ghost text-2xl mb-15 block"></i>
+                            <p class="m-0">No confessions yet</p>
+                            <button onclick="window.location.href='../tools/confession-box/index.html'"
+                                class="btn-dash-primary" style="margin-top:15px; font-size:0.85rem; padding:8px 20px;">
+                                Write Your First Confession
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
+                    snap.forEach(docSnap => {
+                        const data = docSnap.data();
+                        const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Recent';
+                        html += `
+                            <div style="padding:15px; background:rgba(255,255,255,0.03); border-radius:8px; border-left:3px solid var(--purple-accent);">
+                                <div style="font-size:0.75rem; opacity:0.6; margin-bottom:5px;">${date}</div>
+                                <div style="font-size:0.9rem; opacity:0.8;">${data.content?.substring(0, 100) || 'Confession'}...</div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                }
+            } catch (err) {
+                console.error('❌ Error loading confessions:', err);
+            }
+        }
+
+        async function loadUserSavedItems(uid) {
+            try {
+                const container = document.querySelector('#view-saved .workspace-body > div');
+                if (!container) return;
+
+                const q = query(collection(db, 'user_saved_items'), where('uid', '==', uid));
+                const snap = await getDocs(q);
+
+                if (snap.empty) {
+                    container.innerHTML = `
+                        <div style="text-align:center; max-width:420px;">
+                            <div style="width:80px; height:80px; background:rgba(139,92,246,0.08); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; border:1px solid rgba(139,92,246,0.2);">
+                                <i class="fas fa-bookmark" style="font-size:2rem; color:#8b5cf6;"></i>
+                            </div>
+                            <p style="color:var(--text-muted); opacity:0.7; line-height:1.7; font-size:0.95rem;">
+                                When you save articles, peer stories, or forum threads, they'll appear here.<br><br>
+                                <button onclick="window.location.href='../our-peers/index.html'"
+                                    class="btn-dash-primary" style="margin-top:15px; font-size:0.85rem; padding:8px 20px;">
+                                    Browse Content
+                                </button>
+                            </p>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error('❌ Error loading saved items:', err);
+            }
+        }
+
+        let userSessionsUnsubscribe = null;
+
+        function loadUserSessions(uid) {
+            try {
+                const container = document.getElementById('user-upcoming-sessions');
+                if (!container) return;
+
+                if (userSessionsUnsubscribe) {
+                    userSessionsUnsubscribe();
+                }
+
+                const q = query(
+                    collection(db, 'peer_bookings'),
+                    where('userId', '==', uid)
+                );
+
+                userSessionsUnsubscribe = onSnapshot(q, (snapshot) => {
+                    let sessions = [];
+                    snapshot.forEach(docSnap => {
+                        sessions.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+
+                    // Fetch local fallback
+                    const localBookings = JSON.parse(sessionStorage.getItem('local_bookings') || '[]');
+                    localBookings.forEach(b => {
+                        if (b.userId === uid && !sessions.some(s => s.id === b.id)) {
+                            sessions.push(b);
+                        }
+                    });
+
+                    if (sessions.length === 0) {
+                        container.innerHTML = `
+                            <div style="text-align:center; padding:20px; background:var(--bg-deep); border-radius:12px; border:1px dashed var(--border-subtle);">
+                                <i class="fas fa-calendar-check" style="font-size:1.5rem; opacity:0.3; margin-bottom:10px;"></i>
+                                <p style="opacity:0.7; font-size:0.9rem; margin-bottom:10px;">
+                                    No upcoming sessions scheduled.
+                                </p>
+                                <button onclick="window.location.href='../our-peers/index.html'"
+                                    class="btn-dash-primary" style="font-size:0.85rem; padding:8px 20px;">
+                                    Book a Session
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        let html = '';
+                        sessions.forEach(data => {
+                            const peerName = data.peerName || 'Peer Listener';
+                            let date = 'TBD';
+                            if (data.startTime?.toDate) {
+                                date = data.startTime.toDate().toLocaleString();
+                            } else if (data.startTime) {
+                                date = new Date(data.startTime).toLocaleString();
+                            } else if (data.createdAt?.toDate) {
+                                date = data.createdAt.toDate().toLocaleString();
+                            }
+
+                            const statusColor = data.status === 'confirmed' ? '#2dd4bf' : (data.status === 'cancelled' ? '#ef4444' : '#f59e0b');
+
+                            html += `
+                                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px; padding:12px; background:rgba(255,255,255,0.03); border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
+                                    <div style="display:flex; align-items:center; gap:12px;">
+                                        <div style="width:42px; height:42px; background:var(--peach-glow); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--bg-deep); font-weight:700; font-size:0.9rem;">
+                                            ${peerName.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div style="flex:1;">
+                                            <div style="font-weight:600; font-size:0.9rem;">${peerName} <span style="font-size:0.75rem; opacity:0.6;">(${data.slId || 'SL-2026'})</span></div>
+                                            <div style="font-size:0.75rem; opacity:0.6;"><i class="far fa-clock" style="margin-right:4px;"></i>${date}</div>
+                                        </div>
+                                        <div style="background:rgba(255,255,255,0.05); color:${statusColor}; border:1px solid ${statusColor}44; padding:4px 10px; border-radius:12px; font-size:0.7rem; font-weight:600;">
+                                            ${(data.status || 'pending').toUpperCase()}
+                                        </div>
+                                    </div>
+                                    <div style="display:flex; gap:8px; margin-top:6px; justify-content:flex-end; align-items:center;">
+                                        <a href="../portal/video-conference.html?roomId=${data.slId || data.id}"
+                                           style="background:#4ECDC4; color:#0f172a; padding:6px 14px; border-radius:8px; font-size:0.75rem; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                                            <i class="fas fa-video"></i> Join Session
+                                        </a>
+                                        ${data.status !== 'cancelled' ? `
+                                            <button onclick="window.requestCancelUserSession('${data.id}')"
+                                                    style="background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.3); padding:6px 12px; border-radius:8px; font-size:0.75rem; cursor:pointer;">
+                                                Cancel
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        container.innerHTML = html;
+                    }
+                }, (err) => {
+                    console.error('❌ Real-time user sessions error:', err);
+                });
+
+                window.requestCancelUserSession = async (bookingId) => {
+                    if (!confirm("Are you sure you want to cancel this session?")) return;
+                    try {
+                        const { cancelSession } = await import('../assets/js/peer-booking-handler.js');
+                        await cancelSession(bookingId, "Cancelled by client user");
+                        alert("Session cancelled successfully.");
+                    } catch (e) {
+                        alert("Could not cancel session: " + e.message);
+                    }
+                };
+            } catch (err) {
+                console.error('❌ Error initializing real-time sessions:', err);
+            }
+        }
+
+        async function loadUserWallet(uid) {
+            try {
+                const walletDoc = await getDoc(doc(db, 'user_wallets', uid));
+                const balanceEl = document.getElementById('wallet-balance');
+
+                if (walletDoc.exists()) {
+                    const data = walletDoc.data();
+                    const balance = data.balance || 0;
+                    if (balanceEl) {
+                        balanceEl.textContent = '$' + balance.toFixed(2);
+                    }
+                } else {
+                    // Create wallet if doesn't exist
+                    console.log('💰 No wallet found, user will see $0.00');
+                    if (balanceEl) balanceEl.textContent = '$0.00';
+                }
+            } catch (err) {
+                console.error('❌ Error loading wallet:', err);
+                const balanceEl = document.getElementById('wallet-balance');
+                if (balanceEl) balanceEl.textContent = '$0.00';
+            }
+        }
+
+        async function loadUpcomingSessions(uid) {
+            // Already handled by loadUserSessions
+            console.log('📅 Upcoming sessions loader initialized');
+        }
+
+        console.log('🚀 User Dashboard Dynamic Data Loader initialized');
+    </script>
+
+    <script src="../assets/js/soulbot-widget-v2.js"></script>
+</body>
+
+</html>

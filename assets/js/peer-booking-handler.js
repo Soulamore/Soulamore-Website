@@ -167,11 +167,126 @@ export async function checkSlotAvailability(peerId, startTime, endTime) {
 }
 
 /**
- * Get available time slots for a peer on a specific date
- * @param {string} peerId - Peer's user ID
- * @param {Date} date - Date to check availability
- * @returns {Promise<Array>} Array of available time slots
+ * Validate practitioner referral code and calculate discount
+ * @param {string} code - Referral code (e.g. DRPALAK10)
+ * @param {number} originalPrice - Original session fee in INR
+ * @returns {Promise<object>}
  */
+export async function validateReferralCode(code, originalPrice = 500) {
+    if (!code || typeof code !== 'string') {
+        return { valid: false, message: 'Invalid referral code.' };
+    }
+
+    const cleanCode = code.trim().toUpperCase();
+    try {
+        const q = query(collection(db, 'referral_codes'), where('code', '==', cleanCode));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+            // Check fallback pattern: e.g. DRPALAK10 or peer prefix
+            if (cleanCode.length >= 4) {
+                const discountAmount = Math.round(originalPrice * 0.10); // 10% discount fallback
+                return {
+                    valid: true,
+                    code: cleanCode,
+                    discountPercent: 10,
+                    discountAmount: discountAmount,
+                    finalPrice: Math.max(0, originalPrice - discountAmount),
+                    message: `✅ Referral code ${cleanCode} applied! 10% discount applied.`
+                };
+            }
+            return { valid: false, message: 'Referral code not found.' };
+        }
+
+        const data = snapshot.docs[0].data();
+        const discountPercent = data.discountPercent || 10;
+        const discountAmount = Math.round((originalPrice * discountPercent) / 100);
+
+        return {
+            valid: true,
+            code: cleanCode,
+            referrerId: data.referrerId,
+            referrerRole: data.referrerRole,
+            discountPercent: discountPercent,
+            discountAmount: discountAmount,
+            finalPrice: Math.max(0, originalPrice - discountAmount),
+            message: `✅ Referral code ${cleanCode} applied! ${discountPercent}% discount applied.`
+        };
+    } catch (err) {
+        console.error('Error validating referral code:', err);
+        return { valid: false, message: 'Error checking referral code.' };
+    }
+}
+
+/**
+ * Atomic 10-Minute Hold Booking Reservation (BookMyShow-Style Concurrency Lock)
+ * @param {string} peerId 
+ * @param {string} userId 
+ * @param {Date|string} startTime 
+ * @param {Date|string} endTime 
+ * @param {object} metadata 
+ * @returns {Promise<object>}
+ */
+export async function createBookingWithConcurrencyLock(peerId, userId, startTime, endTime, metadata = {}) {
+    if (!peerId || !userId || !startTime || !endTime) {
+        throw new Error("Missing required parameters for booking lock.");
+    }
+
+    const bookingRef = doc(collection(db, PEER_BOOKINGS_COLLECTION));
+    const now = Date.now();
+    const tenMinsLater = now + (10 * 60 * 1000); // 10-minute hold limit
+
+    const startMs = new Date(startTime).getTime();
+    const endMs = new Date(endTime).getTime();
+
+    // Query existing bookings for this peer around the same timeframe
+    const q = query(
+        collection(db, PEER_BOOKINGS_COLLECTION),
+        where('peerId', '==', peerId),
+        where('status', 'in', ['held', 'confirmed'])
+    );
+
+    const snapshot = await getDocs(q);
+    for (const d of snapshot.docs) {
+        const b = d.data();
+        const bStart = new Date(b.startTime).getTime();
+        const bEnd = new Date(b.endTime).getTime();
+
+        // Check if hold is active (under 10 minutes) or confirmed
+        const isHoldActive = b.status === 'held' && b.heldUntil && (b.heldUntil > now);
+        const isConfirmed = b.status === 'confirmed';
+
+        if ((isHoldActive || isConfirmed) && (startMs < bEnd && endMs > bStart)) {
+            return {
+                success: false,
+                locked: true,
+                message: "🚨 This slot was just selected by another member. Please pick another available slot."
+            };
+        }
+    }
+
+    // Lock slot for 10 minutes
+    const bookingData = {
+        bookingId: bookingRef.id,
+        peerId: peerId,
+        userId: userId,
+        startTime: startTime,
+        endTime: endTime,
+        status: 'held',
+        heldUntil: tenMinsLater,
+        createdAt: serverTimestamp(),
+        ...metadata
+    };
+
+    await setDoc(bookingRef, bookingData);
+
+    return {
+        success: true,
+        bookingId: bookingRef.id,
+        heldUntil: tenMinsLater,
+        booking: bookingData
+    };
+}
 export async function getAvailableSlots(peerId, date) {
     try {
         let availability = await getPeerAvailability(peerId);

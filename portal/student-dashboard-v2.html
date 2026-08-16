@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- DOMAIN ROUTER & CANONICAL -->
+    <script>
+        (function() {
+            var host = window.location.hostname;
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var targetDomain = 'soulamore.com';
+            
+            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
+                window.location.replace('https://' + targetDomain + path + search);
+            }
+            
+            var canonicalUrl = 'https://' + targetDomain + path;
+            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
+            link.rel = 'canonical';
+            link.href = canonicalUrl;
+            if (!link.parentNode) document.head.appendChild(link);
+        })();
+    </script>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com;
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+                 font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+                 img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
+                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://region1.google-analytics.com https://www.google-analytics.com https://analytics.google.com;
+                 frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
+
+    <!-- AUTH GUARD -->
+    <script src="../assets/js/portal-utils.js"></script>
+    <script src="../assets/js/auth-guard.js"></script>
+
+    <!-- STANDALONE UI NAVIGATION UTILITIES & DASHBOARD LOADING SYSTEM -->
+    <link rel="stylesheet" href="../assets/css/dashboard-loading.css">
+    <script>
+        function v2SwitchTab(tabName, element) {
+            document.querySelectorAll('.v2-nav-item').forEach(function(el) { el.classList.remove('active'); });
+            if (element) element.classList.add('active');
+
+            document.querySelectorAll('.v2-view-section').forEach(function(sec) { sec.classList.remove('active'); });
+            var targetSec = document.getElementById('v2-view-' + tabName);
+            if (targetSec) targetSec.classList.add('active');
+
+            var titleMap = {
+                overview: 'Student Overview',
+                peers: 'Campus Peer Listeners',
+                exam: 'Exam & Academic Toolkit',
+                vent: 'Anonymous Campus Vent Box',
+                circles: 'Healing Circles & Groups',
+                booking: 'Book Student Counselor',
+                settings: 'Student Account Settings'
+            };
+            var headerTitle = document.getElementById('v2HeaderTitle');
+            if (headerTitle) headerTitle.textContent = titleMap[tabName] || 'Campus Student Sanctuary';
+        }
+
+        function v2ToggleTheme() {
+            var isDark = document.body.getAttribute('data-theme') === 'dark';
+            var icon = document.getElementById('v2ThemeIcon');
+
+            if (isDark) {
+                document.body.removeAttribute('data-theme');
+                if (icon) icon.className = 'fas fa-moon';
+                localStorage.setItem('soulamore_v2_student_theme', 'light');
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                if (icon) icon.className = 'fas fa-sun';
+                localStorage.setItem('soulamore_v2_student_theme', 'dark');
+            }
+        }
+
+        if (localStorage.getItem('soulamore_v2_student_theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            window.addEventListener('DOMContentLoaded', function() {
+                var icon = document.getElementById('v2ThemeIcon');
+                if (icon) icon.className = 'fas fa-sun';
+            });
+        }
+
+        function v2ToggleMobileSidebar() {
+            var sidebar = document.getElementById('v2Sidebar');
+            if (sidebar) sidebar.classList.toggle('mobile-open');
+        }
+
+        function hideV2Loader() {
+            var loader = document.getElementById('v2DashboardLoader');
+            if (loader) {
+                loader.classList.add('hidden');
+                setTimeout(function() { loader.style.display = 'none'; }, 500);
+            }
+        }
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Student Sanctuary | Soulamore V2</title>
+
+    <!-- FONTS & ICONS -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="../assets/images/favicon_symbol.webp" type="image/x-icon">
+
+    <!-- SUPER PREMIUM STYLES & RICH 2-COLUMN GRID SYSTEM -->
+    <style>
+        :root {
+            --bg-canvas: #F5F3FF;
+            --bg-surface: #FFFFFF;
+            --bg-surface-elevated: #EDE9FE;
+            --border-subtle: rgba(124, 58, 237, 0.15);
+            --border-strong: rgba(124, 58, 237, 0.3);
+            
+            --primary-violet: #7C3AED;
+            --primary-violet-hover: #6D28D9;
+            --violet-light: #DDD6FE;
+            --violet-glow: rgba(124, 58, 237, 0.15);
+            
+            --text-primary: #334155;
+            --text-secondary: #475569;
+            --text-muted: #64748B;
+            
+            --sidebar-width: 250px;
+            --topbar-height: 64px;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-subtle: 0 4px 20px -2px rgba(124, 58, 237, 0.05);
+            --transition-smooth: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-canvas: #0F172A;
+            --bg-surface: #1E293B;
+            --bg-surface-elevated: #2E1065;
+            --border-subtle: rgba(167, 139, 250, 0.2);
+            --border-strong: rgba(167, 139, 250, 0.4);
+            
+            --primary-violet: #A78BFA;
+            --primary-violet-hover: #C4B5FD;
+            --violet-light: rgba(167, 139, 250, 0.15);
+            --violet-glow: rgba(167, 139, 250, 0.25);
+            
+            --text-primary: #F8FAFC;
+            --text-secondary: #CBD5E1;
+            --text-muted: #64748B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+        }
+
+        /* SIDEBAR */
+        .v2-sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .v2-sidebar-brand {
+            height: var(--topbar-height);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .v2-brand-logo-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            height: 42px;
+        }
+
+        .v2-brand-logo-base {
+            height: 42px;
+            max-width: 180px;
+            object-fit: contain;
+        }
+
+        .v2-brand-logo-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 42px;
+            max-width: 180px;
+            object-fit: contain;
+            filter: brightness(0.22);
+            clip-path: inset(0 0 0 32.5%);
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        [data-theme="dark"] .v2-brand-logo-overlay {
+            opacity: 0;
+        }
+
+        .v2-user-profile-badge {
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-surface-elevated);
+            margin: 10px 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .v2-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--violet-light);
+            color: var(--primary-violet);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-strong);
+            flex-shrink: 0;
+        }
+
+        .v2-user-info { overflow: hidden; }
+
+        .v2-user-name {
+            font-weight: 600;
+            font-size: 0.84rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .v2-user-status {
+            font-size: 0.7rem;
+            color: var(--primary-violet);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+
+        .v2-status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary-violet);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .v2-nav-list {
+            list-style: none;
+            padding: 8px 12px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .v2-nav-section-title {
+            padding: 8px 10px 4px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .v2-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.84rem;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+        }
+
+        .v2-nav-item:hover {
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+        }
+
+        .v2-nav-item.active {
+            background: var(--violet-light);
+            color: var(--primary-violet);
+            font-weight: 600;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .v2-nav-item i {
+            width: 18px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .v2-nav-divider {
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 6px 0;
+        }
+
+        .v2-sidebar-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .v2-btn-logout {
+            width: 100%;
+            padding: 8px;
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: var(--transition-smooth);
+        }
+
+        .v2-btn-logout:hover {
+            background: rgba(239, 68, 68, 0.08);
+            color: #EF4444;
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        /* MAIN WRAPPER & GRID */
+        .v2-main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .v2-topbar {
+            height: var(--topbar-height);
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 90;
+            position: relative;
+        }
+
+        .v2-topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .v2-page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .v2-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .v2-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-surface-elevated);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .v2-icon-btn:hover {
+            color: var(--primary-violet);
+            border-color: var(--border-strong);
+        }
+
+        .v2-content-viewport {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .v2-view-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .v2-view-section.active {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            opacity: 1;
+        }
+
+        .v2-grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .v2-section-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .v2-side-card {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .v2-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .v2-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .v2-btn-primary {
+            background: var(--primary-violet);
+            color: white;
+            border: none;
+            padding: 9px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: 0.84rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .v2-btn-primary:hover {
+            background: var(--primary-violet-hover);
+        }
+
+        .v2-textarea {
+            width: 100%;
+            min-height: 90px;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            color: var(--text-primary);
+            font-size: 0.88rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .v2-badge-pill {
+            background: var(--violet-light);
+            color: var(--primary-violet);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            width: fit-content;
+        }
+
+        .v2-mobile-sidebar-toggle { display: none; }
+
+        @media (max-width: 900px) {
+            .v2-sidebar { position: fixed; left: -250px; top: 0; }
+            .v2-sidebar.mobile-open { left: 0; }
+            .v2-mobile-sidebar-toggle { display: flex; }
+            .v2-grid-2col { grid-template-columns: 1fr; }
+        }
+    </style>
+
+    <!-- SEO & OPEN GRAPH META TAGS -->
+    <meta name="description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soulamore.com/portal/student-dashboard-v2.html">
+    <meta property="og:title" content="Campus Student Sanctuary | Soulamore V2">
+    <meta property="og:description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta property="og:image" content="https://soulamore.com/assets/images/favicon_symbol.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Campus Student Sanctuary | Soulamore V2">
+    <meta name="twitter:description" content="Soulamore is India's leading anonymous emotional support sanctuary. Get affordable online therapy, clinical assessments, and peer counseling.">
+    <meta name="twitter:image" content="https://soulamore.com/assets/images/favicon_symbol.webp">
+</head>
+
+<body>
+    <!-- STUDENT LOADING SCREEN (Safe Earth Theme) -->
+    <div id="v2DashboardLoader" class="dashboard-loading user-theme">
+        <div class="loading-breath-circle">
+            <span style="font-size:2rem;">🎓</span>
+        </div>
+        <div class="loading-text-container" style="text-align:center;">
+            <div class="loading-title">Campus Student Sanctuary</div>
+            <div class="loading-subtitle">Preparing your campus peer listening space...</div>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+        <div class="loading-tips">
+            <div class="loading-tip-icon" style="text-align:center;">🎓</div>
+            <div class="loading-tip-text" style="text-align:center;">"Exams & grades don't define your self-worth. Take a gentle breath."</div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <nav class="v2-sidebar" id="v2Sidebar">
+        <div class="v2-sidebar-brand">
+            <div class="v2-brand-logo-container">
+                <img src="../assets/images/logo.webp" alt="Soulamore" class="v2-brand-logo-base">
+                <img src="../assets/images/logo.webp" alt="" class="v2-brand-logo-overlay">
+            </div>
+        </div>
+
+        <div class="v2-user-profile-badge">
+            <div class="v2-avatar" id="v2Avatar">S</div>
+            <div class="v2-user-info">
+                <div class="v2-user-name" id="v2UserName">Loading Student...</div>
+                <div class="v2-user-status"><span class="v2-status-dot"></span> Campus Student</div>
+            </div>
+        </div>
+
+        <ul class="v2-nav-list">
+            <li class="v2-nav-item active" onclick="v2SwitchTab('overview', this)">
+                <i class="fas fa-graduation-cap"></i> Student Overview
+            </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('peers', this)">
+                <i class="fas fa-users-line"></i> Peer Listeners
+            </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('exam', this)">
+                <i class="fas fa-brain"></i> Exam Stress Toolkit
+            </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('vent', this)">
+                <i class="fas fa-fire"></i> Campus Vent Box
+            </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('circles', this)">
+                <i class="fas fa-comments"></i> Healing Circles
+            </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('booking', this)">
+                <i class="fas fa-calendar-check"></i> Book Session
+            </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('settings', this)">
+                <i class="fas fa-cog"></i> Account Settings
+            </li>
+        </ul>
+
+        <div class="v2-sidebar-footer">
+            <button class="v2-btn-logout" onclick="handleLogout()">
+                <i class="fas fa-arrow-right-from-bracket"></i> Log Out
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN VIEW WRAPPER -->
+    <div class="v2-main-wrapper">
+        <header class="v2-topbar">
+            <div class="v2-topbar-left">
+                <button class="v2-icon-btn v2-mobile-sidebar-toggle" onclick="v2ToggleMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="v2-page-title" id="v2HeaderTitle">Student Overview</h1>
+            </div>
+
+            <div class="v2-topbar-right">
+                <!-- Theme Toggle -->
+                <button class="v2-icon-btn" onclick="v2ToggleTheme()" title="Toggle Theme">
+                    <i class="fas fa-moon" id="v2ThemeIcon"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="v2-content-viewport">
+            
+            <!-- 1. OVERVIEW -->
+            <section class="v2-view-section active" id="v2-view-overview">
+                <div class="v2-grid-2col">
+                    <div class="v2-section-card">
+                        <div class="v2-section-header">
+                            <div class="v2-section-title"><i class="fas fa-graduation-cap" style="color:var(--primary-violet);"></i> Campus Wellbeing Dashboard</div>
+                        </div>
+                        <p style="font-size:0.88rem; color:var(--text-secondary); line-height:1.6;">
+                            Welcome to your dedicated Campus Sanctuary space. Connect with empathetic student peer listeners, access 24/7 exam stress relievers, or vent anonymously.
+                        </p>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-top:8px;">
+                            <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <div style="font-size:0.75rem; color:var(--text-muted);">Active Campus Peers</div>
+                                <div style="font-size:1.3rem; font-weight:600; color:var(--primary-violet);">12 Online Now</div>
+                            </div>
+                            <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <div style="font-size:0.75rem; color:var(--text-muted);">Next Healing Circle</div>
+                                <div style="font-size:1.1rem; font-weight:600; color:var(--primary-violet);">Today 6:00 PM</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="v2-side-card">
+                        <div style="font-weight:600; font-size:0.9rem;"><i class="fas fa-bolt" style="color:var(--primary-violet);"></i> Quick Relief Tools</div>
+                        <button class="v2-btn-primary" style="justify-content:center;" onclick="v2SwitchTab('vent')"><i class="fas fa-fire"></i> Anonymous Campus Vent Box</button>
+                        <button class="v2-btn-primary" style="justify-content:center; background:var(--bg-surface); color:var(--text-primary); border:1px solid var(--border-subtle);" onclick="v2SwitchTab('exam')"><i class="fas fa-brain"></i> 5-Min Exam De-Stresser</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. CAMPUS PEER LISTENERS -->
+            <section class="v2-view-section" id="v2-view-peers">
+                <div class="v2-section-card">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-users-line" style="color:var(--primary-violet);"></i> Peer Supporters On Campus</div>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--text-secondary);">Verified student peer listeners available to chat without judgment.</p>
+                    <a href="../our-peers/index.html" class="v2-btn-primary" style="align-self:flex-start; margin-top:8px;">Browse All Campus Peer Listeners</a>
+                </div>
+            </section>
+
+            <!-- 3. EXAM STRESS TOOLKIT -->
+            <section class="v2-view-section" id="v2-view-exam">
+                <div class="v2-section-card">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-brain" style="color:var(--primary-violet);"></i> Exam & Academic Stress Toolkit</div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                            <div style="font-weight:600; font-size:0.88rem;">1. Box Breathing Technique (4-4-4-4)</div>
+                            <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:4px;">Inhale 4s • Hold 4s • Exhale 4s • Pause 4s</div>
+                        </div>
+                        <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                            <div style="font-weight:600; font-size:0.88rem;">2. Imposter Syndrome Grounding</div>
+                            <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:4px;">"A single exam score measures memory on one day, not your future capability."</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. CAMPUS VENT BOX -->
+            <section class="v2-view-section" id="v2-view-vent">
+                <div class="v2-section-card">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-fire" style="color:var(--primary-violet);"></i> Anonymous Campus Vent Box</div>
+                    </div>
+                    <textarea class="v2-textarea" style="min-height:110px;" placeholder="Vent your academic stress, relationship worries, or campus feelings anonymously..."></textarea>
+                    <button class="v2-btn-primary" style="align-self:flex-start;" onclick="alert('Vent safely released anonymously!')"><i class="fas fa-paper-plane"></i> Release Anonymously</button>
+                </div>
+            </section>
+
+            <!-- 5. HEALING CIRCLES -->
+            <section class="v2-view-section" id="v2-view-circles">
+                <div class="v2-section-card">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-comments" style="color:var(--primary-violet);"></i> Student Healing Circles & Discussion Groups</div>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--text-secondary);">Join anonymous weekly listening circles led by trained peer facilitators.</p>
+                </div>
+            </section>
+
+            <!-- 6. BOOK SESSION -->
+            <section class="v2-view-section" id="v2-view-booking">
+                <div class="v2-section-card">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-calendar-check"></i> Book Student Counselor</div>
+                    </div>
+                    <a href="../our-peers/index.html" class="v2-btn-primary" style="align-self:flex-start;">Book 1-on-1 Session</a>
+                </div>
+            </section>
+
+            <!-- 7. SETTINGS -->
+            <section class="v2-view-section" id="v2-view-settings">
+                <div class="v2-section-card">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-cog"></i> Account Preferences</div>
+                    </div>
+                    <input type="text" class="v2-textarea" style="min-height:auto; padding:10px;" id="v2StudentNameInput" placeholder="Display Name">
+                    <button class="v2-btn-primary" style="align-self:flex-start; margin-top:8px;" onclick="alert('Settings saved!')">Save Preferences</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SCRIPT LOGIC -->
+    <script type="module">
+        import { auth, db, doc, getDoc } from '../assets/js/firebase-config.js';
+
+        async function loadStudentDashboard(uid) {
+            try {
+                const userDoc = await getDoc(doc(db, 'users', uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    const name = data.displayName || data.name || data.email?.split('@')[0] || 'Student';
+                    
+                    const nameEl = document.getElementById('v2UserName');
+                    const avatarEl = document.getElementById('v2Avatar');
+                    if (nameEl) nameEl.textContent = name;
+                    if (avatarEl) avatarEl.textContent = name.charAt(0).toUpperCase();
+                }
+                hideV2Loader();
+            } catch (err) {
+                console.error('Error loading student dashboard:', err);
+                hideV2Loader();
+            }
+        }
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loadStudentDashboard(user.uid);
+            } else {
+                hideV2Loader();
+            }
+        });
+    </script>
+</body>
+
+</html>

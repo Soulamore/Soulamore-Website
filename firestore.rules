@@ -296,6 +296,29 @@ service cloud.firestore {
       allow write: if false; // Only Cloud Functions Admin SDK can write
     }
 
+    // Provider Public Profiles & Moderated Edit Requests Queue
+    match /providers/{providerId} {
+      allow read: if true; // Public read
+      allow write: if isAdmin(); // Direct live profile updates gated to Admin / Cloud Functions
+
+      match /editRequests/{requestId} {
+        allow read: if isSelf(providerId) || isAdmin();
+        allow create: if isSelf(providerId) && request.resource.data.status == 'pending';
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // Collection Group rule for Admin Moderation Queue
+    match /{path=**}/editRequests/{requestId} {
+      allow read: if isAdmin() || (isSignedIn() && resource != null && resource.data.submittedBy == request.auth.uid);
+    }
+
+    // Master Specialty / Typology Tags Taxonomy
+    match /specialtyTags/{tagId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Default: Deny all other access
     match /{document=**} {
       allow read, write: if false;
