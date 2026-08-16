@@ -1106,25 +1106,72 @@
                 </div>
             </section>
 
-            <!-- 5. SESSION NOTES -->
+            <!-- 5. CLINICAL SESSION NOTES & SOAP BUILDER -->
             <section class="v2-view-section" id="v2-view-notes">
                 <div class="v2-grid-2col">
                     <div class="v2-section-card">
                         <div class="v2-section-header">
-                            <div class="v2-section-title"><i class="fas fa-file-medical" style="color:var(--primary-cyan);"></i> Confidential Session Notes (SOAP)</div>
+                            <div class="v2-section-title"><i class="fas fa-file-medical" style="color:var(--primary-cyan);"></i> Structured Clinical SOAP Note Builder</div>
+                            <span class="v2-badge-pill" style="background:rgba(6, 182, 212, 0.15); color:var(--primary-cyan);"><i class="fas fa-lock"></i> End-to-End Encrypted</span>
                         </div>
-                        <input type="text" id="v2NotePatientName" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Patient Name / ID">
-                        
-                        <label class="v2-field-label">Rich Clinical SOAP Note</label>
-                        <div id="v2SoapQuillEditor" style="height:160px; background:var(--bg-surface-elevated); border-radius:var(--radius-md);"></div>
 
-                        <button class="v2-btn-primary" style="align-self:flex-start;" onclick="v2SaveSessionNote()"><i class="fas fa-save"></i> Save Note</button>
+                        <div class="v2-field-group">
+                            <label class="v2-field-label">Patient Name & Record ID</label>
+                            <input type="text" id="v2NotePatientName" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Patient Name (e.g. Aditya H. - PAT-9872)">
+                        </div>
+
+                        <!-- 4-Part SOAP Fields -->
+                        <div class="v2-field-group">
+                            <label class="v2-field-label" style="color:var(--primary-cyan);">S — Subjective (Client Reported Symptoms & Mood)</label>
+                            <textarea id="v2SoapSubjective" class="v2-textarea" style="min-height:70px;" placeholder="Client states feeling restless, reports 3 sleepless nights due to work anxiety..."></textarea>
+                        </div>
+
+                        <div class="v2-field-group">
+                            <label class="v2-field-label" style="color:var(--primary-cyan);">O — Objective (Clinical Observations & Affect)</label>
+                            <textarea id="v2SoapObjective" class="v2-textarea" style="min-height:70px;" placeholder="Appears fatigued, flat affect initially, engaged well during cognitive restructuring exercise..."></textarea>
+                        </div>
+
+                        <div class="v2-field-group">
+                            <label class="v2-field-label" style="color:var(--primary-cyan);">A — Assessment (DSM-5 / ICD-11 Diagnostic Impression)</label>
+                            <select id="v2SoapDiagnosticTag" class="v2-textarea" style="min-height:auto; padding:10px; cursor:pointer;">
+                                <option value="F41.1">F41.1 — Generalized Anxiety Disorder (GAD)</option>
+                                <option value="F32.1">F32.1 — Moderate Depressive Episode</option>
+                                <option value="F43.2">F43.2 — Adjustment Disorder with Anxious Mood</option>
+                                <option value="Z73.0">Z73.0 — Burnout & Work Exhaustion</option>
+                                <option value="F41.0">F41.0 — Panic Disorder</option>
+                            </select>
+                        </div>
+
+                        <div class="v2-field-group">
+                            <label class="v2-field-label" style="color:var(--primary-cyan);">P — Plan (Therapeutic Homework & Next Session)</label>
+                            <textarea id="v2SoapPlan" class="v2-textarea" style="min-height:70px;" placeholder="Assigned 4-7-8 breathing logs, scheduled follow-up CBT session for next Tuesday at 4:00 PM..."></textarea>
+                        </div>
+
+                        <button class="v2-btn-primary" style="align-self:flex-start; margin-top:6px; background:var(--primary-cyan);" onclick="v2SaveSessionNote()"><i class="fas fa-save"></i> Save Encrypted SOAP Note</button>
                     </div>
 
-                    <div class="v2-side-card">
-                        <div style="font-weight:600; font-size:0.9rem;"><i class="fas fa-lock" style="color:var(--primary-cyan);"></i> Encrypted SOAP Storage</div>
-                        <div style="font-size:0.78rem; color:var(--text-secondary); line-height:1.5;">
-                            Notes are encrypted and accessible only by you.
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="v2-side-card">
+                            <div style="font-weight:600; font-size:0.9rem; margin-bottom:8px;"><i class="fas fa-chart-line" style="color:var(--primary-cyan);"></i> Patient Mood Trajectory & PHQ-9 Progress</div>
+                            <div style="background:var(--bg-surface); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-bottom:10px;">
+                                <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600; margin-bottom:4px;">
+                                    <span>PHQ-9 Severity Index</span>
+                                    <span style="color:#10B981;">Mild (Down from Severe)</span>
+                                </div>
+                                <div style="width:100%; height:8px; background:var(--border-subtle); border-radius:4px; overflow:hidden;">
+                                    <div style="width:35%; height:100%; background:#10B981;"></div>
+                                </div>
+                            </div>
+                            <div style="font-size:0.78rem; color:var(--text-secondary); line-height:1.5;">
+                                💡 Patient shows a 45% reduction in anxiety indicators over 4 sessions.
+                            </div>
+                        </div>
+
+                        <div class="v2-side-card">
+                            <div style="font-weight:600; font-size:0.9rem;"><i class="fas fa-shield-halved" style="color:var(--primary-cyan);"></i> Encrypted SOAP Storage</div>
+                            <div style="font-size:0.78rem; color:var(--text-secondary); line-height:1.5; margin-top:4px;">
+                                Notes are encrypted at rest and accessible solely by your verified practitioner credentials.
+                            </div>
                         </div>
                     </div>
                 </div>
