@@ -35,7 +35,8 @@
     <script src="../assets/js/portal-utils.js"></script>
     <script src="../assets/js/auth-guard.js"></script>
 
-    <!-- STANDALONE UI NAVIGATION UTILITIES -->
+    <!-- STANDALONE UI NAVIGATION UTILITIES & DASHBOARD LOADING SYSTEM -->
+    <link rel="stylesheet" href="../assets/css/dashboard-loading.css">
     <script>
         function v2SwitchTab(tabName, element) {
             document.querySelectorAll('.v2-nav-item').forEach(function(el) { el.classList.remove('active'); });
@@ -46,19 +47,16 @@
             if (targetSec) targetSec.classList.add('active');
 
             var titleMap = {
-                home: 'Home',
-                journal: 'My Journal',
-                bookings: 'My Sessions',
-                availability: 'My Availability',
-                soulbot: 'SoulBot AI',
-                messages: 'Messages',
-                saved: 'Saved Items',
-                wallet: 'My Wallet',
-                profile: 'My Profile',
+                overview: 'Overview',
+                saved: 'Bookmarked Guides & Articles',
+                consents: 'Parental & Privacy Consents',
+                soulbot: 'SoulBot Coping Assistant',
+                journal: 'My Sanctuary Journal',
+                booking: 'Book Counselor Session',
                 settings: 'Account Settings'
             };
             var headerTitle = document.getElementById('v2HeaderTitle');
-            if (headerTitle) headerTitle.textContent = titleMap[tabName] || 'User Dashboard';
+            if (headerTitle) headerTitle.textContent = titleMap[tabName] || 'User Sanctuary';
         }
 
         function v2ToggleTheme() {
@@ -106,9 +104,8 @@
         function hideV2Loader() {
             var loader = document.getElementById('v2DashboardLoader');
             if (loader) {
-                loader.style.opacity = '0';
-                loader.style.visibility = 'hidden';
-                setTimeout(function() { loader.style.display = 'none'; }, 450);
+                loader.classList.add('hidden');
+                setTimeout(function() { loader.style.display = 'none'; }, 500);
             }
         }
     </script>
@@ -649,14 +646,21 @@
 </head>
 
 <body>
-    <!-- SMOOTH DASHBOARD LOADER OVERLAY -->
-    <div id="v2DashboardLoader" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg-canvas); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; transition:opacity 0.4s ease, visibility 0.4s ease;">
-        <div style="position:relative; display:inline-flex; align-items:center; height:50px;">
-            <img src="../assets/images/logo.webp" alt="Soulamore" style="height:50px; max-width:200px; object-fit:contain;">
+    <!-- USER LOADING SCREEN (Safe Earth Theme) -->
+    <div id="v2DashboardLoader" class="dashboard-loading user-theme">
+        <div class="loading-breath-circle">
+            <span style="font-size:2rem;">🌿</span>
         </div>
-        <div style="display:flex; align-items:center; gap:10px; font-size:0.9rem; font-weight:500; color:var(--text-secondary);">
-            <i class="fas fa-circle-notch fa-spin" style="color:var(--primary-emerald); font-size:1.1rem;"></i>
-            <span>Preparing your personal sanctuary...</span>
+        <div class="loading-text-container" style="text-align:center;">
+            <div class="loading-title">Welcome Back</div>
+            <div class="loading-subtitle">Preparing your safe sanctuary space...</div>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+        <div class="loading-tips">
+            <div class="loading-tip-icon" style="text-align:center;">🌿</div>
+            <div class="loading-tip-text" style="text-align:center;">Your safe space is being prepared. Take a deep breath...</div>
         </div>
     </div>
 
