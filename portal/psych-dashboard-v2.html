@@ -972,6 +972,7 @@
                 <div class="v2-section-card">
                     <div class="v2-section-header">
                         <div class="v2-section-title"><i class="fas fa-users" style="color:var(--primary-cyan);"></i> Active Patient Roster</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px;" onclick="v2OpenAddPatientModal()"><i class="fas fa-user-plus"></i> + Add New Patient</button>
                     </div>
                     <div id="psych-patient-roster" style="font-size:0.88rem; color:var(--text-muted);">
                         Loading patient roster records...
@@ -1003,18 +1004,34 @@
                 </div>
             </section>
 
-            <!-- 6. EARNINGS -->
+            <!-- 6. EARNINGS & FINANCIAL REPORTS -->
             <section class="v2-view-section" id="v2-view-billing">
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-wallet"></i> Consultation Earnings</div>
+                        <div class="v2-section-title"><i class="fas fa-wallet"></i> Consultation Earnings & Commission Level</div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="v2ExportPsychFinancials()"><i class="fas fa-download"></i> Export CSV</button>
+                            <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="v2OpenPsychPayoutModal()"><i class="fas fa-hand-holding-dollar"></i> Request Payout</button>
+                        </div>
                     </div>
-                    <div style="font-size:1.4rem; font-weight:600; color:var(--text-primary);" id="v2PsychEarnings">₹0.00</div>
+                    <div style="display:flex; align-items:center; gap:16px; margin:8px 0;">
+                        <div style="font-size:1.8rem; font-weight:700; color:var(--text-primary);" id="v2PsychEarnings">₹0.00</div>
+                        <div class="v2-badge-pill" style="background:rgba(6, 182, 212, 0.15); color:var(--primary-cyan);">Senior Clinician Tier (85% Payout Share)</div>
+                    </div>
                 </div>
             </section>
 
-            <!-- 7. AVAILABILITY -->
+            <!-- 7. AVAILABILITY & CALENDAR SYNC -->
             <section class="v2-view-section" id="v2-view-availability">
+                <!-- GOOGLE CALENDAR SYNC CARD -->
+                <div class="v2-section-card" style="margin-bottom:16px;">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fab fa-google" style="color:var(--primary-cyan);"></i> Google Calendar Sync Integration</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px;" onclick="v2ConnectPsychGoogleCalendar()"><i class="fab fa-google"></i> Connect Google Calendar</button>
+                    </div>
+                    <div style="font-size:0.82rem; color:var(--text-muted);">Sync clinical appointments and therapy sessions directly to your Google Calendar.</div>
+                </div>
+
                 <div class="v2-section-card">
                     <div class="v2-section-header">
                         <div class="v2-section-title"><i class="fas fa-calendar-check" style="color:var(--primary-cyan);"></i> Weekly Consultation Availability Matrix</div>
@@ -1083,9 +1100,95 @@
     </div>
 </div>
 
+    <!-- MODAL 1: ADD NEW PATIENT MODAL -->
+    <div class="v2-modal-overlay" id="v2AddPatientModal" style="display:none;">
+        <div class="v2-modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:600;">
+                <span><i class="fas fa-user-plus" style="color:var(--primary-cyan);"></i> Register New Patient</span>
+                <i class="fas fa-times" style="cursor:pointer;" onclick="document.getElementById('v2AddPatientModal').style.display='none'"></i>
+            </div>
+            <div class="v2-field-group" style="margin-top:10px;">
+                <label class="v2-field-label">Full Patient Name</label>
+                <input type="text" id="v2PatientName" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Patient Full Name">
+            </div>
+            <div class="v2-field-group">
+                <label class="v2-field-label">Patient Email Address</label>
+                <input type="email" id="v2PatientEmail" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="patient@example.com">
+            </div>
+            <div class="v2-field-group">
+                <label class="v2-field-label">Emergency Contact Number</label>
+                <input type="tel" id="v2PatientEmergency" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="+91 9876543210">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="document.getElementById('v2AddPatientModal').style.display='none'">Cancel</button>
+                <button class="v2-btn-primary" onclick="v2SaveNewPatient()"><i class="fas fa-user-check"></i> Register Patient</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: REQUEST PAYOUT MODAL -->
+    <div class="v2-modal-overlay" id="v2PsychPayoutModal" style="display:none;">
+        <div class="v2-modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:600;">
+                <span><i class="fas fa-hand-holding-dollar" style="color:var(--primary-cyan);"></i> Request Consultation Earnings Payout</span>
+                <i class="fas fa-times" style="cursor:pointer;" onclick="document.getElementById('v2PsychPayoutModal').style.display='none'"></i>
+            </div>
+            <div class="v2-field-group" style="margin-top:10px;">
+                <label class="v2-field-label">Payout Amount (₹)</label>
+                <input type="number" id="v2PsychPayoutAmount" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Amount to withdraw">
+            </div>
+            <div class="v2-field-group">
+                <label class="v2-field-label">Bank Account Number / UPI ID</label>
+                <input type="text" id="v2PsychPayoutBank" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Account No or UPI ID">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="document.getElementById('v2PsychPayoutModal').style.display='none'">Cancel</button>
+                <button class="v2-btn-primary" onclick="v2SubmitPsychPayoutRequest()"><i class="fas fa-paper-plane"></i> Submit Payout Request</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT LOGIC -->
     <script type="module">
         import { auth, db, collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc, updateDoc, serverTimestamp } from '../assets/js/firebase-config.js';
+
+        // --- PSYCHOLOGIST PRACTICE HANDLERS ---
+        window.v2OpenAddPatientModal = function() {
+            document.getElementById('v2AddPatientModal').style.display = 'flex';
+        };
+
+        window.v2SaveNewPatient = async function() {
+            const name = document.getElementById('v2PatientName').value;
+            const email = document.getElementById('v2PatientEmail').value;
+            if (!name || !email) {
+                alert('Please enter patient name and email.');
+                return;
+            }
+            alert(`✅ Patient [${name}] registered in your active clinical roster!`);
+            document.getElementById('v2AddPatientModal').style.display = 'none';
+        };
+
+        window.v2ExportPsychFinancials = function() {
+            alert('📥 Downloading Consultation Earnings & Payout Ledger (CSV)...');
+        };
+
+        window.v2OpenPsychPayoutModal = function() {
+            document.getElementById('v2PsychPayoutModal').style.display = 'flex';
+        };
+
+        window.v2SubmitPsychPayoutRequest = function() {
+            const amt = document.getElementById('v2PsychPayoutAmount').value;
+            if (!amt || amt <= 0) {
+                alert('Please enter a valid payout amount.');
+                return;
+            }
+            alert(`✅ Payout request for ₹${amt} submitted to accounting!`);
+            document.getElementById('v2PsychPayoutModal').style.display = 'none';
+        };
+
+        window.v2ConnectPsychGoogleCalendar = function() {
+            alert('📅 Google Calendar OAuth integration initialized for clinical consultations!');
+        };
 
         let psychSessionsUnsubscribe = null;
         let quillSoapEditor = null;

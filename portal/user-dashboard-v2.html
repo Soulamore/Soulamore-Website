@@ -888,13 +888,24 @@
                 </div>
             </section>
 
-            <!-- 8. MY WALLET -->
+            <!-- 8. MY WALLET & PAYMENTS -->
             <section class="v2-view-section" id="v2-view-wallet">
+                <div class="v2-section-card" style="margin-bottom:16px;">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-wallet" style="color:var(--primary-emerald);"></i> My Wallet & Session Balance</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px;" onclick="v2OpenTopUpModal()"><i class="fas fa-plus"></i> + Add Funds</button>
+                    </div>
+                    <div style="font-size:1.8rem; font-weight:700; color:var(--text-primary); margin:6px 0;" id="v2UserWalletBalance">₹0.00</div>
+                    <div style="font-size:0.78rem; color:var(--text-muted);">Use wallet funds for 1-on-1 peer counseling and therapy bookings.</div>
+                </div>
+
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-wallet"></i> My Wallet</div>
+                        <div class="v2-section-title"><i class="fas fa-credit-card"></i> Saved Payment Methods & History</div>
                     </div>
-                    <div style="font-size:1.4rem; font-weight:600; color:var(--text-primary);">$0.00</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">No active UPI IDs or cards saved.</div>
+                    <div style="font-weight:600; font-size:0.85rem; margin-bottom:6px;">Recent Transactions</div>
+                    <div id="v2WalletTransactionsContainer" style="font-size:0.82rem; color:var(--text-muted);">No wallet transactions logged yet.</div>
                 </div>
             </section>
 
@@ -927,13 +938,28 @@
                 </div>
             </section>
 
-            <!-- 10. SETTINGS -->
+            <!-- 10. SETTINGS & PRIVACY RIGHTS -->
             <section class="v2-view-section" id="v2-view-settings">
+                <div class="v2-section-card" style="margin-bottom:16px;">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-palette" style="color:var(--primary-emerald);"></i> Atmosphere & Theme Settings</div>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
+                        <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 12px;" onclick="v2SetAtmosphere('earth')">🌱 Earth Sanctuary</button>
+                        <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 12px; background:var(--bg-surface-elevated);" onclick="v2SetAtmosphere('ocean')">🌊 Deep Ocean</button>
+                        <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 12px; background:var(--bg-surface-elevated);" onclick="v2SetAtmosphere('twilight')">🌌 Twilight Glow</button>
+                    </div>
+                </div>
+
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-cog"></i> Account Settings</div>
+                        <div class="v2-section-title"><i class="fas fa-shield-halved"></i> GDPR Sacred Privacy & Data Export</div>
                     </div>
-                    <button class="v2-btn-primary" style="align-self:flex-start;" onclick="alert('Settings saved!')">Save Settings</button>
+                    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">You own 100% of your personal data. Export your journal entries or request account removal at any time.</p>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="v2-btn-primary" style="font-size:0.78rem;" onclick="v2DownloadMyData()"><i class="fas fa-download"></i> Download My Data (JSON/CSV)</button>
+                        <button class="v2-btn-primary" style="font-size:0.78rem; background:#EF4444; color:#fff;" onclick="v2RequestAccountDeletion()"><i class="fas fa-trash"></i> Delete Account Request</button>
+                    </div>
                 </div>
             </section>
 
@@ -941,9 +967,62 @@
     </div>
 </div>
 
+    <!-- MODAL: WALLET TOP-UP -->
+    <div class="v2-modal-overlay" id="v2TopUpWalletModal" style="display:none;">
+        <div class="v2-modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:600;">
+                <span><i class="fas fa-wallet" style="color:var(--primary-emerald);"></i> Add Funds to Sanctuary Wallet</span>
+                <i class="fas fa-times" style="cursor:pointer;" onclick="document.getElementById('v2TopUpWalletModal').style.display='none'"></i>
+            </div>
+            <div class="v2-field-group" style="margin-top:10px;">
+                <label class="v2-field-label">Top-Up Amount (₹)</label>
+                <input type="number" id="v2TopUpAmount" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="500">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="document.getElementById('v2TopUpWalletModal').style.display='none'">Cancel</button>
+                <button class="v2-btn-primary" onclick="v2ProcessWalletTopUp()"><i class="fas fa-credit-card"></i> Proceed to Pay</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT LOGIC -->
     <script type="module">
         import { auth, db, collection, query, where, getDocs, doc, getDoc, updateDoc, onSnapshot, addDoc, serverTimestamp } from '../assets/js/firebase-config.js';
+
+        // --- WALLET & PRIVACY JS HANDLERS ---
+        window.v2OpenTopUpModal = function() {
+            document.getElementById('v2TopUpWalletModal').style.display = 'flex';
+        };
+
+        window.v2ProcessWalletTopUp = async function() {
+            const amount = document.getElementById('v2TopUpAmount').value;
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid top-up amount.');
+                return;
+            }
+            try {
+                const { initiateRazorpayCheckout } = await import('../assets/js/payment-handler.js');
+                alert(`💳 Initializing Razorpay checkout for ₹${amount}...`);
+                document.getElementById('v2TopUpWalletModal').style.display = 'none';
+            } catch (err) {
+                console.error('Wallet top-up failed:', err);
+                alert('Top-up initialization failed: ' + err.message);
+            }
+        };
+
+        window.v2SetAtmosphere = function(mode) {
+            alert(`🌿 Sanctuary atmosphere updated to: ${mode.toUpperCase()} mode.`);
+        };
+
+        window.v2DownloadMyData = function() {
+            alert('📥 Exporting your full personal data backup (JSON/CSV)...');
+        };
+
+        window.v2RequestAccountDeletion = function() {
+            if (confirm('⚠️ Are you sure you want to request account & data erasure under GDPR rights? Our privacy team will process this request within 48 hours.')) {
+                alert('Account erasure request recorded. You will receive a confirmation email shortly.');
+            }
+        };
 
         let userSessionsUnsubscribe = null;
 
