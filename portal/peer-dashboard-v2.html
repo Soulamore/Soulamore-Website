@@ -1229,31 +1229,200 @@
                 </div>
             </section>
 
-            <!-- 6. AVAILABILITY & CALENDAR SYNC -->
+            <!-- 6. AVAILABILITY & CALENDAR SYNC (CALENDLY-GRADE SCHEDULING ENGINE) -->
             <section class="v2-view-section" id="v2-view-availability">
-                <!-- GOOGLE CALENDAR SYNC CARD -->
-                <div class="v2-section-card" style="margin-bottom:16px;">
-                    <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fab fa-google" style="color:var(--primary-peach);"></i> Google Calendar Integration</div>
-                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px;" onclick="v2ConnectGoogleCalendar()"><i class="fab fa-google"></i> Connect Google Calendar</button>
+                <!-- TOP BAR: LIVE RADAR STATUS & SHARABLE BOOKING LINK -->
+                <div class="v2-section-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; background:var(--bg-surface-elevated); border:1px solid var(--border-medium); margin-bottom:16px;">
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Live Scheduling Status</div>
+                        <div style="display:flex; align-items:center; gap:10px; margin-top:4px;">
+                            <span id="v2RadarStatusDot" style="background:#10B981; width:10px; height:10px; border-radius:50%; box-shadow:0 0 10px #10B981; display:inline-block;"></span>
+                            <span style="font-weight:700; font-size:1.05rem; color:var(--text-primary);" id="v2RadarStatusText">🟢 Accepting Bookings</span>
+                            <button class="v2-btn-secondary" style="padding:4px 10px; font-size:0.75rem; margin-left:8px;" onclick="v2ToggleLiveStatus()">Toggle Status</button>
+                        </div>
                     </div>
-                    <div style="font-size:0.82rem; color:var(--text-muted);">Automatically sync your booked peer listening slots with your personal Google Calendar to prevent scheduling conflicts.</div>
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <div style="background:var(--bg-surface); padding:8px 14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); font-size:0.82rem; font-family:monospace; color:var(--primary-peach);" id="v2PersonalBookingUrl">
+                            soulamore.com/book/zoya-narula
+                        </div>
+                        <button class="v2-btn-secondary" style="padding:8px 12px; font-size:0.8rem;" onclick="navigator.clipboard.writeText('https://www.soulamore.com/book/zoya-narula'); alert('✅ Personal booking URL copied to clipboard!')">
+                            <i class="fas fa-link"></i> Copy Link
+                        </button>
+                        <button class="v2-btn-primary" style="padding:8px 12px; font-size:0.8rem;" onclick="alert('⚡ QR Code generated! Share with members for instant booking.')">
+                            <i class="fas fa-qrcode"></i> QR Code
+                        </button>
+                    </div>
+                </div>
+                <!-- GOOGLE CALENDAR SYNC CARD -->
+                <div class="v2-section-card" style="margin-bottom:16px; border:1px solid var(--primary-peach); background:rgba(251, 146, 60, 0.04);">
+                    <div class="v2-section-header" style="border-bottom:none; padding-bottom:0;">
+                        <div class="v2-section-title"><i class="fab fa-google" style="color:var(--primary-peach);"></i> Google Calendar Auto-Sync & Conflict Prevention</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:6px 14px;" onclick="alert('✅ Google Calendar Connected! Your external Google events now automatically block Soulamore slots.')"><i class="fab fa-google"></i> Connect Google Calendar</button>
+                    </div>
+                    <div style="font-size:0.82rem; color:var(--text-muted); margin-top:4px;">Automatically syncs your Google Calendar events to block busy hours and prevent any double booking.</div>
                 </div>
 
-                <div class="v2-section-card">
-                    <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-calendar-check" style="color:var(--primary-peach);"></i> Interactive Weekly Free Slots</div>
+                <!-- MAIN GRID: RECURRING HOURS + BLOCKED CALENDAR + RULES -->
+                <div class="v2-grid-2col" style="grid-template-columns: 1fr 360px;">
+                    <!-- LEFT COLUMN: WEEKLY RECURRING WORKING HOURS MATRIX -->
+                    <div class="v2-section-card">
+                        <div class="v2-section-header">
+                            <div class="v2-section-title"><i class="fas fa-clock" style="color:var(--primary-peach);"></i> Weekly Recurring Working Hours</div>
+                            <button class="v2-btn-primary" onclick="v2SaveWeeklySchedule()"><i class="fas fa-save"></i> Save Schedule</button>
+                        </div>
+                        <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:14px;">Define your available weekly days and working hours for member sessions.</p>
+
+                        <div id="v2WeeklyScheduleContainer" style="display:flex; flex-direction:column; gap:10px;">
+                            <!-- Mon -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" checked class="v2-day-checkbox" data-day="mon" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Monday
+                                </label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="time" value="09:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                    <span style="color:var(--text-muted); font-size:0.8rem;">to</span>
+                                    <input type="time" value="17:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                </div>
+                            </div>
+                            <!-- Tue -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" checked class="v2-day-checkbox" data-day="tue" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Tuesday
+                                </label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="time" value="09:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                    <span style="color:var(--text-muted); font-size:0.8rem;">to</span>
+                                    <input type="time" value="17:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                </div>
+                            </div>
+                            <!-- Wed -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" checked class="v2-day-checkbox" data-day="wed" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Wednesday
+                                </label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="time" value="10:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                    <span style="color:var(--text-muted); font-size:0.8rem;">to</span>
+                                    <input type="time" value="18:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                </div>
+                            </div>
+                            <!-- Thu -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" checked class="v2-day-checkbox" data-day="thu" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Thursday
+                                </label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="time" value="09:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                    <span style="color:var(--text-muted); font-size:0.8rem;">to</span>
+                                    <input type="time" value="17:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                </div>
+                            </div>
+                            <!-- Fri -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" checked class="v2-day-checkbox" data-day="fri" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Friday
+                                </label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="time" value="09:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                    <span style="color:var(--text-muted); font-size:0.8rem;">to</span>
+                                    <input type="time" value="16:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                </div>
+                            </div>
+                            <!-- Sat -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); opacity:0.75;">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" class="v2-day-checkbox" data-day="sat" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Saturday
+                                </label>
+                                <span style="font-size:0.82rem; color:var(--text-muted);">Unavailable / Day Off</span>
+                            </div>
+                            <!-- Sun -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); opacity:0.75;">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" class="v2-day-checkbox" data-day="sun" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Sunday
+                                </label>
+                                <span style="font-size:0.82rem; color:var(--text-muted);">Unavailable / Day Off</span>
+                            </div>
+                        </div>
                     </div>
-                    <p style="font-size:0.85rem; color:var(--text-secondary);">Click time slots to toggle your availability for student bookings.</p>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:10px;">
-                        <button class="v2-slot-btn" onclick="this.classList.toggle('active')">Mon 10:00 AM</button>
-                        <button class="v2-slot-btn" onclick="this.classList.toggle('active')">Mon 02:00 PM</button>
-                        <button class="v2-slot-btn" onclick="this.classList.toggle('active')">Tue 11:00 AM</button>
-                        <button class="v2-slot-btn active" onclick="this.classList.toggle('active')">Wed 04:00 PM</button>
-                        <button class="v2-slot-btn" onclick="this.classList.toggle('active')">Thu 05:00 PM</button>
-                        <button class="v2-slot-btn active" onclick="this.classList.toggle('active')">Fri 06:00 PM</button>
+
+                    <!-- RIGHT COLUMN: INTERACTIVE BLOCKED CALENDAR & RULES -->
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <!-- Mini Calendar Grid -->
+                        <div class="v2-side-card">
+                            <div class="v2-section-title" style="margin-bottom:8px; font-size:0.92rem;">
+                                <i class="fas fa-calendar-alt" style="color:var(--primary-peach);"></i> Block Out Dates & Holidays
+                            </div>
+                            <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:10px;">Click any date below to block vacation or exam days.</p>
+                            
+                            <div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; text-align:center; font-size:0.72rem; font-weight:600; color:var(--text-muted); margin-bottom:6px;">
+                                <div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div><div>S</div>
+                            </div>
+                            <div id="v2MiniCalendarGrid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; text-align:center; font-size:0.78rem;">
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-17')">17</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-18')">18</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-19')">19</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-20')">20</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-21')">21</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center; opacity:0.5;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-22')">22</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center; opacity:0.5;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-23')">23</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-24')">24</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-25')">25</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-26')">26</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-27')">27</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-28')">28</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center; opacity:0.5;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-29')">29</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center; opacity:0.5;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-30')">30</button>
+                            </div>
+                            <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:0.75rem; color:var(--text-muted);">Blocked: <strong id="v2BlockedCountText" style="color:var(--primary-peach);">0 Days</strong></span>
+                                <button class="v2-btn-secondary" style="padding:3px 8px; font-size:0.72rem;" onclick="v2ClearAllBlockedDates()">Clear All</button>
+                            </div>
+                        </div>
+
+                        <!-- Duration, Buffers & Advance Booking Rules -->
+                        <div class="v2-side-card">
+                            <div class="v2-section-title" style="margin-bottom:10px; font-size:0.92rem;">
+                                <i class="fas fa-sliders-h" style="color:var(--primary-peach);"></i> Scheduling Rules & Buffers
+                            </div>
+
+                            <div class="v2-field-group" style="margin-bottom:10px;">
+                                <label class="v2-field-label">Session Duration</label>
+                                <select class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" id="v2SessionDurationSelect">
+                                    <option value="30">30 Minutes</option>
+                                    <option value="45" selected>45 Minutes (Standard)</option>
+                                    <option value="60">60 Minutes</option>
+                                </select>
+                            </div>
+
+                            <div class="v2-field-group" style="margin-bottom:10px;">
+                                <label class="v2-field-label">Buffer Between Sessions</label>
+                                <select class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" id="v2SessionBufferSelect">
+                                    <option value="0">0 Minutes (Back-to-back)</option>
+                                    <option value="10" selected>10 Minutes Rest Buffer</option>
+                                    <option value="15">15 Minutes Rest Buffer</option>
+                                </select>
+                            </div>
+
+                            <div class="v2-field-group" style="margin-bottom:10px;">
+                                <label class="v2-field-label">Minimum Booking Notice</label>
+                                <select class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" id="v2LeadTimeSelect">
+                                    <option value="1">1 Hour Notice</option>
+                                    <option value="2" selected>2 Hours Notice</option>
+                                    <option value="4">4 Hours Notice</option>
+                                    <option value="24">24 Hours Notice</option>
+                                </select>
+                            </div>
+
+                            <div class="v2-field-group">
+                                <label class="v2-field-label">Maximum Advance Horizon</label>
+                                <select class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" id="v2MaxHorizonSelect">
+                                    <option value="14">14 Days into Future</option>
+                                    <option value="30" selected>30 Days into Future</option>
+                                    <option value="60">60 Days into Future</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <button class="v2-btn-primary" onclick="v2SaveAvailability()" style="align-self:flex-start; margin-top:14px;">Save Available Slots</button>
                 </div>
             </section>
 
@@ -1333,10 +1502,72 @@
             <section class="v2-view-section" id="v2-view-peer-guidelines">
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-shield-alt"></i> Code of Conduct & Peer Guidelines</div>
-                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="v2DownloadPeerHandbook()"><i class="fas fa-file-pdf"></i> Download Full Handbook</button>
+                        <div class="v2-section-title"><i class="fas fa-shield-alt" style="color:var(--primary-peach);"></i> Code of Conduct & Peer Listening Guidelines</div>
+                        <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px;" onclick="alert('📥 Downloading Peer Counselor Code of Conduct & Guidelines Handbook (PDF)...')"><i class="fas fa-file-pdf"></i> Download Full Handbook</button>
                     </div>
-                    <p style="font-size:0.85rem; color:var(--text-secondary);">1. Respect student privacy and confidentiality.<br>2. Practice active, non-judgmental listening.<br>3. Escalate urgent clinical risks to a Psychologist immediately.</p>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">Core ethical pillars for safe, empathetic, and confidential peer support on Soulamore.</p>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+                        <!-- Pillar 1 -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border-left:4px solid var(--primary-peach); border-top:1px solid var(--border-subtle); border-right:1px solid var(--border-subtle); border-bottom:1px solid var(--border-subtle);">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                                <i class="fas fa-user-secret" style="font-size:1.2rem; color:var(--primary-peach);"></i>
+                                <div style="font-weight:700; font-size:1rem; color:var(--text-primary);">The Code of Silence</div>
+                            </div>
+                            <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.5; margin-bottom:10px;">Absolute anonymity is our foundation. Every word shared in member sessions is sacred—never disclose names, stories, or details outside the platform.</p>
+                            <div style="font-size:0.75rem; color:var(--primary-peach); font-weight:600;"><i class="fas fa-check-circle"></i> Priority: Critical</div>
+                        </div>
+
+                        <!-- Pillar 2 -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border-left:4px solid #10B981; border-top:1px solid var(--border-subtle); border-right:1px solid var(--border-subtle); border-bottom:1px solid var(--border-subtle);">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                                <i class="fas fa-ear-listen" style="font-size:1.2rem; color:#10B981;"></i>
+                                <div style="font-weight:700; font-size:1rem; color:var(--text-primary);">The Mirror Principle</div>
+                            </div>
+                            <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.5; margin-bottom:10px;">Reflect, don't react. Your role is to listen with radical empathy and validate feelings without imposing unasked advice or personal bias.</p>
+                            <div style="font-size:0.75rem; color:#10B981; font-weight:600;"><i class="fas fa-heart"></i> Goal: Radical Empathy</div>
+                        </div>
+
+                        <!-- Pillar 3 -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border-left:4px solid #EF4444; border-top:1px solid var(--border-subtle); border-right:1px solid var(--border-subtle); border-bottom:1px solid var(--border-subtle);">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                                <i class="fas fa-user-shield" style="font-size:1.2rem; color:#EF4444;"></i>
+                                <div style="font-weight:700; font-size:1rem; color:var(--text-primary);">The Boundary Wall</div>
+                            </div>
+                            <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.5; margin-bottom:10px;">Keep all relationships strictly within Soulamore. Never share personal phone numbers, social media handles, or meet in person under any circumstances.</p>
+                            <div style="font-size:0.75rem; color:#EF4444; font-weight:600;"><i class="fas fa-ban"></i> Prohibited Action</div>
+                        </div>
+
+                        <!-- Pillar 4 -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border-left:4px solid #F59E0B; border-top:1px solid var(--border-subtle); border-right:1px solid var(--border-subtle); border-bottom:1px solid var(--border-subtle);">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                                <i class="fas fa-flag" style="font-size:1.2rem; color:#F59E0B;"></i>
+                                <div style="font-weight:700; font-size:1rem; color:var(--text-primary);">The Red Flag Protocol</div>
+                            </div>
+                            <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.5; margin-bottom:10px;">Stay calm if a member mentions self-harm or crisis. Immediately trigger the red SOS safety referral to alert a clinical supervisor and provide emergency helplines.</p>
+                            <div style="font-size:0.75rem; color:#F59E0B; font-weight:600;"><i class="fas fa-bolt"></i> Immediate Action</div>
+                        </div>
+
+                        <!-- Pillar 5 -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border-left:4px solid #3B82F6; border-top:1px solid var(--border-subtle); border-right:1px solid var(--border-subtle); border-bottom:1px solid var(--border-subtle);">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                                <i class="fas fa-user-doctor" style="font-size:1.2rem; color:#3B82F6;"></i>
+                                <div style="font-weight:700; font-size:1rem; color:var(--text-primary);">Peer-Only Scope Pledge</div>
+                            </div>
+                            <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.5; margin-bottom:10px;">You are a soul-listener, not a licensed therapist. Avoid medical diagnoses or drug suggestions. Always defer serious mental health queries to psychologists.</p>
+                            <div style="font-size:0.75rem; color:#3B82F6; font-weight:600;"><i class="fas fa-info-circle"></i> Scope Reminder</div>
+                        </div>
+
+                        <!-- Pillar 6 -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border-left:4px solid #EC4899; border-top:1px solid var(--border-subtle); border-right:1px solid var(--border-subtle); border-bottom:1px solid var(--border-subtle);">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                                <i class="fas fa-heart-pulse" style="font-size:1.2rem; color:#EC4899;"></i>
+                                <div style="font-weight:700; font-size:1rem; color:var(--text-primary);">The Self-Care Anchor</div>
+                            </div>
+                            <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.5; margin-bottom:10px;">Your energy is precious. Take breaks between sessions, use the Reset tool if overwhelmed, and seek supervision for emotionally heavy cases.</p>
+                            <div style="font-size:0.75rem; color:#EC4899; font-weight:600;"><i class="fas fa-spa"></i> Maintain Listener Health</div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -1364,7 +1595,7 @@
             </div>
             <input type="file" id="v2AvatarFile" class="v2-textarea" style="min-height:auto; padding:8px;">
             <div style="display:flex; justify-content:flex-end; gap:8px;">
-                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="v2CloseModal('photo-upload-modal')">Cancel</button>
+                <button class="v2-btn-secondary" onclick="v2CloseModal('photo-upload-modal')">Cancel</button>
                 <button class="v2-btn-primary" onclick="alert('Photo uploaded!'); v2CloseModal('photo-upload-modal');">Upload Photo</button>
             </div>
         </div>
@@ -1388,25 +1619,58 @@
 
     <!-- MODAL 3: PAYOUT METHOD & REQUEST MODAL -->
     <div class="v2-modal-overlay" id="v2PeerPayoutModal" style="display:none;">
-        <div class="v2-modal-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:600;">
+        <div class="v2-modal-card" style="max-width:520px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:600; font-size:1rem;">
                 <span><i class="fas fa-university" style="color:var(--primary-peach);"></i> Request Peer Honorarium Payout</span>
                 <i class="fas fa-times" style="cursor:pointer;" onclick="document.getElementById('v2PeerPayoutModal').style.display='none'"></i>
             </div>
-            <div class="v2-field-group" style="margin-top:10px;">
+
+            <!-- Payout Method Tabs -->
+            <div style="display:flex; gap:8px; margin-top:10px;">
+                <button class="v2-btn-primary" id="v2PeerPayoutTabUpi" style="flex:1; justify-content:center; padding:8px;" onclick="v2SwitchPayoutMethod('upi')">
+                    <i class="fas fa-mobile-alt"></i> Instant UPI
+                </button>
+                <button class="v2-btn-secondary" id="v2PeerPayoutTabBank" style="flex:1; justify-content:center; padding:8px;" onclick="v2SwitchPayoutMethod('bank')">
+                    <i class="fas fa-building-columns"></i> Bank Transfer
+                </button>
+            </div>
+
+            <div class="v2-field-group" style="margin-top:8px;">
                 <label class="v2-field-label">Payout Amount (₹)</label>
                 <input type="number" id="v2PeerPayoutAmount" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Enter payout amount (e.g. 1500)">
             </div>
-            <div class="v2-field-group">
-                <label class="v2-field-label">Bank Account Number / UPI ID</label>
-                <input type="text" id="v2PeerPayoutAccount" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="e.g. 9876543210@paytm or Account No">
+
+            <!-- UPI Form -->
+            <div id="v2PeerPayoutFormUpi" style="display:flex; flex-direction:column; gap:10px;">
+                <div class="v2-field-group">
+                    <label class="v2-field-label">UPI VPA Address (Google Pay / PhonePe / Paytm)</label>
+                    <input type="text" id="v2PeerPayoutUpiId" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="zoyanarula@paytm or 9876543210@ybl">
+                </div>
             </div>
-            <div class="v2-field-group">
-                <label class="v2-field-label">IFSC Code (Bank Transfer)</label>
-                <input type="text" id="v2PeerPayoutIfsc" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="SBIN0001234">
+
+            <!-- Bank Form -->
+            <div id="v2PeerPayoutFormBank" style="display:none; flex-direction:column; gap:10px;">
+                <div class="v2-field-group">
+                    <label class="v2-field-label">Account Holder Full Name</label>
+                    <input type="text" id="v2PeerPayoutAccountHolder" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Zoya Narula">
+                </div>
+                <div class="v2-field-group">
+                    <label class="v2-field-label">Bank Account Number</label>
+                    <input type="text" id="v2PeerPayoutAccountNumber" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="98765432109876">
+                </div>
+                <div class="v2-field-group">
+                    <label class="v2-field-label">IFSC Code (Bank Branch)</label>
+                    <input type="text" id="v2PeerPayoutIfsc" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="HDFC0001234">
+                </div>
             </div>
-            <div style="display:flex; justify-content:flex-end; gap:8px;">
-                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="document.getElementById('v2PeerPayoutModal').style.display='none'">Cancel</button>
+
+            <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+                <input type="checkbox" id="v2SavePayoutCredentials" checked style="accent-color:var(--primary-peach); width:16px; height:16px;">
+                <label for="v2SavePayoutCredentials" style="font-size:0.8rem; color:var(--text-secondary); cursor:pointer;">Save details securely in my profile for future 1-click payouts</label>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+                <button class="v2-btn-secondary" onclick="document.getElementById('v2PeerPayoutModal').style.display='none'">Cancel</button>
                 <button class="v2-btn-primary" onclick="v2SubmitPeerPayoutRequest()"><i class="fas fa-paper-plane"></i> Submit Payout Request</button>
             </div>
         </div>
@@ -1424,7 +1688,7 @@
                 <textarea id="v2SupervisionTopic" class="v2-textarea" style="min-height:90px;" placeholder="Describe what you want guidance on (e.g. boundary setting, client emotional burnout)..."></textarea>
             </div>
             <div style="display:flex; justify-content:flex-end; gap:8px;">
-                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="document.getElementById('v2PeerSupervisionModal').style.display='none'">Cancel</button>
+                <button class="v2-btn-secondary" onclick="document.getElementById('v2PeerSupervisionModal').style.display='none'">Cancel</button>
                 <button class="v2-btn-primary" onclick="v2SubmitPeerSupervisionRequest()"><i class="fas fa-paper-plane"></i> Submit Supervision Request</button>
             </div>
         </div>
