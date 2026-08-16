@@ -1695,7 +1695,7 @@
             <div id="v2PeerPayoutFormUpi" style="display:flex; flex-direction:column; gap:10px;">
                 <div class="v2-field-group">
                     <label class="v2-field-label">UPI VPA Address (Google Pay / PhonePe / Paytm)</label>
-                    <input type="text" id="v2PeerPayoutUpiId" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="zoyanarula@paytm or 9876543210@ybl">
+                    <input type="text" id="v2PeerPayoutUpiId" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="yourname@upi or 9876543210@ybl">
                 </div>
             </div>
 
@@ -1703,7 +1703,7 @@
             <div id="v2PeerPayoutFormBank" style="display:none; flex-direction:column; gap:10px;">
                 <div class="v2-field-group">
                     <label class="v2-field-label">Account Holder Full Name</label>
-                    <input type="text" id="v2PeerPayoutAccountHolder" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Zoya Narula">
+                    <input type="text" id="v2PeerPayoutAccountHolder" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Registered Account Holder Name">
                 </div>
                 <div class="v2-field-group">
                     <label class="v2-field-label">Bank Account Number</label>
@@ -2159,11 +2159,16 @@
                     const avatarEl = document.getElementById('v2Avatar');
                     const prevNameEl = document.getElementById('v2PreviewName');
                     const prevInitialEl = document.getElementById('v2PrevInitial');
+                    const bookingUrlEl = document.getElementById('v2PersonalBookingUrl');
                     
                     if (nameEl) nameEl.textContent = displayName;
                     if (avatarEl) avatarEl.textContent = displayName.charAt(0).toUpperCase();
                     if (prevNameEl) prevNameEl.textContent = displayName;
                     if (prevInitialEl) prevInitialEl.textContent = displayName.charAt(0).toUpperCase();
+                    if (bookingUrlEl) {
+                        const slug = displayName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                        bookingUrlEl.textContent = `soulamore.com/book/${slug}`;
+                    }
 
                     // Generate, Set & Auto-Persist Dynamic Referral Code to Firestore
                     const dynamicRefCode = data.referralCode || v2GeneratePractitionerReferralCode(displayName, uid);
