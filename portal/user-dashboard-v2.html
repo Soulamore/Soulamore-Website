@@ -1408,19 +1408,33 @@
                     const q = query(collection(db, 'peer_bookings'), where('userId', '==', uid));
                     userSessionsUnsubscribe = onSnapshot(q, (snapshot) => {
                         if (snapshot.empty) {
-                            bookingsContainer.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted);">No active session bookings found.</div>';
+                            bookingsContainer.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:24px;"><i class="fas fa-calendar-plus" style="font-size:1.4rem; color:var(--primary-emerald); margin-bottom:8px; display:block;"></i>No upcoming session bookings. Use the practitioner directory above to book your first 1-on-1 session!</div>';
                         } else {
                             let html = '';
                             snapshot.forEach(docSnap => {
                                 const data = docSnap.data();
-                                const dateStr = data.startTime?.toDate ? data.startTime.toDate().toLocaleString() : 'Scheduled';
+                                const dateStr = data.startTime?.toDate ? data.startTime.toDate().toLocaleString() : (data.date || 'Scheduled');
+                                const status = data.status || 'confirmed';
+                                const isPendingPayment = status.toLowerCase().includes('pending');
+
+                                const statusBadge = isPendingPayment
+                                    ? '<span class="v2-badge-pill" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B;"><i class="fas fa-clock"></i> Payment Pending</span>'
+                                    : '<span class="v2-badge-pill" style="background:rgba(16, 185, 129, 0.15); color:#10B981;"><i class="fas fa-check-circle"></i> Confirmed</span>';
+
+                                const joinBtn = isPendingPayment
+                                    ? `<button class="v2-btn-secondary" style="font-size:0.75rem; padding:5px 12px; opacity:0.6; cursor:not-allowed;" disabled><i class="fas fa-lock"></i> Complete Payment to Join</button>`
+                                    : `<a href="../portal/video-conference.html?roomId=${data.slId || docSnap.id}" class="v2-btn-primary" style="font-size:0.78rem; padding:5px 12px; text-decoration:none;"><i class="fas fa-video"></i> Join Session Video</a>`;
+
                                 html += `
                                     <div style="background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); padding:14px; margin-bottom:10px;">
-                                        <div style="font-weight:600; font-size:0.9rem;">${data.peerName || 'Peer Listener'}</div>
-                                        <div style="font-size:0.88rem; color:var(--text-muted); margin:4px 0 10px;"><i class="far fa-clock"></i> ${dateStr}</div>
-                                        <a href="../portal/video-conference.html?roomId=${data.slId || docSnap.id}" class="v2-btn-primary" style="font-size:0.78rem; padding:5px 12px; text-decoration:none;">
-                                            <i class="fas fa-video"></i> Join Session Video
-                                        </a>
+                                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                                            <div style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">${data.peerName || data.providerName || 'Verified Practitioner'}</div>
+                                            <div>${statusBadge}</div>
+                                        </div>
+                                        <div style="font-size:0.8rem; color:var(--text-muted); margin:6px 0 12px;"><i class="far fa-clock"></i> ${dateStr}</div>
+                                        <div style="display:flex; justify-content:flex-end;">
+                                            ${joinBtn}
+                                        </div>
                                     </div>
                                 `;
                             });

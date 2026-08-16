@@ -2110,7 +2110,7 @@
                         let html = '';
 
                         if (snapshot.empty) {
-                            sessionsContainer.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:20px;">No booked sessions currently scheduled.</div>';
+                            sessionsContainer.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:24px;"><i class="fas fa-calendar-xmark" style="font-size:1.4rem; color:var(--text-muted); margin-bottom:8px; display:block;"></i>No confirmed client sessions scheduled right now.</div>';
                         } else {
                             snapshot.forEach(docSnap => {
                                 const data = docSnap.data();
@@ -2119,19 +2119,28 @@
                                     totalEarnings += data.financials.practitionerShare || 0;
                                 }
 
-                                const dateStr = data.startTime?.toDate ? data.startTime.toDate().toLocaleString() : 'Scheduled';
+                                const dateStr = data.startTime?.toDate ? data.startTime.toDate().toLocaleString() : (data.date || 'Scheduled');
                                 const status = data.status || 'confirmed';
+
+                                const isPendingPayment = status.toLowerCase().includes('pending');
+                                const statusBadge = isPendingPayment
+                                    ? '<span class="v2-badge-pill" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B;"><i class="fas fa-clock"></i> Payment Pending</span>'
+                                    : '<span class="v2-badge-pill" style="background:rgba(16, 185, 129, 0.15); color:#10B981;"><i class="fas fa-check-circle"></i> Confirmed</span>';
+
+                                const videoBtn = isPendingPayment
+                                    ? `<button class="v2-btn-secondary" style="font-size:0.75rem; padding:5px 12px; opacity:0.6; cursor:not-allowed;" disabled><i class="fas fa-lock"></i> Awaiting Payment</button>`
+                                    : `<a href="../portal/video-conference.html?roomId=${data.slId || docSnap.id}" class="v2-btn-primary" style="font-size:0.78rem; padding:5px 12px; text-decoration:none; background:var(--primary-peach);"><i class="fas fa-video"></i> Start Video Session</a>`;
 
                                 html += `
                                     <div style="background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); padding:14px; margin-bottom:10px;">
                                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                                            <div style="font-weight:600; font-size:0.9rem;">${data.userName || 'Client'}</div>
-                                            <div style="font-size:0.75rem; font-weight:600; color:var(--primary-peach);">${status.toUpperCase()}</div>
+                                            <div style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">${data.userName || data.clientName || 'Anonymous Member'}</div>
+                                            <div>${statusBadge}</div>
                                         </div>
-                                        <div style="font-size:0.8rem; color:var(--text-muted); margin:4px 0 10px;"><i class="far fa-clock"></i> ${dateStr}</div>
-                                        <a href="../portal/video-conference.html?roomId=${data.slId || docSnap.id}" class="v2-btn-primary" style="font-size:0.78rem; padding:5px 12px; text-decoration:none;">
-                                            <i class="fas fa-video"></i> Start Video Session
-                                        </a>
+                                        <div style="font-size:0.8rem; color:var(--text-muted); margin:6px 0 12px;"><i class="far fa-clock"></i> ${dateStr}</div>
+                                        <div style="display:flex; justify-content:flex-end;">
+                                            ${videoBtn}
+                                        </div>
                                     </div>
                                 `;
                             });
