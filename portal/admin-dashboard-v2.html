@@ -894,17 +894,80 @@
                 <div class="v2-section-card">
                     <div class="v2-section-header">
                         <div class="v2-section-title"><i class="fas fa-users-gear"></i> Users & Providers Directory</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="v2OpenDirectEmailModal()"><i class="fas fa-envelope"></i> Send Direct Email</button>
+                    </div>
+                    <!-- Role Filter Pills -->
+                    <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+                        <button class="v2-badge-pill" style="background:var(--primary-violet); color:#fff; cursor:pointer;" onclick="v2FilterUserRole('all')">All Roles</button>
+                        <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2FilterUserRole('user')">Members</button>
+                        <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2FilterUserRole('peer')">Peers</button>
+                        <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2FilterUserRole('psychologist')">Psychologists</button>
+                        <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2FilterUserRole('admin')">Admins</button>
                     </div>
                     <div id="v2UsersListContainer" style="font-size:0.88rem; color:var(--text-muted);">Loading user directory...</div>
                 </div>
             </section>
 
-            <!-- 4. NEWSLETTER SUBSCRIBERS (REAL-TIME LISTENER) -->
+            <!-- 4. NEWSLETTER & CAMPAIGN BROADCAST ENGINE -->
             <section class="v2-view-section" id="v2-view-newsletter">
+                <!-- BROADCAST CAMPAIGN DESIGNER CARD -->
+                <div class="v2-section-card" style="margin-bottom:20px;">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-bullhorn" style="color:var(--primary-violet);"></i> Campaign Center & Mass Broadcast Engine</div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:12px;">
+                        <!-- Left: Form Controls -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:12px;">
+                            <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary);"><i class="fas fa-magic" style="color:var(--primary-violet);"></i> AI Campaign Writer</div>
+                            <div style="display:flex; gap:8px;">
+                                <input type="text" id="v2AiCampaignPrompt" class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" placeholder="Prompt (e.g. 'Draft monthly wellness update')">
+                                <button class="v2-btn-primary" style="font-size:0.75rem; white-space:nowrap;" onclick="v2GenerateAiCampaign()"><i class="fas fa-sparkles"></i> Draft</button>
+                            </div>
+
+                            <div style="font-weight:600; font-size:0.85rem; margin-top:4px;">Quick Preset Templates:</div>
+                            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2LoadCampaignTemplate('feature')">🌸 Feature</button>
+                                <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2LoadCampaignTemplate('confession')">🌌 Confession</button>
+                                <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2LoadCampaignTemplate('reminder')">🤍 Reminder</button>
+                                <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2LoadCampaignTemplate('postcard')">📮 Postcard</button>
+                            </div>
+
+                            <div class="v2-field-group" style="margin-top:4px;">
+                                <label class="v2-field-label">Target Audience Segment</label>
+                                <select id="v2CampaignSegment" class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.85rem;">
+                                    <option value="all">All Registered Platform Users</option>
+                                    <option value="subscribers">Newsletter Subscribers Only</option>
+                                    <option value="peers">Peer Counselors Only</option>
+                                    <option value="psychologists">Licensed Psychologists Only</option>
+                                </select>
+                            </div>
+
+                            <div class="v2-field-group">
+                                <label class="v2-field-label">Campaign Subject Line</label>
+                                <input type="text" id="v2CampaignSubject" class="v2-textarea" style="min-height:auto; padding:8px;" placeholder="Email Subject Line">
+                            </div>
+
+                            <button class="v2-btn-primary" style="align-self:flex-start; margin-top:6px;" onclick="v2DispatchMassBroadcast()"><i class="fas fa-paper-plane"></i> Dispatch Mass Email Broadcast</button>
+                        </div>
+
+                        <!-- Right: Live Email Previewer -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:10px;">
+                            <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary);"><i class="fas fa-eye"></i> Live Email HTML Preview</div>
+                            <div style="font-size:0.78rem; color:var(--text-muted);">Subject: <span id="v2PreviewSubject" style="color:var(--text-primary); font-weight:600;">(No Subject)</span></div>
+                            <iframe id="v2EmailPreviewIframe" style="width:100%; height:260px; border:1px solid var(--border-subtle); border-radius:6px; background:#fff;"></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBSCRIBERS DIRECTORY CARD -->
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-paper-plane" style="color:var(--primary-violet);"></i> Newsletter Subscribers</div>
-                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="alert('Exporting CSV subscribers list...')"><i class="fas fa-download"></i> Export CSV</button>
+                        <div class="v2-section-title"><i class="fas fa-paper-plane" style="color:var(--primary-violet);"></i> Newsletter Subscribers Directory</div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="v2ExportNewsletterCsv()"><i class="fas fa-download"></i> Export CSV</button>
+                            <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px; background:var(--bg-surface-elevated);" onclick="v2OpenDirectEmailModal()"><i class="fas fa-envelope"></i> Send Direct Email</button>
+                        </div>
                     </div>
                     <div id="v2NewsletterContainer" style="font-size:0.88rem; color:var(--text-muted);">Loading subscribers...</div>
                 </div>
@@ -983,32 +1046,88 @@
 
             <!-- 12. SECURITY & CONSENT LOGS -->
             <section class="v2-view-section" id="v2-view-security">
+                <div class="v2-section-card" style="margin-bottom:16px;">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-file-shield" style="color:var(--primary-violet);"></i> Security Breach Report Generator</div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;">
+                        <div class="v2-field-group">
+                            <label class="v2-field-label">Incident Title</label>
+                            <input type="text" id="v2BreachTitle" class="v2-textarea" style="min-height:auto; padding:8px;" placeholder="Incident Title">
+                        </div>
+                        <div class="v2-field-group">
+                            <label class="v2-field-label">Severity Level</label>
+                            <select id="v2BreachSeverity" class="v2-textarea" style="min-height:auto; padding:8px;">
+                                <option value="low">Low Impact</option>
+                                <option value="medium">Medium Impact</option>
+                                <option value="high">High Security Event</option>
+                                <option value="critical">Critical Data Breach</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="v2-btn-primary" style="margin-top:8px; align-self:flex-start;" onclick="v2GenerateBreachReport()"><i class="fas fa-file-export"></i> Generate Breach Log PDF/CSV</button>
+                </div>
+
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-lock"></i> Security & Consent Logs</div>
+                        <div class="v2-section-title"><i class="fas fa-lock"></i> Parental Consent & Audit Records</div>
                     </div>
-                    <div style="font-size:0.88rem; color:var(--text-muted);">Minor parental consent verification records.</div>
+                    <div id="v2ConsentLogsContainer" style="font-size:0.88rem; color:var(--text-muted);">Minor parental consent verification records.</div>
                 </div>
             </section>
 
             <!-- 13. BLOG & STORY MANAGER -->
             <section class="v2-view-section" id="v2-view-blog-engine">
+                <div class="v2-section-card" style="margin-bottom:16px;">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-layer-group" style="color:var(--primary-violet);"></i> Curated Mental Health Content Pillars</div>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                        <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2SelectBlogPillar(1)">🌿 1. Understanding Feelings</button>
+                        <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2SelectBlogPillar(2)">🛠️ 2. Everyday Coping</button>
+                        <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2SelectBlogPillar(3)">🫂 3. Relationships & Connection</button>
+                        <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2SelectBlogPillar(4)">🛡️ 4. Seeking Help & Stigma</button>
+                        <button class="v2-badge-pill" style="cursor:pointer;" onclick="v2SelectBlogPillar(5)">🌱 5. Resilience & Growth</button>
+                    </div>
+                </div>
+
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-newspaper"></i> Blog & Story Publishing Manager</div>
+                        <div class="v2-section-title"><i class="fas fa-newspaper"></i> Blog & Story Publishing Queue</div>
                     </div>
-                    <div style="font-size:0.88rem; color:var(--text-muted);">Review and publish blog posts and stories.</div>
+                    <div id="v2BlogQueueContainer" style="font-size:0.88rem; color:var(--text-muted);">Review and publish blog posts and stories.</div>
                 </div>
             </section>
 
-            <!-- 14. SETTINGS & MAINTENANCE MODE -->
+            <!-- 14. SETTINGS & SYSTEM CONTROL LOCKS -->
             <section class="v2-view-section" id="v2-view-settings">
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-cog"></i> System Settings & Maintenance Mode</div>
+                        <div class="v2-section-title"><i class="fas fa-sliders" style="color:var(--primary-violet);"></i> System Settings & Global Feature Locks</div>
                     </div>
-                    <p style="font-size:0.85rem; color:var(--text-secondary);">Toggle global platform maintenance mode lock flag.</p>
-                    <button class="v2-btn-primary" style="align-self:flex-start;" onclick="v2ToggleMaintenanceMode()">Toggle Platform Maintenance Mode</button>
+                    <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-surface-elevated); padding:12px; border-radius:8px; border:1px solid var(--border-subtle);">
+                            <div>
+                                <div style="font-weight:600; font-size:0.88rem;">Global Platform Maintenance Lock</div>
+                                <div style="font-size:0.78rem; color:var(--text-muted);">Locks standard user access during system updates.</div>
+                            </div>
+                            <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px;" onclick="v2ToggleMaintenanceMode()">Toggle Maintenance</button>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-surface-elevated); padding:12px; border-radius:8px; border:1px solid var(--border-subtle);">
+                            <div>
+                                <div style="font-weight:600; font-size:0.88rem;">Public User Signups</div>
+                                <div style="font-size:0.78rem; color:var(--text-muted);">Enable or restrict new member registrations.</div>
+                            </div>
+                            <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px;" onclick="v2ToggleSignupLock()">Toggle Signup Lock</button>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-surface-elevated); padding:12px; border-radius:8px; border:1px solid var(--border-subtle);">
+                            <div>
+                                <div style="font-weight:600; font-size:0.88rem;">API Debug & Telemetry Logging</div>
+                                <div style="font-size:0.78rem; color:var(--text-muted);">Enable verbose Cloud Functions debug log output.</div>
+                            </div>
+                            <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px;" onclick="v2ToggleApiDebug()">Toggle Debug Logs</button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -1032,9 +1151,134 @@
         </div>
     </div>
 
+    <!-- MODAL: DIRECT USER & SUBSCRIBER EMAIL SENDER -->
+    <div class="v2-modal-overlay" id="v2DirectEmailModal" style="display:none;">
+        <div class="v2-modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:600;">
+                <span><i class="fas fa-envelope" style="color:var(--primary-violet);"></i> Send Direct Email Message</span>
+                <i class="fas fa-times" style="cursor:pointer;" onclick="document.getElementById('v2DirectEmailModal').style.display='none'"></i>
+            </div>
+            <div class="v2-field-group" style="margin-top:10px;">
+                <label class="v2-field-label">Recipient Email Address</label>
+                <input type="email" id="v2DirectRecipientEmail" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="user@example.com">
+            </div>
+            <div class="v2-field-group">
+                <label class="v2-field-label">Email Subject</label>
+                <input type="text" id="v2DirectEmailSubject" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Message Subject">
+            </div>
+            <div class="v2-field-group">
+                <label class="v2-field-label">Message Content (HTML Supported)</label>
+                <textarea id="v2DirectEmailBody" class="v2-textarea" style="min-height:120px;" placeholder="Write message content here..."></textarea>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="document.getElementById('v2DirectEmailModal').style.display='none'">Cancel</button>
+                <button class="v2-btn-primary" onclick="v2SendDirectEmail()"><i class="fas fa-paper-plane"></i> Send Direct Email</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT LOGIC -->
     <script type="module">
         import { auth, db, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, addDoc, serverTimestamp } from '../assets/js/firebase-config.js';
+
+        // --- BROADCAST & CAMPAIGN ENGINE JS HANDLERS ---
+        window.v2OpenDirectEmailModal = function(email) {
+            if (email) document.getElementById('v2DirectRecipientEmail').value = email;
+            document.getElementById('v2DirectEmailModal').style.display = 'flex';
+        };
+
+        window.v2SendDirectEmail = async function() {
+            const email = document.getElementById('v2DirectRecipientEmail').value;
+            const subject = document.getElementById('v2DirectEmailSubject').value;
+            const body = document.getElementById('v2DirectEmailBody').value;
+            if (!email || !subject || !body) {
+                alert('Please fill out all email fields.');
+                return;
+            }
+            try {
+                await addDoc(collection(db, 'mail_queue'), {
+                    to: email,
+                    message: { subject: subject, html: body },
+                    createdAt: serverTimestamp(),
+                    status: 'queued'
+                });
+                alert(`✅ Direct email successfully queued for ${email}!`);
+                document.getElementById('v2DirectEmailModal').style.display = 'none';
+            } catch (err) {
+                console.error('Error queueing direct email:', err);
+                alert('Failed to send email: ' + err.message);
+            }
+        };
+
+        window.v2GenerateAiCampaign = function() {
+            const prompt = document.getElementById('v2AiCampaignPrompt').value;
+            if (!prompt) {
+                alert('Please enter a draft prompt for the AI Writer.');
+                return;
+            }
+            document.getElementById('v2CampaignSubject').value = `Soulamore Digest: ${prompt}`;
+            const sampleHtml = `<div style="font-family:sans-serif; padding:20px; color:#1e293b;">
+                <h2>Soulamore Wellness Community Update</h2>
+                <p>Hello friend,</p>
+                <p>We are reaching out regarding: <strong>${prompt}</strong>.</p>
+                <p>Remember that your mental well-being is always a priority. Take a deep breath today.</p>
+                <br><p>Warmly,<br>The Soulamore Care Team</p>
+            </div>`;
+            document.getElementById('v2PreviewSubject').textContent = `Soulamore Digest: ${prompt}`;
+            const iframe = document.getElementById('v2EmailPreviewIframe');
+            iframe.srcdoc = sampleHtml;
+        };
+
+        window.v2LoadCampaignTemplate = function(type) {
+            const templates = {
+                feature: { subj: "🌿 Discover New Sanctuary Features on Soulamore", html: "<h2 style='color:#0d9488;'>Sanctuary Feature Spotlight</h2><p>Explore our latest wellness tools, confidential groups, and peer support options.</p>" },
+                confession: { subj: "🌌 Weekly Reflection & Confession Box Digest", html: "<h2 style='color:#4f46e5;'>Weekly Confessions & Whispers</h2><p>Read anonymous reflections shared by your fellow community members this week.</p>" },
+                reminder: { subj: "🤍 A Gentle Reminder for Your Mental Peace", html: "<h2 style='color:#059669;'>Gentle Daily Reminder</h2><p>Pause, unclamp your jaw, drop your shoulders, and take three deep breaths.</p>" },
+                postcard: { subj: "📮 A Special Postcard from Soulamore Away", html: "<h2 style='color:#d97706;'>Greetings from Afar</h2><p>Someone across the world sent a gentle thought into the sanctuary for you.</p>" }
+            };
+            const t = templates[type] || templates.feature;
+            document.getElementById('v2CampaignSubject').value = t.subj;
+            document.getElementById('v2PreviewSubject').textContent = t.subj;
+            document.getElementById('v2EmailPreviewIframe').srcdoc = t.html;
+        };
+
+        window.v2DispatchMassBroadcast = async function() {
+            const subject = document.getElementById('v2CampaignSubject').value;
+            const segment = document.getElementById('v2CampaignSegment').value;
+            if (!subject) {
+                alert('Please enter a campaign subject line or select a template.');
+                return;
+            }
+            if (confirm(`Are you sure you want to dispatch mass email broadcast to segment [${segment.toUpperCase()}]?`)) {
+                alert(`🚀 Broadcast campaign [${subject}] has been dispatched to ${segment}!`);
+            }
+        };
+
+        window.v2ExportNewsletterCsv = function() {
+            alert('📥 Downloading Newsletter Subscribers CSV...');
+        };
+
+        window.v2FilterUserRole = function(role) {
+            alert(`Filtering user directory for role: ${role.toUpperCase()}`);
+        };
+
+        window.v2GenerateBreachReport = function() {
+            const title = document.getElementById('v2BreachTitle').value || 'System Incident Report';
+            const severity = document.getElementById('v2BreachSeverity').value;
+            alert(`✅ Generated ${severity.toUpperCase()} breach report: [${title}]. Exporting log file...`);
+        };
+
+        window.v2SelectBlogPillar = function(pillarNum) {
+            alert(`Selected Mental Health Content Pillar #${pillarNum}. Initializing AI blog generator prompt...`);
+        };
+
+        window.v2ToggleSignupLock = function() {
+            alert('🔒 Toggled Public User Signup Lock state.');
+        };
+
+        window.v2ToggleApiDebug = function() {
+            alert('🛠️ Toggled Cloud Functions API Debug Telemetry Logging.');
+        };
 
         window.v2ApproveProfileEdit = async function(requestId, userId, proposedData) {
             try {

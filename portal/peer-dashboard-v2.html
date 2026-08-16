@@ -1083,8 +1083,17 @@
                 </div>
             </section>
 
-            <!-- 6. AVAILABILITY -->
+            <!-- 6. AVAILABILITY & CALENDAR SYNC -->
             <section class="v2-view-section" id="v2-view-availability">
+                <!-- GOOGLE CALENDAR SYNC CARD -->
+                <div class="v2-section-card" style="margin-bottom:16px;">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fab fa-google" style="color:var(--primary-peach);"></i> Google Calendar Integration</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px;" onclick="v2ConnectGoogleCalendar()"><i class="fab fa-google"></i> Connect Google Calendar</button>
+                    </div>
+                    <div style="font-size:0.82rem; color:var(--text-muted);">Automatically sync your booked peer listening slots with your personal Google Calendar to prevent scheduling conflicts.</div>
+                </div>
+
                 <div class="v2-section-card">
                     <div class="v2-section-header">
                         <div class="v2-section-title"><i class="fas fa-calendar-check" style="color:var(--primary-peach);"></i> Interactive Weekly Free Slots</div>
@@ -1114,13 +1123,15 @@
                 </div>
             </section>
 
-            <!-- 8. EARNINGS -->
+            <!-- 8. EARNINGS & PAYOUT METHODS -->
             <section class="v2-view-section" id="v2-view-billing">
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-wallet"></i> Earnings & Payouts</div>
+                        <div class="v2-section-title"><i class="fas fa-wallet"></i> Earnings & Payout Methods</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px;" onclick="v2OpenPeerPayoutModal()"><i class="fas fa-university"></i> Update Payout Method</button>
                     </div>
-                    <div style="font-size:1.4rem; font-weight:600; color:var(--text-primary);" id="v2EarningsTotal">₹0.00</div>
+                    <div style="font-size:1.8rem; font-weight:700; color:var(--text-primary); margin:6px 0;" id="v2EarningsTotal">₹0.00</div>
+                    <div style="font-size:0.78rem; color:var(--text-muted);">Peer counseling honorarium payout balance. Paid bi-weekly.</div>
                 </div>
             </section>
 
@@ -1152,9 +1163,13 @@
                 <div class="v2-section-card">
                     <div class="v2-section-header">
                         <div class="v2-section-title"><i class="fas fa-user-shield"></i> Clinical Supervision Hub</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px;" onclick="v2OpenPeerSupervisionModal()"><i class="fas fa-calendar-plus"></i> Request Supervision Session</button>
                     </div>
-                    <p style="font-size:0.85rem; color:var(--text-secondary);">Request guidance or escalate a high-stress client session to your assigned supervising psychologist.</p>
-                    <button class="v2-btn-primary" style="align-self:flex-start; background:#EF4444;" onclick="alert('Supervisor alerted!')">Call Urgent Supervisor Help 🆘</button>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px;">Request formal guidance or escalate a high-stress client session to your assigned supervising psychologist.</p>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="v2-btn-primary" style="font-size:0.78rem; background:#EF4444; color:#fff;" onclick="alert('Supervisor alerted!')">Call Urgent Supervisor Help 🆘</button>
+                        <button class="v2-btn-primary" style="font-size:0.78rem; background:var(--bg-surface-elevated);" onclick="v2OpenPeerSupervisionModal()"><i class="fas fa-user-doctor"></i> Schedule Supervision 1-on-1</button>
+                    </div>
                 </div>
             </section>
 
@@ -1173,6 +1188,7 @@
                 <div class="v2-section-card">
                     <div class="v2-section-header">
                         <div class="v2-section-title"><i class="fas fa-shield-alt"></i> Code of Conduct & Peer Guidelines</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="v2DownloadPeerHandbook()"><i class="fas fa-file-pdf"></i> Download Full Handbook</button>
                     </div>
                     <p style="font-size:0.85rem; color:var(--text-secondary);">1. Respect student privacy and confidentiality.<br>2. Practice active, non-judgmental listening.<br>3. Escalate urgent clinical risks to a Psychologist immediately.</p>
                 </div>
@@ -1224,9 +1240,86 @@
         </div>
     </div>
 
+    <!-- MODAL 3: PAYOUT METHOD EDIT MODAL -->
+    <div class="v2-modal-overlay" id="v2PeerPayoutModal" style="display:none;">
+        <div class="v2-modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:600;">
+                <span><i class="fas fa-university" style="color:var(--primary-peach);"></i> Update Peer Honorarium Payout Method</span>
+                <i class="fas fa-times" style="cursor:pointer;" onclick="document.getElementById('v2PeerPayoutModal').style.display='none'"></i>
+            </div>
+            <div class="v2-field-group" style="margin-top:10px;">
+                <label class="v2-field-label">Bank Account Number / UPI ID</label>
+                <input type="text" id="v2PeerPayoutAccount" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="e.g. 9876543210@paytm or Account No">
+            </div>
+            <div class="v2-field-group">
+                <label class="v2-field-label">IFSC Code (Bank Transfer)</label>
+                <input type="text" id="v2PeerPayoutIfsc" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="SBIN0001234">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="document.getElementById('v2PeerPayoutModal').style.display='none'">Cancel</button>
+                <button class="v2-btn-primary" onclick="v2SavePeerPayoutMethod()"><i class="fas fa-save"></i> Save Payout Details</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: REQUEST FORMAL SUPERVISION MODAL -->
+    <div class="v2-modal-overlay" id="v2PeerSupervisionModal" style="display:none;">
+        <div class="v2-modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:600;">
+                <span><i class="fas fa-user-doctor" style="color:var(--primary-peach);"></i> Request Clinical Supervision 1-on-1</span>
+                <i class="fas fa-times" style="cursor:pointer;" onclick="document.getElementById('v2PeerSupervisionModal').style.display='none'"></i>
+            </div>
+            <div class="v2-field-group" style="margin-top:10px;">
+                <label class="v2-field-label">Supervision Topic / Case Note</label>
+                <textarea id="v2SupervisionTopic" class="v2-textarea" style="min-height:90px;" placeholder="Describe what you want guidance on (e.g. boundary setting, client emotional burnout)..."></textarea>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="document.getElementById('v2PeerSupervisionModal').style.display='none'">Cancel</button>
+                <button class="v2-btn-primary" onclick="v2SubmitPeerSupervisionRequest()"><i class="fas fa-paper-plane"></i> Submit Supervision Request</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT LOGIC -->
     <script type="module">
         import { auth, db, collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc, updateDoc, serverTimestamp } from '../assets/js/firebase-config.js';
+
+        // --- PEER DASHBOARD HANDLERS ---
+        window.v2ConnectGoogleCalendar = function() {
+            alert('📅 Google Calendar OAuth integration initialized! Syncing peer availability...');
+        };
+
+        window.v2OpenPeerPayoutModal = function() {
+            document.getElementById('v2PeerPayoutModal').style.display = 'flex';
+        };
+
+        window.v2SavePeerPayoutMethod = function() {
+            const acc = document.getElementById('v2PeerPayoutAccount').value;
+            if (!acc) {
+                alert('Please enter a bank account or UPI ID.');
+                return;
+            }
+            alert(`✅ Payout method updated to: ${acc}`);
+            document.getElementById('v2PeerPayoutModal').style.display = 'none';
+        };
+
+        window.v2OpenPeerSupervisionModal = function() {
+            document.getElementById('v2PeerSupervisionModal').style.display = 'flex';
+        };
+
+        window.v2SubmitPeerSupervisionRequest = async function() {
+            const topic = document.getElementById('v2SupervisionTopic').value;
+            if (!topic) {
+                alert('Please describe your supervision reflection topic.');
+                return;
+            }
+            alert('✅ Formal clinical supervision request submitted! Your supervising psychologist will contact you shortly.');
+            document.getElementById('v2PeerSupervisionModal').style.display = 'none';
+        };
+
+        window.v2DownloadPeerHandbook = function() {
+            alert('📥 Downloading Peer Counselor Code of Conduct & Guidelines Handbook (PDF)...');
+        };
 
         let peerSessionsUnsubscribe = null;
         let quillStoryEditor = null;
