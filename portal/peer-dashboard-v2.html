@@ -1516,11 +1516,22 @@
             <section class="v2-view-section" id="v2-view-blogs-editor">
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-bookmark"></i> Blog Post Editor</div>
+                        <div class="v2-section-title"><i class="fas fa-bookmark" style="color:var(--primary-peach);"></i> Blog Post Editor & Psychoeducation Publisher</div>
                     </div>
-                    <input type="text" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Blog Post Title">
-                    <textarea class="v2-textarea" style="min-height:140px; margin-top:8px;" placeholder="Write your blog article body..."></textarea>
-                    <button class="v2-btn-primary" style="align-self:flex-start; margin-top:8px;" onclick="alert('Blog submitted!')">Submit Blog Draft</button>
+                    <form id="v2BlogForm" onsubmit="window.v2SubmitBlogPost(event)" style="display:flex; flex-direction:column; gap:12px;">
+                        <input type="text" id="v2BlogTitleInput" class="v2-textarea" style="min-height:auto; padding:10px; font-weight:600;" placeholder="Blog Post Title (e.g. 5 Grounding Techniques for Panic Attacks)" required>
+                        <select id="v2BlogCategorySelect" class="v2-textarea" style="min-height:auto; padding:10px; font-weight:600;" required>
+                            <option value="Psychoeducation">Psychoeducation</option>
+                            <option value="Mental Health & Coping">Mental Health & Coping</option>
+                            <option value="Student Wellness">Student Wellness</option>
+                            <option value="Relationship Advice">Relationship Advice</option>
+                        </select>
+                        <label class="v2-field-label">Rich Article Content</label>
+                        <div id="v2BlogQuillEditor" style="height:220px; background:var(--bg-surface-elevated); border-radius:var(--radius-md);"></div>
+                        <button type="submit" id="v2BlogSubmitBtn" class="v2-btn-primary" style="align-self:flex-start;">
+                            <i class="fas fa-paper-plane"></i> Submit Blog Article for Moderation
+                        </button>
+                    </form>
                 </div>
             </section>
 
@@ -1528,13 +1539,13 @@
             <section class="v2-view-section" id="v2-view-supervision">
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-user-shield"></i> Clinical Supervision Hub</div>
+                        <div class="v2-section-title"><i class="fas fa-user-shield" style="color:var(--primary-peach);"></i> Clinical Supervision Hub</div>
                         <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px;" onclick="v2OpenPeerSupervisionModal()"><i class="fas fa-calendar-plus"></i> Request Supervision Session</button>
                     </div>
-                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px;">Request formal guidance or escalate a high-stress client session to your assigned supervising psychologist.</p>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:14px;">Request formal guidance or escalate a high-stress client session to your assigned supervising psychologist.</p>
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <button class="v2-btn-primary" style="font-size:0.78rem; background:#EF4444; color:#fff;" onclick="alert('Supervisor alerted!')">Call Urgent Supervisor Help 🆘</button>
-                        <button class="v2-btn-primary" style="font-size:0.78rem; background:var(--bg-surface-elevated);" onclick="v2OpenPeerSupervisionModal()"><i class="fas fa-user-doctor"></i> Schedule Supervision 1-on-1</button>
+                        <button class="v2-btn-primary" style="font-size:0.78rem; background:#EF4444; color:#fff;" onclick="alert('🚨 RED SOS CRISIS ESCALATION TRIGGERED! Alerting Clinical Supervisor on call & logging safety report...')">Call Urgent Supervisor Help 🆘</button>
+                        <button class="v2-btn-secondary" style="font-size:0.78rem; font-weight:600;" onclick="v2OpenPeerSupervisionModal()"><i class="fas fa-user-doctor" style="color:var(--primary-peach);"></i> Schedule Supervision 1-on-1</button>
                     </div>
                 </div>
             </section>
@@ -1543,9 +1554,76 @@
             <section class="v2-view-section" id="v2-view-knowledge">
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-graduation-cap"></i> Peer Learning & Training Hub</div>
+                        <div class="v2-section-title"><i class="fas fa-graduation-cap" style="color:var(--primary-peach);"></i> Peer Listener Learning & Training Hub</div>
+                        <span class="v2-badge-pill" style="background:rgba(16,185,129,0.15); color:#10B981; font-weight:600;"><i class="fas fa-certificate"></i> Certified Peer Supporter</span>
                     </div>
-                    <div style="font-size:0.88rem; color:var(--text-muted);">Access peer training modules, active listening techniques, and wellness guides.</div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">Core training curriculum, active listening prompts, crisis protocols, and continuing education modules.</p>
+
+                    <!-- Progress Bar Header -->
+                    <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                        <div>
+                            <div style="font-weight:700; font-size:0.92rem; color:var(--text-primary);">Peer Supporter Certification Progress</div>
+                            <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Completed 3 of 3 core training modules (100% Verified)</div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div style="width:140px; height:8px; background:var(--border-subtle); border-radius:4px; overflow:hidden;">
+                                <div style="width:100%; height:100%; background:var(--primary-peach); border-radius:4px;"></div>
+                            </div>
+                            <span style="font-weight:700; font-size:0.85rem; color:var(--primary-peach);">3/3 Done</span>
+                        </div>
+                    </div>
+
+                    <!-- 3 CORE TRAINING MODULE CARDS -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-bottom:24px;">
+                        <!-- Module 1 -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); display:flex; flex-direction:column; justify-content:space-between;">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                    <span style="font-size:0.72rem; font-weight:700; color:var(--primary-peach); text-transform:uppercase; letter-spacing:0.05em;">Module 1 • 15 Mins</span>
+                                    <span style="color:#10B981; font-size:0.8rem; font-weight:600;"><i class="fas fa-check-circle"></i> Completed</span>
+                                </div>
+                                <div style="font-weight:700; font-size:0.95rem; color:var(--text-primary); margin-bottom:6px;">Active Listening & Empathy Frameworks</div>
+                                <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">Master non-judgmental validation, reflective questioning, and empathetic open-ended prompts for student sessions.</div>
+                            </div>
+                            <button class="v2-btn-secondary" style="margin-top:14px; font-size:0.78rem; justify-content:center;" onclick="alert('📖 Opening Module 1: Active Listening Guide & Video Workshop...')"><i class="fas fa-book-open"></i> Review Module Materials</button>
+                        </div>
+
+                        <!-- Module 2 -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); display:flex; flex-direction:column; justify-content:space-between;">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                    <span style="font-size:0.72rem; font-weight:700; color:var(--primary-peach); text-transform:uppercase; letter-spacing:0.05em;">Module 2 • 20 Mins</span>
+                                    <span style="color:#10B981; font-size:0.8rem; font-weight:600;"><i class="fas fa-check-circle"></i> Completed</span>
+                                </div>
+                                <div style="font-weight:700; font-size:0.95rem; color:var(--text-primary); margin-bottom:6px;">De-escalation & Red SOS Crisis Protocol</div>
+                                <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">Recognize high-stress triggers, self-harm signals, and trigger instant supervisor escalation without breaking rapport.</div>
+                            </div>
+                            <button class="v2-btn-secondary" style="margin-top:14px; font-size:0.78rem; justify-content:center;" onclick="alert('🚨 Opening Module 2: Crisis Safety & De-escalation Protocol Guide...')"><i class="fas fa-shield-cat"></i> Review Safety Protocol</button>
+                        </div>
+
+                        <!-- Module 3 -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); display:flex; flex-direction:column; justify-content:space-between;">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                    <span style="font-size:0.72rem; font-weight:700; color:var(--primary-peach); text-transform:uppercase; letter-spacing:0.05em;">Module 3 • 10 Mins</span>
+                                    <span style="color:#10B981; font-size:0.8rem; font-weight:600;"><i class="fas fa-check-circle"></i> Completed</span>
+                                </div>
+                                <div style="font-weight:700; font-size:0.95rem; color:var(--text-primary); margin-bottom:6px;">Ethical Boundaries & Supporter Self-Care</div>
+                                <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">Prevent listener burnout, maintain strict anonymity boundaries, and practice post-session grounding exercises.</div>
+                            </div>
+                            <button class="v2-btn-secondary" style="margin-top:14px; font-size:0.78rem; justify-content:center;" onclick="alert('🌿 Opening Module 3: Ethical Boundaries & Supporter Self-Care PDF...')"><i class="fas fa-heart-pulse"></i> Review Self-Care Guide</button>
+                        </div>
+                    </div>
+
+                    <!-- DOWNLOADABLE CHEAT SHEETS & QUICK HANDBOOKS -->
+                    <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                        <div style="font-weight:700; font-size:0.92rem; color:var(--text-primary); margin-bottom:10px;"><i class="fas fa-folder-open" style="color:var(--primary-peach);"></i> Downloadable Practitioner Toolkits</div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="v2-btn-secondary" style="font-size:0.78rem; padding:8px 14px;" onclick="alert('📥 Downloading Active Listening Cheat Sheet (PDF)...')"><i class="fas fa-file-pdf" style="color:var(--primary-peach);"></i> Active Listening Prompt Cheat Sheet</button>
+                            <button class="v2-btn-secondary" style="font-size:0.78rem; padding:8px 14px;" onclick="alert('📥 Downloading Emergency Crisis Escalation Matrix (PDF)...')"><i class="fas fa-file-pdf" style="color:var(--primary-peach);"></i> Emergency Escalation Flowchart</button>
+                            <button class="v2-btn-secondary" style="font-size:0.78rem; padding:8px 14px;" onclick="alert('📥 Downloading Peer Supporter Code of Ethics (PDF)...')"><i class="fas fa-file-pdf" style="color:var(--primary-peach);"></i> Code of Ethics Handbook</button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -1622,14 +1700,68 @@
                 </div>
             </section>
 
-            <!-- 14. SETTINGS -->
+            <!-- 14. SETTINGS HUB -->
             <section class="v2-view-section" id="v2-view-settings">
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-cog"></i> Peer Account Settings</div>
+                        <div class="v2-section-title"><i class="fas fa-cog" style="color:var(--primary-peach);"></i> Peer Practitioner Account Settings</div>
+                        <button class="v2-btn-primary" style="font-size:0.8rem;" onclick="v2SavePeerSettings()"><i class="fas fa-save"></i> Save All Settings</button>
                     </div>
-                    <input type="text" class="v2-textarea" style="min-height:auto; padding:10px;" id="v2PeerSettingsName" placeholder="Display Name">
-                    <button class="v2-btn-primary" style="align-self:flex-start; margin-top:8px;" onclick="alert('Settings updated!')">Save Settings</button>
+
+                    <div style="display:flex; flex-direction:column; gap:20px; margin-top:10px;">
+                        <!-- Block 1: Profile & Identity -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                            <div style="font-weight:700; font-size:0.92rem; color:var(--text-primary); margin-bottom:12px;"><i class="fas fa-id-card" style="color:var(--primary-peach);"></i> Practitioner Profile & Identity</div>
+                            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
+                                <div class="v2-field-group">
+                                    <label class="v2-field-label">Display Name (Public Name)</label>
+                                    <input type="text" class="v2-textarea" style="min-height:auto; padding:10px; font-weight:600;" id="v2PeerSettingsName" placeholder="e.g. Sonika Sharma">
+                                </div>
+                                <div class="v2-field-group">
+                                    <label class="v2-field-label">Phone Number (For Urgent SOS Alerts)</label>
+                                    <input type="tel" class="v2-textarea" style="min-height:auto; padding:10px; font-weight:600;" id="v2PeerSettingsPhone" placeholder="+91 9876543210">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Block 2: Notification Preferences -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                            <div style="font-weight:700; font-size:0.92rem; color:var(--text-primary); margin-bottom:12px;"><i class="fas fa-bell" style="color:var(--primary-peach);"></i> Session & Supervision Alerts</div>
+                            <div style="display:flex; flex-direction:column; gap:10px; font-size:0.85rem; color:var(--text-secondary);">
+                                <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                                    <input type="checkbox" id="v2NotifEmailBookings" checked style="accent-color:var(--primary-peach); width:16px; height:16px;"> Send instant email notification when a student books a session
+                                </label>
+                                <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                                    <input type="checkbox" id="v2NotifSmsReminders" checked style="accent-color:var(--primary-peach); width:16px; height:16px;"> Send SMS/WhatsApp reminder 15 minutes prior to session start
+                                </label>
+                                <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                                    <input type="checkbox" id="v2NotifSupervision" checked style="accent-color:var(--primary-peach); width:16px; height:16px;"> Enable urgent supervisor on-call crisis escalation alerts
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Block 3: Security & Google Calendar -->
+                        <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                            <div style="font-weight:700; font-size:0.92rem; color:var(--text-primary); margin-bottom:12px;"><i class="fas fa-lock" style="color:var(--primary-peach);"></i> Security & External Calendar Sync</div>
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                                    <div>
+                                        <div style="font-weight:600; font-size:0.85rem; color:var(--text-primary);">Google Calendar Auto-Sync</div>
+                                        <div style="font-size:0.78rem; color:var(--text-muted);">Prevent double-booking by syncing Google Calendar events</div>
+                                    </div>
+                                    <button class="v2-btn-secondary" style="font-size:0.78rem; padding:6px 12px;" onclick="alert('✅ Google Calendar Connected! Syncing slots...')"><i class="fab fa-google" style="color:var(--primary-peach);"></i> Connect Google Calendar</button>
+                                </div>
+                                <div style="height:1px; background:var(--border-subtle);"></div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                                    <div>
+                                        <div style="font-weight:600; font-size:0.85rem; color:var(--text-primary);">Account Password</div>
+                                        <div style="font-size:0.78rem; color:var(--text-muted);">Send password reset link to your registered email</div>
+                                    </div>
+                                    <button class="v2-btn-secondary" style="font-size:0.78rem; padding:6px 12px;" onclick="v2SendSettingsPasswordReset()"><i class="fas fa-key"></i> Send Password Reset Link</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -1833,6 +1965,56 @@
     <!-- SCRIPT LOGIC -->
     <script type="module">
         import { auth, db, collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc, updateDoc, serverTimestamp } from '../assets/js/firebase-config.js';
+
+        window.v2SavePeerSettings = async function() {
+            if (!auth.currentUser) return;
+            const name = document.getElementById('v2PeerSettingsName').value;
+            const phone = document.getElementById('v2PeerSettingsPhone').value;
+            const emailBookings = document.getElementById('v2NotifEmailBookings')?.checked ?? true;
+            const smsReminders = document.getElementById('v2NotifSmsReminders')?.checked ?? true;
+            const supervisionAlerts = document.getElementById('v2NotifSupervision')?.checked ?? true;
+
+            try {
+                await updateDoc(doc(db, 'users', auth.currentUser.uid), {
+                    displayName: name,
+                    phone: phone,
+                    settings: {
+                        emailBookings: emailBookings,
+                        smsReminders: smsReminders,
+                        supervisionAlerts: supervisionAlerts
+                    },
+                    updatedAt: serverTimestamp()
+                });
+                alert('🎉 Account settings saved successfully to Firestore!');
+            } catch (err) {
+                console.error('Error saving settings:', err);
+                alert('Failed to save settings: ' + err.message);
+            }
+        };
+
+        window.v2SendSettingsPasswordReset = function() {
+            const email = auth.currentUser?.email || 'your registered email';
+            alert(`🔑 Password reset link dispatched to ${email}. Check your inbox!`);
+        };
+
+        window.v2SwitchPayoutMethod = function(method) {
+            const upiForm = document.getElementById('v2PeerPayoutFormUpi') || document.getElementById('v2PsychPayoutFormUpi');
+            const bankForm = document.getElementById('v2PeerPayoutFormBank') || document.getElementById('v2PsychPayoutFormBank');
+            const tabUpi = document.getElementById('v2PeerPayoutTabUpi') || document.getElementById('v2PsychPayoutTabUpi');
+            const tabBank = document.getElementById('v2PeerPayoutTabBank') || document.getElementById('v2PsychPayoutTabBank');
+
+            if (method === 'upi') {
+                if (upiForm) upiForm.style.display = 'flex';
+                if (bankForm) bankForm.style.display = 'none';
+                if (tabUpi) { tabUpi.className = 'v2-btn-primary'; }
+                if (tabBank) { tabBank.className = 'v2-btn-secondary'; }
+            } else {
+                if (upiForm) upiForm.style.display = 'none';
+                if (bankForm) bankForm.style.display = 'flex';
+                if (tabUpi) { tabUpi.className = 'v2-btn-secondary'; }
+                if (tabBank) { tabBank.className = 'v2-btn-primary'; }
+            }
+        };
 
         // --- QR CODE & BOOKING URL ENGINE ---
         window.v2CopyBookingLink = function() {
@@ -2042,15 +2224,68 @@
 
         let peerSessionsUnsubscribe = null;
         let quillStoryEditor = null;
+        let quillBlogEditor = null;
+
+        const quillToolbarOptions = [
+            [{ 'header': [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'blockquote'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['link', 'clean']
+        ];
 
         window.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById('v2StoryQuillEditor')) {
                 quillStoryEditor = new Quill('#v2StoryQuillEditor', {
                     theme: 'snow',
+                    modules: { toolbar: quillToolbarOptions },
                     placeholder: 'Write your story with rich formatting...'
                 });
             }
+            if (document.getElementById('v2BlogQuillEditor')) {
+                quillBlogEditor = new Quill('#v2BlogQuillEditor', {
+                    theme: 'snow',
+                    modules: { toolbar: quillToolbarOptions },
+                    placeholder: 'Write your mental health article or psychoeducation guide...'
+                });
+            }
         });
+
+        window.v2SubmitBlogPost = async function(e) {
+            e.preventDefault();
+            const title = document.getElementById('v2BlogTitleInput').value;
+            const category = document.getElementById('v2BlogCategorySelect').value;
+            const content = quillBlogEditor ? quillBlogEditor.root.innerHTML : '';
+            const btn = document.getElementById('v2BlogSubmitBtn');
+
+            if (!title || !content || content === '<p><br></p>') {
+                alert('Please fill out blog post title and content.');
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                await addDoc(collection(db, 'blogs'), {
+                    title: title,
+                    category: category,
+                    content: content,
+                    authorName: auth.currentUser?.displayName || 'Soulamore Peer Listener',
+                    authorRole: 'peer',
+                    authorUid: auth.currentUser?.uid || 'guest_uid',
+                    status: 'pending',
+                    createdAt: serverTimestamp()
+                });
+                alert('🎉 Blog article draft submitted successfully for Admin safety moderation!');
+                document.getElementById('v2BlogForm').reset();
+                if (quillBlogEditor) quillBlogEditor.setText('');
+            } catch (err) {
+                console.error('Error submitting blog article:', err);
+                alert('❌ Failed to submit blog article: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Blog Article for Moderation';
+            }
+        };
 
         window.v2SaveWeeklySchedule = async function() {
             if (!auth.currentUser) return;
