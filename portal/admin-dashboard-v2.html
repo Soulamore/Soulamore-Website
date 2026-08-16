@@ -1372,23 +1372,37 @@
                     }
                 });
 
-                // 6. Safety & Risk Reports Listener
-                onSnapshot(collection(db, 'safety_reports'), (snapshot) => {
-                    const container = document.getElementById('v2SafetyReportsContainer');
+                // 7. Platform Bookings Master Listener
+                onSnapshot(collection(db, 'peer_bookings'), (snapshot) => {
+                    const container = document.getElementById('v2SessionsContainer');
+                    if (!container) return;
+
                     if (snapshot.empty) {
-                        if (container) container.innerHTML = '<div style="font-size:0.88rem; color:#26A69A; font-weight:600;">✅ Zero open crisis or self-harm risk reports.</div>';
+                        container.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:20px;">No platform bookings recorded yet.</div>';
                     } else {
-                        let html = '';
+                        let html = `
+                            <div style="display:flex; flex-direction:column; gap:8px;">
+                        `;
                         snapshot.forEach(docSnap => {
-                            const r = docSnap.data();
+                            const b = docSnap.data();
+                            const dateStr = b.startTime?.toDate ? b.startTime.toDate().toLocaleString() : (b.startTime || 'Scheduled');
+                            const statusColor = b.status === 'confirmed' ? '#10B981' : b.status === 'held' ? '#F59E0B' : '#64748B';
+
                             html += `
-                                <div style="padding:12px; background:rgba(239,68,68,0.1); border-radius:6px; margin-bottom:8px; border:1px solid rgba(239,68,68,0.3);">
-                                    <div style="font-weight:600; font-size:0.88rem; color:#EF4444;">🚨 High-Risk Crisis Trigger Alert</div>
-                                    <div style="font-size:0.8rem; color:var(--text-primary); margin-top:4px;">${r.content || 'Crisis keyword detected.'}</div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
+                                    <div>
+                                        <div style="font-weight:700; font-size:0.88rem;">${b.userName || b.userEmail || 'Member'} ➔ ${b.peerName || b.psychName || 'Practitioner'}</div>
+                                        <div style="font-size:0.76rem; color:var(--text-muted); margin-top:2px;"><i class="far fa-clock"></i> ${dateStr}</div>
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <span style="font-size:0.75rem; font-weight:700; color:${statusColor};">STATUS: ${(b.status || 'CONFIRMED').toUpperCase()}</span>
+                                        <span class="v2-badge-pill">₹${b.amount || 500}</span>
+                                    </div>
                                 </div>
                             `;
                         });
-                        if (container) container.innerHTML = html;
+                        html += `</div>`;
+                        container.innerHTML = html;
                     }
                     hideV2Loader();
                 });
