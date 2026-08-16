@@ -143,11 +143,13 @@ When user's prompt is NOT in English:
 2. What PRINCIPLES must I apply?
 3. How does this DIFFER from generic output?
 
-### 🗄️ Reports Archiving Protocol
+### 🗄️ Reports & Bug Tracking Local-Only Protocol (STRICT GIT BAN)
 
-- **Maximum Capacity**: Always keep a maximum of 5 most recent report files at the root of `reports/ADITYA/ANTIGRAVITY`.
-- **Automatic Archiving**: Move older reports (chronologically sorted by prefix index `001_` to `060_`) to the `reports/ADITYA/ANTIGRAVITY/archive` directory.
-- **Commit Coverage**: All archived files must remain tracked in version control.
+> 🔴 **STRICT MANDATE:** Reports and test bug files under `reports/` MUST NEVER BE COMMITTED OR SENT TO GIT. They remain local files only.
+
+- **Local Storage Only**: All generated test reports, bug logs, audit outputs, and backlog files inside `reports/` (e.g. `reports/testing/`) are for local developer reference only.
+- **Git Exclusions**: NEVER run `git add -f` or include any file inside `reports/` in git commits.
+- **Maximum Local Capacity**: Always keep a maximum of 5 most recent report files at the root of `reports/ADITYA/ANTIGRAVITY`. Older reports are moved to `reports/ADITYA/ANTIGRAVITY/archive` locally.
 
 ---
 
