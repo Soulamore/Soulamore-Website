@@ -88,8 +88,13 @@ function updateAuthUI(user) {
 
             // Update user icon
             if (userIconBtn) {
+                userIconBtn.innerHTML = '';
                 if (user.photoURL) {
-                    userIconBtn.innerHTML = `<img src="${user.photoURL}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" alt="User">`;
+                    const img = document.createElement('img');
+                    img.src = encodeURI(user.photoURL);
+                    img.style.cssText = "width: 32px; height: 32px; border-radius: 50%; object-fit: cover;";
+                    img.alt = "User Profile";
+                    userIconBtn.appendChild(img);
                 } else {
                     userIconBtn.innerHTML = '<i class="fas fa-user-circle"></i>';
                 }
