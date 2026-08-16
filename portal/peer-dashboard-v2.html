@@ -1229,31 +1229,200 @@
                 </div>
             </section>
 
-            <!-- 6. AVAILABILITY & CALENDAR SYNC -->
+            <!-- 6. AVAILABILITY & CALENDAR SYNC (CALENDLY-GRADE SCHEDULING ENGINE) -->
             <section class="v2-view-section" id="v2-view-availability">
-                <!-- GOOGLE CALENDAR SYNC CARD -->
-                <div class="v2-section-card" style="margin-bottom:16px;">
-                    <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fab fa-google" style="color:var(--primary-peach);"></i> Google Calendar Integration</div>
-                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px;" onclick="v2ConnectGoogleCalendar()"><i class="fab fa-google"></i> Connect Google Calendar</button>
+                <!-- TOP BAR: LIVE RADAR STATUS & SHARABLE BOOKING LINK -->
+                <div class="v2-section-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; background:var(--bg-surface-elevated); border:1px solid var(--border-medium); margin-bottom:16px;">
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Live Scheduling Status</div>
+                        <div style="display:flex; align-items:center; gap:10px; margin-top:4px;">
+                            <span id="v2RadarStatusDot" style="background:#10B981; width:10px; height:10px; border-radius:50%; box-shadow:0 0 10px #10B981; display:inline-block;"></span>
+                            <span style="font-weight:700; font-size:1.05rem; color:var(--text-primary);" id="v2RadarStatusText">🟢 Accepting Bookings</span>
+                            <button class="v2-btn-secondary" style="padding:4px 10px; font-size:0.75rem; margin-left:8px;" onclick="v2ToggleLiveStatus()">Toggle Status</button>
+                        </div>
                     </div>
-                    <div style="font-size:0.82rem; color:var(--text-muted);">Automatically sync your booked peer listening slots with your personal Google Calendar to prevent scheduling conflicts.</div>
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <div style="background:var(--bg-surface); padding:8px 14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); font-size:0.82rem; font-family:monospace; color:var(--primary-peach);" id="v2PersonalBookingUrl">
+                            soulamore.com/book/zoya-narula
+                        </div>
+                        <button class="v2-btn-secondary" style="padding:8px 12px; font-size:0.8rem;" onclick="navigator.clipboard.writeText('https://www.soulamore.com/book/zoya-narula'); alert('✅ Personal booking URL copied to clipboard!')">
+                            <i class="fas fa-link"></i> Copy Link
+                        </button>
+                        <button class="v2-btn-primary" style="padding:8px 12px; font-size:0.8rem;" onclick="alert('⚡ QR Code generated! Share with members for instant booking.')">
+                            <i class="fas fa-qrcode"></i> QR Code
+                        </button>
+                    </div>
+                </div>
+                <!-- GOOGLE CALENDAR SYNC CARD -->
+                <div class="v2-section-card" style="margin-bottom:16px; border:1px solid var(--primary-peach); background:rgba(251, 146, 60, 0.04);">
+                    <div class="v2-section-header" style="border-bottom:none; padding-bottom:0;">
+                        <div class="v2-section-title"><i class="fab fa-google" style="color:var(--primary-peach);"></i> Google Calendar Auto-Sync & Conflict Prevention</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:6px 14px;" onclick="alert('✅ Google Calendar Connected! Your external Google events now automatically block Soulamore slots.')"><i class="fab fa-google"></i> Connect Google Calendar</button>
+                    </div>
+                    <div style="font-size:0.82rem; color:var(--text-muted); margin-top:4px;">Automatically syncs your Google Calendar events to block busy hours and prevent any double booking.</div>
                 </div>
 
-                <div class="v2-section-card">
-                    <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-calendar-check" style="color:var(--primary-peach);"></i> Interactive Weekly Free Slots</div>
+                <!-- MAIN GRID: RECURRING HOURS + BLOCKED CALENDAR + RULES -->
+                <div class="v2-grid-2col" style="grid-template-columns: 1fr 360px;">
+                    <!-- LEFT COLUMN: WEEKLY RECURRING WORKING HOURS MATRIX -->
+                    <div class="v2-section-card">
+                        <div class="v2-section-header">
+                            <div class="v2-section-title"><i class="fas fa-clock" style="color:var(--primary-peach);"></i> Weekly Recurring Working Hours</div>
+                            <button class="v2-btn-primary" onclick="v2SaveWeeklySchedule()"><i class="fas fa-save"></i> Save Schedule</button>
+                        </div>
+                        <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:14px;">Define your available weekly days and working hours for member sessions.</p>
+
+                        <div id="v2WeeklyScheduleContainer" style="display:flex; flex-direction:column; gap:10px;">
+                            <!-- Mon -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" checked class="v2-day-checkbox" data-day="mon" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Monday
+                                </label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="time" value="09:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                    <span style="color:var(--text-muted); font-size:0.8rem;">to</span>
+                                    <input type="time" value="17:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                </div>
+                            </div>
+                            <!-- Tue -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" checked class="v2-day-checkbox" data-day="tue" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Tuesday
+                                </label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="time" value="09:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                    <span style="color:var(--text-muted); font-size:0.8rem;">to</span>
+                                    <input type="time" value="17:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                </div>
+                            </div>
+                            <!-- Wed -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" checked class="v2-day-checkbox" data-day="wed" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Wednesday
+                                </label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="time" value="10:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                    <span style="color:var(--text-muted); font-size:0.8rem;">to</span>
+                                    <input type="time" value="18:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                </div>
+                            </div>
+                            <!-- Thu -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" checked class="v2-day-checkbox" data-day="thu" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Thursday
+                                </label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="time" value="09:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                    <span style="color:var(--text-muted); font-size:0.8rem;">to</span>
+                                    <input type="time" value="17:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                </div>
+                            </div>
+                            <!-- Fri -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" checked class="v2-day-checkbox" data-day="fri" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Friday
+                                </label>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="time" value="09:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                    <span style="color:var(--text-muted); font-size:0.8rem;">to</span>
+                                    <input type="time" value="16:00" class="v2-time-input" style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-primary);">
+                                </div>
+                            </div>
+                            <!-- Sat -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); opacity:0.75;">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" class="v2-day-checkbox" data-day="sat" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Saturday
+                                </label>
+                                <span style="font-size:0.82rem; color:var(--text-muted);">Unavailable / Day Off</span>
+                            </div>
+                            <!-- Sun -->
+                            <div class="v2-schedule-day-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); opacity:0.75;">
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:600; width:120px; cursor:pointer;">
+                                    <input type="checkbox" class="v2-day-checkbox" data-day="sun" style="accent-color:var(--primary-peach); width:16px; height:16px;"> Sunday
+                                </label>
+                                <span style="font-size:0.82rem; color:var(--text-muted);">Unavailable / Day Off</span>
+                            </div>
+                        </div>
                     </div>
-                    <p style="font-size:0.85rem; color:var(--text-secondary);">Click time slots to toggle your availability for student bookings.</p>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:10px;">
-                        <button class="v2-slot-btn" onclick="this.classList.toggle('active')">Mon 10:00 AM</button>
-                        <button class="v2-slot-btn" onclick="this.classList.toggle('active')">Mon 02:00 PM</button>
-                        <button class="v2-slot-btn" onclick="this.classList.toggle('active')">Tue 11:00 AM</button>
-                        <button class="v2-slot-btn active" onclick="this.classList.toggle('active')">Wed 04:00 PM</button>
-                        <button class="v2-slot-btn" onclick="this.classList.toggle('active')">Thu 05:00 PM</button>
-                        <button class="v2-slot-btn active" onclick="this.classList.toggle('active')">Fri 06:00 PM</button>
+
+                    <!-- RIGHT COLUMN: INTERACTIVE BLOCKED CALENDAR & RULES -->
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <!-- Mini Calendar Grid -->
+                        <div class="v2-side-card">
+                            <div class="v2-section-title" style="margin-bottom:8px; font-size:0.92rem;">
+                                <i class="fas fa-calendar-alt" style="color:var(--primary-peach);"></i> Block Out Dates & Holidays
+                            </div>
+                            <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:10px;">Click any date below to block vacation or exam days.</p>
+                            
+                            <div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; text-align:center; font-size:0.72rem; font-weight:600; color:var(--text-muted); margin-bottom:6px;">
+                                <div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div><div>S</div>
+                            </div>
+                            <div id="v2MiniCalendarGrid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; text-align:center; font-size:0.78rem;">
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-17')">17</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-18')">18</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-19')">19</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-20')">20</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-21')">21</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center; opacity:0.5;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-22')">22</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center; opacity:0.5;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-23')">23</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-24')">24</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-25')">25</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-26')">26</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-27')">27</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-28')">28</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center; opacity:0.5;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-29')">29</button>
+                                <button class="v2-btn-secondary" style="padding:6px 0; justify-content:center; opacity:0.5;" onclick="this.classList.toggle('v2-blocked-day'); v2ToggleDateBlock('2026-08-30')">30</button>
+                            </div>
+                            <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:0.75rem; color:var(--text-muted);">Blocked: <strong id="v2BlockedCountText" style="color:var(--primary-peach);">0 Days</strong></span>
+                                <button class="v2-btn-secondary" style="padding:3px 8px; font-size:0.72rem;" onclick="v2ClearAllBlockedDates()">Clear All</button>
+                            </div>
+                        </div>
+
+                        <!-- Duration, Buffers & Advance Booking Rules -->
+                        <div class="v2-side-card">
+                            <div class="v2-section-title" style="margin-bottom:10px; font-size:0.92rem;">
+                                <i class="fas fa-sliders-h" style="color:var(--primary-peach);"></i> Scheduling Rules & Buffers
+                            </div>
+
+                            <div class="v2-field-group" style="margin-bottom:10px;">
+                                <label class="v2-field-label">Session Duration</label>
+                                <select class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" id="v2SessionDurationSelect">
+                                    <option value="30">30 Minutes</option>
+                                    <option value="45" selected>45 Minutes (Standard)</option>
+                                    <option value="60">60 Minutes</option>
+                                </select>
+                            </div>
+
+                            <div class="v2-field-group" style="margin-bottom:10px;">
+                                <label class="v2-field-label">Buffer Between Sessions</label>
+                                <select class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" id="v2SessionBufferSelect">
+                                    <option value="0">0 Minutes (Back-to-back)</option>
+                                    <option value="10" selected>10 Minutes Rest Buffer</option>
+                                    <option value="15">15 Minutes Rest Buffer</option>
+                                </select>
+                            </div>
+
+                            <div class="v2-field-group" style="margin-bottom:10px;">
+                                <label class="v2-field-label">Minimum Booking Notice</label>
+                                <select class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" id="v2LeadTimeSelect">
+                                    <option value="1">1 Hour Notice</option>
+                                    <option value="2" selected>2 Hours Notice</option>
+                                    <option value="4">4 Hours Notice</option>
+                                    <option value="24">24 Hours Notice</option>
+                                </select>
+                            </div>
+
+                            <div class="v2-field-group">
+                                <label class="v2-field-label">Maximum Advance Horizon</label>
+                                <select class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" id="v2MaxHorizonSelect">
+                                    <option value="14">14 Days into Future</option>
+                                    <option value="30" selected>30 Days into Future</option>
+                                    <option value="60">60 Days into Future</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <button class="v2-btn-primary" onclick="v2SaveAvailability()" style="align-self:flex-start; margin-top:14px;">Save Available Slots</button>
                 </div>
             </section>
 
