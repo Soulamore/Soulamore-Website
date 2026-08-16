@@ -13,9 +13,13 @@
     // Dashboard role requirements - STRICT ENFORCEMENT
     const ROLE_RULES = {
         'user-dashboard': ['user', 'member'],
+        'user-dashboard-v2': ['user', 'member'],
         'peer-dashboard': ['peer'],
+        'peer-dashboard-v2': ['peer'],
         'psych-dashboard': ['psychologist'],
-        'admin-dashboard': ['admin']
+        'psych-dashboard-v2': ['psychologist'],
+        'admin-dashboard': ['admin'],
+        'admin-dashboard-v2': ['admin']
     };
 
     // Get user's role via RoleHelper (Standardized)
@@ -35,13 +39,13 @@
     function redirectToDashboard(role) {
         const roleLower = role.toLowerCase();
 
-        // Map roles to dashboard URLs (absolute paths)
+        // Map roles to V2 dashboard URLs (absolute paths)
         const dashboardMap = {
-            'admin': '/portal/admin-dashboard.html',
-            'psychologist': '/portal/psych-dashboard.html',
-            'peer': '/portal/peer-dashboard.html',
-            'user': '/portal/user-dashboard.html',
-            'member': '/portal/user-dashboard.html'
+            'admin': '/portal/admin-dashboard-v2.html',
+            'psychologist': '/portal/psych-dashboard-v2.html',
+            'peer': '/portal/peer-dashboard-v2.html',
+            'user': '/portal/user-dashboard-v2.html',
+            'member': '/portal/user-dashboard-v2.html'
         };
 
         const targetDashboard = dashboardMap[roleLower] || dashboardMap['user'];
