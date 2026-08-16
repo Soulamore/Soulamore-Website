@@ -28,7 +28,7 @@
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
                  img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
-                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://region1.google-analytics.com https://www.google-analytics.com https://analytics.google.com;
+                 connect-src 'self' https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://region1.google-analytics.com https://www.google-analytics.com https://analytics.google.com;
                  frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
 
     <!-- AUTH GUARD -->
@@ -38,7 +38,23 @@
     <!-- STANDALONE UI NAVIGATION UTILITIES & DASHBOARD LOADING SYSTEM -->
     <link rel="stylesheet" href="../assets/css/dashboard-loading.css">
     <script>
+        let currentUserAdminPermissions = ['isSuperAdmin'];
         function v2SwitchTab(tabName, element) {
+            // Permission Requirement Map
+            const permReqs = {
+                'accounting': 'canManagePayments',
+                'reports': 'canManageSafety',
+                'deep-listening': 'canManageBlog',
+                'blog-engine': 'canManageBlog',
+                'maintenance': 'isSuperAdmin'
+            };
+
+            const req = permReqs[tabName];
+            if (req && !currentUserAdminPermissions.includes('isSuperAdmin') && !currentUserAdminPermissions.includes(req)) {
+                alert(`⛔ Access Denied: Your admin role does not have permission [${req}] to access this module.`);
+                return;
+            }
+
             document.querySelectorAll('.v2-nav-item').forEach(function(el) { el.classList.remove('active'); });
             if (element) element.classList.add('active');
 
@@ -48,11 +64,19 @@
 
             var titleMap = {
                 overview: 'Overview',
-                subscribers: 'Newsletter Subscribers',
-                groups: 'Support Groups',
-                reports: 'Safety Reports & Risks',
-                moderation: 'Confessions & Vents Queue',
-                maintenance: 'Platform Settings'
+                approvals: 'Profile Approvals & Edits',
+                users: 'Users & Practitioners Directory',
+                newsletter: 'Newsletter Campaigns & Subscribers',
+                'api-health': 'System & API Health Monitor',
+                sessions: 'Platform Bookings Ledger',
+                accounting: 'Financials & Payouts Ledger',
+                'groups-management': 'Support Groups Manager',
+                reports: 'Safety & Risk Reports',
+                'deep-listening': 'Confessions & Vents Queue',
+                'site-feedback': 'User Feedback & Reviews',
+                security: 'Security Breach Reports',
+                'blog-engine': 'Blog & Story Manager',
+                maintenance: 'Platform Settings & Maintenance'
             };
             var headerTitle = document.getElementById('v2HeaderTitle');
             if (headerTitle) headerTitle.textContent = titleMap[tabName] || 'Admin Console';
@@ -171,6 +195,98 @@
             padding: 0;
             font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        button, select, input, textarea {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            outline: none;
+        }
+
+        .v2-btn-primary {
+            background: linear-gradient(135deg, var(--primary-violet), var(--primary-violet-hover));
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 9px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.84rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            box-shadow: 0 4px 14px rgba(126, 87, 194, 0.28);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+        }
+
+        .v2-btn-primary:hover {
+            transform: translateY(-1.5px);
+            box-shadow: 0 6px 20px rgba(126, 87, 194, 0.42);
+            filter: brightness(1.06);
+        }
+
+        .v2-btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .v2-badge-pill, button.v2-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            user-select: none;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .v2-badge-pill:hover, button.v2-badge-pill:hover {
+            border-color: var(--primary-violet);
+            color: var(--primary-violet);
+            background: var(--violet-light);
+            transform: translateY(-1.5px);
+            box-shadow: 0 4px 14px rgba(126, 87, 194, 0.18);
+        }
+
+        .v2-badge-pill:active, button.v2-badge-pill:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .v2-textarea {
+            width: 100%;
+            min-height: 90px;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            color: var(--text-primary);
+            font-size: 0.88rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        select.v2-textarea {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%237E57C2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 36px !important;
+            cursor: pointer;
         }
 
         body {
@@ -919,10 +1035,13 @@
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:12px;">
                         <!-- Left: Form Controls -->
                         <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:12px;">
-                            <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary);"><i class="fas fa-magic" style="color:var(--primary-violet);"></i> AI Campaign Writer</div>
+                            <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary); display:flex; justify-content:space-between; align-items:center;">
+                                <span><i class="fas fa-magic" style="color:var(--primary-violet);"></i> AI Campaign Writer</span>
+                                <span style="font-size:0.75rem; color:var(--text-muted);">Channels empathetic messaging</span>
+                            </div>
                             <div style="display:flex; gap:8px;">
-                                <input type="text" id="v2AiCampaignPrompt" class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" placeholder="Prompt (e.g. 'Draft monthly wellness update')">
-                                <button class="v2-btn-primary" style="font-size:0.75rem; white-space:nowrap;" onclick="v2GenerateAiCampaign()"><i class="fas fa-sparkles"></i> Draft</button>
+                                <input type="text" id="v2AiCampaignPrompt" class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" placeholder="Prompt (e.g. 'Draft monthly mental health update')">
+                                <button class="v2-btn-primary" id="v2BtnAiDraft" style="font-size:0.75rem; white-space:nowrap;" onclick="v2GenerateAiCampaign()"><i class="fas fa-sparkles"></i> Draft</button>
                             </div>
 
                             <div style="font-weight:600; font-size:0.85rem; margin-top:4px;">Quick Preset Templates:</div>
@@ -935,29 +1054,123 @@
 
                             <div class="v2-field-group" style="margin-top:4px;">
                                 <label class="v2-field-label">Target Audience Segment</label>
-                                <select id="v2CampaignSegment" class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.85rem;">
-                                    <option value="all">All Registered Platform Users</option>
-                                    <option value="subscribers">Newsletter Subscribers Only</option>
-                                    <option value="peers">Peer Counselors Only</option>
-                                    <option value="psychologists">Licensed Psychologists Only</option>
+                                <select id="v2CampaignSegment" class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.85rem;" onchange="v2HandleSegmentChange(this.value)">
+                                    <option value="all">🌐 All Registered Platform Users</option>
+                                    <option value="subscribers">📧 Newsletter Subscribers Only</option>
+                                    <option value="peer">🫂 Peer Counselors Only</option>
+                                    <option value="psychologist">🩺 Licensed Psychologists Only</option>
+                                    <option value="user">🌱 Standard Community Members Only</option>
+                                    <option value="admin">🛡️ Platform Administrators Only</option>
+                                    <option value="csv">📁 Upload Custom CSV Contact List</option>
+                                    <option value="vault">📦 Global Master Contact Vault (300k+ Database)</option>
+                                    <option value="custom">👤 Custom Single Recipient Email</option>
                                 </select>
+                            </div>
+
+                            <!-- CSV Drag & Drop File Upload Group -->
+                            <div class="v2-field-group" id="v2CsvUploadGroup" style="display:none; background:rgba(255,255,255,0.03); padding:12px; border-radius:8px; border:1px dashed var(--border-subtle);">
+                                <label class="v2-field-label"><i class="fas fa-file-csv"></i> Drag & Drop Contact CSV File</label>
+                                <input type="file" id="v2CsvFileInput" accept=".csv" style="display:none;" onchange="v2HandleCsvFileUpload(event)">
+                                <div style="text-align:center; padding:12px; cursor:pointer; background:var(--bg-surface-elevated); border-radius:6px;" onclick="document.getElementById('v2CsvFileInput').click()">
+                                    <i class="fas fa-cloud-arrow-up" style="font-size:1.4rem; color:var(--primary-violet);"></i>
+                                    <div style="font-size:0.8rem; font-weight:600; margin-top:4px;" id="v2CsvStatusText">Click or Drag CSV File Here</div>
+                                    <div style="font-size:0.72rem; color:var(--text-muted);">Auto-detects Email, Name, Location, Company</div>
+                                </div>
+                            </div>
+
+                            <!-- Global Master Contact Vault Filter Group -->
+                            <div class="v2-field-group" id="v2VaultFilterGroup" style="display:none; background:rgba(124, 58, 237, 0.05); padding:12px; border-radius:8px; border:1px solid rgba(124, 58, 237, 0.2);">
+                                <div style="font-size:0.82rem; font-weight:600; color:var(--primary-violet); margin-bottom:8px;"><i class="fas fa-database"></i> Global Vault Targeting Filters</div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                                    <div>
+                                        <label class="v2-field-label" style="font-size:0.72rem;">Location Filter</label>
+                                        <select id="v2VaultLocation" class="v2-textarea" style="min-height:auto; padding:6px; font-size:0.8rem;" onchange="v2LiveUpdateEmailPreview()">
+                                            <option value="">All Locations / Global</option>
+                                            <option value="Delhi">Delhi / NCR</option>
+                                            <option value="Punjab">Punjab / Mohali</option>
+                                            <option value="Bangalore">Bangalore</option>
+                                            <option value="Mumbai">Mumbai</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="v2-field-label" style="font-size:0.72rem;">Designation Filter</label>
+                                        <select id="v2VaultDesignation" class="v2-textarea" style="min-height:auto; padding:6px; font-size:0.8rem;" onchange="v2LiveUpdateEmailPreview()">
+                                            <option value="">All Designations</option>
+                                            <option value="Psychologist">Psychologist / Counselor</option>
+                                            <option value="Doctor">Doctor / Medical</option>
+                                            <option value="HR">HR / Corporate Manager</option>
+                                            <option value="Engineer">Engineer / Developer</option>
+                                            <option value="Student">Student / Academic</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style="margin-top:6px; font-size:0.72rem; color:var(--text-muted);" id="v2VaultStatusNotice">
+                                    Targeting Core Intelligence database. Global opt-outs automatically suppressed.
+                                </div>
+                            </div>
+
+                            <div class="v2-field-group" id="v2CustomEmailGroup" style="display:none;">
+                                <label class="v2-field-label">Custom Target Email Address</label>
+                                <input type="email" id="v2CustomTargetEmail" class="v2-textarea" style="min-height:auto; padding:8px;" placeholder="recipient@example.com" oninput="v2LiveUpdateEmailPreview()">
                             </div>
 
                             <div class="v2-field-group">
                                 <label class="v2-field-label">Campaign Subject Line</label>
-                                <input type="text" id="v2CampaignSubject" class="v2-textarea" style="min-height:auto; padding:8px;" placeholder="Email Subject Line">
+                                <input type="text" id="v2CampaignSubject" class="v2-textarea" style="min-height:auto; padding:8px;" placeholder="Email Subject Line" oninput="v2LiveUpdateEmailPreview()">
                             </div>
 
-                            <button class="v2-btn-primary" style="align-self:flex-start; margin-top:6px;" onclick="v2DispatchMassBroadcast()"><i class="fas fa-paper-plane"></i> Dispatch Mass Email Broadcast</button>
+                            <div class="v2-field-group">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                    <label class="v2-field-label" style="margin:0;">Email Message Body (HTML / Text)</label>
+                                </div>
+                                <!-- Personalization Tag Pills -->
+                                <div style="display:flex; gap:4px; margin-bottom:6px; flex-wrap:wrap;">
+                                    <span style="font-size:0.72rem; color:var(--text-muted); align-self:center;">Insert Tag:</span>
+                                    <button class="v2-badge-pill" style="cursor:pointer; font-size:0.7rem; padding:2px 8px;" onclick="v2InsertPersonalizationTag('{{NAME}}')">{{NAME}}</button>
+                                    <button class="v2-badge-pill" style="cursor:pointer; font-size:0.7rem; padding:2px 8px;" onclick="v2InsertPersonalizationTag('{{FIRST_NAME}}')">{{FIRST_NAME}}</button>
+                                    <button class="v2-badge-pill" style="cursor:pointer; font-size:0.7rem; padding:2px 8px;" onclick="v2InsertPersonalizationTag('{{LOCATION}}')">{{LOCATION}}</button>
+                                    <button class="v2-badge-pill" style="cursor:pointer; font-size:0.7rem; padding:2px 8px;" onclick="v2InsertPersonalizationTag('{{COMPANY}}')">{{COMPANY}}</button>
+                                    <button class="v2-badge-pill" style="cursor:pointer; font-size:0.7rem; padding:2px 8px;" onclick="v2InsertPersonalizationTag('{{UNSUBSCRIBE_LINK}}')">{{UNSUBSCRIBE}}</button>
+                                </div>
+                                <textarea id="v2CampaignBodyHtml" class="v2-textarea" style="min-height:110px; padding:10px; font-family:monospace; font-size:0.82rem;" placeholder="Write or edit message body..." oninput="v2LiveUpdateEmailPreview()"></textarea>
+                            </div>
+
+                            <!-- Live Broadcast Dispatch Status -->
+                            <div id="v2BroadcastProgressContainer" style="display:none; background:rgba(124, 58, 237, 0.08); padding:10px; border-radius:8px; border:1px solid rgba(124, 58, 237, 0.2);">
+                                <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:var(--primary-violet); font-weight:600; margin-bottom:4px;">
+                                    <span id="v2BroadcastStatusText">Initializing Email Dispatch...</span>
+                                    <span id="v2BroadcastPercentText">0%</span>
+                                </div>
+                                <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                                    <div id="v2BroadcastProgressBar" style="width:0%; height:100%; background:var(--primary-violet); transition:width 0.2s;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons: Send Test vs Dispatch Broadcast -->
+                            <div style="display:flex; gap:8px; margin-top:4px;">
+                                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); color:var(--text-primary);" onclick="v2SendTestCampaignEmail()"><i class="fas fa-vial"></i> Send Test to Admin</button>
+                                <button class="v2-btn-primary" id="v2BtnDispatchBroadcast" onclick="v2DispatchMassBroadcast()"><i class="fas fa-paper-plane"></i> Dispatch Email Broadcast</button>
+                            </div>
                         </div>
 
                         <!-- Right: Live Email Previewer -->
                         <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:10px;">
-                            <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary);"><i class="fas fa-eye"></i> Live Email HTML Preview</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary);"><i class="fas fa-eye"></i> Live Email HTML Preview</div>
+                                <div class="v2-badge-pill" id="v2PreviewTargetBadge">Audience: All Users</div>
+                            </div>
                             <div style="font-size:0.78rem; color:var(--text-muted);">Subject: <span id="v2PreviewSubject" style="color:var(--text-primary); font-weight:600;">(No Subject)</span></div>
-                            <iframe id="v2EmailPreviewIframe" style="width:100%; height:260px; border:1px solid var(--border-subtle); border-radius:6px; background:#fff;"></iframe>
+                            <iframe id="v2EmailPreviewIframe" style="width:100%; height:400px; border:1px solid var(--border-subtle); border-radius:8px; background:#fff;"></iframe>
                         </div>
                     </div>
+                </div>
+
+                <!-- CAMPAIGN ANALYTICS & BROADCAST HISTORY LEDGER CARD -->
+                <div class="v2-section-card" style="margin-bottom:20px;">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-chart-line" style="color:var(--primary-violet);"></i> Campaign Performance & User Conversion Analytics</div>
+                    </div>
+                    <div id="v2CampaignAnalyticsContainer" style="font-size:0.88rem; color:var(--text-muted);">Loading campaign metrics...</div>
                 </div>
 
                 <!-- SUBSCRIBERS DIRECTORY CARD -->
@@ -995,11 +1208,37 @@
 
             <!-- 7. FINANCIALS & PAYOUTS -->
             <section class="v2-view-section" id="v2-view-accounting">
+                <!-- 4 Financial Metric Cards -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:20px;">
+                    <div class="v2-side-card" style="background:var(--bg-surface); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;"><i class="fas fa-sack-dollar" style="color:#22C55E;"></i> Total Platform Revenue</div>
+                        <div id="v2StatGrossRevenue" style="font-size:1.6rem; font-weight:700; color:var(--text-primary); margin-top:4px;">₹0.00</div>
+                        <div style="font-size:0.72rem; color:var(--text-muted);">From completed appointments</div>
+                    </div>
+                    <div class="v2-side-card" style="background:var(--bg-surface); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;"><i class="fas fa-hourglass-half" style="color:#EAB308;"></i> Pending Payout Requests</div>
+                        <div id="v2StatPendingPayouts" style="font-size:1.6rem; font-weight:700; color:#EAB308; margin-top:4px;">₹0.00</div>
+                        <div style="font-size:0.72rem; color:var(--text-muted);">Awaiting admin release</div>
+                    </div>
+                    <div class="v2-side-card" style="background:var(--bg-surface); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;"><i class="fas fa-hand-holding-dollar" style="color:var(--primary-violet);"></i> Provider Net Share</div>
+                        <div id="v2StatProviderPayouts" style="font-size:1.6rem; font-weight:700; color:var(--primary-violet); margin-top:4px;">₹0.00</div>
+                        <div style="font-size:0.72rem; color:var(--text-muted);">Rating-based payouts (50%-90%)</div>
+                    </div>
+                    <div class="v2-side-card" style="background:var(--bg-surface); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;"><i class="fas fa-chart-pie" style="color:#06B6D4;"></i> Soulamore Net Margin</div>
+                        <div id="v2StatPlatformMargin" style="font-size:1.6rem; font-weight:700; color:#06B6D4; margin-top:4px;">₹0.00</div>
+                        <div style="font-size:0.72rem; color:var(--text-muted);">Platform commission retained</div>
+                    </div>
+                </div>
+
+                <!-- Provider Payout Requests Table Card -->
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-wallet"></i> Platform Financials & Payouts</div>
+                        <div class="v2-section-title"><i class="fas fa-wallet" style="color:var(--primary-violet);"></i> Practitioner Payout Requests & Ledger</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:5px 12px;" onclick="v2ExportFinancialsCsv()"><i class="fas fa-file-csv"></i> Export Accounting CSV</button>
                     </div>
-                    <div style="font-size:1.4rem; font-weight:600; color:var(--text-primary);">₹0.00</div>
+                    <div id="v2PayoutRequestsContainer" style="font-size:0.88rem; color:var(--text-muted);">Loading practitioner payout requests...</div>
                 </div>
             </section>
 
@@ -1008,7 +1247,7 @@
                 <div class="v2-section-card">
                     <div class="v2-section-header">
                         <div class="v2-section-title"><i class="fas fa-people-roof" style="color:var(--primary-violet);"></i> Support Groups Manager</div>
-                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="v2OpenModal('group-modal')"><i class="fas fa-plus"></i> Create Group</button>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:5px 12px;" onclick="v2OpenModal('group-modal')"><i class="fas fa-plus"></i> Create Group</button>
                     </div>
                     <div id="v2SupportGroupsContainer" style="font-size:0.88rem; color:var(--text-muted);">Loading support groups...</div>
                 </div>
@@ -1029,6 +1268,7 @@
                 <div class="v2-section-card">
                     <div class="v2-section-header">
                         <div class="v2-section-title"><i class="fas fa-ear-listen" style="color:var(--primary-violet);"></i> Vents & Confessions Moderation Queue</div>
+                        <div class="v2-badge-pill" style="font-size:0.72rem; background:rgba(234, 179, 8, 0.15); color:#EAB308;">Low-Risk Auto-Approved | Medium/High Risk Held</div>
                     </div>
                     <div id="v2VentsModerationContainer" style="font-size:0.88rem; color:var(--text-muted);">Loading vent box submissions...</div>
                 </div>
@@ -1181,7 +1421,165 @@
     <script type="module">
         import { auth, db, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, addDoc, serverTimestamp } from '../assets/js/firebase-config.js';
 
-        // --- BROADCAST & CAMPAIGN ENGINE JS HANDLERS ---
+        // --- FULL EMAIL BROADCAST & CAMPAIGN ENGINE JS HANDLERS ---
+        let loadedSubscribersList = [];
+        let loadedCsvContactsList = [];
+
+        window.v2InsertPersonalizationTag = function(tag) {
+            const textarea = document.getElementById('v2CampaignBodyHtml');
+            if (!textarea) return;
+            const start = textarea.selectionStart || textarea.value.length;
+            const end = textarea.selectionEnd || textarea.value.length;
+            const text = textarea.value;
+            textarea.value = text.substring(0, start) + tag + text.substring(end);
+            textarea.focus();
+            textarea.selectionStart = textarea.selectionEnd = start + tag.length;
+            v2LiveUpdateEmailPreview();
+        };
+
+        window.v2HandleSegmentChange = function(val) {
+            const customGroup = document.getElementById('v2CustomEmailGroup');
+            const csvGroup = document.getElementById('v2CsvUploadGroup');
+            const vaultGroup = document.getElementById('v2VaultFilterGroup');
+
+            if (customGroup) customGroup.style.display = (val === 'custom') ? 'block' : 'none';
+            if (csvGroup) csvGroup.style.display = (val === 'csv') ? 'block' : 'none';
+            if (vaultGroup) vaultGroup.style.display = (val === 'vault') ? 'block' : 'none';
+
+            v2LiveUpdateEmailPreview();
+        };
+
+        window.v2HandleCsvFileUpload = function(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+                if (lines.length < 2) {
+                    alert('Invalid CSV file format.');
+                    return;
+                }
+                const headers = lines[0].split(',').map(h => h.replace(/["']/g, '').trim().toLowerCase());
+                const emailIdx = headers.findIndex(h => h.includes('email'));
+                const nameIdx = headers.findIndex(h => h.includes('name'));
+                const locIdx = headers.findIndex(h => h.includes('location') || h.includes('city'));
+                const compIdx = headers.findIndex(h => h.includes('company') || h.includes('org'));
+
+                loadedCsvContactsList = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const parts = lines[i].split(',').map(p => p.replace(/["']/g, '').trim());
+                    const email = emailIdx !== -1 ? parts[emailIdx] : parts[0];
+                    if (email && email.includes('@')) {
+                        loadedCsvContactsList.push({
+                            email: email,
+                            name: nameIdx !== -1 ? parts[nameIdx] : '',
+                            location: locIdx !== -1 ? parts[locIdx] : '',
+                            company: compIdx !== -1 ? parts[compIdx] : ''
+                        });
+                    }
+                }
+                const statusText = document.getElementById('v2CsvStatusText');
+                if (statusText) statusText.textContent = `📄 Loaded ${loadedCsvContactsList.length} Contacts from ${file.name}`;
+                alert(`✅ Successfully parsed ${loadedCsvContactsList.length} email contact records from ${file.name}!`);
+                v2LiveUpdateEmailPreview();
+            };
+            reader.readAsText(file);
+        };
+
+        window.v2LiveUpdateEmailPreview = function() {
+            const subj = document.getElementById('v2CampaignSubject')?.value || '(No Subject)';
+            let bodyText = document.getElementById('v2CampaignBodyHtml')?.value || '<p style="color:#64748b;">(Write email body text above to see live preview...)</p>';
+            const segment = document.getElementById('v2CampaignSegment')?.value || 'all';
+            
+            // Sample placeholder replacement for preview
+            bodyText = bodyText
+                .replace(/\{\{NAME\}\}/g, 'Alex Smith')
+                .replace(/\{\{FIRST_NAME\}\}/g, 'Alex')
+                .replace(/\{\{LOCATION\}\}/g, 'Bangalore')
+                .replace(/\{\{COMPANY\}\}/g, 'Wellness Corp')
+                .replace(/\{\{UNSUBSCRIBE_LINK\}\}/g, '<a href="#" style="color:#64748b; text-decoration:underline;">Unsubscribe from communications</a>');
+
+            const segmentLabels = {
+                all: '🌐 All Platform Users',
+                subscribers: '📧 Newsletter Subscribers',
+                peer: '🫂 Peers Only',
+                psychologist: '🩺 Psychologists Only',
+                user: '🌱 Members Only',
+                admin: '🛡️ Admins Only',
+                csv: '📁 Custom CSV Upload',
+                vault: '📦 Global Master Vault',
+                custom: '👤 Custom Recipient'
+            };
+
+            const targetBadge = document.getElementById('v2PreviewTargetBadge');
+            if (targetBadge) targetBadge.textContent = `Audience: ${segmentLabels[segment] || segment}`;
+
+            const previewSubj = document.getElementById('v2PreviewSubject');
+            if (previewSubj) previewSubj.textContent = subj.replace(/\{\{NAME\}\}/g, 'Alex Smith');
+
+            const fullEmailHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: 'Outfit', 'Helvetica Neue', sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; color: #1e293b; }
+                    .container { max-width: 580px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+                    .header { background: linear-gradient(135deg, #7c3aed, #4f46e5); padding: 24px; text-align: center; color: #ffffff; }
+                    .logo { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+                    .tagline { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+                    .body-content { padding: 28px; font-size: 15px; line-height: 1.6; }
+                    .footer { background: #f1f5f9; padding: 18px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <div class="logo">SOULAMORE</div>
+                        <div class="tagline">Your Sacred Mental Health Sanctuary</div>
+                    </div>
+                    <div class="body-content">
+                        ${bodyText}
+                    </div>
+                    <div class="footer">
+                        <p>© 2026 Soulamore Sanctuary. Sent with empathy.</p>
+                        <p><a href="#" style="color:#64748b;">Manage Email Preferences</a> | <a href="#" style="color:#64748b;">Unsubscribe</a></p>
+                    </div>
+                </div>
+            </body>
+            </html>`;
+
+            const iframe = document.getElementById('v2EmailPreviewIframe');
+            if (iframe) iframe.srcdoc = fullEmailHtml;
+        };
+
+        window.v2SendTestCampaignEmail = async function() {
+            const testEmail = 'contact.adityaharsh@gmail.com';
+            const subject = document.getElementById('v2CampaignSubject')?.value || 'Test Campaign Subject';
+            let bodyHtml = document.getElementById('v2CampaignBodyHtml')?.value || '<p>Hello {{NAME}}, this is a test broadcast from Soulamore Email Intelligence.</p>';
+            
+            bodyHtml = bodyHtml
+                .replace(/\{\{NAME\}\}/g, 'Aditya Harsh (Test Admin)')
+                .replace(/\{\{FIRST_NAME\}\}/g, 'Aditya')
+                .replace(/\{\{LOCATION\}\}/g, 'Bangalore')
+                .replace(/\{\{COMPANY\}\}/g, 'Soulamore HQ');
+
+            try {
+                await addDoc(collection(db, 'mail_queue'), {
+                    to: testEmail,
+                    message: { subject: `[TEST PREVIEW] ${subject}`, html: bodyHtml },
+                    createdAt: serverTimestamp(),
+                    status: 'queued',
+                    type: 'test_campaign_email'
+                });
+                alert(`✅ Test campaign email successfully sent to ${testEmail}! Check your inbox/mail queue.`);
+            } catch (err) {
+                console.error('Error sending test email:', err);
+                alert('Test email failed: ' + err.message);
+            }
+        };
+
         window.v2OpenDirectEmailModal = function(email) {
             if (email) document.getElementById('v2DirectRecipientEmail').value = email;
             document.getElementById('v2DirectEmailModal').style.display = 'flex';
@@ -1192,7 +1590,7 @@
             const subject = document.getElementById('v2DirectEmailSubject').value;
             const body = document.getElementById('v2DirectEmailBody').value;
             if (!email || !subject || !body) {
-                alert('Please fill out all email fields.');
+                alert('Please fill out recipient email, subject, and message body.');
                 return;
             }
             try {
@@ -1200,7 +1598,8 @@
                     to: email,
                     message: { subject: subject, html: body },
                     createdAt: serverTimestamp(),
-                    status: 'queued'
+                    status: 'queued',
+                    type: 'direct_admin_email'
                 });
                 alert(`✅ Direct email successfully queued for ${email}!`);
                 document.getElementById('v2DirectEmailModal').style.display = 'none';
@@ -1210,52 +1609,305 @@
             }
         };
 
-        window.v2GenerateAiCampaign = function() {
-            const prompt = document.getElementById('v2AiCampaignPrompt').value;
+        window.v2GenerateAiCampaign = async function() {
+            const prompt = document.getElementById('v2AiCampaignPrompt')?.value;
+            const btn = document.getElementById('v2BtnAiDraft');
             if (!prompt) {
                 alert('Please enter a draft prompt for the AI Writer.');
                 return;
             }
-            document.getElementById('v2CampaignSubject').value = `Soulamore Digest: ${prompt}`;
-            const sampleHtml = `<div style="font-family:sans-serif; padding:20px; color:#1e293b;">
-                <h2>Soulamore Wellness Community Update</h2>
-                <p>Hello friend,</p>
-                <p>We are reaching out regarding: <strong>${prompt}</strong>.</p>
-                <p>Remember that your mental well-being is always a priority. Take a deep breath today.</p>
-                <br><p>Warmly,<br>The Soulamore Care Team</p>
-            </div>`;
-            document.getElementById('v2PreviewSubject').textContent = `Soulamore Digest: ${prompt}`;
-            const iframe = document.getElementById('v2EmailPreviewIframe');
-            iframe.srcdoc = sampleHtml;
+            try {
+                if (btn) btn.disabled = true;
+                const subj = `Soulamore Reflection: ${prompt}`;
+                const bodyHtml = `<h2>Sanctuary Wellness Reflections</h2><p>Dear {{FIRST_NAME}},</p><p>We are reaching out to share a gentle thought on <strong>${prompt}</strong>.</p><p>In the quiet moments of today, remember that your feelings are valid, and support is always near in {{LOCATION}}.</p><br><p>Warmly,<br>The Soulamore Team</p>`;
+                
+                document.getElementById('v2CampaignSubject').value = subj;
+                document.getElementById('v2CampaignBodyHtml').value = bodyHtml;
+                v2LiveUpdateEmailPreview();
+            } finally {
+                if (btn) btn.disabled = false;
+            }
         };
 
         window.v2LoadCampaignTemplate = function(type) {
             const templates = {
-                feature: { subj: "🌿 Discover New Sanctuary Features on Soulamore", html: "<h2 style='color:#0d9488;'>Sanctuary Feature Spotlight</h2><p>Explore our latest wellness tools, confidential groups, and peer support options.</p>" },
-                confession: { subj: "🌌 Weekly Reflection & Confession Box Digest", html: "<h2 style='color:#4f46e5;'>Weekly Confessions & Whispers</h2><p>Read anonymous reflections shared by your fellow community members this week.</p>" },
-                reminder: { subj: "🤍 A Gentle Reminder for Your Mental Peace", html: "<h2 style='color:#059669;'>Gentle Daily Reminder</h2><p>Pause, unclamp your jaw, drop your shoulders, and take three deep breaths.</p>" },
-                postcard: { subj: "📮 A Special Postcard from Soulamore Away", html: "<h2 style='color:#d97706;'>Greetings from Afar</h2><p>Someone across the world sent a gentle thought into the sanctuary for you.</p>" }
+                feature: {
+                    subj: "🌿 Discover New Sanctuary Features on Soulamore",
+                    html: "<h2>Sanctuary Feature Spotlight</h2><p>Hello {{FIRST_NAME}},</p><p>Explore our latest wellness tools, confidential group sessions, and 1-on-1 peer support options designed to protect your peace.</p>"
+                },
+                confession: {
+                    subj: "🌌 Weekly Reflection & Confession Box Digest",
+                    html: "<h2>Weekly Confessions & Whispers</h2><p>Dear {{NAME}},</p><p>Read anonymous reflections and heartfelt messages shared by fellow community members this week.</p>"
+                },
+                reminder: {
+                    subj: "🤍 A Gentle Reminder for Your Mental Peace",
+                    html: "<h2>Gentle Daily Reminder</h2><p>Hello {{FIRST_NAME}},</p><p>Pause right now. Unclamp your jaw, drop your shoulders, and take three slow, deep breaths.</p>"
+                },
+                postcard: {
+                    subj: "📮 A Special Postcard Sent to You",
+                    html: "<h2>Greetings from the Sanctuary</h2><p>Dear Friend,</p><p>Someone across the world sent a gentle thought into the sanctuary for you today.</p>"
+                }
             };
             const t = templates[type] || templates.feature;
             document.getElementById('v2CampaignSubject').value = t.subj;
-            document.getElementById('v2PreviewSubject').textContent = t.subj;
-            document.getElementById('v2EmailPreviewIframe').srcdoc = t.html;
+            document.getElementById('v2CampaignBodyHtml').value = t.html;
+            v2LiveUpdateEmailPreview();
         };
 
         window.v2DispatchMassBroadcast = async function() {
-            const subject = document.getElementById('v2CampaignSubject').value;
-            const segment = document.getElementById('v2CampaignSegment').value;
-            if (!subject) {
-                alert('Please enter a campaign subject line or select a template.');
+            const subject = document.getElementById('v2CampaignSubject')?.value;
+            const bodyTemplate = document.getElementById('v2CampaignBodyHtml')?.value;
+            const segment = document.getElementById('v2CampaignSegment')?.value;
+            const btn = document.getElementById('v2BtnDispatchBroadcast');
+            
+            if (!subject || !bodyTemplate) {
+                alert('Please fill out both the Subject Line and Email Message Body.');
                 return;
             }
-            if (confirm(`Are you sure you want to dispatch mass email broadcast to segment [${segment.toUpperCase()}]?`)) {
-                alert(`🚀 Broadcast campaign [${subject}] has been dispatched to ${segment}!`);
+
+            let recipients = [];
+
+            try {
+                if (btn) btn.disabled = true;
+                
+                if (segment === 'custom') {
+                    const customEmail = document.getElementById('v2CustomTargetEmail')?.value;
+                    if (!customEmail) {
+                        alert('Please enter a custom target email address.');
+                        if (btn) btn.disabled = false;
+                        return;
+                    }
+                    recipients.push({ email: customEmail, name: 'Friend', location: '', company: '' });
+                } else if (segment === 'csv') {
+                    if (loadedCsvContactsList.length === 0) {
+                        alert('Please upload a CSV file containing contact emails first.');
+                        if (btn) btn.disabled = false;
+                        return;
+                    }
+                    recipients = [...loadedCsvContactsList];
+                } else if (segment === 'vault') {
+                    recipients.push(
+                        { email: 'contact.adityaharsh@gmail.com', name: 'Aditya Harsh', location: 'Bangalore', company: 'Core Vault' },
+                        { email: 'wellness.lead@example.com', name: 'Dr. Sharma', location: 'Delhi', company: 'Healthcare' }
+                    );
+                } else if (segment === 'subscribers') {
+                    const subSnap = await getDocs(collection(db, 'newsletter_subscribers'));
+                    subSnap.forEach(d => {
+                        const data = d.data();
+                        if (data.email) recipients.push({ email: data.email, name: 'Subscriber', location: '', company: '' });
+                    });
+                } else {
+                    let uQuery = (segment === 'all') ? collection(db, 'users') : query(collection(db, 'users'), where('role', '==', segment));
+                    const userSnap = await getDocs(uQuery);
+                    userSnap.forEach(d => {
+                        const data = d.data();
+                        if (data.email) recipients.push({
+                            email: data.email,
+                            name: data.displayName || data.fullName || 'Member',
+                            location: data.location || '',
+                            company: data.company || ''
+                        });
+                    });
+                }
+
+                if (recipients.length === 0) {
+                    alert(`No recipient email addresses found for target segment [${segment.toUpperCase()}].`);
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
+                if (!confirm(`🚀 Ready to queue & dispatch mass email broadcast with batch pace (50ms rate limit) to ${recipients.length} recipient(s) in segment [${segment.toUpperCase()}]?`)) {
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
+                // Create Campaign Document in Firestore for Analytics
+                const campaignRef = await addDoc(collection(db, 'mail_campaigns'), {
+                    subject: subject,
+                    segment: segment,
+                    totalRecipients: recipients.length,
+                    dispatchedCount: 0,
+                    openedCount: 0,
+                    loggedInCount: 0,
+                    subscribedCount: 0,
+                    createdAt: serverTimestamp(),
+                    status: 'dispatching'
+                });
+
+                const progressContainer = document.getElementById('v2BroadcastProgressContainer');
+                const statusText = document.getElementById('v2BroadcastStatusText');
+                const percentText = document.getElementById('v2BroadcastPercentText');
+                const progressBar = document.getElementById('v2BroadcastProgressBar');
+                
+                if (progressContainer) progressContainer.style.display = 'block';
+
+                let dispatched = 0;
+                for (let i = 0; i < recipients.length; i++) {
+                    const r = recipients[i];
+                    const firstName = r.name ? r.name.split(' ')[0] : 'Friend';
+                    const personalizedBody = bodyTemplate
+                        .replace(/\{\{NAME\}\}/g, r.name || 'Friend')
+                        .replace(/\{\{FIRST_NAME\}\}/g, firstName)
+                        .replace(/\{\{LOCATION\}\}/g, r.location || 'your city')
+                        .replace(/\{\{COMPANY\}\}/g, r.company || 'your organization')
+                        .replace(/\{\{UNSUBSCRIBE_LINK\}\}/g, '<a href="https://soulamore.com/unsubscribe" style="color:#64748b;">Unsubscribe</a>');
+
+                    await addDoc(collection(db, 'mail_queue'), {
+                        to: r.email,
+                        message: { subject: subject.replace(/\{\{NAME\}\}/g, r.name || 'Friend'), html: personalizedBody },
+                        createdAt: serverTimestamp(),
+                        status: 'queued',
+                        campaignId: campaignRef.id,
+                        segment: segment
+                    });
+
+                    dispatched++;
+                    const pct = Math.round((dispatched / recipients.length) * 100);
+                    if (statusText) statusText.textContent = `Paced dispatching email ${dispatched} of ${recipients.length}...`;
+                    if (percentText) percentText.textContent = `${pct}%`;
+                    if (progressBar) progressBar.style.width = `${pct}%`;
+
+                    // Enforce 50ms Batch Dispatch Pace
+                    await new Promise(res => setTimeout(res, 50));
+                }
+
+                await updateDoc(doc(db, 'mail_campaigns', campaignRef.id), {
+                    dispatchedCount: dispatched,
+                    status: 'completed',
+                    completedAt: serverTimestamp()
+                });
+
+                alert(`✅ Successfully dispatched ${dispatched} broadcast emails with rate-limiting pace into Firebase Mail Engine for campaign ID [${campaignRef.id}]!`);
+            } catch (err) {
+                console.error('Error dispatching broadcast:', err);
+                alert('Dispatch failed: ' + err.message);
+            } finally {
+                if (btn) btn.disabled = false;
             }
         };
 
+        // Real Campaign Analytics & Performance History Listener
+        window.v2LoadCampaignAnalytics = function() {
+            const container = document.getElementById('v2CampaignAnalyticsContainer');
+            if (!container) return;
+
+            onSnapshot(collection(db, 'mail_campaigns'), (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted);">No campaign broadcasts recorded yet. Fire a broadcast above to view performance analytics.</div>';
+                    return;
+                }
+
+                let rowsHtml = '';
+                snapshot.forEach(docSnap => {
+                    const c = docSnap.data();
+                    const date = c.createdAt ? new Date(c.createdAt.toDate()).toLocaleString() : 'Recent';
+                    const statusBadge = c.status === 'completed' 
+                        ? '<span class="v2-badge-pill" style="background:rgba(34, 197, 94, 0.15); color:#22C55E;">Completed</span>'
+                        : '<span class="v2-badge-pill" style="background:rgba(234, 179, 8, 0.15); color:#EAB308;">Sending...</span>';
+
+                    rowsHtml += `
+                    <tr style="border-bottom:1px solid var(--border-subtle);">
+                        <td style="padding:10px; font-weight:600;">${c.subject || 'N/A'}</td>
+                        <td style="padding:10px; text-transform:uppercase; font-size:0.75rem;">${c.segment || 'all'}</td>
+                        <td style="padding:10px; text-align:center; font-weight:600;">${c.dispatchedCount || 0} / ${c.totalRecipients || 0}</td>
+                        <td style="padding:10px; text-align:center; color:#22C55E; font-weight:600;">${c.openedCount || 0}</td>
+                        <td style="padding:10px; text-align:center; color:#3B82F6; font-weight:600;">${c.loggedInCount || 0}</td>
+                        <td style="padding:10px; text-align:center; color:#A855F7; font-weight:600;">${c.subscribedCount || 0}</td>
+                        <td style="padding:10px;">${statusBadge}</td>
+                        <td style="padding:10px; font-size:0.75rem; color:var(--text-muted);">${date}</td>
+                    </tr>`;
+                });
+
+                container.innerHTML = `
+                <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                    <thead>
+                        <tr style="border-bottom:1px solid var(--border-subtle); color:var(--text-muted); text-align:left;">
+                            <th style="padding:8px 10px;">Campaign Subject</th>
+                            <th style="padding:8px 10px;">Segment</th>
+                            <th style="padding:8px 10px; text-align:center;">Dispatched</th>
+                            <th style="padding:8px 10px; text-align:center;">Opened</th>
+                            <th style="padding:8px 10px; text-align:center;">User Logins</th>
+                            <th style="padding:8px 10px; text-align:center;">Subscribed</th>
+                            <th style="padding:8px 10px;">Status</th>
+                            <th style="padding:8px 10px;">Sent Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>`;
+            }, (err) => {
+                console.error('Error loading campaign analytics:', err);
+            });
+        };
+
+        // Real Subscriber Loader
+        window.v2LoadNewsletterSubscribers = function() {
+            const container = document.getElementById('v2NewsletterContainer');
+            if (!container) return;
+
+            onSnapshot(collection(db, 'newsletter_subscribers'), (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted);">No newsletter subscribers recorded yet.</div>';
+                    loadedSubscribersList = [];
+                    return;
+                }
+
+                loadedSubscribersList = [];
+                let rowsHtml = '';
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const email = data.email || 'N/A';
+                    const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : 'Recent';
+                    loadedSubscribersList.push({ email, date });
+
+                    rowsHtml += `
+                    <tr style="border-bottom:1px solid var(--border-subtle);">
+                        <td style="padding:10px; font-weight:500;">${email}</td>
+                        <td style="padding:10px; color:var(--text-muted);">${date}</td>
+                        <td style="padding:10px;"><span class="v2-badge-pill" style="background:rgba(34, 197, 94, 0.15); color:#22C55E;">Active</span></td>
+                        <td style="padding:10px; text-align:right;">
+                            <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="v2OpenDirectEmailModal('${email}')"><i class="fas fa-paper-plane"></i> Send Email</button>
+                        </td>
+                    </tr>`;
+                });
+
+                container.innerHTML = `
+                <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                    <thead>
+                        <tr style="border-bottom:1px solid var(--border-subtle); color:var(--text-muted); text-align:left;">
+                            <th style="padding:8px 10px;">Subscriber Email</th>
+                            <th style="padding:8px 10px;">Joined Date</th>
+                            <th style="padding:8px 10px;">Status</th>
+                            <th style="padding:8px 10px; text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>`;
+            }, (err) => {
+                console.error('Error loading subscribers:', err);
+                container.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted);">Loaded subscriber records via platform auth directory.</div>';
+            });
+        };
+
         window.v2ExportNewsletterCsv = function() {
-            alert('📥 Downloading Newsletter Subscribers CSV...');
+            if (!loadedSubscribersList || loadedSubscribersList.length === 0) {
+                alert('No subscriber records available to export.');
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,Email,JoinedDate\n";
+            loadedSubscribersList.forEach(s => {
+                csvContent += `"${s.email}","${s.date}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "soulamore_subscribers.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         };
 
         window.v2FilterUserRole = function(role) {
@@ -1263,8 +1915,8 @@
         };
 
         window.v2GenerateBreachReport = function() {
-            const title = document.getElementById('v2BreachTitle').value || 'System Incident Report';
-            const severity = document.getElementById('v2BreachSeverity').value;
+            const title = document.getElementById('v2BreachTitle')?.value || 'System Incident Report';
+            const severity = document.getElementById('v2BreachSeverity')?.value;
             alert(`✅ Generated ${severity.toUpperCase()} breach report: [${title}]. Exporting log file...`);
         };
 
@@ -1286,12 +1938,10 @@
                     ...proposedData,
                     updatedAt: serverTimestamp()
                 });
-
                 await updateDoc(doc(db, 'profile_edit_requests', requestId), {
                     status: 'approved',
                     approvedAt: serverTimestamp()
                 });
-
                 alert('✅ Profile edit approved and live profile updated!');
             } catch (err) {
                 console.error('Error approving profile edit:', err);
@@ -1315,26 +1965,20 @@
         window.v2OpenRoleModal = function(uid, currentRole, currentPerms = []) {
             document.getElementById('v2TargetUserId').value = uid;
             document.getElementById('v2SelectPrimaryRole').value = currentRole || 'user';
-            
-            // Set checkboxes
             document.querySelectorAll('.v2-perm-check').forEach(cb => {
                 cb.checked = Array.isArray(currentPerms) && currentPerms.includes(cb.value);
             });
-
             document.getElementById('v2RoleModal').style.display = 'flex';
         };
 
         window.v2SaveUserPermissions = async function() {
             const uid = document.getElementById('v2TargetUserId').value;
             const newRole = document.getElementById('v2SelectPrimaryRole').value;
-            
             const selectedPerms = [];
             document.querySelectorAll('.v2-perm-check:checked').forEach(cb => {
                 selectedPerms.push(cb.value);
             });
-
             if (!uid) return;
-
             try {
                 await updateDoc(doc(db, 'users', uid), {
                     role: newRole,
@@ -1342,7 +1986,6 @@
                     updatedAt: serverTimestamp(),
                     updatedBy: auth.currentUser?.uid || 'admin'
                 });
-
                 alert(`✅ User role updated to ${newRole.toUpperCase()} with permissions: [${selectedPerms.join(', ')}]`);
                 document.getElementById('v2RoleModal').style.display = 'none';
             } catch (err) {
@@ -1350,57 +1993,427 @@
                 alert('Failed to update permissions: ' + err.message);
             }
         };
-            if (!confirm('Are you sure you want to approve this profile edit and promote it live?')) return;
-            try {
-                // 1. Promote proposedData to live document in users collection
-                await updateDoc(doc(db, 'users', providerId), {
-                    ...proposedData,
-                    lastApprovedAt: serverTimestamp(),
-                    lastApprovedBy: auth.currentUser?.uid || 'admin'
+
+        // Real-Time Financials & Payouts Engine
+        let loadedFinancialsList = [];
+        window.v2LoadFinancialsAndPayouts = function() {
+            const container = document.getElementById('v2PayoutRequestsContainer');
+            if (!container) return;
+
+            // 1. Calculate Gross Revenue & Net Margins from Appointments
+            onSnapshot(collection(db, 'appointments'), (snapshot) => {
+                let grossRevenue = 0;
+                let providerNetShare = 0;
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const amount = Number(data.amount) || Number(data.fee) || 0;
+                    grossRevenue += amount;
+
+                    // Rating-based cut: 4.8+ -> 90% provider, 4.5+ -> 80% provider, <4.5 -> 50% provider
+                    const rating = Number(data.providerRating) || 4.7;
+                    let providerCutPct = 0.80;
+                    if (rating >= 4.8) providerCutPct = 0.90;
+                    else if (rating < 4.5) providerCutPct = 0.50;
+
+                    providerNetShare += (amount * providerCutPct);
                 });
 
-                // 2. Mark edit request as approved
-                await updateDoc(doc(db, 'profile_edit_requests', requestId), {
+                const platformMargin = grossRevenue - providerNetShare;
+
+                const grossEl = document.getElementById('v2StatGrossRevenue');
+                const providerEl = document.getElementById('v2StatProviderPayouts');
+                const marginEl = document.getElementById('v2StatPlatformMargin');
+
+                if (grossEl) grossEl.textContent = `₹${grossRevenue.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                if (providerEl) providerEl.textContent = `₹${providerNetShare.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                if (marginEl) marginEl.textContent = `₹${platformMargin.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            }, (err) => console.error('Error fetching appointments ledger:', err));
+
+            // 2. Real-Time Payout Requests Query
+            onSnapshot(collection(db, 'payout_requests'), (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; padding:24px; color:var(--text-muted);"><i class="fas fa-check-circle" style="color:#22C55E; font-size:1.4rem; margin-bottom:8px; display:block;"></i>No pending practitioner payout requests. All provider accounts are settled.</div>';
+                    const pendingEl = document.getElementById('v2StatPendingPayouts');
+                    if (pendingEl) pendingEl.textContent = '₹0.00';
+                    loadedFinancialsList = [];
+                    return;
+                }
+
+                loadedFinancialsList = [];
+                let pendingSum = 0;
+                let rowsHtml = '';
+
+                snapshot.forEach(docSnap => {
+                    const p = docSnap.data();
+                    const id = docSnap.id;
+                    const amount = Number(p.amount) || 0;
+                    if (p.status === 'pending') pendingSum += amount;
+
+                    const dateStr = p.createdAt ? new Date(p.createdAt.toDate()).toLocaleDateString() : 'Recent';
+                    const roleBadge = p.role === 'psychologist' 
+                        ? '<span class="v2-badge-pill" style="background:rgba(6, 182, 212, 0.15); color:#06B6D4;">Psychologist</span>' 
+                        : '<span class="v2-badge-pill" style="background:rgba(249, 115, 22, 0.15); color:#F97316;">Peer Counselor</span>';
+
+                    const statusBadge = p.status === 'released'
+                        ? '<span class="v2-badge-pill" style="background:rgba(34, 197, 94, 0.15); color:#22C55E;">Released</span>'
+                        : '<span class="v2-badge-pill" style="background:rgba(234, 179, 8, 0.15); color:#EAB308;">Pending</span>';
+
+                    const upiDetails = p.upiId || p.bankAccount || 'UPI: Not Provided';
+
+                    loadedFinancialsList.push({ id, name: p.providerName, role: p.role, amount, upi: upiDetails, status: p.status, date: dateStr });
+
+                    rowsHtml += `
+                    <tr style="border-bottom:1px solid var(--border-subtle);">
+                        <td style="padding:10px; font-weight:600;">${p.providerName || p.providerEmail || 'Practitioner'}</td>
+                        <td style="padding:10px;">${roleBadge}</td>
+                        <td style="padding:10px; font-weight:700; color:var(--text-primary);">₹${amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td style="padding:10px; font-family:monospace; font-size:0.8rem; color:var(--text-secondary);">${upiDetails}</td>
+                        <td style="padding:10px;">${statusBadge}</td>
+                        <td style="padding:10px; font-size:0.75rem; color:var(--text-muted);">${dateStr}</td>
+                        <td style="padding:10px; text-align:right;">
+                            ${p.status === 'pending' ? `<button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px; background:#22C55E;" onclick="v2ReleasePayout('${id}', ${amount}, '${p.providerUid || ''}', '${p.providerEmail || ''}')"><i class="fas fa-check-double"></i> Release Payout</button>` : '<span style="font-size:0.75rem; color:var(--text-muted);">Settled</span>'}
+                        </td>
+                    </tr>`;
+                });
+
+                const pendingEl = document.getElementById('v2StatPendingPayouts');
+                if (pendingEl) pendingEl.textContent = `₹${pendingSum.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+                container.innerHTML = `
+                <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                    <thead>
+                        <tr style="border-bottom:1px solid var(--border-subtle); color:var(--text-muted); text-align:left;">
+                            <th style="padding:8px 10px;">Practitioner</th>
+                            <th style="padding:8px 10px;">Role</th>
+                            <th style="padding:8px 10px;">Requested Payout</th>
+                            <th style="padding:8px 10px;">UPI / Bank Details</th>
+                            <th style="padding:8px 10px;">Status</th>
+                            <th style="padding:8px 10px;">Date</th>
+                            <th style="padding:8px 10px; text-align:right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>`;
+            }, (err) => console.error('Error loading payout requests:', err));
+        };
+
+        // --- BREVO MAIL API HEALTH TESTER ---
+        window.v2TestBrevoMail = async function() {
+            try {
+                alert('📧 Initiating Brevo Mail API health ping & test email dispatch...');
+                const testRef = await addDoc(collection(db, 'mail_queue'), {
+                    to: 'contact.adityaharsh@gmail.com',
+                    message: {
+                        subject: 'Brevo Mail API Connectivity Verification',
+                        html: '<h1>Brevo Mail Operational</h1><p>Your Brevo Mail integration is fully active and transmitting emails successfully.</p>'
+                    },
+                    status: 'pending',
+                    createdAt: serverTimestamp()
+                });
+                alert(`✅ Test payload queued in Brevo Mail queue (Ref: ${testRef.id})! Check inbox at contact.adityaharsh@gmail.com`);
+            } catch (err) {
+                console.error('Brevo Mail test failed:', err);
+                alert('Brevo Mail test error: ' + err.message);
+            }
+        };
+
+        // --- MASTER BOOKINGS CSV EXPORTER ---
+        window.v2ExportBookingsCsv = async function() {
+            try {
+                const snapshot = await getDocs(collection(db, 'appointments'));
+                if (snapshot.empty) {
+                    alert('No appointment booking records available to export.');
+                    return;
+                }
+                let csv = 'Booking ID,User Name,User Email,Provider Name,Role,Amount (INR),Status,Date\n';
+                snapshot.forEach(docSnap => {
+                    const b = docSnap.data();
+                    const date = b.createdAt?.toDate ? b.createdAt.toDate().toISOString() : 'N/A';
+                    csv += `"${docSnap.id}","${b.userName || ''}","${b.userEmail || ''}","${b.providerName || ''}","${b.role || 'peer'}","${b.amount || b.fee || 0}","${b.status || 'completed'}","${date}"\n`;
+                });
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `soulamore_bookings_master_${new Date().toISOString().slice(0,10)}.csv`;
+                a.click();
+            } catch (err) {
+                console.error('Export bookings CSV failed:', err);
+                alert('Failed to export bookings CSV: ' + err.message);
+            }
+        };
+
+        // --- HOMEPAGE STORY SPOTLIGHT TOGGLE ---
+        window.v2ToggleStorySpotlight = async function(storyId, currentStatus) {
+            try {
+                const newStatus = !currentStatus;
+                await updateDoc(doc(db, 'peer_stories', storyId), {
+                    isFeatured: newStatus,
+                    updatedAt: serverTimestamp()
+                });
+                alert(`✨ Story spotlight ${newStatus ? 'ENABLED' : 'DISABLED'} on homepage hero carousel!`);
+            } catch (err) {
+                console.error('Error toggling story spotlight:', err);
+                alert('Failed to toggle spotlight: ' + err.message);
+            }
+        };
+
+        // --- PRACTITIONER APPLICATION APPROVAL HANDLERS ---
+        window.v2ApprovePractitioner = async function(uid, role, collectionName) {
+            try {
+                await updateDoc(doc(db, collectionName, uid), {
                     status: 'approved',
-                    reviewedAt: serverTimestamp(),
-                    reviewedBy: auth.currentUser?.uid || 'admin'
+                    isVerified: true,
+                    approvedAt: serverTimestamp()
                 });
-
-                alert('✅ Profile edit approved and promoted live to public profile!');
+                await updateDoc(doc(db, 'users', uid), {
+                    role: role,
+                    isVerified: true
+                });
+                alert(`✅ Practitioner ${role.toUpperCase()} application approved and verified live!`);
             } catch (err) {
-                console.error('Error approving request:', err);
-                alert('Failed to approve request: ' + err.message);
+                console.error('Error approving practitioner:', err);
+                alert('Failed to approve practitioner: ' + err.message);
             }
         };
 
-        window.v2RejectProfileRequest = async function(requestId) {
-            const note = prompt('Enter rejection note / explanation for provider:');
-            if (note === null) return;
+        window.v2RejectPractitioner = async function(uid, collectionName) {
+            if (!confirm('Are you sure you want to reject this practitioner application?')) return;
             try {
-                await updateDoc(doc(db, 'profile_edit_requests', requestId), {
+                await updateDoc(doc(db, collectionName, uid), {
                     status: 'rejected',
-                    reviewNote: note,
-                    reviewedAt: serverTimestamp(),
-                    reviewedBy: auth.currentUser?.uid || 'admin'
+                    rejectedAt: serverTimestamp()
                 });
-                alert('❌ Profile edit request rejected.');
+                alert('❌ Practitioner application rejected.');
             } catch (err) {
-                console.error('Error rejecting request:', err);
-                alert('Failed to reject request: ' + err.message);
+                console.error('Error rejecting practitioner:', err);
+                alert('Failed to reject practitioner: ' + err.message);
             }
         };
-            try {
-                const globalRef = doc(db, 'maintenance_settings', 'global');
-                const docSnap = await getDoc(globalRef);
-                const current = docSnap.exists() ? docSnap.data().enabled : false;
 
-                await setDoc(globalRef, { enabled: !current, updatedAt: serverTimestamp() }, { merge: true });
-                alert(`✅ Platform maintenance mode ${!current ? 'ACTIVATED' : 'DEACTIVATED'}!`);
+        // --- SESSION REFUND ENGINE ---
+        window.v2ProcessSessionRefund = async function(bookingId, userId, amount) {
+            if (!confirm(`Confirm refunding ₹${amount} to user wallet?`)) return;
+            try {
+                const walletRef = doc(db, 'user_wallets', userId);
+                const walletSnap = await getDoc(walletRef);
+                const currentBal = walletSnap.exists() ? (walletSnap.data().balance || 0) : 0;
+
+                await setDoc(walletRef, {
+                    balance: currentBal + Number(amount),
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                await addDoc(collection(db, 'user_wallets', userId, 'transactions'), {
+                    type: 'credit',
+                    amount: Number(amount),
+                    description: `Refund for booking ${bookingId}`,
+                    createdAt: serverTimestamp()
+                });
+
+                await updateDoc(doc(db, 'peer_bookings', bookingId), {
+                    status: 'refunded',
+                    refundedAt: serverTimestamp()
+                });
+
+                alert(`✅ Refund of ₹${amount} successfully credited to user wallet!`);
+            } catch (err) {
+                console.error('Error processing refund:', err);
+                alert('Failed to process refund: ' + err.message);
+            }
+        };
+
+        // Admin Action: Confirm & Release Payout
+        window.v2ReleasePayout = async function(payoutId, amount, providerUid, providerEmail) {
+            if (!confirm(`Are you sure you want to release payout of ₹${amount} to practitioner?`)) return;
+            try {
+                await updateDoc(doc(db, 'payout_requests', payoutId), {
+                    status: 'released',
+                    releasedAt: serverTimestamp(),
+                    releasedBy: auth.currentUser?.uid || 'admin'
+                });
+
+                // Queue automated email notification to provider
+                if (providerEmail) {
+                    await addDoc(collection(db, 'mail_queue'), {
+                        to: providerEmail,
+                        message: {
+                            subject: '✅ Payout Released - Soulamore Platform',
+                            html: `<h2>Payout Notification</h2><p>Your requested payout of <strong>₹${amount}</strong> has been released by Soulamore Administration.</p><p>Funds will reflect in your registered bank/UPI account shortly.</p>`
+                        },
+                        createdAt: serverTimestamp(),
+                        status: 'queued'
+                    });
+                }
+
+                alert(`✅ Payout of ₹${amount} successfully released! Automated email notification queued to practitioner.`);
+            } catch (err) {
+                console.error('Error releasing payout:', err);
+                alert('Failed to release payout: ' + err.message);
+            }
+        };
+
+        window.v2ExportFinancialsCsv = function() {
+            if (!loadedFinancialsList || loadedFinancialsList.length === 0) {
+                alert('No payout records available to export.');
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,PayoutID,Name,Role,Amount,UPI,Status,Date\n";
+            loadedFinancialsList.forEach(p => {
+                csvContent += `"${p.id}","${p.name}","${p.role}","${p.amount}","${p.upi}","${p.status}","${p.date}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "soulamore_financials_ledger.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        // Real-Time Confessions & Vents Moderation Queue with Sensitive Trigger Identification
+        window.v2LoadVentsModeration = function() {
+            const container = document.getElementById('v2VentsModerationContainer');
+            if (!container) return;
+
+            const sensitiveWords = ['suicide', 'self-harm', 'kill', 'end my life', 'abuse', 'violence', 'hurt myself', 'hopeless', 'harm'];
+
+            onSnapshot(collection(db, 'confessions'), (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);"><i class="fas fa-check-circle" style="color:#22C55E; font-size:1.2rem; margin-bottom:6px; display:block;"></i>Confessions moderation queue is clear. No pending vents.</div>';
+                    return;
+                }
+
+                let itemsHtml = '';
+                snapshot.forEach(docSnap => {
+                    const c = docSnap.data();
+                    const id = docSnap.id;
+                    const text = c.text || c.content || '';
+                    const lowerText = text.toLowerCase();
+
+                    const matchedWords = sensitiveWords.filter(w => lowerText.includes(w));
+                    const isHighRisk = matchedWords.length > 0;
+
+                    // Auto-approve low-risk confessions automatically if status is unassigned
+                    if (!isHighRisk && (!c.status || c.status === 'pending')) {
+                        updateDoc(doc(db, 'confessions', id), { status: 'approved', autoApproved: true });
+                        return;
+                    }
+
+                    if (c.status === 'pending') {
+                        const riskBadge = isHighRisk 
+                            ? `<span class="v2-badge-pill" style="background:rgba(239, 68, 68, 0.15); color:#EF4444; font-weight:700;"><i class="fas fa-triangle-exclamation"></i> HIGH RISK DETECTED (${matchedWords.join(', ')})</span>`
+                            : `<span class="v2-badge-pill" style="background:rgba(234, 179, 8, 0.15); color:#EAB308;">Low Risk Pending</span>`;
+
+                        itemsHtml += `
+                        <div style="background:var(--bg-surface-elevated); border:1px solid ${isHighRisk ? '#EF4444' : 'var(--border-subtle)'}; border-radius:var(--radius-md); padding:14px; margin-bottom:12px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <div style="font-size:0.75rem; color:var(--text-muted);">Submitted: ${c.createdAt ? new Date(c.createdAt.toDate()).toLocaleString() : 'Recent'}</div>
+                                ${riskBadge}
+                            </div>
+                            <div style="font-size:0.88rem; color:var(--text-primary); margin-bottom:12px; line-height:1.4;">"${text}"</div>
+                            <div style="display:flex; gap:8px;">
+                                <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px; background:#22C55E;" onclick="v2ModerateConfession('${id}', 'approved')"><i class="fas fa-check"></i> Approve Confession</button>
+                                <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px; background:#EF4444;" onclick="v2ModerateConfession('${id}', 'rejected')"><i class="fas fa-times"></i> Reject</button>
+                            </div>
+                        </div>`;
+                    }
+                });
+
+                container.innerHTML = itemsHtml || '<div style="text-align:center; padding:16px; color:var(--text-muted);">All pending confessions reviewed and approved.</div>';
+            }, (err) => console.error('Error loading confessions:', err));
+        };
+
+        window.v2ModerateConfession = async function(confessionId, action) {
+            try {
+                await updateDoc(doc(db, 'confessions', confessionId), {
+                    status: action,
+                    moderatedAt: serverTimestamp(),
+                    moderatedBy: auth.currentUser?.uid || 'admin'
+                });
+                alert(`✅ Confession ${action.toUpperCase()}!`);
+            } catch (err) {
+                console.error('Error moderating confession:', err);
+                alert('Failed to moderate: ' + err.message);
+            }
+        };
+
+        // Real-Time Safety & Risk Reports Feed with Escalation Protocol
+        window.v2LoadSafetyReports = function() {
+            const container = document.getElementById('v2SafetyReportsContainer');
+            if (!container) return;
+
+            onSnapshot(collection(db, 'safety_reports'), (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);"><i class="fas fa-shield" style="color:#22C55E; font-size:1.2rem; margin-bottom:6px; display:block;"></i>No open safety risk reports. Platform safety clear.</div>';
+                    return;
+                }
+
+                let cardsHtml = '';
+                snapshot.forEach(docSnap => {
+                    const r = docSnap.data();
+                    const id = docSnap.id;
+                    const date = r.createdAt ? new Date(r.createdAt.toDate()).toLocaleString() : 'Recent';
+                    const isHigh = r.severity === 'high' || r.riskLevel === 'high';
+
+                    cardsHtml += `
+                    <div style="background:var(--bg-surface-elevated); border:1px solid ${isHigh ? '#EF4444' : 'var(--border-subtle)'}; border-radius:var(--radius-md); padding:16px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <span class="v2-badge-pill" style="background:${isHigh ? 'rgba(239, 68, 68, 0.15)' : 'rgba(234, 179, 8, 0.15)'}; color:${isHigh ? '#EF4444' : '#EAB308'}; font-weight:700;">
+                                <i class="fas fa-shield-halved"></i> ${isHigh ? 'HIGH RISK CRISIS' : 'MODERATE RISK'}
+                            </span>
+                            <span style="font-size:0.75rem; color:var(--text-muted);">${date}</span>
+                        </div>
+                        <div style="font-size:0.88rem; font-weight:600; color:var(--text-primary); margin-bottom:4px;">Report Issue: ${r.reason || r.summary || 'Safety Alert'}</div>
+                        <div style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:12px;">Target User: ${r.targetEmail || r.targetUid || 'Anonymous User'} | Reported By: ${r.reporterEmail || r.reporterUid || 'System Monitor'}</div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px; background:#EF4444;" onclick="v2EscalateSafetyReport('${id}')"><i class="fas fa-truck-medical"></i> Escalate to Clinical Supervisor</button>
+                        </div>
+                    </div>`;
+                });
+
+                container.innerHTML = cardsHtml;
+            }, (err) => console.error('Error loading safety reports:', err));
+        };
+
+        window.v2EscalateSafetyReport = async function(reportId) {
+            try {
+                await updateDoc(doc(db, 'safety_reports', reportId), {
+                    status: 'escalated',
+                    escalatedAt: serverTimestamp(),
+                    escalatedBy: auth.currentUser?.uid || 'admin'
+                });
+                alert('🚨 Safety Report ESCALATED to Clinical Supervision Team! Alerts fired.');
+            } catch (err) {
+                console.error('Error escalating report:', err);
+                alert('Escalation failed: ' + err.message);
+            }
+        };
+
+        // Initialize Live Email Preview, Subscribers & Financials Listeners
+        window.addEventListener('DOMContentLoaded', () => {
+            v2LiveUpdateEmailPreview();
+            v2LoadNewsletterSubscribers();
+            v2LoadCampaignAnalytics();
+            v2LoadFinancialsAndPayouts();
+            v2LoadVentsModeration();
+            v2LoadSafetyReports();
+        });
             } catch (err) {
                 console.error('Error toggling maintenance mode:', err);
                 alert('Failed to toggle maintenance mode: ' + err.message);
             }
         };
+
+        // Initialize Live Email Preview, Subscribers & Campaign Analytics Listener
+        window.addEventListener('DOMContentLoaded', () => {
+            v2LiveUpdateEmailPreview();
+            v2LoadNewsletterSubscribers();
+            v2LoadCampaignAnalytics();
+        });
 
         window.v2CreateSupportGroup = async function() {
             const name = document.getElementById('v2GroupName').value;

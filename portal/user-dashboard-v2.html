@@ -24,7 +24,7 @@
     </script>
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
-                 script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com;
+                 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com;
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
                  img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
@@ -171,6 +171,98 @@
             padding: 0;
             font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        button, select, input, textarea {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            outline: none;
+        }
+
+        .v2-btn-primary {
+            background: linear-gradient(135deg, var(--primary-emerald), var(--primary-emerald-hover));
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 9px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.84rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            box-shadow: 0 4px 14px rgba(38, 166, 154, 0.28);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+        }
+
+        .v2-btn-primary:hover {
+            transform: translateY(-1.5px);
+            box-shadow: 0 6px 20px rgba(38, 166, 154, 0.42);
+            filter: brightness(1.06);
+        }
+
+        .v2-btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .v2-badge-pill, button.v2-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            user-select: none;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .v2-badge-pill:hover, button.v2-badge-pill:hover {
+            border-color: var(--primary-emerald);
+            color: var(--primary-emerald);
+            background: var(--emerald-light);
+            transform: translateY(-1.5px);
+            box-shadow: 0 4px 14px rgba(38, 166, 154, 0.18);
+        }
+
+        .v2-badge-pill:active, button.v2-badge-pill:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .v2-textarea {
+            width: 100%;
+            min-height: 90px;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            color: var(--text-primary);
+            font-size: 0.88rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        select.v2-textarea {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2326A69A'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 36px !important;
+            cursor: pointer;
         }
 
         body {
@@ -1011,7 +1103,66 @@
         };
 
         window.v2SetAtmosphere = function(mode) {
-            alert(`🌿 Sanctuary atmosphere updated to: ${mode.toUpperCase()} mode.`);
+            const root = document.documentElement;
+            if (mode === 'calm') {
+                root.style.setProperty('--primary-violet', '#06B6D4');
+                root.style.setProperty('--bg-surface', '#0F172A');
+            } else if (mode === 'evening') {
+                root.style.setProperty('--primary-violet', '#8B5CF6');
+                root.style.setProperty('--bg-surface', '#1E1B4B');
+            } else {
+                root.style.setProperty('--primary-violet', '#7C3AED');
+                root.style.setProperty('--bg-surface', '#090D16');
+            }
+            alert(`🌿 Sanctuary atmosphere updated to: ${mode.toUpperCase()} preset.`);
+        };
+
+        window.v2SendPasswordResetEmail = async function() {
+            try {
+                const user = auth.currentUser;
+                if (!user || !user.email) {
+                    alert('User email not found. Please log in again.');
+                    return;
+                }
+                const { sendPasswordResetEmail } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
+                await sendPasswordResetEmail(auth, user.email);
+                alert(`📧 Password reset link sent to ${user.email}! Please check your inbox.`);
+            } catch (err) {
+                console.error('Password reset failed:', err);
+                alert('Failed to send reset link: ' + err.message);
+            }
+        };
+
+        window.v2RequestCancelUserSession = async function(bookingId, amount) {
+            if (!confirm('Are you sure you want to cancel this booking? 100% of your booking fee will be instantly refunded to your Sanctuary Wallet.')) return;
+            try {
+                const uid = auth.currentUser.uid;
+                const walletRef = doc(db, 'user_wallets', uid);
+                const walletSnap = await getDoc(walletRef);
+                const currentBal = walletSnap.exists() ? (walletSnap.data().balance || 0) : 0;
+
+                await setDoc(walletRef, {
+                    balance: currentBal + Number(amount || 0),
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                await addDoc(collection(db, 'user_wallets', uid, 'transactions'), {
+                    type: 'credit',
+                    amount: Number(amount || 0),
+                    description: `Cancelled session refund (Booking: ${bookingId})`,
+                    createdAt: serverTimestamp()
+                });
+
+                await updateDoc(doc(db, 'peer_bookings', bookingId), {
+                    status: 'cancelled',
+                    cancelledAt: serverTimestamp()
+                });
+
+                alert('✅ Booking cancelled. 100% refund credited back to your Sanctuary Wallet!');
+            } catch (err) {
+                console.error('Error cancelling session:', err);
+                alert('Failed to cancel session: ' + err.message);
+            }
         };
 
         window.v2DownloadMyData = function() {
@@ -1079,6 +1230,72 @@
 
                     v2LiveUserPreviewUpdate();
                 }
+
+                // Real-Time User Wallet Listener
+                const walletDocRef = doc(db, 'user_wallets', uid);
+                onSnapshot(walletDocRef, (walletSnap) => {
+                    const balanceEl = document.getElementById('v2WalletBalanceText');
+                    const historyContainer = document.getElementById('v2WalletTransactionsContainer');
+
+                    let balance = 0;
+                    if (walletSnap.exists()) {
+                        balance = Number(walletSnap.data().balance) || 0;
+                    }
+                    if (balanceEl) balanceEl.textContent = `₹${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+                    // Fetch Transaction Ledger
+                    onSnapshot(collection(db, 'user_wallets', uid, 'transactions'), (txSnap) => {
+                        if (!historyContainer) return;
+                        if (txSnap.empty) {
+                            historyContainer.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); padding:10px;">No wallet transaction history recorded yet.</div>';
+                            return;
+                        }
+
+                        let html = '';
+                        txSnap.forEach(tDoc => {
+                            const t = tDoc.data();
+                            const date = t.createdAt ? new Date(t.createdAt.toDate()).toLocaleString() : 'Recent';
+                            const isCredit = t.type === 'credit' || t.amount > 0;
+
+                            html += `
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border-subtle); font-size:0.82rem;">
+                                <div>
+                                    <div style="font-weight:600;">${t.description || 'Wallet Transaction'}</div>
+                                    <div style="font-size:0.75rem; color:var(--text-muted);">${date}</div>
+                                </div>
+                                <div style="font-weight:700; color:${isCredit ? '#22C55E' : '#EF4444'};">
+                                    ${isCredit ? '+' : '-'}₹${Math.abs(t.amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
+                                </div>
+                            </div>`;
+                        });
+                        historyContainer.innerHTML = html;
+                    });
+                });
+
+                // User Journals Real-Time Listener
+                const journalQ = query(collection(db, 'user_journals'), where('userId', '==', uid));
+                onSnapshot(journalQ, (journalSnap) => {
+                    const container = document.getElementById('v2UserJournalsListContainer');
+                    if (!container) return;
+
+                    if (journalSnap.empty) {
+                        container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted);">No private reflections written yet. Record your first reflection above.</div>';
+                        return;
+                    }
+
+                    let html = '';
+                    journalSnap.forEach(jDoc => {
+                        const j = jDoc.data();
+                        const date = j.createdAt ? new Date(j.createdAt.toDate()).toLocaleString() : 'Recent';
+
+                        html += `
+                        <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px; margin-bottom:10px;">
+                            <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">${date}</div>
+                            <div style="font-size:0.88rem; color:var(--text-primary); line-height:1.4;">${j.content || ''}</div>
+                        </div>`;
+                    });
+                    container.innerHTML = html;
+                });
 
                 // Notifications Listener
                 const notifQ = query(collection(db, 'notifications'), where('userId', '==', uid));
