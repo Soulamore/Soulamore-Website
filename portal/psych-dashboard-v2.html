@@ -97,6 +97,7 @@
 
         function v2LivePsychPreviewUpdate() {
             var titleVal = document.getElementById('v2PsychTitle') ? document.getElementById('v2PsychTitle').value : '';
+            var quoteVal = document.getElementById('v2PsychQuote') ? document.getElementById('v2PsychQuote').value : '';
             var licenseVal = document.getElementById('v2PsychLicense') ? document.getElementById('v2PsychLicense').value : '';
             var bioVal = document.getElementById('v2PsychBio') ? document.getElementById('v2PsychBio').value : '';
             var feeVal = document.getElementById('v2PsychFee') ? document.getElementById('v2PsychFee').value : '';
@@ -110,7 +111,7 @@
 
             if (prevTitle) prevTitle.textContent = titleVal || 'Clinical Psychologist, M.Phil';
             if (prevLicense) prevLicense.textContent = licenseVal ? 'RCI License: ' + licenseVal : 'License: Verification Pending';
-            if (prevBio) prevBio.textContent = bioVal || 'Specializing in CBT, mindfulness, and trauma-informed care...';
+            if (prevBio) prevBio.textContent = quoteVal ? `"${quoteVal}" — ${bioVal}` : (bioVal || 'Specializing in CBT, mindfulness, and trauma-informed care...');
             if (prevFee) prevFee.textContent = feeVal ? 'Session Fee: ₹' + feeVal : 'Session Fee: ₹1,200 / 45m';
 
             if (prevSpecs) {
@@ -868,6 +869,11 @@
                         </div>
 
                         <div class="v2-field-group">
+                            <label class="v2-field-label"><i class="fas fa-quote-left"></i> Hero Quote & Personal Philosophy</label>
+                            <input type="text" class="v2-textarea" style="min-height:auto; padding:11px;" id="v2PsychQuote" placeholder='e.g. "Healing isn’t about rushing to fix yourself..."' oninput="v2LivePsychPreviewUpdate()">
+                        </div>
+
+                        <div class="v2-field-group">
                             <label class="v2-field-label"><i class="fas fa-certificate"></i> RCI License Number</label>
                             <input type="text" class="v2-textarea" style="min-height:auto; padding:11px;" id="v2PsychLicense" placeholder="RCI License (e.g. PSY-2026-IN)" oninput="v2LivePsychPreviewUpdate()">
                         </div>
@@ -1093,6 +1099,7 @@
 
         window.v2SubmitPsychProfileEdit = async function() {
             const title = document.getElementById('v2PsychTitle').value;
+            const quote = document.getElementById('v2PsychQuote').value;
             const license = document.getElementById('v2PsychLicense').value;
             const bio = document.getElementById('v2PsychBio').value;
             const specialties = document.getElementById('v2PsychSpecialties').value;
@@ -1111,6 +1118,7 @@
                     role: 'psychologist',
                     proposedData: {
                         title: title,
+                        quote: quote,
                         license: license,
                         bio: bio,
                         specialties: specialties ? specialties.split(',').map(s => s.trim()) : [],
@@ -1190,6 +1198,7 @@
 
                     // Pre-fill fields
                     if (data.title && document.getElementById('v2PsychTitle')) document.getElementById('v2PsychTitle').value = data.title;
+                    if (data.quote && document.getElementById('v2PsychQuote')) document.getElementById('v2PsychQuote').value = data.quote;
                     if (data.license && document.getElementById('v2PsychLicense')) document.getElementById('v2PsychLicense').value = data.license;
                     if (data.bio && document.getElementById('v2PsychBio')) document.getElementById('v2PsychBio').value = data.bio;
                     if (data.specialties && document.getElementById('v2PsychSpecialties')) document.getElementById('v2PsychSpecialties').value = Array.isArray(data.specialties) ? data.specialties.join(', ') : data.specialties;
