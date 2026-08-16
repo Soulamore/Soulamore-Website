@@ -74,29 +74,21 @@ export async function handleRoleRouting(user, intent, isNewUser = false) {
         }
 
         if (role === 'peer') {
-            if (userData.isSetupComplete) {
-                finalizeSession('peer', 'portal/peer-dashboard-v2.html');
-            } else {
-                finalizeSession('peer', 'portal/peer-setup.html');
-            }
+            finalizeSession('peer', 'portal/peer-dashboard-v2.html');
             return;
         }
 
         if (role === 'psychologist') {
-            if (userData.isSetupComplete) {
-                finalizeSession('psychologist', 'portal/psych-dashboard-v2.html');
-            } else {
-                finalizeSession('psychologist', 'portal/psych-setup.html');
-            }
+            finalizeSession('psychologist', 'portal/psych-dashboard-v2.html');
             return;
         }
 
-        // Default: user dashboard
+        // Default: user dashboard v2
         finalizeSession('user', 'portal/user-dashboard-v2.html');
 
     } catch (error) {
         console.error('[AuthContext] Routing Error:', error);
-        // Fallback to user dashboard on error
-        finalizeSession('user', 'portal/user-dashboard.html');
+        // Fallback to user dashboard v2 on error
+        finalizeSession('user', 'portal/user-dashboard-v2.html');
     }
 }

@@ -99,7 +99,7 @@ function updateAuthUI(user) {
                     userIconBtn.innerHTML = '<i class="fas fa-user-circle"></i>';
                 }
                 // Signed-in avatar should open the dashboard (not profile)
-                userIconBtn.href = `${getRootPath()}portal/user-dashboard.html`;
+                userIconBtn.href = `${getRootPath()}portal/user-dashboard-v2.html`;
                 userIconBtn.onclick = null;
             }
         } else {
