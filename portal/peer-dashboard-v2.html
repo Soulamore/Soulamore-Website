@@ -1274,12 +1274,12 @@
                     </div>
                     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                         <div style="background:var(--bg-surface); padding:8px 14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); font-size:0.82rem; font-family:monospace; color:var(--primary-peach);" id="v2PersonalBookingUrl">
-                            soulamore.com/book/zoya-narula
+                            soulamore.com/book/peer-counselor
                         </div>
-                        <button class="v2-btn-secondary" style="padding:8px 12px; font-size:0.8rem;" onclick="navigator.clipboard.writeText('https://www.soulamore.com/book/zoya-narula'); alert('✅ Personal booking URL copied to clipboard!')">
+                        <button class="v2-btn-secondary" style="padding:8px 12px; font-size:0.8rem;" onclick="v2CopyBookingLink()">
                             <i class="fas fa-link"></i> Copy Link
                         </button>
-                        <button class="v2-btn-primary" style="padding:8px 12px; font-size:0.8rem;" onclick="alert('⚡ QR Code generated! Share with members for instant booking.')">
+                        <button class="v2-btn-primary" style="padding:8px 12px; font-size:0.8rem;" onclick="v2OpenQrCodeModal('peer')">
                             <i class="fas fa-qrcode"></i> QR Code
                         </button>
                     </div>
@@ -1807,9 +1807,63 @@
         </div>
     </div>
 
+    <!-- MODAL: DYNAMIC PRACTITIONER QR CODE GENERATOR -->
+    <div class="v2-modal-overlay" id="v2QrCodeModal" style="display:none;">
+        <div class="v2-modal-card" style="max-width:400px; text-align:center;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:1rem; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
+                <span><i class="fas fa-qrcode" style="color:var(--primary-peach);"></i> Personal Practitioner QR Code</span>
+                <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted);" onclick="document.getElementById('v2QrCodeModal').style.display='none'"></i>
+            </div>
+
+            <div style="padding:16px 0 10px;">
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Members can scan this QR code with any phone camera for instant 1-click booking.</div>
+                <div style="background:#FFF; padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-medium); display:inline-block; box-shadow:var(--shadow-sm);">
+                    <img id="v2QrModalImage" src="" alt="Practitioner QR Code" style="width:200px; height:200px; display:block;">
+                </div>
+                <div style="font-size:0.78rem; font-family:monospace; color:var(--primary-peach); margin-top:10px; font-weight:600;" id="v2QrModalUrlText">soulamore.com/book/peer-counselor</div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="v2-btn-secondary" style="flex:1; justify-content:center; padding:9px; font-size:0.8rem;" onclick="v2CopyBookingLink()"><i class="fas fa-link"></i> Copy Link</button>
+                <button class="v2-btn-primary" style="flex:1; justify-content:center; padding:9px; font-size:0.8rem; background:var(--primary-peach);" onclick="v2DownloadQrCode()"><i class="fas fa-download"></i> Download PNG</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT LOGIC -->
     <script type="module">
         import { auth, db, collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc, updateDoc, serverTimestamp } from '../assets/js/firebase-config.js';
+
+        // --- QR CODE & BOOKING URL ENGINE ---
+        window.v2CopyBookingLink = function() {
+            const urlText = document.getElementById('v2PersonalBookingUrl')?.textContent?.trim() || 'soulamore.com/book/peer-counselor';
+            const fullUrl = urlText.startsWith('http') ? urlText : `https://www.${urlText}`;
+            navigator.clipboard.writeText(fullUrl);
+            alert(`✅ Personal booking link copied to clipboard!\n${fullUrl}`);
+        };
+
+        window.v2OpenQrCodeModal = function(role) {
+            const urlEl = document.getElementById(role === 'psych' ? 'v2PsychBookingUrl' : 'v2PersonalBookingUrl');
+            let urlText = urlEl?.textContent?.trim() || 'soulamore.com/book/peer-counselor';
+            let fullUrl = urlText.startsWith('http') ? urlText : `https://www.${urlText}`;
+
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(fullUrl)}&color=FB923C&bgcolor=FFFFFF`;
+
+            const imgEl = document.getElementById('v2QrModalImage');
+            const txtEl = document.getElementById('v2QrModalUrlText');
+
+            if (imgEl) imgEl.src = qrApiUrl;
+            if (txtEl) txtEl.textContent = urlText;
+
+            document.getElementById('v2QrCodeModal').style.display = 'flex';
+        };
+
+        window.v2DownloadQrCode = function() {
+            const img = document.getElementById('v2QrModalImage');
+            if (!img || !img.src) return;
+            window.open(img.src, '_blank');
+            alert('📥 QR Code image opened! Right-click or hold to save the PNG image.');
+        };
 
         // --- DYNAMIC PRACTITIONER REFERRAL CODE ENGINE ---
         window.v2GeneratePractitionerReferralCode = function(name, uid) {
