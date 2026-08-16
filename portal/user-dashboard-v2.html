@@ -971,7 +971,7 @@
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
                                 <div style="font-weight:700; font-size:0.9rem; color:var(--text-primary);">₹499 / 60m</div>
-                                <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px;" onclick="alert('📅 Session booked with Sonika Sharma for tomorrow at 5:00 PM!')"><i class="fas fa-calendar-check"></i> Book Session</button>
+                                <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px;" onclick="v2OpenBookingModal('Sonika Sharma', 'peer', 499)"><i class="fas fa-calendar-check"></i> Book Session</button>
                             </div>
                         </div>
 
@@ -989,7 +989,7 @@
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
                                 <div style="font-weight:700; font-size:0.9rem; color:var(--text-primary);">₹1,499 / 60m</div>
-                                <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px; background:#06B6D4;" onclick="alert('📅 Clinical Therapy session booked with Dr. Bhagyavathi for Friday at 4:00 PM!')"><i class="fas fa-calendar-check"></i> Book Session</button>
+                                <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px; background:#06B6D4;" onclick="v2OpenBookingModal('Dr. Bhagyavathi', 'psychologist', 1499)"><i class="fas fa-calendar-check"></i> Book Session</button>
                             </div>
                         </div>
                     </div>
@@ -1135,9 +1135,137 @@
         </div>
     </div>
 
+    <!-- MODAL: 1-CLICK BOOKING CHECKOUT WITH DYNAMIC REFERRAL CODE ENGINE -->
+    <div class="v2-modal-overlay" id="v2BookingCheckoutModal" style="display:none;">
+        <div class="v2-modal-card" style="max-width:440px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:1rem; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
+                <span><i class="fas fa-calendar-check" style="color:var(--primary-emerald);"></i> Confirm Session Booking</span>
+                <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted);" onclick="document.getElementById('v2BookingCheckoutModal').style.display='none'"></i>
+            </div>
+
+            <!-- Practitioner Summary Box -->
+            <div style="background:var(--bg-surface-elevated); padding:12px 14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin:14px 0 10px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-weight:700; font-size:0.92rem; color:var(--text-primary);" id="v2ModalPractitionerName">Sonika Sharma</div>
+                    <div style="font-size:0.76rem; color:var(--primary-emerald); font-weight:600;" id="v2ModalPractitionerRole">Peer Listener • 60 min session</div>
+                </div>
+                <div style="font-weight:700; font-size:1.1rem; color:var(--text-primary);" id="v2ModalBaseFeeDisplay">₹499</div>
+            </div>
+
+            <!-- Referral Code Promo Box -->
+            <div style="margin-bottom:14px;">
+                <label style="font-size:0.78rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:6px;">
+                    <i class="fas fa-ticket-alt" style="color:var(--primary-emerald);"></i> Have a Practitioner Referral Code?
+                </label>
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="v2BookingPromoInput" class="v2-textarea" style="min-height:auto; padding:8px 12px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; flex:1;" placeholder="e.g. SONIKA10">
+                    <button class="v2-btn-secondary" style="padding:8px 14px; font-size:0.8rem; font-weight:600;" onclick="v2ValidateBookingPromoCode()">Apply</button>
+                </div>
+                <div id="v2BookingPromoStatus" style="font-size:0.78rem; font-weight:600; margin-top:6px; min-height:18px;"></div>
+            </div>
+
+            <!-- Pricing Breakdown Table -->
+            <div style="background:var(--bg-surface-elevated); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); font-size:0.82rem; display:flex; flex-direction:column; gap:6px; margin-bottom:16px;">
+                <div style="display:flex; justify-content:space-between; color:var(--text-muted);">
+                    <span>Session Base Fee</span>
+                    <span id="v2BreakdownBase">₹499.00</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; color:#10B981; font-weight:600; display:none;" id="v2BreakdownDiscountRow">
+                    <span>Referral Discount (10% OFF)</span>
+                    <span id="v2BreakdownDiscount">-₹49.90</span>
+                </div>
+                <div style="height:1px; background:var(--border-subtle); margin:2px 0;"></div>
+                <div style="display:flex; justify-content:space-between; font-weight:700; font-size:0.95rem; color:var(--text-primary);">
+                    <span>Total Amount Payable</span>
+                    <span id="v2BreakdownTotal" style="color:var(--primary-emerald);">₹499.00</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex; gap:10px;">
+                <button class="v2-btn-secondary" style="flex:1; justify-content:center; padding:10px;" onclick="document.getElementById('v2BookingCheckoutModal').style.display='none'">Cancel</button>
+                <button class="v2-btn-primary" style="flex:2; justify-content:center; padding:10px;" id="v2ConfirmBookingBtn" onclick="v2ConfirmSessionBooking()"><i class="fas fa-lock"></i> Confirm & Book Session</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT LOGIC -->
     <script type="module">
         import { auth, db, collection, query, where, getDocs, doc, getDoc, updateDoc, onSnapshot, addDoc, serverTimestamp } from '../assets/js/firebase-config.js';
+
+        let currentBookingData = { name: 'Sonika Sharma', role: 'peer', fee: 499, appliedCode: '', discount: 0, finalFee: 499 };
+
+        window.v2OpenBookingModal = function(name, role, fee) {
+            currentBookingData = { name: name, role: role, fee: fee, appliedCode: '', discount: 0, finalFee: fee };
+            document.getElementById('v2ModalPractitionerName').textContent = name;
+            document.getElementById('v2ModalPractitionerRole').textContent = (role === 'peer' ? 'Peer Listener' : 'Licensed Psychologist') + ' • 60 min session';
+            document.getElementById('v2ModalBaseFeeDisplay').textContent = '₹' + fee;
+            document.getElementById('v2BreakdownBase').textContent = '₹' + fee + '.00';
+            document.getElementById('v2BreakdownTotal').textContent = '₹' + fee + '.00';
+            document.getElementById('v2BookingPromoInput').value = '';
+            document.getElementById('v2BookingPromoStatus').innerHTML = '';
+            document.getElementById('v2BreakdownDiscountRow').style.display = 'none';
+            document.getElementById('v2BookingCheckoutModal').style.display = 'flex';
+        };
+
+        window.v2ValidateBookingPromoCode = async function() {
+            const code = document.getElementById('v2BookingPromoInput').value.trim().toUpperCase();
+            const statusEl = document.getElementById('v2BookingPromoStatus');
+            if (!code) {
+                statusEl.innerHTML = '<span style="color:#EF4444;">Please enter a referral code.</span>';
+                return;
+            }
+
+            try {
+                statusEl.innerHTML = '<span style="color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Verifying promo code...</span>';
+                const q = query(collection(db, 'users'), where('referralCode', '==', code));
+                const snapshot = await getDocs(q);
+
+                if (!snapshot.empty || code === 'SONIKA10' || code === 'PALAK10' || code === 'PEER10' || code === 'SOUL10') {
+                    const discountAmt = Math.round(currentBookingData.fee * 0.10);
+                    const finalPayable = currentBookingData.fee - discountAmt;
+                    currentBookingData.appliedCode = code;
+                    currentBookingData.discount = discountAmt;
+                    currentBookingData.finalFee = finalPayable;
+
+                    statusEl.innerHTML = `<span style="color:#10B981;"><i class="fas fa-check-circle"></i> 🎉 Code "${code}" Applied! 10% OFF (Saved ₹${discountAmt})</span>`;
+                    document.getElementById('v2BreakdownDiscount').textContent = `-₹${discountAmt}.00`;
+                    document.getElementById('v2BreakdownDiscountRow').style.display = 'flex';
+                    document.getElementById('v2BreakdownTotal').textContent = `₹${finalPayable}.00`;
+                } else {
+                    statusEl.innerHTML = '<span style="color:#EF4444;"><i class="fas fa-times-circle"></i> Invalid or expired referral code.</span>';
+                }
+            } catch (err) {
+                console.error('Error validating referral code:', err);
+                statusEl.innerHTML = '<span style="color:#EF4444;">Verification error. Please try again.</span>';
+            }
+        };
+
+        window.v2ConfirmSessionBooking = async function() {
+            try {
+                const user = auth.currentUser;
+                const newBooking = {
+                    userId: user ? user.uid : 'guest_uid',
+                    userName: user ? (user.displayName || user.email) : 'Sanctuary Member',
+                    peerName: currentBookingData.name,
+                    providerRole: currentBookingData.role,
+                    amount: currentBookingData.finalFee,
+                    originalFee: currentBookingData.fee,
+                    referralCode: currentBookingData.appliedCode || null,
+                    discountApplied: currentBookingData.discount,
+                    status: 'confirmed',
+                    startTime: serverTimestamp(),
+                    date: new Date().toLocaleString()
+                };
+
+                await addDoc(collection(db, 'peer_bookings'), newBooking);
+                alert(`🎉 Session booked successfully with ${currentBookingData.name}!\nTotal Amount: ₹${currentBookingData.finalFee} ${currentBookingData.appliedCode ? '(10% Referral Discount Applied)' : ''}`);
+                document.getElementById('v2BookingCheckoutModal').style.display = 'none';
+            } catch (err) {
+                console.error('Error creating booking:', err);
+                alert('❌ Booking creation failed: ' + err.message);
+            }
+        };
 
         // --- WALLET & PRIVACY JS HANDLERS ---
         window.v2OpenTopUpModal = function() {

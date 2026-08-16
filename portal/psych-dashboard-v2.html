@@ -1012,9 +1012,14 @@
                             <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-medium); text-align:center; box-shadow:var(--shadow-sm);">
                                 <div style="font-size:0.75rem; color:var(--text-muted); font-weight:500;">Share with patients for 10% OFF</div>
                                 <div style="font-size:1.3rem; font-weight:700; color:var(--primary-cyan); letter-spacing:0.1em; margin:8px 0;" id="v2PsychRefCode">DRPALAK10</div>
-                                <button class="v2-btn-primary" style="width:100%; justify-content:center; padding:8px 12px; font-size:0.8rem;" onclick="v2CopyReferralCode('v2PsychRefCode')">
-                                    <i class="fas fa-copy"></i> Copy Code
-                                </button>
+                                <div style="display:flex; gap:8px;">
+                                    <button class="v2-btn-primary" style="flex:1; justify-content:center; padding:8px; font-size:0.78rem;" onclick="v2CopyReferralCode('v2PsychRefCode')">
+                                        <i class="fas fa-copy"></i> Copy Code
+                                    </button>
+                                    <button class="v2-btn-secondary" style="padding:8px 10px; font-size:0.78rem;" onclick="v2EditCustomReferralCode('v2PsychRefCode')" title="Customize your referral code">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -1921,6 +1926,25 @@
             alert(`✅ Practitioner referral code "${code}" copied to clipboard!\nShare this code with patients for 10% OFF session bookings.`);
         };
 
+        window.v2EditCustomReferralCode = async function(elementId) {
+            const currentCode = document.getElementById(elementId)?.textContent || 'SOUL10';
+            const newCode = prompt('✏️ Enter custom referral code for your account:\n(Must be alphanumeric, e.g. DRPALAK10 or PALAKHEALS10)', currentCode);
+            if (newCode && newCode.trim().length >= 3) {
+                const cleanCode = newCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+                try {
+                    const user = auth.currentUser;
+                    if (user) {
+                        await updateDoc(doc(db, 'users', user.uid), { referralCode: cleanCode });
+                        document.getElementById(elementId).textContent = cleanCode;
+                        alert(`🎉 Custom referral code "${cleanCode}" saved successfully to your profile!`);
+                    }
+                } catch (err) {
+                    console.error('Error saving custom referral code:', err);
+                    alert('❌ Failed to update custom referral code. Please try again.');
+                }
+            }
+        };
+
         async function loadPsychDashboard(uid) {
             try {
                 const userDoc = await getDoc(doc(db, 'users', uid));
@@ -1930,10 +1954,19 @@
                     const userNameEl = document.getElementById('v2UserName');
                     if (userNameEl) userNameEl.textContent = displayName;
 
-                    // Generate & Set Dynamic Referral Code
+                    // Generate, Set & Auto-Persist Dynamic Referral Code to Firestore
                     const dynamicRefCode = data.referralCode || v2GeneratePractitionerReferralCode(displayName, uid);
                     const refCodeEl = document.getElementById('v2PsychRefCode');
                     if (refCodeEl) refCodeEl.textContent = dynamicRefCode;
+
+                    if (!data.referralCode) {
+                        try {
+                            await updateDoc(doc(db, 'users', uid), { referralCode: dynamicRefCode });
+                            console.log('✅ Persisted new psychologist referral code to Firestore users collection:', dynamicRefCode);
+                        } catch (err) {
+                            console.warn('Could not auto-save referralCode to Firestore:', err);
+                        }
+                    }
 
                     // Pre-fill fields
                     if (data.title && document.getElementById('v2PsychTitle')) document.getElementById('v2PsychTitle').value = data.title;
