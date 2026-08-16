@@ -1085,9 +1085,14 @@
                             <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-medium); text-align:center; box-shadow:var(--shadow-sm);">
                                 <div style="font-size:0.75rem; color:var(--text-muted); font-weight:500;">Share with members for 10% OFF</div>
                                 <div style="font-size:1.3rem; font-weight:700; color:var(--primary-peach); letter-spacing:0.1em; margin:8px 0;" id="v2PeerRefCode">PEER10</div>
-                                <button class="v2-btn-primary" style="width:100%; justify-content:center; padding:8px 12px; font-size:0.8rem;" onclick="v2CopyReferralCode('v2PeerRefCode')">
-                                    <i class="fas fa-copy"></i> Copy Code
-                                </button>
+                                <div style="display:flex; gap:8px;">
+                                    <button class="v2-btn-primary" style="flex:1; justify-content:center; padding:8px; font-size:0.78rem;" onclick="v2CopyReferralCode('v2PeerRefCode')">
+                                        <i class="fas fa-copy"></i> Copy Code
+                                    </button>
+                                    <button class="v2-btn-secondary" style="padding:8px 10px; font-size:0.78rem;" onclick="v2EditCustomReferralCode('v2PeerRefCode')" title="Customize your referral code">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -1827,6 +1832,25 @@
             alert(`✅ Practitioner referral code "${code}" copied to clipboard!\nShare this code with members for 10% OFF session bookings.`);
         };
 
+        window.v2EditCustomReferralCode = async function(elementId) {
+            const currentCode = document.getElementById(elementId)?.textContent || 'SOUL10';
+            const newCode = prompt('✏️ Enter custom referral code for your account:\n(Must be alphanumeric, e.g. SONIKA10 or SONIKALISTENS10)', currentCode);
+            if (newCode && newCode.trim().length >= 3) {
+                const cleanCode = newCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+                try {
+                    const user = auth.currentUser;
+                    if (user) {
+                        await updateDoc(doc(db, 'users', user.uid), { referralCode: cleanCode });
+                        document.getElementById(elementId).textContent = cleanCode;
+                        alert(`🎉 Custom referral code "${cleanCode}" saved successfully to your profile!`);
+                    }
+                } catch (err) {
+                    console.error('Error saving custom referral code:', err);
+                    alert('❌ Failed to update custom referral code. Please try again.');
+                }
+            }
+        };
+
         // --- PEER DASHBOARD HANDLERS ---
         window.v2ConnectGoogleCalendar = function() {
             alert('📅 Google Calendar OAuth integration initialized! Syncing peer availability...');
@@ -2087,10 +2111,19 @@
                     if (prevNameEl) prevNameEl.textContent = displayName;
                     if (prevInitialEl) prevInitialEl.textContent = displayName.charAt(0).toUpperCase();
 
-                    // Generate & Set Dynamic Referral Code
+                    // Generate, Set & Auto-Persist Dynamic Referral Code to Firestore
                     const dynamicRefCode = data.referralCode || v2GeneratePractitionerReferralCode(displayName, uid);
                     const refCodeEl = document.getElementById('v2PeerRefCode');
                     if (refCodeEl) refCodeEl.textContent = dynamicRefCode;
+
+                    if (!data.referralCode) {
+                        try {
+                            await updateDoc(doc(db, 'users', uid), { referralCode: dynamicRefCode });
+                            console.log('✅ Persisted new referral code to Firestore users collection:', dynamicRefCode);
+                        } catch (err) {
+                            console.warn('Could not auto-save referralCode to Firestore:', err);
+                        }
+                    }
 
                     // Pre-fill existing fields
                     if (data.quote && document.getElementById('v2ProfileTagline')) document.getElementById('v2ProfileTagline').value = data.quote;
