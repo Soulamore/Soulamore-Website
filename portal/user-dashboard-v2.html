@@ -1172,6 +1172,72 @@
                     v2LiveUserPreviewUpdate();
                 }
 
+                // Real-Time User Wallet Listener
+                const walletDocRef = doc(db, 'user_wallets', uid);
+                onSnapshot(walletDocRef, (walletSnap) => {
+                    const balanceEl = document.getElementById('v2WalletBalanceText');
+                    const historyContainer = document.getElementById('v2WalletTransactionsContainer');
+
+                    let balance = 0;
+                    if (walletSnap.exists()) {
+                        balance = Number(walletSnap.data().balance) || 0;
+                    }
+                    if (balanceEl) balanceEl.textContent = `₹${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+                    // Fetch Transaction Ledger
+                    onSnapshot(collection(db, 'user_wallets', uid, 'transactions'), (txSnap) => {
+                        if (!historyContainer) return;
+                        if (txSnap.empty) {
+                            historyContainer.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); padding:10px;">No wallet transaction history recorded yet.</div>';
+                            return;
+                        }
+
+                        let html = '';
+                        txSnap.forEach(tDoc => {
+                            const t = tDoc.data();
+                            const date = t.createdAt ? new Date(t.createdAt.toDate()).toLocaleString() : 'Recent';
+                            const isCredit = t.type === 'credit' || t.amount > 0;
+
+                            html += `
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border-subtle); font-size:0.82rem;">
+                                <div>
+                                    <div style="font-weight:600;">${t.description || 'Wallet Transaction'}</div>
+                                    <div style="font-size:0.75rem; color:var(--text-muted);">${date}</div>
+                                </div>
+                                <div style="font-weight:700; color:${isCredit ? '#22C55E' : '#EF4444'};">
+                                    ${isCredit ? '+' : '-'}₹${Math.abs(t.amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
+                                </div>
+                            </div>`;
+                        });
+                        historyContainer.innerHTML = html;
+                    });
+                });
+
+                // User Journals Real-Time Listener
+                const journalQ = query(collection(db, 'user_journals'), where('userId', '==', uid));
+                onSnapshot(journalQ, (journalSnap) => {
+                    const container = document.getElementById('v2UserJournalsListContainer');
+                    if (!container) return;
+
+                    if (journalSnap.empty) {
+                        container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted);">No private reflections written yet. Record your first reflection above.</div>';
+                        return;
+                    }
+
+                    let html = '';
+                    journalSnap.forEach(jDoc => {
+                        const j = jDoc.data();
+                        const date = j.createdAt ? new Date(j.createdAt.toDate()).toLocaleString() : 'Recent';
+
+                        html += `
+                        <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px; margin-bottom:10px;">
+                            <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">${date}</div>
+                            <div style="font-size:0.88rem; color:var(--text-primary); line-height:1.4;">${j.content || ''}</div>
+                        </div>`;
+                    });
+                    container.innerHTML = html;
+                });
+
                 // Notifications Listener
                 const notifQ = query(collection(db, 'notifications'), where('userId', '==', uid));
                 onSnapshot(notifQ, (snapshot) => {

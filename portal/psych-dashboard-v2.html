@@ -1322,6 +1322,33 @@
             }
         });
 
+        window.v2SavePsychSoapNote = async function() {
+            if (!auth.currentUser) return;
+            const patientName = document.getElementById('v2SoapPatientSelect')?.value || 'General Patient';
+            const noteText = quillSoapEditor ? quillSoapEditor.getText().trim() : '';
+
+            if (!noteText) {
+                alert('Please enter SOAP notes content before saving.');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, 'patient_soap_notes'), {
+                    psychologistUid: auth.currentUser.uid,
+                    psychologistName: auth.currentUser.displayName || 'Clinical Psychologist',
+                    patientName: patientName,
+                    content: noteText,
+                    createdAt: serverTimestamp()
+                });
+
+                alert('✅ Confidential SOAP Clinical Note saved successfully!');
+                if (quillSoapEditor) quillSoapEditor.setText('');
+            } catch (err) {
+                console.error('Error saving SOAP note:', err);
+                alert('Failed to save SOAP note: ' + err.message);
+            }
+        };
+
         window.v2SavePsychAvailability = async function() {
             if (!auth.currentUser) return;
             const activeSlots = [];

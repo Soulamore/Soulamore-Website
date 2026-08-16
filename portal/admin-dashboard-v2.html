@@ -38,7 +38,23 @@
     <!-- STANDALONE UI NAVIGATION UTILITIES & DASHBOARD LOADING SYSTEM -->
     <link rel="stylesheet" href="../assets/css/dashboard-loading.css">
     <script>
+        let currentUserAdminPermissions = ['isSuperAdmin'];
         function v2SwitchTab(tabName, element) {
+            // Permission Requirement Map
+            const permReqs = {
+                'accounting': 'canManagePayments',
+                'reports': 'canManageSafety',
+                'deep-listening': 'canManageBlog',
+                'blog-engine': 'canManageBlog',
+                'maintenance': 'isSuperAdmin'
+            };
+
+            const req = permReqs[tabName];
+            if (req && !currentUserAdminPermissions.includes('isSuperAdmin') && !currentUserAdminPermissions.includes(req)) {
+                alert(`⛔ Access Denied: Your admin role does not have permission [${req}] to access this module.`);
+                return;
+            }
+
             document.querySelectorAll('.v2-nav-item').forEach(function(el) { el.classList.remove('active'); });
             if (element) element.classList.add('active');
 
@@ -48,11 +64,19 @@
 
             var titleMap = {
                 overview: 'Overview',
-                subscribers: 'Newsletter Subscribers',
-                groups: 'Support Groups',
-                reports: 'Safety Reports & Risks',
-                moderation: 'Confessions & Vents Queue',
-                maintenance: 'Platform Settings'
+                approvals: 'Profile Approvals & Edits',
+                users: 'Users & Practitioners Directory',
+                newsletter: 'Newsletter Campaigns & Subscribers',
+                'api-health': 'System & API Health Monitor',
+                sessions: 'Platform Bookings Ledger',
+                accounting: 'Financials & Payouts Ledger',
+                'groups-management': 'Support Groups Manager',
+                reports: 'Safety & Risk Reports',
+                'deep-listening': 'Confessions & Vents Queue',
+                'site-feedback': 'User Feedback & Reviews',
+                security: 'Security Breach Reports',
+                'blog-engine': 'Blog & Story Manager',
+                maintenance: 'Platform Settings & Maintenance'
             };
             var headerTitle = document.getElementById('v2HeaderTitle');
             if (headerTitle) headerTitle.textContent = titleMap[tabName] || 'Admin Console';
