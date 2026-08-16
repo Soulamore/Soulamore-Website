@@ -369,7 +369,7 @@
                 <div class="countdown-progress" id="countdown-progress"></div>
             </div>
             <span class="countdown-number" id="countdown-number">5</span>
-            <a href="../index.html?fresh=true" class="redirect-link" id="redirect-now">
+            <a href="/" class="redirect-link" id="redirect-now">
                 Go to Homepage Now
             </a>
         </div>
@@ -381,12 +381,10 @@
     <script type="module" src="../assets/js/auth-handler.js?v=3.5"></script>
 
     <script>
-        // ============================================
-        // CLEAR ONLY AUTH CACHE (Keep site cache)
-        // ============================================
+        // Ensure returning visitor flag is preserved so index.html doesn't redirect to start-here.html
+        localStorage.setItem('soulamore_visited', 'true');
 
         // Clear local storage for Soulamore (Core session keys)
-        // Redundant but safe if redirected here directly
         localStorage.removeItem('soulamore_session');
         localStorage.removeItem('user_role');
         localStorage.removeItem('authToken');
@@ -428,8 +426,8 @@
             countdownProgress.style.width = progressPercentage + '%';
 
             if (countdown <= 0) {
-                // Redirect with fresh=true to force fresh state
-                window.location.href = '../index.html?fresh=true';
+                // Redirect to root clean URL
+                window.location.href = '/';
             } else {
                 countdown--;
                 setTimeout(updateCountdown, 1000);

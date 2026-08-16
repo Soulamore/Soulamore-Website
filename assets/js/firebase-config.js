@@ -68,10 +68,14 @@ try {
 let analytics = null;
 // Load Analytics dynamically so adblockers don't crash the entire ES6 module
 import("https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js").then((module) => {
-    analytics = module.getAnalytics(app);
-    console.log("Firebase Analytics initialized");
+    try {
+        analytics = module.getAnalytics(app);
+        console.log("Firebase Analytics initialized");
+    } catch (err) {
+        console.warn("Firebase Analytics getAnalytics failed gracefully:", err.message);
+    }
 }).catch((error) => {
-    console.warn("Firebase Analytics could not be loaded (likely blocked by an adblocker). Data will gracefully continue without it.", error);
+    console.warn("Firebase Analytics script could not be loaded (likely blocked by an adblocker). Data will gracefully continue without it.", error);
 });
 
 // Use default Firestore database (native Firestore, not MongoDB-compatible)
