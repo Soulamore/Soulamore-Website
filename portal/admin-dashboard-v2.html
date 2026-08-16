@@ -2811,6 +2811,39 @@
             alert('🚀 All 2,267 unscheduled pending leads queued for campaign distribution.');
         };
 
+        // --- USER ROLE MANAGEMENT & DUPLICATE MERGING ---
+        window.v2UpdateUserRole = async function(uid, newRole) {
+            if (!confirm(`Update user role for ${uid} to [${newRole}]?`)) return;
+            try {
+                await updateDoc(doc(db, 'users', uid), { role: newRole, updatedAt: serverTimestamp() });
+                alert(`✅ User role successfully updated to ${newRole}`);
+            } catch (err) {
+                console.error('Role update error:', err);
+                alert('Role update error: ' + err.message);
+            }
+        };
+
+        window.v2MergeDuplicateUser = async function(primaryUid, secondaryUid) {
+            if (!confirm(`Merge account ${secondaryUid} into primary ${primaryUid}?`)) return;
+            try {
+                await updateDoc(doc(db, 'users', secondaryUid), { isMerged: true, primaryId: primaryUid, updatedAt: serverTimestamp() });
+                alert('✅ Accounts merged! Secondary user marked as merged.');
+            } catch (err) {
+                console.error('Account merge error:', err);
+                alert('Merge error: ' + err.message);
+            }
+        };
+
+        window.v2ToggleSystemMaintenance = async function(enabled) {
+            try {
+                await setDoc(doc(db, 'maintenance_settings', 'global'), { enabled: !!enabled, updatedAt: serverTimestamp() }, { merge: true });
+                alert(`✅ Maintenance Mode updated: ${enabled ? 'ENABLED' : 'DISABLED'}`);
+            } catch (err) {
+                console.error('Maintenance mode toggle error:', err);
+                alert('Maintenance toggle error: ' + err.message);
+            }
+        };
+
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 const userNameEl = document.getElementById('v2UserName');
