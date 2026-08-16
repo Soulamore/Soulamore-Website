@@ -58,15 +58,8 @@ export async function openRazorpayCheckout(
             createRazorpayOrder(bookingId)
         ]);
     } catch (err) {
-        console.warn("Secure createRazorpayOrder failed, falling back to client-side order parameters:", err);
-        Razorpay = await loadRazorpayScript();
-        // Fallback order object using the keys Aryan added
-        order = {
-            keyId: "rzp_test_S4uV6QL9r7JLPL",
-            amount: Math.round(amount * 100), // convert to paise
-            currency: "INR",
-            orderId: null // client-side flow doesn't pre-create order
-        };
+        console.error("Secure Razorpay order creation failed:", err);
+        throw new Error("Could not initialize secure checkout order. Please refresh and try again.");
     }
 
     return new Promise((resolve, reject) => {
