@@ -1412,30 +1412,67 @@
                 <input type="tel" id="v2PatientEmergency" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="+91 9876543210">
             </div>
             <div style="display:flex; justify-content:flex-end; gap:8px;">
-                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="document.getElementById('v2AddPatientModal').style.display='none'">Cancel</button>
-                <button class="v2-btn-primary" onclick="v2SaveNewPatient()"><i class="fas fa-user-check"></i> Register Patient</button>
+                <button class="v2-btn-secondary" onclick="document.getElementById('v2AddPatientModal').style.display='none'">Cancel</button>
+                <button class="v2-btn-primary" style="background:var(--primary-cyan);" onclick="v2SaveNewPatient()"><i class="fas fa-user-check"></i> Register Patient</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL 2: REQUEST PAYOUT MODAL -->
     <div class="v2-modal-overlay" id="v2PsychPayoutModal" style="display:none;">
-        <div class="v2-modal-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:600;">
+        <div class="v2-modal-card" style="max-width:520px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:600; font-size:1rem;">
                 <span><i class="fas fa-hand-holding-dollar" style="color:var(--primary-cyan);"></i> Request Consultation Earnings Payout</span>
                 <i class="fas fa-times" style="cursor:pointer;" onclick="document.getElementById('v2PsychPayoutModal').style.display='none'"></i>
             </div>
-            <div class="v2-field-group" style="margin-top:10px;">
+
+            <!-- Payout Method Tabs -->
+            <div style="display:flex; gap:8px; margin-top:10px;">
+                <button class="v2-btn-primary" id="v2PsychPayoutTabUpi" style="flex:1; justify-content:center; padding:8px; background:var(--primary-cyan);" onclick="v2SwitchPsychPayoutMethod('upi')">
+                    <i class="fas fa-mobile-alt"></i> Instant UPI
+                </button>
+                <button class="v2-btn-secondary" id="v2PsychPayoutTabBank" style="flex:1; justify-content:center; padding:8px;" onclick="v2SwitchPsychPayoutMethod('bank')">
+                    <i class="fas fa-building-columns"></i> Bank Transfer
+                </button>
+            </div>
+
+            <div class="v2-field-group" style="margin-top:8px;">
                 <label class="v2-field-label">Payout Amount (₹)</label>
-                <input type="number" id="v2PsychPayoutAmount" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Amount to withdraw">
+                <input type="number" id="v2PsychPayoutAmount" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Amount to withdraw (e.g. 5000)">
             </div>
-            <div class="v2-field-group">
-                <label class="v2-field-label">Bank Account Number / UPI ID</label>
-                <input type="text" id="v2PsychPayoutBank" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Account No or UPI ID">
+
+            <!-- UPI Form -->
+            <div id="v2PsychPayoutFormUpi" style="display:flex; flex-direction:column; gap:10px;">
+                <div class="v2-field-group">
+                    <label class="v2-field-label">UPI VPA Address (Google Pay / PhonePe / Paytm)</label>
+                    <input type="text" id="v2PsychPayoutUpiId" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="drpalakshori@okicici or 9876543210@paytm">
+                </div>
             </div>
-            <div style="display:flex; justify-content:flex-end; gap:8px;">
-                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="document.getElementById('v2PsychPayoutModal').style.display='none'">Cancel</button>
-                <button class="v2-btn-primary" onclick="v2SubmitPsychPayoutRequest()"><i class="fas fa-paper-plane"></i> Submit Payout Request</button>
+
+            <!-- Bank Form -->
+            <div id="v2PsychPayoutFormBank" style="display:none; flex-direction:column; gap:10px;">
+                <div class="v2-field-group">
+                    <label class="v2-field-label">Account Holder Full Name</label>
+                    <input type="text" id="v2PsychPayoutAccountHolder" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Dr. Palak Shori">
+                </div>
+                <div class="v2-field-group">
+                    <label class="v2-field-label">Bank Account Number</label>
+                    <input type="text" id="v2PsychPayoutAccountNumber" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="98765432109876">
+                </div>
+                <div class="v2-field-group">
+                    <label class="v2-field-label">IFSC Code (Bank Branch)</label>
+                    <input type="text" id="v2PsychPayoutIfsc" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="ICIC0001234">
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+                <input type="checkbox" id="v2SavePsychPayoutCredentials" checked style="accent-color:var(--primary-cyan); width:16px; height:16px;">
+                <label for="v2SavePsychPayoutCredentials" style="font-size:0.8rem; color:var(--text-secondary); cursor:pointer;">Save details securely in my clinical profile for future 1-click payouts</label>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+                <button class="v2-btn-secondary" onclick="document.getElementById('v2PsychPayoutModal').style.display='none'">Cancel</button>
+                <button class="v2-btn-primary" style="background:var(--primary-cyan);" onclick="v2SubmitPsychPayoutRequest()"><i class="fas fa-paper-plane"></i> Submit Payout Request</button>
             </div>
         </div>
     </div>
