@@ -2844,6 +2844,21 @@
             }
         };
 
+        // --- COMPLIANCE SECURITY EVENT LOGGER ---
+        window.v2LogSecurityEvent = async function(eventType, description) {
+            try {
+                await addDoc(collection(db, 'security_events'), {
+                    eventType: eventType || 'UNAUTHORIZED_ACCESS_ATTEMPT',
+                    description: description || 'Flagged activity recorded by compliance engine',
+                    timestamp: serverTimestamp(),
+                    userAgent: navigator.userAgent
+                });
+                console.log('✅ Security event logged for compliance audit');
+            } catch (err) {
+                console.warn('Security log write failed:', err);
+            }
+        };
+
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 const userNameEl = document.getElementById('v2UserName');
