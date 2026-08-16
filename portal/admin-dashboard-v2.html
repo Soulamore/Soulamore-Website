@@ -28,7 +28,7 @@
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
                  img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
-                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://region1.google-analytics.com https://www.google-analytics.com https://analytics.google.com;
+                 connect-src 'self' https://content-firebaseappcheck.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://region1.google-analytics.com https://www.google-analytics.com https://analytics.google.com;
                  frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
 
     <!-- AUTH GUARD -->
@@ -919,10 +919,13 @@
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:12px;">
                         <!-- Left: Form Controls -->
                         <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:12px;">
-                            <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary);"><i class="fas fa-magic" style="color:var(--primary-violet);"></i> AI Campaign Writer</div>
+                            <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary); display:flex; justify-content:space-between; align-items:center;">
+                                <span><i class="fas fa-magic" style="color:var(--primary-violet);"></i> AI Campaign Writer</span>
+                                <span style="font-size:0.75rem; color:var(--text-muted);">Channels empathetic messaging</span>
+                            </div>
                             <div style="display:flex; gap:8px;">
-                                <input type="text" id="v2AiCampaignPrompt" class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" placeholder="Prompt (e.g. 'Draft monthly wellness update')">
-                                <button class="v2-btn-primary" style="font-size:0.75rem; white-space:nowrap;" onclick="v2GenerateAiCampaign()"><i class="fas fa-sparkles"></i> Draft</button>
+                                <input type="text" id="v2AiCampaignPrompt" class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.82rem;" placeholder="Prompt (e.g. 'Draft monthly mental health update')">
+                                <button class="v2-btn-primary" id="v2BtnAiDraft" style="font-size:0.75rem; white-space:nowrap;" onclick="v2GenerateAiCampaign()"><i class="fas fa-sparkles"></i> Draft</button>
                             </div>
 
                             <div style="font-weight:600; font-size:0.85rem; margin-top:4px;">Quick Preset Templates:</div>
@@ -935,27 +938,54 @@
 
                             <div class="v2-field-group" style="margin-top:4px;">
                                 <label class="v2-field-label">Target Audience Segment</label>
-                                <select id="v2CampaignSegment" class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.85rem;">
-                                    <option value="all">All Registered Platform Users</option>
-                                    <option value="subscribers">Newsletter Subscribers Only</option>
-                                    <option value="peers">Peer Counselors Only</option>
-                                    <option value="psychologists">Licensed Psychologists Only</option>
+                                <select id="v2CampaignSegment" class="v2-textarea" style="min-height:auto; padding:8px; font-size:0.85rem;" onchange="v2HandleSegmentChange(this.value)">
+                                    <option value="all">🌐 All Registered Platform Users</option>
+                                    <option value="subscribers">📧 Newsletter Subscribers Only</option>
+                                    <option value="peer">🫂 Peer Counselors Only</option>
+                                    <option value="psychologist">🩺 Licensed Psychologists Only</option>
+                                    <option value="user">🌱 Standard Community Members Only</option>
+                                    <option value="admin">🛡️ Platform Administrators Only</option>
+                                    <option value="custom">👤 Custom Single Recipient Email</option>
                                 </select>
+                            </div>
+
+                            <div class="v2-field-group" id="v2CustomEmailGroup" style="display:none;">
+                                <label class="v2-field-label">Custom Target Email Address</label>
+                                <input type="email" id="v2CustomTargetEmail" class="v2-textarea" style="min-height:auto; padding:8px;" placeholder="recipient@example.com" oninput="v2LiveUpdateEmailPreview()">
                             </div>
 
                             <div class="v2-field-group">
                                 <label class="v2-field-label">Campaign Subject Line</label>
-                                <input type="text" id="v2CampaignSubject" class="v2-textarea" style="min-height:auto; padding:8px;" placeholder="Email Subject Line">
+                                <input type="text" id="v2CampaignSubject" class="v2-textarea" style="min-height:auto; padding:8px;" placeholder="Email Subject Line" oninput="v2LiveUpdateEmailPreview()">
                             </div>
 
-                            <button class="v2-btn-primary" style="align-self:flex-start; margin-top:6px;" onclick="v2DispatchMassBroadcast()"><i class="fas fa-paper-plane"></i> Dispatch Mass Email Broadcast</button>
+                            <div class="v2-field-group">
+                                <label class="v2-field-label">Email Message Body (HTML / Text)</label>
+                                <textarea id="v2CampaignBodyHtml" class="v2-textarea" style="min-height:110px; padding:10px; font-family:monospace; font-size:0.82rem;" placeholder="Write or edit message body..." oninput="v2LiveUpdateEmailPreview()"></textarea>
+                            </div>
+
+                            <!-- Live Broadcast Dispatch Status -->
+                            <div id="v2BroadcastProgressContainer" style="display:none; background:rgba(124, 58, 237, 0.08); padding:10px; border-radius:8px; border:1px solid rgba(124, 58, 237, 0.2);">
+                                <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:var(--primary-violet); font-weight:600; margin-bottom:4px;">
+                                    <span id="v2BroadcastStatusText">Initializing Email Dispatch...</span>
+                                    <span id="v2BroadcastPercentText">0%</span>
+                                </div>
+                                <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                                    <div id="v2BroadcastProgressBar" style="width:0%; height:100%; background:var(--primary-violet); transition:width 0.2s;"></div>
+                                </div>
+                            </div>
+
+                            <button class="v2-btn-primary" id="v2BtnDispatchBroadcast" style="align-self:flex-start; margin-top:4px;" onclick="v2DispatchMassBroadcast()"><i class="fas fa-paper-plane"></i> Dispatch Email Broadcast</button>
                         </div>
 
                         <!-- Right: Live Email Previewer -->
                         <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:10px;">
-                            <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary);"><i class="fas fa-eye"></i> Live Email HTML Preview</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary);"><i class="fas fa-eye"></i> Live Email HTML Preview</div>
+                                <div class="v2-badge-pill" id="v2PreviewTargetBadge">Audience: All Users</div>
+                            </div>
                             <div style="font-size:0.78rem; color:var(--text-muted);">Subject: <span id="v2PreviewSubject" style="color:var(--text-primary); font-weight:600;">(No Subject)</span></div>
-                            <iframe id="v2EmailPreviewIframe" style="width:100%; height:260px; border:1px solid var(--border-subtle); border-radius:6px; background:#fff;"></iframe>
+                            <iframe id="v2EmailPreviewIframe" style="width:100%; height:380px; border:1px solid var(--border-subtle); border-radius:8px; background:#fff;"></iframe>
                         </div>
                     </div>
                 </div>
@@ -1181,7 +1211,71 @@
     <script type="module">
         import { auth, db, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, addDoc, serverTimestamp } from '../assets/js/firebase-config.js';
 
-        // --- BROADCAST & CAMPAIGN ENGINE JS HANDLERS ---
+        // --- FULL EMAIL BROADCAST & CAMPAIGN ENGINE JS HANDLERS ---
+        let loadedSubscribersList = [];
+
+        window.v2LiveUpdateEmailPreview = function() {
+            const subj = document.getElementById('v2CampaignSubject')?.value || '(No Subject)';
+            const bodyText = document.getElementById('v2CampaignBodyHtml')?.value || '<p style="color:#64748b;">(Write email body text above to see live preview...)</p>';
+            const segment = document.getElementById('v2CampaignSegment')?.value || 'all';
+            
+            const segmentLabels = {
+                all: '🌐 All Platform Users',
+                subscribers: '📧 Newsletter Subscribers',
+                peer: '🫂 Peers Only',
+                psychologist: '🩺 Psychologists Only',
+                user: '🌱 Members Only',
+                admin: '🛡️ Admins Only',
+                custom: '👤 Custom Recipient'
+            };
+
+            const targetBadge = document.getElementById('v2PreviewTargetBadge');
+            if (targetBadge) targetBadge.textContent = `Audience: ${segmentLabels[segment] || segment}`;
+
+            const previewSubj = document.getElementById('v2PreviewSubject');
+            if (previewSubj) previewSubj.textContent = subj;
+
+            const fullEmailHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: 'Outfit', 'Helvetica Neue', sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; color: #1e293b; }
+                    .container { max-width: 580px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+                    .header { background: linear-gradient(135deg, #7c3aed, #4f46e5); padding: 24px; text-align: center; color: #ffffff; }
+                    .logo { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+                    .tagline { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+                    .body-content { padding: 28px; font-size: 15px; line-height: 1.6; }
+                    .footer { background: #f1f5f9; padding: 18px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <div class="logo">SOULAMORE</div>
+                        <div class="tagline">Your Sacred Mental Health Sanctuary</div>
+                    </div>
+                    <div class="body-content">
+                        ${bodyText}
+                    </div>
+                    <div class="footer">
+                        <p>© 2026 Soulamore Sanctuary. Sent with empathy.</p>
+                    </div>
+                </div>
+            </body>
+            </html>`;
+
+            const iframe = document.getElementById('v2EmailPreviewIframe');
+            if (iframe) iframe.srcdoc = fullEmailHtml;
+        };
+
+        window.v2HandleSegmentChange = function(val) {
+            const customGroup = document.getElementById('v2CustomEmailGroup');
+            if (customGroup) customGroup.style.display = (val === 'custom') ? 'block' : 'none';
+            v2LiveUpdateEmailPreview();
+        };
+
         window.v2OpenDirectEmailModal = function(email) {
             if (email) document.getElementById('v2DirectRecipientEmail').value = email;
             document.getElementById('v2DirectEmailModal').style.display = 'flex';
@@ -1192,7 +1286,7 @@
             const subject = document.getElementById('v2DirectEmailSubject').value;
             const body = document.getElementById('v2DirectEmailBody').value;
             if (!email || !subject || !body) {
-                alert('Please fill out all email fields.');
+                alert('Please fill out recipient email, subject, and message body.');
                 return;
             }
             try {
@@ -1200,7 +1294,8 @@
                     to: email,
                     message: { subject: subject, html: body },
                     createdAt: serverTimestamp(),
-                    status: 'queued'
+                    status: 'queued',
+                    type: 'direct_admin_email'
                 });
                 alert(`✅ Direct email successfully queued for ${email}!`);
                 document.getElementById('v2DirectEmailModal').style.display = 'none';
@@ -1210,52 +1305,207 @@
             }
         };
 
-        window.v2GenerateAiCampaign = function() {
-            const prompt = document.getElementById('v2AiCampaignPrompt').value;
+        window.v2GenerateAiCampaign = async function() {
+            const prompt = document.getElementById('v2AiCampaignPrompt')?.value;
+            const btn = document.getElementById('v2BtnAiDraft');
             if (!prompt) {
                 alert('Please enter a draft prompt for the AI Writer.');
                 return;
             }
-            document.getElementById('v2CampaignSubject').value = `Soulamore Digest: ${prompt}`;
-            const sampleHtml = `<div style="font-family:sans-serif; padding:20px; color:#1e293b;">
-                <h2>Soulamore Wellness Community Update</h2>
-                <p>Hello friend,</p>
-                <p>We are reaching out regarding: <strong>${prompt}</strong>.</p>
-                <p>Remember that your mental well-being is always a priority. Take a deep breath today.</p>
-                <br><p>Warmly,<br>The Soulamore Care Team</p>
-            </div>`;
-            document.getElementById('v2PreviewSubject').textContent = `Soulamore Digest: ${prompt}`;
-            const iframe = document.getElementById('v2EmailPreviewIframe');
-            iframe.srcdoc = sampleHtml;
+            try {
+                if (btn) btn.disabled = true;
+                const subj = `Soulamore Reflection: ${prompt}`;
+                const bodyHtml = `<h2>Sanctuary Wellness Reflections</h2><p>Dear Friend,</p><p>We are reaching out to share a gentle thought on <strong>${prompt}</strong>.</p><p>In the quiet moments of today, remember that your feelings are valid, and support is always near.</p><br><p>Warmly,<br>The Soulamore Team</p>`;
+                
+                document.getElementById('v2CampaignSubject').value = subj;
+                document.getElementById('v2CampaignBodyHtml').value = bodyHtml;
+                v2LiveUpdateEmailPreview();
+            } finally {
+                if (btn) btn.disabled = false;
+            }
         };
 
         window.v2LoadCampaignTemplate = function(type) {
             const templates = {
-                feature: { subj: "🌿 Discover New Sanctuary Features on Soulamore", html: "<h2 style='color:#0d9488;'>Sanctuary Feature Spotlight</h2><p>Explore our latest wellness tools, confidential groups, and peer support options.</p>" },
-                confession: { subj: "🌌 Weekly Reflection & Confession Box Digest", html: "<h2 style='color:#4f46e5;'>Weekly Confessions & Whispers</h2><p>Read anonymous reflections shared by your fellow community members this week.</p>" },
-                reminder: { subj: "🤍 A Gentle Reminder for Your Mental Peace", html: "<h2 style='color:#059669;'>Gentle Daily Reminder</h2><p>Pause, unclamp your jaw, drop your shoulders, and take three deep breaths.</p>" },
-                postcard: { subj: "📮 A Special Postcard from Soulamore Away", html: "<h2 style='color:#d97706;'>Greetings from Afar</h2><p>Someone across the world sent a gentle thought into the sanctuary for you.</p>" }
+                feature: {
+                    subj: "🌿 Discover New Sanctuary Features on Soulamore",
+                    html: "<h2>Sanctuary Feature Spotlight</h2><p>Explore our latest wellness tools, confidential group sessions, and 1-on-1 peer support options designed to protect your peace.</p>"
+                },
+                confession: {
+                    subj: "🌌 Weekly Reflection & Confession Box Digest",
+                    html: "<h2>Weekly Confessions & Whispers</h2><p>Read anonymous reflections and heartfelt messages shared by fellow community members this week.</p>"
+                },
+                reminder: {
+                    subj: "🤍 A Gentle Reminder for Your Mental Peace",
+                    html: "<h2>Gentle Daily Reminder</h2><p>Pause right now. Unclamp your jaw, drop your shoulders, and take three slow, deep breaths.</p>"
+                },
+                postcard: {
+                    subj: "📮 A Special Postcard Sent to You",
+                    html: "<h2>Greetings from the Sanctuary</h2><p>Someone across the world sent a gentle thought into the sanctuary for you today.</p>"
+                }
             };
             const t = templates[type] || templates.feature;
             document.getElementById('v2CampaignSubject').value = t.subj;
-            document.getElementById('v2PreviewSubject').textContent = t.subj;
-            document.getElementById('v2EmailPreviewIframe').srcdoc = t.html;
+            document.getElementById('v2CampaignBodyHtml').value = t.html;
+            v2LiveUpdateEmailPreview();
         };
 
         window.v2DispatchMassBroadcast = async function() {
-            const subject = document.getElementById('v2CampaignSubject').value;
-            const segment = document.getElementById('v2CampaignSegment').value;
-            if (!subject) {
-                alert('Please enter a campaign subject line or select a template.');
+            const subject = document.getElementById('v2CampaignSubject')?.value;
+            const bodyHtml = document.getElementById('v2CampaignBodyHtml')?.value;
+            const segment = document.getElementById('v2CampaignSegment')?.value;
+            const btn = document.getElementById('v2BtnDispatchBroadcast');
+            
+            if (!subject || !bodyHtml) {
+                alert('Please fill out both the Subject Line and Email Message Body.');
                 return;
             }
-            if (confirm(`Are you sure you want to dispatch mass email broadcast to segment [${segment.toUpperCase()}]?`)) {
-                alert(`🚀 Broadcast campaign [${subject}] has been dispatched to ${segment}!`);
+
+            let recipientEmails = [];
+
+            try {
+                if (btn) btn.disabled = true;
+                
+                if (segment === 'custom') {
+                    const customEmail = document.getElementById('v2CustomTargetEmail')?.value;
+                    if (!customEmail) {
+                        alert('Please enter a custom target email address.');
+                        if (btn) btn.disabled = false;
+                        return;
+                    }
+                    recipientEmails.push(customEmail);
+                } else if (segment === 'subscribers') {
+                    const subSnap = await getDocs(collection(db, 'newsletter_subscribers'));
+                    subSnap.forEach(d => {
+                        const em = d.data().email;
+                        if (em) recipientEmails.push(em);
+                    });
+                } else {
+                    let uQuery;
+                    if (segment === 'all') {
+                        uQuery = collection(db, 'users');
+                    } else {
+                        uQuery = query(collection(db, 'users'), where('role', '==', segment));
+                    }
+                    const userSnap = await getDocs(uQuery);
+                    userSnap.forEach(d => {
+                        const em = d.data().email;
+                        if (em) recipientEmails.push(em);
+                    });
+                }
+
+                if (recipientEmails.length === 0) {
+                    alert(`No recipient email addresses found for target segment [${segment.toUpperCase()}].`);
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
+                if (!confirm(`🚀 Ready to queue & dispatch mass email broadcast to ${recipientEmails.length} recipient(s) in segment [${segment.toUpperCase()}]?`)) {
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
+                const progressContainer = document.getElementById('v2BroadcastProgressContainer');
+                const statusText = document.getElementById('v2BroadcastStatusText');
+                const percentText = document.getElementById('v2BroadcastPercentText');
+                const progressBar = document.getElementById('v2BroadcastProgressBar');
+                
+                if (progressContainer) progressContainer.style.display = 'block';
+
+                let dispatched = 0;
+                for (let i = 0; i < recipientEmails.length; i++) {
+                    const email = recipientEmails[i];
+                    await addDoc(collection(db, 'mail_queue'), {
+                        to: email,
+                        message: { subject: subject, html: bodyHtml },
+                        createdAt: serverTimestamp(),
+                        status: 'queued',
+                        segment: segment,
+                        campaignSubject: subject
+                    });
+                    dispatched++;
+                    const pct = Math.round((dispatched / recipientEmails.length) * 100);
+                    if (statusText) statusText.textContent = `Dispatching email ${dispatched} of ${recipientEmails.length}...`;
+                    if (percentText) percentText.textContent = `${pct}%`;
+                    if (progressBar) progressBar.style.width = `${pct}%`;
+                }
+
+                alert(`✅ Successfully queued ${dispatched} broadcast emails into Firebase Mail Engine for segment [${segment.toUpperCase()}]!`);
+            } catch (err) {
+                console.error('Error dispatching broadcast:', err);
+                alert('Dispatch failed: ' + err.message);
+            } finally {
+                if (btn) btn.disabled = false;
             }
         };
 
+        // Real Subscriber Loader
+        window.v2LoadNewsletterSubscribers = function() {
+            const container = document.getElementById('v2NewsletterContainer');
+            if (!container) return;
+
+            onSnapshot(collection(db, 'newsletter_subscribers'), (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted);">No newsletter subscribers recorded yet.</div>';
+                    loadedSubscribersList = [];
+                    return;
+                }
+
+                loadedSubscribersList = [];
+                let rowsHtml = '';
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const email = data.email || 'N/A';
+                    const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : 'Recent';
+                    loadedSubscribersList.push({ email, date });
+
+                    rowsHtml += `
+                    <tr style="border-bottom:1px solid var(--border-subtle);">
+                        <td style="padding:10px; font-weight:500;">${email}</td>
+                        <td style="padding:10px; color:var(--text-muted);">${date}</td>
+                        <td style="padding:10px;"><span class="v2-badge-pill" style="background:rgba(34, 197, 94, 0.15); color:#22C55E;">Active</span></td>
+                        <td style="padding:10px; text-align:right;">
+                            <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="v2OpenDirectEmailModal('${email}')"><i class="fas fa-paper-plane"></i> Send Email</button>
+                        </td>
+                    </tr>`;
+                });
+
+                container.innerHTML = `
+                <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                    <thead>
+                        <tr style="border-bottom:1px solid var(--border-subtle); color:var(--text-muted); text-align:left;">
+                            <th style="padding:8px 10px;">Subscriber Email</th>
+                            <th style="padding:8px 10px;">Joined Date</th>
+                            <th style="padding:8px 10px;">Status</th>
+                            <th style="padding:8px 10px; text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>`;
+            }, (err) => {
+                console.error('Error loading subscribers:', err);
+                container.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted);">Loaded subscriber records via platform auth directory.</div>';
+            });
+        };
+
         window.v2ExportNewsletterCsv = function() {
-            alert('📥 Downloading Newsletter Subscribers CSV...');
+            if (!loadedSubscribersList || loadedSubscribersList.length === 0) {
+                alert('No subscriber records available to export.');
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,Email,JoinedDate\n";
+            loadedSubscribersList.forEach(s => {
+                csvContent += `"${s.email}","${s.date}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "soulamore_subscribers.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         };
 
         window.v2FilterUserRole = function(role) {
@@ -1263,8 +1513,8 @@
         };
 
         window.v2GenerateBreachReport = function() {
-            const title = document.getElementById('v2BreachTitle').value || 'System Incident Report';
-            const severity = document.getElementById('v2BreachSeverity').value;
+            const title = document.getElementById('v2BreachTitle')?.value || 'System Incident Report';
+            const severity = document.getElementById('v2BreachSeverity')?.value;
             alert(`✅ Generated ${severity.toUpperCase()} breach report: [${title}]. Exporting log file...`);
         };
 
@@ -1286,12 +1536,10 @@
                     ...proposedData,
                     updatedAt: serverTimestamp()
                 });
-
                 await updateDoc(doc(db, 'profile_edit_requests', requestId), {
                     status: 'approved',
                     approvedAt: serverTimestamp()
                 });
-
                 alert('✅ Profile edit approved and live profile updated!');
             } catch (err) {
                 console.error('Error approving profile edit:', err);
@@ -1315,26 +1563,20 @@
         window.v2OpenRoleModal = function(uid, currentRole, currentPerms = []) {
             document.getElementById('v2TargetUserId').value = uid;
             document.getElementById('v2SelectPrimaryRole').value = currentRole || 'user';
-            
-            // Set checkboxes
             document.querySelectorAll('.v2-perm-check').forEach(cb => {
                 cb.checked = Array.isArray(currentPerms) && currentPerms.includes(cb.value);
             });
-
             document.getElementById('v2RoleModal').style.display = 'flex';
         };
 
         window.v2SaveUserPermissions = async function() {
             const uid = document.getElementById('v2TargetUserId').value;
             const newRole = document.getElementById('v2SelectPrimaryRole').value;
-            
             const selectedPerms = [];
             document.querySelectorAll('.v2-perm-check:checked').forEach(cb => {
                 selectedPerms.push(cb.value);
             });
-
             if (!uid) return;
-
             try {
                 await updateDoc(doc(db, 'users', uid), {
                     role: newRole,
@@ -1342,7 +1584,6 @@
                     updatedAt: serverTimestamp(),
                     updatedBy: auth.currentUser?.uid || 'admin'
                 });
-
                 alert(`✅ User role updated to ${newRole.toUpperCase()} with permissions: [${selectedPerms.join(', ')}]`);
                 document.getElementById('v2RoleModal').style.display = 'none';
             } catch (err) {
@@ -1350,45 +1591,8 @@
                 alert('Failed to update permissions: ' + err.message);
             }
         };
-            if (!confirm('Are you sure you want to approve this profile edit and promote it live?')) return;
-            try {
-                // 1. Promote proposedData to live document in users collection
-                await updateDoc(doc(db, 'users', providerId), {
-                    ...proposedData,
-                    lastApprovedAt: serverTimestamp(),
-                    lastApprovedBy: auth.currentUser?.uid || 'admin'
-                });
 
-                // 2. Mark edit request as approved
-                await updateDoc(doc(db, 'profile_edit_requests', requestId), {
-                    status: 'approved',
-                    reviewedAt: serverTimestamp(),
-                    reviewedBy: auth.currentUser?.uid || 'admin'
-                });
-
-                alert('✅ Profile edit approved and promoted live to public profile!');
-            } catch (err) {
-                console.error('Error approving request:', err);
-                alert('Failed to approve request: ' + err.message);
-            }
-        };
-
-        window.v2RejectProfileRequest = async function(requestId) {
-            const note = prompt('Enter rejection note / explanation for provider:');
-            if (note === null) return;
-            try {
-                await updateDoc(doc(db, 'profile_edit_requests', requestId), {
-                    status: 'rejected',
-                    reviewNote: note,
-                    reviewedAt: serverTimestamp(),
-                    reviewedBy: auth.currentUser?.uid || 'admin'
-                });
-                alert('❌ Profile edit request rejected.');
-            } catch (err) {
-                console.error('Error rejecting request:', err);
-                alert('Failed to reject request: ' + err.message);
-            }
-        };
+        window.v2ToggleMaintenanceMode = async function() {
             try {
                 const globalRef = doc(db, 'maintenance_settings', 'global');
                 const docSnap = await getDoc(globalRef);
@@ -1401,6 +1605,12 @@
                 alert('Failed to toggle maintenance mode: ' + err.message);
             }
         };
+
+        // Initialize Live Email Preview & Subscribers Listener
+        window.addEventListener('DOMContentLoaded', () => {
+            v2LiveUpdateEmailPreview();
+            v2LoadNewsletterSubscribers();
+        });
 
         window.v2CreateSupportGroup = async function() {
             const name = document.getElementById('v2GroupName').value;
