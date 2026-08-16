@@ -1060,7 +1060,7 @@
                             <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-medium); text-align:center; box-shadow:var(--shadow-sm);">
                                 <div style="font-size:0.75rem; color:var(--text-muted); font-weight:500;">Share with members for 10% OFF</div>
                                 <div style="font-size:1.3rem; font-weight:700; color:var(--primary-peach); letter-spacing:0.1em; margin:8px 0;" id="v2PeerRefCode">PEER10</div>
-                                <button class="v2-btn-primary" style="width:100%; justify-content:center; padding:8px 12px; font-size:0.8rem;" onclick="navigator.clipboard.writeText(document.getElementById('v2PeerRefCode').textContent); alert('✅ Referral code copied to clipboard!')">
+                                <button class="v2-btn-primary" style="width:100%; justify-content:center; padding:8px 12px; font-size:0.8rem;" onclick="v2CopyReferralCode('v2PeerRefCode')">
                                     <i class="fas fa-copy"></i> Copy Code
                                 </button>
                             </div>
@@ -1761,6 +1761,27 @@
     <script type="module">
         import { auth, db, collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc, updateDoc, serverTimestamp } from '../assets/js/firebase-config.js';
 
+        // --- DYNAMIC PRACTITIONER REFERRAL CODE ENGINE ---
+        window.v2GeneratePractitionerReferralCode = function(name, uid) {
+            if (!name || name.trim() === '') {
+                return 'SOUL10' + (uid ? uid.substring(0, 4).toUpperCase() : '');
+            }
+            let cleanName = name.replace(/^dr\.?\s+/i, '').trim();
+            let parts = cleanName.split(/\s+/);
+            let firstName = parts[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            if (firstName.length < 3 && parts.length > 1) {
+                firstName += parts[1].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            }
+            if (firstName.length > 10) firstName = firstName.substring(0, 10);
+            return firstName + '10';
+        };
+
+        window.v2CopyReferralCode = function(elementId) {
+            const code = document.getElementById(elementId)?.textContent || 'SOUL10';
+            navigator.clipboard.writeText(code);
+            alert(`✅ Practitioner referral code "${code}" copied to clipboard!\nShare this code with members for 10% OFF session bookings.`);
+        };
+
         // --- PEER DASHBOARD HANDLERS ---
         window.v2ConnectGoogleCalendar = function() {
             alert('📅 Google Calendar OAuth integration initialized! Syncing peer availability...');
@@ -2020,6 +2041,11 @@
                     if (avatarEl) avatarEl.textContent = displayName.charAt(0).toUpperCase();
                     if (prevNameEl) prevNameEl.textContent = displayName;
                     if (prevInitialEl) prevInitialEl.textContent = displayName.charAt(0).toUpperCase();
+
+                    // Generate & Set Dynamic Referral Code
+                    const dynamicRefCode = data.referralCode || v2GeneratePractitionerReferralCode(displayName, uid);
+                    const refCodeEl = document.getElementById('v2PeerRefCode');
+                    if (refCodeEl) refCodeEl.textContent = dynamicRefCode;
 
                     // Pre-fill existing fields
                     if (data.quote && document.getElementById('v2ProfileTagline')) document.getElementById('v2ProfileTagline').value = data.quote;

@@ -987,7 +987,7 @@
                             <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-medium); text-align:center; box-shadow:var(--shadow-sm);">
                                 <div style="font-size:0.75rem; color:var(--text-muted); font-weight:500;">Share with patients for 10% OFF</div>
                                 <div style="font-size:1.3rem; font-weight:700; color:var(--primary-cyan); letter-spacing:0.1em; margin:8px 0;" id="v2PsychRefCode">DRPALAK10</div>
-                                <button class="v2-btn-primary" style="width:100%; justify-content:center; padding:8px 12px; font-size:0.8rem;" onclick="navigator.clipboard.writeText(document.getElementById('v2PsychRefCode').textContent); alert('✅ Referral code copied to clipboard!')">
+                                <button class="v2-btn-primary" style="width:100%; justify-content:center; padding:8px 12px; font-size:0.8rem;" onclick="v2CopyReferralCode('v2PsychRefCode')">
                                     <i class="fas fa-copy"></i> Copy Code
                                 </button>
                             </div>
@@ -1855,6 +1855,27 @@
             }
         };
 
+        // --- DYNAMIC PRACTITIONER REFERRAL CODE ENGINE ---
+        window.v2GeneratePractitionerReferralCode = function(name, uid) {
+            if (!name || name.trim() === '') {
+                return 'SOUL10' + (uid ? uid.substring(0, 4).toUpperCase() : '');
+            }
+            let cleanName = name.replace(/^dr\.?\s+/i, '').trim();
+            let parts = cleanName.split(/\s+/);
+            let firstName = parts[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            if (firstName.length < 3 && parts.length > 1) {
+                firstName += parts[1].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            }
+            if (firstName.length > 10) firstName = firstName.substring(0, 10);
+            return firstName + '10';
+        };
+
+        window.v2CopyReferralCode = function(elementId) {
+            const code = document.getElementById(elementId)?.textContent || 'SOUL10';
+            navigator.clipboard.writeText(code);
+            alert(`✅ Practitioner referral code "${code}" copied to clipboard!\nShare this code with patients for 10% OFF session bookings.`);
+        };
+
         async function loadPsychDashboard(uid) {
             try {
                 const userDoc = await getDoc(doc(db, 'users', uid));
@@ -1863,6 +1884,11 @@
                     const displayName = data.displayName || data.name || 'Dr. ' + (data.email?.split('@')[0] || 'Psychologist');
                     const userNameEl = document.getElementById('v2UserName');
                     if (userNameEl) userNameEl.textContent = displayName;
+
+                    // Generate & Set Dynamic Referral Code
+                    const dynamicRefCode = data.referralCode || v2GeneratePractitionerReferralCode(displayName, uid);
+                    const refCodeEl = document.getElementById('v2PsychRefCode');
+                    if (refCodeEl) refCodeEl.textContent = dynamicRefCode;
 
                     // Pre-fill fields
                     if (data.title && document.getElementById('v2PsychTitle')) document.getElementById('v2PsychTitle').value = data.title;
