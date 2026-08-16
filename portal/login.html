@@ -616,7 +616,9 @@
                     const errorCode = result.code || result.error;
 
                     if (errorCode) {
-                        if (errorCode === 'auth/user-not-found') {
+                        if (errorCode === 'auth/invalid-credential' || errorCode.includes('invalid-credential')) {
+                            errorMsg = "Incorrect email or password. Please check your credentials or reset your password.";
+                        } else if (errorCode === 'auth/user-not-found') {
                             errorMsg = "No account found with this email. Please sign up first.";
                         } else if (errorCode === 'auth/wrong-password') {
                             errorMsg = "Incorrect password. Please try again or use 'Forgot Password?' to reset it.";
@@ -635,17 +637,16 @@
                         }
                     }
 
-                    console.error('Email login error:', errorCode, errorMsg);
-                    alert(errorMsg);
-                    const globalLoader = document.getElementById('login-global-loader');
-                    if (globalLoader) globalLoader.style.display = 'none';
+                    throw new Error(errorMsg);
                 }
             } catch (e) {
                 console.error('Email login exception:', e);
                 let errorMsg = e.message || "An unexpected error occurred. Please try again.";
 
                 if (e.code) {
-                    if (e.code === 'auth/user-not-found') {
+                    if (e.code === 'auth/invalid-credential' || e.code.includes('invalid-credential')) {
+                        errorMsg = "Incorrect email or password. Please check your credentials or reset your password.";
+                    } else if (e.code === 'auth/user-not-found') {
                         errorMsg = "No account found with this email. Please sign up first.";
                     } else if (e.code === 'auth/wrong-password') {
                         errorMsg = "Incorrect password. Please try again.";
@@ -655,13 +656,17 @@
                 }
 
                 alert(errorMsg);
+            } finally {
+                window.__loginInProgress = false;
                 const globalLoader = document.getElementById('login-global-loader');
                 if (globalLoader) globalLoader.style.display = 'none';
-            } finally {
+
                 // Re-enable button
-                submitBtn.disabled = false;
-                submitBtn.style.opacity = '1';
-                submitBtn.innerHTML = 'Log In';
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.innerHTML = 'Log In';
+                }
             }
         };
     </script>
