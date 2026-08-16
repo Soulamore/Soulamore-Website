@@ -48,7 +48,7 @@ export async function handleRoleRouting(user, intent, isNewUser = false) {
     if (isNewUser && intent === 'user') {
         const confirmMsg = "Welcome to Soulamore! Would you like to complete your profile now?";
         if (confirm(confirmMsg)) {
-            finalizeSession('user', '/portal/user-dashboard.html?showProfile=true');
+            finalizeSession('user', '/portal/user-dashboard-v2.html?showProfile=true');
             return;
         }
     }
@@ -69,13 +69,13 @@ export async function handleRoleRouting(user, intent, isNewUser = false) {
 
         // Route based on role
         if (role === 'admin') {
-            finalizeSession('admin', 'portal/admin-dashboard.html');
+            finalizeSession('admin', 'portal/admin-dashboard-v2.html');
             return;
         }
 
         if (role === 'peer') {
             if (userData.isSetupComplete) {
-                finalizeSession('peer', 'portal/peer-dashboard.html');
+                finalizeSession('peer', 'portal/peer-dashboard-v2.html');
             } else {
                 finalizeSession('peer', 'portal/peer-setup.html');
             }
@@ -84,7 +84,7 @@ export async function handleRoleRouting(user, intent, isNewUser = false) {
 
         if (role === 'psychologist') {
             if (userData.isSetupComplete) {
-                finalizeSession('psychologist', 'portal/psych-dashboard.html');
+                finalizeSession('psychologist', 'portal/psych-dashboard-v2.html');
             } else {
                 finalizeSession('psychologist', 'portal/psych-setup.html');
             }
@@ -92,7 +92,7 @@ export async function handleRoleRouting(user, intent, isNewUser = false) {
         }
 
         // Default: user dashboard
-        finalizeSession('user', 'portal/user-dashboard.html');
+        finalizeSession('user', 'portal/user-dashboard-v2.html');
 
     } catch (error) {
         console.error('[AuthContext] Routing Error:', error);
