@@ -680,6 +680,42 @@
             <div class="loading-tip-icon" style="text-align:center;">🛡️</div>
             <div class="loading-tip-text" style="text-align:center;">Moderation Queues • Audit Trails • Platform Maintenance</div>
         </div>
+    <!-- ROLE & PERMISSIONS MANAGEMENT MODAL -->
+    <div id="v2RoleModal" class="v2-modal-backdrop" style="display:none;">
+        <div class="v2-modal-card">
+            <div style="font-family:'Outfit', sans-serif; font-size:1.1rem; font-weight:700; color:var(--text-primary); border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
+                <i class="fas fa-user-shield" style="color:var(--primary-violet);"></i> Manage User Role & Sub-Permissions
+            </div>
+            
+            <input type="hidden" id="v2TargetUserId">
+            
+            <div class="v2-field-group">
+                <label class="v2-field-label" style="font-weight:600;"><i class="fas fa-id-badge"></i> Primary Platform Role</label>
+                <select class="v2-textarea" id="v2SelectPrimaryRole" style="min-height:auto; padding:10px;">
+                    <option value="user">User / Member</option>
+                    <option value="peer">Peer Listener</option>
+                    <option value="psychologist">Clinical Psychologist</option>
+                    <option value="admin">Administrator</option>
+                </select>
+            </div>
+
+            <div class="v2-field-group" style="margin-top:6px;">
+                <label class="v2-field-label" style="font-weight:600;"><i class="fas fa-key"></i> Granular Admin Sub-Permissions</label>
+                <div style="display:flex; flex-direction:column; gap:8px; background:var(--bg-surface-elevated); padding:12px; border-radius:8px; border:1px solid var(--border-subtle); font-size:0.84rem;">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" value="canManagePayments" class="v2-perm-check"> 💳 Payments & Financials Manager</label>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" value="canModerateProfiles" class="v2-perm-check"> 📝 Profile Edit Moderator</label>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" value="canReviewApplications" class="v2-perm-check"> 📋 Practitioner Application Reviewer</label>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" value="canManageSafety" class="v2-perm-check"> 🚨 Crisis & Risk Safety Officer</label>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" value="canManageBlog" class="v2-perm-check"> 📰 Community & Blog Editor</label>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" value="isSuperAdmin" class="v2-perm-check"> 👑 Super Admin (Full Access)</label>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary); border:1px solid var(--border-subtle);" onclick="document.getElementById('v2RoleModal').style.display='none'">Cancel</button>
+                <button class="v2-btn-primary" onclick="v2SaveUserPermissions()">Save Role & Permissions</button>
+            </div>
+        </div>
     </div>
 
     <!-- SIDEBAR -->
@@ -1013,7 +1049,44 @@
             }
         };
 
-        window.v2ApproveProfileRequest = async function(requestId, providerId, proposedData) {
+        window.v2OpenRoleModal = function(uid, currentRole, currentPerms = []) {
+            document.getElementById('v2TargetUserId').value = uid;
+            document.getElementById('v2SelectPrimaryRole').value = currentRole || 'user';
+            
+            // Set checkboxes
+            document.querySelectorAll('.v2-perm-check').forEach(cb => {
+                cb.checked = Array.isArray(currentPerms) && currentPerms.includes(cb.value);
+            });
+
+            document.getElementById('v2RoleModal').style.display = 'flex';
+        };
+
+        window.v2SaveUserPermissions = async function() {
+            const uid = document.getElementById('v2TargetUserId').value;
+            const newRole = document.getElementById('v2SelectPrimaryRole').value;
+            
+            const selectedPerms = [];
+            document.querySelectorAll('.v2-perm-check:checked').forEach(cb => {
+                selectedPerms.push(cb.value);
+            });
+
+            if (!uid) return;
+
+            try {
+                await updateDoc(doc(db, 'users', uid), {
+                    role: newRole,
+                    adminPermissions: selectedPerms,
+                    updatedAt: serverTimestamp(),
+                    updatedBy: auth.currentUser?.uid || 'admin'
+                });
+
+                alert(`✅ User role updated to ${newRole.toUpperCase()} with permissions: [${selectedPerms.join(', ')}]`);
+                document.getElementById('v2RoleModal').style.display = 'none';
+            } catch (err) {
+                console.error('Error saving user permissions:', err);
+                alert('Failed to update permissions: ' + err.message);
+            }
+        };
             if (!confirm('Are you sure you want to approve this profile edit and promote it live?')) return;
             try {
                 // 1. Promote proposedData to live document in users collection
@@ -1208,8 +1281,40 @@
                     }
                 });
 
-                // 2. Users List Listener
+                // 2. Users Directory & Sub-Permissions Listener
                 onSnapshot(collection(db, 'users'), (snapshot) => {
+                    const usersListContainer = document.getElementById('v2UsersListContainer');
+                    const usersCountEl = document.getElementById('v2UsersCount');
+                    if (usersCountEl) usersCountEl.textContent = snapshot.size;
+
+                    if (usersListContainer) {
+                        let html = `<div style="display:flex; flex-direction:column; gap:10px;">`;
+                        snapshot.forEach(docSnap => {
+                            const u = docSnap.data();
+                            const uid = docSnap.id;
+                            const role = (u.role || 'user').toLowerCase();
+                            const perms = u.adminPermissions || [];
+
+                            html += `
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
+                                    <div>
+                                        <div style="font-weight:700; font-size:0.9rem;">${u.displayName || u.name || u.email || 'User'}</div>
+                                        <div style="font-size:0.76rem; color:var(--text-muted);">${u.email || uid}</div>
+                                        ${perms.length > 0 ? `<div style="font-size:0.72rem; color:var(--primary-violet); margin-top:30px;">Permissions: ${perms.join(', ')}</div>` : ''}
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <span class="v2-badge-pill" style="font-weight:700;">${role.toUpperCase()}</span>
+                                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:5px 12px;" onclick="v2OpenRoleModal('${uid}', '${role}', ${JSON.stringify(perms).replace(/"/g, '&quot;')})">
+                                            <i class="fas fa-user-gear"></i> Manage Roles & Permissions
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += `</div>`;
+                        usersListContainer.innerHTML = html;
+                    }
+                });
 
                 // 3. Newsletter Subscribers Listener
                 onSnapshot(collection(db, 'newsletters'), (snapshot) => {
