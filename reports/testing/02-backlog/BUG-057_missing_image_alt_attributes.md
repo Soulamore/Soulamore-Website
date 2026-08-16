@@ -1,4 +1,4 @@
-# BUG-004: Missing Image Alt Attributes in Legacy Templates
+# BUG-057: Missing Image Alt Attributes in Legacy Templates
 
 ## Ticket metadata
 

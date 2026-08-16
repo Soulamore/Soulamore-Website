@@ -1,4 +1,4 @@
-# BUG-003: Missing WebRTC Directives in Video Telehealth CSP Header
+# BUG-056: Missing WebRTC Directives in Video Telehealth CSP Header
 
 ## Ticket metadata
 

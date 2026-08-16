@@ -1,4 +1,4 @@
-# BUG-002: Hardcoded Client-Side Razorpay Key Fallback in payment-handler.js
+# BUG-055: Hardcoded Client-Side Razorpay Key Fallback in payment-handler.js
 
 ## Ticket metadata
 
@@ -64,7 +64,7 @@ Flagged by automated security scanner.
 
 ### Root cause
 
-Fallback mechanism designed for offline offline dev environment left in production script.
+Fallback mechanism designed for offline dev environment left in production script.
 
 ### Fix implemented
 

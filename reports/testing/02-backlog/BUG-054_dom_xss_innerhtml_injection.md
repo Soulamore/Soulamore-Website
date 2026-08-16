@@ -1,4 +1,4 @@
-# BUG-001: DOM XSS Vulnerability in Unsanitized innerHTML Assignments
+# BUG-054: DOM XSS Vulnerability in Unsanitized innerHTML Assignments
 
 ## Ticket metadata
 
