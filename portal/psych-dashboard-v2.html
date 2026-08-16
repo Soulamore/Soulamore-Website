@@ -28,7 +28,7 @@
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.quilljs.com https://cdn.jsdelivr.net;
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
                  img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
-                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://region1.google-analytics.com https://www.google-analytics.com https://analytics.google.com;
+                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://region1.google-analytics.com https://www.google-analytics.com https://analytics.google.com;
                  frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
 
     <!-- AUTH GUARD -->
@@ -1271,14 +1271,32 @@
             document.getElementById('v2PsychPayoutModal').style.display = 'flex';
         };
 
-        window.v2SubmitPsychPayoutRequest = function() {
+        window.v2SubmitPsychPayoutRequest = async function() {
             const amt = document.getElementById('v2PsychPayoutAmount').value;
+            const upi = document.getElementById('v2PsychUpiId')?.value || 'Registered UPI';
             if (!amt || amt <= 0) {
                 alert('Please enter a valid payout amount.');
                 return;
             }
-            alert(`✅ Payout request for ₹${amt} submitted to accounting!`);
-            document.getElementById('v2PsychPayoutModal').style.display = 'none';
+            try {
+                const user = auth.currentUser;
+                await addDoc(collection(db, 'payout_requests'), {
+                    providerUid: user?.uid || 'psych_uid',
+                    providerName: user?.displayName || 'Psychologist',
+                    providerEmail: user?.email || '',
+                    role: 'psychologist',
+                    amount: Number(amt),
+                    upiId: upi,
+                    status: 'pending',
+                    createdAt: serverTimestamp()
+                });
+
+                alert(`✅ Payout request for ₹${amt} successfully submitted to Soulamore Administration!`);
+                document.getElementById('v2PsychPayoutModal').style.display = 'none';
+            } catch (err) {
+                console.error('Error submitting psychologist payout request:', err);
+                alert('Failed to submit payout request: ' + err.message);
+            }
         };
 
         window.v2ConnectPsychGoogleCalendar = function() {

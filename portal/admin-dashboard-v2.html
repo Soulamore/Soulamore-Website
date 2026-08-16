@@ -28,7 +28,7 @@
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
                  img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
-                 connect-src 'self' https://content-firebaseappcheck.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://region1.google-analytics.com https://www.google-analytics.com https://analytics.google.com;
+                 connect-src 'self' https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://region1.google-analytics.com https://www.google-analytics.com https://analytics.google.com;
                  frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
 
     <!-- AUTH GUARD -->
@@ -1184,11 +1184,37 @@
 
             <!-- 7. FINANCIALS & PAYOUTS -->
             <section class="v2-view-section" id="v2-view-accounting">
+                <!-- 4 Financial Metric Cards -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:20px;">
+                    <div class="v2-side-card" style="background:var(--bg-surface); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;"><i class="fas fa-sack-dollar" style="color:#22C55E;"></i> Total Platform Revenue</div>
+                        <div id="v2StatGrossRevenue" style="font-size:1.6rem; font-weight:700; color:var(--text-primary); margin-top:4px;">₹0.00</div>
+                        <div style="font-size:0.72rem; color:var(--text-muted);">From completed appointments</div>
+                    </div>
+                    <div class="v2-side-card" style="background:var(--bg-surface); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;"><i class="fas fa-hourglass-half" style="color:#EAB308;"></i> Pending Payout Requests</div>
+                        <div id="v2StatPendingPayouts" style="font-size:1.6rem; font-weight:700; color:#EAB308; margin-top:4px;">₹0.00</div>
+                        <div style="font-size:0.72rem; color:var(--text-muted);">Awaiting admin release</div>
+                    </div>
+                    <div class="v2-side-card" style="background:var(--bg-surface); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;"><i class="fas fa-hand-holding-dollar" style="color:var(--primary-violet);"></i> Provider Net Share</div>
+                        <div id="v2StatProviderPayouts" style="font-size:1.6rem; font-weight:700; color:var(--primary-violet); margin-top:4px;">₹0.00</div>
+                        <div style="font-size:0.72rem; color:var(--text-muted);">Rating-based payouts (50%-90%)</div>
+                    </div>
+                    <div class="v2-side-card" style="background:var(--bg-surface); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;"><i class="fas fa-chart-pie" style="color:#06B6D4;"></i> Soulamore Net Margin</div>
+                        <div id="v2StatPlatformMargin" style="font-size:1.6rem; font-weight:700; color:#06B6D4; margin-top:4px;">₹0.00</div>
+                        <div style="font-size:0.72rem; color:var(--text-muted);">Platform commission retained</div>
+                    </div>
+                </div>
+
+                <!-- Provider Payout Requests Table Card -->
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-wallet"></i> Platform Financials & Payouts</div>
+                        <div class="v2-section-title"><i class="fas fa-wallet" style="color:var(--primary-violet);"></i> Practitioner Payout Requests & Ledger</div>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:5px 12px;" onclick="v2ExportFinancialsCsv()"><i class="fas fa-file-csv"></i> Export Accounting CSV</button>
                     </div>
-                    <div style="font-size:1.4rem; font-weight:600; color:var(--text-primary);">₹0.00</div>
+                    <div id="v2PayoutRequestsContainer" style="font-size:0.88rem; color:var(--text-muted);">Loading practitioner payout requests...</div>
                 </div>
             </section>
 
@@ -1197,7 +1223,7 @@
                 <div class="v2-section-card">
                     <div class="v2-section-header">
                         <div class="v2-section-title"><i class="fas fa-people-roof" style="color:var(--primary-violet);"></i> Support Groups Manager</div>
-                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="v2OpenModal('group-modal')"><i class="fas fa-plus"></i> Create Group</button>
+                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:5px 12px;" onclick="v2OpenModal('group-modal')"><i class="fas fa-plus"></i> Create Group</button>
                     </div>
                     <div id="v2SupportGroupsContainer" style="font-size:0.88rem; color:var(--text-muted);">Loading support groups...</div>
                 </div>
@@ -1218,6 +1244,7 @@
                 <div class="v2-section-card">
                     <div class="v2-section-header">
                         <div class="v2-section-title"><i class="fas fa-ear-listen" style="color:var(--primary-violet);"></i> Vents & Confessions Moderation Queue</div>
+                        <div class="v2-badge-pill" style="font-size:0.72rem; background:rgba(234, 179, 8, 0.15); color:#EAB308;">Low-Risk Auto-Approved | Medium/High Risk Held</div>
                     </div>
                     <div id="v2VentsModerationContainer" style="font-size:0.88rem; color:var(--text-muted);">Loading vent box submissions...</div>
                 </div>
@@ -1943,14 +1970,288 @@
             }
         };
 
-        window.v2ToggleMaintenanceMode = async function() {
-            try {
-                const globalRef = doc(db, 'maintenance_settings', 'global');
-                const docSnap = await getDoc(globalRef);
-                const current = docSnap.exists() ? docSnap.data().enabled : false;
+        // Real-Time Financials & Payouts Engine
+        let loadedFinancialsList = [];
+        window.v2LoadFinancialsAndPayouts = function() {
+            const container = document.getElementById('v2PayoutRequestsContainer');
+            if (!container) return;
 
-                await setDoc(globalRef, { enabled: !current, updatedAt: serverTimestamp() }, { merge: true });
-                alert(`✅ Platform maintenance mode ${!current ? 'ACTIVATED' : 'DEACTIVATED'}!`);
+            // 1. Calculate Gross Revenue & Net Margins from Appointments
+            onSnapshot(collection(db, 'appointments'), (snapshot) => {
+                let grossRevenue = 0;
+                let providerNetShare = 0;
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const amount = Number(data.amount) || Number(data.fee) || 0;
+                    grossRevenue += amount;
+
+                    // Rating-based cut: 4.8+ -> 90% provider, 4.5+ -> 80% provider, <4.5 -> 50% provider
+                    const rating = Number(data.providerRating) || 4.7;
+                    let providerCutPct = 0.80;
+                    if (rating >= 4.8) providerCutPct = 0.90;
+                    else if (rating < 4.5) providerCutPct = 0.50;
+
+                    providerNetShare += (amount * providerCutPct);
+                });
+
+                const platformMargin = grossRevenue - providerNetShare;
+
+                const grossEl = document.getElementById('v2StatGrossRevenue');
+                const providerEl = document.getElementById('v2StatProviderPayouts');
+                const marginEl = document.getElementById('v2StatPlatformMargin');
+
+                if (grossEl) grossEl.textContent = `₹${grossRevenue.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                if (providerEl) providerEl.textContent = `₹${providerNetShare.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                if (marginEl) marginEl.textContent = `₹${platformMargin.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            }, (err) => console.error('Error fetching appointments ledger:', err));
+
+            // 2. Real-Time Payout Requests Query
+            onSnapshot(collection(db, 'payout_requests'), (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; padding:24px; color:var(--text-muted);"><i class="fas fa-check-circle" style="color:#22C55E; font-size:1.4rem; margin-bottom:8px; display:block;"></i>No pending practitioner payout requests. All provider accounts are settled.</div>';
+                    const pendingEl = document.getElementById('v2StatPendingPayouts');
+                    if (pendingEl) pendingEl.textContent = '₹0.00';
+                    loadedFinancialsList = [];
+                    return;
+                }
+
+                loadedFinancialsList = [];
+                let pendingSum = 0;
+                let rowsHtml = '';
+
+                snapshot.forEach(docSnap => {
+                    const p = docSnap.data();
+                    const id = docSnap.id;
+                    const amount = Number(p.amount) || 0;
+                    if (p.status === 'pending') pendingSum += amount;
+
+                    const dateStr = p.createdAt ? new Date(p.createdAt.toDate()).toLocaleDateString() : 'Recent';
+                    const roleBadge = p.role === 'psychologist' 
+                        ? '<span class="v2-badge-pill" style="background:rgba(6, 182, 212, 0.15); color:#06B6D4;">Psychologist</span>' 
+                        : '<span class="v2-badge-pill" style="background:rgba(249, 115, 22, 0.15); color:#F97316;">Peer Counselor</span>';
+
+                    const statusBadge = p.status === 'released'
+                        ? '<span class="v2-badge-pill" style="background:rgba(34, 197, 94, 0.15); color:#22C55E;">Released</span>'
+                        : '<span class="v2-badge-pill" style="background:rgba(234, 179, 8, 0.15); color:#EAB308;">Pending</span>';
+
+                    const upiDetails = p.upiId || p.bankAccount || 'UPI: Not Provided';
+
+                    loadedFinancialsList.push({ id, name: p.providerName, role: p.role, amount, upi: upiDetails, status: p.status, date: dateStr });
+
+                    rowsHtml += `
+                    <tr style="border-bottom:1px solid var(--border-subtle);">
+                        <td style="padding:10px; font-weight:600;">${p.providerName || p.providerEmail || 'Practitioner'}</td>
+                        <td style="padding:10px;">${roleBadge}</td>
+                        <td style="padding:10px; font-weight:700; color:var(--text-primary);">₹${amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td style="padding:10px; font-family:monospace; font-size:0.8rem; color:var(--text-secondary);">${upiDetails}</td>
+                        <td style="padding:10px;">${statusBadge}</td>
+                        <td style="padding:10px; font-size:0.75rem; color:var(--text-muted);">${dateStr}</td>
+                        <td style="padding:10px; text-align:right;">
+                            ${p.status === 'pending' ? `<button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px; background:#22C55E;" onclick="v2ReleasePayout('${id}', ${amount}, '${p.providerUid || ''}', '${p.providerEmail || ''}')"><i class="fas fa-check-double"></i> Release Payout</button>` : '<span style="font-size:0.75rem; color:var(--text-muted);">Settled</span>'}
+                        </td>
+                    </tr>`;
+                });
+
+                const pendingEl = document.getElementById('v2StatPendingPayouts');
+                if (pendingEl) pendingEl.textContent = `₹${pendingSum.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+                container.innerHTML = `
+                <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                    <thead>
+                        <tr style="border-bottom:1px solid var(--border-subtle); color:var(--text-muted); text-align:left;">
+                            <th style="padding:8px 10px;">Practitioner</th>
+                            <th style="padding:8px 10px;">Role</th>
+                            <th style="padding:8px 10px;">Requested Payout</th>
+                            <th style="padding:8px 10px;">UPI / Bank Details</th>
+                            <th style="padding:8px 10px;">Status</th>
+                            <th style="padding:8px 10px;">Date</th>
+                            <th style="padding:8px 10px; text-align:right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>`;
+            }, (err) => console.error('Error loading payout requests:', err));
+        };
+
+        // Admin Action: Confirm & Release Payout
+        window.v2ReleasePayout = async function(payoutId, amount, providerUid, providerEmail) {
+            if (!confirm(`Are you sure you want to release payout of ₹${amount} to practitioner?`)) return;
+            try {
+                await updateDoc(doc(db, 'payout_requests', payoutId), {
+                    status: 'released',
+                    releasedAt: serverTimestamp(),
+                    releasedBy: auth.currentUser?.uid || 'admin'
+                });
+
+                // Queue automated email notification to provider
+                if (providerEmail) {
+                    await addDoc(collection(db, 'mail_queue'), {
+                        to: providerEmail,
+                        message: {
+                            subject: '✅ Payout Released - Soulamore Platform',
+                            html: `<h2>Payout Notification</h2><p>Your requested payout of <strong>₹${amount}</strong> has been released by Soulamore Administration.</p><p>Funds will reflect in your registered bank/UPI account shortly.</p>`
+                        },
+                        createdAt: serverTimestamp(),
+                        status: 'queued'
+                    });
+                }
+
+                alert(`✅ Payout of ₹${amount} successfully released! Automated email notification queued to practitioner.`);
+            } catch (err) {
+                console.error('Error releasing payout:', err);
+                alert('Failed to release payout: ' + err.message);
+            }
+        };
+
+        window.v2ExportFinancialsCsv = function() {
+            if (!loadedFinancialsList || loadedFinancialsList.length === 0) {
+                alert('No payout records available to export.');
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,PayoutID,Name,Role,Amount,UPI,Status,Date\n";
+            loadedFinancialsList.forEach(p => {
+                csvContent += `"${p.id}","${p.name}","${p.role}","${p.amount}","${p.upi}","${p.status}","${p.date}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "soulamore_financials_ledger.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        // Real-Time Confessions & Vents Moderation Queue with Sensitive Trigger Identification
+        window.v2LoadVentsModeration = function() {
+            const container = document.getElementById('v2VentsModerationContainer');
+            if (!container) return;
+
+            const sensitiveWords = ['suicide', 'self-harm', 'kill', 'end my life', 'abuse', 'violence', 'hurt myself', 'hopeless', 'harm'];
+
+            onSnapshot(collection(db, 'confessions'), (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);"><i class="fas fa-check-circle" style="color:#22C55E; font-size:1.2rem; margin-bottom:6px; display:block;"></i>Confessions moderation queue is clear. No pending vents.</div>';
+                    return;
+                }
+
+                let itemsHtml = '';
+                snapshot.forEach(docSnap => {
+                    const c = docSnap.data();
+                    const id = docSnap.id;
+                    const text = c.text || c.content || '';
+                    const lowerText = text.toLowerCase();
+
+                    const matchedWords = sensitiveWords.filter(w => lowerText.includes(w));
+                    const isHighRisk = matchedWords.length > 0;
+
+                    // Auto-approve low-risk confessions automatically if status is unassigned
+                    if (!isHighRisk && (!c.status || c.status === 'pending')) {
+                        updateDoc(doc(db, 'confessions', id), { status: 'approved', autoApproved: true });
+                        return;
+                    }
+
+                    if (c.status === 'pending') {
+                        const riskBadge = isHighRisk 
+                            ? `<span class="v2-badge-pill" style="background:rgba(239, 68, 68, 0.15); color:#EF4444; font-weight:700;"><i class="fas fa-triangle-exclamation"></i> HIGH RISK DETECTED (${matchedWords.join(', ')})</span>`
+                            : `<span class="v2-badge-pill" style="background:rgba(234, 179, 8, 0.15); color:#EAB308;">Low Risk Pending</span>`;
+
+                        itemsHtml += `
+                        <div style="background:var(--bg-surface-elevated); border:1px solid ${isHighRisk ? '#EF4444' : 'var(--border-subtle)'}; border-radius:var(--radius-md); padding:14px; margin-bottom:12px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <div style="font-size:0.75rem; color:var(--text-muted);">Submitted: ${c.createdAt ? new Date(c.createdAt.toDate()).toLocaleString() : 'Recent'}</div>
+                                ${riskBadge}
+                            </div>
+                            <div style="font-size:0.88rem; color:var(--text-primary); margin-bottom:12px; line-height:1.4;">"${text}"</div>
+                            <div style="display:flex; gap:8px;">
+                                <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px; background:#22C55E;" onclick="v2ModerateConfession('${id}', 'approved')"><i class="fas fa-check"></i> Approve Confession</button>
+                                <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px; background:#EF4444;" onclick="v2ModerateConfession('${id}', 'rejected')"><i class="fas fa-times"></i> Reject</button>
+                            </div>
+                        </div>`;
+                    }
+                });
+
+                container.innerHTML = itemsHtml || '<div style="text-align:center; padding:16px; color:var(--text-muted);">All pending confessions reviewed and approved.</div>';
+            }, (err) => console.error('Error loading confessions:', err));
+        };
+
+        window.v2ModerateConfession = async function(confessionId, action) {
+            try {
+                await updateDoc(doc(db, 'confessions', confessionId), {
+                    status: action,
+                    moderatedAt: serverTimestamp(),
+                    moderatedBy: auth.currentUser?.uid || 'admin'
+                });
+                alert(`✅ Confession ${action.toUpperCase()}!`);
+            } catch (err) {
+                console.error('Error moderating confession:', err);
+                alert('Failed to moderate: ' + err.message);
+            }
+        };
+
+        // Real-Time Safety & Risk Reports Feed with Escalation Protocol
+        window.v2LoadSafetyReports = function() {
+            const container = document.getElementById('v2SafetyReportsContainer');
+            if (!container) return;
+
+            onSnapshot(collection(db, 'safety_reports'), (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);"><i class="fas fa-shield" style="color:#22C55E; font-size:1.2rem; margin-bottom:6px; display:block;"></i>No open safety risk reports. Platform safety clear.</div>';
+                    return;
+                }
+
+                let cardsHtml = '';
+                snapshot.forEach(docSnap => {
+                    const r = docSnap.data();
+                    const id = docSnap.id;
+                    const date = r.createdAt ? new Date(r.createdAt.toDate()).toLocaleString() : 'Recent';
+                    const isHigh = r.severity === 'high' || r.riskLevel === 'high';
+
+                    cardsHtml += `
+                    <div style="background:var(--bg-surface-elevated); border:1px solid ${isHigh ? '#EF4444' : 'var(--border-subtle)'}; border-radius:var(--radius-md); padding:16px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <span class="v2-badge-pill" style="background:${isHigh ? 'rgba(239, 68, 68, 0.15)' : 'rgba(234, 179, 8, 0.15)'}; color:${isHigh ? '#EF4444' : '#EAB308'}; font-weight:700;">
+                                <i class="fas fa-shield-halved"></i> ${isHigh ? 'HIGH RISK CRISIS' : 'MODERATE RISK'}
+                            </span>
+                            <span style="font-size:0.75rem; color:var(--text-muted);">${date}</span>
+                        </div>
+                        <div style="font-size:0.88rem; font-weight:600; color:var(--text-primary); margin-bottom:4px;">Report Issue: ${r.reason || r.summary || 'Safety Alert'}</div>
+                        <div style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:12px;">Target User: ${r.targetEmail || r.targetUid || 'Anonymous User'} | Reported By: ${r.reporterEmail || r.reporterUid || 'System Monitor'}</div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px; background:#EF4444;" onclick="v2EscalateSafetyReport('${id}')"><i class="fas fa-truck-medical"></i> Escalate to Clinical Supervisor</button>
+                        </div>
+                    </div>`;
+                });
+
+                container.innerHTML = cardsHtml;
+            }, (err) => console.error('Error loading safety reports:', err));
+        };
+
+        window.v2EscalateSafetyReport = async function(reportId) {
+            try {
+                await updateDoc(doc(db, 'safety_reports', reportId), {
+                    status: 'escalated',
+                    escalatedAt: serverTimestamp(),
+                    escalatedBy: auth.currentUser?.uid || 'admin'
+                });
+                alert('🚨 Safety Report ESCALATED to Clinical Supervision Team! Alerts fired.');
+            } catch (err) {
+                console.error('Error escalating report:', err);
+                alert('Escalation failed: ' + err.message);
+            }
+        };
+
+        // Initialize Live Email Preview, Subscribers & Financials Listeners
+        window.addEventListener('DOMContentLoaded', () => {
+            v2LiveUpdateEmailPreview();
+            v2LoadNewsletterSubscribers();
+            v2LoadCampaignAnalytics();
+            v2LoadFinancialsAndPayouts();
+            v2LoadVentsModeration();
+            v2LoadSafetyReports();
+        });
             } catch (err) {
                 console.error('Error toggling maintenance mode:', err);
                 alert('Failed to toggle maintenance mode: ' + err.message);

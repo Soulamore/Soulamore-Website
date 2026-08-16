@@ -24,11 +24,11 @@
     </script>
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
-                 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com https://cdn.quilljs.com https://cdn.jsdelivr.net;
-                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.quilljs.com https://cdn.jsdelivr.net;
+                 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com;
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
                  font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
                  img-src 'self' data: https: https://lh3.googleusercontent.com https://graph.facebook.com;
-                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://region1.google-analytics.com https://www.google-analytics.com https://analytics.google.com;
+                 connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://www.facebook.com https://graph.facebook.com https://www.googleapis.com https://www.google.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://analytics.google.com https://www.google-analytics.com https://region1.google-analytics.com;
                  frame-src 'self' https://accounts.google.com https://www.facebook.com https://www.google.com https://www.gstatic.com/recaptcha/ https://recaptcha.google.com https://soulamore-f0a64.firebaseapp.com https://*.firebaseapp.com;">
 
     <!-- AUTH GUARD -->
@@ -1332,14 +1332,18 @@
         </div>
     </div>
 
-    <!-- MODAL 3: PAYOUT METHOD EDIT MODAL -->
+    <!-- MODAL 3: PAYOUT METHOD & REQUEST MODAL -->
     <div class="v2-modal-overlay" id="v2PeerPayoutModal" style="display:none;">
         <div class="v2-modal-card">
             <div style="display:flex; justify-content:space-between; align-items:center; font-weight:600;">
-                <span><i class="fas fa-university" style="color:var(--primary-peach);"></i> Update Peer Honorarium Payout Method</span>
+                <span><i class="fas fa-university" style="color:var(--primary-peach);"></i> Request Peer Honorarium Payout</span>
                 <i class="fas fa-times" style="cursor:pointer;" onclick="document.getElementById('v2PeerPayoutModal').style.display='none'"></i>
             </div>
             <div class="v2-field-group" style="margin-top:10px;">
+                <label class="v2-field-label">Payout Amount (₹)</label>
+                <input type="number" id="v2PeerPayoutAmount" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Enter payout amount (e.g. 1500)">
+            </div>
+            <div class="v2-field-group">
                 <label class="v2-field-label">Bank Account Number / UPI ID</label>
                 <input type="text" id="v2PeerPayoutAccount" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="e.g. 9876543210@paytm or Account No">
             </div>
@@ -1349,7 +1353,7 @@
             </div>
             <div style="display:flex; justify-content:flex-end; gap:8px;">
                 <button class="v2-btn-primary" style="background:var(--bg-surface-elevated); color:var(--text-primary);" onclick="document.getElementById('v2PeerPayoutModal').style.display='none'">Cancel</button>
-                <button class="v2-btn-primary" onclick="v2SavePeerPayoutMethod()"><i class="fas fa-save"></i> Save Payout Details</button>
+                <button class="v2-btn-primary" onclick="v2SubmitPeerPayoutRequest()"><i class="fas fa-paper-plane"></i> Submit Payout Request</button>
             </div>
         </div>
     </div>
@@ -1385,14 +1389,40 @@
             document.getElementById('v2PeerPayoutModal').style.display = 'flex';
         };
 
-        window.v2SavePeerPayoutMethod = function() {
-            const acc = document.getElementById('v2PeerPayoutAccount').value;
-            if (!acc) {
-                alert('Please enter a bank account or UPI ID.');
+        window.v2SubmitPeerPayoutRequest = async function() {
+            const amount = document.getElementById('v2PeerPayoutAmount')?.value;
+            const acc = document.getElementById('v2PeerPayoutAccount')?.value;
+            const ifsc = document.getElementById('v2PeerPayoutIfsc')?.value;
+
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid payout amount.');
                 return;
             }
-            alert(`✅ Payout method updated to: ${acc}`);
-            document.getElementById('v2PeerPayoutModal').style.display = 'none';
+            if (!acc) {
+                alert('Please enter your UPI ID or Bank Account details.');
+                return;
+            }
+
+            try {
+                const user = auth.currentUser;
+                await addDoc(collection(db, 'payout_requests'), {
+                    providerUid: user?.uid || 'peer_uid',
+                    providerName: user?.displayName || 'Peer Counselor',
+                    providerEmail: user?.email || '',
+                    role: 'peer',
+                    amount: Number(amount),
+                    upiId: acc,
+                    ifscCode: ifsc || '',
+                    status: 'pending',
+                    createdAt: serverTimestamp()
+                });
+
+                alert(`✅ Payout request for ₹${amount} successfully submitted to Soulamore Administration!`);
+                document.getElementById('v2PeerPayoutModal').style.display = 'none';
+            } catch (err) {
+                console.error('Error submitting peer payout request:', err);
+                alert('Failed to submit payout request: ' + err.message);
+            }
         };
 
         window.v2OpenPeerSupervisionModal = function() {
