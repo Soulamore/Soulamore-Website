@@ -43,11 +43,11 @@ import {
 const STORAGE_KEY = 'soulamore_session';
 const VALID_ROLES = ['user', 'peer', 'psychologist', 'admin'];
 const DASHBOARD_MAP = {
-    'admin': 'portal/admin-dashboard.html',
-    'psychologist': 'portal/psych-dashboard.html',
-    'peer': 'portal/peer-dashboard.html',
-    'user': 'portal/user-dashboard.html',
-    'member': 'portal/user-dashboard.html'
+    'admin': 'portal/admin-dashboard-v2.html',
+    'psychologist': 'portal/psych-dashboard-v2.html',
+    'peer': 'portal/peer-dashboard-v2.html',
+    'user': 'portal/user-dashboard-v2.html',
+    'member': 'portal/user-dashboard-v2.html'
 };
 
 // Hardcoded overrides (emergency only)

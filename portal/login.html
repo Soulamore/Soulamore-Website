@@ -298,8 +298,8 @@
                 } catch (err) {
                     console.error('[AutoRedirect] Unified role routing failed, using fallback:', err);
                     const storedRole = (JSON.parse(localStorage.getItem("soulamore_session") || '{}').role) || 'user';
-                    const fallbackMap = { admin: 'admin-dashboard.html', peer: 'peer-dashboard.html', psychologist: 'psych-dashboard.html' };
-                    window.location.replace(fallbackMap[storedRole] || 'user-dashboard.html');
+                    const fallbackMap = { admin: 'admin-dashboard-v2.html', peer: 'peer-dashboard-v2.html', psychologist: 'psych-dashboard-v2.html' };
+                    window.location.replace(fallbackMap[storedRole] || 'user-dashboard-v2.html');
                 }
             }
         });
@@ -926,9 +926,10 @@
         }
 
         function manualRedirect(intent) {
-            let target = 'user-dashboard.html';
-            if (intent === 'peer') target = 'peer-dashboard.html';
-            if (intent === 'psychologist' || intent === 'pro') target = 'psych-dashboard.html'; // Handle 'pro' alias
+            let target = 'user-dashboard-v2.html';
+            if (intent === 'peer') target = 'peer-dashboard-v2.html';
+            if (intent === 'psychologist' || intent === 'pro') target = 'psych-dashboard-v2.html';
+            if (intent === 'admin') target = 'admin-dashboard-v2.html';
 
             console.log(`Redirecting to: ${target}`);
             window.location.href = target;

@@ -33,10 +33,10 @@
 
     // ==================== DASHBOARD MAPPING ====================
     const DASHBOARD_RULES = {
-        'admin-dashboard': { allowed: ['admin'], redirect: 'portal/admin-dashboard.html' },
-        'psych-dashboard': { allowed: ['psychologist'], redirect: 'portal/psych-dashboard.html' },
-        'peer-dashboard': { allowed: ['peer'], redirect: 'portal/peer-dashboard.html' },
-        'user-dashboard': { allowed: ['user', 'member', 'peer', 'psychologist', 'admin'], redirect: 'portal/user-dashboard.html' }
+        'admin-dashboard': { allowed: ['admin'], redirect: 'portal/admin-dashboard-v2.html' },
+        'psych-dashboard': { allowed: ['psychologist'], redirect: 'portal/psych-dashboard-v2.html' },
+        'peer-dashboard': { allowed: ['peer'], redirect: 'portal/peer-dashboard-v2.html' },
+        'user-dashboard': { allowed: ['user', 'member', 'peer', 'psychologist', 'admin'], redirect: 'portal/user-dashboard-v2.html' }
     };
 
     // ==================== STATE ====================
