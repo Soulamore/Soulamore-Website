@@ -1011,7 +1011,7 @@
                             <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary); margin-bottom:8px;"><i class="fas fa-ticket-alt" style="color:var(--primary-cyan); margin-right:4px;"></i> My Practitioner Referral Code</div>
                             <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-medium); text-align:center; box-shadow:var(--shadow-sm);">
                                 <div style="font-size:0.75rem; color:var(--text-muted); font-weight:500;">Share with patients for 10% OFF</div>
-                                <div style="font-size:1.3rem; font-weight:700; color:var(--primary-cyan); letter-spacing:0.1em; margin:8px 0;" id="v2PsychRefCode">DRPALAK10</div>
+                                <div style="font-size:1.3rem; font-weight:700; color:var(--primary-cyan); letter-spacing:0.1em; margin:8px 0;" id="v2PsychRefCode">SOUL10</div>
                                 <div style="display:flex; gap:8px;">
                                     <button class="v2-btn-primary" style="flex:1; justify-content:center; padding:8px; font-size:0.78rem;" onclick="v2CopyReferralCode('v2PsychRefCode')">
                                         <i class="fas fa-copy"></i> Copy Code
@@ -1619,7 +1619,7 @@
             <div id="v2PsychPayoutFormUpi" style="display:flex; flex-direction:column; gap:10px;">
                 <div class="v2-field-group">
                     <label class="v2-field-label">UPI VPA Address (Google Pay / PhonePe / Paytm)</label>
-                    <input type="text" id="v2PsychPayoutUpiId" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="drpalakshori@okicici or 9876543210@paytm">
+                    <input type="text" id="v2PsychPayoutUpiId" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="yourname@upi or 9876543210@paytm">
                 </div>
             </div>
 
@@ -1627,7 +1627,7 @@
             <div id="v2PsychPayoutFormBank" style="display:none; flex-direction:column; gap:10px;">
                 <div class="v2-field-group">
                     <label class="v2-field-label">Account Holder Full Name</label>
-                    <input type="text" id="v2PsychPayoutAccountHolder" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Dr. Palak Shori">
+                    <input type="text" id="v2PsychPayoutAccountHolder" class="v2-textarea" style="min-height:auto; padding:10px;" placeholder="Registered Account Holder Name">
                 </div>
                 <div class="v2-field-group">
                     <label class="v2-field-label">Bank Account Number</label>
@@ -2006,7 +2006,12 @@
                     const data = userDoc.data();
                     const displayName = data.displayName || data.name || 'Dr. ' + (data.email?.split('@')[0] || 'Psychologist');
                     const userNameEl = document.getElementById('v2UserName');
+                    const bookingUrlEl = document.getElementById('v2PsychPersonalBookingUrl');
                     if (userNameEl) userNameEl.textContent = displayName;
+                    if (bookingUrlEl) {
+                        const slug = displayName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                        bookingUrlEl.textContent = `soulamore.com/book/${slug}`;
+                    }
 
                     // Generate, Set & Auto-Persist Dynamic Referral Code to Firestore
                     const dynamicRefCode = data.referralCode || v2GeneratePractitionerReferralCode(displayName, uid);
