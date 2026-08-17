@@ -822,7 +822,7 @@
                 <i class="fas fa-bookmark"></i> Saved
             </li>
             <li class="v2-nav-item" onclick="v2SwitchTab('wallet', this)">
-                <i class="fas fa-wallet"></i> My Wallet
+                <i class="fas fa-wallet"></i> My Wallet <span class="v2-badge-pill" id="v2NavWalletBadge" style="margin-left:auto; font-size:0.7rem; padding:2px 8px; background:rgba(16, 185, 129, 0.2); color:#10B981;">₹0</span>
             </li>
 
             <div class="v2-nav-divider"></div>
@@ -1051,9 +1051,21 @@
 
                 <div class="v2-section-card">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-credit-card"></i> Saved Payment Methods & History</div>
+                        <div class="v2-section-title"><i class="fas fa-credit-card"></i> Saved Payment Handles & Wallet History</div>
                     </div>
-                    <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">No active UPI IDs or cards saved.</div>
+                    <div style="margin-bottom:16px; padding:12px; background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:10px;">
+                        <div style="font-size:0.83rem; font-weight:700; color:var(--text-primary); margin-bottom:8px;">
+                            <i class="fas fa-mobile-alt" style="color:var(--primary-emerald);"></i> Quick Pay UPI Handles
+                        </div>
+                        <div id="v2SavedUpiList" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                            <div style="font-size:0.8rem; color:var(--text-muted);">No UPI handles saved yet. Add your default UPI ID below for 1-click checkout.</div>
+                        </div>
+                        <div style="display:flex; gap:8px; max-width:380px;">
+                            <input type="text" id="v2NewUpiInput" class="v2-textarea" style="min-height:auto; padding:8px 12px; font-size:0.8rem;" placeholder="e.g. user@okaxis or name@upi">
+                            <button class="v2-btn-secondary" style="padding:8px 14px; font-size:0.78rem; font-weight:600;" onclick="v2SaveNewUpiHandle()">Save UPI</button>
+                        </div>
+                    </div>
+
                     <div style="font-weight:600; font-size:0.85rem; margin-bottom:6px;">Recent Transactions</div>
                     <div id="v2WalletTransactionsContainer" style="font-size:0.82rem; color:var(--text-muted);">No wallet transactions logged yet.</div>
                 </div>
@@ -1519,6 +1531,44 @@
             }
         };
 
+        window.v2SaveNewUpiHandle = function() {
+            const upi = document.getElementById('v2NewUpiInput')?.value.trim();
+            if (!upi || !upi.includes('@')) {
+                alert('Please enter a valid UPI ID (e.g. user@upi or name@okaxis).');
+                return;
+            }
+            let saved = JSON.parse(localStorage.getItem('soulamore_saved_upis') || '[]');
+            if (!saved.includes(upi)) {
+                saved.push(upi);
+                localStorage.setItem('soulamore_saved_upis', JSON.stringify(saved));
+            }
+            if (document.getElementById('v2NewUpiInput')) document.getElementById('v2NewUpiInput').value = '';
+            v2RenderSavedUpis();
+        };
+
+        window.v2RenderSavedUpis = function() {
+            const listEl = document.getElementById('v2SavedUpiList');
+            if (!listEl) return;
+            let saved = JSON.parse(localStorage.getItem('soulamore_saved_upis') || '[]');
+            if (saved.length === 0) {
+                listEl.innerHTML = '<div style="font-size:0.8rem; color:var(--text-muted);">No UPI handles saved yet. Add your default UPI ID below for 1-click checkout.</div>';
+                return;
+            }
+            listEl.innerHTML = saved.map(upi => `
+                <div style="background:rgba(16, 185, 129, 0.12); border:1px solid var(--primary-emerald); color:var(--text-primary); padding:6px 12px; border-radius:50px; font-size:0.78rem; font-weight:600; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="fas fa-check-circle" style="color:var(--primary-emerald);"></i> ${upi}
+                    <i class="fas fa-times" style="cursor:pointer; opacity:0.7;" onclick="v2RemoveUpiHandle('${upi}')"></i>
+                </div>
+            `).join('');
+        };
+
+        window.v2RemoveUpiHandle = function(upi) {
+            let saved = JSON.parse(localStorage.getItem('soulamore_saved_upis') || '[]');
+            saved = saved.filter(u => u !== upi);
+            localStorage.setItem('soulamore_saved_upis', JSON.stringify(saved));
+            v2RenderSavedUpis();
+        };
+
         window.v2DownloadMyData = function() {
             alert('📥 Exporting your full personal data backup (JSON/CSV)...');
         };
@@ -1656,17 +1706,25 @@
                     v2LiveUserPreviewUpdate();
                 }
 
+                // Render Saved UPI Handles
+                v2RenderSavedUpis();
+
                 // Real-Time User Wallet Listener
                 const walletDocRef = doc(db, 'user_wallets', uid);
                 onSnapshot(walletDocRef, (walletSnap) => {
                     const balanceEl = document.getElementById('v2WalletBalanceText');
+                    const walletMainEl = document.getElementById('v2UserWalletBalance');
+                    const navBadgeEl = document.getElementById('v2NavWalletBadge');
                     const historyContainer = document.getElementById('v2WalletTransactionsContainer');
 
                     let balance = 0;
                     if (walletSnap.exists()) {
                         balance = Number(walletSnap.data().balance) || 0;
                     }
-                    if (balanceEl) balanceEl.textContent = `₹${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                    const formatted = `₹${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                    if (balanceEl) balanceEl.textContent = formatted;
+                    if (walletMainEl) walletMainEl.textContent = formatted;
+                    if (navBadgeEl) navBadgeEl.textContent = `₹${balance}`;
 
                     // Fetch Transaction Ledger
                     onSnapshot(collection(db, 'user_wallets', uid, 'transactions'), (txSnap) => {
