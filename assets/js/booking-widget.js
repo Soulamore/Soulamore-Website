@@ -15,8 +15,8 @@ import {
     useSessionCreditForBooking,
     PEER_PLAN_TYPES,
     DEFAULT_PLANS
-} from "./peer-booking-handler.js?v=20260723-5";
-import { openRazorpayCheckout } from "./payment-handler.js?v=20260723-5";
+} from "./peer-booking-handler.js?v=20260817-v10";
+import { openRazorpayCheckout } from "./payment-handler.js?v=20260817-v10";
 
 /**
  * Initialize a booking widget inside a given root element.
@@ -231,11 +231,11 @@ export function initBookingWidget(config) {
                 </div>
             </div>
 
-            <div id="${rootId}-guest-fields" style="margin-bottom:18px; display:none;">
+            <div id="${rootId}-guest-fields" style="margin-bottom:18px; display:block;">
                 <div style="display:flex; flex-wrap:wrap; gap:14px;">
                     <div style="flex:1 1 200px;">
                         <label style="display:block; font-size:0.8rem; font-weight:600; color:#475569; margin-bottom:6px;">
-                            Your Name (Guest)
+                            Your Full Name <span style="color:#e11d48;">*</span>
                         </label>
                         <input type="text"
                                id="${rootId}-guest-name"
@@ -252,7 +252,7 @@ export function initBookingWidget(config) {
                     </div>
                     <div style="flex:1 1 200px;">
                         <label style="display:block; font-size:0.8rem; font-weight:600; color:#475569; margin-bottom:6px;">
-                            Email Address
+                            Email Address <span style="color:#e11d48;">*</span>
                         </label>
                         <input type="email"
                                id="${rootId}-guest-email"
@@ -555,25 +555,25 @@ export function initBookingWidget(config) {
     if (submitBtn) {
         submitBtn.addEventListener("click", async () => {
             let activeUser = currentUser;
-            let guestName = "";
-            let guestEmail = "";
+            const nameInput = document.getElementById(`${rootId}-guest-name`);
+            const emailInput = document.getElementById(`${rootId}-guest-email`);
+            
+            const guestName = nameInput ? nameInput.value.trim() : (activeUser ? activeUser.displayName : "");
+            const guestEmail = emailInput ? emailInput.value.trim() : (activeUser ? activeUser.email : "");
+
+            if (!guestName) {
+                setMessage("Please enter your name to confirm your booking.", true);
+                if (nameInput) nameInput.focus();
+                return;
+            }
+
+            if (!guestEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
+                setMessage("Please enter a valid email address.", true);
+                if (emailInput) emailInput.focus();
+                return;
+            }
 
             if (!activeUser) {
-                const nameInput = document.getElementById(`${rootId}-guest-name`);
-                const emailInput = document.getElementById(`${rootId}-guest-email`);
-                guestName = nameInput ? nameInput.value.trim() : "";
-                guestEmail = emailInput ? emailInput.value.trim() : "";
-
-                if (!guestName || !guestEmail) {
-                    setMessage("Please enter your name and email to continue as guest.", true);
-                    return;
-                }
-
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
-                    setMessage("Please enter a valid email address.", true);
-                    return;
-                }
-
                 try {
                     submitBtn.disabled = true;
                     submitBtn.textContent = "Setting up guest account...";
@@ -615,8 +615,8 @@ export function initBookingWidget(config) {
                 const startTime = selectedSlot.start;
                 const endTime = selectedSlot.end;
 
-                const finalName = guestName || activeUser.displayName || "Friend";
-                const finalEmail = guestEmail || activeUser.email || "";
+                const finalName = guestName || (activeUser ? activeUser.displayName : "") || "Friend";
+                const finalEmail = guestEmail || (activeUser ? activeUser.email : "") || "";
 
                 const booking = await createBookingRequest(
                     activeUser.uid,
@@ -663,9 +663,15 @@ export function initBookingWidget(config) {
         if (authWarning) {
             authWarning.style.display = user ? "none" : "block";
         }
-        const guestFields = document.getElementById(`${rootId}-guest-fields`);
-        if (guestFields) {
-            guestFields.style.display = user ? "none" : "block";
+        const nameInput = document.getElementById(`${rootId}-guest-name`);
+        const emailInput = document.getElementById(`${rootId}-guest-email`);
+        if (user) {
+            if (nameInput && !nameInput.value) {
+                nameInput.value = user.displayName || user.email.split('@')[0] || "";
+            }
+            if (emailInput && !emailInput.value) {
+                emailInput.value = user.email || "";
+            }
         }
 
         if (user && !user.isAnonymous) {

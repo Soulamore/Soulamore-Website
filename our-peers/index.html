@@ -673,12 +673,61 @@
         // --- FETCH PEERS FROM DYANMIC DB ---
         let peers = []; // Global store
 
+        const defaultPeersList = [
+            {
+                id: "1",
+                name: "Aditya",
+                quote: "I'm here to listen without rushing your story.",
+                tags: ["Mental Wellness", "Anxiety", "Student", "Hindi", "Physical"],
+                markers: { price: "Free", lang: "Hindi", age: "18-24", gender: "Male", avail: "Online" },
+                avatarColor: "#4ECDC4",
+                profileUrl: "/our-peers/profile.html?id=1"
+            },
+            {
+                id: "10",
+                name: "Zoya",
+                quote: "Here to help you get through tough times.",
+                tags: ["Work Stress", "Travel", "Relationships", "Academic"],
+                markers: { price: "Paid", lang: "English", age: "25-34", gender: "Female", avail: "Online" },
+                avatarColor: "#fbbf24",
+                profileUrl: "/our-peers/profile.html?id=10"
+            },
+            {
+                id: "20",
+                name: "Sonika",
+                quote: "A safe space to untangle your thoughts.",
+                tags: ["Social Anxiety", "LGBTQ+", "Academic Pressure", "Financial"],
+                markers: { price: "Free", lang: "English", age: "18-24", gender: "Female", avail: "Online" },
+                avatarColor: "#F472B6",
+                profileUrl: "/our-peers/profile.html?id=20"
+            },
+            {
+                id: "30",
+                name: "Rohan",
+                quote: "Let's figure things out together, one step at a time.",
+                tags: ["Anxiety", "Career Stress", "Relationships"],
+                markers: { price: "Free", lang: "Hindi", age: "18-24", gender: "Male", avail: "Offline" },
+                avatarColor: "#38bdf8",
+                profileUrl: "/our-peers/profile.html?id=30"
+            }
+        ];
+
+        function mergeWithDefaultPeers(newList) {
+            const map = new Map();
+            defaultPeersList.forEach(p => map.set(String(p.id), p));
+            newList.forEach(p => map.set(String(p.id), p));
+            return Array.from(map.values());
+        }
+
         async function fetchPeers() {
-            // 1. FAST PATH: Instant Memory/Session Cache Lookup (0ms UI latency)
+            // Start with defaults so all peers render instantly
+            peers = defaultPeersList;
+
+            // 1. FAST PATH: Instant Memory/Session Cache Lookup
             const cachedItems = window.SoulamoreCache ? window.SoulamoreCache.getProfessionals('peer') : [];
             if (cachedItems && cachedItems.length > 0) {
                 console.log(`⚡ Instant Cache Hit: Loaded ${cachedItems.length} peers from eager prefetch cache.`);
-                peers = cachedItems.map(p => ({
+                const mappedCached = cachedItems.map(p => ({
                     id: p.id || p.uid,
                     name: p.name || p.displayName,
                     quote: p.quote || "Here to listen.",
@@ -694,27 +743,24 @@
                     photoURL: p.photoURL || p.image || "",
                     profileUrl: `/our-peers/profile.html?id=${encodeURIComponent(p.id || p.uid)}`
                 }));
+                peers = mergeWithDefaultPeers(mappedCached);
+                renderPeers();
+            } else {
                 renderPeers();
             }
 
             try {
-                // Timeout Promise (2.5 seconds limit - Faster Fallback)
                 const timeout = new Promise((_, reject) =>
                     setTimeout(() => reject(new Error("Request timed out")), 2500)
                 );
 
-                // Data Promise
                 const dataFetch = getDocs(collection(db, "professionals"));
-
-                // Race them
                 const querySnapshot = await Promise.race([dataFetch, timeout]);
-
                 const fetchedPeers = [];
 
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    // FILTER: Only show Peers
-                    const isPeer = (data.role && data.role.toLowerCase().includes('peer')) ||
+                    const isPeer = !data.role || (data.role && data.role.toLowerCase().includes('peer')) ||
                         (data.title && data.title.toLowerCase().includes('peer'));
 
                     if (isPeer) {
@@ -738,56 +784,13 @@
                 });
 
                 if (fetchedPeers.length > 0) {
-                    peers = fetchedPeers;
+                    peers = mergeWithDefaultPeers(fetchedPeers);
                     renderPeers();
-                    return;
                 }
             } catch (error) {
                 console.warn("Firestore peers query notice:", error.message);
             }
-
-            // Fallback Data if peers is still empty
-            if (peers.length === 0) {
-                peers = [
-                    {
-                        id: "1",
-                        name: "Aditya",
-                        quote: "I'm here to listen without rushing your story.",
-                        tags: ["Mental Wellness", "Anxiety", "Student", "Hindi"],
-                        markers: { price: "Free", lang: "Hindi", age: "18-24", gender: "Male", avail: "Online" },
-                        avatarColor: "#4ECDC4",
-                        profileUrl: "/our-peers/profile.html?id=1"
-                    },
-                    {
-                        id: "10",
-                        name: "Zoya",
-                        quote: "Here to help you get through tough times.",
-                        tags: ["Work Stress", "Travel", "Relationships"],
-                        markers: { price: "Paid", lang: "English", age: "25-34", gender: "Female", avail: "Online" },
-                        avatarColor: "#fbbf24",
-                        profileUrl: "/our-peers/profile.html?id=10"
-                    },
-                    {
-                        id: "20",
-                        name: "Sonika",
-                        quote: "A safe space to untangle your thoughts.",
-                        tags: ["Social Anxiety", "LGBTQ+", "Academic Pressure"],
-                        markers: { price: "Free", lang: "English", age: "18-24", gender: "Female", avail: "Online" },
-                        avatarColor: "#F472B6",
-                        profileUrl: "/our-peers/profile.html?id=20"
-                    },
-                    {
-                        id: "30",
-                        name: "Rohan",
-                        quote: "Let's figure things out together, one step at a time.",
-                        tags: ["Anxiety", "Career Stress", "Relationships"],
-                        markers: { price: "Free", lang: "Hindi", age: "18-24", gender: "Male", avail: "Offline" },
-                        avatarColor: "#38bdf8",
-                        profileUrl: "/our-peers/profile.html?id=30"
-                    }
-                ];
-                renderPeers();
-            }
+        }
         }
 
         // --- FILTER STATE ---
