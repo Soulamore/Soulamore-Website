@@ -569,8 +569,24 @@
                         </button>
                     </div>
 
-                    <!-- 2. Secondary Filter Bar (Markers) -->
+                    <!-- 2. Combined Filter Bar (Topics + Markers) -->
                     <div class="filter-bar">
+                        <select class="filter-select" id="topicFilter" onchange="setCategory(this.value)">
+                            <option value="all">Topic: All Topics</option>
+                            <option value="Physical">Physical Wellness</option>
+                            <option value="Academic">Academic Wellness</option>
+                            <option value="Financial">Financial Wellness</option>
+                            <option value="Anxiety">Anxiety & Overthinking</option>
+                            <option value="Low Mood">Feeling Low</option>
+                            <option value="Loneliness">Loneliness</option>
+                            <option value="Relationships">Relationships</option>
+                            <option value="Body Image">Body Image</option>
+                            <option value="Self-Esteem">Self-Esteem</option>
+                            <option value="ADHD">ADHD Support</option>
+                            <option value="Grief">Grief & Loss</option>
+                            <option value="LGBTQ">LGBTQ+ Identity</option>
+                        </select>
+
                         <select class="filter-select" id="priceFilter" onchange="applyFilters()">
                             <option value="all">Price: Any</option>
                             <option value="Free">Free (Volunteer)</option>
@@ -855,6 +871,11 @@
         // --- INTERACTION ---
         window.setCategory = function (cat) {
             currentCategory = cat;
+            const topicSelect = document.getElementById('topicFilter');
+            if (topicSelect && topicSelect.value !== cat) {
+                topicSelect.value = cat;
+            }
+
             // Update UI pills
             document.querySelectorAll('.category-pill').forEach(p => {
                 p.classList.remove('active');
@@ -869,6 +890,7 @@
 
         window.resetAll = function () {
             currentCategory = 'all';
+            if (document.getElementById('topicFilter')) document.getElementById('topicFilter').value = 'all';
             document.getElementById('priceFilter').value = 'all';
             document.getElementById('langFilter').value = 'all';
             document.getElementById('ageFilter').value = 'all';
