@@ -289,25 +289,57 @@ export async function createBookingWithConcurrencyLock(peerId, userId, startTime
 }
 export async function getAvailableSlots(peerId, date) {
     try {
+        const dateStr = date.toISOString().split('T')[0];
+
         let availability = await getPeerAvailability(peerId);
-        if (!availability || !availability.availability) {
-            // Provide dynamic default mock availability so practitioners always have slots
-            availability = {
-                peerId: peerId,
-                availability: [
-                    { day: "monday", startTime: "09:00", endTime: "17:00" },
-                    { day: "tuesday", startTime: "09:00", endTime: "17:00" },
-                    { day: "wednesday", startTime: "09:00", endTime: "17:00" },
-                    { day: "thursday", startTime: "09:00", endTime: "17:00" },
-                    { day: "friday", startTime: "09:00", endTime: "17:00" },
-                    { day: "saturday", startTime: "10:00", endTime: "16:00" },
-                    { day: "sunday", startTime: "10:00", endTime: "16:00" }
-                ]
-            };
+        if (!availability) {
+            try {
+                const pSnap = await getDoc(doc(db, "psych_availability", peerId));
+                if (pSnap.exists()) availability = pSnap.data();
+            } catch (e) {}
         }
 
-        const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-        const daySchedules = availability.availability.filter(slot => slot.day.toLowerCase() === dayName);
+        // Check if practitioner marked this date as fully blocked
+        if (availability && Array.isArray(availability.blockedDates) && availability.blockedDates.includes(dateStr)) {
+            console.log(`Practitioner ${peerId} is blocked/off on ${dateStr}`);
+            return [];
+        }
+
+        // Check dateOverrides for custom hours
+        let daySchedules = [];
+        if (availability && availability.dateOverrides && availability.dateOverrides[dateStr]) {
+            const override = availability.dateOverrides[dateStr];
+            if (override.type === 'blocked') {
+                return [];
+            } else if (override.type === 'custom_hours' && Array.isArray(override.slots)) {
+                daySchedules = override.slots.map(s => ({
+                    day: date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase(),
+                    startTime: s.start,
+                    endTime: s.end
+                }));
+            }
+        }
+
+        if (daySchedules.length === 0) {
+            if (!availability || !availability.availability) {
+                // Provide dynamic default mock availability so practitioners always have slots
+                availability = {
+                    peerId: peerId,
+                    availability: [
+                        { day: "monday", startTime: "09:00", endTime: "17:00" },
+                        { day: "tuesday", startTime: "09:00", endTime: "17:00" },
+                        { day: "wednesday", startTime: "09:00", endTime: "17:00" },
+                        { day: "thursday", startTime: "09:00", endTime: "17:00" },
+                        { day: "friday", startTime: "09:00", endTime: "17:00" },
+                        { day: "saturday", startTime: "10:00", endTime: "16:00" },
+                        { day: "sunday", startTime: "10:00", endTime: "16:00" }
+                    ]
+                };
+            }
+
+            const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+            daySchedules = availability.availability.filter(slot => slot.day.toLowerCase() === dayName);
+        }
 
         if (daySchedules.length === 0) {
             return []; // Peer not available on this day
