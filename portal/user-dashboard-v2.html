@@ -797,7 +797,7 @@
         <div class="v2-user-profile-badge">
             <div class="v2-avatar" id="v2Avatar">A</div>
             <div class="v2-user-info">
-                <div class="v2-user-name" id="v2UserName">Loading Member...</div>
+                <div class="v2-user-name" id="v2UserName"></div>
                 <div class="v2-user-status"><span class="v2-status-dot"></span> Member Space</div>
             </div>
         </div>
@@ -1549,19 +1549,30 @@
                                     ? '<span class="v2-badge-pill" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B;"><i class="fas fa-clock"></i> Payment Pending</span>'
                                     : '<span class="v2-badge-pill" style="background:rgba(16, 185, 129, 0.15); color:#10B981;"><i class="fas fa-check-circle"></i> Confirmed</span>';
 
+                                const meetUrl = data.meetingUrl || data.meetLink || `../portal/video-conference.html?roomId=${data.slId || docSnap.id}`;
                                 const joinBtn = isPendingPayment
                                     ? `<button class="v2-btn-secondary" style="font-size:0.75rem; padding:5px 12px; opacity:0.6; cursor:not-allowed;" disabled><i class="fas fa-lock"></i> Complete Payment to Join</button>`
-                                    : `<a href="../portal/video-conference.html?roomId=${data.slId || docSnap.id}" class="v2-btn-primary" style="font-size:0.78rem; padding:5px 12px; text-decoration:none;"><i class="fas fa-video"></i> Join Session Video</a>`;
+                                    : `<a href="${meetUrl}" target="_blank" class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px; text-decoration:none; background:#10B981; color:#fff; border-radius:6px; display:inline-flex; align-items:center; gap:6px;"><i class="fas fa-video"></i> Join Meeting Room</a>`;
+
+                                const actionBtns = isPendingPayment ? '' : `
+                                    <button onclick="window.v2RescheduleSession('${docSnap.id}')" style="background:rgba(148,163,184,0.15); color:var(--text-primary); border:1px solid var(--border-subtle); padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer; margin-right:6px;">
+                                        <i class="fas fa-calendar-alt"></i> Reschedule
+                                    </button>
+                                    <button onclick="window.v2CancelSession('${docSnap.id}')" style="background:rgba(239,68,68,0.1); color:#EF4444; border:1px solid rgba(239,68,68,0.3); padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer;">
+                                        <i class="fas fa-times-circle"></i> Cancel
+                                    </button>
+                                `;
 
                                 html += `
                                     <div style="background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); padding:14px; margin-bottom:10px;">
-                                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                                            <div style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">${data.peerName || data.providerName || 'Verified Practitioner'}</div>
+                                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                                            <div style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">${data.peerName || data.providerName || 'Verified Practitioner'} <span style="font-size:0.75rem; opacity:0.7; font-weight:normal;">(${data.slId || 'Session'})</span></div>
                                             <div>${statusBadge}</div>
                                         </div>
                                         <div style="font-size:0.8rem; color:var(--text-muted); margin:6px 0 12px;"><i class="far fa-clock"></i> ${dateStr}</div>
-                                        <div style="display:flex; justify-content:flex-end;">
-                                            ${joinBtn}
+                                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                                            <div>${actionBtns}</div>
+                                            <div>${joinBtn}</div>
                                         </div>
                                     </div>
                                 `;
@@ -1579,8 +1590,49 @@
             }
         }
 
-        auth.onAuthStateChanged(user => {
+        // Global Reschedule & Cancel Actions
+        window.v2RescheduleSession = async function(bookingId) {
+            const newDate = prompt("Enter new date & time (e.g. Tomorrow 4:00 PM):");
+            if (!newDate) return;
+            try {
+                const { rescheduleBooking } = await import("../assets/js/peer-booking-handler.js");
+                await rescheduleBooking(bookingId, new Date(), new Date(Date.now() + 3600000));
+                alert("Session rescheduled successfully!");
+            } catch (err) {
+                alert("Could not reschedule session: " + err.message);
+            }
+        };
+
+        window.v2CancelSession = async function(bookingId) {
+            if (!confirm("Are you sure you want to cancel this booking?")) return;
+            try {
+                const { cancelBooking } = await import("../assets/js/peer-booking-handler.js");
+                await cancelBooking(bookingId, "Cancelled by user from dashboard");
+                alert("Session cancelled.");
+            } catch (err) {
+                alert("Could not cancel session: " + err.message);
+            }
+        };
+
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
+                const userNameEl = document.getElementById('v2UserName');
+                const avatarEl = document.getElementById('v2Avatar');
+                let displayName = user.displayName || user.email?.split('@')[0] || '';
+
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        displayName = data.displayName || data.name || data.fullName || displayName;
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch user profile doc:', e);
+                }
+
+                if (userNameEl) userNameEl.textContent = displayName;
+                if (avatarEl && displayName) avatarEl.textContent = displayName.charAt(0).toUpperCase();
+
                 loadUserDashboard(user.uid);
             }
         });

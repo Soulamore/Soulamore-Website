@@ -545,6 +545,7 @@
     <script type="module">
         import { resolvePsychologistProfile, mapPsychologistRecordToProfile } from "../assets/js/profile-catalog.js";
         import { mountPsychologistProfile } from "../assets/js/profile-renderers.js";
+        import { SoulamoreCache } from "../assets/js/global-prefetch.js";
 
         const params = new URLSearchParams(window.location.search);
         const key = params.get('slug') || params.get('id') || 'bhagyavathi';
@@ -592,17 +593,33 @@
 
             const uid = params.get('id');
             if (uid) {
-                // Try reading from cache first for instant sub-second loading
-                const cacheKey = `profile_cache_${uid}`;
-                const cached = localStorage.getItem(cacheKey);
-                if (cached) {
-                    try {
-                        profile = JSON.parse(cached);
-                        console.log("⚡ Profile loaded from local cache");
-                        mountPsychologistProfile({ profile, root, loadingEl, errorEl });
-                        setupBookBtnListener(profile);
-                    } catch (e) {
-                        console.warn("Failed to parse cached profile:", e);
+                // Try reading from global eager prefetch cache first (0ms UI latency)
+                if (window.SoulamoreCache) {
+                    const globalCached = window.SoulamoreCache.getById(uid);
+                    if (globalCached && globalCached.raw) {
+                        try {
+                            profile = mapPsychologistRecordToProfile(globalCached.raw, uid);
+                            console.log("⚡ Profile loaded instantly from SoulamoreCache");
+                            mountPsychologistProfile({ profile, root, loadingEl, errorEl });
+                            setupBookBtnListener(profile);
+                        } catch (err) {
+                            console.warn("Global cache map warning:", err);
+                        }
+                    }
+                }
+
+                if (!profile) {
+                    const cacheKey = `profile_cache_${uid}`;
+                    const cached = localStorage.getItem(cacheKey);
+                    if (cached) {
+                        try {
+                            profile = JSON.parse(cached);
+                            console.log("⚡ Profile loaded from local cache");
+                            mountPsychologistProfile({ profile, root, loadingEl, errorEl });
+                            setupBookBtnListener(profile);
+                        } catch (e) {
+                            console.warn("Failed to parse cached profile:", e);
+                        }
                     }
                 }
 

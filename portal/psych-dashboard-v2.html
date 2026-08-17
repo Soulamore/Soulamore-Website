@@ -891,7 +891,7 @@
         <div class="v2-user-profile-badge">
             <div class="v2-avatar" id="v2Avatar">Dr</div>
             <div class="v2-user-info">
-                <div class="v2-user-name" id="v2UserName">Loading Doctor...</div>
+                <div class="v2-user-name" id="v2UserName"></div>
                 <div class="v2-user-status"><span class="v2-status-dot"></span> Licensed Psychologist</div>
             </div>
         </div>
@@ -2309,8 +2309,59 @@
             }
         }
 
-        auth.onAuthStateChanged(user => {
+        window.v2SwitchPsychPayoutMethod = function(method) {
+            const tabBank = document.getElementById('v2PsychPayoutTabBank');
+            const tabUpi = document.getElementById('v2PsychPayoutTabUpi');
+            if (method === 'bank') {
+                if (tabBank) tabBank.className = 'v2-btn-primary';
+                if (tabUpi) tabUpi.className = 'v2-btn-secondary';
+            } else {
+                if (tabBank) tabBank.className = 'v2-btn-secondary';
+                if (tabUpi) tabUpi.className = 'v2-btn-primary';
+            }
+        };
+
+        window.v2TogglePsychLiveStatus = async function() {
+            try {
+                const user = auth.currentUser;
+                if (!user) return;
+                const psychRef = doc(db, 'psychologists', user.uid);
+                const docSnap = await getDoc(psychRef);
+                const currentStatus = docSnap.exists() ? docSnap.data().isLive : false;
+                await setDoc(psychRef, { isLive: !currentStatus, updatedAt: serverTimestamp() }, { merge: true });
+                alert(`🩺 Clinical practice status is now ${!currentStatus ? 'ACTIVE' : 'OFFLINE'}.`);
+            } catch (err) {
+                console.error('Error toggling status:', err);
+                alert('Failed to toggle status: ' + err.message);
+            }
+        };
+
+        window.v2ClearAllPsychBlockedDates = function() {
+            if (confirm('Clear all custom blocked clinical dates for this month?')) {
+                document.querySelectorAll('.v2-blocked-day').forEach(el => el.classList.remove('v2-blocked-day'));
+                alert('✅ Blocked dates cleared.');
+            }
+        };
+
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
+                const userNameEl = document.getElementById('v2UserName');
+                const avatarEl = document.getElementById('v2Avatar');
+                let displayName = user.displayName || user.email?.split('@')[0] || '';
+
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        displayName = data.displayName || data.name || data.fullName || displayName;
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch user profile doc:', e);
+                }
+
+                if (userNameEl) userNameEl.textContent = displayName;
+                if (avatarEl && displayName) avatarEl.textContent = displayName.charAt(0).toUpperCase();
+
                 loadPsychDashboard(user.uid);
             }
         });

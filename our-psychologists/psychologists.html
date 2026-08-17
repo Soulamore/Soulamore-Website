@@ -309,16 +309,43 @@
     <script src="../assets/js/components.js?v=3.6"></script>
     <script type="module">
         import { db, collection, getDocs } from "../assets/js/firebase-config.js";
+        import { SoulamoreCache } from "../assets/js/global-prefetch.js";
 
         // Global State
         let psychs = [];
         let fetchedPsychs = [];
 
         async function fetchPsychs() {
+            // 1. FAST PATH: Instant Memory/Session Cache Lookup (0ms UI latency)
+            const cachedItems = window.SoulamoreCache ? window.SoulamoreCache.getProfessionals('psychologist') : [];
+            if (cachedItems && cachedItems.length > 0) {
+                console.log(`⚡ Instant Cache Hit: Loaded ${cachedItems.length} psychologists from eager prefetch cache.`);
+                psychs = cachedItems.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    role: p.role || "Clinical Psychologist",
+                    category: p.raw?.category || "Mental Wellness",
+                    image: p.photoURL,
+                    avatarColor: p.avatarColor || "#F49F75",
+                    color: p.raw?.color || "#fff",
+                    tags: p.tags || [],
+                    rating: p.raw?.rating || 5.0,
+                    reviews: p.reviews ? (Array.isArray(p.reviews) ? p.reviews.length : p.reviews) : 0,
+                    price: p.rate || 1500,
+                    exp: p.raw?.experience || "5",
+                    lang: p.languages || "English",
+                    online: p.onlineStatus === 'online',
+                    verified: p.raw?.verified !== false,
+                    profileUrl: `/our-psychologists/profile.html?id=${p.id}`,
+                    location: p.raw?.location || p.raw?.city || "Remote"
+                }));
+                renderPsychs();
+            }
+
             try {
-                // Initial Loading State
+                // Initial Loading State (only show if no cache hit yet)
                 const grid = document.getElementById('psychGrid');
-                if (grid) grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding: 40px; opacity: 0.7;">Loading professionals...</div>';
+                if (grid && psychs.length === 0) grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding: 40px; opacity: 0.7;">Loading professionals...</div>';
 
                 // Timeout Promise (2.5 seconds limit - Faster Fallback)
                 const timeout = new Promise((_, reject) =>
@@ -364,17 +391,18 @@
                     }
                 });
 
-                // FALLBACK if empty
-                if (fetchedPsychs.length === 0) {
+                // FALLBACK if empty and no cache exists
+                if (fetchedPsychs.length === 0 && psychs.length === 0) {
                     console.warn("No psychologists found in Firestore. Using fallback demo data.");
                     throw new Error("Empty DB");
-                } else {
+                } else if (fetchedPsychs.length > 0) {
                     psychs = fetchedPsychs;
                     renderPsychs();
                 }
 
             } catch (error) {
-                console.warn("Using fallback data due to error:", error);
+                if (psychs.length === 0) {
+                    console.warn("Using fallback data due to error:", error);
 
                 // Fallback Data
                 psychs = [

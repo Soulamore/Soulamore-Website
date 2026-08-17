@@ -313,14 +313,28 @@ export async function getAvailableSlots(peerId, date) {
             return []; // Peer not available on this day
         }
 
-        // Fetch busy slots once to optimize network roundtrips
+        // Fetch busy slots (Direct Firestore query first for 100% CORS safety)
         let busySlots = [];
         try {
-            const getBusySlotsFn = httpsCallable(functionsInstance, 'getPeerBusySlots');
-            const res = await getBusySlotsFn({ peerId });
-            busySlots = res.data.busySlots || [];
+            const q = query(
+                collection(db, PEER_BOOKINGS_COLLECTION),
+                where('peerId', '==', peerId),
+                where('status', 'in', ['held', 'confirmed', 'pending_payment'])
+            );
+            const snapshot = await getDocs(q);
+            snapshot.forEach(docSnap => {
+                const b = docSnap.data();
+                busySlots.push(b);
+            });
         } catch (err) {
-            console.error("Error fetching busy slots from functions:", err);
+            console.warn("Direct Firestore busy slots fetch failed, trying Cloud Function fallback:", err);
+            try {
+                const getBusySlotsFn = httpsCallable(functionsInstance, 'getPeerBusySlots');
+                const res = await getBusySlotsFn({ peerId });
+                busySlots = res.data.busySlots || [];
+            } catch (fnErr) {
+                console.warn("Cloud function busy slots fetch skipped/failed:", fnErr);
+            }
         }
 
         // Generate time slots (every hour or based on session duration) for all slots configured
@@ -379,15 +393,22 @@ export async function getAvailableSlots(peerId, date) {
                     }
                 }
 
-                if (isAvailable) {
-                    slots.push({
-                        start: new Date(currentTime),
-                        end: new Date(slotEnd),
-                        display: currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
-                    });
-                }
+                const hours = currentTime.getHours();
+                const minutes = currentTime.getMinutes();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const formattedHours = hours % 12 || 12;
+                const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+                const timeString = `${formattedHours}:${formattedMinutes} ${ampm}`;
 
-                currentTime.setHours(currentTime.getHours() + 1);
+                slots.push({
+                    start: new Date(currentTime),
+                    end: slotEnd,
+                    display: timeString,
+                    available: isAvailable
+                });
+
+                // Move to next hour
+                currentTime = slotEnd;
             }
         }
 
@@ -442,10 +463,10 @@ export function generateSLID() {
  * @returns {Promise<{bookingId: string, amount: number}|null>}
  */
 export async function createBookingRequest(userId, peerId, planType, startTime, endTime, userName = "", userEmail = "", bookedByRole = "user", targetUserId = null) {
+    const plan = DEFAULT_PLANS[planType] || DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION];
+    
     try {
-        const plan = DEFAULT_PLANS[planType] || DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION];
         const bookSessionFn = httpsCallable(functionsInstance, 'bookSessionCallable');
-
         const requestId = `req_${new Date(startTime).getTime()}_${peerId}_${userId}`;
         const res = await bookSessionFn({
             peerId: peerId,
@@ -470,18 +491,14 @@ export async function createBookingRequest(userId, peerId, planType, startTime, 
             plan: plan
         };
     } catch (error) {
-        console.error("Error creating atomic booking request:", error);
-        // Fallback for Guest Users / Permission Denied or local sandbox mode
-        if (error.code === 'permission-denied' || error.message.includes('permission') || (userId && userId.startsWith('guest_'))) {
-            console.warn("Falling back to client-side mock booking reference for guest/sandbox testing.");
-            const mockBookingId = "bk_" + Math.random().toString(36).substr(2, 9);
+        console.warn("Cloud function booking creation failed/skipped. Falling back to direct Firestore booking creation:", error.message);
+        try {
             const slId = generateSLID();
-            const plan = DEFAULT_PLANS[planType] || DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION];
-            
-            const mockBooking = {
-                id: mockBookingId,
+            const bookingRef = doc(collection(db, PEER_BOOKINGS_COLLECTION));
+            const bookingData = {
+                bookingId: bookingRef.id,
                 slId: slId,
-                tag: "PEER",
+                peerId: peerId,
                 userId: userId,
                 peerId: peerId,
                 userName: userName,
@@ -721,22 +738,126 @@ export async function getUserBookings(userId) {
  * @param {string} peerId - Peer ID
  * @returns {Promise<Array>}
  */
-export async function getPeerBookings(peerId) {
+/**
+ * Get user's active session credits from pre-purchased plans
+ * @param {string} userId
+ * @returns {Promise<{credits: number, planName: string, expiresAt: Date|null}>}
+ */
+export async function getUserSessionCredits(userId) {
+    if (!userId) return { credits: 0, planName: "", expiresAt: null };
     try {
-        const bookingsRef = collection(db, PEER_BOOKINGS_COLLECTION);
-        const q = query(bookingsRef, where("peerId", "==", peerId));
-
-        const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-            startTime: doc.data().startTime?.toDate?.() || doc.data().startTime,
-            endTime: doc.data().endTime?.toDate?.() || doc.data().endTime
-        }));
-    } catch (error) {
-        console.error("Error getting peer bookings:", error);
-        return [];
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const data = userSnap.data();
+            const credits = data.sessionCredits || 0;
+            const planName = data.activePlanName || "Standard";
+            const expiresAt = data.planExpiresAt ? new Date(data.planExpiresAt.toDate ? data.planExpiresAt.toDate() : data.planExpiresAt) : null;
+            return { credits, planName, expiresAt };
+        }
+    } catch (e) {
+        console.warn("Error fetching user session credits:", e);
     }
+    return { credits: 0, planName: "", expiresAt: null };
+}
+
+/**
+ * Redeem 1 session credit for booking
+ */
+export async function useSessionCreditForBooking(userId, peerId, startTime, endTime, userName = "", userEmail = "") {
+    if (!userId || !peerId || !startTime || !endTime) {
+        throw new Error("Missing required parameters for credit booking.");
+    }
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists() || (userSnap.data().sessionCredits || 0) <= 0) {
+        throw new Error("No available session credits in your wallet.");
+    }
+
+    const currentCredits = userSnap.data().sessionCredits || 0;
+    await updateDoc(userRef, {
+        sessionCredits: Math.max(0, currentCredits - 1),
+        updatedAt: serverTimestamp()
+    });
+
+    const slId = generateSLID();
+    const meetingUrl = `https://meet.jit.si/soulamore-${slId.toLowerCase()}`;
+    const bookingRef = doc(collection(db, PEER_BOOKINGS_COLLECTION));
+    const bookingData = {
+        bookingId: bookingRef.id,
+        slId: slId,
+        peerId: peerId,
+        userId: userId,
+        userName: userName || userSnap.data().name || "Client",
+        userEmail: userEmail || userSnap.data().email || "",
+        peerName: "Peer Listener",
+        planType: "session_credit",
+        startTime: new Date(startTime).toISOString(),
+        endTime: new Date(endTime).toISOString(),
+        meetingUrl: meetingUrl,
+        amount: 0,
+        paidWithCredit: true,
+        status: "confirmed",
+        createdAt: serverTimestamp()
+    };
+
+    await setDoc(bookingRef, bookingData);
+    return {
+        bookingId: bookingRef.id,
+        slId: slId,
+        meetingUrl: meetingUrl,
+        status: "confirmed"
+    };
+}
+
+/**
+ * Reschedule a booking to a new time slot
+ */
+export async function rescheduleBooking(bookingId, newStartTime, newEndTime) {
+    if (!bookingId || !newStartTime || !newEndTime) {
+        throw new Error("Missing parameters for rescheduling.");
+    }
+    const bookingRef = doc(db, PEER_BOOKINGS_COLLECTION, bookingId);
+    await updateDoc(bookingRef, {
+        startTime: new Date(newStartTime).toISOString(),
+        endTime: new Date(newEndTime).toISOString(),
+        rescheduledAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+    });
+    return true;
+}
+
+/**
+ * Cancel a booking and restore session credit if applicable
+ */
+export async function cancelBooking(bookingId, reason = "User requested cancellation") {
+    if (!bookingId) return false;
+    const bookingRef = doc(db, PEER_BOOKINGS_COLLECTION, bookingId);
+    const snap = await getDoc(bookingRef);
+    if (!snap.exists()) return false;
+
+    const data = snap.data();
+    await updateDoc(bookingRef, {
+        status: "cancelled",
+        cancelReason: reason,
+        cancelledAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+    });
+
+    // If paid with session credit, refund credit to user wallet
+    if (data.paidWithCredit && data.userId) {
+        try {
+            const userRef = doc(db, "users", data.userId);
+            const uSnap = await getDoc(userRef);
+            if (uSnap.exists()) {
+                const current = uSnap.data().sessionCredits || 0;
+                await updateDoc(userRef, { sessionCredits: current + 1 });
+            }
+        } catch (err) {
+            console.warn("Error restoring session credit:", err);
+        }
+    }
+    return true;
 }
 
 

@@ -69,12 +69,14 @@ export const onBookingUpdated = functions.firestore
                     ? new Date(newData.startTime.toDate()).toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'short' })
                     : 'Scheduled Time';
 
+                const meetingLink = newData.meetingUrl || newData.meetLink || `https://meet.jit.si/soulamore-${(newData.slId || context.params.docId).toLowerCase()}`;
+
                 const { subject, html } = generateSoulamoreEmail('booking_confirmed', {
-                    name: userData.name || 'Friend',
+                    name: userData.name || newData.userName || 'Friend',
                     slid: newData.slId || context.params.docId,
-                    peer_name: peerData.name || 'Your Peer Listener',
+                    peer_name: peerData.name || newData.peerName || 'Your Practitioner',
                     date_time: formattedDate,
-                    meet_link: newData.meetLink || 'https://soulamore.com/portal/'
+                    meet_link: meetingLink
                 });
 
                 const userEmail = newData.userEmail || userData.email;
@@ -96,8 +98,12 @@ export const onBookingUpdated = functions.firestore
                     try {
                         await sendEmail(
                             { email: peerData.email, name: peerData.name },
-                            `New Booking Confirmed: ${newData.slId}`,
-                            `<p>Hello ${peerData.name}, you have a new confirmed booking (${newData.slId}) for ${formattedDate}. Link: ${newData.meetLink}</p>`
+                            `New Session Confirmed: ${newData.slId}`,
+                            `<div style="font-family:sans-serif; padding:20px; line-height:1.6;">
+                                <h2>Hello ${peerData.name},</h2>
+                                <p>You have a new confirmed wellness session (ID: <strong>${newData.slId}</strong>) scheduled for <strong>${formattedDate}</strong> with ${userData.name || newData.userName || 'Client'}.</p>
+                                <p><a href="${meetingLink}" style="background:#0d9488; color:#fff; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:bold;">Join Meeting Room</a></p>
+                            </div>`
                         );
                         peerStatus = 'sent';
                     } catch (error) {
