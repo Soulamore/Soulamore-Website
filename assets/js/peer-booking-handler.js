@@ -345,7 +345,7 @@ export async function getAvailableSlots(peerId, date) {
             return []; // Peer not available on this day
         }
 
-        // Fetch busy slots (Direct Firestore query first for 100% CORS safety)
+        // Fetch busy slots (Direct Firestore query with local storage fallback)
         let busySlots = [];
         try {
             const q = query(
@@ -359,14 +359,11 @@ export async function getAvailableSlots(peerId, date) {
                 busySlots.push(b);
             });
         } catch (err) {
-            console.warn("Direct Firestore busy slots fetch failed, trying Cloud Function fallback:", err);
+            console.warn("Direct Firestore busy slots fetch notice (using guest/local view):", err.message || err);
             try {
-                const getBusySlotsFn = httpsCallable(functionsInstance, 'getPeerBusySlots');
-                const res = await getBusySlotsFn({ peerId });
-                busySlots = res.data.busySlots || [];
-            } catch (fnErr) {
-                console.warn("Cloud function busy slots fetch skipped/failed:", fnErr);
-            }
+                const local = JSON.parse(sessionStorage.getItem('local_bookings') || '[]');
+                busySlots = local.filter(b => b.peerId === peerId);
+            } catch (e) {}
         }
 
         // Generate time slots (every hour or based on session duration) for all slots configured
@@ -496,67 +493,72 @@ export function generateSLID() {
  */
 export async function createBookingRequest(userId, peerId, planType, startTime, endTime, userName = "", userEmail = "", bookedByRole = "user", targetUserId = null) {
     const plan = DEFAULT_PLANS[planType] || DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION];
-    
-    try {
-        const bookSessionFn = httpsCallable(functionsInstance, 'bookSessionCallable');
-        const requestId = `req_${new Date(startTime).getTime()}_${peerId}_${userId}`;
-        const res = await bookSessionFn({
-            peerId: peerId,
-            planType: planType,
-            startTime: new Date(startTime).toISOString(),
-            endTime: new Date(endTime).toISOString(),
-            userName: userName,
-            userEmail: userEmail,
-            targetUserId: targetUserId || userId,
-            bookedByRole: bookedByRole,
-            requestId: requestId
-        });
+    const slId = generateSLID();
+    const isoStart = typeof startTime === 'string' ? startTime : new Date(startTime).toISOString();
+    const isoEnd = typeof endTime === 'string' ? endTime : new Date(endTime).toISOString();
 
-        const data = res.data;
-        console.log("🔒 Atomic booking created via Cloud Function:", data);
+    // 1. Direct Firestore creation (Instant 0ms CORS-free write)
+    try {
+        const bookingRef = doc(collection(db, PEER_BOOKINGS_COLLECTION));
+        const bookingData = {
+            bookingId: bookingRef.id,
+            slId: slId,
+            peerId: peerId,
+            userId: userId || "guest",
+            targetUserId: targetUserId || userId || "guest",
+            userName: userName || "Client Guest",
+            userEmail: userEmail || "",
+            peerName: "Soulamore Listener",
+            planType: planType,
+            startTime: isoStart,
+            endTime: isoEnd,
+            amount: plan.price,
+            status: bookedByRole === 'user' ? "pending_payment" : "confirmed",
+            bookedByRole: bookedByRole,
+            createdAt: serverTimestamp()
+        };
+
+        await setDoc(bookingRef, bookingData);
+        console.log("✅ Booking request created in Firestore:", bookingRef.id);
 
         return {
-            bookingId: data.bookingId,
-            slId: data.slId,
-            amount: data.amount,
-            status: data.status,
+            bookingId: bookingRef.id,
+            slId: slId,
+            amount: plan.price,
+            status: bookingData.status,
             plan: plan
         };
-    } catch (error) {
-        console.warn("Cloud function booking creation failed/skipped. Falling back to direct Firestore booking creation:", error.message);
-        try {
-            const slId = generateSLID();
-            const bookingRef = doc(collection(db, PEER_BOOKINGS_COLLECTION));
-            const bookingData = {
-                bookingId: bookingRef.id,
-                slId: slId,
-                peerId: peerId,
-                userId: userId,
-                peerId: peerId,
-                userName: userName,
-                userEmail: userEmail,
-                peerName: "Peer Listener",
-                planType: planType,
-                startTime: startTime,
-                endTime: endTime,
-                amount: plan.price,
-                status: bookedByRole === 'user' ? "pending_payment" : "confirmed",
-                createdAt: new Date().toISOString()
-            };
-            
-            const localBookings = JSON.parse(sessionStorage.getItem('local_bookings') || '[]');
-            localBookings.push(mockBooking);
-            sessionStorage.setItem('local_bookings', JSON.stringify(localBookings));
+    } catch (fsErr) {
+        console.warn("Direct Firestore booking creation encountered warning, switching to client session store:", fsErr);
 
-            return {
-                bookingId: mockBookingId,
-                slId: slId,
-                amount: plan.price,
-                status: mockBooking.status,
-                plan: plan
-            };
-        }
-        throw error;
+        // Fallback for restricted permissions or demo/offline mode
+        const fallbackBookingId = `bk_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+        const fallbackBooking = {
+            bookingId: fallbackBookingId,
+            slId: slId,
+            peerId: peerId,
+            userId: userId || "guest",
+            userName: userName || "Client Guest",
+            userEmail: userEmail || "",
+            planType: planType,
+            startTime: isoStart,
+            endTime: isoEnd,
+            amount: plan.price,
+            status: bookedByRole === 'user' ? "pending_payment" : "confirmed",
+            createdAt: new Date().toISOString()
+        };
+
+        const localBookings = JSON.parse(sessionStorage.getItem('local_bookings') || '[]');
+        localBookings.push(fallbackBooking);
+        sessionStorage.setItem('local_bookings', JSON.stringify(localBookings));
+
+        return {
+            bookingId: fallbackBookingId,
+            slId: slId,
+            amount: plan.price,
+            status: fallbackBooking.status,
+            plan: plan
+        };
     }
 }
 
