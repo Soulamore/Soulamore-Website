@@ -1199,6 +1199,53 @@
                     </div>
                 </div>
 
+                <!-- NOTIFICATION PREFERENCES -->
+                <div class="v2-section-card" style="margin-bottom:16px;">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-bell" style="color:var(--primary-emerald);"></i> Notification & Reminder Preferences</div>
+                    </div>
+                    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">Choose how and when Soulamore reminds you of upcoming sessions and daily reflections.</p>
+                    <div style="display:flex; flex-direction:column; gap:10px; font-size:0.85rem; color:var(--text-primary);">
+                        <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                            <input type="checkbox" id="v2NotifEmail" checked style="width:16px; height:16px; accent-color:var(--primary-emerald);">
+                            <span><i class="far fa-envelope" style="color:var(--primary-emerald); width:18px;"></i> Email Session Confirmations & 24h/1h Reminders</span>
+                        </label>
+                        <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                            <input type="checkbox" id="v2NotifSms" checked style="width:16px; height:16px; accent-color:var(--primary-emerald);">
+                            <span><i class="fas fa-mobile-alt" style="color:var(--primary-emerald); width:18px;"></i> WhatsApp / SMS Instant Booking Alerts</span>
+                        </label>
+                        <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                            <input type="checkbox" id="v2NotifJournal" checked style="width:16px; height:16px; accent-color:var(--primary-emerald);">
+                            <span><i class="far fa-calendar-check" style="color:var(--primary-emerald); width:18px;"></i> Daily Evening Mood & Journal Reflection Prompt</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ACCESSIBILITY & COMFORT -->
+                <div class="v2-section-card" style="margin-bottom:16px;">
+                    <div class="v2-section-header">
+                        <div class="v2-section-title"><i class="fas fa-universal-access" style="color:var(--primary-emerald);"></i> Accessibility & Comfort Settings</div>
+                    </div>
+                    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">Customize font scaling and motion preferences for a calming experience.</p>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+                        <div class="v2-field-group">
+                            <label class="v2-field-label"><i class="fas fa-text-height"></i> Interface Text Size</label>
+                            <select id="v2TextSizeSelect" class="v2-textarea" style="min-height:auto; padding:8px;" onchange="v2SetTextSize(this.value)">
+                                <option value="100%">Standard (100%)</option>
+                                <option value="112%">Comfortable (112%)</option>
+                                <option value="125%">Large (125%)</option>
+                            </select>
+                        </div>
+                        <div class="v2-field-group">
+                            <label class="v2-field-label"><i class="fas fa-feather"></i> Motion & Animation</label>
+                            <select id="v2MotionSelect" class="v2-textarea" style="min-height:auto; padding:8px;" onchange="v2SetMotionPreference(this.value)">
+                                <option value="full">Smooth Animations (Full)</option>
+                                <option value="reduced">Reduced Motion (Calm / Static)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="v2-section-card">
                     <div class="v2-section-header">
                         <div class="v2-section-title"><i class="fas fa-shield-halved"></i> GDPR Sacred Privacy & Data Export</div>
@@ -1406,6 +1453,21 @@
                     document.body.removeAttribute('data-theme');
                     if (icon) icon.className = 'fas fa-moon';
                 }
+            }
+        };
+
+        window.v2SetTextSize = function(size) {
+            document.documentElement.style.fontSize = size === '125%' ? '18px' : (size === '112%' ? '16px' : '14px');
+            localStorage.setItem('soulamore_text_size', size);
+        };
+
+        window.v2SetMotionPreference = function(mode) {
+            if (mode === 'reduced') {
+                document.body.classList.add('v2-reduced-motion');
+                localStorage.setItem('soulamore_motion', 'reduced');
+            } else {
+                document.body.classList.remove('v2-reduced-motion');
+                localStorage.setItem('soulamore_motion', 'full');
             }
         };
 
