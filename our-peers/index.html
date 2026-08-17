@@ -608,11 +608,35 @@
     <script src="../assets/js/components.js?v=3.6"></script>
     <script type="module">
         import { db, collection, getDocs } from "../assets/js/firebase-config.js";
+        import { SoulamoreCache } from "../assets/js/global-prefetch.js";
 
         // --- FETCH PEERS FROM DYANMIC DB ---
         let peers = []; // Global store
 
         async function fetchPeers() {
+            // 1. FAST PATH: Instant Memory/Session Cache Lookup (0ms UI latency)
+            const cachedItems = window.SoulamoreCache ? window.SoulamoreCache.getProfessionals('peer') : [];
+            if (cachedItems && cachedItems.length > 0) {
+                console.log(`⚡ Instant Cache Hit: Loaded ${cachedItems.length} peers from eager prefetch cache.`);
+                peers = cachedItems.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    quote: p.quote || "Here to listen.",
+                    tags: p.tags || [],
+                    markers: {
+                        price: p.rate > 0 ? "Paid" : "Free",
+                        lang: p.languages || "English",
+                        age: p.ageRange || "18-24",
+                        gender: p.gender || "Any",
+                        avail: p.onlineStatus === 'online' ? "Online" : "Offline"
+                    },
+                    avatarColor: p.avatarColor || "#fbbf24",
+                    photoURL: p.photoURL,
+                    profileUrl: `/our-peers/profile.html?id=${encodeURIComponent(p.id)}`
+                }));
+                renderPeers();
+            }
+
             try {
                 // Timeout Promise (2.5 seconds limit - Faster Fallback)
                 const timeout = new Promise((_, reject) =>
@@ -653,17 +677,18 @@
                     }
                 });
 
-                // FALLBACK: If DB is empty, use Hardcoded Demo Data
-                if (fetchedPeers.length === 0) {
+                // FALLBACK: If DB is empty and no cached peers exist, use Hardcoded Demo Data
+                if (fetchedPeers.length === 0 && peers.length === 0) {
                     console.warn("No peers found in DB, using fallback demo data.");
                     throw new Error("Empty DB"); // Trigger catch block for fallback
-                } else {
+                } else if (fetchedPeers.length > 0) {
                     peers = fetchedPeers;
                     renderPeers();
                 }
 
             } catch (error) {
-                console.warn("Using fallback data due to:", error.message);
+                if (peers.length === 0) {
+                    console.warn("Using fallback data due to:", error.message);
                 // Fallback Data
                 peers = [
                     {

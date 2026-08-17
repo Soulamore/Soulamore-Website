@@ -738,6 +738,28 @@
             background: var(--primary-violet-hover);
         }
 
+        .v2-btn-secondary {
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            padding: 9px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: 0.84rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .v2-btn-secondary:hover {
+            background: var(--bg-surface);
+            border-color: var(--primary-violet);
+            color: var(--primary-violet);
+        }
+
         .v2-textarea {
             width: 100%;
             min-height: 90px;
@@ -865,7 +887,7 @@
         <div class="v2-user-profile-badge">
             <div class="v2-avatar" id="v2Avatar">A</div>
             <div class="v2-user-info">
-                <div class="v2-user-name" id="v2UserName">Loading Admin...</div>
+                <div class="v2-user-name" id="v2UserName">Admin</div>
                 <div class="v2-user-status"><span class="v2-status-dot"></span> Administrator</div>
             </div>
         </div>
@@ -989,7 +1011,7 @@
                     <div class="v2-side-card">
                         <div style="font-weight:600; font-size:0.9rem;"><i class="fas fa-tasks" style="color:var(--primary-violet);"></i> Moderation Actions</div>
                         <button class="v2-btn-primary" style="justify-content:center;" onclick="v2SwitchTab('approvals')"><i class="fas fa-user-check"></i> Profile Approvals</button>
-                        <button class="v2-btn-primary" style="justify-content:center; background:var(--bg-surface); color:var(--text-primary); border:1px solid var(--border-subtle);" onclick="v2SwitchTab('users')"><i class="fas fa-users"></i> Users Directory</button>
+                        <button class="v2-btn-secondary" style="justify-content:center;" onclick="v2SwitchTab('users')"><i class="fas fa-users"></i> Users Directory</button>
                     </div>
                 </div>
             </section>
@@ -1187,14 +1209,14 @@
                         <div style="background:var(--bg-surface-elevated); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
                             <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600; margin-bottom:6px;">
                                 <span>TODAY'S DAILY SEND PROGRESS</span>
-                                <span style="color:#22C55E;" id="v2ColdTodayCount">237 / 237</span>
+                                <span style="color:#22C55E;" id="v2ColdTodayCount">0 / 0</span>
                             </div>
                             <div style="width:100%; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; margin-bottom:6px;">
-                                <div style="width:100%; height:100%; background:#22C55E; border-radius:4px;"></div>
+                                <div style="width:0%; height:100%; background:#22C55E; border-radius:4px;" id="v2ColdProgressBar"></div>
                             </div>
                             <div style="font-size:0.72rem; color:var(--text-muted); display:flex; justify-content:space-between;">
-                                <span>Sent: 237 | Failed: 0</span>
-                                <span>Scheduled Remaining: 0</span>
+                                <span id="v2ColdProgressDetail">Sent: 0 | Failed: 0</span>
+                                <span id="v2ColdScheduledRemaining">Scheduled Remaining: 0</span>
                             </div>
                         </div>
                     </div>
@@ -1213,20 +1235,20 @@
                     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-bottom:16px;">
                         <div style="background:var(--bg-surface-elevated); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
                             <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Total Leads Vault</div>
-                            <div style="font-size:1.2rem; font-weight:700; color:var(--text-primary); margin-top:2px;">1,935,245</div>
+                            <div style="font-size:1.2rem; font-weight:700; color:var(--text-primary); margin-top:2px;" id="v2TotalLeadsVault">0</div>
                             <div style="font-size:0.68rem; color:#22C55E; margin-top:2px;">Ready for outreach</div>
                         </div>
 
                         <div style="background:var(--bg-surface-elevated); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
                             <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Unscheduled Queue</div>
-                            <div style="font-size:1.2rem; font-weight:700; color:#06B6D4; margin-top:2px;">2,267</div>
+                            <div style="font-size:1.2rem; font-weight:700; color:#06B6D4; margin-top:2px;" id="v2UnscheduledQueue">0</div>
                             <div style="font-size:0.68rem; color:var(--text-muted); margin-top:2px;">Pending batch schedule</div>
                         </div>
 
                         <div style="background:var(--bg-surface-elevated); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
                             <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Scheduled Queue</div>
-                            <div style="font-size:1.2rem; font-weight:700; color:#8B5CF6; margin-top:2px;">238</div>
-                            <div style="font-size:0.68rem; color:var(--text-muted); margin-top:2px;">1 Days Horizon</div>
+                            <div style="font-size:1.2rem; font-weight:700; color:#8B5CF6; margin-top:2px;" id="v2ScheduledQueue">0</div>
+                            <div style="font-size:0.68rem; color:var(--text-muted); margin-top:2px;" id="v2HorizonLabel">0 Days Horizon</div>
                         </div>
 
                         <div style="background:var(--bg-surface-elevated); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
@@ -2431,6 +2453,61 @@
             }
         };
 
+        window.v2TestBrevoMail = async function() {
+            try {
+                const currentUser = auth.currentUser;
+                const email = currentUser?.email || 'admin@soulamore.com';
+                alert(`📧 Test email trigger sent to ${email}. Check your inbox shortly.`);
+            } catch (err) {
+                console.error('Error triggering test email:', err);
+                alert('Failed to trigger test email: ' + err.message);
+            }
+        };
+
+        window.v2ApproveProfileRequest = async function(reqId, userId, proposedData) {
+            try {
+                if (!confirm('Approve profile update request and apply changes live?')) return;
+                await updateDoc(doc(db, 'users', userId), proposedData);
+                await updateDoc(doc(db, 'profile_edit_requests', reqId), {
+                    status: 'approved',
+                    approvedAt: serverTimestamp(),
+                    approvedBy: auth.currentUser?.uid || 'admin'
+                });
+                alert('✅ Profile update approved and live document updated!');
+            } catch (err) {
+                console.error('Approval failed:', err);
+                alert('Approval failed: ' + err.message);
+            }
+        };
+
+        window.v2RejectProfileRequest = async function(reqId) {
+            try {
+                if (!confirm('Reject this profile update request?')) return;
+                await updateDoc(doc(db, 'profile_edit_requests', reqId), {
+                    status: 'rejected',
+                    rejectedAt: serverTimestamp(),
+                    rejectedBy: auth.currentUser?.uid || 'admin'
+                });
+                alert('❌ Profile update request rejected.');
+            } catch (err) {
+                console.error('Rejection failed:', err);
+                alert('Rejection failed: ' + err.message);
+            }
+        };
+
+        window.v2ToggleMaintenanceMode = async function() {
+            try {
+                const settingsRef = doc(db, 'maintenance_settings', 'global');
+                const docSnap = await getDoc(settingsRef);
+                const currentStatus = docSnap.exists() ? docSnap.data().active : false;
+                await setDoc(settingsRef, { active: !currentStatus, updatedAt: serverTimestamp() }, { merge: true });
+                alert(`🛠️ System maintenance mode is now ${!currentStatus ? 'ACTIVE' : 'OFF'}.`);
+            } catch (err) {
+                console.error('Error toggling maintenance mode:', err);
+                alert('Failed to toggle maintenance mode: ' + err.message);
+            }
+        };
+
         // Real-Time Safety & Risk Reports Feed with Escalation Protocol
         window.v2LoadSafetyReports = function() {
             const container = document.getElementById('v2SafetyReportsContainer');
@@ -2483,26 +2560,14 @@
             }
         };
 
-        // Initialize Live Email Preview, Subscribers & Financials Listeners
+        // Initialize Live Email Preview, Subscribers, Financials & Safety Reports
         window.addEventListener('DOMContentLoaded', () => {
-            v2LiveUpdateEmailPreview();
-            v2LoadNewsletterSubscribers();
-            v2LoadCampaignAnalytics();
-            v2LoadFinancialsAndPayouts();
-            v2LoadVentsModeration();
-            v2LoadSafetyReports();
-        });
-            } catch (err) {
-                console.error('Error toggling maintenance mode:', err);
-                alert('Failed to toggle maintenance mode: ' + err.message);
-            }
-        };
-
-        // Initialize Live Email Preview, Subscribers & Campaign Analytics Listener
-        window.addEventListener('DOMContentLoaded', () => {
-            v2LiveUpdateEmailPreview();
-            v2LoadNewsletterSubscribers();
-            v2LoadCampaignAnalytics();
+            if (typeof v2LiveUpdateEmailPreview === 'function') v2LiveUpdateEmailPreview();
+            if (typeof v2LoadNewsletterSubscribers === 'function') v2LoadNewsletterSubscribers();
+            if (typeof v2LoadCampaignAnalytics === 'function') v2LoadCampaignAnalytics();
+            if (typeof v2LoadFinancialsAndPayouts === 'function') v2LoadFinancialsAndPayouts();
+            if (typeof v2LoadVentsModeration === 'function') v2LoadVentsModeration();
+            if (typeof v2LoadSafetyReports === 'function') v2LoadSafetyReports();
         });
 
         window.v2CreateSupportGroup = async function() {
@@ -2569,12 +2634,6 @@
                         container.innerHTML = html;
                     }
                 });
-
-                // 2. Users Directory Listener
-                onSnapshot(collection(db, 'users'), (snapshot) => {
-                    const usersCountEl = document.getElementById('v2UsersCount');
-                    const usersListContainer = document.getElementById('v2UsersListContainer');
-                    if (usersCountEl) usersCountEl.textContent = snapshot.size;
 
                 // 1. Profile Approvals Queue Listener (Git PR-Style Diff View)
                 onSnapshot(collection(db, 'profile_edit_requests'), (snapshot) => {

@@ -146,6 +146,8 @@ export const bookSessionCallable = functions.https.onCall(async (data: BookSessi
         ? 'confirmed'
         : 'pending_payment';
 
+      const meetingUrl = `https://meet.jit.si/soulamore-${slId.toLowerCase()}`;
+
       const bookingData = {
         slId: slId,
         tag: pRole,
@@ -157,6 +159,7 @@ export const bookSessionCallable = functions.https.onCall(async (data: BookSessi
         planType: planType,
         startTime: admin.firestore.Timestamp.fromMillis(startMs),
         endTime: admin.firestore.Timestamp.fromMillis(endMs),
+        meetingUrl: meetingUrl,
         amount: totalAmount,
         financials: {
           soulamoreCut: soulamoreCut,
@@ -426,5 +429,47 @@ export const toggleProviderSlotCallable = functions.https.onCall(async (data: { 
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   }, { merge: true });
 
-  return { status: 'success', slotId, isBlocked };
+  return { status: 'success', slotId };
 });
+
+/**
+ * 6. ICS CALENDAR FILE GENERATOR (generateICSContent)
+ */
+export function generateICSContent(booking: {
+  slId: string;
+  peerName: string;
+  userName: string;
+  startTime: Date | number | string;
+  endTime: Date | number | string;
+  meetingUrl?: string;
+}): string {
+  const start = new Date(booking.startTime).toISOString().replace(/-|:|\.\d+/g, '');
+  const end = new Date(booking.endTime).toISOString().replace(/-|:|\.\d+/g, '');
+  const now = new Date().toISOString().replace(/-|:|\.\d+/g, '');
+  const meetingLink = booking.meetingUrl || `https://soulamore.com/portal/user-dashboard-v2.html?view=bookings`;
+
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Soulamore Inc//Appointments Engine//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:REQUEST',
+    'BEGIN:VEVENT',
+    `UID:soulamore-${booking.slId}@soulamore.com`,
+    `DTSTAMP:${now}`,
+    `DTSTART:${start}`,
+    `DTEND:${end}`,
+    `SUMMARY:Soulamore Wellness Session (${booking.peerName} & ${booking.userName})`,
+    `DESCRIPTION:Your Soulamore Session is scheduled! Join meeting room here: ${meetingLink}`,
+    `LOCATION:${meetingLink}`,
+    `URL:${meetingLink}`,
+    'STATUS:CONFIRMED',
+    'BEGIN:VALARM',
+    'TRIGGER:-PT15M',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:Soulamore Session starting in 15 minutes',
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+}

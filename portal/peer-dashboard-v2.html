@@ -944,7 +944,7 @@
         <div class="v2-user-profile-badge" onclick="v2OpenModal('photo-upload-modal')">
             <div class="v2-avatar" id="v2Avatar">P</div>
             <div class="v2-user-info">
-                <div class="v2-user-name" id="v2UserName">Loading Peer...</div>
+                <div class="v2-user-name" id="v2UserName"></div>
                 <div class="v2-user-status"><span class="v2-status-dot"></span> Peer Counselor</div>
             </div>
         </div>
@@ -2567,18 +2567,19 @@
                                     ? '<span class="v2-badge-pill" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B;"><i class="fas fa-clock"></i> Payment Pending</span>'
                                     : '<span class="v2-badge-pill" style="background:rgba(16, 185, 129, 0.15); color:#10B981;"><i class="fas fa-check-circle"></i> Confirmed</span>';
 
+                                const meetUrl = data.meetingUrl || data.meetLink || `../portal/video-conference.html?roomId=${data.slId || docSnap.id}`;
                                 const videoBtn = isPendingPayment
                                     ? `<button class="v2-btn-secondary" style="font-size:0.75rem; padding:5px 12px; opacity:0.6; cursor:not-allowed;" disabled><i class="fas fa-lock"></i> Awaiting Payment</button>`
-                                    : `<a href="../portal/video-conference.html?roomId=${data.slId || docSnap.id}" class="v2-btn-primary" style="font-size:0.78rem; padding:5px 12px; text-decoration:none; background:var(--primary-peach);"><i class="fas fa-video"></i> Start Video Session</a>`;
+                                    : `<a href="${meetUrl}" target="_blank" class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px; text-decoration:none; background:#10B981; color:#fff; border-radius:6px; display:inline-flex; align-items:center; gap:6px;"><i class="fas fa-video"></i> Start Video Session</a>`;
 
                                 html += `
                                     <div style="background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); padding:14px; margin-bottom:10px;">
-                                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                                            <div style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">${data.userName || data.clientName || 'Anonymous Member'}</div>
+                                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                                            <div style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">${data.userName || data.clientName || 'Anonymous Member'} <span style="font-size:0.75rem; opacity:0.7; font-weight:normal;">(${data.slId || 'Session'})</span></div>
                                             <div>${statusBadge}</div>
                                         </div>
                                         <div style="font-size:0.8rem; color:var(--text-muted); margin:6px 0 12px;"><i class="far fa-clock"></i> ${dateStr}</div>
-                                        <div style="display:flex; justify-content:flex-end;">
+                                        <div style="display:flex; justify-content:flex-end; gap:8px;">
                                             ${videoBtn}
                                         </div>
                                     </div>
@@ -2606,8 +2607,53 @@
             }
         }
 
-        auth.onAuthStateChanged(user => {
+        window.v2OpenPeerSupervisionModal = function() {
+            const modal = document.getElementById('v2PeerSupervisionModal');
+            if (modal) modal.style.display = 'flex';
+            else alert('🤝 Supervision request submitted to clinical supervisor.');
+        };
+
+        window.v2ClearAllBlockedDates = function() {
+            if (confirm('Clear all custom blocked dates for this month?')) {
+                document.querySelectorAll('.v2-blocked-day').forEach(el => el.classList.remove('v2-blocked-day'));
+                alert('✅ Blocked dates cleared.');
+            }
+        };
+
+        window.v2ToggleLiveStatus = async function() {
+            try {
+                const user = auth.currentUser;
+                if (!user) return;
+                const peerRef = doc(db, 'peers', user.uid);
+                const docSnap = await getDoc(peerRef);
+                const currentStatus = docSnap.exists() ? docSnap.data().isLive : false;
+                await setDoc(peerRef, { isLive: !currentStatus, updatedAt: serverTimestamp() }, { merge: true });
+                alert(`🟢 Your listening status is now ${!currentStatus ? 'ONLINE & READY' : 'OFFLINE'}.`);
+            } catch (err) {
+                console.error('Error toggling live status:', err);
+                alert('Failed to toggle status: ' + err.message);
+            }
+        };
+
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
+                const userNameEl = document.getElementById('v2UserName');
+                const avatarEl = document.getElementById('v2Avatar');
+                let displayName = user.displayName || user.email?.split('@')[0] || '';
+
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        displayName = data.displayName || data.name || data.fullName || displayName;
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch user profile:', e);
+                }
+
+                if (userNameEl) userNameEl.textContent = displayName;
+                if (avatarEl && displayName) avatarEl.textContent = displayName.charAt(0).toUpperCase();
+
                 loadPeerDashboard(user.uid);
             }
         });

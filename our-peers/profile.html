@@ -550,6 +550,7 @@
         import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { initBookingWidget } from "../assets/js/booking-widget.js?v=20260723-5";
+        import { SoulamoreCache } from "../assets/js/global-prefetch.js";
 
         // Global State
         let currentUser = null;
@@ -588,29 +589,50 @@
             // --- DATA FETCHING ---
             let profile = null;
 
-            try {
-                // Prefer the public professional profile, then fall back to the
-                // peer's user profile because the listing is sourced from users.
-                let docSnap = await getDoc(doc(db, "professionals", id));
-                if (!docSnap.exists()) {
-                    docSnap = await getDoc(doc(db, "users", id));
-                }
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
+            // 1. FAST PATH: Check Global Memory/Session Cache (0ms latency, zero wait)
+            if (window.SoulamoreCache) {
+                const cached = window.SoulamoreCache.getById(id);
+                if (cached) {
+                    console.log(`⚡ Instant Profile Cache Hit for peer ID: ${id}`);
                     profile = {
-                        name: data.name || data.displayName || "Peer Listener",
-                        role: data.role || "Peer Listener",
-                        image: data.photoURL || "",
-                        quote: data.quote || `"Here to listen."`,
-                        bio: data.bio || "No bio available yet.",
-                        tags: data.tags || [],
-                        langs: data.languages || "",
-                        convo: data.conversationStyle || "• We start wherever you are.\n• No agenda, just listening.",
-                        match: data.bestMatch || "• You need a safe space to vent.\n• You are feeling overwhelmed.",
-                        bound: data.boundaries || "Use specific boundaries set by the peer.",
-                        reviews: data.reviews || []
+                        name: cached.name,
+                        role: cached.role || "Peer Listener",
+                        image: cached.photoURL || cached.image || "",
+                        quote: cached.quote || `"Here to listen."`,
+                        bio: cached.bio || "No bio available yet.",
+                        tags: cached.tags || [],
+                        langs: cached.languages || cached.langs || "",
+                        convo: cached.conversationStyle || cached.convo || "• We start wherever you are.\n• No agenda, just listening.",
+                        match: cached.bestMatch || cached.match || "• You need a safe space to vent.\n• You are feeling overwhelmed.",
+                        bound: cached.boundaries || cached.bound || "Use specific boundaries set by the peer.",
+                        reviews: cached.reviews || []
                     };
+                }
+            }
+
+            try {
+                if (!profile) {
+                    let docSnap = await getDoc(doc(db, "professionals", id));
+                    if (!docSnap.exists()) {
+                        docSnap = await getDoc(doc(db, "users", id));
+                    }
+
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        profile = {
+                            name: data.name || data.displayName || "Peer Listener",
+                            role: data.role || "Peer Listener",
+                            image: data.photoURL || "",
+                            quote: data.quote || `"Here to listen."`,
+                            bio: data.bio || "No bio available yet.",
+                            tags: data.tags || [],
+                            langs: data.languages || "",
+                            convo: data.conversationStyle || "• We start wherever you are.\n• No agenda, just listening.",
+                            match: data.bestMatch || "• You need a safe space to vent.\n• You are feeling overwhelmed.",
+                            bound: data.boundaries || "Use specific boundaries set by the peer.",
+                            reviews: data.reviews || []
+                        };
+                    }
                 }
             } catch (e) {
                 console.warn("DB Fetch Error (likely offline/demo):", e);
