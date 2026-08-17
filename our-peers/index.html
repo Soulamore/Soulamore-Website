@@ -619,20 +619,20 @@
             if (cachedItems && cachedItems.length > 0) {
                 console.log(`⚡ Instant Cache Hit: Loaded ${cachedItems.length} peers from eager prefetch cache.`);
                 peers = cachedItems.map(p => ({
-                    id: p.id,
-                    name: p.name,
+                    id: p.id || p.uid,
+                    name: p.name || p.displayName,
                     quote: p.quote || "Here to listen.",
-                    tags: p.tags || [],
+                    tags: p.tags || ["Mental Wellness", "Peer Listener"],
                     markers: {
-                        price: p.rate > 0 ? "Paid" : "Free",
-                        lang: p.languages || "English",
+                        price: (p.rate && p.rate > 0) ? "Paid" : "Free",
+                        lang: p.languages || p.langs || "English",
                         age: p.ageRange || "18-24",
                         gender: p.gender || "Any",
-                        avail: p.onlineStatus === 'online' ? "Online" : "Offline"
+                        avail: (p.onlineStatus === 'online') ? "Online" : "Offline"
                     },
                     avatarColor: p.avatarColor || "#fbbf24",
-                    photoURL: p.photoURL,
-                    profileUrl: `/our-peers/profile.html?id=${encodeURIComponent(p.id)}`
+                    photoURL: p.photoURL || p.image || "",
+                    profileUrl: `/our-peers/profile.html?id=${encodeURIComponent(p.id || p.uid)}`
                 }));
                 renderPeers();
             }
@@ -651,48 +651,46 @@
 
                 const fetchedPeers = [];
 
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
                     // FILTER: Only show Peers
                     const isPeer = (data.role && data.role.toLowerCase().includes('peer')) ||
                         (data.title && data.title.toLowerCase().includes('peer'));
 
                     if (isPeer) {
                         fetchedPeers.push({
-                            id: doc.id,
-                            name: data.name,
+                            id: docSnap.id,
+                            name: data.name || data.displayName || "Peer Listener",
                             quote: data.quote || "Here to listen.",
-                            tags: data.tags || [],
+                            tags: data.tags || ["Mental Wellness"],
                             markers: {
-                                price: data.rate > 0 ? "Paid" : "Free",
-                                lang: data.languages || "English",
-                                age: data.ageRange || "18-24", // Needs field
+                                price: (data.rate && data.rate > 0) ? "Paid" : "Free",
+                                lang: data.languages || data.langs || "English",
+                                age: data.ageRange || "18-24",
                                 gender: data.gender || "Any",
-                                avail: data.onlineStatus === 'online' ? "Online" : "Offline"
+                                avail: (data.onlineStatus === 'online') ? "Online" : "Offline"
                             },
                             avatarColor: data.avatarColor || "#fbbf24",
-                            photoURL: data.photoURL,
-                            profileUrl: `/our-peers/profile.html?id=${encodeURIComponent(doc.id)}`
+                            photoURL: data.photoURL || data.image || "",
+                            profileUrl: `/our-peers/profile.html?id=${encodeURIComponent(docSnap.id)}`
                         });
                     }
                 });
 
-                // FALLBACK: If DB is empty and no cached peers exist, use Hardcoded Demo Data
-                if (fetchedPeers.length === 0 && peers.length === 0) {
-                    console.warn("No peers found in DB, using fallback demo data.");
-                    throw new Error("Empty DB"); // Trigger catch block for fallback
-                } else if (fetchedPeers.length > 0) {
+                if (fetchedPeers.length > 0) {
                     peers = fetchedPeers;
                     renderPeers();
+                    return;
                 }
-
             } catch (error) {
-                if (peers.length === 0) {
-                    console.warn("Using fallback data due to:", error.message);
-                // Fallback Data
+                console.warn("Firestore peers query notice:", error.message);
+            }
+
+            // Fallback Data if peers is still empty
+            if (peers.length === 0) {
                 peers = [
                     {
-                        id: 1,
+                        id: "1",
                         name: "Aditya",
                         quote: "I'm here to listen without rushing your story.",
                         tags: ["Mental Wellness", "Anxiety", "Student", "Hindi"],
@@ -701,7 +699,7 @@
                         profileUrl: "/our-peers/profile.html?id=1"
                     },
                     {
-                        id: 10,
+                        id: "10",
                         name: "Zoya",
                         quote: "Here to help you get through tough times.",
                         tags: ["Work Stress", "Travel", "Relationships"],
@@ -710,7 +708,7 @@
                         profileUrl: "/our-peers/profile.html?id=10"
                     },
                     {
-                        id: 20,
+                        id: "20",
                         name: "Sonika",
                         quote: "A safe space to untangle your thoughts.",
                         tags: ["Social Anxiety", "LGBTQ+", "Academic Pressure"],
@@ -719,7 +717,7 @@
                         profileUrl: "/our-peers/profile.html?id=20"
                     },
                     {
-                        id: 30,
+                        id: "30",
                         name: "Rohan",
                         quote: "Let's figure things out together, one step at a time.",
                         tags: ["Anxiety", "Career Stress", "Relationships"],
@@ -731,7 +729,6 @@
                 renderPeers();
             }
         }
-    }
 
         // Init Fetch
         fetchPeers();
