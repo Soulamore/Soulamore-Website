@@ -1092,12 +1092,19 @@
             <section class="v2-view-section" id="v2-view-settings">
                 <div class="v2-section-card" style="margin-bottom:16px;">
                     <div class="v2-section-header">
-                        <div class="v2-section-title"><i class="fas fa-palette" style="color:var(--primary-emerald);"></i> Atmosphere & Theme Settings</div>
+                        <div class="v2-section-title"><i class="fas fa-palette" style="color:var(--primary-emerald);"></i> Sanctuary Appearance & Theme</div>
                     </div>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
-                        <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 12px;" onclick="v2SetAtmosphere('earth')">🌱 Earth Sanctuary</button>
-                        <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 12px; background:var(--bg-surface-elevated);" onclick="v2SetAtmosphere('ocean')">🌊 Deep Ocean</button>
-                        <button class="v2-btn-primary" style="font-size:0.78rem; padding:6px 12px; background:var(--bg-surface-elevated);" onclick="v2SetAtmosphere('twilight')">🌌 Twilight Glow</button>
+                    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">Choose your preferred display aesthetic for the Soulamore Sanctuary dashboard.</p>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="v2-btn-secondary" id="v2ThemeBtnLight" style="font-size:0.8rem; padding:8px 16px; display:inline-flex; align-items:center; gap:8px;" onclick="v2SelectTheme('light')">
+                            <i class="fas fa-sun" style="color:#F59E0B;"></i> Light Mode
+                        </button>
+                        <button class="v2-btn-secondary" id="v2ThemeBtnDark" style="font-size:0.8rem; padding:8px 16px; display:inline-flex; align-items:center; gap:8px;" onclick="v2SelectTheme('dark')">
+                            <i class="fas fa-moon" style="color:#10B981;"></i> Dark Sanctuary
+                        </button>
+                        <button class="v2-btn-secondary" id="v2ThemeBtnSystem" style="font-size:0.8rem; padding:8px 16px; display:inline-flex; align-items:center; gap:8px;" onclick="v2SelectTheme('system')">
+                            <i class="fas fa-desktop" style="color:#6366F1;"></i> Match System
+                        </button>
                     </div>
                 </div>
 
@@ -1288,19 +1295,27 @@
             }
         };
 
-        window.v2SetAtmosphere = function(mode) {
-            const root = document.documentElement;
-            if (mode === 'calm') {
-                root.style.setProperty('--primary-violet', '#06B6D4');
-                root.style.setProperty('--bg-surface', '#0F172A');
-            } else if (mode === 'evening') {
-                root.style.setProperty('--primary-violet', '#8B5CF6');
-                root.style.setProperty('--bg-surface', '#1E1B4B');
-            } else {
-                root.style.setProperty('--primary-violet', '#7C3AED');
-                root.style.setProperty('--bg-surface', '#090D16');
+        window.v2SelectTheme = function(mode) {
+            var icon = document.getElementById('v2ThemeIcon');
+            if (mode === 'light') {
+                document.body.removeAttribute('data-theme');
+                if (icon) icon.className = 'fas fa-moon';
+                localStorage.setItem('soulamore_v2_user_theme', 'light');
+            } else if (mode === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                if (icon) icon.className = 'fas fa-sun';
+                localStorage.setItem('soulamore_v2_user_theme', 'dark');
+            } else if (mode === 'system') {
+                localStorage.removeItem('soulamore_v2_user_theme');
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) {
+                    document.body.setAttribute('data-theme', 'dark');
+                    if (icon) icon.className = 'fas fa-sun';
+                } else {
+                    document.body.removeAttribute('data-theme');
+                    if (icon) icon.className = 'fas fa-moon';
+                }
             }
-            alert(`🌿 Sanctuary atmosphere updated to: ${mode.toUpperCase()} preset.`);
         };
 
         window.v2SendPasswordResetEmail = async function() {
