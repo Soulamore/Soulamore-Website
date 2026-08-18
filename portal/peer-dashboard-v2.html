@@ -2784,6 +2784,7 @@
 
                         const currentUid = auth.currentUser ? auth.currentUser.uid : '';
                         const currentName = (auth.currentUser && auth.currentUser.displayName) ? auth.currentUser.displayName.toLowerCase() : '';
+                        const currentEmail = (auth.currentUser && auth.currentUser.email) ? auth.currentUser.email.toLowerCase() : '';
 
                         if (snapshot.empty) {
                             sessionsContainer.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:24px;"><i class="fas fa-calendar-xmark" style="font-size:1.4rem; color:var(--text-muted); margin-bottom:8px; display:block;"></i>No confirmed client sessions scheduled right now.</div>';
@@ -2793,8 +2794,8 @@
                                 const pId = String(data.peerId || '');
                                 const pName = String(data.peerName || '').toLowerCase();
 
-                                // Match if peerId equals current uid, or '1' (Aditya default profile), or matches peer's display name, or if unassigned
-                                const isMyBooking = !currentUid || pId === currentUid || pId === '1' || (currentName && pName.includes(currentName));
+                                // Match if peerId equals current uid, '1', '20', or matches peer's display name or email
+                                const isMyBooking = !currentUid || pId === currentUid || pId === '1' || pId === '20' || (currentName && pName.includes(currentName)) || (currentEmail.includes('sonika') && (pId === '20' || pName.includes('sonika')));
 
                                 if (isMyBooking) {
                                     count++;

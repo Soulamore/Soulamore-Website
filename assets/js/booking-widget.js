@@ -625,7 +625,10 @@ export function initBookingWidget(config) {
                     startTime,
                     endTime,
                     finalName,
-                    finalEmail
+                    finalEmail,
+                    "user",
+                    null,
+                    providerName
                 );
 
                 await openRazorpayCheckout(
