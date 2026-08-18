@@ -15,8 +15,8 @@ import {
     useSessionCreditForBooking,
     PEER_PLAN_TYPES,
     DEFAULT_PLANS
-} from "./peer-booking-handler.js?v=20260817-v10";
-import { openRazorpayCheckout } from "./payment-handler.js?v=20260817-v10";
+} from "./peer-booking-handler.js?v=20260818-v11";
+import { openRazorpayCheckout } from "./payment-handler.js?v=20260818-v11";
 
 /**
  * Initialize a booking widget inside a given root element.
