@@ -318,8 +318,7 @@ export async function getAvailableSlots(peerId, date) {
                     endTime: s.end
                 }));
             }
-        }
-
+        } else {
             const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
             if (availability && Array.isArray(availability.availability)) {
                 daySchedules = availability.availability.filter(slot => slot.day && slot.day.toLowerCase() === dayName);
