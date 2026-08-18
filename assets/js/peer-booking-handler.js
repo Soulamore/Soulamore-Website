@@ -416,7 +416,9 @@ export async function getAvailableSlots(peerId, date) {
                         existingEnd = new Date(booking.endTime).getTime();
                     }
 
-                    if ((bookingStart < existingEnd && bookingEnd > existingStart)) {
+                    // Only individual session bookings (< 4 hours) or explicit slot blocks block hourly slots
+                    const bookingDurationHours = (existingEnd - existingStart) / (1000 * 60 * 60);
+                    if (bookingDurationHours > 0 && bookingDurationHours <= 4 && (bookingStart < existingEnd && bookingEnd > existingStart)) {
                         isAvailable = false;
                         break; // Slot overlaps with existing booking
                     }
