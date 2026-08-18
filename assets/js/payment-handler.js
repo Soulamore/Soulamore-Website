@@ -69,8 +69,8 @@ export async function openRazorpayCheckout(
         console.warn("Secure Razorpay order creation notice, activating direct confirmation fallback:", err);
         const { confirmBooking } = await import("./peer-booking-handler.js");
         const mockPayId = "pay_demo_" + Math.random().toString(36).substring(2, 9);
-        await confirmBooking(bookingId, mockPayId, { mode: "demo_fallback" });
-        return { success: true, bookingId: bookingId, paymentId: mockPayId, amount: amount };
+        await confirmBooking(bookingId, mockPayId, { mode: "demo_fallback", amount: amount || 499 });
+        return { success: true, bookingId: bookingId, paymentId: mockPayId, amount: amount || 499 };
     }
 
     return new Promise((resolve, reject) => {
