@@ -161,6 +161,22 @@ service cloud.firestore {
       allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
 
+    // Parental & Processing Consents
+    match /parental_consents/{id} {
+      allow read, write: if isSignedIn() || isAdmin();
+    }
+    match /parental_consent/{id} {
+      allow read, write: if isSignedIn() || isAdmin();
+    }
+    match /processing_consents/{id} {
+      allow read, write: if isSignedIn() || isAdmin();
+    }
+
+    // User Notes & Reflection
+    match /user_notes/{id} {
+      allow read, write: if isSignedIn() || isAdmin();
+    }
+
     // ==================== TOOLS & ENGAGEMENT ====================
 
     match /problem-wall-notes/{document=**} {

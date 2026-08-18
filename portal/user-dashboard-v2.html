@@ -1811,16 +1811,18 @@
                 });
 
                 // Parental Consents Listener
-                const consentQ = query(collection(db, 'processing_consents'), where('userId', '==', uid));
-                onSnapshot(consentQ, (snapshot) => {
-                    const banner = document.getElementById('v2ParentalConsentBanner');
-                    const statusText = document.getElementById('v2ConsentStatusText');
-                    if (!snapshot.empty && banner && statusText) {
-                        banner.style.display = 'block';
-                        const c = snapshot.docs[0].data();
-                        statusText.textContent = (c.status || 'Verified').toUpperCase();
-                    }
-                });
+                try {
+                    const consentQ = query(collection(db, 'processing_consents'), where('userId', '==', uid));
+                    onSnapshot(consentQ, (snapshot) => {
+                        const banner = document.getElementById('v2ParentalConsentBanner');
+                        const statusText = document.getElementById('v2ConsentStatusText');
+                        if (!snapshot.empty && banner && statusText) {
+                            banner.style.display = 'block';
+                            const c = snapshot.docs[0].data();
+                            statusText.textContent = (c.status || 'Verified').toUpperCase();
+                        }
+                    }, (err) => console.warn("Processing consent notice:", err.message));
+                } catch (e) {}
 
                 // Bookings Listener
                 const bookingsContainer = document.getElementById('v2UserBookingsContainer');
