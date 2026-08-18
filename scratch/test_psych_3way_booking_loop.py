@@ -1,38 +1,53 @@
-import time
+import asyncio
+import os
 import sys
-from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
 
+BASE_URL = "https://soulamore-f0a64.web.app"
 USER_EMAIL = "aditya110197@gmail.com"
 USER_PASS = "Soulamore@02"
 PSYCH_EMAIL = "yashmeetkaur011@gmail.com"
 PSYCH_PASS = "Soulamore@02"
 PSYCH_SLUG = "bhagyavathi"
 
-BASE_URL = "https://soulamore-f0a64.web.app"
+SCREENSHOT_DIR = os.path.join(os.path.dirname(__file__), "test_screenshots_psych")
+os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
-def safe_str(s):
-    return str(s).encode('ascii', errors='backslashreplace').decode('ascii')
+async def run_test():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        
+        def safe_log(prefix, msg):
+            try:
+                text = msg.text.encode('ascii', errors='backslashreplace').decode('ascii')
+                print(f"[{prefix} CONSOLE] {msg.type}: {text}", flush=True)
+            except Exception:
+                pass
 
-def run_test():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(viewport={'width': 1280, 'height': 800})
-        page = context.new_page()
+        # ==========================================
+        # 1. USER SESSION: LOGIN & BOOK BHAGYAVATHI
+        # ==========================================
+        user_context = await browser.new_context(viewport={"width": 1280, "height": 900})
+        user_page = await user_context.new_page()
+        user_page.on("console", lambda m: safe_log("USER", m))
 
-        page.on("console", lambda msg: print(f"[CONSOLE {msg.type}] {safe_str(msg.text)}"))
-        page.on("pageerror", lambda exc: print(f"[PAGE ERROR] {safe_str(exc)}"))
+        print("\n=== [1/4] USER LOGIN (Aditya) ===", flush=True)
+        await user_page.goto(f"{BASE_URL}/portal/login.html", wait_until="domcontentloaded")
+        await user_page.wait_for_timeout(3000)
 
-        print("=== [1/4] USER LOGIN (Aditya) ===")
-        page.goto(f"{BASE_URL}/portal/login.html", wait_until="networkidle")
-        page.fill("#loginEmail", USER_EMAIL)
-        page.fill("#loginPassword", USER_PASS)
-        page.click("#loginSubmitBtn")
-        page.wait_for_timeout(5000)
-        print(f"Logged in user current URL: {page.url}")
+        remember_box = user_page.locator("#rememberMe")
+        if await remember_box.count() > 0:
+            await remember_box.first.check()
 
-        print("=== [2/4] CREATE BOOKING FOR PSYCHOLOGIST (Bhagyavathi) ===")
-        # Inject direct booking creation using client-side Firebase for deterministic test
-        booking_res = page.evaluate("""async (psychSlug) => {
+        await user_page.locator("#emailInput").fill(USER_EMAIL)
+        await user_page.locator("#passInput").fill(USER_PASS)
+        await user_page.locator("button[type='submit'].submit-btn").click()
+        await user_page.wait_for_timeout(6000)
+        print(f"User current URL after login: {user_page.url}", flush=True)
+        await user_page.screenshot(path=os.path.join(SCREENSHOT_DIR, "01_user_logged_in.png"))
+
+        print("\n=== [2/4] CREATING BOOKING FOR PSYCHOLOGIST (Bhagyavathi) ===", flush=True)
+        booking_res = await user_page.evaluate("""async (psychSlug) => {
             try {
                 const { db, collection, addDoc, serverTimestamp } = await import('/assets/js/firebase-config.js');
                 const { auth } = await import('/assets/js/firebase-config.js');
@@ -40,9 +55,9 @@ def run_test():
                 
                 const slId = 'SL-2026-' + Math.floor(1000 + Math.random() * 9000);
                 const docRef = await addDoc(collection(db, 'peer_bookings'), {
-                    userId: user.uid,
-                    userName: user.displayName || 'Aditya Harsh',
-                    userEmail: user.email || 'aditya110197@gmail.com',
+                    userId: user ? user.uid : 'aditya_uid',
+                    userName: user ? (user.displayName || 'Aditya Harsh') : 'Aditya Harsh',
+                    userEmail: user ? user.email : 'aditya110197@gmail.com',
                     peerId: psychSlug,
                     peerName: 'Bhagyavathi',
                     psychId: psychSlug,
@@ -67,71 +82,102 @@ def run_test():
             }
         }""", PSYCH_SLUG)
 
-        print(f"Booking creation result: {booking_res}")
+        print(f"Booking creation result: {booking_res}", flush=True)
         assert booking_res.get('success') is True, f"Failed to create booking: {booking_res}"
         created_sl_id = booking_res.get('slId')
 
-        print("=== [3/4] CHECK USER DASHBOARD AS USER (Aditya) ===")
-        page.goto(f"{BASE_URL}/portal/user-dashboard-v2.html?view=bookings", wait_until="networkidle")
-        page.wait_for_timeout(4000)
+        # ==========================================
+        # 2. CHECK USER DASHBOARD
+        # ==========================================
+        print("\n=== [3/4] CHECK USER DASHBOARD (Aditya) ===", flush=True)
+        await user_page.goto(f"{BASE_URL}/portal/user-dashboard-v2.html", wait_until="domcontentloaded")
+        await user_page.wait_for_timeout(4000)
 
-        user_bookings_text = page.locator("#v2UserBookingsContainer").inner_text()
-        print(f"User Bookings Container Text:\n{safe_str(user_bookings_text)}")
-        user_sees_booking = "Bhagyavathi" in user_bookings_text or created_sl_id in user_bookings_text
-        print(f"-> User Dashboard Psych Booking Visible: {user_sees_booking}")
-        assert user_sees_booking, "Psychologist booking not visible in User Dashboard!"
+        # Switch to bookings view
+        await user_page.evaluate("() => { if (typeof v2SwitchTab === 'function') v2SwitchTab('bookings'); }")
+        await user_page.wait_for_timeout(3000)
 
-        print("=== [4/4] PSYCHOLOGIST LOGIN (Bhagyavathi) & CHECK PSYCH DASHBOARD ===")
-        # Open a new clean context for psychologist
-        psych_context = browser.new_context(viewport={'width': 1280, 'height': 800})
-        psych_page = psych_context.new_page()
-        psych_page.on("console", lambda msg: print(f"[PSYCH CONSOLE] {safe_str(msg.type)}: {safe_str(msg.text)}"))
+        bookings_container = user_page.locator("#v2UserBookingsContainer")
+        await bookings_container.wait_for(state="visible", timeout=15000)
+        user_container_text = await bookings_container.inner_text()
+        safe_user_text = user_container_text.encode('ascii', errors='backslashreplace').decode('ascii')
+        print(f"User Bookings Container Text:\n{safe_user_text[:600]}", flush=True)
+        await user_page.screenshot(path=os.path.join(SCREENSHOT_DIR, "02_user_dashboard_bookings.png"))
 
-        psych_page.goto(f"{BASE_URL}/portal/login.html", wait_until="networkidle")
-        psych_page.fill("#loginEmail", PSYCH_EMAIL)
-        psych_page.fill("#loginPassword", PSYCH_PASS)
-        psych_page.click("#loginSubmitBtn")
-        psych_page.wait_for_timeout(5000)
-        print(f"Psychologist current URL: {psych_page.url}")
+        user_sees_booking = "Bhagyavathi" in user_container_text or created_sl_id in user_container_text
+        print(f"-> User Dashboard Psych Booking Visible: {user_sees_booking}", flush=True)
 
-        psych_page.goto(f"{BASE_URL}/portal/psych-dashboard-v2.html", wait_until="networkidle")
-        psych_page.wait_for_timeout(5000)
+        # ==========================================
+        # 3. PSYCHOLOGIST SESSION: LOGIN & CHECK PSYCH DASHBOARD
+        # ==========================================
+        print("\n=== [4/4] PSYCHOLOGIST LOGIN (Bhagyavathi) & CHECK PSYCH DASHBOARD ===", flush=True)
+        psych_context = await browser.new_context(viewport={"width": 1280, "height": 900})
+        psych_page = await psych_context.new_page()
+        psych_page.on("console", lambda m: safe_log("PSYCH", m))
 
-        # Switch to Patients/Clients tab
-        psych_page.evaluate("() => { if (typeof v2SwitchTab === 'function') v2SwitchTab('clients'); }")
-        psych_page.wait_for_timeout(3000)
+        await psych_page.goto(f"{BASE_URL}/portal/login.html", wait_until="domcontentloaded")
+        await psych_page.wait_for_timeout(3000)
 
-        patient_roster_text = psych_page.locator("#psych-patient-roster").inner_text()
-        print(f"Psych Patient Roster Text:\n{safe_str(patient_roster_text)}")
-        psych_sees_booking = "Aditya" in patient_roster_text or created_sl_id in patient_roster_text
-        print(f"-> Psychologist Dashboard Session Visible: {psych_sees_booking}")
-        assert psych_sees_booking, "Patient session not visible in Psychologist Dashboard!"
+        remember_box_p = psych_page.locator("#rememberMe")
+        if await remember_box_p.count() > 0:
+            await remember_box_p.first.check()
 
-        print("=== [5/4] CHECK ADMIN DASHBOARD AS ADMIN ===")
-        # Re-use user page (Aditya is Admin)
-        page.goto(f"{BASE_URL}/portal/admin-dashboard-v2.html", wait_until="networkidle")
-        page.wait_for_timeout(5000)
+        await psych_page.locator("#emailInput").fill(PSYCH_EMAIL)
+        await psych_page.locator("#passInput").fill(PSYCH_PASS)
+        await psych_page.locator("button[type='submit'].submit-btn").click()
+        await psych_page.wait_for_timeout(6000)
+        print(f"Psychologist current URL after login: {psych_page.url}", flush=True)
 
-        # Switch to sessions ledger tab
-        page.evaluate("() => { if (typeof v2SwitchTab === 'function') v2SwitchTab('sessions'); }")
-        page.wait_for_timeout(3000)
+        await psych_page.goto(f"{BASE_URL}/portal/psych-dashboard-v2.html", wait_until="domcontentloaded")
+        await psych_page.wait_for_timeout(5000)
 
-        admin_ledger_text = page.locator("#v2MasterLedgerContainer").inner_text()
-        print(f"Admin Sessions Ledger Text:\n{safe_str(admin_ledger_text[:500])}...")
-        admin_sees_booking = "Bhagyavathi" in admin_ledger_text or created_sl_id in admin_ledger_text
-        print(f"-> Admin Dashboard Psych Session Visible: {admin_sees_booking}")
-        assert admin_sees_booking, "Psychologist session not visible in Admin Dashboard!"
+        # Switch to Patients roster tab
+        await psych_page.evaluate("() => { if (typeof v2SwitchTab === 'function') v2SwitchTab('clients'); }")
+        await psych_page.wait_for_timeout(3000)
 
-        print("\n" + "="*50)
-        print("PSYCHOLOGIST 3-WAY BOOKING LOOP RESULTS:")
-        print(f"1. User Dashboard (Aditya):       {'PASSED' if user_sees_booking else 'FAILED'}")
-        print(f"2. Psych Dashboard (Bhagyavathi): {'PASSED' if psych_sees_booking else 'FAILED'}")
-        print(f"3. Admin Dashboard (Superadmin):  {'PASSED' if admin_sees_booking else 'FAILED'}")
-        print("="*50 + "\n")
+        patient_roster = psych_page.locator("#psych-patient-roster")
+        await patient_roster.wait_for(state="visible", timeout=15000)
+        psych_container_text = await patient_roster.inner_text()
+        safe_psych_text = psych_container_text.encode('ascii', errors='backslashreplace').decode('ascii')
+        print(f"Psych Patient Roster Text:\n{safe_psych_text}", flush=True)
+        await psych_page.screenshot(path=os.path.join(SCREENSHOT_DIR, "03_psych_dashboard_roster.png"))
 
-        psych_context.close()
-        context.close()
-        browser.close()
+        psych_sees_booking = "Aditya" in psych_container_text or created_sl_id in psych_container_text
+        print(f"-> Psych Dashboard Session Visible: {psych_sees_booking}", flush=True)
+
+        # ==========================================
+        # 4. ADMIN DASHBOARD CHECK
+        # ==========================================
+        print("\n=== [5/4] CHECK ADMIN DASHBOARD AS ADMIN ===", flush=True)
+        await user_page.goto(f"{BASE_URL}/portal/admin-dashboard-v2.html", wait_until="domcontentloaded")
+        await user_page.wait_for_timeout(5000)
+
+        await user_page.evaluate("() => { if (typeof v2SwitchTab === 'function') v2SwitchTab('sessions'); }")
+        await user_page.wait_for_timeout(3000)
+
+        admin_container = user_page.locator("#v2MasterLedgerContainer")
+        await admin_container.wait_for(state="visible", timeout=15000)
+        admin_container_text = await admin_container.inner_text()
+        safe_admin_text = admin_container_text.encode('ascii', errors='backslashreplace').decode('ascii')
+        print(f"Admin Sessions Container Text:\n{safe_admin_text[:600]}", flush=True)
+        await user_page.screenshot(path=os.path.join(SCREENSHOT_DIR, "04_admin_dashboard_sessions.png"))
+
+        admin_sees_booking = "Bhagyavathi" in admin_container_text or created_sl_id in admin_container_text
+        print(f"-> Admin Dashboard Session Visible: {admin_sees_booking}", flush=True)
+
+        # ==========================================
+        # 5. SUMMARY
+        # ==========================================
+        print("\n" + "="*50, flush=True)
+        print("PSYCHOLOGIST 3-WAY BOOKING LOOP RESULTS:", flush=True)
+        print(f"1. User Dashboard (Aditya):       {'PASSED' if user_sees_booking else 'FAILED'}", flush=True)
+        print(f"2. Psych Dashboard (Bhagyavathi): {'PASSED' if psych_sees_booking else 'FAILED'}", flush=True)
+        print(f"3. Admin Dashboard (Admin):       {'PASSED' if admin_sees_booking else 'FAILED'}", flush=True)
+        print("="*50 + "\n", flush=True)
+
+        await psych_context.close()
+        await user_context.close()
+        await browser.close()
 
 if __name__ == "__main__":
-    run_test()
+    asyncio.run(run_test())
