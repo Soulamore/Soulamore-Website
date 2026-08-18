@@ -15,8 +15,8 @@ import {
     useSessionCreditForBooking,
     PEER_PLAN_TYPES,
     DEFAULT_PLANS
-} from "./peer-booking-handler.js?v=20260818-v11";
-import { openRazorpayCheckout } from "./payment-handler.js?v=20260818-v11";
+} from "./peer-booking-handler.js?v=20260818-v12";
+import { openRazorpayCheckout } from "./payment-handler.js?v=20260818-v12";
 
 /**
  * Initialize a booking widget inside a given root element.
@@ -364,7 +364,7 @@ export function initBookingWidget(config) {
                         box-shadow: 0 4px 18px rgba(78, 205, 196, 0.4);
                         transition: all 0.2s ease;
                     ">
-                Confirm & Pay
+                Confirm Booking Request
             </button>
         </div>
     `;
@@ -609,7 +609,7 @@ export function initBookingWidget(config) {
             const plan = DEFAULT_PLANS[planKey] || DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION];
             try {
                 submitBtn.disabled = true;
-                submitBtn.textContent = "Opening payment...";
+                submitBtn.textContent = "Confirming booking...";
                 setMessage("");
 
                 const startTime = selectedSlot.start;
@@ -648,14 +648,14 @@ export function initBookingWidget(config) {
                     if (activeUser.isAnonymous) {
                         window.location.href = "../index.html?booking_success=true";
                     } else {
-                        window.location.href = "../portal/user-dashboard.html?view=bookings";
+                        window.location.href = "../portal/user-dashboard-v2.html?view=bookings";
                     }
                 }, 2000);
             } catch (err) {
                 console.error("BookingWidget: booking/payment failed", err);
                 setMessage(err.message || "Payment failed or was cancelled. Please try again.", true);
                 submitBtn.disabled = false;
-                submitBtn.textContent = "Confirm & Pay";
+                submitBtn.textContent = "Confirm Booking Request";
             }
         });
     }
@@ -728,4 +728,9 @@ export function initBookingWidget(config) {
     // Initial Load: Select Today & Start 7-Day Slot Prefetch
     selectDate(selectedDate);
     setTimeout(prefetch7DaysSlots, 400);
+}
+
+// Global window assignment
+if (typeof window !== "undefined") {
+    window.initBookingWidget = initBookingWidget;
 }

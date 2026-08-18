@@ -10,11 +10,6 @@
             var path = window.location.pathname;
             var search = window.location.search;
             var targetDomain = 'soulamore.com';
-            
-            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
-                window.location.replace('https://' + targetDomain + path + search);
-            }
-            
             var canonicalUrl = 'https://' + targetDomain + path;
             var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
             link.rel = 'canonical';
@@ -2799,7 +2794,7 @@
 
                 // 7. Platform Bookings Master Listener
                 onSnapshot(collection(db, 'peer_bookings'), (snapshot) => {
-                    const container = document.getElementById('v2SessionsContainer');
+                    const container = document.getElementById('v2MasterLedgerContainer') || document.getElementById('v2SessionsContainer');
                     if (!container) return;
 
                     if (snapshot.empty) {
@@ -2829,6 +2824,9 @@
                         html += `</div>`;
                         container.innerHTML = html;
                     }
+                    hideV2Loader();
+                }, (err) => {
+                    console.warn("Admin bookings listener warning:", err.message);
                     hideV2Loader();
                 });
 

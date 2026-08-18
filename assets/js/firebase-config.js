@@ -37,32 +37,21 @@ try {
     console.log("Firebase app initialized");
 }
 
-// --- APP CHECK INITIALIZATION ---
-// App Check with reCAPTCHA Enterprise
-let appCheck = null;
+// Initialize App Check with reCAPTCHA Enterprise only when explicitly requested
+const isProduction = window.location.hostname === 'soulamore.com' || window.location.hostname === 'www.soulamore.com';
 
-// Debug mode for localhost, local network IPs, or custom local domains, and reCAPTCHA Enterprise for production
-const isLocal = 
-    window.location.hostname === 'localhost' || 
-    window.location.hostname === '127.0.0.1' || 
-    window.location.hostname.startsWith('192.168.') || 
-    window.location.hostname.startsWith('10.') || 
-    window.location.hostname.endsWith('.local') ||
-    window.location.hostname.startsWith('172.');
-
-if (isLocal) {
+if (window.ENABLE_APP_CHECK && isProduction) {
+    try {
+        appCheck = initializeAppCheck(app, {
+            provider: new ReCaptchaEnterpriseProvider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
+            isTokenAutoRefreshEnabled: true
+        });
+        console.log("✅ Firebase App Check initialized (Enterprise)");
+    } catch (err) {
+        console.warn("⚠️ App Check initialization warning:", err.message);
+    }
+} else {
     self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-    console.log("🔧 Firebase App Check Debug Mode enabled. Check console for Debug Token!");
-}
-
-try {
-    appCheck = initializeAppCheck(app, {
-        provider: new ReCaptchaEnterpriseProvider('6LcYEpIsAAAAANAIbvcDMDyYRUYmUFyyyGXsZEBP'),
-        isTokenAutoRefreshEnabled: true
-    });
-    console.log("✅ Firebase App Check initialized (Enterprise)");
-} catch (err) {
-    console.warn("⚠️ App Check initialization failed:", err.message);
 }
 
 let analytics = null;

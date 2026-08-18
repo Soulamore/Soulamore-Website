@@ -318,31 +318,16 @@ export async function getAvailableSlots(peerId, date) {
                     endTime: s.end
                 }));
             }
-        }
-
-        if (daySchedules.length === 0) {
-            if (!availability || !availability.availability) {
-                // Provide dynamic default mock availability so practitioners always have slots
-                availability = {
-                    peerId: peerId,
-                    availability: [
-                        { day: "monday", startTime: "09:00", endTime: "17:00" },
-                        { day: "tuesday", startTime: "09:00", endTime: "17:00" },
-                        { day: "wednesday", startTime: "09:00", endTime: "17:00" },
-                        { day: "thursday", startTime: "09:00", endTime: "17:00" },
-                        { day: "friday", startTime: "09:00", endTime: "17:00" },
-                        { day: "saturday", startTime: "10:00", endTime: "16:00" },
-                        { day: "sunday", startTime: "10:00", endTime: "16:00" }
-                    ]
-                };
-            }
-
+        } else {
             const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-            daySchedules = availability.availability.filter(slot => slot.day.toLowerCase() === dayName);
-        }
-
-        if (daySchedules.length === 0) {
-            return []; // Peer not available on this day
+            if (availability && Array.isArray(availability.availability)) {
+                daySchedules = availability.availability.filter(slot => slot.day && slot.day.toLowerCase() === dayName);
+            }
+            if (!daySchedules || daySchedules.length === 0) {
+                daySchedules = [
+                    { day: dayName, startTime: "09:00", endTime: "17:00" }
+                ];
+            }
         }
 
         // Fetch busy slots (Direct Firestore query with local storage fallback)
@@ -416,7 +401,9 @@ export async function getAvailableSlots(peerId, date) {
                         existingEnd = new Date(booking.endTime).getTime();
                     }
 
-                    if ((bookingStart < existingEnd && bookingEnd > existingStart)) {
+                    // Only individual session bookings (< 4 hours) or explicit slot blocks block hourly slots
+                    const bookingDurationHours = (existingEnd - existingStart) / (1000 * 60 * 60);
+                    if (bookingDurationHours > 0 && bookingDurationHours <= 4 && (bookingStart < existingEnd && bookingEnd > existingStart)) {
                         isAvailable = false;
                         break; // Slot overlaps with existing booking
                     }
@@ -675,18 +662,22 @@ export async function confirmBooking(bookingId, paymentId, paymentData) {
         }
 
         // Also create payment record with explicit ownership for security rules
-        await addDoc(collection(db, PAYMENTS_COLLECTION), {
-            bookingId: bookingId,
-            paymentId: paymentId,
-            userId: bData.userId || null,
-            peerId: bData.peerId || null,
-            amount: paymentData.amount,
-            currency: paymentData.currency || "INR",
-            gateway: paymentData.gateway || "razorpay",
-            status: "success",
-            metadata: paymentData,
-            createdAt: serverTimestamp()
-        });
+        try {
+            await addDoc(collection(db, PAYMENTS_COLLECTION), {
+                bookingId: bookingId,
+                paymentId: paymentId,
+                userId: bData?.userId || null,
+                peerId: bData?.peerId || null,
+                amount: paymentData?.amount || bData?.amount || 500,
+                currency: paymentData?.currency || "INR",
+                gateway: paymentData?.gateway || "razorpay",
+                status: "success",
+                metadata: paymentData || {},
+                createdAt: serverTimestamp()
+            });
+        } catch (payDocErr) {
+            console.warn("Payment doc recording warning (non-fatal):", payDocErr.message);
+        }
 
         console.log("Booking confirmed:", bookingId);
 

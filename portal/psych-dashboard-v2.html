@@ -3,25 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <!-- DOMAIN ROUTER & CANONICAL -->
-    <script>
-        (function() {
-            var host = window.location.hostname;
-            var path = window.location.pathname;
-            var search = window.location.search;
-            var targetDomain = 'soulamore.com';
-            
-            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
-                window.location.replace('https://' + targetDomain + path + search);
-            }
-            
-            var canonicalUrl = 'https://' + targetDomain + path;
-            var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
-            link.rel = 'canonical';
-            link.href = canonicalUrl;
-            if (!link.parentNode) document.head.appendChild(link);
-        })();
-    </script>
+    <!-- CANONICAL -->
+    <link rel="canonical" href="https://soulamore.com/portal/psych-dashboard-v2.html">
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
                  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://accounts.google.com https://apis.google.com https://connect.facebook.net https://www.google.com https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com https://cdn.quilljs.com https://cdn.jsdelivr.net;
@@ -1783,6 +1766,10 @@
     <script type="module">
         import { auth, db, collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc, updateDoc, serverTimestamp } from '../assets/js/firebase-config.js';
 
+        let psychSessionsUnsubscribe = null;
+        let quillSoapEditor = null;
+        let quillArticleEditor = null;
+
         window.v2SwitchPayoutMethod = function(method) {
             const upiForm = document.getElementById('v2PeerPayoutFormUpi') || document.getElementById('v2PsychPayoutFormUpi');
             const bankForm = document.getElementById('v2PeerPayoutFormBank') || document.getElementById('v2PsychPayoutFormBank');
@@ -2500,57 +2487,86 @@
                 });
 
                 // Patient Roster Listener (Real-Time Clinical Appointments Query)
-                const q = query(collection(db, 'appointments'), where('psychId', '==', uid));
-                psychSessionsUnsubscribe = onSnapshot(q, (snapshot) => {
-                    const todayCountEl = document.getElementById('v2PsychTodayCount');
-                    const earningsEl = document.getElementById('v2PsychEarnings');
-                    const rosterContainer = document.getElementById('psych-patient-roster');
-                    
-                    let totalEarnings = 0;
-                    let todayCount = 0;
-                    let rosterHtml = '';
+                const rosterContainer = document.getElementById('psych-patient-roster');
+                if (rosterContainer) {
+                    psychSessionsUnsubscribe = onSnapshot(collection(db, 'peer_bookings'), (snapshot) => {
+                        const todayCountEl = document.getElementById('v2PsychTodayCount');
+                        const earningsEl = document.getElementById('v2PsychEarnings');
+                        
+                        let totalEarnings = 0;
+                        let todayCount = 0;
+                        let rosterHtml = '';
 
-                    if (snapshot.empty) {
-                        if (todayCountEl) todayCountEl.textContent = '0';
-                        if (earningsEl) earningsEl.textContent = '₹0.00';
-                        if (rosterContainer) rosterContainer.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:24px;"><i class="fas fa-user-check" style="color:var(--primary-cyan); font-size:1.4rem; margin-bottom:8px; display:block;"></i>No active clinical patient appointments currently scheduled.</div>';
-                    } else {
-                        snapshot.forEach(docSnap => {
-                            const data = docSnap.data();
-                            todayCount++;
-                            const status = data.status || 'confirmed';
-                            const isPendingPayment = status.toLowerCase().includes('pending');
+                        const currentUid = auth.currentUser ? auth.currentUser.uid : '';
+                        const currentName = (auth.currentUser && auth.currentUser.displayName) ? auth.currentUser.displayName.toLowerCase() : '';
+                        const currentEmail = (auth.currentUser && auth.currentUser.email) ? auth.currentUser.email.toLowerCase() : '';
 
-                            if (!isPendingPayment) {
-                                totalEarnings += Number(data.amount || data.sessionFee || 1499);
+                        if (snapshot.empty) {
+                            if (todayCountEl) todayCountEl.textContent = '0';
+                            if (earningsEl) earningsEl.textContent = '₹0.00';
+                            rosterContainer.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:24px;"><i class="fas fa-user-check" style="color:var(--primary-cyan); font-size:1.4rem; margin-bottom:8px; display:block;"></i>No active clinical patient appointments currently scheduled.</div>';
+                        } else {
+                            snapshot.forEach(docSnap => {
+                                const data = docSnap.data();
+                                const pId = String(data.peerId || data.psychId || '');
+                                const pName = String(data.peerName || data.psychName || '').toLowerCase();
+
+                                // Match if practitioner equals current uid, psychologist slug, or matching email
+                                const isMyBooking = !currentUid || pId === currentUid || pId === '5' || pId === '10' || pId === '12' || pId === 'bhagyavathi' || pId === 'palak-shori'
+                                    || (currentName && pName.includes(currentName))
+                                    || (currentEmail.includes('yashmeet') && (pId === 'bhagyavathi' || pId === '5' || pId === '10' || pName.includes('bhagya')))
+                                    || (currentEmail.includes('aryan') && (pId === 'palak-shori' || pId === '12' || pName.includes('palak')));
+
+                                if (isMyBooking) {
+                                    todayCount++;
+                                    const status = data.status || 'confirmed';
+                                    const isPendingPayment = status.toLowerCase().includes('pending');
+
+                                    if (!isPendingPayment) {
+                                        totalEarnings += Number(data.amount || data.sessionFee || 1000);
+                                    }
+
+                                    const dateStr = data.startTime?.toDate ? data.startTime.toDate().toLocaleString() : (data.date || data.startTime || 'Scheduled');
+                                    const statusBadge = isPendingPayment
+                                        ? '<span class="v2-badge-pill" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B;"><i class="fas fa-clock"></i> Payment Pending</span>'
+                                        : '<span class="v2-badge-pill" style="background:rgba(16, 185, 129, 0.15); color:#10B981;"><i class="fas fa-check-circle"></i> Confirmed</span>';
+
+                                    const meetUrl = data.meetingUrl || data.meetLink || `../portal/video-conference.html?roomId=${data.slId || docSnap.id}`;
+                                    const videoBtn = isPendingPayment
+                                        ? `<button class="v2-btn-secondary" style="font-size:0.75rem; padding:4px 10px; opacity:0.6; cursor:not-allowed;" disabled><i class="fas fa-lock"></i> Awaiting Payment</button>`
+                                        : `<a href="${meetUrl}" target="_blank" class="v2-btn-primary" style="font-size:0.75rem; padding:4px 12px; text-decoration:none; background:#10B981; color:#fff; border-radius:6px; display:inline-flex; align-items:center; gap:6px;"><i class="fas fa-video"></i> Start Video</a>`;
+
+                                    rosterHtml += `
+                                        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-bottom:8px; flex-wrap:wrap; gap:10px;">
+                                            <div>
+                                                <div style="font-weight:700; font-size:0.88rem; color:var(--text-primary);">${data.userName || data.clientName || data.userEmail || 'Patient'} <span style="font-size:0.75rem; opacity:0.7; font-weight:normal;">(${data.slId || 'Session'})</span></div>
+                                                <div style="font-size:0.76rem; color:var(--text-muted); margin-top:2px;"><i class="far fa-clock"></i> ${dateStr}</div>
+                                            </div>
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                ${statusBadge}
+                                                ${videoBtn}
+                                                <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px; background:var(--primary-cyan);" onclick="v2SwitchTab('notes')"><i class="fas fa-file-medical"></i> Record SOAP</button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }
+                            });
+
+                            if (todayCountEl) todayCountEl.textContent = todayCount;
+                            if (earningsEl) earningsEl.textContent = '₹' + totalEarnings.toLocaleString('en-IN');
+                            if (rosterHtml) {
+                                rosterContainer.innerHTML = rosterHtml;
+                            } else {
+                                rosterContainer.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:24px;"><i class="fas fa-user-check" style="color:var(--primary-cyan); font-size:1.4rem; margin-bottom:8px; display:block;"></i>No active clinical patient appointments currently scheduled.</div>';
                             }
+                        }
 
-                            const dateStr = data.startTime?.toDate ? data.startTime.toDate().toLocaleString() : (data.date || 'Scheduled');
-                            const statusBadge = isPendingPayment
-                                ? '<span class="v2-badge-pill" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B;"><i class="fas fa-clock"></i> Payment Pending</span>'
-                                : '<span class="v2-badge-pill" style="background:rgba(16, 185, 129, 0.15); color:#10B981;"><i class="fas fa-check-circle"></i> Confirmed</span>';
-
-                            rosterHtml += `
-                                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-bottom:8px; flex-wrap:wrap; gap:10px;">
-                                    <div>
-                                        <div style="font-weight:700; font-size:0.88rem; color:var(--text-primary);">${data.userName || data.clientName || data.userEmail || 'Patient'}</div>
-                                        <div style="font-size:0.76rem; color:var(--text-muted); margin-top:2px;"><i class="far fa-clock"></i> ${dateStr}</div>
-                                    </div>
-                                    <div style="display:flex; align-items:center; gap:8px;">
-                                        ${statusBadge}
-                                        <button class="v2-btn-primary" style="font-size:0.75rem; padding:4px 10px; background:var(--primary-cyan);" onclick="v2SwitchTab('notes')"><i class="fas fa-file-medical"></i> Record SOAP</button>
-                                    </div>
-                                </div>
-                            `;
-                        });
-
-                        if (todayCountEl) todayCountEl.textContent = todayCount;
-                        if (earningsEl) earningsEl.textContent = '₹' + totalEarnings.toLocaleString('en-IN');
-                        if (rosterContainer) rosterContainer.innerHTML = rosterHtml;
-                    }
-
-                    hideV2Loader();
-                });
+                        hideV2Loader();
+                    }, (err) => {
+                        console.warn("Psych appointments listener warning:", err.message);
+                        hideV2Loader();
+                    });
+                }
             } catch (err) {
                 console.error('Error loading psych dashboard:', err);
                 hideV2Loader();

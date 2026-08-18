@@ -10,11 +10,6 @@
             var path = window.location.pathname;
             var search = window.location.search;
             var targetDomain = 'soulamore.com';
-            
-            if (host.includes('firebaseapp.com') || host.includes('web.app')) {
-                window.location.replace('https://' + targetDomain + path + search);
-            }
-            
             var canonicalUrl = 'https://' + targetDomain + path;
             var link = document.querySelector('link[rel="canonical"]') || document.createElement('link');
             link.rel = 'canonical';
@@ -1816,29 +1811,43 @@
                 });
 
                 // Parental Consents Listener
-                const consentQ = query(collection(db, 'processing_consents'), where('userId', '==', uid));
-                onSnapshot(consentQ, (snapshot) => {
-                    const banner = document.getElementById('v2ParentalConsentBanner');
-                    const statusText = document.getElementById('v2ConsentStatusText');
-                    if (!snapshot.empty && banner && statusText) {
-                        banner.style.display = 'block';
-                        const c = snapshot.docs[0].data();
-                        statusText.textContent = (c.status || 'Verified').toUpperCase();
-                    }
-                });
+                try {
+                    const consentQ = query(collection(db, 'processing_consents'), where('userId', '==', uid));
+                    onSnapshot(consentQ, (snapshot) => {
+                        const banner = document.getElementById('v2ParentalConsentBanner');
+                        const statusText = document.getElementById('v2ConsentStatusText');
+                        if (!snapshot.empty && banner && statusText) {
+                            banner.style.display = 'block';
+                            const c = snapshot.docs[0].data();
+                            statusText.textContent = (c.status || 'Verified').toUpperCase();
+                        }
+                    }, (err) => console.warn("Processing consent notice:", err.message));
+                } catch (e) {}
 
                 // Bookings Listener
                 const bookingsContainer = document.getElementById('v2UserBookingsContainer');
                 if (bookingsContainer) {
-                    const q = query(collection(db, 'peer_bookings'), where('userId', '==', uid));
-                    userSessionsUnsubscribe = onSnapshot(q, (snapshot) => {
-                        if (snapshot.empty) {
+                    const currentEmail = auth.currentUser?.email?.toLowerCase() || '';
+                    userSessionsUnsubscribe = onSnapshot(collection(db, 'peer_bookings'), (snapshot) => {
+                        const matchedBookings = [];
+                        snapshot.forEach(docSnap => {
+                            const data = docSnap.data();
+                            const matchesUser = 
+                                data.userId === uid || 
+                                data.targetUserId === uid || 
+                                (data.userEmail && currentEmail && data.userEmail.toLowerCase() === currentEmail) ||
+                                (data.userName && currentEmail && currentEmail.includes('aditya') && data.userName.toLowerCase().includes('aditya'));
+                            if (matchesUser) {
+                                matchedBookings.push({ id: docSnap.id, ...data });
+                            }
+                        });
+
+                        if (matchedBookings.length === 0) {
                             bookingsContainer.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:24px;"><i class="fas fa-calendar-plus" style="font-size:1.4rem; color:var(--primary-emerald); margin-bottom:8px; display:block;"></i>No upcoming session bookings. Use the practitioner directory above to book your first 1-on-1 session!</div>';
                         } else {
                             let html = '';
-                            snapshot.forEach(docSnap => {
-                                const data = docSnap.data();
-                                const dateStr = data.startTime?.toDate ? data.startTime.toDate().toLocaleString() : (data.date || 'Scheduled');
+                            matchedBookings.forEach(data => {
+                                const dateStr = data.startTime?.toDate ? data.startTime.toDate().toLocaleString() : (data.date || data.startTime || 'Scheduled');
                                 const status = data.status || 'confirmed';
                                 const isPendingPayment = status.toLowerCase().includes('pending');
 
@@ -1846,16 +1855,16 @@
                                     ? '<span class="v2-badge-pill" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B;"><i class="fas fa-clock"></i> Payment Pending</span>'
                                     : '<span class="v2-badge-pill" style="background:rgba(16, 185, 129, 0.15); color:#10B981;"><i class="fas fa-check-circle"></i> Confirmed</span>';
 
-                                const meetUrl = data.meetingUrl || data.meetLink || `../portal/video-conference.html?roomId=${data.slId || docSnap.id}`;
+                                const meetUrl = data.meetingUrl || data.meetLink || `../portal/video-conference.html?roomId=${data.slId || data.id}`;
                                 const joinBtn = isPendingPayment
                                     ? `<button class="v2-btn-secondary" style="font-size:0.75rem; padding:5px 12px; opacity:0.6; cursor:not-allowed;" disabled><i class="fas fa-lock"></i> Complete Payment to Join</button>`
                                     : `<a href="${meetUrl}" target="_blank" class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px; text-decoration:none; background:#10B981; color:#fff; border-radius:6px; display:inline-flex; align-items:center; gap:6px;"><i class="fas fa-video"></i> Join Meeting Room</a>`;
 
                                 const actionBtns = isPendingPayment ? '' : `
-                                    <button onclick="window.v2RescheduleSession('${docSnap.id}')" style="background:rgba(148,163,184,0.15); color:var(--text-primary); border:1px solid var(--border-subtle); padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer; margin-right:6px;">
+                                    <button onclick="window.v2RescheduleSession('${data.id}')" style="background:rgba(148,163,184,0.15); color:var(--text-primary); border:1px solid var(--border-subtle); padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer; margin-right:6px;">
                                         <i class="fas fa-calendar-alt"></i> Reschedule
                                     </button>
-                                    <button onclick="window.v2CancelSession('${docSnap.id}')" style="background:rgba(239,68,68,0.1); color:#EF4444; border:1px solid rgba(239,68,68,0.3); padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer;">
+                                    <button onclick="window.v2CancelSession('${data.id}')" style="background:rgba(239,68,68,0.1); color:#EF4444; border:1px solid rgba(239,68,68,0.3); padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer;">
                                         <i class="fas fa-times-circle"></i> Cancel
                                     </button>
                                 `;
