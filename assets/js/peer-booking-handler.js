@@ -320,29 +320,15 @@ export async function getAvailableSlots(peerId, date) {
             }
         }
 
-        if (daySchedules.length === 0) {
-            if (!availability || !availability.availability) {
-                // Provide dynamic default mock availability so practitioners always have slots
-                availability = {
-                    peerId: peerId,
-                    availability: [
-                        { day: "monday", startTime: "09:00", endTime: "17:00" },
-                        { day: "tuesday", startTime: "09:00", endTime: "17:00" },
-                        { day: "wednesday", startTime: "09:00", endTime: "17:00" },
-                        { day: "thursday", startTime: "09:00", endTime: "17:00" },
-                        { day: "friday", startTime: "09:00", endTime: "17:00" },
-                        { day: "saturday", startTime: "10:00", endTime: "16:00" },
-                        { day: "sunday", startTime: "10:00", endTime: "16:00" }
-                    ]
-                };
-            }
-
             const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-            daySchedules = availability.availability.filter(slot => slot.day.toLowerCase() === dayName);
-        }
-
-        if (daySchedules.length === 0) {
-            return []; // Peer not available on this day
+            if (availability && Array.isArray(availability.availability)) {
+                daySchedules = availability.availability.filter(slot => slot.day && slot.day.toLowerCase() === dayName);
+            }
+            if (!daySchedules || daySchedules.length === 0) {
+                daySchedules = [
+                    { day: dayName, startTime: "09:00", endTime: "17:00" }
+                ];
+            }
         }
 
         // Fetch busy slots (Direct Firestore query with local storage fallback)
