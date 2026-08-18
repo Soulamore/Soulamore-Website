@@ -730,8 +730,7 @@ export function initBookingWidget(config) {
     setTimeout(prefetch7DaysSlots, 400);
 }
 
-// Global and ES Module export
+// Global window assignment
 if (typeof window !== "undefined") {
     window.initBookingWidget = initBookingWidget;
 }
-export { initBookingWidget };
