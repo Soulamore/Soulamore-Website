@@ -12,14 +12,14 @@
 
     // Dashboard role requirements - STRICT ENFORCEMENT
     const ROLE_RULES = {
-        'user-dashboard': ['user', 'member', 'student', 'workplace', 'corporate'],
-        'user-dashboard-v2': ['user', 'member', 'student', 'workplace', 'corporate'],
-        'student-dashboard-v2': ['student', 'user', 'member'],
-        'workplace-dashboard-v2': ['workplace', 'corporate', 'user', 'member'],
-        'peer-dashboard': ['peer'],
-        'peer-dashboard-v2': ['peer'],
-        'psych-dashboard': ['psychologist'],
-        'psych-dashboard-v2': ['psychologist'],
+        'user-dashboard': ['user', 'member', 'student', 'workplace', 'corporate', 'admin'],
+        'user-dashboard-v2': ['user', 'member', 'student', 'workplace', 'corporate', 'admin'],
+        'student-dashboard-v2': ['student', 'user', 'member', 'admin'],
+        'workplace-dashboard-v2': ['workplace', 'corporate', 'user', 'member', 'admin'],
+        'peer-dashboard': ['peer', 'admin'],
+        'peer-dashboard-v2': ['peer', 'admin'],
+        'psych-dashboard': ['psychologist', 'admin'],
+        'psych-dashboard-v2': ['psychologist', 'admin'],
         'admin-dashboard': ['admin'],
         'admin-dashboard-v2': ['admin']
     };

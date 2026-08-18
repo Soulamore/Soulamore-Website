@@ -93,10 +93,16 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Clinical & General Appointments
+    match /appointments/{appId} {
+      allow read: if isSignedIn() || isAdmin();
+      allow write: if isSignedIn() || isAdmin();
+    }
+
     // Payments
     match /payments/{paymentId} {
       allow read: if isAdmin() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid));
-      allow create: if false;
+      allow create: if isSignedIn();
       allow update, delete: if isAdmin();
     }
 

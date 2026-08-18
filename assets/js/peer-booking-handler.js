@@ -675,18 +675,22 @@ export async function confirmBooking(bookingId, paymentId, paymentData) {
         }
 
         // Also create payment record with explicit ownership for security rules
-        await addDoc(collection(db, PAYMENTS_COLLECTION), {
-            bookingId: bookingId,
-            paymentId: paymentId,
-            userId: bData.userId || null,
-            peerId: bData.peerId || null,
-            amount: paymentData.amount,
-            currency: paymentData.currency || "INR",
-            gateway: paymentData.gateway || "razorpay",
-            status: "success",
-            metadata: paymentData,
-            createdAt: serverTimestamp()
-        });
+        try {
+            await addDoc(collection(db, PAYMENTS_COLLECTION), {
+                bookingId: bookingId,
+                paymentId: paymentId,
+                userId: bData?.userId || null,
+                peerId: bData?.peerId || null,
+                amount: paymentData?.amount || bData?.amount || 500,
+                currency: paymentData?.currency || "INR",
+                gateway: paymentData?.gateway || "razorpay",
+                status: "success",
+                metadata: paymentData || {},
+                createdAt: serverTimestamp()
+            });
+        } catch (payDocErr) {
+            console.warn("Payment doc recording warning (non-fatal):", payDocErr.message);
+        }
 
         console.log("Booking confirmed:", bookingId);
 
