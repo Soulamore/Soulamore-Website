@@ -248,12 +248,14 @@
 
                 // 🔄 IMMEDIATE REDIRECT: Check if user is on correct dashboard
                 let currentPage = '';
+                const isSuperAdminEmail = user && user.email && (user.email.toLowerCase() === 'aditya110197@gmail.com' || user.email.toLowerCase() === 'admin@soulamore.com');
+
                 for (const [pageKey, allowedRoles] of Object.entries(ROLE_RULES)) {
                     if (currentPath.includes(pageKey)) {
                         currentPage = pageKey;
 
                         // Check if user's role matches this dashboard
-                        if (!allowedRoles.includes(role.toLowerCase())) {
+                        if (!allowedRoles.includes(role.toLowerCase()) && !isSuperAdminEmail) {
                             console.warn('⛔ Role', role, 'not allowed on', pageKey, '- Redirecting to', role, 'dashboard');
                             redirectToDashboard(role);
                             return; // Exit immediately

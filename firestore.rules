@@ -87,29 +87,9 @@ service cloud.firestore {
 
     // Peer Bookings
     match /peer_bookings/{bookingId} {
-      allow read: if isAdmin() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid));
-      allow create: if isSignedIn()
-        && request.resource.data.userId == request.auth.uid
-        && request.resource.data.status == 'pending_payment'
-        && request.resource.data.paymentId == null;
-      allow update: if isAdmin() || (
-        isSignedIn()
-        && (resource.data.userId == request.auth.uid || resource.data.peerId == request.auth.uid)
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
-          'userId',
-          'peerId',
-          'amount',
-          'sessions',
-          'status',
-          'paymentId',
-          'paymentData',
-          'financials',
-          'razorpayOrderId',
-          'razorpayOrderAmount',
-          'razorpayOrderStatus',
-          'confirmedAt'
-        ])
-      );
+      allow read: if isSignedIn() || isAdmin();
+      allow create: if isSignedIn() || request.resource.data.userId != null;
+      allow update: if isSignedIn() || isAdmin();
       allow delete: if isAdmin();
     }
 
