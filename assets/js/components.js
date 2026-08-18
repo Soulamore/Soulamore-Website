@@ -20,12 +20,7 @@
     var path = window.location.pathname;
     var search = window.location.search;
     var targetDomain = 'soulamore.com';
-    
-    // 1. Redirect Firebase Traffic
-    if (host.includes('firebaseapp.com') || host.includes('web.app')) {
-        window.location.replace('https://' + targetDomain + path + search);
-    }
-    
+    // 1. Domain Router (Traffic redirect disabled to allow web.app hosting & automated testing)
     // 2. Canonical Verification/Injection
     // If head script missed it or it's a dynamic page
     if (!document.querySelector('link[rel="canonical"]')) {
