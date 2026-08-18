@@ -570,7 +570,7 @@
         }
 
         // --- LOAD LOGIC ---
-        document.addEventListener('DOMContentLoaded', async () => {
+        async function initProfilePage() {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
             currentProfileId = id;
@@ -729,12 +729,21 @@
             // Render or Fail
             if (profile) {
                 renderProfile(profile, id);
-                document.getElementById('loadingState').style.display = 'none';
-                document.getElementById('profileContent').style.display = 'block';
+                const loadingEl = document.getElementById('loadingState');
+                const contentEl = document.getElementById('profileContent');
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (contentEl) contentEl.style.display = 'block';
             } else {
-                document.getElementById('loadingState').innerHTML = `<p>Profile not found.</p><a href="index.html">Back</a>`;
+                const loadingEl = document.getElementById('loadingState');
+                if (loadingEl) loadingEl.innerHTML = `<p>Profile not found.</p><a href="index.html">Back</a>`;
             }
-        });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initProfilePage);
+        } else {
+            initProfilePage();
+        }
 
         function renderProfile(p, id) {
             document.getElementById('pName').innerText = p.name;
