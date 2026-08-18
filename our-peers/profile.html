@@ -606,12 +606,15 @@
 
             try {
                 if (!profile) {
-                    let docSnap = await getDoc(doc(db, "professionals", id));
-                    if (!docSnap.exists()) {
-                        docSnap = await getDoc(doc(db, "users", id));
+                    const fetchWithTimeout = (promise, ms = 2500) => 
+                        Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))]);
+
+                    let docSnap = await fetchWithTimeout(getDoc(doc(db, "professionals", id))).catch(() => null);
+                    if (!docSnap || !docSnap.exists()) {
+                        docSnap = await fetchWithTimeout(getDoc(doc(db, "users", id))).catch(() => null);
                     }
 
-                    if (docSnap.exists()) {
+                    if (docSnap && docSnap.exists()) {
                         const data = docSnap.data();
                         profile = {
                             name: data.name || data.displayName || "Peer Listener",
