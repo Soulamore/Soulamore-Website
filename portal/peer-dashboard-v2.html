@@ -2776,49 +2776,66 @@
                 // Sessions Listener
                 const sessionsContainer = document.getElementById('peer-upcoming-sessions');
                 if (sessionsContainer) {
-                    const q = query(collection(db, 'peer_bookings'), where('peerId', '==', uid));
-                    peerSessionsUnsubscribe = onSnapshot(q, (snapshot) => {
+                    peerSessionsUnsubscribe = onSnapshot(collection(db, 'peer_bookings'), (snapshot) => {
                         let totalPeople = new Set();
                         let totalEarnings = 0;
                         let html = '';
+                        let count = 0;
+
+                        const currentUid = auth.currentUser ? auth.currentUser.uid : '';
+                        const currentName = (auth.currentUser && auth.currentUser.displayName) ? auth.currentUser.displayName.toLowerCase() : '';
 
                         if (snapshot.empty) {
                             sessionsContainer.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:24px;"><i class="fas fa-calendar-xmark" style="font-size:1.4rem; color:var(--text-muted); margin-bottom:8px; display:block;"></i>No confirmed client sessions scheduled right now.</div>';
                         } else {
                             snapshot.forEach(docSnap => {
                                 const data = docSnap.data();
-                                if (data.userId) totalPeople.add(data.userId);
-                                if (data.status === 'completed' && data.financials) {
-                                    totalEarnings += data.financials.practitionerShare || 0;
+                                const pId = String(data.peerId || '');
+                                const pName = String(data.peerName || '').toLowerCase();
+
+                                // Match if peerId equals current uid, or '1' (Aditya default profile), or matches peer's display name, or if unassigned
+                                const isMyBooking = !currentUid || pId === currentUid || pId === '1' || (currentName && pName.includes(currentName));
+
+                                if (isMyBooking) {
+                                    count++;
+                                    if (data.userId) totalPeople.add(data.userId);
+                                    if (data.status === 'completed' && data.financials) {
+                                        totalEarnings += data.financials.practitionerShare || 0;
+                                    }
+
+                                    const dateStr = data.startTime?.toDate ? data.startTime.toDate().toLocaleString() : (data.date || data.startTime || 'Scheduled');
+                                    const status = data.status || 'confirmed';
+
+                                    const isPendingPayment = status.toLowerCase().includes('pending');
+                                    const statusBadge = isPendingPayment
+                                        ? '<span class="v2-badge-pill" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B;"><i class="fas fa-clock"></i> Payment Pending</span>'
+                                        : '<span class="v2-badge-pill" style="background:rgba(16, 185, 129, 0.15); color:#10B981;"><i class="fas fa-check-circle"></i> Confirmed</span>';
+
+                                    const meetUrl = data.meetingUrl || data.meetLink || `../portal/video-conference.html?roomId=${data.slId || docSnap.id}`;
+                                    const videoBtn = isPendingPayment
+                                        ? `<button class="v2-btn-secondary" style="font-size:0.75rem; padding:5px 12px; opacity:0.6; cursor:not-allowed;" disabled><i class="fas fa-lock"></i> Awaiting Payment</button>`
+                                        : `<a href="${meetUrl}" target="_blank" class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px; text-decoration:none; background:#10B981; color:#fff; border-radius:6px; display:inline-flex; align-items:center; gap:6px;"><i class="fas fa-video"></i> Start Video Session</a>`;
+
+                                    html += `
+                                        <div style="background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); padding:14px; margin-bottom:10px;">
+                                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                                                <div style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">${data.userName || data.userEmail || data.clientName || 'Anonymous Member'} <span style="font-size:0.75rem; opacity:0.7; font-weight:normal;">(${data.slId || 'Session'})</span></div>
+                                                <div>${statusBadge}</div>
+                                            </div>
+                                            <div style="font-size:0.8rem; color:var(--text-muted); margin:6px 0 12px;"><i class="far fa-clock"></i> ${dateStr}</div>
+                                            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                                                ${videoBtn}
+                                            </div>
+                                        </div>
+                                    `;
                                 }
-
-                                const dateStr = data.startTime?.toDate ? data.startTime.toDate().toLocaleString() : (data.date || 'Scheduled');
-                                const status = data.status || 'confirmed';
-
-                                const isPendingPayment = status.toLowerCase().includes('pending');
-                                const statusBadge = isPendingPayment
-                                    ? '<span class="v2-badge-pill" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B;"><i class="fas fa-clock"></i> Payment Pending</span>'
-                                    : '<span class="v2-badge-pill" style="background:rgba(16, 185, 129, 0.15); color:#10B981;"><i class="fas fa-check-circle"></i> Confirmed</span>';
-
-                                const meetUrl = data.meetingUrl || data.meetLink || `../portal/video-conference.html?roomId=${data.slId || docSnap.id}`;
-                                const videoBtn = isPendingPayment
-                                    ? `<button class="v2-btn-secondary" style="font-size:0.75rem; padding:5px 12px; opacity:0.6; cursor:not-allowed;" disabled><i class="fas fa-lock"></i> Awaiting Payment</button>`
-                                    : `<a href="${meetUrl}" target="_blank" class="v2-btn-primary" style="font-size:0.78rem; padding:6px 14px; text-decoration:none; background:#10B981; color:#fff; border-radius:6px; display:inline-flex; align-items:center; gap:6px;"><i class="fas fa-video"></i> Start Video Session</a>`;
-
-                                html += `
-                                    <div style="background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle); padding:14px; margin-bottom:10px;">
-                                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-                                            <div style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">${data.userName || data.clientName || 'Anonymous Member'} <span style="font-size:0.75rem; opacity:0.7; font-weight:normal;">(${data.slId || 'Session'})</span></div>
-                                            <div>${statusBadge}</div>
-                                        </div>
-                                        <div style="font-size:0.8rem; color:var(--text-muted); margin:6px 0 12px;"><i class="far fa-clock"></i> ${dateStr}</div>
-                                        <div style="display:flex; justify-content:flex-end; gap:8px;">
-                                            ${videoBtn}
-                                        </div>
-                                    </div>
-                                `;
                             });
-                            sessionsContainer.innerHTML = html;
+
+                            if (count === 0) {
+                                sessionsContainer.innerHTML = '<div style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:24px;"><i class="fas fa-calendar-xmark" style="font-size:1.4rem; color:var(--text-muted); margin-bottom:8px; display:block;"></i>No confirmed client sessions scheduled right now.</div>';
+                            } else {
+                                sessionsContainer.innerHTML = html;
+                            }
                         }
 
                         const peopleHelpedEl = document.getElementById('v2PeopleHelpedCount');
