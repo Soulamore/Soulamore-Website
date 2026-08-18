@@ -729,3 +729,9 @@ export function initBookingWidget(config) {
     selectDate(selectedDate);
     setTimeout(prefetch7DaysSlots, 400);
 }
+
+// Global and ES Module export
+if (typeof window !== "undefined") {
+    window.initBookingWidget = initBookingWidget;
+}
+export { initBookingWidget };
