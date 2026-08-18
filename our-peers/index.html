@@ -544,32 +544,7 @@
 
                 <!-- FILTERS -->
                 <div class="filter-section fade-in">
-                    <!-- 1. Horizontal Rail -->
-                    <div class="category-rail-container">
-                        <button type="button" class="rail-nav-btn" style="margin-right:8px;" onclick="document.querySelector('.category-rail').scrollBy({left: -200, behavior: 'smooth'})" title="Scroll Left">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <div class="category-rail">
-                            <div class="category-pill active" onclick="setCategory('all')">All Topics</div>
-                            <div class="category-pill" onclick="setCategory('Physical')">Physical Wellness</div>
-                            <div class="category-pill" onclick="setCategory('Academic')">Academic Wellness</div>
-                            <div class="category-pill" onclick="setCategory('Financial')">Financial Wellness</div>
-                            <div class="category-pill" onclick="setCategory('Anxiety')">Anxiety & Overthinking</div>
-                            <div class="category-pill" onclick="setCategory('Low Mood')">Feeling Low</div>
-                            <div class="category-pill" onclick="setCategory('Loneliness')">Loneliness</div>
-                            <div class="category-pill" onclick="setCategory('Relationships')">Relationships</div>
-                            <div class="category-pill" onclick="setCategory('Body Image')">Body Image</div>
-                            <div class="category-pill" onclick="setCategory('Self-Esteem')">Self-Esteem</div>
-                            <div class="category-pill" onclick="setCategory('ADHD')">ADHD Support</div>
-                            <div class="category-pill" onclick="setCategory('Grief')">Grief & Loss</div>
-                            <div class="category-pill" onclick="setCategory('LGBTQ')">LGBTQ+ Identity</div>
-                        </div>
-                        <button type="button" class="rail-nav-btn" style="margin-left:8px;" onclick="document.querySelector('.category-rail').scrollBy({left: 200, behavior: 'smooth'})" title="Scroll Right">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-
-                    <!-- 2. Combined Filter Bar (Topics + Markers) -->
+                    <!-- Combined Filter Bar (Topics + Markers) -->
                     <div class="filter-bar">
                         <select class="filter-select" id="topicFilter" onchange="setCategory(this.value)">
                             <option value="all">Topic: All Topics</option>
@@ -791,7 +766,6 @@
                 console.warn("Firestore peers query notice:", error.message);
             }
         }
-        }
 
         // --- FILTER STATE ---
         let currentCategory = 'all';
@@ -878,14 +852,6 @@
             if (topicSelect && topicSelect.value !== cat) {
                 topicSelect.value = cat;
             }
-
-            // Update UI pills
-            document.querySelectorAll('.category-pill').forEach(p => {
-                p.classList.remove('active');
-                if ((cat === 'all' && p.innerText === 'All Topics') || p.getAttribute('onclick').includes(cat)) {
-                    p.classList.add('active');
-                }
-            });
             renderPeers();
         }
 
@@ -899,10 +865,6 @@
             document.getElementById('ageFilter').value = 'all';
             document.getElementById('genderFilter').value = 'all';
             document.getElementById('availFilter').value = 'all';
-
-            // Reset Active Pill UI
-            document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
-            document.querySelector('.category-pill').classList.add('active'); // First one
 
             renderPeers();
         }
