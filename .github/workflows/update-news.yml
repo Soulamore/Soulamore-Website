@@ -1,25 +1,26 @@
 name: Update Mental Health News
 
-permissions:
-  contents: write
-
 on:
   schedule:
     - cron: '30 2 * * *' # Every day at 8:00 AM IST (2:30 AM UTC)
   push:
     branches:
-      - aditya
+      - main
+      - feature/booking-system-improv-v3
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update-news:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -29,7 +30,7 @@ jobs:
           pip install requests google-generativeai
 
       - name: Run News Sync Script
-        run: python smart_news_rituals.py
+        run: python scripts/smart_news_rituals.py
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
@@ -39,6 +40,5 @@ jobs:
           git config --global user.email "bot@soulamore.com"
           git add assets/data/news-feed.json || true
           git add assets/data/rituals.json || true
-          find "knowledge source/news sourced" -name "*.json" | xargs -r git add || true
           git commit -m "chore: dynamic news update [skip ci]" || echo "No changes to commit"
           git push
