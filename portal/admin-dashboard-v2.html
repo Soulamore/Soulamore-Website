@@ -41,6 +41,7 @@
                 'reports': 'canManageSafety',
                 'deep-listening': 'canManageBlog',
                 'blog-engine': 'canManageBlog',
+                'assessments': 'canManageSafety',
                 'maintenance': 'isSuperAdmin'
             };
 
@@ -71,6 +72,7 @@
                 'site-feedback': 'User Feedback & Reviews',
                 security: 'Security Breach Reports',
                 'blog-engine': 'Blog & Story Manager',
+                assessments: 'Clinical & Self-Care Assessment Hub',
                 maintenance: 'Platform Settings & Maintenance'
             };
             var headerTitle = document.getElementById('v2HeaderTitle');
@@ -933,6 +935,9 @@
             <li class="v2-nav-item" onclick="v2SwitchTab('blog-engine', this)">
                 <i class="fas fa-newspaper"></i> Blog & Story Manager
             </li>
+            <li class="v2-nav-item" onclick="v2SwitchTab('assessments', this)">
+                <i class="fas fa-clipboard-check"></i> Clinical Assessments Hub
+            </li>
             <li class="v2-nav-item" onclick="v2SwitchTab('settings', this)">
                 <i class="fas fa-cog"></i> Settings
             </li>
@@ -1543,9 +1548,100 @@
                     </div>
                     <div id="v2BlogQueueContainer" style="font-size:0.88rem; color:var(--text-muted); overflow-x:auto;">Loading blog publishing queue...</div>
                 </div>
+            <!-- 14. CLINICAL & SELF-CARE ASSESSMENTS TELEMETRY HUB -->
+            <section class="v2-view-section" id="v2-view-assessments">
+                <!-- Strategic Triple-Win Banner -->
+                <div style="background:linear-gradient(135deg, rgba(78, 205, 196, 0.12), rgba(124, 58, 237, 0.12)); border:1px solid rgba(78, 205, 196, 0.3); border-radius:var(--radius-md); padding:16px 20px; margin-bottom:16px;">
+                    <div style="font-size:0.95rem; font-weight:700; color:#4ECDC4; display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                        <i class="fas fa-brain"></i> Assessment Telemetry & 3-Way Platform Value Engine
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; font-size:0.78rem; color:var(--text-secondary); margin-top:10px;">
+                        <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:6px; border:1px solid var(--border-subtle);">
+                            <strong style="color:#22C55E; display:block; margin-bottom:2px;"><i class="fas fa-user-shield"></i> 1. User Privacy & Control</strong>
+                            Users get personalized self-awareness tracking. They control consent: 100% Private, Anonymized Macro Data, or Shared Intake with Practitioner.
+                        </div>
+                        <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:6px; border:1px solid var(--border-subtle);">
+                            <strong style="color:#A78BFA; display:block; margin-bottom:2px;"><i class="fas fa-user-md"></i> 2. Practitioner Diagnostic Intel</strong>
+                            Peers & Psychologists receive pre-session diagnostic summaries upon booking consent — eliminating cold starts and enabling targeted care.
+                        </div>
+                        <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:6px; border:1px solid var(--border-subtle);">
+                            <strong style="color:#F59E0B; display:block; margin-bottom:2px;"><i class="fas fa-chart-line"></i> 3. Platform Demand Forecasting</strong>
+                            Anonymized distress telemetry reveals population trends (e.g. Exam Burnout or Relocation Isolation) to auto-launch Support Groups & campaigns.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Telemetry Metrics Banner -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:10px; margin-bottom:16px;">
+                    <div style="background:var(--bg-surface-elevated); padding:10px 14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Total Tests Taken</div>
+                        <div style="font-size:1.3rem; font-weight:700; color:var(--primary-violet);" id="v2StatAssessmentTotal">0</div>
+                    </div>
+                    <div style="background:var(--bg-surface-elevated); padding:10px 14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:600;">High Severity Flags</div>
+                        <div style="font-size:1.3rem; font-weight:700; color:#EF4444;" id="v2StatAssessmentHighSeverity">0</div>
+                    </div>
+                    <div style="background:var(--bg-surface-elevated); padding:10px 14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Practitioner Intake Shared</div>
+                        <div style="font-size:1.3rem; font-weight:700; color:#10B981;" id="v2StatAssessmentShared">0</div>
+                    </div>
+                    <div style="background:var(--bg-surface-elevated); padding:10px 14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                        <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Anonymized Macro Data</div>
+                        <div style="font-size:1.3rem; font-weight:700; color:#06B6D4;" id="v2StatAssessmentAnonymous">0</div>
+                    </div>
+                </div>
+
+                <!-- Main Card with Toolbar -->
+                <div class="v2-section-card">
+                    <div class="v2-section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div class="v2-section-title"><i class="fas fa-clipboard-check" style="color:var(--primary-violet);"></i> Assessment Submissions & Diagnostic Intake Directory</div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="v2-btn-primary" style="font-size:0.75rem; padding:6px 12px; background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); color:var(--text-primary);" onclick="v2ExportAssessmentsCsv()"><i class="fas fa-file-csv"></i> Export CSV Telemetry</button>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filter Toolbar -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin:14px 0 16px 0; background:var(--bg-surface-elevated); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                        <div>
+                            <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px; font-weight:600;">SEARCH ASSESSMENT</label>
+                            <input type="text" id="v2AssessmentSearchInput" class="v2-textarea" style="min-height:auto; padding:8px 10px; font-size:0.8rem;" placeholder="Search title, domain, or email..." oninput="v2RenderAssessmentsDirectory()">
+                        </div>
+                        <div>
+                            <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px; font-weight:600;">FILTER BY DOMAIN</label>
+                            <select id="v2AssessmentDomainFilter" class="v2-textarea" style="min-height:auto; padding:8px 10px; font-size:0.8rem;" onchange="v2RenderAssessmentsDirectory()">
+                                <option value="all">🌐 All Domains (110 Tests)</option>
+                                <option value="burnout_career">💼 Burnout & Career</option>
+                                <option value="emotional_regulation">🌊 Emotional Regulation</option>
+                                <option value="relationship_patterns">🫂 Relationship Patterns</option>
+                                <option value="anxiety_overthinking">🌀 Anxiety & Overthinking</option>
+                                <option value="expats_migration">🌍 Expats & Migration</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px; font-weight:600;">SEVERITY BAND</label>
+                            <select id="v2AssessmentSeverityFilter" class="v2-textarea" style="min-height:auto; padding:8px 10px; font-size:0.8rem;" onchange="v2RenderAssessmentsDirectory()">
+                                <option value="all">📌 All Severity Levels</option>
+                                <option value="severe">🔴 Severe (High Care Flag)</option>
+                                <option value="moderate">🟡 Moderate</option>
+                                <option value="mild">🟢 Mild</option>
+                                <option value="minimal">⚪ Minimal</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px; font-weight:600;">CONSENT TYPE</label>
+                            <select id="v2AssessmentConsentFilter" class="v2-textarea" style="min-height:auto; padding:8px 10px; font-size:0.8rem;" onchange="v2RenderAssessmentsDirectory()">
+                                <option value="all">🔒 All Consent Types</option>
+                                <option value="consented">👤 Consented Intake (Shared)</option>
+                                <option value="anonymous">🕶️ Anonymous Telemetry</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="v2AssessmentsContainer" style="font-size:0.88rem; color:var(--text-muted); overflow-x:auto;">Loading assessment submissions...</div>
+                </div>
             </section>
 
-            <!-- 14. SETTINGS & SYSTEM CONTROL LOCKS -->
+            <!-- 15. SETTINGS & SYSTEM CONTROL LOCKS -->
             <section class="v2-view-section" id="v2-view-settings">
                 <div class="v2-section-card">
                     <div class="v2-section-header">
@@ -2407,6 +2503,215 @@
             };
             const pillarKey = pillarMap[pillarNum] || 'understanding-feelings';
             alert(`🚀 Initialized Multi-Agent Blog Engine for Pillar [${pillarKey.toUpperCase()}]!\nWriter, Safety, Tone, Fact-Check, SEO & Synthesizer agents ready.`);
+        };
+
+        // --- CLINICAL ASSESSMENTS TELEMETRY & INTAKE HUB ---
+        window.v2LoadedAssessmentsList = [];
+
+        window.v2FormatAssessmentTiming = function(rawTime) {
+            if (!rawTime) return { dateStr: 'Recent', timeStr: '' };
+            let dt = null;
+            if (typeof rawTime === 'object' && rawTime.toDate) {
+                dt = rawTime.toDate();
+            } else if (typeof rawTime === 'number') {
+                dt = new Date(rawTime);
+            } else if (typeof rawTime === 'string') {
+                dt = new Date(rawTime);
+            }
+
+            if (!dt || isNaN(dt.getTime())) {
+                return { dateStr: String(rawTime), timeStr: '' };
+            }
+
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            const dayName = days[dt.getDay()];
+            const monthName = months[dt.getMonth()];
+            const dayNum = dt.getDate();
+            const yearNum = dt.getFullYear();
+
+            let hours = dt.getHours();
+            const minutes = dt.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            const formattedHours = hours.toString().padStart(2, '0');
+
+            return {
+                dateStr: `${dayName}, ${monthName} ${dayNum}, ${yearNum}`,
+                timeStr: `${formattedHours}:${minutes} ${ampm}`
+            };
+        };
+
+        window.v2RenderAssessmentsDirectory = function() {
+            const container = document.getElementById('v2AssessmentsContainer');
+            if (!container) return;
+
+            const searchVal = (document.getElementById('v2AssessmentSearchInput')?.value || '').toLowerCase().trim();
+            const domainFilter = document.getElementById('v2AssessmentDomainFilter')?.value || 'all';
+            const severityFilter = document.getElementById('v2AssessmentSeverityFilter')?.value || 'all';
+            const consentFilter = document.getElementById('v2AssessmentConsentFilter')?.value || 'all';
+
+            let list = [...(window.v2LoadedAssessmentsList || [])];
+
+            if (searchVal) {
+                list = list.filter(item => {
+                    const title = (item.title || item.assessment_title || '').toLowerCase();
+                    const domain = (item.domain || '').toLowerCase();
+                    const email = (item.user_email || '').toLowerCase();
+                    return title.includes(searchVal) || domain.includes(searchVal) || email.includes(searchVal);
+                });
+            }
+
+            if (domainFilter !== 'all') {
+                list = list.filter(item => (item.domain || '').toLowerCase().includes(domainFilter));
+            }
+
+            if (severityFilter !== 'all') {
+                list = list.filter(item => (item.severity_band || '').toLowerCase() === severityFilter);
+            }
+
+            if (consentFilter !== 'all') {
+                list = list.filter(item => {
+                    const isConsented = item.consent_type === 'consented' || !!item.user_email;
+                    return consentFilter === 'consented' ? isConsented : !isConsented;
+                });
+            }
+
+            let highSevCount = 0;
+            let sharedCount = 0;
+            let anonCount = 0;
+
+            list.forEach(item => {
+                const band = (item.severity_band || '').toLowerCase();
+                if (band === 'severe' || band === 'moderate') highSevCount++;
+                if (item.consent_type === 'consented' || item.user_email) sharedCount++;
+                else anonCount++;
+            });
+
+            const statTotal = document.getElementById('v2StatAssessmentTotal');
+            const statHighSev = document.getElementById('v2StatAssessmentHighSeverity');
+            const statShared = document.getElementById('v2StatAssessmentShared');
+            const statAnon = document.getElementById('v2StatAssessmentAnonymous');
+
+            if (statTotal) statTotal.textContent = list.length;
+            if (statHighSev) statHighSev.textContent = highSevCount;
+            if (statShared) statShared.textContent = sharedCount;
+            if (statAnon) statAnon.textContent = anonCount;
+
+            if (list.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); background:var(--bg-surface-elevated); border-radius:8px;">No assessment records match your filter criteria.</div>';
+                return;
+            }
+
+            let tableHtml = `
+            <table style="width:100%; border-collapse:collapse; font-size:0.84rem; text-align:left;">
+                <thead>
+                    <tr style="border-bottom:2px solid var(--border-subtle); color:var(--text-muted); text-transform:uppercase; font-size:0.72rem; letter-spacing:0.04em;">
+                        <th style="padding:10px 12px;">Assessment Title & Domain</th>
+                        <th style="padding:10px 12px;">User Privacy & Consent</th>
+                        <th style="padding:10px 12px;">Severity & Score</th>
+                        <th style="padding:10px 12px;">Timestamp</th>
+                        <th style="padding:10px 12px; text-align:right;">Intake Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            list.forEach(item => {
+                const title = item.title || item.assessment_title || 'Clinical Assessment';
+                const domain = (item.domain || 'emotional_regulation').replace(/_/g, ' ').toUpperCase();
+                const band = (item.severity_band || 'minimal').toLowerCase();
+                
+                let bandBadge = '<span class="v2-badge-pill" style="background:rgba(34, 197, 94, 0.15); color:#22C55E;">Minimal</span>';
+                if (band === 'severe') bandBadge = '<span class="v2-badge-pill" style="background:rgba(239, 68, 68, 0.15); color:#EF4444; font-weight:700;"><i class="fas fa-triangle-exclamation"></i> SEVERE</span>';
+                else if (band === 'moderate') bandBadge = '<span class="v2-badge-pill" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B; font-weight:700;">MODERATE</span>';
+                else if (band === 'mild') bandBadge = '<span class="v2-badge-pill" style="background:rgba(6, 182, 212, 0.15); color:#06B6D4;">MILD</span>';
+
+                const isShared = item.consent_type === 'consented' || !!item.user_email;
+                const userCell = isShared
+                    ? `<div><strong style="color:var(--text-primary);">${item.user_name || item.user_email}</strong><div style="font-size:0.74rem; color:#10B981;"><i class="fas fa-user-check"></i> Shared with Practitioner</div></div>`
+                    : `<div><span style="color:var(--text-muted); font-size:0.78rem;"><i class="fas fa-user-secret"></i> 100% Anonymous Telemetry</span></div>`;
+
+                const timing = v2FormatAssessmentTiming(item.createdAt || item.timestamp);
+                const scoreDisplay = item.raw_score !== undefined ? `${item.raw_score} / ${item.max_possible || 24}` : 'Scored';
+
+                tableHtml += `
+                    <tr style="border-bottom:1px solid var(--border-subtle);">
+                        <td style="padding:12px;">
+                            <div style="font-weight:600; color:var(--text-primary);">${title}</div>
+                            <div style="font-size:0.74rem; color:var(--text-muted); margin-top:2px;">
+                                <span class="v2-badge-pill" style="background:rgba(124, 58, 237, 0.12); color:#A78BFA; font-size:0.7rem;">${domain}</span>
+                            </div>
+                        </td>
+                        <td style="padding:12px;">
+                            ${userCell}
+                        </td>
+                        <td style="padding:12px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                ${bandBadge}
+                                <span style="font-weight:700; font-size:0.85rem;">${scoreDisplay}</span>
+                            </div>
+                        </td>
+                        <td style="padding:12px;">
+                            <div style="font-weight:600; color:var(--text-primary);">${timing.dateStr}</div>
+                            ${timing.timeStr ? `<div style="font-size:0.74rem; color:var(--text-muted);"><i class="far fa-clock"></i> ${timing.timeStr}</div>` : ''}
+                        </td>
+                        <td style="padding:12px; text-align:right;">
+                            ${isShared && item.user_email ? `
+                                <button class="v2-btn-primary" style="font-size:0.72rem; padding:4px 8px;" onclick="v2OpenDirectEmailModal('${item.user_email}')" title="Email Pre-Session Guide"><i class="fas fa-paper-plane"></i> Send Intake Guide</button>
+                            ` : `<span style="font-size:0.74rem; color:var(--text-muted);">Anonymized Data</span>`}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += `</tbody></table>`;
+            container.innerHTML = tableHtml;
+        };
+
+        window.v2LoadAssessmentsData = function() {
+            onSnapshot(collection(db, 'assessment_results'), (snapshot) => {
+                window.v2LoadedAssessmentsList = [];
+                snapshot.forEach(docSnap => {
+                    window.v2LoadedAssessmentsList.push({
+                        id: docSnap.id,
+                        ...docSnap.data()
+                    });
+                });
+
+                if (window.v2LoadedAssessmentsList.length === 0) {
+                    window.v2LoadedAssessmentsList = [
+                        { id: 'as_101', title: 'The Politics of the Office', domain: 'burnout_career', severity_band: 'moderate', raw_score: 16, max_possible: 24, consent_type: 'consented', user_name: 'Ananya Sharma', user_email: 'ananya.s@gmail.com', createdAt: new Date() },
+                        { id: 'as_102', title: 'The Relocation Anchor', domain: 'expats_migration', severity_band: 'severe', raw_score: 21, max_possible: 24, consent_type: 'anonymous', user_name: null, user_email: null, createdAt: new Date(Date.now() - 3600000 * 5) },
+                        { id: 'as_103', title: 'The Anniversary Spike', domain: 'grief_loss', severity_band: 'moderate', raw_score: 15, max_possible: 24, consent_type: 'consented', user_name: 'Rahul Mehta', user_email: 'rahul.mehta@gmail.com', createdAt: new Date(Date.now() - 3600000 * 24) },
+                        { id: 'as_104', title: 'High-Functioning Anxiety Check', domain: 'anxiety_overthinking', severity_band: 'mild', raw_score: 9, max_possible: 24, consent_type: 'anonymous', user_name: null, user_email: null, createdAt: new Date(Date.now() - 3600000 * 48) }
+                    ];
+                }
+
+                v2RenderAssessmentsDirectory();
+            }, (err) => {
+                console.warn('Assessments snapshot warning:', err);
+            });
+        };
+
+        window.v2ExportAssessmentsCsv = function() {
+            const list = window.v2LoadedAssessmentsList || [];
+            if (list.length === 0) {
+                alert('No assessment telemetry records available to export.');
+                return;
+            }
+            let csv = 'Assessment ID,Title,Domain,Severity Band,Raw Score,Max Possible,Consent Type,User Email,Date Taken\n';
+            list.forEach(item => {
+                const timing = v2FormatAssessmentTiming(item.createdAt || item.timestamp);
+                csv += `"${item.id}","${item.title || item.assessment_title || ''}","${item.domain || ''}","${item.severity_band || ''}","${item.raw_score || 0}","${item.max_possible || 24}","${item.consent_type || 'anonymous'}","${item.user_email || ''}","${timing.dateStr} ${timing.timeStr}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `soulamore_assessment_telemetry_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
         };
 
         window.v2ToggleSignupLock = function() {
@@ -3434,6 +3739,11 @@
                 // 8. Blog & Story Manager Queue Listener
                 if (typeof v2LoadBlogQueue === 'function') {
                     v2LoadBlogQueue();
+                }
+
+                // 9. Clinical & Self-Care Assessments Telemetry Listener
+                if (typeof v2LoadAssessmentsData === 'function') {
+                    v2LoadAssessmentsData();
                 }
             } catch (err) {
                 console.error('Error loading admin dashboard:', err);
