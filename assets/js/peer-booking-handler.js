@@ -478,7 +478,7 @@ export function generateSLID() {
  * @param {Date} endTime - Booking end time
  * @returns {Promise<{bookingId: string, amount: number}|null>}
  */
-export async function createBookingRequest(userId, peerId, planType, startTime, endTime, userName = "", userEmail = "", bookedByRole = "user", targetUserId = null, peerName = "") {
+export async function createBookingRequest(userId, peerId, planType, startTime, endTime, userName = "", userEmail = "", bookedByRole = "user", targetUserId = null, peerName = "", intakePasskey = null) {
     const plan = DEFAULT_PLANS[planType] || DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION];
     const slId = generateSLID();
     const isoStart = typeof startTime === 'string' ? startTime : new Date(startTime).toISOString();
@@ -497,6 +497,7 @@ export async function createBookingRequest(userId, peerId, planType, startTime, 
             userEmail: userEmail || "",
             peerName: peerName || "Soulamore Listener",
             planType: planType,
+            intakePasskey: intakePasskey || null,
             startTime: isoStart,
             endTime: isoEnd,
             amount: plan.price,

@@ -268,6 +268,27 @@ export function initBookingWidget(config) {
                                ">
                     </div>
                 </div>
+                <!-- OPTIONAL PRE-SESSION INTAKE PASSKEY FIELD -->
+                <div style="margin-top:14px;">
+                    <label style="display:block; font-size:0.8rem; font-weight:600; color:#0d9488; margin-bottom:6px;">
+                        🔑 Assessment Passkey (Optional)
+                    </label>
+                    <input type="text"
+                           id="${rootId}-passkey"
+                           placeholder="e.g. PASS-8821 (attaches diagnostic intake summary)"
+                           style="
+                               width:100%;
+                               padding:11px 14px;
+                               border-radius:12px;
+                               border:1px dashed rgba(78, 205, 196, 0.6);
+                               font-size:0.9rem;
+                               color:#0f172a;
+                               background:#f0fdfa;
+                           ">
+                    <span style="font-size:0.75rem; color:#64748b; display:block; margin-top:4px;">
+                        <i class="fas fa-shield-alt" style="color:#0d9488;"></i> Sharing your passkey allows your practitioner to review your assessment before your session starts.
+                    </span>
+                </div>
             </div>
 
             <!-- STEP 1: DATE SELECTION (HORIZONTAL CAROUSEL) -->
@@ -479,6 +500,17 @@ export function initBookingWidget(config) {
 
         slotsContainer.innerHTML = html;
 
+        // Auto pre-fill passkey from URL params or sessionStorage
+        setTimeout(() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const passkeyFromUrl = urlParams.get('passkey');
+            const passkeyFromStorage = sessionStorage.getItem('soulamore_intake_passkey');
+            const passEl = document.getElementById(`${rootId}-passkey`);
+            if (passEl && !passEl.value && (passkeyFromUrl || passkeyFromStorage)) {
+                passEl.value = passkeyFromUrl || passkeyFromStorage;
+            }
+        }, 400);
+
         // Attach click listeners to time pills
         const pills = slotsContainer.querySelectorAll(".bw-time-pill:not(.unavailable)");
         pills.forEach(pillBtn => {
@@ -618,6 +650,9 @@ export function initBookingWidget(config) {
                 const finalName = guestName || (activeUser ? activeUser.displayName : "") || "Friend";
                 const finalEmail = guestEmail || (activeUser ? activeUser.email : "") || "";
 
+                const passkeyInput = document.getElementById(`${rootId}-passkey`);
+                const enteredPasskey = passkeyInput ? passkeyInput.value.trim() : "";
+
                 const booking = await createBookingRequest(
                     activeUser.uid,
                     peerId,
@@ -628,7 +663,8 @@ export function initBookingWidget(config) {
                     finalEmail,
                     "user",
                     null,
-                    providerName
+                    providerName,
+                    enteredPasskey
                 );
 
                 await openRazorpayCheckout(
