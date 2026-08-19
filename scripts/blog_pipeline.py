@@ -169,7 +169,9 @@ class MultiAgentBlogEngine:
 <h2>Understanding What You Are Experiencing</h2>
 <p>Many of us carry unseen emotional fatigue through our daily routines. When our minds feel crowded or overwhelmed, it is often a natural signal that our inner resources need care, quiet, and gentle validation rather than pressure.</p>
 
-<p>Instead of trying to force yourself out of how you feel, what might happen if you offered yourself the same kindness you would extend to a dear friend?</p>
+<div class="handwritten-callout">
+    💡 <strong>Gentle Reflection:</strong> Instead of trying to force yourself out of how you feel, what might happen if you offered yourself the same kindness you would extend to a dear friend?
+</div>
 
 <h2>Small, Grounded Micro-Practices</h2>
 <p>Here are a few small steps that can help anchor your nervous system when things feel heavy:</p>
@@ -179,6 +181,30 @@ class MultiAgentBlogEngine:
     <li><strong>Somatic grounding:</strong> Place one hand gently on your chest and feel three steady breaths.</li>
     <li><strong>Lower the bar for today:</strong> Give yourself explicit permission to leave non-essential tasks for tomorrow.</li>
 </ul>
+
+<!-- CODED HANDWRITTEN STICK DIAGRAM -->
+<div class="stick-diagram-box">
+    <svg class="stick-figure-svg" viewBox="0 0 400 160" width="380" height="150">
+        <!-- Ground Line -->
+        <path d="M 30 135 Q 200 140 370 135" stroke="#4ECDC4" stroke-width="2" stroke-dasharray="6 4" />
+        
+        <!-- Left Stick Figure (Pausing & Breathing) -->
+        <circle cx="110" cy="65" r="16" />
+        <path d="M 110 81 L 110 115 M 110 95 L 90 108 M 110 95 L 130 108 M 110 115 L 95 135 M 110 115 L 125 135" />
+        
+        <!-- Soft Thought Cloud -->
+        <path d="M 135 45 Q 145 30 160 35 Q 175 25 190 35 Q 200 45 190 55 Q 175 65 150 55 Z" stroke="#F59E0B" stroke-width="2" fill="rgba(245, 158, 11, 0.12)" />
+        <text x="148" y="44" fill="#F59E0B" font-size="11" font-family="'Caveat', cursive" stroke="none">soft breath...</text>
+        
+        <!-- Empathy Heart -->
+        <path d="M 195 90 C 195 80 205 75 210 85 C 215 75 225 80 225 90 C 225 100 210 110 210 113 C 210 110 195 100 195 90 Z" fill="#F472B6" stroke="#F472B6" />
+
+        <!-- Right Stick Figure (Holding Open Arms) -->
+        <circle cx="290" cy="65" r="16" />
+        <path d="M 290 81 L 290 115 M 290 95 L 260 90 M 290 95 L 315 108 M 290 115 L 275 135 M 290 115 L 305 135" />
+    </svg>
+    <div class="stick-diagram-caption">✨ "You are allowed to pause. Emotional warmth is a shared journey."</div>
+</div>
 
 <h2>You Don't Have to Do This Alone</h2>
 <p>Remember that seeking support—whether through quiet reflection, reaching out to a peer, or engaging with a community space—is a sign of self-respect. Take it one gentle moment at a time.</p>
