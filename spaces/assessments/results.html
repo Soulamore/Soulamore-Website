@@ -651,6 +651,23 @@
                         </div>
                     </div>
 
+                    <!-- INTAKE PASSKEY CARD FOR ZERO COLD-START BOOKINGS -->
+                    <div style="background:rgba(78, 205, 196, 0.1); border:1px dashed rgba(78, 205, 196, 0.4); border-radius:16px; padding:24px; margin:30px 0; text-align:center;">
+                        <div style="font-size:0.8rem; text-transform:uppercase; font-weight:700; color:#4ECDC4; letter-spacing:1px; margin-bottom:6px;">
+                            🔑 Your Private Pre-Session Intake Passkey
+                        </div>
+                        <div style="font-family:'Outfit', sans-serif; font-size:2rem; font-weight:800; color:white; letter-spacing:3px; margin:8px 0;" id="intakePasskeyVal">
+                            PASS-8821
+                        </div>
+                        <p style="font-size:0.88rem; color:rgba(255,255,255,0.7); max-width:540px; margin:0 auto 16px;">
+                            Want to talk to a Peer Listener or Clinical Psychologist? Copy this passkey or click below to attach your diagnostic summary to your session booking with 100% privacy consent!
+                        </p>
+                        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+                            <button class="share-btn" onclick="copyPasskeyToClipboard()"><i class="fas fa-copy"></i> Copy Passkey</button>
+                            <button class="share-btn" style="background:#4ECDC4; color:#0f172a; font-weight:700; border-color:#4ECDC4;" onclick="bookSessionWithPasskey()"><i class="fas fa-calendar-check"></i> Book Session with This Passkey</button>
+                        </div>
+                    </div>
+
                     <!-- LEAD GEN FORM (Premium Version) -->
                     <div class="lead-gen-box" id="leadGenBox">
                         <div class="premium-incentive">
@@ -1004,6 +1021,25 @@ NEVER diagnose. NEVER use words like "disorder", "syndrome", "therapy", or "clin
 
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('resultsUI').style.display = 'block';
+
+            // --- GENERATE & DISPLAY 6-DIGIT INTAKE PASSKEY ---
+            const passkeyNum = Math.floor(1000 + Math.random() * 9000);
+            const generatedPasskey = `PASS-${passkeyNum}`;
+            const passkeyValEl = document.getElementById('intakePasskeyVal');
+            if (passkeyValEl) passkeyValEl.textContent = generatedPasskey;
+
+            sessionStorage.setItem('soulamore_intake_passkey', generatedPasskey);
+            sessionStorage.setItem('soulamore_latest_test_title', data.assessment_title || data.domain || 'Self-Care Assessment');
+            sessionStorage.setItem('soulamore_latest_test_severity', metrics.severity_band || 'minimal');
+
+            window.copyPasskeyToClipboard = function() {
+                navigator.clipboard.writeText(generatedPasskey);
+                alert(`🔑 Passkey ${generatedPasskey} copied to clipboard!\nYou can paste this optional passkey when booking any session.`);
+            };
+
+            window.bookSessionWithPasskey = function() {
+                window.location.href = `../../our-peers/index.html?passkey=${generatedPasskey}`;
+            };
 
         } catch (error) {
             console.error("Gemini Interpretation Failed:", error);
