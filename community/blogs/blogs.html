@@ -707,17 +707,10 @@
     <!-- SCRIPTS -->
     <script src="../../assets/js/components.js?v=3.6"></script>
     <script type="module">
-        // FIXED IMPORT PATH FROM BLOGS.HTML TO ROOT ASSETS (../../assets/js/blog-data.js)
         import { getAllPosts } from '../../assets/js/blog-data.js';
+        import { db, collection, query, where, getDocs } from '../../assets/js/firebase-config.js';
 
         let posts = [];
-        try {
-            posts = getAllPosts();
-            console.log("📚 [Soulamore Stories] Loaded posts count:", posts.length);
-        } catch (err) {
-            console.error("❌ [Soulamore Stories] Failed to load blog-data.js:", err);
-        }
-
         let currentFilter = 'all';
         let searchQuery = '';
         let sortMode = 'newest';
@@ -726,11 +719,51 @@
         const featuredContainer = document.getElementById('featuredStory');
         const searchInput = document.getElementById('searchInput');
 
-        // Update counts in sidebar
-        updateCounts();
+        async function loadAllBlogPosts() {
+            let staticPosts = [];
+            try {
+                staticPosts = getAllPosts();
+            } catch (err) {
+                console.error("❌ [Soulamore Stories] Failed to load blog-data.js:", err);
+            }
 
-        // Initial Render
-        render();
+            let firestorePosts = [];
+            try {
+                const q = query(collection(db, 'blogs'), where('status', '==', 'published'));
+                const snap = await getDocs(q);
+                snap.forEach(docSnap => {
+                    const d = docSnap.data();
+                    firestorePosts.push({
+                        id: docSnap.id,
+                        title: d.title || 'Untitled Story',
+                        author: d.author || 'Soulamore Editorial',
+                        authorRole: d.authorRole || 'Editorial',
+                        authorBio: d.authorBio || 'Mental health advocate and writer at Soulamore.',
+                        authorImage: d.authorImage || '../../assets/images/Founder/Aditya%20Harsh.jpg',
+                        type: d.pillar ? (d.pillar.toLowerCase().includes('expert') || d.pillar.toLowerCase().includes('psych') ? 'Psychologist' : 'Peer') : 'Peer',
+                        topic: d.pillar || 'Mental Health',
+                        date: d.publishedAt ? new Date(d.publishedAt.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently Published',
+                        readTime: (d.readTimeMinutes || 4) + ' min',
+                        image: d.image || 'https://images.unsplash.com/photo-1544365558-35aa4afcf11f?auto=format&fit=crop&w=800&q=80',
+                        excerpt: d.metaDescription || (d.content ? d.content.replace(/<[^>]*>?/gm, '').slice(0, 160) + '...' : ''),
+                        content: d.content || '',
+                        views: d.views || '0',
+                        likes: d.likes || 0
+                    });
+                });
+            } catch (err) {
+                console.warn("⚠️ [Soulamore Stories] Could not load published blogs from Firestore:", err);
+            }
+
+            const firestoreIds = new Set(firestorePosts.map(p => p.id));
+            const uniqueStatic = staticPosts.filter(p => !firestoreIds.has(p.id));
+            posts = [...firestorePosts, ...uniqueStatic];
+
+            updateCounts();
+            render();
+        }
+
+        loadAllBlogPosts();
 
         // Search Input Listener
         if (searchInput) {
