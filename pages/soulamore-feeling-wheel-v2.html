@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soulamore — Feeling Wheel — Component Only</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,400..700,0..1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0F14;
+    --card: #121A22;
+    --card-line: rgba(255,255,255,0.08);
+    --teal: #5EEAD4;
+    --teal-deep: #2DD4BF;
+    --gold: #F0B95A;
+    --coral: #F0806B;
+    --ink: #ECF2F1;
+    --muted: #8B9BA3;
+    --muted-dim: #5C6B72;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  @media (prefers-reduced-motion: reduce){ *,*::before,*::after{ animation-duration:0.01ms !important; transition-duration:0.01ms !important; } }
+
+  body{
+    background: var(--bg);
+    background-image: radial-gradient(ellipse 800px 400px at 20% 0%, rgba(94,234,212,0.06), transparent),
+                       radial-gradient(ellipse 700px 500px at 85% 15%, rgba(240,185,90,0.05), transparent);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+
+  .wheel-section{ max-width: 1040px; margin: 0 auto; }
+  .section-head{ text-align:center; margin-bottom: 8px; }
+  .section-head .eyebrow{ font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:10px; }
+  .section-head h2{ font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:26px; margin-bottom:10px; }
+  .section-head p{ color:var(--muted); font-size:13.5px; max-width:480px; margin:0 auto 8px; line-height:1.6; }
+
+  .wheel-layout{
+    display:grid; grid-template-columns: 1fr 320px; gap: 40px; align-items:start; margin-top: 34px;
+  }
+  @media (max-width: 860px){ .wheel-layout{ grid-template-columns: 1fr; justify-items:center; } }
+
+  .wheel-stage{ position:relative; display:flex; justify-content:center; }
+  .wheel-stage svg{ max-width: 100%; height:auto; }
+
+  .seg{ cursor:pointer; transition: opacity 0.35s ease, filter 0.35s ease; }
+  .seg:hover{ filter: brightness(1.18); }
+  .seg-label{
+    font-size: 9px; fill: #0A0F14; font-weight:600; pointer-events:none;
+    text-anchor:middle; dominant-baseline:middle;
+  }
+  .seg-label.light{ fill: #ECF2F1; }
+  .seg-label.core{ font-size: 12px; font-weight:700; }
+
+  .breadcrumb{
+    display:flex; align-items:center; gap:8px; justify-content:center; margin-top: 26px;
+    font-size:12.5px; color: var(--muted); flex-wrap:wrap;
+  }
+  .breadcrumb .crumb{ color: var(--teal); cursor:pointer; }
+  .breadcrumb .sep{ color: var(--muted-dim); }
+  .reset-btn{
+    display:block; margin: 14px auto 0; background:transparent; border:1px solid var(--card-line);
+    color: var(--muted); font-size:12px; padding:6px 16px; border-radius:999px; cursor:pointer;
+  }
+  .reset-btn:hover{ border-color: var(--teal); color: var(--teal); }
+
+  .panel{
+    background: var(--card); border:1px solid var(--card-line); border-radius:16px;
+    padding: 24px; min-height: 420px; display:flex; flex-direction:column; width:100%; max-width:320px;
+  }
+  .panel .stage-label{ font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color: var(--muted-dim); margin-bottom:14px; }
+  .prompt-line{ font-family:'Fraunces', serif; font-style:italic; font-size:19px; line-height:1.4; color:var(--ink); margin-bottom: 10px; }
+  .prompt-sub{ font-size:13px; color: var(--muted); line-height:1.6; margin-bottom: 20px; }
+
+  .option-list{ display:flex; flex-direction:column; gap:8px; }
+  .option-btn{
+    text-align:left; background: rgba(255,255,255,0.03); border:1px solid var(--card-line);
+    color: var(--ink); font-size:13.5px; padding: 11px 14px; border-radius:10px; cursor:pointer;
+    transition: all 0.2s ease;
+  }
+  .option-btn:hover{ border-color: var(--teal); background: rgba(94,234,212,0.06); }
+
+  .result-card{ margin-top:auto; }
+  .badge{ display:inline-block; font-size:10px; font-weight:700; letter-spacing:0.05em; padding: 4px 10px; border-radius:6px; margin-bottom: 12px; }
+  .badge.clinical{ background: rgba(240,185,90,0.15); color: var(--gold); }
+  .badge.reflect{ background: rgba(94,234,212,0.15); color: var(--teal); }
+  .result-title{ font-size: 18px; font-weight:700; margin-bottom: 8px; }
+  .result-desc{ font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:18px; }
+  .result-cta{ width:100%; background: linear-gradient(135deg, var(--teal), var(--teal-deep)); color:#04201C; border:none; padding: 12px; border-radius:10px; font-weight:700; font-size:13.5px; cursor:pointer; }
+  .result-cta.soft{ background: transparent; border:1px solid var(--teal); color: var(--teal); }
+
+  .empty-hint{ color: var(--muted-dim); font-size:13px; text-align:center; margin: auto; line-height:1.7; }
+</style>
+</head>
+<body>
+
+<div class="wheel-section">
+  <div class="section-head">
+    <div class="eyebrow">Or, start with how you're feeling</div>
+    <h2>Not sure which test is yours yet?</h2>
+    <p>No wrong answer here — just narrow it down, one honest layer at a time. We'll meet you where you land.</p>
+  </div>
+
+  <div class="wheel-layout">
+    <div>
+      <div class="wheel-stage">
+        <svg id="wheelSvg" viewBox="0 0 560 560" width="560" height="560"></svg>
+      </div>
+      <div class="breadcrumb" id="breadcrumb"></div>
+      <button class="reset-btn" id="resetBtn" style="display:none;">Start over</button>
+    </div>
+
+    <div class="panel" id="panel">
+      <div class="empty-hint" id="emptyHint">Pick whichever core feeling sits closest to today.<br>You can always come back to the center.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const WHEEL = {
+  Happy:     { color:"#E4CE55", light:true,  middles:{
+    Playful:["Aroused","Cheeky"], Content:["Free","Joyful"], Interested:["Curious","Inquisitive"],
+    Proud:["Successful","Confident"], Accepted:["Respected","Valued"], Powerful:["Courageous","Creative"],
+    Peaceful:["Loving","Thankful"], Trusting:["Sensitive","Intimate"], Optimistic:["Hopeful","Inspired"]
+  }},
+  Surprised: { color:"#A98CDB", light:true,  middles:{
+    Startled:["Shocked","Dismayed"], Confused:["Disillusioned","Perplexed"],
+    Amazed:["Astonished","Awe"], Excited:["Eager","Energetic"]
+  }},
+  Bad:       { color:"#6FBF8E", light:true,  middles:{
+    Bored:["Indifferent","Apathetic"], Busy:["Pressured","Rushed"],
+    Stressed:["Overwhelmed","Out of control"], Tired:["Sleepy","Unfocussed"]
+  }},
+  Fearful:   { color:"#E2A863", light:false, middles:{
+    Scared:["Helpless","Frightened"], Anxious:["Overwhelmed","Worried"], Insecure:["Inadequate","Inferior"],
+    Weak:["Worthless","Insignificant"], Rejected:["Excluded","Persecuted"], Threatened:["Nervous","Exposed"]
+  }},
+  Angry:     { color:"#E1706B", light:false, middles:{
+    "Let down":["Betrayed","Resentful"], Humiliated:["Disrespected","Ridiculed"], Bitter:["Indignant","Violated"],
+    Mad:["Furious","Jealous"], Aggressive:["Provoked","Hostile"], Frustrated:["Infuriated","Annoyed"],
+    Distant:["Withdrawn","Numb"], Critical:["Sceptical","Dismissive"]
+  }},
+  Disgusted: { color:"#8B909A", light:false, middles:{
+    Disapproving:["Judgmental","Embarrassed"], Disappointed:["Appalled","Revolted"],
+    Awful:["Nauseated","Detestable"], Repelled:["Horrified","Hesitant"]
+  }},
+  Sad:       { color:"#6E96C8", light:false, middles:{
+    Lonely:["Isolated","Abandoned"], Vulnerable:["Victimised","Fragile"], Despair:["Grief","Powerless"],
+    Guilty:["Ashamed","Remorseful"], Depressed:["Empty","Inferior"], Hurt:["Disappointed","Embarrassed"]
+  }}
+};
+
+const BUCKET = {
+  Scared:"anxiety", Anxious:"anxiety", Insecure:"anxiety", Weak:"anxiety", Threatened:"anxiety", Rejected:"relationships",
+  "Let down":"relationships", Humiliated:"relationships", Bitter:"relationships", Distant:"relationships", Critical:"relationships",
+  Mad:"burnout", Aggressive:"burnout", Frustrated:"burnout",
+  Disapproving:"relationships", Disappointed:"relationships", Awful:"anxiety", Repelled:"anxiety",
+  Lonely:"expats", Vulnerable:"relationships", Despair:"grief", Depressed:"grief", Guilty:"relationships", Hurt:"relationships",
+  Bored:"burnout", Busy:"burnout", Stressed:"burnout", Tired:"burnout"
+};
+
+const RESULTS = {
+  anxiety: { badge:"POPULAR • CLINICAL BACKING", type:"clinical", title:"The Overthinking Loop",
+    desc:"Assess whether your mind is protecting you or trapping you — map racing thoughts against how much real risk is actually there.",
+    testUrl: "../spaces/assessments/engine.html?test=anxiety_overthinking" },
+  burnout: { badge:"BURNOUT • HIGH DEMAND", type:"clinical", title:"The Weight You Carry to Work",
+    desc:"Assess how much of your day goes to managing threat and pressure, versus actually doing the work in front of you.",
+    testUrl: "../spaces/assessments/engine.html?test=burnout_career" },
+  relationships: { badge:"RELATIONSHIPS", type:"clinical", title:"The Withholding Pattern",
+    desc:"Assess 'Silent Resentment' — discover whether you're protecting the relationship, or quietly already leaving it.",
+    testUrl: "../spaces/assessments/engine.html?test=relationship_patterns" },
+  expats: { badge:"EXPATS • HIGH DEMAND", type:"clinical", title:"The Relocation Anchor",
+    desc:"Assess the 'Presence Gap' in your new life. Differentiate between being alone and systemic isolation.",
+    testUrl: "../spaces/assessments/engine.html?test=cultural_perspective_informant" },
+  grief: { badge:"GRIEF & HEALING", type:"clinical", title:"The Anniversary Spike",
+    desc:"Assess 'The Calendar of Pain' — discover if specific dates are quietly hunting your nervous system.",
+    testUrl: "../spaces/assessments/engine.html?test=psychological_first_aid_initial_response" },
+  reflect: { badge:"NO TEST NEEDED", type:"reflect", title:"Just sit with this one",
+    desc:"This one doesn't need a test — it needs a page. Try a short journal entry or a breathing reset instead, and come back if something heavier surfaces later.",
+    testUrl: "../tools/breathing.html" }
+};
+
+/* ================= GEOMETRY ================= */
+const CX = 280, CY = 280;
+const R = [70, 140, 210, 270];
+
+function polar(cx, cy, r, angleDeg){
+  const a = (angleDeg - 90) * Math.PI / 180;
+  return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+}
+function arcPath(cx, cy, rInner, rOuter, startAngle, endAngle){
+  const large = (endAngle - startAngle) > 180 ? 1 : 0;
+  const p1 = polar(cx, cy, rOuter, startAngle);
+  const p2 = polar(cx, cy, rOuter, endAngle);
+  const p3 = polar(cx, cy, rInner, endAngle);
+  const p4 = polar(cx, cy, rInner, startAngle);
+  return `M ${p1.x} ${p1.y} A ${rOuter} ${rOuter} 0 ${large} 1 ${p2.x} ${p2.y}
+          L ${p3.x} ${p3.y} A ${rInner} ${rInner} 0 ${large} 0 ${p4.x} ${p4.y} Z`;
+}
+function midAngle(a1, a2){ return (a1 + a2) / 2; }
+function labelPoint(cx, cy, rInner, rOuter, a1, a2){
+  return polar(cx, cy, (rInner + rOuter) / 2, midAngle(a1, a2));
+}
+
+// Rotate label to run RADIALLY (along the spoke, outward from center) so narrow wedges
+// have far more room than horizontal text would. Flip 180° on the left half so nothing
+// renders upside down — computed directly from the label's actual x/y, not the angle
+// convention used to place it, so it's self-consistent regardless of that offset.
+function labelRotation(x, y){
+  const dx = x - CX, dy = y - CY;
+  let deg = Math.atan2(dy, dx) * 180 / Math.PI;
+  if (deg > 90 || deg < -90) deg += 180;
+  return deg;
+}
+
+/* ================= STATE ================= */
+let state = { level: 0, core: null, middle: null, outer: null };
+
+const svg = document.getElementById('wheelSvg');
+const panel = document.getElementById('panel');
+const breadcrumbEl = document.getElementById('breadcrumb');
+const resetBtn = document.getElementById('resetBtn');
+
+function addLabel(lp, text, cls, fontSize){
+  const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+  label.setAttribute('x', lp.x); label.setAttribute('y', lp.y);
+  label.setAttribute('class', cls);
+  if (fontSize) label.setAttribute('font-size', fontSize);
+  const rot = labelRotation(lp.x, lp.y);
+  label.setAttribute('transform', `rotate(${rot} ${lp.x} ${lp.y})`);
+  label.textContent = text;
+  label.style.pointerEvents = 'none';
+  svg.appendChild(label);
+  return label;
+}
+
+function render(){
+  svg.innerHTML = '';
+  const coreNames = Object.keys(WHEEL);
+  const totalMiddles = coreNames.reduce((s,c) => s + Object.keys(WHEEL[c].middles).length, 0);
+
+  let angleCursor = 0;
+  const coreAngles = {};
+  coreNames.forEach(core => {
+    const count = Object.keys(WHEEL[core].middles).length;
+    const span = 360 * count / totalMiddles;
+    coreAngles[core] = { start: angleCursor, end: angleCursor + span };
+    angleCursor += span;
+  });
+
+  // ---- RING 1: core ----
+  coreNames.forEach(core => {
+    const { start, end } = coreAngles[core];
+    const isSelected = state.core === core;
+    const dim = state.level >= 1 && !isSelected;
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', arcPath(CX, CY, R[0], R[1], start, end));
+    path.setAttribute('fill', WHEEL[core].color);
+    path.setAttribute('opacity', dim ? 0.18 : 1);
+    path.classList.add('seg');
+    path.addEventListener('click', () => selectCore(core));
+    svg.appendChild(path);
+
+    const lp = labelPoint(CX, CY, R[0], R[1], start, end);
+    const lbl = addLabel(lp, core, 'seg-label core' + (WHEEL[core].light ? '' : ' light'));
+    lbl.setAttribute('opacity', dim ? 0.25 : 1);
+  });
+
+  // ---- RING 2 + RING 3 ----
+  coreNames.forEach(core => {
+    const { start, end } = coreAngles[core];
+    const middleNames = Object.keys(WHEEL[core].middles);
+    const showThisRing = state.level >= 1;
+    const isThisCore = state.core === core;
+    let cursor = start;
+    middleNames.forEach(mid => {
+      const span = (end - start) / middleNames.length;
+      const mStart = cursor, mEnd = cursor + span;
+      cursor += span;
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d', arcPath(CX, CY, R[1], R[2], mStart, mEnd));
+      path.setAttribute('fill', WHEEL[core].color);
+      let opacity = 0;
+      if (showThisRing) opacity = isThisCore ? (state.middle && state.middle !== mid ? 0.18 : 0.85) : 0.06;
+      path.setAttribute('opacity', opacity);
+      path.classList.add('seg');
+      if (isThisCore) path.addEventListener('click', () => selectMiddle(core, mid));
+      svg.appendChild(path);
+
+      if (showThisRing && isThisCore){
+        const lp = labelPoint(CX, CY, R[1], R[2], mStart, mEnd);
+        addLabel(lp, mid, 'seg-label' + (WHEEL[core].light ? '' : ' light'));
+      }
+
+      if (state.level >= 2 && isThisCore && state.middle === mid){
+        const outers = WHEEL[core].middles[mid];
+        let oCursor = mStart;
+        outers.forEach(word => {
+          const oSpan = (mEnd - mStart) / outers.length;
+          const oStart = oCursor, oEnd = oCursor + oSpan;
+          oCursor += oSpan;
+
+          const opath = document.createElementNS('http://www.w3.org/2000/svg','path');
+          opath.setAttribute('d', arcPath(CX, CY, R[2], R[3], oStart, oEnd));
+          opath.setAttribute('fill', WHEEL[core].color);
+          const outerSelected = state.outer === word;
+          opath.setAttribute('opacity', state.outer && !outerSelected ? 0.25 : 1);
+          opath.classList.add('seg');
+          opath.addEventListener('click', () => selectOuter(core, mid, word));
+          svg.appendChild(opath);
+
+          const olp = labelPoint(CX, CY, R[2], R[3], oStart, oEnd);
+          addLabel(olp, word, 'seg-label' + (WHEEL[core].light ? '' : ' light'), 8.3);
+        });
+      }
+    });
+  });
+
+  // ---- center label ----
+  const centerText = document.createElementNS('http://www.w3.org/2000/svg','text');
+  centerText.setAttribute('x', CX); centerText.setAttribute('y', CY - 4);
+  centerText.setAttribute('text-anchor','middle');
+  centerText.setAttribute('font-family',"'Fraunces', serif");
+  centerText.setAttribute('font-style','italic');
+  centerText.setAttribute('font-size','14');
+  centerText.setAttribute('fill','#ECF2F1');
+  centerText.textContent = state.core ? state.core : "How are you";
+  svg.appendChild(centerText);
+
+  const centerSub = document.createElementNS('http://www.w3.org/2000/svg','text');
+  centerSub.setAttribute('x', CX); centerSub.setAttribute('y', CY + 14);
+  centerSub.setAttribute('text-anchor','middle');
+  centerSub.setAttribute('font-size','9.5');
+  centerSub.setAttribute('fill','#8B9BA3');
+  centerSub.textContent = state.core ? "tap to reset this branch" : "feeling, right now?";
+  centerSub.style.cursor = state.core ? 'pointer' : 'default';
+  if (state.core) centerSub.addEventListener('click', resetAll);
+  svg.appendChild(centerSub);
+
+  renderBreadcrumb();
+  renderPanel();
+}
+
+function renderBreadcrumb(){
+  breadcrumbEl.innerHTML = '';
+  const parts = [];
+  if (state.core) parts.push({label: state.core, onClick: () => selectCore(state.core)});
+  if (state.middle) parts.push({label: state.middle, onClick: () => selectMiddle(state.core, state.middle)});
+  if (state.outer) parts.push({label: state.outer, onClick: null});
+  parts.forEach((p, i) => {
+    if (i > 0){ const sep = document.createElement('span'); sep.className='sep'; sep.textContent='›'; breadcrumbEl.appendChild(sep); }
+    const c = document.createElement('span');
+    c.className = 'crumb'; c.textContent = p.label;
+    if (p.onClick) c.addEventListener('click', p.onClick); else c.style.cursor='default';
+    breadcrumbEl.appendChild(c);
+  });
+  resetBtn.style.display = state.level > 0 ? 'block' : 'none';
+}
+
+function renderPanel(){
+  panel.innerHTML = '';
+  if (state.level === 0){
+    const hint = document.createElement('div');
+    hint.className = 'empty-hint';
+    hint.innerHTML = "Pick whichever core feeling sits closest to today.<br>You can always come back to the center.";
+    panel.appendChild(hint);
+    return;
+  }
+  if (state.level === 1){
+    const label = document.createElement('div'); label.className='stage-label'; label.textContent='STEP 2 OF 3';
+    const prompt = document.createElement('div'); prompt.className='prompt-line';
+    prompt.textContent = `You picked ${state.core}. Which of these feels closer?`;
+    const sub = document.createElement('div'); sub.className='prompt-sub';
+    sub.textContent = 'Tap a word on the wheel, or choose one here.';
+    panel.appendChild(label); panel.appendChild(prompt); panel.appendChild(sub);
+
+    const list = document.createElement('div'); list.className='option-list';
+    Object.keys(WHEEL[state.core].middles).forEach(mid => {
+      const b = document.createElement('button'); b.className='option-btn'; b.textContent = mid;
+      b.addEventListener('click', () => selectMiddle(state.core, mid));
+      list.appendChild(b);
+    });
+    panel.appendChild(list);
+    return;
+  }
+  if (state.level === 2){
+    const label = document.createElement('div'); label.className='stage-label'; label.textContent='STEP 3 OF 3';
+    const prompt = document.createElement('div'); prompt.className='prompt-line';
+    prompt.textContent = `${state.middle}. Can you get more specific?`;
+    const sub = document.createElement('div'); sub.className='prompt-sub';
+    sub.textContent = 'Whichever one lands — there\'s no wrong answer.';
+    panel.appendChild(label); panel.appendChild(prompt); panel.appendChild(sub);
+
+    const list = document.createElement('div'); list.className='option-list';
+    WHEEL[state.core].middles[state.middle].forEach(word => {
+      const b = document.createElement('button'); b.className='option-btn'; b.textContent = word;
+      b.addEventListener('click', () => selectOuter(state.core, state.middle, word));
+      list.appendChild(b);
+    });
+    panel.appendChild(list);
+    return;
+  }
+  if (state.level === 3){
+    const bucket = BUCKET[state.middle] || 'reflect';
+    const r = RESULTS[bucket];
+    const label = document.createElement('div'); label.className='stage-label'; label.textContent='BASED ON WHAT YOU SHARED';
+    const prompt = document.createElement('div'); prompt.className='prompt-line';
+    prompt.textContent = `"${state.outer}" — that's worth a closer look.`;
+    panel.appendChild(label); panel.appendChild(prompt);
+
+    const card = document.createElement('div'); card.className='result-card';
+    const badge = document.createElement('span'); badge.className = 'badge ' + (r.type === 'clinical' ? 'clinical' : 'reflect');
+    badge.textContent = r.badge;
+    const title = document.createElement('div'); title.className='result-title'; title.textContent = r.title;
+    const desc = document.createElement('div'); desc.className='result-desc'; desc.textContent = r.desc;
+    const cta = document.createElement('button');
+    cta.className = 'result-cta' + (r.type === 'reflect' ? ' soft' : '');
+    cta.textContent = r.type === 'reflect' ? 'Go to Self-Care Tools' : 'Take this test — 5 min';
+    if (r.testUrl) {
+      cta.addEventListener('click', () => {
+        window.location.href = r.testUrl;
+      });
+    }
+    card.appendChild(badge); card.appendChild(title); card.appendChild(desc); card.appendChild(cta);
+    panel.appendChild(card);
+  }
+}
+
+function selectCore(core){ state = { level: 1, core, middle: null, outer: null }; render(); }
+function selectMiddle(core, mid){ state = { level: 2, core, middle: mid, outer: null }; render(); }
+function selectOuter(core, mid, word){ state = { level: 3, core, middle: mid, outer: word }; render(); }
+function resetAll(){ state = { level: 0, core: null, middle: null, outer: null }; render(); }
+
+resetBtn.addEventListener('click', resetAll);
+render();
+</script>
+
+</body>
+</html>

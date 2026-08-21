@@ -231,6 +231,84 @@ export function initBookingWidget(config) {
                 </div>
             </div>
 
+            <!-- STEP 1: DATE SELECTION (HORIZONTAL CAROUSEL) -->
+            <div style="margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <label style="font-size:0.83rem; font-weight:700; color:#334155; text-transform:uppercase; letter-spacing:0.5px;">
+                        <i class="far fa-calendar-alt" style="color:#0d9488; margin-right:4px;"></i> Step 1: Select Date
+                    </label>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="font-size:0.75rem; color:#64748b;">More dates:</span>
+                        <input type="date"
+                               id="${rootId}-custom-date"
+                               style="
+                                   padding:4px 8px;
+                                   border-radius:8px;
+                                   border:1px solid rgba(148, 163, 184, 0.4);
+                                   font-size:0.8rem;
+                                   color:#0f172a;
+                                   background:#f8fafc;
+                                   cursor:pointer;
+                               ">
+                    </div>
+                </div>
+
+                <div class="bw-date-bar" id="${rootId}-date-bar">
+                    <!-- Dynamic Date Pills injected here -->
+                </div>
+            </div>
+
+            <!-- STEP 2: AVAILABLE TIME SLOTS (CATEGORIZED) -->
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-size:0.83rem; font-weight:700; color:#334155; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
+                    <i class="far fa-clock" style="color:#0d9488; margin-right:4px;"></i> Step 2: Pick Time Slot
+                </label>
+                <div id="${rootId}-slots"
+                     style="
+                        min-height:70px;
+                        padding:14px 16px;
+                        background:#f8fafc;
+                        border-radius:16px;
+                        border:1px solid rgba(148, 163, 184, 0.25);
+                     ">
+                    <div style="font-size:0.85rem; color:#64748b; padding:10px 0;">
+                        <i class="fas fa-spinner fa-spin"></i> Checking availability...
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: PLAN SELECTOR -->
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-size:0.83rem; font-weight:700; color:#334155; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">
+                    <i class="fas fa-tag" style="color:#0d9488; margin-right:4px;"></i> Step 3: Select Plan
+                </label>
+                <select id="${rootId}-plan"
+                        style="
+                           width:100%;
+                           padding:11px 14px;
+                           border-radius:12px;
+                           border:1px solid rgba(148, 163, 184, 0.5);
+                           font-size:0.9rem;
+                           color:#0f172a;
+                           background:#ffffff;
+                           cursor:pointer;
+                        ">
+                    <option value="${PEER_PLAN_TYPES.PER_SESSION}">
+                        ${DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION].name} – ₹${DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION].price}
+                    </option>
+                    <option value="${PEER_PLAN_TYPES.MONTHLY}">
+                        ${DEFAULT_PLANS[PEER_PLAN_TYPES.MONTHLY].name} – ₹${DEFAULT_PLANS[PEER_PLAN_TYPES.MONTHLY].price}
+                    </option>
+                    <option value="${PEER_PLAN_TYPES.QUARTERLY}">
+                        ${DEFAULT_PLANS[PEER_PLAN_TYPES.QUARTERLY].name} – ₹${DEFAULT_PLANS[PEER_PLAN_TYPES.QUARTERLY].price}
+                    </option>
+                    <option value="${PEER_PLAN_TYPES.YEARLY}">
+                        ${DEFAULT_PLANS[PEER_PLAN_TYPES.YEARLY].name} – ₹${DEFAULT_PLANS[PEER_PLAN_TYPES.YEARLY].price}
+                    </option>
+                </select>
+            </div>
+
+            <!-- STEP 4: GUEST / ACCOUNT DETAILS -->
             <div id="${rootId}-guest-fields" style="margin-bottom:18px; display:block;">
                 <div style="display:flex; flex-wrap:wrap; gap:14px;">
                     <div style="flex:1 1 200px;">
@@ -268,102 +346,29 @@ export function initBookingWidget(config) {
                                ">
                     </div>
                 </div>
-                <!-- OPTIONAL PRE-SESSION INTAKE PASSKEY FIELD -->
-                <div style="margin-top:14px;">
-                    <label style="display:block; font-size:0.8rem; font-weight:600; color:#0d9488; margin-bottom:6px;">
-                        🔑 Assessment Passkey (Optional)
-                    </label>
-                    <input type="text"
-                           id="${rootId}-passkey"
-                           placeholder="e.g. PASS-8821 (attaches diagnostic intake summary)"
-                           style="
-                               width:100%;
-                               padding:11px 14px;
-                               border-radius:12px;
-                               border:1px dashed rgba(78, 205, 196, 0.6);
-                               font-size:0.9rem;
-                               color:#0f172a;
-                               background:#f0fdfa;
-                           ">
-                    <span style="font-size:0.75rem; color:#64748b; display:block; margin-top:4px;">
-                        <i class="fas fa-shield-alt" style="color:#0d9488;"></i> Sharing your passkey allows your practitioner to review your assessment before your session starts.
-                    </span>
-                </div>
-            </div>
-
-            <!-- STEP 1: DATE SELECTION (HORIZONTAL CAROUSEL) -->
-            <div style="margin-bottom:18px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <label style="font-size:0.83rem; font-weight:700; color:#334155; text-transform:uppercase; letter-spacing:0.5px;">
-                        <i class="far fa-calendar-alt" style="color:#0d9488; margin-right:4px;"></i> Select Date
-                    </label>
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <span style="font-size:0.75rem; color:#64748b;">More dates:</span>
-                        <input type="date"
-                               id="${rootId}-custom-date"
+                <!-- OPTIONAL PRE-SESSION INTAKE PASSKEY (COLLAPSIBLE TOGGLE) -->
+                <div style="margin-top:12px;">
+                    <button type="button" 
+                            id="${rootId}-passkey-toggle" 
+                            style="background:none; border:none; color:#0d9488; font-size:0.8rem; font-weight:600; cursor:pointer; padding:0; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="fas fa-key"></i> + Have an Assessment Passkey? (Optional)
+                    </button>
+                    <div id="${rootId}-passkey-wrapper" style="display:none; margin-top:8px;">
+                        <input type="text"
+                               id="${rootId}-passkey"
+                               placeholder="e.g. PASS-8821 (attaches diagnostic intake summary)"
                                style="
-                                   padding:4px 8px;
-                                   border-radius:8px;
-                                   border:1px solid rgba(148, 163, 184, 0.4);
-                                   font-size:0.8rem;
+                                   width:100%;
+                                   padding:10px 14px;
+                                   border-radius:12px;
+                                   border:1px dashed rgba(78, 205, 196, 0.6);
+                                   font-size:0.85rem;
                                    color:#0f172a;
-                                   background:#f8fafc;
-                                   cursor:pointer;
+                                   background:#f0fdfa;
                                ">
-                    </div>
-                </div>
-
-                <div class="bw-date-bar" id="${rootId}-date-bar">
-                    <!-- Dynamic Date Pills injected here -->
-                </div>
-            </div>
-
-            <!-- STEP 2: PLAN SELECTOR -->
-            <div style="margin-bottom:18px;">
-                <label style="display:block; font-size:0.83rem; font-weight:700; color:#334155; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">
-                    <i class="fas fa-tag" style="color:#0d9488; margin-right:4px;"></i> Select Plan
-                </label>
-                <select id="${rootId}-plan"
-                        style="
-                           width:100%;
-                           padding:11px 14px;
-                           border-radius:12px;
-                           border:1px solid rgba(148, 163, 184, 0.5);
-                           font-size:0.9rem;
-                           color:#0f172a;
-                           background:#ffffff;
-                           cursor:pointer;
-                        ">
-                    <option value="${PEER_PLAN_TYPES.PER_SESSION}">
-                        ${DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION].name} – ₹${DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION].price}
-                    </option>
-                    <option value="${PEER_PLAN_TYPES.MONTHLY}">
-                        ${DEFAULT_PLANS[PEER_PLAN_TYPES.MONTHLY].name} – ₹${DEFAULT_PLANS[PEER_PLAN_TYPES.MONTHLY].price}
-                    </option>
-                    <option value="${PEER_PLAN_TYPES.QUARTERLY}">
-                        ${DEFAULT_PLANS[PEER_PLAN_TYPES.QUARTERLY].name} – ₹${DEFAULT_PLANS[PEER_PLAN_TYPES.QUARTERLY].price}
-                    </option>
-                    <option value="${PEER_PLAN_TYPES.YEARLY}">
-                        ${DEFAULT_PLANS[PEER_PLAN_TYPES.YEARLY].name} – ₹${DEFAULT_PLANS[PEER_PLAN_TYPES.YEARLY].price}
-                    </option>
-                </select>
-            </div>
-
-            <!-- STEP 3: AVAILABLE TIME SLOTS (CATEGORIZED) -->
-            <div>
-                <label style="display:block; font-size:0.83rem; font-weight:700; color:#334155; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
-                    <i class="far fa-clock" style="color:#0d9488; margin-right:4px;"></i> Available Time Slots
-                </label>
-                <div id="${rootId}-slots"
-                     style="
-                        min-height:70px;
-                        padding:12px 14px;
-                        background:#f8fafc;
-                        border-radius:16px;
-                        border:1px solid rgba(148, 163, 184, 0.25);
-                     ">
-                    <div style="font-size:0.85rem; color:#64748b; padding:10px 0;">
-                        <i class="fas fa-spinner fa-spin"></i> Checking availability...
+                        <span style="font-size:0.75rem; color:#64748b; display:block; margin-top:4px;">
+                            <i class="fas fa-shield-alt" style="color:#0d9488;"></i> Sharing your passkey allows your practitioner to review your assessment before your session starts.
+                        </span>
                     </div>
                 </div>
             </div>
@@ -385,7 +390,7 @@ export function initBookingWidget(config) {
                         box-shadow: 0 4px 18px rgba(78, 205, 196, 0.4);
                         transition: all 0.2s ease;
                     ">
-                Confirm Booking Request
+                Proceed to Payment (₹500)
             </button>
         </div>
     `;
@@ -475,7 +480,7 @@ export function initBookingWidget(config) {
             return `
                 <div class="bw-category-title">
                     <span>${icon}</span> ${title} 
-                    <span style="font-size:0.72rem; font-weight:600; color:#475569; background:rgba(148, 163, 184, 0.2); padding:2px 8px; border-radius:12px; margin-left:4px;">
+                    <span style="font-size:0.72rem; font-weight:600; color:#0d9488; background:rgba(78, 205, 196, 0.15); padding:2px 8px; border-radius:12px; margin-left:4px;">
                         ${openCount} available
                     </span>
                 </div>
@@ -485,7 +490,8 @@ export function initBookingWidget(config) {
                         const isAvail = slot.available !== false;
                         const slotClass = !isAvail ? "bw-time-pill unavailable" : (isSelected ? "bw-time-pill selected" : "bw-time-pill");
                         const iconCheck = isSelected ? '<i class="fas fa-check-circle"></i> ' : '';
-                        return `<button type="button" class="${slotClass}" data-start="${slot.start.getTime()}" ${!isAvail ? 'disabled' : ''}>${iconCheck}${slot.display}</button>`;
+                        const displayWithTz = `${slot.display} <span style="font-size:0.7rem; opacity:0.7;">IST</span>`;
+                        return `<button type="button" class="${slotClass}" data-start="${slot.start.getTime()}" ${!isAvail ? 'disabled' : ''}>${iconCheck}${displayWithTz}</button>`;
                     }).join("")}
                 </div>
             `;
@@ -493,21 +499,33 @@ export function initBookingWidget(config) {
 
         let html = "";
         const totalOpen = currentSlots.filter(s => s.available !== false).length;
-        html += `<div style="font-size:0.8rem; font-weight:700; color:#0d9488; margin-bottom:6px;">Showing all ${currentSlots.length} generated slots (${totalOpen} open for booking)</div>`;
+        html += `<div style="font-size:0.83rem; font-weight:700; color:#0d9488; margin-bottom:8px; display:flex; align-items:center; gap:6px;"><i class="fas fa-calendar-check"></i> ${totalOpen} open slot${totalOpen === 1 ? '' : 's'} available</div>`;
         html += renderSlotGroup("Morning", "🌅", morningSlots);
         html += renderSlotGroup("Afternoon", "☀️", afternoonSlots);
         html += renderSlotGroup("Evening", "🌙", eveningSlots);
 
         slotsContainer.innerHTML = html;
 
-        // Auto pre-fill passkey from URL params or sessionStorage
+        // Auto pre-fill passkey from URL params or sessionStorage & handle toggle
         setTimeout(() => {
             const urlParams = new URLSearchParams(window.location.search);
             const passkeyFromUrl = urlParams.get('passkey');
             const passkeyFromStorage = sessionStorage.getItem('soulamore_intake_passkey');
             const passEl = document.getElementById(`${rootId}-passkey`);
+            const passToggle = document.getElementById(`${rootId}-passkey-toggle`);
+            const passWrapper = document.getElementById(`${rootId}-passkey-wrapper`);
+
             if (passEl && !passEl.value && (passkeyFromUrl || passkeyFromStorage)) {
                 passEl.value = passkeyFromUrl || passkeyFromStorage;
+            }
+            if (passEl && passEl.value && passWrapper) {
+                passWrapper.style.display = "block";
+            }
+            if (passToggle && passWrapper) {
+                passToggle.addEventListener("click", () => {
+                    const isHidden = passWrapper.style.display === "none" || !passWrapper.style.display;
+                    passWrapper.style.display = isHidden ? "block" : "none";
+                });
             }
         }, 400);
 

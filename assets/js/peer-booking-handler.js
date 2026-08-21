@@ -373,6 +373,13 @@ export async function getAvailableSlots(peerId, date) {
                 const bookingEnd = slotEnd.getTime();
                 let isAvailable = true;
 
+                // Check if slot is in the past or within minimum lead-time buffer (30 minutes notice)
+                const now = Date.now();
+                const minLeadTimeMs = 30 * 60 * 1000; // 30 minutes lead-time notice
+                if (bookingStart <= (now + minLeadTimeMs)) {
+                    isAvailable = false;
+                }
+
                 for (const booking of busySlots) {
                     let existingStart;
                     let existingEnd;
