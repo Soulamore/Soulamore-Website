@@ -571,7 +571,34 @@
                 return;
             }
 
-            const post = getPostById(postId);
+            let post = getPostById(postId);
+
+            if (!post) {
+                try {
+                    const docSnap = await getDoc(doc(db, 'blogs', postId));
+                    if (docSnap.exists()) {
+                        const d = docSnap.data();
+                        post = {
+                            id: docSnap.id,
+                            title: d.title || 'Untitled Story',
+                            author: d.author || 'Soulamore Editorial',
+                            authorRole: d.authorRole || 'Editorial',
+                            authorBio: d.authorBio || 'Mental health advocate and writer at Soulamore.',
+                            authorImage: d.authorImage || '../../assets/images/Founder/Aditya%20Harsh.jpg',
+                            type: d.pillar ? (d.pillar.toLowerCase().includes('expert') || d.pillar.toLowerCase().includes('psych') ? 'Psychologist' : 'Peer') : 'Peer',
+                            topic: d.pillar || 'Mental Health',
+                            date: d.publishedAt ? new Date(d.publishedAt.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently Published',
+                            readTime: (d.readTimeMinutes || 4) + ' min',
+                            image: d.image || 'https://images.unsplash.com/photo-1544365558-35aa4afcf11f?auto=format&fit=crop&w=800&q=80',
+                            excerpt: d.metaDescription || '',
+                            content: d.content || '<p>Content coming soon.</p>',
+                            likes: d.likes || 0
+                        };
+                    }
+                } catch (err) {
+                    console.warn("⚠️ Firestore blog fallback error:", err);
+                }
+            }
 
             if (post) {
                 // UPDATE METADATA
