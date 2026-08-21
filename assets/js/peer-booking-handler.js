@@ -239,6 +239,15 @@ export async function createBookingWithConcurrencyLock(peerId, userId, startTime
     const startMs = new Date(startTime).getTime();
     const endMs = new Date(endTime).getTime();
 
+    // Reject reservation attempts for past time slots (with 1-min clock drift tolerance)
+    if (startMs <= (now - 60000)) {
+        return {
+            success: false,
+            locked: false,
+            message: "🚨 Cannot reserve a slot in the past. Please select a future date and time."
+        };
+    }
+
     // Query existing bookings for this peer around the same timeframe
     const q = query(
         collection(db, PEER_BOOKINGS_COLLECTION),
@@ -373,6 +382,13 @@ export async function getAvailableSlots(peerId, date) {
                 const bookingEnd = slotEnd.getTime();
                 let isAvailable = true;
 
+                // Check if slot is in the past or within minimum lead-time buffer (30 minutes notice)
+                const now = Date.now();
+                const minLeadTimeMs = 30 * 60 * 1000; // 30 minutes lead-time notice
+                if (bookingStart <= (now + minLeadTimeMs)) {
+                    isAvailable = false;
+                }
+
                 for (const booking of busySlots) {
                     let existingStart;
                     let existingEnd;
@@ -482,7 +498,10 @@ export async function createBookingRequest(userId, peerId, planType, startTime, 
     const plan = DEFAULT_PLANS[planType] || DEFAULT_PLANS[PEER_PLAN_TYPES.PER_SESSION];
     const slId = generateSLID();
     const isoStart = typeof startTime === 'string' ? startTime : new Date(startTime).toISOString();
-    const isoEnd = typeof endTime === 'string' ? endTime : new Date(endTime).toISOString();
+    const startMs = new Date(startTime).getTime();
+    if (startMs <= (Date.now() - 60000)) {
+        throw new Error("Cannot create a booking for a past date or time. Please select a future time slot.");
+    }
 
     // 1. Direct Firestore creation (Instant 0ms CORS-free write)
     try {

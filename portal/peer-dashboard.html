@@ -3125,6 +3125,10 @@ You don't need to arrive with clarity. We can find it together, or simply sit wi
                     if (!dateStr) return;
 
                     const startTime = new Date(dateStr);
+                    if (isNaN(startTime.getTime()) || startTime.getTime() <= Date.now()) {
+                        alert("Cannot book a session in the past. Please select a future date and time.");
+                        return;
+                    }
                     const endTime = new Date(startTime);
                     endTime.setHours(startTime.getHours() + 1);
 
