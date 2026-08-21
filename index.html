@@ -345,7 +345,20 @@
             color: var(--text-muted);
         }
 
+        /* --- FEELING WHEEL SVG STYLES --- */
+        .seg { cursor: pointer; transition: opacity 0.35s ease, filter 0.35s ease; }
+        .seg:hover { filter: brightness(1.18); }
+        .seg-label { font-size: 9px; fill: #0A0F14; font-weight: 600; pointer-events: none; text-anchor: middle; dominant-baseline: middle; }
+        .seg-label.light { fill: #ECF2F1; }
+        .seg-label.core { font-size: 12px; font-weight: 700; }
+
         /* Responsive Mobile */
+        @media (max-width: 860px) {
+            .feeling-wheel-hero-box > div:last-child {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
         @media (max-width: 768px) {
             .hero-title {
                 font-size: 2.3rem;
@@ -378,6 +391,34 @@
                 <p class="hero-subtitle">
                     Map your overthinking, workplace burnout, relocation isolation, or grief spikes with zero judgment. Instant AI reflections, private passkeys, and zero cold-start care matching.
                 </p>
+
+                <!-- 🎨 INTERACTIVE FEELING WHEEL & ASSESSMENT DISCOVERY -->
+                <div class="feeling-wheel-hero-box" style="margin: 35px 0 45px 0; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(78, 205, 196, 0.25); border-radius: 24px; padding: 32px 24px; box-shadow: 0 15px 45px rgba(0,0,0,0.4);">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <span style="font-size: 0.78rem; font-weight: 700; color: #fbbf24; letter-spacing: 1.2px; text-transform: uppercase;">Interactive Emotion Discovery</span>
+                        <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; margin: 6px 0 8px 0; color: #f1f5f9;">Or, Start With How You're Feeling</h2>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 560px; margin: 0 auto; line-height: 1.6;">Tap a core emotion on the wheel to narrow down your feelings, and we'll instantly match you to the right clinical assessment test.</p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 32px; align-items: start; text-align: left;">
+                        <!-- LEFT COLUMN: SVG Feeling Wheel -->
+                        <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                            <div style="position: relative; max-width: 480px; width: 100%;">
+                                <svg id="homepageWheelSvg" viewBox="0 0 560 560" width="100%" height="auto"></svg>
+                            </div>
+                            <div id="homepageBreadcrumb" style="display: flex; gap: 8px; font-size: 0.85rem; color: var(--text-muted); margin-top: 16px; flex-wrap: wrap; justify-content: center; min-height: 24px;"></div>
+                            <button id="homepageResetBtn" style="display: none; margin-top: 10px; background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #4ECDC4; padding: 5px 16px; border-radius: 50px; font-size: 0.78rem; font-weight: 600; cursor: pointer;">Start Over</button>
+                        </div>
+
+                        <!-- RIGHT COLUMN: Dynamic Test Matcher Card -->
+                        <div id="homepageWheelPanel" style="background: rgba(11, 17, 32, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 24px; min-height: 420px; display: flex; flex-direction: column; justify-content: center; width: 100%;">
+                            <div id="emptyHint" style="color: #64748b; font-size: 0.9rem; text-align: center; line-height: 1.6;">
+                                <i class="fas fa-compass" style="font-size: 2rem; color: #4ECDC4; margin-bottom: 12px; display: block;"></i>
+                                Pick whichever core feeling sits closest to today.<br><span style="font-size: 0.82rem; color: #475569;">You can always tap the center to reset.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Search Input -->
                 <div class="assessment-search-box">
@@ -575,6 +616,78 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderHomepageAssessments();
+        });
+    </script>
+
+    <!-- FEELING WHEEL HOMEPAGE INITIALIZATION -->
+    <script type="module">
+        import { initFeelingWheel, EMOTION_BUCKETS, ASSESSMENT_MATCHES, WHEEL_DATA } from './assets/js/feeling-wheel-engine.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const svg = document.getElementById('homepageWheelSvg');
+            const breadcrumb = document.getElementById('homepageBreadcrumb');
+            const resetBtn = document.getElementById('homepageResetBtn');
+            const panel = document.getElementById('homepageWheelPanel');
+
+            if (!svg || !panel) return;
+
+            initFeelingWheel(svg, breadcrumb, resetBtn, (state) => {
+                if (state.level === 0) {
+                    panel.innerHTML = `
+                        <div style="color: #64748b; font-size: 0.9rem; text-align: center; line-height: 1.6;">
+                            <i class="fas fa-compass" style="font-size: 2rem; color: #4ECDC4; margin-bottom: 12px; display: block;"></i>
+                            Pick whichever core feeling sits closest to today.<br><span style="font-size: 0.82rem; color: #475569;">You can always tap the center to reset.</span>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (state.level === 1) {
+                    let html = `
+                        <div style="font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">STEP 2 OF 3</div>
+                        <div style="font-size: 1.15rem; font-weight: 700; color: #f1f5f9; margin-bottom: 6px;">You picked ${state.core}. Which feels closer?</div>
+                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">Tap a word on the wheel or select below:</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                    `;
+                    Object.keys(WHEEL_DATA[state.core].middles).forEach(mid => {
+                        html += `<div style="text-align: left; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #f1f5f9; padding: 10px 14px; border-radius: 10px; font-size: 0.88rem;">${mid}</div>`;
+                    });
+                    html += `</div>`;
+                    panel.innerHTML = html;
+                    return;
+                }
+
+                if (state.level === 2) {
+                    let html = `
+                        <div style="font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">STEP 3 OF 3</div>
+                        <div style="font-size: 1.15rem; font-weight: 700; color: #f1f5f9; margin-bottom: 6px;">${state.middle}. Can you get more specific?</div>
+                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">Whichever one lands — there's no wrong answer:</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                    `;
+                    WHEEL_DATA[state.core].middles[state.middle].forEach(word => {
+                        html += `<div style="text-align: left; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #f1f5f9; padding: 10px 14px; border-radius: 10px; font-size: 0.88rem;">${word}</div>`;
+                    });
+                    html += `</div>`;
+                    panel.innerHTML = html;
+                    return;
+                }
+
+                if (state.level === 3) {
+                    const bucket = EMOTION_BUCKETS[state.middle] || 'reflect';
+                    const match = ASSESSMENT_MATCHES[bucket];
+                    const testUrl = match.link.replace('/spaces/assessments/', 'spaces/assessments/').replace('/tools/', 'tools/');
+                    panel.innerHTML = `
+                        <div style="font-size: 0.72rem; font-weight: 700; color: #4ECDC4; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">RECOMMENDED ASSESSMENT MATCH</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin-bottom: 8px;">"${state.outer}"</div>
+                        <span style="display: inline-block; font-size: 0.7rem; font-weight: 700; background: rgba(78, 205, 196, 0.15); color: #4ECDC4; border: 1px solid rgba(78, 205, 196, 0.3); padding: 4px 12px; border-radius: 50px; margin-bottom: 14px;">${match.badge}</span>
+                        <div style="font-size: 1.05rem; font-weight: 700; color: #f1f5f9; margin-bottom: 8px;">${match.title}</div>
+                        <div style="font-size: 0.88rem; color: #94a3b8; line-height: 1.5; margin-bottom: 20px;">${match.desc}</div>
+                        <a href="${testUrl}" style="display: block; width: 100%; text-align: center; background: linear-gradient(135deg, #4ECDC4, #2DD4BF); color: #0f172a; font-weight: 700; font-size: 0.9rem; padding: 12px; border-radius: 12px; text-decoration: none; box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3); transition: transform 0.2s;">
+                            ${match.cta} <i class="fas fa-arrow-right" style="margin-left: 6px;"></i>
+                        </a>
+                    `;
+                }
+            });
         });
     </script>
     <script type="module" src="assets/js/global-prefetch.js"></script>
