@@ -2415,10 +2415,12 @@
         window.v2BookSessionForClient = async function() {
             const clientEmail = document.getElementById('v2PeerClientEmail')?.value;
             const dateStr = document.getElementById('v2PeerSessionDate')?.value;
-            if (!clientEmail || !dateStr) {
-                alert('Please fill out client email and session date/time.');
+            const sessionTime = new Date(dateStr).getTime();
+            if (isNaN(sessionTime) || sessionTime <= Date.now()) {
+                alert('Cannot book a session in the past. Please select a future date and time.');
                 return;
             }
+
             try {
                 await addDoc(collection(db, 'peer_bookings'), {
                     peerId: auth.currentUser.uid,
